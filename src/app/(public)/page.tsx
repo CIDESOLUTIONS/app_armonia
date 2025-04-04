@@ -11,7 +11,7 @@ import {
   Mail, Shield, Phone, Home,  
   BarChart, MessageSquare  
 } from 'lucide-react'; 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ROUTES } from '@/constants/routes';
 
 interface FormData { 
@@ -30,13 +30,7 @@ interface Feature {
 
 export default function LandingPage() {
   const router = useRouter();
-  const auth = useAuth();
-
-  if (auth.loading) {
-    return <div>Cargando...</div>;
-  }
-
-  const { isLoggedIn, loading: authLoading } = useAuth();
+  const { isLoggedIn, loading: authLoading, adminName } = useAuth();
   const [formData, setFormData] = useState<FormData>({ 
     complexName: '', 
     totalUnits: '', 
@@ -304,8 +298,8 @@ export default function LandingPage() {
         setLanguage={setLanguage}
         currency={currency}
         setCurrency={setCurrency}
-        isLoggedIn={auth.isLoggedIn}
-        adminName={auth.adminName || ''}
+        isLoggedIn={isLoggedIn}
+        adminName={adminName || ''}
       />
     )}
     
@@ -342,19 +336,16 @@ export default function LandingPage() {
             transition={{ duration: 0.8 }}
             className="w-full h-48 sm:h-64 overflow-hidden rounded-lg shadow-md"
           >
-            <AnimatePresence mode="wait">
-              <motion.img
+            <motion.img
                 key={currentImageIndex}
                 src={images[currentImageIndex]}
                 alt="Community management"
                 className="w-full h-full object-cover"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
                 transition={{ duration: 0.5 }}
                 loading="lazy"
               />
-            </AnimatePresence>
           </motion.div>
 
           <motion.div

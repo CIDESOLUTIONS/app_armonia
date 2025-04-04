@@ -1,12 +1,24 @@
+// src/app/api/logout/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { ServerLogger } from '@/lib/logging/server-logger';
 
 export async function POST(req: NextRequest) {
   try {
-    const response = NextResponse.json({ message: 'Sesión cerrada exitosamente' }, { status: 200 });
-    response.cookies.delete('token'); // Elimina la cookie del token
-    return response;
+    ServerLogger.info('Cerrando sesión');
+    
+    // Eliminar la cookie de token estableciendo su expiración al pasado
+    cookies().set({
+      name: 'token',
+      value: '',
+      expires: new Date(0),
+      path: '/',
+    });
+    
+    ServerLogger.info('Sesión cerrada exitosamente');
+    return NextResponse.json({ message: 'Sesión cerrada exitosamente' }, { status: 200 });
   } catch (error) {
-    console.error('[API Logout] Error:', error);
+    ServerLogger.error('[API Logout] Error:', error);
     return NextResponse.json({ message: 'Error al cerrar sesión' }, { status: 500 });
   }
 }

@@ -4,6 +4,7 @@ import { getPrisma } from "@/lib/prisma";
 import { generateToken } from "@/lib/auth";
 import bcrypt from "bcrypt";
 import { ServerLogger } from "@/lib/logging/server-logger";
+import { cookies } from "next/headers";
 
 export async function POST(req: NextRequest) {
   try {
@@ -41,6 +42,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Preparar la respuesta
+    const response = NextResponse.next();
+    
     // Si el usuario no está asociado a un conjunto, es un administrador global
     if (!user.complexId) {
       ServerLogger.info(`Login exitoso para administrador global: ${email}`);
@@ -52,7 +56,18 @@ export async function POST(req: NextRequest) {
         isGlobalAdmin: true
       };
 
-      const token = generateToken(payload);
+      const token = await generateToken(payload);
+      
+      // Establecer cookie segura con el token (7 días de expiración)
+      cookies().set({
+        name: 'token',
+        value: token,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 7, // 7 días
+        path: '/',
+        sameSite: 'strict'
+      });
 
       return NextResponse.json({ 
         token, 
@@ -91,7 +106,18 @@ export async function POST(req: NextRequest) {
         complexName: complexData.name
       };
 
-      const token = generateToken(payload);
+      const token = await generateToken(payload);
+      
+      // Establecer cookie segura con el token (7 días de expiración)
+      cookies().set({
+        name: 'token',
+        value: token,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 7, // 7 días
+        path: '/',
+        sameSite: 'strict'
+      });
 
       return NextResponse.json({ 
         token, 

@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/layout/header";
-import Sidebar from "@/components/layout/sidebar";
+import Sidebar from "@/components/layout/Sidebar";
 import { useAuth } from "@/context/AuthContext";
 import { Loader2 } from "lucide-react";
 import { ROUTES } from "@/constants/routes";

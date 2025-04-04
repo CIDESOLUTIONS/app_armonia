@@ -1,40 +1,89 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { jwtVerify, JWTVerifyResult } from 'jose';
+import { jwtVerify, JWTVerifyResult, SignJWT } from 'jose';
 import { ServerLogger } from './logging/server-logger';
 
 // Interfaz para el payload del token JWT
 export interface JWTPayload {
-  userId: number;
+  id: number;
   email: string;
   role: string;
+  name?: string;
   complexId?: number;
   schemaName?: string;
-  iat: number;
-  exp: number;
+  complexName?: string;
+  isGlobalAdmin?: boolean;
+  iat?: number;
+  exp?: number;
+}
+
+// Obtener secreto JWT
+export function getJwtSecret() {
+  const secretKey = process.env.JWT_SECRET || 'default_secret';
+  return new TextEncoder().encode(secretKey);
+}
+
+// Obtener token de diferentes fuentes
+export function getToken(request: NextRequest): string | null {
+  // Verificar primero en las cabeceras de autorización
+  const authHeader = request.headers.get('authorization');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return authHeader.split(' ')[1];
+  }
+  
+  // Si no está en las cabeceras, verificar en cookies
+  const tokenCookie = request.cookies.get('token');
+  if (tokenCookie) {
+    return tokenCookie.value;
+  }
+  
+  return null;
+}
+
+// Generar token JWT
+export async function generateToken(payload: Partial<JWTPayload>): Promise<string> {
+  try {
+    const encodedSecret = getJwtSecret();
+    
+    // Crear token con jose
+    const token = await new SignJWT({ ...payload })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('24h')
+      .sign(encodedSecret);
+    
+    return token;
+  } catch (error) {
+    ServerLogger.error('Error generando token JWT:', error);
+    throw new Error('Error en la generación del token');
+  }
 }
 
 // Función para verificar autenticación
 export async function verifyAuth(request: NextRequest) {
   try {
-    // Obtener el token de la cabecera Authorization
-    const authHeader = request.headers.get('authorization');
+    // Obtener el token
+    const token = getToken(request);
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      ServerLogger.warn('Autenticación fallida: No hay token Bearer');
+    if (!token) {
+      ServerLogger.warn('Autenticación fallida: No hay token');
       return { auth: false, payload: null };
     }
-    
-    const token = authHeader.split(' ')[1];
 
     // Verificar el token
-    const secretKey = new TextEncoder().encode(process.env.JWT_SECRET || 'default_secret');
+    const secretKey = getJwtSecret();
     
     try {
-      const { payload } = await jwtVerify(token, secretKey) as JWTVerifyResult & { payload: JWTPayload };
+      const { payload } = await jwtVerify(token, secretKey);
       
-      ServerLogger.debug('Token verificado correctamente', { userId: payload.userId });
+      // Asegurar que el payload tenga los campos mínimos requeridos
+      if (!payload.id || !payload.email || !payload.role) {
+        ServerLogger.warn('Token JWT con datos incompletos');
+        return { auth: false, payload: null };
+      }
       
-      return { auth: true, payload };
+      ServerLogger.debug('Token verificado correctamente', { userId: payload.id });
+      
+      return { auth: true, payload: payload as JWTPayload };
     } catch (jwtError) {
       ServerLogger.warn('Token JWT inválido', { error: jwtError });
       return { auth: false, payload: null };
@@ -62,7 +111,7 @@ export async function authMiddleware(
   // Verificar roles
   if (!allowedRoles.includes(payload.role)) {
     ServerLogger.warn('Acceso denegado por rol', { 
-      userId: payload.userId, 
+      userId: payload.id, 
       role: payload.role, 
       allowedRoles 
     });

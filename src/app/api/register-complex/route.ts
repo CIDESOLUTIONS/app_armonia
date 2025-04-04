@@ -39,8 +39,8 @@ export async function POST(req: NextRequest) {
     const complex = await prisma.$queryRawUnsafe(
       `INSERT INTO "armonia"."ResidentialComplex" (
         name, "schemaName", "totalUnits", "adminEmail", "adminName", "adminPhone", 
-        address, city, state, country, "propertyTypes", "createdAt"
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW()) RETURNING *`,
+        address, city, state, country, "propertyTypes", "createdAt", "updatedAt"
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW(), NOW()) RETURNING *`,
       complexName,
       schemaName,
       totalUnits,
@@ -50,8 +50,8 @@ export async function POST(req: NextRequest) {
       address || null,
       city || null,
       state || null,
-      country || null,
-      propertyTypes ? JSON.stringify(propertyTypes) : null
+      country || 'Colombia',
+      propertyTypes ? JSON.stringify(propertyTypes) : JSON.stringify([])
     );
     console.log('[API Register-Complex] Resultado de complex:', complex[0]);
 
@@ -59,8 +59,8 @@ export async function POST(req: NextRequest) {
     const hashedPassword = await bcrypt.hash(adminPassword, 10);
     const user = await prisma.$queryRawUnsafe(
       `INSERT INTO "armonia"."User" (
-        email, name, password, "complexId", role, "createdAt"
-      ) VALUES ($1, $2, $3, $4, 'COMPLEX_ADMIN', NOW()) RETURNING *`,
+        email, name, password, "complexId", role, "createdAt", "updatedAt"
+      ) VALUES ($1, $2, $3, $4, 'COMPLEX_ADMIN', NOW(), NOW()) RETURNING *`,
       adminEmail,
       adminName,
       hashedPassword,
@@ -77,6 +77,7 @@ export async function POST(req: NextRequest) {
         definition: `(
           id SERIAL PRIMARY KEY,
           "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           name TEXT NOT NULL,
           address TEXT,
           "totalUnits" INTEGER NOT NULL,
@@ -94,6 +95,7 @@ export async function POST(req: NextRequest) {
         definition: `(
           id SERIAL PRIMARY KEY,
           "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           "complexId" INTEGER NOT NULL,          
           "unitNumber" TEXT NOT NULL,
           type TEXT NOT NULL,
@@ -110,6 +112,7 @@ export async function POST(req: NextRequest) {
         definition: `(
           id SERIAL PRIMARY KEY,
           "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           email TEXT NOT NULL UNIQUE,
           name TEXT NOT NULL,
           password TEXT NOT NULL,
@@ -122,6 +125,7 @@ export async function POST(req: NextRequest) {
         definition: `(
           id SERIAL PRIMARY KEY,
           "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           "userId" INTEGER UNIQUE NOT NULL,
           "propertyId" INTEGER NOT NULL,
           "complexId" INTEGER NOT NULL,
@@ -136,6 +140,7 @@ export async function POST(req: NextRequest) {
         definition: `(
           id SERIAL PRIMARY KEY,
           "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           name TEXT NOT NULL,
           description TEXT,
           capacity INTEGER,
@@ -152,6 +157,7 @@ export async function POST(req: NextRequest) {
         definition: `(
           id SERIAL PRIMARY KEY,
           "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           title TEXT NOT NULL,
           date TIMESTAMP NOT NULL,
           status TEXT DEFAULT 'PENDING',
@@ -169,6 +175,7 @@ export async function POST(req: NextRequest) {
         definition: `(
           id SERIAL PRIMARY KEY,
           "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           "assemblyId" INTEGER NOT NULL,
           "residentId" INTEGER NOT NULL,
           confirmed BOOLEAN DEFAULT FALSE,
@@ -182,6 +189,8 @@ export async function POST(req: NextRequest) {
         name: 'VotingQuestion',
         definition: `(
           id SERIAL PRIMARY KEY,
+          "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           "assemblyId" INTEGER NOT NULL,
           text TEXT NOT NULL,
           "yesVotes" INTEGER DEFAULT 0,
@@ -199,6 +208,7 @@ export async function POST(req: NextRequest) {
           "residentId" INTEGER NOT NULL,
           vote TEXT,
           "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           UNIQUE("votingQuestionId", "residentId")
         )`
       },
@@ -207,6 +217,7 @@ export async function POST(req: NextRequest) {
         definition: `(
           id SERIAL PRIMARY KEY,
           "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           "assemblyId" INTEGER NOT NULL,
           "fileName" TEXT NOT NULL,
           "fileData" BYTEA NOT NULL,
@@ -218,6 +229,7 @@ export async function POST(req: NextRequest) {
         definition: `(
           id SERIAL PRIMARY KEY,
           "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           year INTEGER NOT NULL,
           amount FLOAT NOT NULL,
           description TEXT NOT NULL,
@@ -230,6 +242,7 @@ export async function POST(req: NextRequest) {
         definition: `(
           id SERIAL PRIMARY KEY,
           "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           amount FLOAT NOT NULL,
           "dueDate" TIMESTAMP NOT NULL,
           status TEXT DEFAULT 'PENDING',
@@ -246,6 +259,7 @@ export async function POST(req: NextRequest) {
         definition: `(
           id SERIAL PRIMARY KEY,
           "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           amount FLOAT NOT NULL,
           method TEXT NOT NULL,
           "transactionId" TEXT,
@@ -259,6 +273,7 @@ export async function POST(req: NextRequest) {
         definition: `(
           id SERIAL PRIMARY KEY,
           "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           type TEXT NOT NULL,
           title TEXT NOT NULL,
           description TEXT NOT NULL,
@@ -273,6 +288,7 @@ export async function POST(req: NextRequest) {
         definition: `(
           id SERIAL PRIMARY KEY,
           "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           name TEXT NOT NULL,
           role TEXT NOT NULL,
           "complexId" INTEGER NOT NULL
@@ -320,7 +336,8 @@ export async function POST(req: NextRequest) {
         state,
         country,
         "propertyTypes",
-        "createdAt"
+        "createdAt",
+        "updatedAt"
       ) SELECT 
         id,
         name,
@@ -333,7 +350,8 @@ export async function POST(req: NextRequest) {
         state,
         country,
         "propertyTypes",
-        "createdAt"
+        "createdAt",
+        "updatedAt"
       FROM "armonia"."ResidentialComplex"
       WHERE id = $1
     `, complex[0].id);
@@ -347,7 +365,8 @@ export async function POST(req: NextRequest) {
         password,
         "complexId",
         role,
-        "createdAt"
+        "createdAt",
+        "updatedAt"
       ) SELECT 
         id,
         email,
@@ -355,7 +374,8 @@ export async function POST(req: NextRequest) {
         password,
         "complexId",
         role,
-        "createdAt"
+        "createdAt",
+        "updatedAt"
       FROM "armonia"."User"
       WHERE id = $1
     `, user[0].id);

@@ -48,4 +48,14 @@ export class ServerLogger {
   static dbError(operation: string, error: any) {
     this.error(`DB Error during ${operation}:`, error);
   }
+
+  // Registrar solicitudes HTTP
+  static httpRequest(data: { method: string; url: string; ip: string }) {
+    this.info(`HTTP ${data.method} ${data.url} from ${data.ip}`);
+  }
+
+  // Registrar eventos de seguridad
+  static security(message: string, data?: any) {
+    this.warn(`Security: ${message}`, data);
+  }
 }

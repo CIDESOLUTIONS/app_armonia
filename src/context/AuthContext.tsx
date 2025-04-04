@@ -43,8 +43,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const router = useRouter();
 
+  // Función para almacenar el token y los datos de usuario
+  const storeAuthData = (authToken: string, userData: User) => {
+    // Guardar en localStorage como respaldo
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('token', authToken);
+      localStorage.setItem('user', JSON.stringify(userData));
+    }
+    
+    // Actualizar el estado
+    setToken(authToken);
+    setUser(userData);
+    setIsLoggedIn(true);
+    
+    // Establecer datos del usuario
+    setAdminName(userData.name || null);
+    
+    if (userData.isGlobalAdmin) {
+      setComplexId(null);
+      setComplexName(null);
+      setSchemaName(null);
+    } else {
+      setComplexId(userData.complexId || null);
+      setComplexName(userData.complexName || `Conjunto ${userData.complexId}`);
+      setSchemaName(userData.schemaName || null);
+    }
+  };
+
+  // Función para limpiar los datos de autenticación
+  const clearAuthData = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
+    
+    setToken(null);
+    setUser(null);
+    setIsLoggedIn(false);
+    setAdminName(null);
+    setComplexName(null);
+    setComplexId(null);
+    setSchemaName(null);
+  };
+
+  // Verificar estado de autenticación al cargar
   useEffect(() => {
-    const checkAuth = () => {
+    const checkAuth = async () => {
       try {
         console.log('[AuthContext] Verificando autenticación...');
         
@@ -53,6 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return;
         }
         
+        // Intentar obtener el token y datos de usuario del localStorage
         const storedToken = localStorage.getItem('token');
         const userData = localStorage.getItem('user');
         
@@ -66,38 +111,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             // Verificar que el usuario tenga todos los campos necesarios
             if (!parsedUser.id || !parsedUser.email || !parsedUser.role) {
               console.error('[AuthContext] Datos de usuario incompletos');
-              handleLogout();
+              clearAuthData();
               return;
             }
             
-            setUser(parsedUser);
-            setToken(storedToken);
-            setIsLoggedIn(true);
-            setAdminName(parsedUser.name || null);
+            // Verificar sesión en el servidor
+            const response = await fetch('/api/verify-session', {
+              method: 'GET',
+              headers: {
+                'Authorization': `Bearer ${storedToken}`
+              }
+            });
             
-            if (parsedUser.isGlobalAdmin) {
-              console.log('[AuthContext] Administrador global autenticado');
-              setComplexId(null);
-              setComplexName(null);
-              setSchemaName(null);
+            if (response.ok) {
+              // Sesión verificada, usar los datos
+              storeAuthData(storedToken, parsedUser);
+              console.log('[AuthContext] Sesión verificada con éxito');
             } else {
-              setComplexId(parsedUser.complexId || null);
-              setComplexName(parsedUser.complexName || `Conjunto ${parsedUser.complexId}`);
-              setSchemaName(parsedUser.schemaName || null);
+              // Sesión no válida, limpiar datos
+              console.log('[AuthContext] Sesión no válida, limpiando datos');
+              clearAuthData();
             }
-            
-            console.log('[AuthContext] Usuario autenticado:', parsedUser);
           } catch (parseError) {
             console.error('[AuthContext] Error parsing user data:', parseError);
-            handleLogout();
+            clearAuthData();
           }
         } else {
           console.log('[AuthContext] No hay datos de autenticación');
-          handleLogout();
+          clearAuthData();
         }
       } catch (err) {
         console.error('[AuthContext] Error checking auth:', err);
-        handleLogout();
+        clearAuthData();
       } finally {
         setLoading(false);
       }
@@ -105,20 +150,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     checkAuth();
   }, []);
-
-  const handleLogout = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-    }
-    setIsLoggedIn(false);
-    setUser(null);
-    setToken(null);
-    setAdminName(null);
-    setComplexName(null);
-    setComplexId(null);
-    setSchemaName(null);
-  };
 
   const login = async (email: string, password: string) => {
     try {
@@ -140,25 +171,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(data.message || 'Error al iniciar sesión');
       }
 
-      // Guardar los datos del usuario exactamente como vienen de la API
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      
-      setUser(data.user);
-      setToken(data.token);
-      setIsLoggedIn(true);
-      setAdminName(data.user.name || null);
-      
-      if (data.user.isGlobalAdmin) {
-        console.log('[AuthContext] Administrador global autenticado');
-        setComplexId(null);
-        setComplexName(null);
-        setSchemaName(null);
-      } else {
-        setComplexId(data.user.complexId || null);
-        setComplexName(data.user.complexName || `Conjunto ${data.user.complexId}`);
-        setSchemaName(data.user.schemaName || null);
-      }
+      // Almacenar datos de autenticación
+      storeAuthData(data.token, data.user);
       
       console.log('[AuthContext] Login exitoso, guardando datos:', data.user);
       console.log('[AuthContext] Redirigiendo a dashboard...');
@@ -180,18 +194,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       console.log('[AuthContext] Cerrando sesión...');
       
-      const response = await fetch('/api/logout', {
+      // Intentar hacer logout en el servidor
+      await fetch('/api/logout', {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
         credentials: 'include',
       });
-
-      if (!response.ok) {
-        console.error('[AuthContext] Error en logout');
-      }
     } catch (err) {
       console.error('[AuthContext] Error en logout:', err);
     } finally {
-      handleLogout();
+      // Limpiar datos de autenticación independientemente del resultado
+      clearAuthData();
+      
+      // Redireccionar a la página de login
       router.push('/login');
     }
   };
