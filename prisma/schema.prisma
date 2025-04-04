@@ -1,0 +1,33 @@
+// Añadir al final del archivo existente
+model Notification {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  type       String
+  recipient  String
+  subject    String
+  body       String
+  entityType String
+  entityId   Int
+  status     String
+  messageId  String?
+}
+
+model ActivityLog {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  userId     Int
+  entityType String
+  entityId   Int
+  action     String
+  details    String?
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entityType, entityId])
+}
+
+// Actualizar el modelo User para incluir la relación de ActivityLog
+model User {
+  // ... otros campos existentes
+  activityLogs ActivityLog[]
+}
