@@ -1,33 +1,51 @@
-// Añadir al final del archivo existente
-model Notification {
-  id         Int      @id @default(autoincrement())
-  createdAt  DateTime @default(now())
-  type       String
-  recipient  String
-  subject    String
-  body       String
-  entityType String
-  entityId   Int
-  status     String
-  messageId  String?
+// Definición del datasource
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  schemas    = ["armonia"]
 }
 
-model ActivityLog {
-  id         Int      @id @default(autoincrement())
-  createdAt  DateTime @default(now())
-  userId     Int
-  entityType String
-  entityId   Int
-  action     String
-  details    String?
-  user       User     @relation(fields: [userId], references: [id])
-
-  @@index([userId])
-  @@index([entityType, entityId])
+// Definición del generator
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
-// Actualizar el modelo User para incluir la relación de ActivityLog
+// Modelos para el esquema principal "armonia"
+model ResidentialComplex {
+  id          Int      @id @default(autoincrement())
+  name        String
+  schemaName  String   @unique  // Nombre del schema en la DB
+  totalUnits  Int
+  adminEmail  String
+  adminName   String
+  adminPhone  String?
+  address     String?
+  city        String?
+  state       String?
+  country     String?  @default("Colombia")
+  propertyTypes Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]
+
+  @@schema("armonia")
+}
+
 model User {
-  // ... otros campos existentes
-  activityLogs ActivityLog[]
+  id          Int      @id @default(autoincrement())
+  email       String   @unique
+  name        String?
+  password    String
+  role        String   // 'ADMIN', 'COMPLEX_ADMIN', 'RESIDENT', 'STAFF'
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  complexId   Int?
+  complex     ResidentialComplex? @relation(fields: [complexId], references: [id])
+
+  @@schema("armonia")
 }
+
+// Los siguientes modelos se usarán como referencia para crear 
+// las tablas en cada esquema de tenant de manera dinámica

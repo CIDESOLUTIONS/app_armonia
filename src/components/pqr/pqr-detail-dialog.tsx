@@ -1,188 +1,180 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogDescription 
-} from '@/components/ui/dialog';
+'use client';
+
+import React, { useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PQRService } from '@/lib/pqr/pqr-service';
-import { ActivityHistory } from '@/components/common/activity-history';
 import { toast } from '@/components/ui/use-toast';
 
-interface PQRDetailDialogProps {
-  pqr: any;
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  onUpdate: () => void;
-  currentUser: {
-    id: number;
-    role: string;
-  };
-}
+export function PQRDetailDialog({ pqr, isOpen, onOpenChange, onUpdate, currentUser }) {
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [comment, setComment] = useState('');
 
-export function PQRDetailDialog({ 
-  pqr, 
-  isOpen, 
-  onOpenChange, 
-  onUpdate,
-  currentUser
-}: PQRDetailDialogProps) {
-  const [status, setStatus] = useState(pqr.status);
-  const [response, setResponse] = useState('');
-  const [activityHistory, setActivityHistory] = useState([]);
-  const [activeTab, setActiveTab] = useState('details');
-
-  // Verificar permisos de actualización
-  const canUpdatePQR = currentUser.role === 'COMPLEX_ADMIN' || 
-                       currentUser.role === 'APP_ADMIN' || 
-                       pqr.userId === currentUser.id;
-
-  useEffect(() => {
-    const fetchActivityHistory = async () => {
-      try {
-        const history = await PQRService.getPQRActivityHistory(pqr.id);
-        setActivityHistory(history);
-      } catch (error) {
-        console.error('Error cargando historial de actividad:', error);
-        toast({
-          title: "Error",
-          description: "No se pudo cargar el historial de actividad",
-          variant: "destructive"
-        });
-      }
-    };
-
-    if (isOpen && activeTab === 'activity') {
-      fetchActivityHistory();
-    }
-  }, [isOpen, activeTab, pqr.id]);
-
-  const handleUpdatePQR = async () => {
+  const canChangeStatus = currentUser?.role === 'ADMIN' || 
+                          currentUser?.role === 'COMPLEX_ADMIN';
+  
+  const handleStatusChange = async (newStatus) => {
     try {
-      if (!canUpdatePQR) {
-        toast({
-          title: "Acceso Denegado",
-          description: "No tiene permisos para actualizar esta PQR",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      await PQRService.updatePQR(
-        pqr.id, 
-        { status, response }, 
-        currentUser.id
-      );
-      
+      setIsUpdating(true);
+      await PQRService.updatePQRStatus(pqr.id, newStatus, currentUser);
       toast({
-        title: "PQR Actualizada",
-        description: "La solicitud ha sido actualizada exitosamente",
+        title: "Estado Actualizado",
+        description: `La PQR ha sido actualizada a estado ${newStatus}`,
         variant: "success"
       });
-
       onUpdate();
-      onOpenChange(false);
     } catch (error) {
-      console.error('Error actualizando PQR:', error);
+      console.error('Error actualizando estado:', error);
       toast({
         title: "Error",
-        description: error.message || "No se pudo actualizar la PQR",
+        description: error.message || "No se pudo actualizar el estado",
         variant: "destructive"
       });
+    } finally {
+      setIsUpdating(false);
     }
   };
 
-  if (!pqr) return null;
+  const handleAddComment = async () => {
+    if (!comment.trim()) return;
+    
+    try {
+      setIsUpdating(true);
+      await PQRService.addComment(pqr.id, comment, currentUser);
+      toast({
+        title: "Comentario Añadido",
+        description: "Su comentario ha sido registrado exitosamente",
+        variant: "success"
+      });
+      setComment('');
+      onUpdate();
+    } catch (error) {
+      console.error('Error añadiendo comentario:', error);
+      toast({
+        title: "Error",
+        description: error.message || "No se pudo añadir el comentario",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[800px]">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Detalle de PQR</DialogTitle>
-          <DialogDescription>
-            Información detallada y gestión de la Petición, Queja o Reclamo
-          </DialogDescription>
+          <DialogTitle>{pqr?.title || 'Detalle de PQR'}</DialogTitle>
         </DialogHeader>
         
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="details">Detalles</TabsTrigger>
-            <TabsTrigger value="activity">Historial de Actividad</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="details">
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <label className="text-right">Tipo:</label>
-                <span className="col-span-3">{pqr.type}</span>
-              </div>
-              
-              <div className="grid grid-cols-4 items-center gap-4">
-                <label className="text-right">Título:</label>
-                <span className="col-span-3">{pqr.title}</span>
-              </div>
-              
-              <div className="grid grid-cols-4 items-center gap-4">
-                <label className="text-right">Descripción:</label>
-                <span className="col-span-3">{pqr.description}</span>
-              </div>
-              
-              <div className="grid grid-cols-4 items-center gap-4">
-                <label className="text-right">Prioridad:</label>
-                <span className="col-span-3">{pqr.priority}</span>
-              </div>
-              
-              {canUpdatePQR && (
-                <>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <label className="text-right">Estado:</label>
-                    <Select value={status} onValueChange={setStatus}>
-                      <SelectTrigger className="col-span-3">
-                        <SelectValue placeholder="Seleccionar estado" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="OPEN">Abierto</SelectItem>
-                        <SelectItem value="IN_PROGRESS">En Progreso</SelectItem>
-                        <SelectItem value="RESOLVED">Resuelto</SelectItem>
-                        <SelectItem value="CLOSED">Cerrado</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <label className="text-right">Respuesta:</label>
-                    <Textarea 
-                      className="col-span-3"
-                      placeholder="Escriba su respuesta aquí"
-                      value={response}
-                      onChange={(e) => setResponse(e.target.value)}
-                    />
-                  </div>
-                </>
-              )}
+        <div className="grid gap-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm font-medium">Tipo:</p>
+              <p>{pqr?.type}</p>
             </div>
-          </TabsContent>
+            <div>
+              <p className="text-sm font-medium">Estado:</p>
+              <p>{pqr?.status}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium">Prioridad:</p>
+              <p>{pqr?.priority}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium">Fecha:</p>
+              <p>{pqr?.createdAt ? new Date(pqr.createdAt).toLocaleDateString() : 'N/A'}</p>
+            </div>
+          </div>
 
-          <TabsContent value="activity">
-            <ActivityHistory activities={activityHistory} />
-          </TabsContent>
-        </Tabs>
-        
-        {canUpdatePQR && (
-          <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={handleUpdatePQR}>
-              Guardar Cambios
+          <div>
+            <p className="text-sm font-medium">Descripción:</p>
+            <p className="whitespace-pre-wrap">{pqr?.description}</p>
+          </div>
+
+          {pqr?.attachments && pqr.attachments.length > 0 && (
+            <div>
+              <p className="text-sm font-medium">Adjuntos:</p>
+              <ul className="list-disc list-inside">
+                {pqr.attachments.map((attachment, index) => (
+                  <li key={index}>
+                    <a 
+                      href={`/api/pqr/${pqr.id}/attachments/${attachment.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      {attachment.fileName}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {pqr?.comments && pqr.comments.length > 0 && (
+            <div>
+              <p className="text-sm font-medium">Comentarios:</p>
+              <div className="space-y-2 max-h-40 overflow-y-auto border rounded p-2">
+                {pqr.comments.map((comment, index) => (
+                  <div key={index} className="border-b pb-2 last:border-b-0">
+                    <p className="text-sm font-medium">{comment.author} - {new Date(comment.date).toLocaleString()}</p>
+                    <p className="text-sm">{comment.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div>
+            <p className="text-sm font-medium">Añadir Comentario:</p>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              className="w-full p-2 border rounded"
+              rows={2}
+              placeholder="Escriba su comentario aquí..."
+            />
+            <Button 
+              onClick={handleAddComment} 
+              disabled={isUpdating || !comment.trim()} 
+              className="mt-2"
+            >
+              Añadir Comentario
             </Button>
           </div>
-        )}
+
+          {canChangeStatus && (
+            <div className="flex justify-end space-x-2 mt-4">
+              <Button
+                variant="outline"
+                onClick={() => handleStatusChange('IN_PROGRESS')}
+                disabled={isUpdating || pqr?.status === 'IN_PROGRESS'}
+              >
+                En Progreso
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => handleStatusChange('RESOLVED')}
+                disabled={isUpdating || pqr?.status === 'RESOLVED'}
+              >
+                Resuelto
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => handleStatusChange('CLOSED')}
+                disabled={isUpdating || pqr?.status === 'CLOSED'}
+              >
+                Cerrado
+              </Button>
+            </div>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );

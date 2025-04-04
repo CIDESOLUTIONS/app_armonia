@@ -2,14 +2,17 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import { ServerLogger } from '@/lib/logging/server-logger';
 
 interface User {
   id: number;
   email: string;
   name: string;
   role: string;
-  complexId: number;
-  schemaName: string;  // Aseguramos que schemaName esté incluido
+  complexId?: number;
+  schemaName?: string;
+  complexName?: string;
+  isGlobalAdmin?: boolean;
 }
 
 interface AuthContextType {
@@ -20,6 +23,8 @@ interface AuthContextType {
   adminName: string | null;
   complexName: string | null;
   complexId: number | null;
+  schemaName: string | null;
+  token: string | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -34,6 +39,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [adminName, setAdminName] = useState<string | null>(null);
   const [complexName, setComplexName] = useState<string | null>(null);
   const [complexId, setComplexId] = useState<number | null>(null);
+  const [schemaName, setSchemaName] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -46,24 +53,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return;
         }
         
-        const token = localStorage.getItem('token');
+        const storedToken = localStorage.getItem('token');
         const userData = localStorage.getItem('user');
         
-        console.log('[AuthContext] Token encontrado:', !!token);
+        console.log('[AuthContext] Token encontrado:', !!storedToken);
         console.log('[AuthContext] User data encontrado:', !!userData);
         
-        if (token && userData) {
+        if (storedToken && userData) {
           try {
             const parsedUser = JSON.parse(userData);
-            // Asegurar que el schemaName esté presente
-            if (!parsedUser.schemaName) {
-              parsedUser.schemaName = `tenant_cj${String(parsedUser.complexId).padStart(4, '0')}`;
+            
+            // Verificar que el usuario tenga todos los campos necesarios
+            if (!parsedUser.id || !parsedUser.email || !parsedUser.role) {
+              console.error('[AuthContext] Datos de usuario incompletos');
+              handleLogout();
+              return;
             }
+            
             setUser(parsedUser);
+            setToken(storedToken);
             setIsLoggedIn(true);
-            setAdminName(parsedUser.name);
-            setComplexId(parsedUser.complexId);
-            setComplexName(`Conjunto ${parsedUser.complexId}`);
+            setAdminName(parsedUser.name || null);
+            
+            if (parsedUser.isGlobalAdmin) {
+              console.log('[AuthContext] Administrador global autenticado');
+              setComplexId(null);
+              setComplexName(null);
+              setSchemaName(null);
+            } else {
+              setComplexId(parsedUser.complexId || null);
+              setComplexName(parsedUser.complexName || `Conjunto ${parsedUser.complexId}`);
+              setSchemaName(parsedUser.schemaName || null);
+            }
+            
             console.log('[AuthContext] Usuario autenticado:', parsedUser);
           } catch (parseError) {
             console.error('[AuthContext] Error parsing user data:', parseError);
@@ -91,9 +113,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     setIsLoggedIn(false);
     setUser(null);
+    setToken(null);
     setAdminName(null);
     setComplexName(null);
     setComplexId(null);
+    setSchemaName(null);
   };
 
   const login = async (email: string, password: string) => {
@@ -116,23 +140,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(data.message || 'Error al iniciar sesión');
       }
 
-      // Asegurar que el usuario tenga schemaName
-      const userData = {
-        ...data.user,
-        schemaName: `tenant_cj${String(data.user.complexId).padStart(4, '0')}`
-      };
-
-      console.log('[AuthContext] Login exitoso, guardando datos:', userData);
-      
+      // Guardar los datos del usuario exactamente como vienen de la API
       localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('user', JSON.stringify(data.user));
       
-      setUser(userData);
+      setUser(data.user);
+      setToken(data.token);
       setIsLoggedIn(true);
-      setAdminName(userData.name);
-      setComplexId(userData.complexId);
-      setComplexName(`Conjunto ${userData.complexId}`);
+      setAdminName(data.user.name || null);
       
+      if (data.user.isGlobalAdmin) {
+        console.log('[AuthContext] Administrador global autenticado');
+        setComplexId(null);
+        setComplexName(null);
+        setSchemaName(null);
+      } else {
+        setComplexId(data.user.complexId || null);
+        setComplexName(data.user.complexName || `Conjunto ${data.user.complexId}`);
+        setSchemaName(data.user.schemaName || null);
+      }
+      
+      console.log('[AuthContext] Login exitoso, guardando datos:', data.user);
       console.log('[AuthContext] Redirigiendo a dashboard...');
       
       // Pequeño retraso para asegurar que los estados se actualicen
@@ -176,24 +204,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     adminName,
     complexName,
     complexId,
+    schemaName,
+    token,
     login,
     logout,
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,  
-        error,
-        isLoggedIn,
-        adminName,
-        complexName,
-        complexId,
-        login,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
