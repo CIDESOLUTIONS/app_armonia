@@ -1,0 +1,14 @@
+# Directorios a ignorar
+node_modules/
+.next/
+dist/
+build/
+
+# Archivos grandes
+*.pack
+*.node
+
+# Otros archivos de sistema
+.DS_Store
+Thumbs.db
+
