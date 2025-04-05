@@ -136,29 +136,23 @@ export default function LandingPage() {
     setIsClient(true);
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 30000);
+    }, 5000); // Reducido de 30000 a 5000 para mejor experiencia de usuario
     return () => clearInterval(interval);
-  }, []);
+  }, [images.length]);
 
   // Manejar redirección cuando el usuario está autenticado
   useEffect(() => {
-    console.log('[LandingPage] Estado de autenticación:', isLoggedIn);
-    console.log('[LandingPage] Estado de carga:', authLoading);
-    
-    // Solo redirigir cuando terminó la carga de autenticación y el usuario está autenticado
     if (!authLoading && isLoggedIn && !isRedirecting) {
-      console.log('[LandingPage] Usuario autenticado, preparando redirección...');
       setIsRedirecting(true);
       
       // Pequeño retraso para evitar redirecciones inmediatas
       const redirectTimer = setTimeout(() => {
-        console.log('[LandingPage] Redirigiendo a dashboard...');
         router.push(ROUTES.DASHBOARD);
       }, 100);
       
       return () => clearTimeout(redirectTimer);
     }
-  }, [isLoggedIn, authLoading, router]);
+  }, [isLoggedIn, authLoading, router, isRedirecting]);
 
   // Si está cargando la autenticación o redirigiendo, mostrar un estado de carga
   if (authLoading || (isLoggedIn && isRedirecting)) {
@@ -192,7 +186,7 @@ export default function LandingPage() {
         : 'Total units must be a number greater than 0.';
     }
 
-    if (!/\S+@\S+\.\S+/.test(formData.adminEmail)) {
+    if (!/\\S+@\\S+\\.\\S+/.test(formData.adminEmail)) {
       return language === 'Español'
         ? 'Ingresa un email válido.'
         : 'Enter a valid email.';
@@ -229,8 +223,6 @@ export default function LandingPage() {
     };
 
     try {
-      console.log('[LandingPage] Enviando datos de registro:', dataToSend.complexName);
-      
       const response = await fetch('/api/register-complex', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -250,12 +242,10 @@ export default function LandingPage() {
           : 'Registration successful! Redirecting to login...'
       );
 
-      console.log('[LandingPage] Registro exitoso, redirigiendo en 2 segundos...');
       setTimeout(() => {
         router.push(ROUTES.LOGIN);
       }, 2000);
     } catch (err) {
-      console.error('[LandingPage] Error en registro:', err);
       setError(err instanceof Error ? err.message : 'Error desconocido');
     } finally {
       setLoading(false);
@@ -290,205 +280,209 @@ export default function LandingPage() {
 
   return (
     <div className={`min-h-screen flex flex-col ${theme === 'Claro' ? 'bg-gray-50' : 'bg-gray-900'}`}>
-    {isClient && (
-      <Header
-        theme={theme}
-        setTheme={setTheme}
-        language={language}
-        setLanguage={setLanguage}
-        currency={currency}
-        setCurrency={setCurrency}
-        isLoggedIn={isLoggedIn}
-        adminName={adminName || ''}
-      />
-    )}
-    
-    <div className="h-16" />
-    
-    <main className="flex-1 mt-16 px-4 sm:px-6 lg:px-8 py-12">
-      <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto">
-        {/* Sección de características */}
-        <div className="lg:flex-[2] flex flex-col">
-          <motion.div 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            transition={{ duration: 0.8 }}
-            className="mb-12"
-          >
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              {language === 'Español' ? 'Nuestro Propósito' : 'Our Purpose'}
-            </h2>
-            <p className="text-lg sm:text-xl md:text-2xl leading-relaxed text-gray-600 dark:text-white pr-12 lg:pr-16">
-              {language === 'Español'
-                ? "Gestión Integral para tu Comunidad, Armonía es una solución diseñada para simplificar y modernizar la gestión de conjuntos residenciales. Con una interfaz intuitiva y herramientas avanzadas, optimiza la administración para consejos y administradores."
-                : "Comprehensive Community Management, Armonía is a solution designed to simplify and modernize the management of residential complexes. With an intuitive interface and advanced tools, it optimizes administration for councils and administrators."}
-            </p>
-          </motion.div>
-          
-          {renderFeatures()}
-        </div>
-
-        {/* Sección de registro */}
-        <div className="lg:w-1/3 w-full flex flex-col space-y-8">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            className="w-full h-48 sm:h-64 overflow-hidden rounded-lg shadow-md"
-          >
-            <motion.img
-                key={currentImageIndex}
-                src={images[currentImageIndex]}
-                alt="Community management"
-                className="w-full h-full object-cover"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                loading="lazy"
-              />
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md w-full"
-          >
-            <h3 className="text-xl font-bold mb-4 text-center text-indigo-600 dark:text-indigo-400">
-              {language === 'Español' ? 'Comienza Ahora' : 'Get Started Now'}
-            </h3>
-            <p className="text-center text-sm text-gray-600 dark:text-white mb-4">
-              {language === 'Español'
-                ? `Por solo ${pricing} por residencia. ¡Prueba gratis por 2 meses hasta 25 inmuebles!`
-                : `For just ${pricing} per residence. Free trial for 2 months up to 25 properties!`}
-            </p>
-            
-            {isClient && (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {language === 'Español' ? 'Nombre del Conjunto' : 'Complex Name'}
-                  </label>
-                  <Input
-                    type="text"
-                    value={formData.complexName}
-                    onChange={(e) => setFormData({ ...formData, complexName: e.target.value })}
-                    required
-                    disabled={loading}
-                    autoComplete="off"
-                    className="mt-1 block w-full"
-                    data-cy="complex-name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {language === 'Español' ? 'Total de Inmuebles' : 'Total Units'}
-                  </label>
-                  <Input
-                    type="number"
-                    value={formData.totalUnits}
-                    onChange={(e) => setFormData({ ...formData, totalUnits: e.target.value })}
-                    required
-                    disabled={loading}
-                    min="1"
-                    className="mt-1 block w-full"
-                    data-cy="total-units"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {language === 'Español' ? 'Nombre Completo del Administrador' : 'Admin Full Name'}
-                  </label>
-                  <Input
-                    type="text"
-                    value={formData.adminName}
-                    onChange={(e) => setFormData({ ...formData, adminName: e.target.value })}
-                    required
-                    disabled={loading}
-                    autoComplete="off"
-                    className="mt-1 block w-full"
-                    data-cy="admin-name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {language === 'Español' ? 'Email del Administrador' : 'Admin Email'}
-                  </label>
-                  <Input
-                    type="email"
-                    value={formData.adminEmail}
-                    onChange={(e) => setFormData({ ...formData, adminEmail: e.target.value })}
-                    required
-                    disabled={loading}
-                    autoComplete="off"
-                    className="mt-1 block w-full"
-                    data-cy="admin-email"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {language === 'Español' ? 'Contraseña' : 'Password'}
-                  </label>
-                  <Input
-                    type="password"
-                    value={formData.adminPassword}
-                    onChange={(e) => setFormData({ ...formData, adminPassword: e.target.value })}
-                    required
-                    disabled={loading}
-                    autoComplete="new-password"
-                    className="mt-1 block w-full"
-                    data-cy="admin-password"
-                  />
-                </div>
-                
-                {error && <p className="text-red-500 text-sm text-center" data-cy="error-message">{error}</p>}
-                {success && <p className="text-green-500 text-sm text-center" data-cy="success-message">{success}</p>}
-                
-                <Button
-                  type="submit"
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
-                  disabled={loading}
-                  data-cy="register-submit"
-                >
-                  {loading 
-                    ? (language === 'Español' ? 'Procesando...' : 'Processing...') 
-                    : (language === 'Español' ? 'Crear Cuenta de Prueba' : 'Create Trial Account')}
-                </Button>
-                
-                <div className="text-center pt-4">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {language === 'Español' ? '¿Ya tienes una cuenta?' : 'Already have an account?'}{' '}
-                    <button
-                      type="button"
-                      onClick={() => router.push(ROUTES.LOGIN)}
-                      className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
-                    >
-                      {language === 'Español' ? 'Iniciar sesión' : 'Login'}
-                    </button>
-                  </p>
-                </div>
-              </form>
-            )}
-          </motion.div>
-        </div>
-      </div>
-    </main>
-
-    <footer className="py-12 bg-gray-100 dark:bg-gray-800">
-      <div className="max-w-4xl mx-auto px-4">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-48 object-cover rounded-lg shadow-md"
-          src="/videos/landing-video.mp4"
+      {isClient && (
+        <Header
+          theme={theme}
+          setTheme={setTheme}
+          language={language}
+          setLanguage={setLanguage}
+          currency={currency}
+          setCurrency={setCurrency}
+          isLoggedIn={isLoggedIn}
+          adminName={adminName || ''}
         />
-        <p className="text-center mt-4 text-sm text-gray-600 dark:text-gray-400">
-          © {new Date().getFullYear()} Armonía - {language === 'Español' ? 'Todos los derechos reservados' : 'All rights reserved'}
-        </p>
-      </div>
-    </footer>
-  </div>
-);
+      )}
+      
+      <div className="h-16" />
+      
+      <main className="flex-1 mt-16 px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto">
+          {/* Sección de características */}
+          <div className="lg:flex-[2] flex flex-col">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              transition={{ duration: 0.8 }}
+              className="mb-12"
+            >
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                {language === 'Español' ? 'Nuestro Propósito' : 'Our Purpose'}
+              </h2>
+              <p className="text-lg sm:text-xl md:text-2xl leading-relaxed text-gray-600 dark:text-white pr-12 lg:pr-16">
+                {language === 'Español'
+                  ? "Gestión Integral para tu Comunidad, Armonía es una solución diseñada para simplificar y modernizar la gestión de conjuntos residenciales. Con una interfaz intuitiva y herramientas avanzadas, optimiza la administración para consejos y administradores."
+                  : "Comprehensive Community Management, Armonía is a solution designed to simplify and modernize the management of residential complexes. With an intuitive interface and advanced tools, it optimizes administration for councils and administrators."}
+              </p>
+            </motion.div>
+            
+            {renderFeatures()}
+          </div>
+
+          {/* Sección de registro */}
+          <div className="lg:w-1/3 w-full flex flex-col space-y-8">
+            {/* Carrusel de imágenes simplificado */}
+            <div className="w-full h-48 sm:h-64 overflow-hidden rounded-lg shadow-md relative">
+              {isClient && images.map((src, index) => (
+                <motion.img
+                  key={src}
+                  src={src}
+                  alt={`Community management ${index + 1}`}
+                  className="w-full h-full object-cover absolute top-0 left-0"
+                  initial={{ opacity: 0 }}
+                  animate={{ 
+                    opacity: currentImageIndex === index ? 1 : 0,
+                    zIndex: currentImageIndex === index ? 10 : 1
+                  }}
+                  transition={{ duration: 0.8 }}
+                  style={{ 
+                    display: currentImageIndex === index ? 'block' : 'none'
+                  }}
+                  loading="lazy"
+                />
+              ))}
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8 }}
+              className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md w-full"
+            >
+              <h3 className="text-xl font-bold mb-4 text-center text-indigo-600 dark:text-indigo-400">
+                {language === 'Español' ? 'Comienza Ahora' : 'Get Started Now'}
+              </h3>
+              <p className="text-center text-sm text-gray-600 dark:text-white mb-4">
+                {language === 'Español'
+                  ? `Por solo ${pricing} por residencia. ¡Prueba gratis por 2 meses hasta 25 inmuebles!`
+                  : `For just ${pricing} per residence. Free trial for 2 months up to 25 properties!`}
+              </p>
+              
+              {isClient && (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {language === 'Español' ? 'Nombre del Conjunto' : 'Complex Name'}
+                    </label>
+                    <Input
+                      type="text"
+                      value={formData.complexName}
+                      onChange={(e) => setFormData({ ...formData, complexName: e.target.value })}
+                      required
+                      disabled={loading}
+                      autoComplete="off"
+                      className="mt-1 block w-full"
+                      data-cy="complex-name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {language === 'Español' ? 'Total de Inmuebles' : 'Total Units'}
+                    </label>
+                    <Input
+                      type="number"
+                      value={formData.totalUnits}
+                      onChange={(e) => setFormData({ ...formData, totalUnits: e.target.value })}
+                      required
+                      disabled={loading}
+                      min="1"
+                      className="mt-1 block w-full"
+                      data-cy="total-units"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {language === 'Español' ? 'Nombre Completo del Administrador' : 'Admin Full Name'}
+                    </label>
+                    <Input
+                      type="text"
+                      value={formData.adminName}
+                      onChange={(e) => setFormData({ ...formData, adminName: e.target.value })}
+                      required
+                      disabled={loading}
+                      autoComplete="off"
+                      className="mt-1 block w-full"
+                      data-cy="admin-name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {language === 'Español' ? 'Email del Administrador' : 'Admin Email'}
+                    </label>
+                    <Input
+                      type="email"
+                      value={formData.adminEmail}
+                      onChange={(e) => setFormData({ ...formData, adminEmail: e.target.value })}
+                      required
+                      disabled={loading}
+                      autoComplete="off"
+                      className="mt-1 block w-full"
+                      data-cy="admin-email"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {language === 'Español' ? 'Contraseña' : 'Password'}
+                    </label>
+                    <Input
+                      type="password"
+                      value={formData.adminPassword}
+                      onChange={(e) => setFormData({ ...formData, adminPassword: e.target.value })}
+                      required
+                      disabled={loading}
+                      autoComplete="new-password"
+                      className="mt-1 block w-full"
+                      data-cy="admin-password"
+                    />
+                  </div>
+                  
+                  {error && <p className="text-red-500 text-sm text-center" data-cy="error-message">{error}</p>}
+                  {success && <p className="text-green-500 text-sm text-center" data-cy="success-message">{success}</p>}
+                  
+                  <Button
+                    type="submit"
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+                    disabled={loading}
+                    data-cy="register-submit"
+                  >
+                    {loading 
+                      ? (language === 'Español' ? 'Procesando...' : 'Processing...') 
+                      : (language === 'Español' ? 'Crear Cuenta de Prueba' : 'Create Trial Account')}
+                  </Button>
+                  
+                  <div className="text-center pt-4">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {language === 'Español' ? '¿Ya tienes una cuenta?' : 'Already have an account?'}{' '}
+                      <button
+                        type="button"
+                        onClick={() => router.push(ROUTES.LOGIN)}
+                        className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
+                      >
+                        {language === 'Español' ? 'Iniciar sesión' : 'Login'}
+                      </button>
+                    </p>
+                  </div>
+                </form>
+              )}
+            </motion.div>
+          </div>
+        </div>
+      </main>
+
+      <footer className="py-12 bg-gray-100 dark:bg-gray-800">
+        <div className="max-w-4xl mx-auto px-4">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-48 object-cover rounded-lg shadow-md"
+            src="/videos/landing-video.mp4"
+          />
+          <p className="text-center mt-4 text-sm text-gray-600 dark:text-gray-400">
+            © {new Date().getFullYear()} Armonía - {language === 'Español' ? 'Todos los derechos reservados' : 'All rights reserved'}
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
 }
