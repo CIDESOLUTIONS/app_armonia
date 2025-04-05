@@ -35,12 +35,16 @@ export async function POST(req: NextRequest) {
     const schemaName = `tenant_cj${String(complexCount + 1).padStart(4, '0')}`;
     console.log('[API Register-Complex] Conteo de complejos:', complexCountResult);
 
+    // Prepare propertyTypes as proper JSONB
+    // Convert propertyTypes to a JSON string and then cast it to JSONB in the query
+    const propertyTypesJson = propertyTypes ? JSON.stringify(propertyTypes) : '[]';
+
     // Crear el complejo residencial en el esquema 'armonia'
     const complex = await prisma.$queryRawUnsafe(
       `INSERT INTO "armonia"."ResidentialComplex" (
         name, "schemaName", "totalUnits", "adminEmail", "adminName", "adminPhone", 
         address, city, state, country, "propertyTypes", "createdAt", "updatedAt"
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW(), NOW()) RETURNING *`,
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb, NOW(), NOW()) RETURNING *`,
       complexName,
       schemaName,
       totalUnits,
@@ -51,7 +55,7 @@ export async function POST(req: NextRequest) {
       city || null,
       state || null,
       country || 'Colombia',
-      propertyTypes ? JSON.stringify(propertyTypes) : JSON.stringify([])
+      propertyTypesJson // Now we're explicitly casting to jsonb with ::jsonb
     );
     console.log('[API Register-Complex] Resultado de complex:', complex[0]);
 
@@ -322,7 +326,7 @@ export async function POST(req: NextRequest) {
       ON DELETE CASCADE
     `);
       
-      // Copiar el complejo al nuevo esquema
+    // Copiar el complejo al nuevo esquema con manejo adecuado de JSONB
     await schemaPrisma.$executeRawUnsafe(`
       INSERT INTO "${schemaName}"."ResidentialComplex" (
         id,
@@ -349,7 +353,7 @@ export async function POST(req: NextRequest) {
         city,
         state,
         country,
-        "propertyTypes",
+        "propertyTypes"::jsonb, -- Ensure proper casting here too
         "createdAt",
         "updatedAt"
       FROM "armonia"."ResidentialComplex"

@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Header } from '@/components/layout/header';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/constants/routes';
@@ -21,8 +20,6 @@ export default function LoginPage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [language, setLanguage] = useState('Español');
-  const [theme, setTheme] = useState('Claro');
-  const [currency, setCurrency] = useState('Pesos');
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -55,83 +52,73 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header
-        theme={theme}
-        setTheme={setTheme}
-        language={language}
-        setLanguage={setLanguage}
-        currency={currency}
-        setCurrency={setCurrency}
-      />
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
+      <div className="w-full max-w-md">
+        <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8">
+          <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">
+            {language === 'Español' ? 'Iniciar Sesión' : 'Log In'}
+          </h2>
 
-      <div className="pt-16">
-        <div className="max-w-md mx-auto px-4 py-8">
-          <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-            <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">
-              {language === 'Español' ? 'Iniciar Sesión' : 'Log In'}
-            </h2>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="email">
-                  {language === 'Español' ? 'Email' : 'Email'}
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                  disabled={loading}
-                  className="mt-1"
-                  placeholder={language === 'Español' ? 'Tu correo electrónico' : 'Your email'}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="password">
-                  {language === 'Español' ? 'Contraseña' : 'Password'}
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  required
-                  disabled={loading}
-                  className="mt-1"
-                  placeholder={language === 'Español' ? 'Tu contraseña' : 'Your password'}
-                />
-              </div>
-
-              {error && (
-                <p className="text-red-500 text-sm text-center">
-                  {error}
-                </p>
-              )}
-
-              <Button
-                type="submit"
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <Label htmlFor="email">
+                {language === 'Español' ? 'Email' : 'Email'}
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                required
                 disabled={loading}
-              >
-                {loading 
-                  ? (language === 'Español' ? 'Iniciando sesión...' : 'Logging in...')
-                  : (language === 'Español' ? 'Iniciar Sesión' : 'Log In')}
-              </Button>
+                className="mt-1"
+                placeholder={language === 'Español' ? 'Tu correo electrónico' : 'Your email'}
+              />
+            </div>
 
-              <div className="mt-4 text-center">
-                <button
-                  type="button"
-                  onClick={() => router.push(ROUTES.HOME)}
-                  className="text-sm text-indigo-600 hover:text-indigo-500"
-                >
-                  {language === 'Español' ? 'Volver al inicio' : 'Back to home'}
-                </button>
+            <div>
+              <Label htmlFor="password">
+                {language === 'Español' ? 'Contraseña' : 'Password'}
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                required
+                disabled={loading}
+                className="mt-1"
+                placeholder={language === 'Español' ? 'Tu contraseña' : 'Your password'}
+              />
+            </div>
+
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded text-sm">
+                {error}
               </div>
-            </form>
-          </div>
+            )}
+
+            <Button
+              type="submit"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white h-10"
+              disabled={loading}
+            >
+              {loading 
+                ? (language === 'Español' ? 'Iniciando sesión...' : 'Logging in...')
+                : (language === 'Español' ? 'Iniciar Sesión' : 'Log In')}
+            </Button>
+
+            <div className="text-center">
+              <Button
+                type="button"
+                variant="link"
+                onClick={() => router.push(ROUTES.HOME)}
+                className="text-sm text-indigo-600 hover:text-indigo-500"
+              >
+                {language === 'Español' ? 'Volver al inicio' : 'Back to home'}
+              </Button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

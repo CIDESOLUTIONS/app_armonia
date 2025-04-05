@@ -1,4 +1,4 @@
-// src/components/layout/sidebar.tsx
+// src/components/layout/Sidebar.tsx
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -23,8 +23,8 @@ interface SidebarProps {
   language: string;
   theme: string;
   currency: string;
-  adminName?: string;
-  complexName?: string;
+  adminName?: string | null;
+  complexName?: string | null;
   logout: () => void;
   isCollapsed: boolean;
   setIsCollapsed: (value: boolean) => void;
@@ -137,7 +137,7 @@ export default function Sidebar({
   });
 
   return (
-    <aside className={`bg-indigo-600 text-white transition-all duration-300 h-screen ${
+    <aside className={`sidebar bg-indigo-600 text-white transition-all duration-300 h-screen ${
       isCollapsed ? "w-16" : "w-64"
     }`}>
       <div className="p-4 flex justify-between items-center">

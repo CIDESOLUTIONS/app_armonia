@@ -10,13 +10,7 @@ import {
   Dog,
   Plus 
 } from 'lucide-react';
-import {
-  TabGroup,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel
-} from '@headlessui/react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
 import { ComplexDataForm } from '@/components/inventory/ComplexDataForm';
 import { ResidentForm } from '@/components/inventory/ResidentForm';
@@ -75,6 +69,7 @@ export default function InventoryPage() {
   const [showComplexForm, setShowComplexForm] = useState(false);
   const [showResidentForm, setShowResidentForm] = useState(false);
   const [selectedResident, setSelectedResident] = useState<Resident | null>(null);
+  const [activeTab, setActiveTab] = useState("properties");
 
   useEffect(() => {
     fetchData();
@@ -213,17 +208,30 @@ export default function InventoryPage() {
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-full">Cargando...</div>;
+    return (
+      <div className="flex justify-center items-center h-full p-8">
+        <div className="animate-spin h-10 w-10 border-4 border-indigo-600 rounded-full border-t-transparent"></div>
+        <span className="ml-3 text-lg">Cargando datos del conjunto...</span>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-red-500 text-center p-4">Error: {error}</div>;
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md m-6">
+        <p className="font-medium">Error</p>
+        <p>{error}</p>
+        <Button onClick={fetchData} className="mt-3 bg-red-600 hover:bg-red-700 text-white">
+          Reintentar
+        </Button>
+      </div>
+    );
   }
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Inventario del Conjunto</h1>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Inventario del Conjunto</h1>
         <Button
           onClick={() => setShowComplexForm(true)}
           className="bg-indigo-600 hover:bg-indigo-700 text-white"
@@ -242,136 +250,102 @@ export default function InventoryPage() {
           />
         ) : (
           complex && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-lg shadow">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
               <div>
-                <p><strong>Nombre:</strong> {complex.name}</p>
-                <p><strong>Dirección:</strong> {complex.address}</p>
-                <p><strong>Ciudad:</strong> {complex.city}</p>
-                <p><strong>Estado:</strong> {complex.state}</p>
-                <p><strong>País:</strong> {complex.country}</p>
+                <p className="py-1"><span className="font-semibold">Nombre:</span> {complex.name}</p>
+                <p className="py-1"><span className="font-semibold">Dirección:</span> {complex.address}</p>
+                <p className="py-1"><span className="font-semibold">Ciudad:</span> {complex.city}</p>
+                <p className="py-1"><span className="font-semibold">Estado:</span> {complex.state}</p>
+                <p className="py-1"><span className="font-semibold">País:</span> {complex.country}</p>
               </div>
               <div>
-                <p><strong>Administrador:</strong> {complex.adminName}</p>
-                <p><strong>DNI:</strong> {complex.adminDNI}</p>
-                <p><strong>Email:</strong> {complex.adminEmail}</p>
-                <p><strong>Teléfono:</strong> {complex.adminPhone}</p>
-                <p><strong>Dirección:</strong> {complex.adminAddress}</p>
+                <p className="py-1"><span className="font-semibold">Administrador:</span> {complex.adminName}</p>
+                <p className="py-1"><span className="font-semibold">DNI:</span> {complex.adminDNI}</p>
+                <p className="py-1"><span className="font-semibold">Email:</span> {complex.adminEmail}</p>
+                <p className="py-1"><span className="font-semibold">Teléfono:</span> {complex.adminPhone}</p>
+                <p className="py-1"><span className="font-semibold">Dirección:</span> {complex.adminAddress}</p>
               </div>
             </div>
           )
         )}
       </div>
 
-      {/* Tabs de Gestión */}
-      <TabGroup>
-        <TabList className="flex space-x-1 rounded-xl bg-blue-900/20 p-1">
-          <Tab className={({ selected }) =>
-            `w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700
-            ${selected
-              ? 'bg-white shadow'
-              : 'text-blue-100 hover:bg-white/[0.12] hover:text-white'
-            }`
-          }>
-            <div className="flex items-center justify-center">
-              <Building2 className="mr-2" />
-              Inmuebles
-            </div>
-          </Tab>
-          <Tab className={({ selected }) =>
-            `w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700
-            ${selected
-              ? 'bg-white shadow'
-              : 'text-blue-100 hover:bg-white/[0.12] hover:text-white'
-            }`
-          }>
-            <div className="flex items-center justify-center">
-              <Users className="mr-2" />
-              Residentes
-            </div>
-          </Tab>
-          <Tab className={({ selected }) =>
-            `w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700
-            ${selected
-              ? 'bg-white shadow'
-              : 'text-blue-100 hover:bg-white/[0.12] hover:text-white'
-            }`
-          }>
-            <div className="flex items-center justify-center">
-              <Car className="mr-2" />
-              Vehículos
-            </div>
-          </Tab>
-          <Tab className={({ selected }) =>
-            `w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700
-            ${selected
-              ? 'bg-white shadow'
-              : 'text-blue-100 hover:bg-white/[0.12] hover:text-white'
-            }`
-          }>
-            <div className="flex items-center justify-center">
-              <Dog className="mr-2" />
-              Mascotas
-            </div>
-          </Tab>
-        </TabList>
+      {/* Tabs de Gestión con componentes de Radix UI */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid grid-cols-4 mb-8">
+          <TabsTrigger value="properties" className="flex items-center gap-2">
+            <Building2 className="w-4 h-4" />
+            <span>Inmuebles</span>
+          </TabsTrigger>
+          <TabsTrigger value="residents" className="flex items-center gap-2">
+            <Users className="w-4 h-4" />
+            <span>Residentes</span>
+          </TabsTrigger>
+          <TabsTrigger value="vehicles" className="flex items-center gap-2">
+            <Car className="w-4 h-4" />
+            <span>Vehículos</span>
+          </TabsTrigger>
+          <TabsTrigger value="pets" className="flex items-center gap-2">
+            <Dog className="w-4 h-4" />
+            <span>Mascotas</span>
+          </TabsTrigger>
+        </TabsList>
 
-        <TabPanels className="mt-2">
-          {/* Panel de Inmuebles */}
-          <TabPanel className="rounded-xl bg-white p-3">
-            <div className="mb-4 flex justify-end">
-              <Button
-                onClick={() => {/* Agregar lógica */}}
-                className="bg-green-600 hover:bg-green-700 text-white"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Nuevo Inmueble
-              </Button>
-            </div>
-            <PropertiesTable properties={properties} />
-          </TabPanel>
+        {/* Panel de Inmuebles */}
+        <TabsContent value="properties" className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+          <div className="mb-4 flex justify-end">
+            <Button
+              onClick={() => {/* Agregar lógica */}}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Nuevo Inmueble
+            </Button>
+          </div>
+          <PropertiesTable properties={properties} />
+        </TabsContent>
 
-          {/* Panel de Residentes */}
-          <TabPanel className="rounded-xl bg-white p-3">
-            <div className="mb-4 flex justify-end">
-              <Button
-                onClick={() => setShowResidentForm(true)}
-                className="bg-green-600 hover:bg-green-700 text-white"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Nuevo Residente
-              </Button>
-            </div>
-            <ResidentsTable
-              residents={residents}
-              onEdit={(resident) => {
-                setSelectedResident(resident);
-                setShowResidentForm(true);
+        {/* Panel de Residentes */}
+        <TabsContent value="residents" className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+          <div className="mb-4 flex justify-end">
+            <Button
+              onClick={() => setShowResidentForm(true)}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Nuevo Residente
+            </Button>
+          </div>
+          <ResidentsTable
+            residents={residents}
+            onEdit={(resident) => {
+              setSelectedResident(resident);
+              setShowResidentForm(true);
+            }}
+          />
+          {showResidentForm && (
+            <ResidentForm
+              resident={selectedResident}
+              onSave={handleResidentSave}
+              onCancel={() => {
+                setShowResidentForm(false);
+                setSelectedResident(null);
               }}
+              properties={properties}
             />
-            {showResidentForm && (
-              <ResidentForm
-                resident={selectedResident}
-                onSave={handleResidentSave}
-                onCancel={() => {
-                  setShowResidentForm(false);
-                  setSelectedResident(null);
-                }}
-                properties={properties}
-              />
-            )}
-          </TabPanel>
+          )}
+        </TabsContent>
 
-          {/* Panel de Vehículos */}
-          <TabPanel className="rounded-xl bg-white p-3">
-            <VehiclesTable />
-          </TabPanel>
+        {/* Panel de Vehículos */}
+        <TabsContent value="vehicles" className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+          <VehiclesTable />
+        </TabsContent>
 
-          {/* Panel de Mascotas */}
-          <TabPanel className="rounded-xl bg-white p-3">
-            <PetsTable />
-          </TabPanel>
-        </TabPanels>
-      </TabGroup>
+        {/* Panel de Mascotas */}
+        <TabsContent value="pets" className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+          <PetsTable />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

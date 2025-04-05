@@ -1,4 +1,4 @@
-// C:\Users\meciz\Documents\armonia\frontend\src\app\resident\assemblies\page.tsx
+// src/app/(auth)/resident/assemblies/page.tsx
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -37,6 +37,7 @@ export default function ResidentAssembliesPage() {
   const [isSubmitting, setIsSubmitting] = useState<{ [key: number]: number | null }>({});
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [selectedAssembly, setSelectedAssembly] = useState<number | null>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -164,84 +165,116 @@ export default function ResidentAssembliesPage() {
 
   if (!isClient || !isLoggedIn || !token) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-full">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <header className="bg-indigo-600 text-white p-4">
-        <h1 className="text-2xl font-bold">{language === 'Español' ? 'Asambleas' : 'Assemblies'}</h1>
-      </header>
-      <main className="flex-1 p-6">
-        <h2 className="text-xl font-semibold mb-4">{language === 'Español' ? 'Asambleas Disponibles' : 'Available Assemblies'}</h2>
-        <div className="space-y-4">
-          {assemblies.map(assembly => (
-            <div key={assembly.id} className="border p-4 rounded-md bg-white shadow-md">
-              <p><strong>{assembly.title}</strong></p>
-              <p>{new Date(assembly.date).toLocaleString()}</p>
-              <Button
-                onClick={() => handleConfirmAttendance(assembly.id)}
-                disabled={isSubmitting[assembly.id] === 0}
-                className="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white mr-2"
-              >
-                {isSubmitting[assembly.id] === 0 ? (
-                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                ) : null}
-                {language === 'Español' ? 'Confirmar Asistencia' : 'Confirm Attendance'}
-              </Button>
-              <div className="mt-4">
-                <h3 className="text-lg font-semibold">{language === 'Español' ? 'Votaciones' : 'Voting'}</h3>
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-6">{language === 'Español' ? 'Asambleas Disponibles' : 'Available Assemblies'}</h2>
+      <div className="space-y-6">
+        {assemblies.map(assembly => (
+          <div key={assembly.id} className="bg-white shadow-md rounded-lg p-6">
+            <h3 className="text-xl font-semibold mb-2">{assembly.title}</h3>
+            <p className="text-gray-600 mb-4">{new Date(assembly.date).toLocaleString()}</p>
+            <Button
+              onClick={() => handleConfirmAttendance(assembly.id)}
+              disabled={isSubmitting[assembly.id] === 0}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white mr-2"
+            >
+              {isSubmitting[assembly.id] === 0 ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              ) : null}
+              {language === 'Español' ? 'Confirmar Asistencia' : 'Confirm Attendance'}
+            </Button>
+            <div className="mt-6">
+              <h4 className="text-lg font-medium mb-3">{language === 'Español' ? 'Votaciones' : 'Voting'}</h4>
+              <div className="space-y-4">
                 {assembly.agenda.map(item => (
-                  <div key={item.numeral} className="mt-2">
-                    <p>{item.numeral}. {item.topic}</p>
-                    <div className="flex space-x-2">
+                  <div key={item.numeral} className="bg-gray-50 p-4 rounded-md">
+                    <p className="mb-2"><span className="font-medium">#{item.numeral}:</span> {item.topic}</p>
+                    <div className="flex space-x-3">
                       <Button
                         onClick={() => handleVote(assembly.id, item.numeral, 'YES')}
                         disabled={isSubmitting[assembly.id] === item.numeral}
-                        className="bg-green-500 hover:bg-green-600 text-white"
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        size="sm"
                       >
                         {isSubmitting[assembly.id] === item.numeral ? (
                           <Loader2 className="w-4 h-4 animate-spin mr-2" />
                         ) : null}
-                        {language === 'Español' ? 'Sí' : 'Yes'}
+                        {language === 'Español' ? 'Aprobar' : 'Approve'}
                       </Button>
                       <Button
                         onClick={() => handleVote(assembly.id, item.numeral, 'NO')}
                         disabled={isSubmitting[assembly.id] === item.numeral}
-                        className="bg-red-500 hover:bg-red-600 text-white"
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                        size="sm"
                       >
                         {isSubmitting[assembly.id] === item.numeral ? (
                           <Loader2 className="w-4 h-4 animate-spin mr-2" />
                         ) : null}
-                        {language === 'Español' ? 'No' : 'No'}
+                        {language === 'Español' ? 'Rechazar' : 'Reject'}
                       </Button>
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="mt-4">
-                <h3 className="text-lg font-semibold">{language === 'Español' ? 'Documentos' : 'Documents'}</h3>
-                {(documents[assembly.id] || []).map(doc => (
-                  <div key={doc.id} className="mt-2">
-                    <p>{doc.fileName} - {new Date(doc.createdAt).toLocaleString()}</p>
-                    <Button
-                      onClick={() => handleDownloadDocument(doc.id)}
-                      className="bg-blue-500 hover:bg-blue-600 text-white"
-                    >
-                      {language === 'Español' ? 'Descargar' : 'Download'}
-                    </Button>
-                  </div>
-                ))}
+            </div>
+            <div className="mt-6">
+              <h4 className="text-lg font-medium mb-3">{language === 'Español' ? 'Documentos' : 'Documents'}</h4>
+              <div className="space-y-2">
+                {(documents[assembly.id] || []).length > 0 ? (
+                  documents[assembly.id].map(doc => (
+                    <div key={doc.id} className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
+                      <div>
+                        <p className="font-medium">{doc.fileName}</p>
+                        <p className="text-sm text-gray-500">{new Date(doc.createdAt).toLocaleString()}</p>
+                      </div>
+                      <Button
+                        onClick={() => {
+                          setSelectedAssembly(assembly.id);
+                          handleDownloadDocument(doc.id);
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                        size="sm"
+                      >
+                        {language === 'Español' ? 'Descargar' : 'Download'}
+                      </Button>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 italic">{language === 'Español' ? 'No hay documentos disponibles' : 'No documents available'}</p>
+                )}
               </div>
             </div>
-          ))}
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          {success && <p className="text-green-500 text-sm">{success}</p>}
-        </div>
-      </main>
+          </div>
+        ))}
+        
+        {assemblies.length === 0 && (
+          <div className="bg-white shadow-md rounded-lg p-6 text-center">
+            <p className="text-gray-500">
+              {language === 'Español' 
+                ? 'No hay asambleas programadas en este momento.' 
+                : 'No assemblies scheduled at this time.'}
+            </p>
+          </div>
+        )}
+        
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+            {error}
+          </div>
+        )}
+        
+        {success && (
+          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md">
+            {success}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
