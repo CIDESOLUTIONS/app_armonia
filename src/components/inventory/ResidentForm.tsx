@@ -1,218 +1,256 @@
 // src/components/inventory/ResidentForm.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-
-interface Property {
-  id: number;
-  unitNumber: string;
-}
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface Resident {
   id?: number;
   name: string;
+  email: string;
   dni: string;
   birthDate: string;
-  email: string;
   whatsapp: string;
   residentType: 'permanente' | 'temporal';
   startDate: string;
   endDate?: string;
-  propertyId: number;
-  status: 'activo' | 'inactivo';
+  status: string;
+  propertyNumber: string;
+}
+
+interface Property {
+  id: number;
+  unitNumber: string;
+  type: string;
+  status: string;
+  ownerName: string;
+  ownerDNI: string;
+  ownerEmail: string;
 }
 
 interface ResidentFormProps {
-  resident?: Resident;
-  properties: Property[];
-  onSave: (data: Resident) => void;
+  resident: Resident | null;
+  onSave: (residentData: Resident) => Promise<void>;
   onCancel: () => void;
+  properties: Property[];
 }
 
-export function ResidentForm({
-  resident,
-  properties,
-  onSave,
-  onCancel
-}: ResidentFormProps) {
-  const [formData, setFormData] = useState<Resident>({
-    name: resident?.name || '',
-    dni: resident?.dni || '',
-    birthDate: resident?.birthDate || '',
-    email: resident?.email || '',
-    whatsapp: resident?.whatsapp || '',
-    residentType: resident?.residentType || 'permanente',
-    startDate: resident?.startDate || new Date().toISOString().split('T')[0],
-    endDate: resident?.endDate,
-    propertyId: resident?.propertyId || 0,
-    status: resident?.status || 'activo'
-  });
-
-  const [errors, setErrors] = useState<Partial<Record<keyof Resident, string>>>({});
-
-  const validateForm = () => {
-    const newErrors: Partial<Record<keyof Resident, string>> = {};
-
-    if (!formData.name) newErrors.name = 'El nombre es requerido';
-    if (!formData.dni) newErrors.dni = 'El DNI es requerido';
-    if (!formData.email) newErrors.email = 'El email es requerido';
-    if (!formData.propertyId) newErrors.propertyId = 'Debe seleccionar una propiedad';
-    
-    // Validar formato de email
-    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email inválido';
+export function ResidentForm({ resident, onSave, onCancel, properties }: ResidentFormProps) {
+  const [formData, setFormData] = useState<Resident>(
+    resident || {
+      name: '',
+      email: '',
+      dni: '',
+      birthDate: '',
+      whatsapp: '',
+      residentType: 'permanente',
+      startDate: new Date().toISOString().split('T')[0],
+      status: 'activo',
+      propertyNumber: '',
     }
+  );
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-    // Validar fechas
-    if (formData.residentType === 'temporal' && !formData.endDate) {
-      newErrors.endDate = 'Fecha fin requerida para residentes temporales';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (validateForm()) {
-      onSave(formData);
+    setLoading(true);
+    setError('');
+
+    try {
+      await onSave(formData);
+    } catch (err) {
+      console.error('Error al guardar residente:', err);
+      setError(err instanceof Error ? err.message : 'Error al guardar residente');
+    } finally {
+      setLoading(false);
     }
   };
+
+  const isTemporary = formData.residentType === 'temporal';
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle>
-            {resident ? 'Editar Residente' : 'Nuevo Residente'}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name">Nombre Completo</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  error={errors.name}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="dni">DNI</Label>
-                <Input
-                  id="dni"
-                  value={formData.dni}
-                  onChange={(e) => setFormData({ ...formData, dni: e.target.value })}
-                  error={errors.dni}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="birthDate">Fecha de Nacimiento</Label>
-                <Input
-                  id="birthDate"
-                  type="date"
-                  value={formData.birthDate}
-                  onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  error={errors.email}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="whatsapp">WhatsApp</Label>
-                <Input
-                  id="whatsapp"
-                  value={formData.whatsapp}
-                  onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="propertyId">Inmueble</Label>
-                <Select
-                  id="propertyId"
-                  value={formData.propertyId.toString()}
-                  onChange={(e) => setFormData({ ...formData, propertyId: parseInt(e.target.value) })}
-                  error={errors.propertyId}
-                >
-                  <option value="">Seleccione un inmueble</option>
-                  {properties.map((property) => (
-                    <option key={property.id} value={property.id}>
-                      {property.unitNumber}
-                    </option>
-                  ))}
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="residentType">Tipo de Residente</Label>
-                <Select
-                  id="residentType"
-                  value={formData.residentType}
-                  onChange={(e) => setFormData({ 
-                    ...formData, 
-                    residentType: e.target.value as 'permanente' | 'temporal'
-                  })}
-                >
-                  <option value="permanente">Permanente</option>
-                  <option value="temporal">Temporal</option>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="startDate">Fecha Inicio</Label>
-                <Input
-                  id="startDate"
-                  type="date"
-                  value={formData.startDate}
-                  onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                />
-              </div>
-
-              {formData.residentType === 'temporal' && (
-                <div>
-                  <Label htmlFor="endDate">Fecha Fin</Label>
-                  <Input
-                    id="endDate"
-                    type="date"
-                    value={formData.endDate || ''}
-                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                    error={errors.endDate}
-                  />
-                </div>
-              )}
+    <Dialog open={true} onOpenChange={() => onCancel()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{resident ? 'Editar Residente' : 'Nuevo Residente'}</DialogTitle>
+        </DialogHeader>
+        
+        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+          <div>
+            <Label htmlFor="name">Nombre Completo</Label>
+            <Input
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="dni">DNI/Identificación</Label>
+            <Input
+              id="dni"
+              name="dni"
+              value={formData.dni}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="whatsapp">WhatsApp</Label>
+            <Input
+              id="whatsapp"
+              name="whatsapp"
+              value={formData.whatsapp}
+              onChange={handleChange}
+              disabled={loading}
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="birthDate">Fecha de Nacimiento</Label>
+            <Input
+              id="birthDate"
+              name="birthDate"
+              type="date"
+              value={formData.birthDate}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="propertyNumber">Propiedad</Label>
+            <select
+              id="propertyNumber"
+              name="propertyNumber"
+              value={formData.propertyNumber}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              required
+              disabled={loading}
+            >
+              <option value="">Seleccione una propiedad</option>
+              {properties.map((property) => (
+                <option key={property.id} value={property.unitNumber}>
+                  {property.unitNumber} - {property.ownerName}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <div>
+            <Label htmlFor="residentType">Tipo de Residente</Label>
+            <select
+              id="residentType"
+              name="residentType"
+              value={formData.residentType}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              required
+              disabled={loading}
+            >
+              <option value="permanente">Permanente</option>
+              <option value="temporal">Temporal</option>
+            </select>
+          </div>
+          
+          <div>
+            <Label htmlFor="startDate">Fecha de Inicio</Label>
+            <Input
+              id="startDate"
+              name="startDate"
+              type="date"
+              value={formData.startDate}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+          </div>
+          
+          {isTemporary && (
+            <div>
+              <Label htmlFor="endDate">Fecha de Finalización</Label>
+              <Input
+                id="endDate"
+                name="endDate"
+                type="date"
+                value={formData.endDate || ''}
+                onChange={handleChange}
+                required={isTemporary}
+                disabled={loading}
+              />
             </div>
-
-            <div className="flex justify-end space-x-2 mt-6">
-              <Button type="button" variant="outline" onClick={onCancel}>
-                Cancelar
-              </Button>
-              <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white">
-                {resident ? 'Actualizar' : 'Crear'}
-              </Button>
+          )}
+          
+          <div>
+            <Label htmlFor="status">Estado</Label>
+            <select
+              id="status"
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              required
+              disabled={loading}
+            >
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+          
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+              {error}
             </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+          )}
+          
+          <div className="flex justify-end space-x-4 pt-4">
+            <Button
+              type="button"
+              onClick={onCancel}
+              variant="outline"
+              disabled={loading}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
+              disabled={loading}
+            >
+              {loading ? 'Guardando...' : 'Guardar'}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -2,25 +2,9 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
-import { 
-  Form, 
-  FormControl, 
-  FormDescription, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormMessage 
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { 
   Select,
@@ -29,287 +13,281 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "@/components/ui/use-toast";
-import { useServices, PQRType, PQRPriority, CreatePQRDto } from "@/lib/services";
-import { useForm } from "react-hook-form";
+import { 
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  CardDescription
+} from "@/components/ui/card";
 
-interface CreatePQRFormProps {
-  onSuccess?: () => void;
-  onCancel?: () => void;
+enum PQRType {
+  PETITION = 'PETITION',
+  COMPLAINT = 'COMPLAINT',
+  CLAIM = 'CLAIM'
 }
 
-export function CreatePQRForm({ onSuccess, onCancel }: CreatePQRFormProps) {
-  const { pqr } = useServices();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // Definir formulario
-  const form = useForm<CreatePQRDto>({
-    defaultValues: {
-      title: "",
-      description: "",
-      type: PQRType.PETITION,
-      priority: PQRPriority.MEDIUM,
-      category: "",
-      subcategory: "",
-    },
+enum PQRPriority {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+  URGENT = 'URGENT'
+}
+
+interface CreatePQRFormProps {
+  onSuccess: () => void;
+  onCancel: () => void;
+  isInCard?: boolean;
+}
+
+export function CreatePQRForm({
+  onSuccess,
+  onCancel,
+  isInCard = false
+}: CreatePQRFormProps) {
+  // Estados para el formulario
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    type: PQRType.PETITION,
+    priority: PQRPriority.MEDIUM,
+    category: "",
+    propertyUnit: "",
   });
   
-  // Categorías de PQR
+  // Estados para la carga y errores
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Categorías disponibles
   const categories = [
-    { value: "infrastructure", label: "Infraestructura" },
-    { value: "security", label: "Seguridad" },
-    { value: "payments", label: "Pagos" },
-    { value: "noise", label: "Ruido" },
-    { value: "common_areas", label: "Áreas comunes" },
-    { value: "other", label: "Otro" },
+    { id: "infrastructure", name: "Infraestructura" },
+    { id: "security", name: "Seguridad" },
+    { id: "noise", name: "Ruido" },
+    { id: "payments", name: "Pagos" },
+    { id: "services", name: "Servicios comunes" },
+    { id: "other", name: "Otro" },
   ];
   
-  // Subcategorías por categoría
-  const subcategories: Record<string, { value: string; label: string }[]> = {
-    infrastructure: [
-      { value: "damages", label: "Daños" },
-      { value: "maintenance", label: "Mantenimiento" },
-      { value: "improvements", label: "Mejoras" },
-    ],
-    security: [
-      { value: "access", label: "Acceso" },
-      { value: "cameras", label: "Cámaras" },
-      { value: "incident", label: "Incidentes" },
-    ],
-    payments: [
-      { value: "fees", label: "Cuotas" },
-      { value: "receipts", label: "Recibos" },
-      { value: "discounts", label: "Descuentos" },
-    ],
-    noise: [
-      { value: "neighbors", label: "Vecinos" },
-      { value: "events", label: "Eventos" },
-      { value: "construction", label: "Construcción" },
-    ],
-    common_areas: [
-      { value: "pool", label: "Piscina" },
-      { value: "gym", label: "Gimnasio" },
-      { value: "garden", label: "Jardines" },
-      { value: "halls", label: "Salones" },
-    ],
-    other: [
-      { value: "general", label: "General" },
-    ],
+  // Manejar cambios en el formulario
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
   
-  // Manejar cambio de categoría
-  const handleCategoryChange = (value: string) => {
-    form.setValue("category", value);
-    form.setValue("subcategory", "");
+  // Manejar cambios en selects
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+  
+  // Validar el formulario
+  const validateForm = () => {
+    if (!formData.title.trim()) {
+      setError("El título es obligatorio");
+      return false;
+    }
+    
+    if (!formData.description.trim()) {
+      setError("La descripción es obligatoria");
+      return false;
+    }
+    
+    if (!formData.category) {
+      setError("La categoría es obligatoria");
+      return false;
+    }
+    
+    return true;
   };
   
   // Manejar envío del formulario
-  const onSubmit = async (data: CreatePQRDto) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+    
+    setLoading(true);
+    setError(null);
+    
     try {
-      setIsSubmitting(true);
+      // Simulación de envío
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Llamar al servicio para crear el PQR
-      const result = await pqr.createPQR(data);
+      // En un caso real, aquí llamaríamos a la API
+      console.log("Datos enviados:", formData);
       
-      toast({
-        title: "Solicitud creada",
-        description: "Tu solicitud ha sido enviada exitosamente",
-        variant: "default",
-      });
-      
-      // Limpiar formulario y notificar éxito
-      form.reset();
-      if (onSuccess) onSuccess();
-      
-    } catch (error) {
-      console.error("Error al crear PQR:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo crear la solicitud. Por favor, intenta nuevamente.",
-        variant: "destructive",
-      });
+      // Notificar éxito
+      onSuccess();
+    } catch (err) {
+      console.error("Error al crear solicitud:", err);
+      setError("No se pudo crear la solicitud. Intenta nuevamente.");
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
   
-  // Obtener la categoría seleccionada
-  const selectedCategory = form.watch("category");
+  // Componente del formulario
+  const FormContent = (
+    <>
+      <div className="space-y-4">
+        <div>
+          <Label htmlFor="title">Título</Label>
+          <Input
+            id="title"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            placeholder="Resumen breve del asunto"
+            required
+          />
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="type">Tipo</Label>
+            <Select
+              value={formData.type}
+              onValueChange={(value) => handleSelectChange("type", value)}
+            >
+              <SelectTrigger id="type">
+                <SelectValue placeholder="Selecciona el tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={PQRType.PETITION}>Petición</SelectItem>
+                <SelectItem value={PQRType.COMPLAINT}>Queja</SelectItem>
+                <SelectItem value={PQRType.CLAIM}>Reclamo</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <Label htmlFor="priority">Prioridad</Label>
+            <Select
+              value={formData.priority}
+              onValueChange={(value) => handleSelectChange("priority", value)}
+            >
+              <SelectTrigger id="priority">
+                <SelectValue placeholder="Selecciona la prioridad" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={PQRPriority.LOW}>Baja</SelectItem>
+                <SelectItem value={PQRPriority.MEDIUM}>Media</SelectItem>
+                <SelectItem value={PQRPriority.HIGH}>Alta</SelectItem>
+                <SelectItem value={PQRPriority.URGENT}>Urgente</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        
+        <div>
+          <Label htmlFor="category">Categoría</Label>
+          <Select
+            value={formData.category}
+            onValueChange={(value) => handleSelectChange("category", value)}
+          >
+            <SelectTrigger id="category">
+              <SelectValue placeholder="Selecciona una categoría" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map((category) => (
+                <SelectItem key={category.id} value={category.id}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div>
+          <Label htmlFor="propertyUnit">Unidad (opcional)</Label>
+          <Input
+            id="propertyUnit"
+            name="propertyUnit"
+            value={formData.propertyUnit}
+            onChange={handleChange}
+            placeholder="Ej: A-101"
+          />
+        </div>
+        
+        <div>
+          <Label htmlFor="description">Descripción detallada</Label>
+          <Textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            placeholder="Describe con detalle tu solicitud, queja o reclamo..."
+            rows={5}
+            required
+          />
+        </div>
+        
+        {error && (
+          <div className="bg-red-50 text-red-700 p-3 rounded-md border border-red-200">
+            {error}
+          </div>
+        )}
+      </div>
+      
+      <div className="flex justify-end gap-2 mt-4">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={loading}
+        >
+          Cancelar
+        </Button>
+        <Button
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? "Enviando..." : "Enviar solicitud"}
+        </Button>
+      </div>
+    </>
+  );
   
+  // Si está dentro de una tarjeta, devolver solo el contenido
+  if (!isInCard) {
+    return (
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {FormContent}
+      </form>
+    );
+  }
+  
+  // Si no, devolver una tarjeta con el formulario
   return (
-    <Card className="w-full">
+    <Card>
       <CardHeader>
-        <CardTitle>Nueva Solicitud</CardTitle>
-        <CardDescription>
-          Completa el formulario para enviar una petición, queja o reclamo
-        </CardDescription>
+        <CardTitle>Nueva solicitud</CardTitle>
+        <CardDescription>Reporta un problema o realiza una petición</CardDescription>
       </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="title"
-              rules={{ required: "Este campo es obligatorio" }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Título</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Escribe un título para tu solicitud" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="type"
-              rules={{ required: "Este campo es obligatorio" }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tipo</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona el tipo de solicitud" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value={PQRType.PETITION}>Petición</SelectItem>
-                      <SelectItem value={PQRType.COMPLAINT}>Queja</SelectItem>
-                      <SelectItem value={PQRType.CLAIM}>Reclamo</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    Selecciona el tipo que mejor describe tu solicitud
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="priority"
-              rules={{ required: "Este campo es obligatorio" }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Prioridad</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona la prioridad" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value={PQRPriority.LOW}>Baja</SelectItem>
-                      <SelectItem value={PQRPriority.MEDIUM}>Media</SelectItem>
-                      <SelectItem value={PQRPriority.HIGH}>Alta</SelectItem>
-                      <SelectItem value={PQRPriority.URGENT}>Urgente</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Categoría</FormLabel>
-                  <Select
-                    onValueChange={handleCategoryChange}
-                    value={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona una categoría" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.value} value={category.value}>
-                          {category.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            {selectedCategory && (
-              <FormField
-                control={form.control}
-                name="subcategory"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Subcategoría</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecciona una subcategoría" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {subcategories[selectedCategory]?.map((subcategory) => (
-                          <SelectItem key={subcategory.value} value={subcategory.value}>
-                            {subcategory.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-            
-            <FormField
-              control={form.control}
-              name="description"
-              rules={{ required: "Este campo es obligatorio" }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descripción</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Describe detalladamente tu solicitud..."
-                      className="min-h-[120px]"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <div className="flex justify-end space-x-4">
-              {onCancel && (
-                <Button type="button" variant="outline" onClick={onCancel}>
-                  Cancelar
-                </Button>
-              )}
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Enviando..." : "Enviar solicitud"}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </CardContent>
+      <form onSubmit={handleSubmit}>
+        <CardContent>
+          {FormContent}
+        </CardContent>
+        <CardFooter className="flex justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={loading}
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? "Enviando..." : "Enviar solicitud"}
+          </Button>
+        </CardFooter>
+      </form>
     </Card>
   );
 }

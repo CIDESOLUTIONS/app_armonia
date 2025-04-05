@@ -2,14 +2,9 @@
 "use client";
 
 import { useState } from 'react';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from '@/components/ui/use-toast';
-import { useToast } from '@/components/ui/use-toast';
-
-
 
 interface ComplexFormData {
   name: string;
@@ -25,189 +20,205 @@ interface ComplexFormData {
 }
 
 interface ComplexDataFormProps {
-  initialData: Partial<ComplexFormData>;
+  initialData: any;
   onSave: (data: ComplexFormData) => Promise<void>;
   onCancel: () => void;
 }
 
-export function MyComponent() {
-  const { toast } = useToast();
-
-  const handleAction = () => {
-    toast({
-      title: "Éxito",
-      description: "Operación completada",
-      variant: "success"
-    });
-  };
-};
-
-export function ComplexDataForm({
-  initialData,
-  onSave,
-  onCancel
-}: ComplexDataFormProps) {
+export function ComplexDataForm({ initialData, onSave, onCancel }: ComplexDataFormProps) {
   const [formData, setFormData] = useState<ComplexFormData>({
-    name: initialData.name || '',
-    address: initialData.address || '',
-    city: initialData.city || '',
-    state: initialData.state || '',
-    country: initialData.country || '',
-    adminName: initialData.adminName || '',
-    adminEmail: initialData.adminEmail || '',
-    adminPhone: initialData.adminPhone || '',
-    adminDNI: initialData.adminDNI || '',
-    adminAddress: initialData.adminAddress || ''
+    name: initialData?.name || '',
+    address: initialData?.address || '',
+    city: initialData?.city || '',
+    state: initialData?.state || '',
+    country: initialData?.country || '',
+    adminName: initialData?.adminName || '',
+    adminEmail: initialData?.adminEmail || '',
+    adminPhone: initialData?.adminPhone || '',
+    adminDNI: initialData?.adminDNI || '',
+    adminAddress: initialData?.adminAddress || '',
   });
-
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
     try {
       await onSave(formData);
-      toast({
-        title: "Éxito",
-        description: "Datos del conjunto actualizados correctamente",
-      });
-    } catch (error) {
-      console.error('Error en formulario:', error);
-      toast({
-        title: "Error",
-        description: "No se pudieron actualizar los datos",
-        variant: "destructive",
-      });
+    } catch (err) {
+      console.error('Error al guardar:', err);
+      setError(err instanceof Error ? err.message : 'Error al guardar datos');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Datos del Conjunto Residencial</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="name">Nombre del Conjunto</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="address">Dirección</Label>
-                <Input
-                  id="address"
-                  value={formData.address}
-                  onChange={(e) => setFormData({...formData, address: e.target.value})}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="city">Ciudad</Label>
-                <Input
-                  id="city"
-                  value={formData.city}
-                  onChange={(e) => setFormData({...formData, city: e.target.value})}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="state">Estado/Departamento</Label>
-                <Input
-                  id="state"
-                  value={formData.state}
-                  onChange={(e) => setFormData({...formData, state: e.target.value})}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="country">País</Label>
-                <Input
-                  id="country"
-                  value={formData.country}
-                  onChange={(e) => setFormData({...formData, country: e.target.value})}
-                  required
-                />
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="adminName">Nombre del Administrador</Label>
-                <Input
-                  id="adminName"
-                  value={formData.adminName}
-                  onChange={(e) => setFormData({...formData, adminName: e.target.value})}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="adminDNI">DNI del Administrador</Label>
-                <Input
-                  id="adminDNI"
-                  value={formData.adminDNI}
-                  onChange={(e) => setFormData({...formData, adminDNI: e.target.value})}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="adminEmail">Email del Administrador</Label>
-                <Input
-                  id="adminEmail"
-                  type="email"
-                  value={formData.adminEmail}
-                  onChange={(e) => setFormData({...formData, adminEmail: e.target.value})}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="adminPhone">Teléfono del Administrador</Label>
-                <Input
-                  id="adminPhone"
-                  value={formData.adminPhone}
-                  onChange={(e) => setFormData({...formData, adminPhone: e.target.value})}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="adminAddress">Dirección del Administrador</Label>
-                <Input
-                  id="adminAddress"
-                  value={formData.adminAddress}
-                  onChange={(e) => setFormData({...formData, adminAddress: e.target.value})}
-                  required
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end space-x-2 mt-6">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onCancel}
+    <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+      <h2 className="text-xl font-bold mb-6">Datos del Conjunto</h2>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Información General</h3>
+          
+          <div className="mb-4">
+            <Label htmlFor="name">Nombre del Conjunto</Label>
+            <Input
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
               disabled={loading}
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              disabled={loading}
-            >
-              {loading ? 'Guardando...' : 'Guardar Cambios'}
-            </Button>
+            />
           </div>
-        </form>
-      </CardContent>
-    </Card>
+          
+          <div className="mb-4">
+            <Label htmlFor="address">Dirección</Label>
+            <Input
+              id="address"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+          </div>
+          
+          <div className="mb-4">
+            <Label htmlFor="city">Ciudad</Label>
+            <Input
+              id="city"
+              name="city"
+              value={formData.city}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+          </div>
+          
+          <div className="mb-4">
+            <Label htmlFor="state">Estado/Provincia</Label>
+            <Input
+              id="state"
+              name="state"
+              value={formData.state}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+          </div>
+          
+          <div className="mb-4">
+            <Label htmlFor="country">País</Label>
+            <Input
+              id="country"
+              name="country"
+              value={formData.country}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+          </div>
+        </div>
+        
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Información del Administrador</h3>
+          
+          <div className="mb-4">
+            <Label htmlFor="adminName">Nombre</Label>
+            <Input
+              id="adminName"
+              name="adminName"
+              value={formData.adminName}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+          </div>
+          
+          <div className="mb-4">
+            <Label htmlFor="adminDNI">DNI/Identificación</Label>
+            <Input
+              id="adminDNI"
+              name="adminDNI"
+              value={formData.adminDNI}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+          </div>
+          
+          <div className="mb-4">
+            <Label htmlFor="adminEmail">Email</Label>
+            <Input
+              id="adminEmail"
+              name="adminEmail"
+              type="email"
+              value={formData.adminEmail}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+          </div>
+          
+          <div className="mb-4">
+            <Label htmlFor="adminPhone">Teléfono</Label>
+            <Input
+              id="adminPhone"
+              name="adminPhone"
+              value={formData.adminPhone}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+          </div>
+          
+          <div className="mb-4">
+            <Label htmlFor="adminAddress">Dirección</Label>
+            <Input
+              id="adminAddress"
+              name="adminAddress"
+              value={formData.adminAddress}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+          </div>
+        </div>
+      </div>
+      
+      {error && (
+        <div className="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          {error}
+        </div>
+      )}
+      
+      <div className="mt-6 flex justify-end space-x-4">
+        <Button
+          type="button"
+          onClick={onCancel}
+          variant="outline"
+          disabled={loading}
+        >
+          Cancelar
+        </Button>
+        <Button
+          type="submit"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white"
+          disabled={loading}
+        >
+          {loading ? 'Guardando...' : 'Guardar Cambios'}
+        </Button>
+      </div>
+    </form>
   );
 }

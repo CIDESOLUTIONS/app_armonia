@@ -59,12 +59,117 @@ interface Resident {
   propertyNumber: string;
 }
 
+// Datos simulados para desarrollo
+const mockComplex: Complex = {
+  id: 1,
+  name: "Conjunto Residencial Armonía",
+  address: "Calle Principal 123",
+  city: "Bogotá",
+  state: "Cundinamarca",
+  country: "Colombia",
+  adminName: "Administrador Demo",
+  adminEmail: "admin@armonia.com",
+  adminPhone: "3001234567",
+  adminDNI: "1234567890",
+  adminAddress: "Calle 45 #12-34, Bogotá",
+  totalProperties: 50,
+  totalResidents: 120
+};
+
+const mockProperties: Property[] = [
+  {
+    id: 1,
+    unitNumber: "A-101",
+    type: "apartment",
+    status: "occupied",
+    ownerName: "Carlos Rodríguez",
+    ownerDNI: "1023456789",
+    ownerEmail: "carlos@example.com"
+  },
+  {
+    id: 2,
+    unitNumber: "A-102",
+    type: "apartment",
+    status: "occupied",
+    ownerName: "María López",
+    ownerDNI: "1087654321",
+    ownerEmail: "maria@example.com"
+  },
+  {
+    id: 3,
+    unitNumber: "A-103",
+    type: "apartment",
+    status: "vacant",
+    ownerName: "Juan Pérez",
+    ownerDNI: "1076543210",
+    ownerEmail: "juan@example.com"
+  },
+  {
+    id: 4,
+    unitNumber: "B-201",
+    type: "apartment",
+    status: "rented",
+    ownerName: "Ana Martínez",
+    ownerDNI: "1065432109",
+    ownerEmail: "ana@example.com"
+  },
+  {
+    id: 5,
+    unitNumber: "B-202",
+    type: "apartment",
+    status: "occupied",
+    ownerName: "Pedro Sánchez",
+    ownerDNI: "1054321098",
+    ownerEmail: "pedro@example.com"
+  }
+];
+
+const mockResidents: Resident[] = [
+  {
+    id: 1,
+    name: "Carlos Rodríguez",
+    email: "carlos@example.com",
+    dni: "1023456789",
+    birthDate: "1980-05-15",
+    whatsapp: "3001234567",
+    residentType: "permanente",
+    startDate: "2020-01-10",
+    status: "activo",
+    propertyNumber: "A-101"
+  },
+  {
+    id: 2,
+    name: "María López",
+    email: "maria@example.com",
+    dni: "1087654321",
+    birthDate: "1985-08-22",
+    whatsapp: "3109876543",
+    residentType: "permanente",
+    startDate: "2020-02-15",
+    status: "activo",
+    propertyNumber: "A-102"
+  },
+  {
+    id: 3,
+    name: "Roberto González",
+    email: "roberto@example.com",
+    dni: "1012345678",
+    birthDate: "1990-03-25",
+    whatsapp: "3209876543",
+    residentType: "temporal",
+    startDate: "2023-01-01",
+    endDate: "2023-12-31",
+    status: "activo",
+    propertyNumber: "B-201"
+  }
+];
+
 export default function InventoryPage() {
   const { user } = useAuth();
-  const [complex, setComplex] = useState<Complex | null>(null);
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [residents, setResidents] = useState<Resident[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [complex, setComplex] = useState<Complex | null>(mockComplex); // Usar datos simulados inicialmente
+  const [properties, setProperties] = useState<Property[]>(mockProperties); // Usar datos simulados inicialmente
+  const [residents, setResidents] = useState<Resident[]>(mockResidents); // Usar datos simulados inicialmente
+  const [loading, setLoading] = useState(false); // Cambiar a false ya que tenemos datos simulados
   const [error, setError] = useState('');
   const [showComplexForm, setShowComplexForm] = useState(false);
   const [showResidentForm, setShowResidentForm] = useState(false);
@@ -72,21 +177,39 @@ export default function InventoryPage() {
   const [activeTab, setActiveTab] = useState("properties");
 
   useEffect(() => {
-    fetchData();
+    // Simulamos un breve tiempo de carga
+    const timer = setTimeout(() => {
+      fetchData();
+    }, 500);
+    
+    return () => clearTimeout(timer);
   }, [user]);
 
   const fetchData = async () => {
-    if (!user?.complexId || !user?.schemaName) {
-      console.error('Faltan datos del usuario:', { user });
-      setError('Error: Información del conjunto no disponible');
-      setLoading(false);
-      return;
-    }
+    // Comentamos la verificación para pruebas
+    // if (!user?.complexId || !user?.schemaName) {
+    //   console.error('Faltan datos del usuario:', { user });
+    //   setError('Error: Información del conjunto no disponible');
+    //   setLoading(false);
+    //   return;
+    // }
   
     try {
       setLoading(true);
       setError('');
       
+      // Simulando la carga de datos desde una API
+      setTimeout(() => {
+        // Aquí es donde eventualmente cargaríamos datos reales de la API
+        // Por ahora, solo usamos los datos simulados definidos arriba
+        setComplex(mockComplex);
+        setProperties(mockProperties);
+        setResidents(mockResidents);
+        setLoading(false);
+      }, 500);
+      
+      // Código para API real (comentado hasta que esté disponible)
+      /*
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('No hay token de autenticación');
@@ -131,17 +254,32 @@ export default function InventoryPage() {
         setProperties(propertiesData.properties || []);
         setResidents(residentsData.residents || []);
       }
+      */
   
     } catch (error) {
       console.error('Error fetching data:', error);
       setError(error instanceof Error ? error.message : 'Error desconocido');
-    } finally {
       setLoading(false);
     }
   };
   
-  const handleComplexUpdate = async (updatedData: ComplexFormData) => {
+  const handleComplexUpdate = async (updatedData: any) => {
     try {
+      setLoading(true);
+      
+      // Simulando una llamada a API
+      setTimeout(() => {
+        // Actualizar los datos locales
+        setComplex({
+          ...mockComplex,
+          ...updatedData
+        });
+        setShowComplexForm(false);
+        setLoading(false);
+      }, 500);
+      
+      // Código para API real (comentado hasta que esté disponible)
+      /*
       const token = localStorage.getItem('token');
       if (!token) throw new Error('No hay token de autenticación');
   
@@ -170,18 +308,38 @@ export default function InventoryPage() {
       const { complex: updatedComplex } = await response.json();
       setComplex(updatedComplex);
       setShowComplexForm(false);
+      */
       
-      // Recargar datos
-      await fetchData();
-  
     } catch (error) {
       console.error('Error updating complex:', error);
-      throw error; // Propagar el error para que el formulario pueda manejarlo
+      setError(error instanceof Error ? error.message : 'Error al actualizar datos');
+      setLoading(false);
     }
   };
 
   const handleResidentSave = async (residentData: Resident) => {
     try {
+      setLoading(true);
+      
+      // Simulando una llamada a API
+      setTimeout(() => {
+        if (selectedResident) {
+          // Actualizar residente existente
+          setResidents(residents.map(resident => 
+            resident.id === selectedResident.id ? { ...residentData, id: resident.id } : resident
+          ));
+        } else {
+          // Agregar nuevo residente
+          setResidents([...residents, { ...residentData, id: residents.length + 1 }]);
+        }
+        
+        setShowResidentForm(false);
+        setSelectedResident(null);
+        setLoading(false);
+      }, 500);
+      
+      // Código para API real (comentado hasta que esté disponible)
+      /*
       const response = await fetch('/api/inventory/residents/update', {
         method: 'POST',
         headers: {
@@ -201,9 +359,12 @@ export default function InventoryPage() {
 
       setShowResidentForm(false);
       fetchData(); // Recargar datos
+      */
+      
     } catch (error) {
       console.error('Error saving resident:', error);
       setError('Error al guardar residente');
+      setLoading(false);
     }
   };
 

@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, BarChart2, Calendar, DollarSign, Building, Users, AlertCircle, Settings, Home, ChevronDown, ChevronUp, Shield, Check, X } from 'lucide-react';
+import { Loader2, Check, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/components/ui/use-toast';
 
 interface Resident {
   id: number;
@@ -18,7 +18,7 @@ interface Resident {
   attendance: 'Sí' | 'No' | 'Delegado';
   delegateName: string | null;
   confirmed: boolean;
-  isMainResident: boolean; // Nuevo campo para identificar residentes principales
+  isMainResident: boolean;
 }
 
 interface Assembly {
@@ -31,111 +31,116 @@ interface Assembly {
   status: string;
 }
 
+// Datos simulados para pruebas
+const mockAssemblies: Assembly[] = [
+  {
+    id: 1,
+    title: "Asamblea General Ordinaria 2024",
+    type: "GENERAL",
+    date: "2024-05-15T18:00:00",
+    description: "Aprobación de presupuesto anual y elección de comités",
+    agenda: [
+      { numeral: "1", topic: "Verificación de quórum", time: "00:15:00", completed: false, notes: "" },
+      { numeral: "2", topic: "Lectura y aprobación del orden del día", time: "00:10:00", completed: false, notes: "" },
+      { numeral: "3", topic: "Presentación de estados financieros", time: "00:30:00", completed: false, notes: "" }
+    ],
+    status: "PENDING"
+  },
+  {
+    id: 2,
+    title: "Asamblea Extraordinaria - Proyecto de Seguridad",
+    type: "EXTRAORDINARY",
+    date: "2024-05-25T19:00:00",
+    description: "Discusión y aprobación del proyecto de mejora de seguridad",
+    agenda: [
+      { numeral: "1", topic: "Verificación de quórum", time: "00:15:00", completed: false, notes: "" },
+      { numeral: "2", topic: "Presentación del proyecto", time: "00:25:00", completed: false, notes: "" },
+      { numeral: "3", topic: "Votación", time: "00:20:00", completed: false, notes: "" }
+    ],
+    status: "PENDING"
+  }
+];
+
+const mockResidents: Resident[] = [
+  {
+    id: 1,
+    number: "A-101",
+    name: "Carlos Rodríguez",
+    dni: "1023456789",
+    email: "carlos@example.com",
+    attendance: 'No',
+    delegateName: null,
+    confirmed: false,
+    isMainResident: true
+  },
+  {
+    id: 2,
+    number: "A-102",
+    name: "María López",
+    dni: "1087654321",
+    email: "maria@example.com",
+    attendance: 'No',
+    delegateName: null,
+    confirmed: false,
+    isMainResident: true
+  },
+  {
+    id: 3,
+    number: "B-201",
+    name: "Juan Pérez",
+    dni: "1076543210",
+    email: "juan@example.com",
+    attendance: 'No',
+    delegateName: null,
+    confirmed: false,
+    isMainResident: true
+  }
+];
+
 export default function AttendancePage() {
   const router = useRouter();
-  const { schemaName, user, isLoggedIn, token } = useAuth();
-  const [language, setLanguage] = useState('Español');
-  const [theme, setTheme] = useState('Claro');
-  const [currency, setCurrency] = useState('Dólares');
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
-  const [isClient, setIsClient] = useState(false);
-  const [expandedMenu, setExpandedMenu] = useState<string | null>('Asambleas');
-  const [residents, setResidents] = useState<Resident[]>([]);
-  const [assemblies, setAssemblies] = useState<Assembly[]>([]);
+  const { user, isLoggedIn, token } = useAuth();
+  const { toast } = useToast();
+  const [residents, setResidents] = useState<Resident[]>(mockResidents);
+  const [assemblies, setAssemblies] = useState<Assembly[]>(mockAssemblies);
   const [selectedAssembly, setSelectedAssembly] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [totalUnits, setTotalUnits] = useState<number>(0);
+  const [totalUnits, setTotalUnits] = useState<number>(50); // Valor simulado
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
-    if (!isLoggedIn || !token) {
-      router.push('/(public)/login');
-    } else {
-      fetchAssemblies();
-      fetchComplexData();
-    }
-  }, [isLoggedIn, token, router]);
+    // Simulamos un breve tiempo de carga de datos
+    setLoading(true);
+    setTimeout(() => {
+      setAssemblies(mockAssemblies);
+      setLoading(false);
+    }, 500);
+  }, []);
 
-  const fetchAssemblies = async () => {
-    try {
-      const response = await fetch(`/api/assemblies/list`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
-      const data = await response.json();
-      if (response.ok) {
-        const today = new Date().setHours(0, 0, 0, 0);
-        const filteredAssemblies = data.assemblies.filter((a: Assembly) => {
-          const assemblyDate = new Date(a.date).setHours(0, 0, 0, 0);
-          return assemblyDate >= today && (a.status === 'PENDING' || a.status === 'IN_PROGRESS');
-        });
-        setAssemblies(filteredAssemblies);
-        console.log('[Voting] Asambleas filtradas:', filteredAssemblies); // Debugging
-      }
-    } catch (err) {
-      console.error('[Voting] Error al cargar asambleas:', err);
-    }
-  };
-
-  const fetchResidents = async (assemblyId?: number) => {
-    try {
-      const url = assemblyId
-        ? `/api/assemblies/attendance?assemblyId=${assemblyId}`
-        : '/api/inventory/residents';
-      const response = await fetch(url, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setResidents(data.residents || []);
-        console.log('[Attendance] Residentes cargados:', data.residents);
-      } else {
-        setError(data.message || 'Error al cargar residentes');
-        console.error('[Attendance] Error en respuesta:', data.message, 'Status:', response.status);
-      }
-    } catch (err) {
-      console.error('[Attendance] Error al conectar con el servidor:', err);
-      setError('Error al conectar con el servidor');
-    }
-  };
-  
-  const fetchComplexData = async () => {
-    try {
-      const response = await fetch('/api/inventory/update', {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
-      const data = await response.json();
-      if (response.ok && data.complex) {
-        setTotalUnits(data.complex.totalUnits);
-      }
-    } catch (err) {
-      console.error('[Attendance] Error al cargar datos del conjunto:', err);
-    }
+  const fetchResidents = async (assemblyId: number) => {
+    setLoading(true);
+    // Simulando la obtención de datos de la API
+    setTimeout(() => {
+      setResidents(mockResidents);
+      setLoading(false);
+    }, 500);
   };
 
   const sendEmailInvitations = async () => {
     if (!selectedAssembly) return;
     setIsSubmitting(true);
     try {
-      const assembly = assemblies.find(a => a.id === selectedAssembly);
-      const response = await fetch('/api/assemblies/send-invitations', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          assemblyId: selectedAssembly,
-          title: assembly?.title,
-          date: assembly?.date,
-          agenda: assembly?.agenda,
-        }),
+      // Simulando envío de correos
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setSuccess('Invitaciones enviadas con éxito.');
+      toast({
+        title: "Envío exitoso",
+        description: "Invitaciones enviadas a todos los propietarios",
       });
-      if (!response.ok) throw new Error('Error al enviar invitaciones');
-      setSuccess(language === 'Español' ? 'Invitaciones enviadas con éxito.' : 'Invitations sent successfully.');
     } catch (err) {
-      setError(err.message);
+      setError('Error al enviar invitaciones');
     } finally {
       setIsSubmitting(false);
     }
@@ -162,7 +167,7 @@ export default function AttendancePage() {
 
   const handleSaveAttendance = async () => {
     if (!selectedAssembly) {
-      setError(language === 'Español' ? 'Por favor, selecciona una asamblea.' : 'Please select an assembly.');
+      setError('Por favor, selecciona una asamblea.');
       return;
     }
 
@@ -171,30 +176,23 @@ export default function AttendancePage() {
     setSuccess(null);
 
     try {
-      const response = await fetch('/api/assemblies/attendance', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          assemblyId: selectedAssembly,
-          residents: residents.map(r => ({
-            id: r.id,
-            attendance: r.attendance,
-            delegateName: r.delegateName,
-            confirmed: r.confirmed || r.attendance !== 'No',
-          })),
-        }),
+      // Simulación de guardado
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Marcar como confirmados los residentes que asisten
+      const updatedResidents = residents.map(r => ({
+        ...r,
+        confirmed: r.attendance === 'Sí' || r.attendance === 'Delegado'
+      }));
+      
+      setResidents(updatedResidents);
+      setSuccess('Asistencia guardada con éxito.');
+      toast({
+        title: "Guardado exitoso",
+        description: "La asistencia ha sido registrada correctamente",
       });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Error al guardar asistencia');
-
-      setSuccess(language === 'Español' ? 'Asistencia guardada con éxito.' : 'Attendance saved successfully.');
-      fetchResidents(selectedAssembly); // Refrescar lista
     } catch (err) {
-      setError(err.message);
+      setError('Error al guardar asistencia');
     } finally {
       setIsSubmitting(false);
     }
@@ -202,20 +200,26 @@ export default function AttendancePage() {
 
   const handleStartAssembly = async () => {
     if (!selectedAssembly || !calculateQuorum().achieved) return;
+    
+    setIsSubmitting(true);
     try {
-      const response = await fetch(`/api/assemblies/update?id=${selectedAssembly}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ status: 'IN_PROGRESS' }),
+      // Simulación de inicio de asamblea
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Actualizar estado de la asamblea localmente
+      setAssemblies(assemblies.map(a => 
+        a.id === selectedAssembly ? { ...a, status: 'IN_PROGRESS' } : a
+      ));
+      
+      setSuccess('Asamblea iniciada.');
+      toast({
+        title: "Asamblea iniciada",
+        description: "La asamblea ha sido iniciada correctamente",
       });
-      if (!response.ok) throw new Error('Error al iniciar asamblea');
-      setSuccess(language === 'Español' ? 'Asamblea iniciada.' : 'Assembly started.');
-      fetchAssemblies();
     } catch (err) {
-      setError(err.message);
+      setError('Error al iniciar asamblea');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -224,278 +228,155 @@ export default function AttendancePage() {
     setIsSubmitting(true);
     try {
       const assembly = assemblies.find(a => a.id === selectedAssembly);
-      const newDate = prompt(language === 'Español' ? 'Ingresa nueva fecha y hora (YYYY-MM-DDTHH:MM):' : 'Enter new date and time (YYYY-MM-DDTHH:MM):');
-      if (!newDate) return;
+      const newDate = prompt('Ingresa nueva fecha y hora (YYYY-MM-DDTHH:MM):');
+      if (!newDate) {
+        setIsSubmitting(false);
+        return;
+      }
 
-      const response = await fetch(`/api/assemblies/update?id=${selectedAssembly}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          title: assembly?.title,
-          type: assembly?.type,
-          date: newDate,
-          description: assembly?.description || undefined,
-          agenda: assembly?.agenda,
-          status: 'PENDING',
-        }),
+      // Simulación de reprogramación
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Actualizar fecha de la asamblea localmente
+      setAssemblies(assemblies.map(a => 
+        a.id === selectedAssembly ? { ...a, date: newDate } : a
+      ));
+      
+      setSuccess('Asamblea reprogramada.');
+      toast({
+        title: "Asamblea reprogramada",
+        description: "La asamblea ha sido reprogramada correctamente",
       });
-      if (!response.ok) throw new Error('Error al reprogramar');
-      setSuccess(language === 'Español' ? 'Asamblea reprogramada.' : 'Assembly rescheduled.');
-      fetchAssemblies();
     } catch (err) {
-      setError(err.message);
+      setError('Error al reprogramar asamblea');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const toggleSidebar = () => setIsSidebarCollapsed(!isSidebarCollapsed);
-  const toggleSubMenu = (label: string) => {
-    setExpandedMenu(expandedMenu === label ? null : label);
-    if (isSidebarCollapsed) setIsSidebarCollapsed(false);
-  };
+  const quorum = calculateQuorum();
 
-  const sidebarItems = [
-    { icon: <BarChart2 className="w-6 h-6" />, label: language === 'Español' ? 'Dashboard' : 'Dashboard', path: '/dashboard' },
-    {
-      icon: <Calendar className="w-6 h-6" />,
-      label: language === 'Español' ? 'Asambleas' : 'Assemblies',
-      subItems: [
-        { label: language === 'Español' ? 'Programación' : 'Scheduling', path: '/dashboard/assemblies/scheduling' },
-        { label: language === 'Español' ? 'Control Asistencia' : 'Attendance Control', path: '/dashboard/assemblies/attendance' },
-        { label: language === 'Español' ? 'Control Votación' : 'Voting Control', path: '/dashboard/assemblies/voting' },
-        { label: language === 'Español' ? 'Actas y Documentos' : 'Minutes and Documents', path: '/dashboard/assemblies/documents' },
-      ],
-    },
-    {
-      icon: <DollarSign className="w-6 h-6" />,
-      label: language === 'Español' ? 'Finanzas' : 'Finances',
-      subItems: [
-        { label: language === 'Español' ? 'Presupuesto' : 'Budget', path: '/dashboard/finances/budget' },
-        { label: language === 'Español' ? 'Proyectos' : 'Projects', path: '/dashboard/finances/projects' },
-        { label: language === 'Español' ? 'Cuotas Ordinarias' : 'Regular Fees', path: '/dashboard/finances/regular-fees' },
-        { label: language === 'Español' ? 'Cuotas Extraordinarias' : 'Extraordinary Fees', path: '/dashboard/finances/extra-fees' },
-        { label: language === 'Español' ? 'Servicios Comunes' : 'Common Services', path: '/dashboard/finances/common-services' },
-        { label: language === 'Español' ? 'Certificaciones' : 'Certifications', path: '/dashboard/finances/certifications' },
-      ],
-    },
-    {
-      icon: <Building className="w-6 h-6" />,
-      label: language === 'Español' ? 'Inventario' : 'Inventory',
-      subItems: [
-        { label: language === 'Español' ? 'Datos del Conjunto' : 'Complex Data', path: '/dashboard/inventory' },
-        { label: language === 'Español' ? 'Inmuebles' : 'Properties', path: '/dashboard/inventory/properties' },
-        { label: language === 'Español' ? 'Vehículos' : 'Vehicles', path: '/dashboard/inventory/vehicles' },
-        { label: language === 'Español' ? 'Mascotas' : 'Pets', path: '/dashboard/inventory/pets' },
-        { label: language === 'Español' ? 'Servicios Comunes' : 'Common Services', path: '/dashboard/inventory/services' },
-      ],
-    },
-    {
-      icon: <Users className="w-6 h-6" />,
-      label: language === 'Español' ? 'Residentes' : 'Residents',
-      subItems: [
-        { label: language === 'Español' ? 'Creación de Usuarios' : 'User Creation', path: '/dashboard/residents/users' },
-      ],
-    },
-    {
-      icon: <Shield className="w-6 h-6" />,
-      label: language === 'Español' ? 'Usuarios' : 'Users',
-      subItems: [
-        { label: language === 'Español' ? 'Recepcionistas' : 'Receptionists', path: '/dashboard/users/receptionists' },
-        { label: language === 'Español' ? 'Vigilantes' : 'Guards', path: '/dashboard/users/guards' },
-        { label: language === 'Español' ? 'Servicios Generales' : 'General Services', path: '/dashboard/users/general-services' },
-      ],
-    },
-    {
-      icon: <AlertCircle className="w-6 h-6" />,
-      label: language === 'Español' ? 'PQR' : 'PQR',
-      subItems: [
-        { label: language === 'Español' ? 'Gestión y Asignación' : 'Management and Assignment', path: '/dashboard/pqr/management' },
-      ],
-    },
-    {
-      icon: <Settings className="w-6 h-6" />,
-      label: language === 'Español' ? 'Configuraciones' : 'Settings',
-      subItems: [
-        { label: language === 'Español' ? 'APIs de Pagos' : 'Payment APIs', path: '/dashboard/settings/payments' },
-        { label: language === 'Español' ? 'WhatsApp' : 'WhatsApp', path: '/dashboard/settings/whatsapp' },
-        { label: language === 'Español' ? 'Cámaras' : 'Cameras', path: '/dashboard/settings/cameras' },
-      ],
-    },
-  ];
-
-  if (!isClient || !isLoggedIn || !token) {
+  if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-600 dark:text-indigo-400" />
+      <div className="flex justify-center items-center h-full p-8">
+        <div className="animate-spin h-10 w-10 border-4 border-indigo-600 rounded-full border-t-transparent"></div>
+        <span className="ml-3 text-lg">Cargando datos...</span>
       </div>
     );
   }
 
-  const quorum = calculateQuorum();
-
   return (
-    <div className={`min-h-screen flex flex-col ${theme === 'Claro' ? 'bg-gray-50' : 'bg-gray-900'}`}>
-      <Header theme={theme} setTheme={setTheme} language={language} setLanguage={setLanguage} currency={currency} setCurrency={setCurrency} />
-      <div className="h-16"></div>
-      <div className="flex flex-1">
-        <aside className={`${isSidebarCollapsed ? 'w-16' : 'w-64'} bg-indigo-600 text-white p-4 transition-all duration-300 flex flex-col`}>
-          <div className="flex items-center justify-end mb-6">
-            <Button variant="ghost" className="text-white" onClick={toggleSidebar}>
-              {isSidebarCollapsed ? '>' : '<'}
-            </Button>
+    <div className="p-6">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }}>
+        <header className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Control de Asistencia
+          </h1>
+        </header>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Seleccionar Asamblea
+            </label>
+            <select
+              value={selectedAssembly || ''}
+              onChange={(e) => {
+                const id = parseInt(e.target.value);
+                setSelectedAssembly(id || null);
+                if (id) fetchResidents(id);
+                else setResidents([]);
+              }}
+              className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="">Selecciona una asamblea</option>
+              {assemblies.map(assembly => (
+                <option key={assembly.id} value={assembly.id}>
+                  {assembly.title} ({new Date(assembly.date).toLocaleString()})
+                </option>
+              ))}
+            </select>
           </div>
-          <nav className="space-y-2 flex-1">
-            {sidebarItems.map((item, index) => (
-              <div key={index} className="relative group">
-                <div
-                  className="flex items-center justify-between cursor-pointer hover:bg-indigo-700 p-2 rounded"
-                  onClick={() => item.path ? router.push(item.path) : toggleSubMenu(item.label)}
-                >
-                  <div className="flex items-center space-x-2">
-                    {item.icon}
-                    <span className={`${isSidebarCollapsed ? 'absolute left-16 bg-indigo-700 text-white px-2 py-1 rounded-md text-sm hidden group-hover:block' : 'block'}`}>
-                      {item.label}
-                    </span>
-                  </div>
-                  {item.subItems && !isSidebarCollapsed && (
-                    <span>{expandedMenu === item.label ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}</span>
-                  )}
-                </div>
-                {!isSidebarCollapsed && item.subItems && expandedMenu === item.label && (
-                  <div className="ml-6 space-y-1">
-                    {item.subItems.map((subItem, subIndex) => (
-                      <div
-                        key={subIndex}
-                        className="flex items-center space-x-2 cursor-pointer hover:bg-indigo-700 p-2 rounded text-sm"
-                        onClick={() => subItem.path && router.push(subItem.path)}
-                      >
-                        <span>{subItem.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </nav>
-        </aside>
-        <main className="flex-1 p-6 max-w-7xl mx-auto space-y-8">
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }}>
-            <header className="flex justify-between items-center mb-6">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                {language === 'Español' ? 'Control de Asistencia' : 'Attendance Control'}
-              </h1>
-            </header>
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {language === 'Español' ? 'Seleccionar Asamblea' : 'Select Assembly'}
-                </label>
-                <select
-                  value={selectedAssembly || ''}
-                  onChange={(e) => {
-                    const id = parseInt(e.target.value);
-                    setSelectedAssembly(id || null);
-                    if (id) fetchResidents(id);
-                    else setResidents([]);
-                  }}
-                  className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                >
-                  <option value="">{language === 'Español' ? 'Selecciona una asamblea' : 'Select an assembly'}</option>
-                  {assemblies.map(assembly => (
-                    <option key={assembly.id} value={assembly.id}>
-                      {assembly.title} ({new Date(assembly.date).toLocaleString()})
-                    </option>
-                  ))}
-                </select>
-              </div>
 
-              {selectedAssembly && (
-                <div className="space-y-4">
-                  <Button onClick={sendEmailInvitations} disabled={isSubmitting}>
-                    {language === 'Español' ? 'Enviar Invitaciones' : 'Send Invitations'}
-                  </Button>
-                  {residents.length === 0 ? (
-                    <p className="text-gray-500">{language === 'Español' ? 'No hay residentes disponibles.' : 'No residents available.'}</p>
-                  ) : (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                          <tr>
-                            <th className="px-6 py-3">{language === 'Español' ? '# Inmueble' : 'Property #'}</th>
-                            <th className="px-6 py-3">{language === 'Español' ? 'Nombre' : 'Name'}</th>
-                            <th className="px-6 py-3">{language === 'Español' ? 'DNI' : 'DNI'}</th>
-                            <th className="px-6 py-3">{language === 'Español' ? 'Asistencia' : 'Attendance'}</th>
-                            <th className="px-6 py-3">{language === 'Español' ? 'Delegado' : 'Delegate'}</th>
-                            <th className="px-6 py-3">{language === 'Español' ? 'Confirmado' : 'Confirmed'}</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {residents.map((resident, index) => (
-                            <tr key={resident.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                              <td className="px-6 py-4">{resident.number}</td>
-                              <td className="px-6 py-4">{resident.name}</td>
-                              <td className="px-6 py-4">{resident.dni}</td>
-                              <td className="px-6 py-4">
-                                <select
-                                  value={resident.attendance}
-                                  onChange={(e) => handleAttendanceChange(index, e.target.value as 'Sí' | 'No' | 'Delegado')}
-                                  className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
-                                >
-                                  <option value="No">{language === 'Español' ? 'No' : 'No'}</option>
-                                  <option value="Sí">{language === 'Español' ? 'Sí' : 'Yes'}</option>
-                                  <option value="Delegado">{language === 'Español' ? 'Delegado' : 'Delegate'}</option>
-                                </select>
-                              </td>
-                              <td className="px-6 py-4">
-                                <Input
-                                  value={resident.delegateName || ''}
-                                  onChange={(e) => handleDelegateNameChange(index, e.target.value)}
-                                  placeholder={language === 'Español' ? 'Nombre del delegado' : 'Delegate Name'}
-                                  disabled={resident.attendance !== 'Delegado'}
-                                  className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
-                                />
-                              </td>
-                              <td className="px-6 py-4">{resident.confirmed ? <Check className="text-green-500" /> : <X className="text-red-500" />}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                  <div className="mt-4">
-                    <p className="text-gray-700 dark:text-white">
-                      {language === 'Español' ? 'Quorum: ' : 'Quorum: '}
-                      {`${quorum.count} de ${totalUnits} (${quorum.percentage.toFixed(2)}%) - ${quorum.achieved ? 'Sí hay quorum' : 'No hay quorum'}`}
-                    </p>
-                    <div className="flex space-x-2 mt-2">
-                      <Button onClick={handleSaveAttendance} disabled={isSubmitting}>
-                        {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                        {language === 'Español' ? 'Guardar' : 'Save'}
-                      </Button>
-                      {quorum.achieved && (
-                        <Button onClick={handleStartAssembly} disabled={isSubmitting} className="bg-green-500 hover:bg-green-600">
-                          {language === 'Español' ? 'Iniciar Asamblea' : 'Start Assembly'}
-                        </Button>
-                      )}
-                      {!quorum.achieved && (
-                        <Button onClick={handleReschedule} disabled={isSubmitting} className="bg-yellow-500 hover:bg-yellow-600">
-                          {language === 'Español' ? 'Reprogramar' : 'Reschedule'}
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                  {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
-                  {success && <p className="text-green-500 text-sm mt-4">{success}</p>}
+          {selectedAssembly && (
+            <div className="space-y-4">
+              <Button onClick={sendEmailInvitations} disabled={isSubmitting}>
+                Enviar Invitaciones
+              </Button>
+              {residents.length === 0 ? (
+                <p className="text-gray-500">No hay residentes disponibles.</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                      <tr>
+                        <th className="px-6 py-3"># Inmueble</th>
+                        <th className="px-6 py-3">Nombre</th>
+                        <th className="px-6 py-3">DNI</th>
+                        <th className="px-6 py-3">Asistencia</th>
+                        <th className="px-6 py-3">Delegado</th>
+                        <th className="px-6 py-3">Confirmado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {residents.map((resident, index) => (
+                        <tr key={resident.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                          <td className="px-6 py-4">{resident.number}</td>
+                          <td className="px-6 py-4">{resident.name}</td>
+                          <td className="px-6 py-4">{resident.dni}</td>
+                          <td className="px-6 py-4">
+                            <select
+                              value={resident.attendance}
+                              onChange={(e) => handleAttendanceChange(index, e.target.value as 'Sí' | 'No' | 'Delegado')}
+                              className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
+                            >
+                              <option value="No">No</option>
+                              <option value="Sí">Sí</option>
+                              <option value="Delegado">Delegado</option>
+                            </select>
+                          </td>
+                          <td className="px-6 py-4">
+                            <Input
+                              value={resident.delegateName || ''}
+                              onChange={(e) => handleDelegateNameChange(index, e.target.value)}
+                              placeholder="Nombre del delegado"
+                              disabled={resident.attendance !== 'Delegado'}
+                              className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
+                            />
+                          </td>
+                          <td className="px-6 py-4">{resident.confirmed ? <Check className="text-green-500" /> : <X className="text-red-500" />}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
+              <div className="mt-4">
+                <p className="text-gray-700 dark:text-white">
+                  Quorum: {`${quorum.count} de ${totalUnits} (${quorum.percentage.toFixed(2)}%) - ${quorum.achieved ? 'Sí hay quorum' : 'No hay quorum'}`}
+                </p>
+                <div className="flex space-x-2 mt-2">
+                  <Button onClick={handleSaveAttendance} disabled={isSubmitting}>
+                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                    Guardar
+                  </Button>
+                  {quorum.achieved && (
+                    <Button onClick={handleStartAssembly} disabled={isSubmitting} className="bg-green-500 hover:bg-green-600">
+                      Iniciar Asamblea
+                    </Button>
+                  )}
+                  {!quorum.achieved && (
+                    <Button onClick={handleReschedule} disabled={isSubmitting} className="bg-yellow-500 hover:bg-yellow-600">
+                      Reprogramar
+                    </Button>
+                  )}
+                </div>
+              </div>
+              {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
+              {success && <p className="text-green-500 text-sm mt-4">{success}</p>}
             </div>
-          </motion.div>
-        </main>
-      </div>
+          )}
+        </div>
+      </motion.div>
     </div>
   );
 }
