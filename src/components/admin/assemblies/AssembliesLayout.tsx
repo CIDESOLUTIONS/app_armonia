@@ -38,6 +38,16 @@ const menuItems = [
 
 const AssembliesLayout: React.FC<AssembliesLayoutProps> = ({ children }) => {
   const pathname = usePathname();
+  
+  // Cuando estemos en /dashboard/assemblies, mostramos el sidebar y el contenido principal
+  // Cuando estemos en una subpágina como scheduling, attendance, etc., solo mostramos el contenido
+  const isMainAssembliesPage = pathname === "/dashboard/assemblies";
+
+  // Si estamos en la página principal, mostramos tanto el sidebar como el contenido
+  // Si estamos en una subpágina, solo mostramos el contenido (que ya tiene su propio layout interno)
+  if (!isMainAssembliesPage) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="flex flex-col md:flex-row">
@@ -60,9 +70,7 @@ const AssembliesLayout: React.FC<AssembliesLayoutProps> = ({ children }) => {
                 >
                   <item.icon className="h-4 w-4" />
                   <span>{item.title}</span>
-                  {pathname === item.href && (
-                    <ChevronRight className="h-4 w-4 ml-auto" />
-                  )}
+                  <ChevronRight className="h-4 w-4 ml-auto" />
                 </Link>
               </li>
             ))}

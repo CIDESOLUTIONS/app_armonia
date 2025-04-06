@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Loader2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Vehicle {
   id: number;
@@ -29,6 +30,7 @@ const VEHICLE_TYPES = ["Automóvil", "Camioneta", "Motocicleta", "Bicicleta", "O
 
 const VehiclesPage = () => {
   const { token, complexId, schemaName } = useAuth();
+  const { toast } = useToast();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -58,9 +60,18 @@ const VehiclesPage = () => {
     setIsLoading(true);
     setError("");
     try {
-      // Simulación de carga de datos ya que estamos usando datos mockeados
-      setTimeout(() => {
-        // Datos mockeados para demostración
+      // Primero intentamos obtener datos reales de la API
+      const response = await fetch(`/api/inventory/vehicles?complexId=${complexId}&schemaName=${schemaName}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Vehículos obtenidos:", data.vehicles);
+        setVehicles(data.vehicles || []);
+      } else {
+        // Si hay error en la API, usamos datos de prueba como fallback
+        console.warn("No se pudieron obtener los vehículos de la API, usando datos de prueba");
         const mockVehicles: Vehicle[] = [
           {
             id: 1,
@@ -113,34 +124,69 @@ const VehiclesPage = () => {
         ];
         
         setVehicles(mockVehicles);
-        setIsLoading(false);
-      }, 1000);
-      
-      // En una implementación real, descomentar este código
-      /*
-      const response = await fetch(`/api/inventory/vehicles?complexId=${complexId}&schemaName=${schemaName}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      
-      if (!response.ok) {
-        throw new Error("Error al cargar los vehículos");
+        toast({
+          title: "Modo de demostración",
+          description: "Mostrando datos de ejemplo porque no se pudo conectar con el servidor",
+          variant: "warning"
+        });
       }
-      
-      const data = await response.json();
-      setVehicles(data.vehicles);
-      setIsLoading(false);
-      */
     } catch (err) {
       console.error("Error fetching vehicles:", err);
       setError("Ocurrió un error al cargar los vehículos. Por favor, inténtelo de nuevo.");
+      
+      // Cargar datos de prueba en caso de error
+      const mockVehicles: Vehicle[] = [
+        {
+          id: 1,
+          propertyUnit: "A-101",
+          ownerName: "Juan Pérez",
+          licensePlate: "ABC123",
+          brand: "Toyota",
+          model: "Corolla",
+          year: 2020,
+          color: "Blanco",
+          type: "Automóvil",
+          parkingSpot: "P-12"
+        },
+        {
+          id: 2,
+          propertyUnit: "A-102",
+          ownerName: "María Rodríguez",
+          licensePlate: "XYZ789",
+          brand: "Honda",
+          model: "Civic",
+          year: 2019,
+          color: "Azul",
+          type: "Automóvil",
+          parkingSpot: "P-15"
+        }
+      ];
+      
+      setVehicles(mockVehicles);
+      toast({
+        title: "Error de conexión",
+        description: "No se pudo conectar al servidor. Mostrando datos de ejemplo.",
+        variant: "destructive"
+      });
+    } finally {
       setIsLoading(false);
     }
   };
 
   const fetchProperties = async () => {
     try {
-      // Simulación de carga de propiedades
-      setTimeout(() => {
+      // Intentamos obtener datos reales de propiedades
+      const response = await fetch(`/api/inventory/properties?complexId=${complexId}&schemaName=${schemaName}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Propiedades obtenidas:", data.properties);
+        setProperties(data.properties || []);
+      } else {
+        // Si hay error, usamos datos de prueba
+        console.warn("No se pudieron obtener las propiedades de la API, usando datos de prueba");
         const mockProperties = [
           { id: 1, unitNumber: "A-101", ownerName: "Juan Pérez" },
           { id: 2, unitNumber: "A-102", ownerName: "María Rodríguez" },
@@ -149,23 +195,18 @@ const VehiclesPage = () => {
           { id: 5, unitNumber: "B-202", ownerName: "Pedro Gómez" }
         ];
         setProperties(mockProperties);
-      }, 500);
-      
-      // En una implementación real, descomentar este código
-      /*
-      const response = await fetch(`/api/inventory/properties?complexId=${complexId}&schemaName=${schemaName}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      
-      if (!response.ok) {
-        throw new Error("Error al cargar las propiedades");
       }
-      
-      const data = await response.json();
-      setProperties(data.properties);
-      */
     } catch (err) {
       console.error("Error fetching properties:", err);
+      // Datos de prueba en caso de error
+      const mockProperties = [
+        { id: 1, unitNumber: "A-101", ownerName: "Juan Pérez" },
+        { id: 2, unitNumber: "A-102", ownerName: "María Rodríguez" },
+        { id: 3, unitNumber: "A-103", ownerName: "Carlos López" },
+        { id: 4, unitNumber: "B-201", ownerName: "Ana Martínez" },
+        { id: 5, unitNumber: "B-202", ownerName: "Pedro Gómez" }
+      ];
+      setProperties(mockProperties);
     }
   };
 
@@ -235,25 +276,9 @@ const VehiclesPage = () => {
     setError("");
 
     try {
-      if (isEditing && selectedVehicle) {
-        // Actualizar vehículo existente
-        const updatedVehicles = vehicles.map(v => 
-          v.id === selectedVehicle.id ? { ...v, ...formData } : v
-        );
-        setVehicles(updatedVehicles);
-      } else {
-        // Crear nuevo vehículo
-        const newVehicle: Vehicle = {
-          id: Math.max(0, ...vehicles.map(v => v.id)) + 1,
-          ...formData as Vehicle
-        };
-        setVehicles([...vehicles, newVehicle]);
-      }
-      
-      // En una implementación real, enviar datos al backend
-      /*
+      // Intentar guardar en el backend
       const url = isEditing 
-        ? `/api/inventory/vehicles/${selectedVehicle.id}` 
+        ? `/api/inventory/vehicles/${selectedVehicle?.id}` 
         : '/api/inventory/vehicles';
       
       const method = isEditing ? 'PUT' : 'POST';
@@ -266,21 +291,84 @@ const VehiclesPage = () => {
         },
         body: JSON.stringify({
           ...formData,
-          complexId
+          complexId,
+          schemaName
         })
       });
       
-      if (!response.ok) {
-        throw new Error("Error al guardar el vehículo");
+      if (response.ok) {
+        const savedVehicle = await response.json();
+        
+        // Actualizar estado local
+        if (isEditing) {
+          setVehicles(vehicles.map(v => 
+            v.id === selectedVehicle?.id ? savedVehicle.vehicle : v
+          ));
+          toast({
+            title: "Vehículo actualizado",
+            description: "El vehículo se ha actualizado correctamente",
+            variant: "default"
+          });
+        } else {
+          setVehicles([...vehicles, savedVehicle.vehicle]);
+          toast({
+            title: "Vehículo registrado",
+            description: "El vehículo se ha registrado correctamente",
+            variant: "default"
+          });
+        }
+      } else {
+        // Si hay error en la API, simular la operación localmente
+        console.warn("Error al guardar en la API, simulando operación localmente");
+        
+        if (isEditing && selectedVehicle) {
+          setVehicles(vehicles.map(v => 
+            v.id === selectedVehicle.id ? { ...v, ...formData } : v
+          ));
+          toast({
+            title: "Vehículo actualizado (modo local)",
+            description: "El vehículo se ha actualizado en modo de demostración",
+            variant: "warning"
+          });
+        } else {
+          const newVehicle: Vehicle = {
+            id: Math.max(0, ...vehicles.map(v => v.id)) + 1,
+            ...formData as Vehicle
+          };
+          setVehicles([...vehicles, newVehicle]);
+          toast({
+            title: "Vehículo registrado (modo local)",
+            description: "El vehículo se ha registrado en modo de demostración",
+            variant: "warning"
+          });
+        }
       }
-      
-      await fetchVehicles(); // Recargar vehículos
-      */
       
       setShowDialog(false);
     } catch (err) {
       console.error("Error saving vehicle:", err);
       setError("Ocurrió un error al guardar el vehículo. Por favor, inténtelo de nuevo.");
+      
+      // Simulación en caso de error de red
+      if (isEditing && selectedVehicle) {
+        setVehicles(vehicles.map(v => 
+          v.id === selectedVehicle.id ? { ...v, ...formData } : v
+        ));
+      } else {
+        const newVehicle: Vehicle = {
+          id: Math.max(0, ...vehicles.map(v => v.id)) + 1,
+          ...formData as Vehicle
+        };
+        setVehicles([...vehicles, newVehicle]);
+      }
+      
+      toast({
+        title: "Error de conexión",
+        description: "Cambios guardados localmente debido a problemas de conexión",
+        variant: "destructive"
+      });
+      
+      setShowDialog(false);
     } finally {
       setIsLoading(false);
     }
@@ -295,25 +383,43 @@ const VehiclesPage = () => {
     setError("");
 
     try {
-      // Simulación de eliminación
-      setVehicles(vehicles.filter(v => v.id !== id));
-      
-      // En una implementación real, enviar solicitud al backend
-      /*
-      const response = await fetch(`/api/inventory/vehicles/${id}`, {
+      const response = await fetch(`/api/inventory/vehicles/${id}?schemaName=${schemaName}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ complexId })
       });
       
-      if (!response.ok) {
-        throw new Error("Error al eliminar el vehículo");
+      if (response.ok) {
+        setVehicles(vehicles.filter(v => v.id !== id));
+        toast({
+          title: "Vehículo eliminado",
+          description: "El vehículo se ha eliminado correctamente",
+          variant: "default"
+        });
+      } else {
+        // Si hay error en la API, simular la eliminación
+        console.warn("Error al eliminar en la API, simulando eliminación localmente");
+        setVehicles(vehicles.filter(v => v.id !== id));
+        toast({
+          title: "Vehículo eliminado (modo local)",
+          description: "El vehículo se ha eliminado en modo de demostración",
+          variant: "warning"
+        });
       }
-      
-      await fetchVehicles(); // Recargar vehículos
-      */
     } catch (err) {
       console.error("Error deleting vehicle:", err);
       setError("Ocurrió un error al eliminar el vehículo. Por favor, inténtelo de nuevo.");
+      
+      // Simulación en caso de error de red
+      setVehicles(vehicles.filter(v => v.id !== id));
+      toast({
+        title: "Error de conexión",
+        description: "Vehículo eliminado localmente debido a problemas de conexión",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
