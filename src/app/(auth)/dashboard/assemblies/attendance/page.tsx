@@ -99,8 +99,9 @@ const mockResidents: Resident[] = [
 
 export default function AttendancePage() {
   const router = useRouter();
-  const { user, isLoggedIn, token } = useAuth();
+  const { schemaName, user, isLoggedIn, token } = useAuth();
   const { toast } = useToast();
+  const [language, setLanguage] = useState('Español');
   const [residents, setResidents] = useState<Resident[]>(mockResidents);
   const [assemblies, setAssemblies] = useState<Assembly[]>(mockAssemblies);
   const [selectedAssembly, setSelectedAssembly] = useState<number | null>(null);
@@ -228,7 +229,7 @@ export default function AttendancePage() {
     setIsSubmitting(true);
     try {
       const assembly = assemblies.find(a => a.id === selectedAssembly);
-      const newDate = prompt('Ingresa nueva fecha y hora (YYYY-MM-DDTHH:MM):');
+      const newDate = prompt(language === 'Español' ? 'Ingresa nueva fecha y hora (YYYY-MM-DDTHH:MM):' : 'Enter new date and time (YYYY-MM-DDTHH:MM):');
       if (!newDate) {
         setIsSubmitting(false);
         return;
@@ -270,13 +271,13 @@ export default function AttendancePage() {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }}>
         <header className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Control de Asistencia
+            {language === 'Español' ? 'Control de Asistencia' : 'Attendance Control'}
           </h1>
         </header>
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Seleccionar Asamblea
+              {language === 'Español' ? 'Seleccionar Asamblea' : 'Select Assembly'}
             </label>
             <select
               value={selectedAssembly || ''}
@@ -288,7 +289,7 @@ export default function AttendancePage() {
               }}
               className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             >
-              <option value="">Selecciona una asamblea</option>
+              <option value="">{language === 'Español' ? 'Selecciona una asamblea' : 'Select an assembly'}</option>
               {assemblies.map(assembly => (
                 <option key={assembly.id} value={assembly.id}>
                   {assembly.title} ({new Date(assembly.date).toLocaleString()})
@@ -300,21 +301,21 @@ export default function AttendancePage() {
           {selectedAssembly && (
             <div className="space-y-4">
               <Button onClick={sendEmailInvitations} disabled={isSubmitting}>
-                Enviar Invitaciones
+                {language === 'Español' ? 'Enviar Invitaciones' : 'Send Invitations'}
               </Button>
               {residents.length === 0 ? (
-                <p className="text-gray-500">No hay residentes disponibles.</p>
+                <p className="text-gray-500">{language === 'Español' ? 'No hay residentes disponibles.' : 'No residents available.'}</p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                       <tr>
-                        <th className="px-6 py-3"># Inmueble</th>
-                        <th className="px-6 py-3">Nombre</th>
-                        <th className="px-6 py-3">DNI</th>
-                        <th className="px-6 py-3">Asistencia</th>
-                        <th className="px-6 py-3">Delegado</th>
-                        <th className="px-6 py-3">Confirmado</th>
+                        <th className="px-6 py-3">{language === 'Español' ? '# Inmueble' : 'Property #'}</th>
+                        <th className="px-6 py-3">{language === 'Español' ? 'Nombre' : 'Name'}</th>
+                        <th className="px-6 py-3">{language === 'Español' ? 'DNI' : 'DNI'}</th>
+                        <th className="px-6 py-3">{language === 'Español' ? 'Asistencia' : 'Attendance'}</th>
+                        <th className="px-6 py-3">{language === 'Español' ? 'Delegado' : 'Delegate'}</th>
+                        <th className="px-6 py-3">{language === 'Español' ? 'Confirmado' : 'Confirmed'}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -329,16 +330,16 @@ export default function AttendancePage() {
                               onChange={(e) => handleAttendanceChange(index, e.target.value as 'Sí' | 'No' | 'Delegado')}
                               className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                             >
-                              <option value="No">No</option>
-                              <option value="Sí">Sí</option>
-                              <option value="Delegado">Delegado</option>
+                              <option value="No">{language === 'Español' ? 'No' : 'No'}</option>
+                              <option value="Sí">{language === 'Español' ? 'Sí' : 'Yes'}</option>
+                              <option value="Delegado">{language === 'Español' ? 'Delegado' : 'Delegate'}</option>
                             </select>
                           </td>
                           <td className="px-6 py-4">
                             <Input
                               value={resident.delegateName || ''}
                               onChange={(e) => handleDelegateNameChange(index, e.target.value)}
-                              placeholder="Nombre del delegado"
+                              placeholder={language === 'Español' ? 'Nombre del delegado' : 'Delegate Name'}
                               disabled={resident.attendance !== 'Delegado'}
                               className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                             />
@@ -352,21 +353,22 @@ export default function AttendancePage() {
               )}
               <div className="mt-4">
                 <p className="text-gray-700 dark:text-white">
-                  Quorum: {`${quorum.count} de ${totalUnits} (${quorum.percentage.toFixed(2)}%) - ${quorum.achieved ? 'Sí hay quorum' : 'No hay quorum'}`}
+                  {language === 'Español' ? 'Quorum: ' : 'Quorum: '}
+                  {`${quorum.count} de ${totalUnits} (${quorum.percentage.toFixed(2)}%) - ${quorum.achieved ? 'Sí hay quorum' : 'No hay quorum'}`}
                 </p>
                 <div className="flex space-x-2 mt-2">
                   <Button onClick={handleSaveAttendance} disabled={isSubmitting}>
                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                    Guardar
+                    {language === 'Español' ? 'Guardar' : 'Save'}
                   </Button>
                   {quorum.achieved && (
                     <Button onClick={handleStartAssembly} disabled={isSubmitting} className="bg-green-500 hover:bg-green-600">
-                      Iniciar Asamblea
+                      {language === 'Español' ? 'Iniciar Asamblea' : 'Start Assembly'}
                     </Button>
                   )}
                   {!quorum.achieved && (
                     <Button onClick={handleReschedule} disabled={isSubmitting} className="bg-yellow-500 hover:bg-yellow-600">
-                      Reprogramar
+                      {language === 'Español' ? 'Reprogramar' : 'Reschedule'}
                     </Button>
                   )}
                 </div>

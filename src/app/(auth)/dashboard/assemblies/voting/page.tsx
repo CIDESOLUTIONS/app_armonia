@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, CheckCircle, X, ChevronRight } from 'lucide-react';
+import { Loader2, CheckCircle, X, ChevronRight, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 
@@ -88,6 +88,7 @@ const mockResidents: ResidentVote[] = [
 export default function VotingPage() {
   const router = useRouter();
   const { user, isLoggedIn, token } = useAuth();
+  const [language, setLanguage] = useState('Español');
   const [assemblies, setAssemblies] = useState<Assembly[]>(mockAssemblies);
   const [selectedAssembly, setSelectedAssembly] = useState<number | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -106,6 +107,7 @@ export default function VotingPage() {
       const inProgressAssembly = mockAssemblies.find(a => a.status === "IN_PROGRESS");
       if (inProgressAssembly) {
         setSelectedAssembly(inProgressAssembly.id);
+        handleAssemblySelect(inProgressAssembly.id);
       }
       setLoading(false);
     }, 500);
@@ -259,6 +261,8 @@ export default function VotingPage() {
     ));
   };
 
+  const selectedAssemblyData = assemblies.find(a => a.id === selectedAssembly);
+
   // Si está cargando, mostrar indicador
   if (loading) {
     return (
@@ -270,17 +274,17 @@ export default function VotingPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="w-full p-6">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }}>
         <header className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Control de Votación
+            {language === 'Español' ? 'Control de Votación' : 'Voting Control'}
           </h1>
         </header>
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Seleccionar Asamblea
+              {language === 'Español' ? 'Seleccionar Asamblea' : 'Select Assembly'}
             </label>
             <select
               value={selectedAssembly || ''}
@@ -291,7 +295,7 @@ export default function VotingPage() {
               }}
               className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             >
-              <option value="">Selecciona una asamblea</option>
+              <option value="">{language === 'Español' ? 'Selecciona una asamblea' : 'Select an assembly'}</option>
               {assemblies.map(assembly => (
                 <option key={assembly.id} value={assembly.id}>
                   {assembly.title} ({new Date(assembly.date).toLocaleString()})
@@ -300,22 +304,22 @@ export default function VotingPage() {
             </select>
           </div>
 
-          {selectedAssembly && (
+          {selectedAssembly && selectedAssemblyData && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold">Agenda</h2>
-                <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-2">
+                <h2 className="text-xl font-semibold">{language === 'Español' ? 'Agenda' : 'Agenda'}</h2>
+                <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                   <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
                       <th className="px-6 py-3">#</th>
-                      <th className="px-6 py-3">Tema</th>
-                      <th className="px-6 py-3">Hora</th>
-                      <th className="px-6 py-3">Observaciones</th>
-                      <th className="px-6 py-3">Estado</th>
+                      <th className="px-6 py-3">{language === 'Español' ? 'Tema' : 'Topic'}</th>
+                      <th className="px-6 py-3">{language === 'Español' ? 'Hora' : 'Time'}</th>
+                      <th className="px-6 py-3">{language === 'Español' ? 'Observaciones' : 'Notes'}</th>
+                      <th className="px-6 py-3">{language === 'Español' ? 'Estado' : 'Status'}</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {assemblies.find(a => a.id === selectedAssembly)?.agenda.map(item => (
+                    {selectedAssemblyData.agenda.map(item => (
                       <tr key={item.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                         <td className="px-6 py-4">{item.numeral}</td>
                         <td className="px-6 py-4">{item.topic}</td>
@@ -335,19 +339,16 @@ export default function VotingPage() {
                 </table>
               </div>
               <div>
-                <h2 className="text-xl font-semibold">Preguntas</h2>
+                <h2 className="text-xl font-semibold">{language === 'Español' ? 'Preguntas' : 'Questions'}</h2>
                 <div className="flex space-x-2 mb-4">
                   <Input
                     value={newQuestion}
                     onChange={(e) => setNewQuestion(e.target.value)}
-                    placeholder="Nueva pregunta para votación"
+                    placeholder={language === 'Español' ? 'Nueva pregunta' : 'New question'}
                     className="flex-1"
                   />
-                  <Button 
-                    onClick={handleAddQuestion} 
-                    disabled={isSubmitting || !newQuestion.trim() || questions.length >= 10}
-                  >
-                    Agregar
+                  <Button onClick={handleAddQuestion} disabled={isSubmitting || questions.length >= 10}>
+                    {language === 'Español' ? 'Agregar' : 'Add'}
                   </Button>
                 </div>
                 {questions.map((q, index) => (
@@ -356,12 +357,12 @@ export default function VotingPage() {
                       <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
                           <th className="px-6 py-3">#</th>
-                          <th className="px-6 py-3">Pregunta</th>
-                          <th className="px-6 py-3">Sí</th>
-                          <th className="px-6 py-3">No</th>
-                          <th className="px-6 py-3">NR</th>
-                          <th className="px-6 py-3">Resultado</th>
-                          <th className="px-6 py-3">Acciones</th>
+                          <th className="px-6 py-3">{language === 'Español' ? 'Pregunta' : 'Question'}</th>
+                          <th className="px-6 py-3">{language === 'Español' ? 'Sí' : 'Yes'}</th>
+                          <th className="px-6 py-3">{language === 'Español' ? 'No' : 'No'}</th>
+                          <th className="px-6 py-3">{language === 'Español' ? 'NR' : 'NR'}</th>
+                          <th className="px-6 py-3">{language === 'Español' ? 'Resultado' : 'Result'}</th>
+                          <th className="px-6 py-3">{language === 'Español' ? 'Acciones' : 'Actions'}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -398,14 +399,14 @@ export default function VotingPage() {
                     </table>
                     {q.showResidents && (
                       <div className="mt-4">
-                        <h3 className="text-lg font-semibold">Votos para "{q.text}"</h3>
+                        <h3 className="text-lg font-semibold">{language === 'Español' ? `Votos para "${q.text}"` : `Votes for "${q.text}"`}</h3>
                         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-2">
                           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
-                              <th className="px-6 py-3"># Inmueble</th>
-                              <th className="px-6 py-3">Nombre</th>
-                              <th className="px-6 py-3">DNI</th>
-                              <th className="px-6 py-3">Voto</th>
+                              <th className="px-6 py-3">{language === 'Español' ? '# Inmueble' : 'Property #'}</th>
+                              <th className="px-6 py-3">{language === 'Español' ? 'Nombre' : 'Name'}</th>
+                              <th className="px-6 py-3">{language === 'Español' ? 'DNI' : 'DNI'}</th>
+                              <th className="px-6 py-3">{language === 'Español' ? 'Voto' : 'Vote'}</th>
                             </tr>
                           </thead>
                           <tbody>
