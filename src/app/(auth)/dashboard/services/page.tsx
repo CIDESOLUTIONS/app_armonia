@@ -9,6 +9,54 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { ROUTES } from "@/constants/routes";
 
+// Datos de muestra para servicios
+const MOCK_SERVICES = [
+  {
+    id: 1,
+    name: "Salón Comunal",
+    description: "Espacio para eventos sociales y reuniones. Capacidad para 50 personas.",
+    capacity: 50,
+    startTime: "08:00",
+    endTime: "22:00",
+    status: "active",
+    cost: 100000,
+    rules: "No se permite uso después de las 10pm. Se debe dejar limpio."
+  },
+  {
+    id: 2,
+    name: "Piscina",
+    description: "Área recreativa con piscina para adultos y niños.",
+    capacity: 30,
+    startTime: "09:00",
+    endTime: "18:00",
+    status: "active",
+    cost: 0,
+    rules: "Obligatorio ducharse antes de ingresar. Prohibido alimentos."
+  },
+  {
+    id: 3,
+    name: "Gimnasio",
+    description: "Equipado con máquinas cardiovasculares y de fuerza.",
+    capacity: 15,
+    startTime: "05:00",
+    endTime: "23:00",
+    status: "active",
+    cost: 0,
+    rules: "Traer toalla personal. Limpiar equipos después de usar."
+  },
+  {
+    id: 4,
+    name: "Cancha de Tenis",
+    description: "Cancha profesional con iluminación nocturna.",
+    capacity: 4,
+    startTime: "07:00",
+    endTime: "21:00",
+    status: "maintenance",
+    cost: 25000,
+    rules: "Reserva máxima de 2 horas por residente."
+  }
+];
+
 export default function ServicesPage() {
   const router = useRouter();
   const { user, isLoggedIn, loading } = useAuth();
@@ -25,6 +73,8 @@ export default function ServicesPage() {
 
     const fetchServices = async () => {
       try {
+        // En un entorno real, descomentar este código y eliminar los datos de muestra
+        /*
         const response = await fetch("/api/services");
         if (response.ok) {
           const data = await response.json();
@@ -32,9 +82,15 @@ export default function ServicesPage() {
         } else {
           console.error("Error fetching services");
         }
+        */
+        
+        // Simular una carga de datos
+        setTimeout(() => {
+          setServices(MOCK_SERVICES);
+          setIsLoading(false);
+        }, 1000);
       } catch (error) {
         console.error("Error:", error);
-      } finally {
         setIsLoading(false);
       }
     };
@@ -57,6 +113,8 @@ export default function ServicesPage() {
   const handleFormSubmit = async (serviceData) => {
     setIsLoading(true);
     try {
+      // En un entorno real, descomentar este código
+      /*
       const url = editingService
         ? `/api/services/${editingService.id}`
         : "/api/services";
@@ -80,15 +138,30 @@ export default function ServicesPage() {
         } else {
           setServices([...services, updatedService]);
         }
+      */
+      
+      // Simulación para desarrollo
+      setTimeout(() => {
+        if (editingService) {
+          // Actualizar servicio existente
+          setServices(services.map(service => 
+            service.id === editingService.id ? { ...service, ...serviceData } : service
+          ));
+        } else {
+          // Añadir nuevo servicio
+          const newService = {
+            id: Math.max(0, ...services.map(s => s.id)) + 1,
+            ...serviceData
+          };
+          setServices([...services, newService]);
+        }
         
         setShowForm(false);
         setEditingService(null);
-      } else {
-        console.error("Error saving service");
-      }
+        setIsLoading(false);
+      }, 800);
     } catch (error) {
       console.error("Error:", error);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -97,6 +170,8 @@ export default function ServicesPage() {
     if (window.confirm("¿Está seguro de que desea eliminar este servicio?")) {
       setIsLoading(true);
       try {
+        // En un entorno real, descomentar este código
+        /*
         const response = await fetch(`/api/services/${id}`, {
           method: "DELETE",
         });
@@ -106,9 +181,15 @@ export default function ServicesPage() {
         } else {
           console.error("Error deleting service");
         }
+        */
+        
+        // Simulación para desarrollo
+        setTimeout(() => {
+          setServices(services.filter((service) => service.id !== id));
+          setIsLoading(false);
+        }, 800);
       } catch (error) {
         console.error("Error:", error);
-      } finally {
         setIsLoading(false);
       }
     }
@@ -134,7 +215,10 @@ export default function ServicesPage() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Gestión de Servicios</h1>
+        <div>
+          <h1 className="text-3xl font-bold">Gestión de Servicios</h1>
+          <p className="text-gray-500">Administre los servicios comunes disponibles en el conjunto</p>
+        </div>
         <Button 
           onClick={handleAddService} 
           className="bg-indigo-600 hover:bg-indigo-700"

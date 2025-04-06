@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { X, Save, Clock, Users, DollarSign } from "lucide-react";
 
@@ -179,7 +179,7 @@ export default function ServiceForm({
               name="description"
               value={formData.description}
               onChange={handleChange}
-              rows={3}
+              className="min-h-[80px]"
             />
           </div>
 
@@ -190,7 +190,7 @@ export default function ServiceForm({
               name="rules"
               value={formData.rules}
               onChange={handleChange}
-              rows={5}
+              className="min-h-[120px]"
               placeholder="Ingrese las reglas y recomendaciones para el uso del servicio..."
             />
           </div>
