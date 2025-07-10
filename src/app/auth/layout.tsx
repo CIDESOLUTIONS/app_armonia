@@ -5,13 +5,13 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/header';
 import Sidebar from "@/components/layout/Sidebar";
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import { Loader2 } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
 import { useToast } from '@/components/ui/use-toast';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
-  const { isLoggedIn, loading, adminName, complexName, logout: authLogout  } = useAuth();
+  const { isLoggedIn, loading, adminName, complexName, logout: authLogout, initializeAuth } = useAuthStore();
   const router = useRouter();
   const { toast } = useToast();
   
@@ -20,6 +20,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   const [_theme, _setTheme] = useState("Claro");
   const [_currency, _setCurrency] = useState("Pesos");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
+
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
 
   useEffect(() => {
     console.log('[AuthLayout] useEffect ejecutado');
@@ -35,8 +39,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         console.log('[AuthLayout] Autenticado, mostrando layout');
         setIsLoading(false);
       }
-    } else {
-      console.log('[AuthLayout] Aún cargando, esperando...');
     }
   }, [isLoggedIn, loading, router]);
 

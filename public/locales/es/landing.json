@@ -1,0 +1,68 @@
+{
+  "hero": {
+    "title": "Gestión integral para conjuntos residenciales",
+    "description": "Armonía es la plataforma integral que revoluciona la administración de conjuntos residenciales, unificando en un solo sistema la gestión de propiedades, residentes, finanzas, asambleas y seguridad.",
+    "loginButton": "Iniciar Sesión",
+    "registerButton": "Registrar Conjunto",
+    "learnMore": "Conocer más",
+    "dashboardPreview": "Visualice toda la información de su conjunto"
+  },
+  "features": {
+    "title": "Funcionalidades Completas para su Conjunto",
+    "description": "Armonía proporciona una plataforma integral, diseñada específicamente para la administración eficiente de conjuntos residenciales.",
+    "inventory": {
+      "title": "Gestión de Inventario",
+      "description": "Control digitalizado y centralizado de todos los activos y unidades de su conjunto residencial.",
+      "feature1": "Registro detallado de propiedades",
+      "feature2": "Base de datos de propietarios y residentes",
+      "feature3": "Control de vehículos y parqueaderos",
+      "feature4": "Registro y control de mascotas"
+    },
+    "assemblies": {
+      "title": "Gestión de Asambleas",
+      "description": "Transforme sus asambleas en eventos eficientes con herramientas digitales que agilizan todo el proceso.",
+      "feature1": "Programación y convocatoria automatizada",
+      "feature2": "Verificación digital de quórum",
+      "feature3": "Sistema de votaciones en tiempo real",
+      "feature4": "Elaboración y firma digital de actas"
+    },
+    "financial": {
+      "title": "Gestión Financiera",
+      "description": "Administre los recursos de su conjunto con transparencia y precisión mediante herramientas financieras avanzadas.",
+      "feature1": "Presupuestos y seguimiento en tiempo real",
+      "feature2": "Generación automática de cuotas",
+      "feature3": "Registro y seguimiento de pagos",
+      "feature4": "Reportes financieros detallados"
+    },
+    "resident": {
+      "title": "Portal de Residentes",
+      "description": "Brinde a los residentes una experiencia digital completa para gestionar todos sus asuntos relacionados con el conjunto."
+    },
+    "pqr": {
+      "title": "Sistema PQR",
+      "description": "Gestione eficientemente las peticiones, quejas y reclamos con un sistema organizado que mejora la comunicación."
+    },
+    "reception": {
+      "title": "Recepción y Vigilancia",
+      "description": "Optimice la seguridad y control de acceso con herramientas digitales diseñadas para el personal de vigilancia."
+    }
+  },
+  "statistics": {
+    "complexesManaged": "Conjuntos gestionados",
+    "satisfiedResidents": "Residentes satisfechos",
+    "userSatisfaction": "Satisfacción de usuarios",
+    "timeReduction": "Reducción en tiempo administrativo"
+  },
+  "video": {
+    "title": "Vea Armonía en Acción",
+    "description": "Descubra cómo Armonía transforma la gestión de conjuntos residenciales a través de esta demostración completa."
+  },
+  "pricing": {
+    "title": "Planes Diseñados para su Conjunto",
+    "description": "Elija el plan que mejor se adapte a las necesidades de su conjunto residencial."
+  },
+  "contact": {
+    "title": "¿Listo para Transformar su Conjunto?",
+    "description": "Contáctenos hoy y descubra cómo Armonía puede revolucionar la administración de su conjunto residencial."
+  }
+}
