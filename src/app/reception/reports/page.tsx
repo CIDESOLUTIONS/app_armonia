@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -33,7 +33,7 @@ interface ReportData {
 }
 
 export default function ReportsPage() {
-  const { user, loading } = useAuth();
+  const { user, loading } = useAuthStore();
   const router = useRouter();
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState('thisMonth');

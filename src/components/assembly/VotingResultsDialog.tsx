@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import {
   Box,
@@ -38,7 +39,8 @@ const VotingResultsDialog = ({ open, onClose, voting }) => {
   const prepareChartData = () => {
     if (!voting.result) return [];
     
-    return Object.entries(voting.result).map(([option, data]) => ({
+    // Asegurarse de que voting.result sea un objeto con las opciones de voto
+    return Object.entries(voting.result).map(([option, data]: [string, any]) => ({
       name: option,
       value: data.coefficient,
       count: data.count
@@ -141,13 +143,13 @@ const VotingResultsDialog = ({ open, onClose, voting }) => {
                         fill="#8884d8"
                         dataKey="value"
                         nameKey="name"
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+                        label={({ name, percent }: { name: string, percent: number }) => `${name}: ${(percent * 100).toFixed(1)}%`}
                       >
                         {chartData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value) => `${value.toFixed(2)}%`} />
+                      <Tooltip formatter={(value: number) => `${value.toFixed(2)}%`} />
                       <Legend />
                     </PieChart>
                   </ResponsiveContainer>

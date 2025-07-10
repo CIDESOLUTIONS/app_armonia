@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import AdminHeader from '@/components/admin/layout/AdminHeader';
 import AdminSidebar from '@/components/admin/layout/AdminSidebar';
 import { AdminDashboardContent } from '@/components/admin/dashboard/AdminDashboardContent';
 import { Loader2 } from 'lucide-react';
 
 export default function AdminDashboard() {
-  const { user, loading, logout } = useAuth();
+  const { user, loading, logout } = useAuthStore();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   if (loading) {

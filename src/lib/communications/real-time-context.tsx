@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 
 // Tipos para las notificaciones
 export interface Notification {
@@ -72,7 +72,7 @@ const RealTimeCommunicationContext = createContext<RealTimeCommunicationContextT
 
 // Proveedor del contexto
 export function RealTimeCommunicationProvider({ children }: { children: ReactNode }) {
-  const { user, _token  } = useAuth();
+  const { user, token } = useAuthStore();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [connected, setConnected] = useState<boolean>(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);

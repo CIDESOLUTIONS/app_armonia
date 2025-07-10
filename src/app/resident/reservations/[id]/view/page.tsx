@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Edit } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import { Loader2, Calendar, MapPin, Users, DollarSign, CreditCard, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,7 +39,7 @@ interface Reservation {
 }
 
 export default function ViewResidentReservationPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
   const router = useRouter();
   const params = useParams();

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -35,7 +35,7 @@ interface PackageItem {
 }
 
 export default function ReceptionPackagesPage() {
-  const { isLoggedIn, _token, schemaName  } = useAuth();
+  const { isLoggedIn, token: _token, schemaName } = useAuthStore();
   const _router = useRouter();
   const [loading, setLoading] = useState(true);
   const [packages, setPackages] = useState<PackageItem[]>([]);

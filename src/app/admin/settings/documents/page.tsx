@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import React, { useState } from 'react';
+import { useAuthStore } from '@/store/authStore';
 import { Loader2, Upload, FileText, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,7 +16,7 @@ interface Document {
 }
 
 export default function DocumentsSettingsPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
   const [documents, setDocuments] = useState<Document[]>([
     // Mock data

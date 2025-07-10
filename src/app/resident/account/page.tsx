@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 
 export default function AccountPage() {
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

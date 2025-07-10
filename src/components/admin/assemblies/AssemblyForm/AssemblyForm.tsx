@@ -1,6 +1,9 @@
-import React from 'react';
-import Input from '@/components/common/Input';
-import Button from '@/components/common/Button';
+import React, { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface AssemblyFormData {
   tipo: 'ordinaria' | 'extraordinaria';
@@ -25,7 +28,7 @@ const AssemblyForm: React.FC<AssemblyFormProps> = ({
   onCancel,
   isLoading = false
 }) => {
-  const [_formData, _setFormData] = React.useState<AssemblyFormData>({
+  const [formData, setFormData] = useState<AssemblyFormData>({
     tipo: 'ordinaria',
     titulo: '',
     fecha: '',
@@ -37,9 +40,15 @@ const AssemblyForm: React.FC<AssemblyFormProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    let processedValue: string | number = value;
+
+    if (name === "quorumRequerido") {
+      processedValue = value === "" ? 0 : Number(value);
+    }
+
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: processedValue,
     }));
   };
 
@@ -52,18 +61,22 @@ const AssemblyForm: React.FC<AssemblyFormProps> = ({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <Label htmlFor="tipo">
             Tipo de Asamblea
-          </label>
-          <select
+          </Label>
+          <Select
             name="tipo"
             value={formData.tipo}
-            onChange={handleChange}
-            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+            onValueChange={(value) => setFormData(prev => ({ ...prev, tipo: value as 'ordinaria' | 'extraordinaria' }))}
           >
-            <option value="ordinaria">Ordinaria</option>
-            <option value="extraordinaria">Extraordinaria</option>
-          </select>
+            <SelectTrigger>
+              <SelectValue placeholder="Seleccionar tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ordinaria">Ordinaria</SelectItem>
+              <SelectItem value="extraordinaria">Extraordinaria</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <Input
@@ -93,10 +106,10 @@ const AssemblyForm: React.FC<AssemblyFormProps> = ({
         />
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700">
+          <Label htmlFor="descripcion">
             Descripción
-          </label>
-          <textarea
+          </Label>
+          <Textarea
             name="descripcion"
             rows={4}
             value={formData.descripcion}
@@ -119,6 +132,7 @@ const AssemblyForm: React.FC<AssemblyFormProps> = ({
 
       <div className="flex justify-end space-x-3">
         <Button
+          type="button"
           variant="outline"
           onClick={onCancel}
           disabled={isLoading}
@@ -127,7 +141,7 @@ const AssemblyForm: React.FC<AssemblyFormProps> = ({
         </Button>
         <Button
           type="submit"
-          loading={isLoading}
+          disabled={isLoading}
         >
           Guardar Asamblea
         </Button>

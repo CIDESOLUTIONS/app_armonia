@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import { Loader2, User, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,7 +17,7 @@ interface Resident {
 }
 
 export default function ResidentDirectoryPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
   const [residents, setResidents] = useState<Resident[]>([]);
   const [loading, setLoading] = useState(true);

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import { Loader2, PlusCircle, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,7 +25,7 @@ interface PQR {
 }
 
 export default function ResidentPQRPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
   const [pqrs, setPqrs] = useState<PQR[]>([]);
   const [loading, setLoading] = useState(true);

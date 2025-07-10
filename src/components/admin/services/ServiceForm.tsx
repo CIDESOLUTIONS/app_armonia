@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,7 +22,7 @@ export default function ServiceForm({
   onCancel,
   isEditing,
 }: ServiceFormProps) {
-  const { complexId } = useAuth();
+  const { complexId } = useAuthStore();
   const [_formData, _setFormData] = useState({
     name: "",
     description: "",
