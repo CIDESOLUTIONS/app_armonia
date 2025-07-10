@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/authStore';
 import { Loader2, PlusCircle, Eye, Calendar as CalendarIcon, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import Link from 'next/link';
 import { useToast } from '@/components/ui/use-toast';
 import { getReservations } from '@/services/reservationService';
@@ -89,31 +90,31 @@ export default function ResidentReservationsPage() {
       </div>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full leading-normal">
-          <thead>
-            <tr>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Área Común</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Título</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Inicio</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fin</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Estado</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100"></th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Área Común</TableHead>
+              <TableHead>Título</TableHead>
+              <TableHead>Inicio</TableHead>
+              <TableHead>Fin</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {reservations.length > 0 ? (
               reservations.map((reservation) => (
-                <tr key={reservation.id}>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{reservation.commonAreaName}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{reservation.title}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{new Date(reservation.startDateTime).toLocaleString()}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{new Date(reservation.endDateTime).toLocaleString()}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                <TableRow key={reservation.id}>
+                  <TableCell>{reservation.commonAreaName}</TableCell>
+                  <TableCell>{reservation.title}</TableCell>
+                  <TableCell>{new Date(reservation.startDateTime).toLocaleString()}</TableCell>
+                  <TableCell>{new Date(reservation.endDateTime).toLocaleString()}</TableCell>
+                  <TableCell>
                     <Badge variant={reservation.status === 'APPROVED' ? 'default' : reservation.status === 'PENDING' ? 'secondary' : 'destructive'}>
                       {reservation.status}
                     </Badge>
-                  </td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right">
+                  </TableCell>
+                  <TableCell className="text-right">
                     <Link href={`/resident/reservations/${reservation.id}/view`}>
                       <Button variant="ghost" size="sm">
                         <Eye className="h-4 w-4" />
@@ -126,18 +127,18 @@ export default function ResidentReservationsPage() {
                         </Button>
                       </Link>
                     )}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))
             ) : (
-              <tr>
-                <td colSpan={6} className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-5">
                   No tienes reservas registradas.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

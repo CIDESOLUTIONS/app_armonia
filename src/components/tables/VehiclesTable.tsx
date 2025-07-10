@@ -8,6 +8,7 @@ import { Edit, Trash, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 interface Vehicle {
   id: number;
@@ -226,19 +227,20 @@ export function VehiclesTable() {
               </div>
               <div>
                 <Label htmlFor="type">Tipo</Label>
-                <select
-                  id="type"
-                  name="type"
+                <Select
                   value={formData.type || ''}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  required
+                  onValueChange={(value) => handleChange({ target: { name: 'type', value } } as React.ChangeEvent<HTMLSelectElement>)}
                 >
-                  <option value="Automóvil">Automóvil</option>
-                  <option value="Motocicleta">Motocicleta</option>
-                  <option value="Camioneta">Camioneta</option>
-                  <option value="Otro">Otro</option>
-                </select>
+                  <SelectTrigger className="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <SelectValue placeholder="Seleccionar tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Automóvil">Automóvil</SelectItem>
+                    <SelectItem value="Motocicleta">Motocicleta</SelectItem>
+                    <SelectItem value="Camioneta">Camioneta</SelectItem>
+                    <SelectItem value="Otro">Otro</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             

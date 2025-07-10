@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
 import { 
   Camera, 
   Search, 
@@ -782,11 +783,11 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
                   <h3 className="text-lg font-medium mb-3">Grabación</h3>
                   <div className="space-y-2">
                     <label className="flex items-center space-x-2">
-                      <input type="checkbox" />
+                      <Checkbox />
                       <span>Habilitar grabación automática</span>
                     </label>
                     <label className="flex items-center space-x-2">
-                      <input type="checkbox" />
+                      <Checkbox />
                       <span>Grabar solo cuando se detecte movimiento</span>
                     </label>
                   </div>

@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/store/authStore';
-import { Loader2, PlusCircle, Edit, Trash2, Video } from 'lucide-react';
+import { Trash2, Video } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -178,47 +179,47 @@ export default function CamerasPage() {
       </div>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full leading-normal">
-          <thead>
-            <tr>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nombre</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Dirección IP</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Puerto</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Ubicación</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Activa</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100"></th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Dirección IP</TableHead>
+              <TableHead>Puerto</TableHead>
+              <TableHead>Ubicación</TableHead>
+              <TableHead>Activa</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {cameras.length > 0 ? (
               cameras.map((camera) => (
-                <tr key={camera.id}>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{camera.name}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{camera.ipAddress}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{camera.port}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{camera.location}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                <TableRow key={camera.id}>
+                  <TableCell>{camera.name}</TableCell>
+                  <TableCell>{camera.ipAddress}</TableCell>
+                  <TableCell>{camera.port}</TableCell>
+                  <TableCell>{camera.location}</TableCell>
+                  <TableCell>
                     {camera.isActive ? <Badge variant="default">Sí</Badge> : <Badge variant="destructive">No</Badge>}
-                  </td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right">
+                  </TableCell>
+                  <TableCell className="text-right">
                     <Button variant="ghost" size="sm" onClick={() => handleEditCamera(camera)} className="mr-2">
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => handleDeleteCamera(camera.id)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))
             ) : (
-              <tr>
-                <td colSpan={6} className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-5">
                   No hay cámaras registradas.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

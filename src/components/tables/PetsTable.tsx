@@ -330,13 +330,11 @@ export function PetsTable() {
             </div>
             
             <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
+              <Checkbox
                 id="hasVaccineRecord"
                 name="hasVaccineRecord"
                 checked={formData.hasVaccineRecord || false}
-                onChange={handleChange}
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                onCheckedChange={(checked) => handleChange({ target: { name: 'hasVaccineRecord', checked: checked as boolean } } as React.ChangeEvent<HTMLInputElement>)}
               />
               <Label htmlFor="hasVaccineRecord">Carnet de vacunación al día</Label>
             </div>

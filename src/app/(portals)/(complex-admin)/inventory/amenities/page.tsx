@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/store/authStore';
-import { Loader2, PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -188,49 +189,49 @@ export default function AmenitiesPage() {
       </div>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full leading-normal">
-          <thead>
-            <tr>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nombre</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Descripción</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Ubicación</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Capacidad</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Requiere Aprobación</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tiene Costo</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Costo</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Activa</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100"></th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Descripción</TableHead>
+              <TableHead>Ubicación</TableHead>
+              <TableHead>Capacidad</TableHead>
+              <TableHead>Requiere Aprobación</TableHead>
+              <TableHead>Tiene Costo</TableHead>
+              <TableHead>Costo</TableHead>
+              <TableHead>Activa</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {amenities.map((amenity) => (
-              <tr key={amenity.id}>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{amenity.name}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{amenity.description}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{amenity.location}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{amenity.capacity}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+              <TableRow key={amenity.id}>
+                <TableCell>{amenity.name}</TableCell>
+                <TableCell>{amenity.description}</TableCell>
+                <TableCell>{amenity.location}</TableCell>
+                <TableCell>{amenity.capacity}</TableCell>
+                <TableCell>
                   {amenity.requiresApproval ? <Badge variant="default">Sí</Badge> : <Badge variant="destructive">No</Badge>}
-                </td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                </TableCell>
+                <TableCell>
                   {amenity.hasFee ? <Badge variant="default">Sí</Badge> : <Badge variant="destructive">No</Badge>}
-                </td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{amenity.feeAmount}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                </TableCell>
+                <TableCell>{amenity.feeAmount}</TableCell>
+                <TableCell>
                   {amenity.isActive ? <Badge variant="default">Sí</Badge> : <Badge variant="destructive">No</Badge>}
-                </td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right">
+                </TableCell>
+                <TableCell className="text-right">
                   <Button variant="ghost" size="sm" onClick={() => handleEditAmenity(amenity)} className="mr-2">
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button variant="ghost" size="sm" onClick={() => handleDeleteAmenity(amenity.id)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

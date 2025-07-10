@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -181,41 +183,41 @@ export default function ResidentsPage() {
       </div>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full leading-normal">
-          <thead>
-            <tr>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nombre</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Teléfono</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Propiedad</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Rol</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Activo</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100"></th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Teléfono</TableHead>
+              <TableHead>Propiedad</TableHead>
+              <TableHead>Rol</TableHead>
+              <TableHead>Activo</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {residents.map((resident) => (
-              <tr key={resident.id}>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{resident.name}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{resident.email}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{resident.phone}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{resident.unitNumber}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{resident.role}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+              <TableRow key={resident.id}>
+                <TableCell>{resident.name}</TableCell>
+                <TableCell>{resident.email}</TableCell>
+                <TableCell>{resident.phone}</TableCell>
+                <TableCell>{resident.unitNumber}</TableCell>
+                <TableCell>{resident.role}</TableCell>
+                <TableCell>
                   {resident.isActive ? <Badge variant="default">Sí</Badge> : <Badge variant="destructive">No</Badge>}
-                </td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right">
+                </TableCell>
+                <TableCell className="text-right">
                   <Button variant="ghost" size="sm" onClick={() => handleEditResident(resident)} className="mr-2">
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button variant="ghost" size="sm" onClick={() => handleDeleteResident(resident.id)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -242,12 +244,16 @@ export default function ResidentsPage() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="role" className="text-right">Rol</Label>
-              <select id="role" name="role" value={formData.role} onChange={handleInputChange} className="col-span-3 p-2 border rounded-md">
-                <option value="">Seleccionar Rol</option>
-                <option value="RESIDENT">Residente</option>
-                <option value="OWNER">Propietario</option>
-                <option value="TENANT">Inquilino</option>
-              </select>
+              <Select id="role" name="role" value={formData.role} onValueChange={(value) => handleInputChange({ target: { name: 'role', value } } as React.ChangeEvent<HTMLSelectElement>)}>
+                <SelectTrigger className="col-span-3 p-2 border rounded-md">
+                  <SelectValue placeholder="Seleccionar Rol" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="RESIDENT">Residente</SelectItem>
+                  <SelectItem value="OWNER">Propietario</SelectItem>
+                  <SelectItem value="TENANT">Inquilino</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex items-center space-x-2">
               <Input id="isActive" name="isActive" type="checkbox" checked={formData.isActive} onChange={handleCheckboxChange} />

@@ -4,6 +4,7 @@ import { MessageSquare, Calendar, Building } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/constants/routes';
 import { useState, FormEvent, ChangeEvent } from 'react';
+import { Textarea } from '@/components/ui/textarea';
 
 interface ContactFormProps {
   theme: string;
@@ -143,7 +144,7 @@ export function ContactForm({ theme }: ContactFormProps) {
                 </div>
                 <div>
                   <label htmlFor="message" className={`block mb-2 text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Mensaje</label>
-                  <textarea 
+                  <Textarea 
                     id="message" 
                     name="message" 
                     value={formData.message} 
@@ -151,7 +152,7 @@ export function ContactForm({ theme }: ContactFormProps) {
                     className={`w-full px-4 py-2 border rounded-lg ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`} 
                     placeholder="¿En qué podemos ayudarle?"
                     rows={4}
-                  ></textarea>
+                  ></Textarea>
                 </div>
                 <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700">
                   Enviar Solicitud
