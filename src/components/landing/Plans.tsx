@@ -28,7 +28,7 @@ export function Plans({ theme, currency }: PlansProps) {
           <div className={`${theme === "dark" ? "bg-gray-700" : "bg-white"} p-8 rounded-lg border ${theme === "dark" ? "border-gray-600" : "border-gray-200"} shadow-md hover:shadow-xl transition-all`}>
             <h3 className={`text-xl font-bold mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Plan Básico</h3>
             <div className={`text-4xl font-bold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Gratuito</div>
-            <p className={`${theme === "dark" ? "text-gray-300" : "text-gray-600"} mb-6`}>Ideal para conjuntos pequeños de hasta 30 unidades.</p>
+            <p className={`${theme === "dark" ? "text-gray-300" : "text-gray-600"} mb-6`}>Ideal para conjuntos pequeños de hasta 25 unidades.</p>
             
             <ul className="space-y-3 mb-8">
               <li className="flex items-start">
@@ -37,7 +37,7 @@ export function Plans({ theme, currency }: PlansProps) {
               </li>
               <li className="flex items-start">
                 <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                <span className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Portal básico de comunicaciones</span>
+                <span className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Funcionalidad básica de comunicaciones (Citofonía Virtual y Cartelera Digital)</span>
               </li>
               <li className="flex items-start">
                 <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
@@ -61,7 +61,7 @@ export function Plans({ theme, currency }: PlansProps) {
             <div className={`text-4xl font-bold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
               ${currency === "USD" ? "25" : "95000"}<span className="text-base font-normal">/mes</span>
             </div>
-            <p className={`${theme === "dark" ? "text-gray-300" : "text-gray-600"} mb-6`}>Para conjuntos de hasta 50 unidades.</p>
+            <p className={`${theme === "dark" ? "text-gray-300" : "text-gray-600"} mb-6`}>Para conjuntos de hasta 40 unidades. ($USD 1/mes por unidad residencial adicional)</p>
             
             <ul className="space-y-3 mb-8">
               <li className="flex items-start">
@@ -95,7 +95,7 @@ export function Plans({ theme, currency }: PlansProps) {
             <div className={`text-4xl font-bold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
               ${currency === "USD" ? "50" : "190000"}<span className="text-base font-normal">/mes</span>
             </div>
-            <p className={`${theme === "dark" ? "text-gray-300" : "text-gray-600"} mb-6`}>Para conjuntos de hasta 120 unidades.</p>
+            <p className={`${theme === "dark" ? "text-gray-300" : "text-gray-600"} mb-6`}>Para conjuntos de hasta 90 unidades. ($USD 1/mes por unidad residencial adicional)</p>
             
             <ul className="space-y-3 mb-8">
               <li className="flex items-start">
@@ -104,11 +104,11 @@ export function Plans({ theme, currency }: PlansProps) {
               </li>
               <li className="flex items-start">
                 <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                <span className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Módulo financiero avanzado</span>
+                <span className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Módulo financiero avanzado con generación automática de recibos</span>
               </li>
               <li className="flex items-start">
                 <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                <span className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Personalización de la plataforma</span>
+                <span className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Personalización de la plataforma con logo y colores corporativos del conjunto residencial</span>
               </li>
               <li className="flex items-start">
                 <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
@@ -116,7 +116,11 @@ export function Plans({ theme, currency }: PlansProps) {
               </li>
               <li className="flex items-start">
                 <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                <span className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Históricos ilimitados</span>
+                <span className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Históricos completos hasta 5 años</span>
+              </li>
+              <li className="flex items-start">
+                <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+                <span className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Soporte prioritario</span>
               </li>
             </ul>
             
