@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import AdminHeader from '@/components/admin/layout/AdminHeader';
 import AdminSidebar from '@/components/admin/layout/AdminSidebar';
 import { Loader2, DollarSign, Activity, Calendar, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ReportsPage() {
-  const { user, loading: authLoading, logout } = useAuth();
+  const { user, loading: authLoading, logout } = useAuthStore();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   if (authLoading) {

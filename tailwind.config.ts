@@ -43,6 +43,15 @@ const config: Config = {
           DEFAULT: 'var(--color-accent)',
           foreground: 'var(--color-accent-foreground)',
         },
+        // Colores específicos de la landing page
+        'gray-50': 'var(--color-gray-50)',
+        'gray-600': 'var(--color-gray-600)',
+        'gray-700': 'var(--color-gray-700)',
+        'gray-800': 'var(--color-gray-800)',
+        'gray-900': 'var(--color-gray-900)',
+        'indigo-50': 'var(--color-indigo-50)',
+        'indigo-600': 'var(--color-primary)', // Ya definido como primary
+        'indigo-800': 'var(--color-indigo-800)',
       },
       borderRadius: {
         lg: 'var(--radius)',

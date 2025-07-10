@@ -25,6 +25,15 @@
     
     --color-border: rgb(229, 231, 235);
     --radius: 0.5rem;
+
+    /* Colores específicos de la landing page */
+    --color-gray-50: rgb(249, 250, 251);
+    --color-gray-600: rgb(75, 85, 99);
+    --color-gray-700: rgb(55, 65, 81);
+    --color-gray-800: rgb(31, 41, 55);
+    --color-gray-900: rgb(17, 24, 39);
+    --color-indigo-50: rgb(238, 242, 255);
+    --color-indigo-800: rgb(58, 48, 133);
   }
 
   .dark {
@@ -47,6 +56,15 @@
     --color-destructive-foreground: #ffffff;
     
     --color-border: rgb(31, 41, 55);
+
+    /* Colores específicos de la landing page para modo oscuro */
+    --color-gray-50: rgb(31, 41, 55);
+    --color-gray-600: rgb(156, 163, 175);
+    --color-gray-700: rgb(209, 213, 219);
+    --color-gray-800: rgb(243, 244, 246);
+    --color-gray-900: #ffffff;
+    --color-indigo-50: rgb(45, 55, 72);
+    --color-indigo-800: rgb(129, 140, 248);
   }
 }
 
@@ -58,42 +76,6 @@
   
   body {
     @apply bg-background text-foreground antialiased;
-  }
-
-  /* Tema oscuro */
-  .dark-theme {
-    background-color: rgb(17, 24, 39);
-    color: #ffffff;
-  }
-
-  /* Estilos específicos para el tema oscuro */
-  .dark-theme .bg-white {
-    background-color: rgb(31, 41, 55);
-  }
-
-  .dark-theme .bg-indigo-50 {
-    background-color: rgb(45, 55, 72);
-  }
-
-  .dark-theme .text-gray-900 {
-    color: #ffffff;
-  }
-
-  .dark-theme .text-gray-700, 
-  .dark-theme .text-gray-600 {
-    color: rgb(209, 213, 219);
-  }
-
-  .dark-theme .border-gray-200 {
-    border-color: rgb(55, 65, 81);
-  }
-
-  .dark-theme .text-indigo-600 {
-    color: rgb(129, 140, 248);
-  }
-
-  .dark-theme .text-indigo-700 {
-    color: rgb(165, 180, 252);
   }
 }
 

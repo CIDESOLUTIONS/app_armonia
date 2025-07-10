@@ -1,0 +1,68 @@
+{
+  "hero": {
+    "title": "Comprehensive Management for Residential Complexes",
+    "description": "Armonía is the comprehensive platform that revolutionizes the administration of residential complexes, unifying property management, residents, finances, assemblies, and security in a single system.",
+    "loginButton": "Login",
+    "registerButton": "Register Complex",
+    "learnMore": "Learn More",
+    "dashboardPreview": "Visualize all your complex information"
+  },
+  "features": {
+    "title": "Complete Features for Your Complex",
+    "description": "Armonía provides a comprehensive platform, specifically designed for the efficient management of residential complexes.",
+    "inventory": {
+      "title": "Inventory Management",
+      "description": "Digitalized and centralized control of all assets and units of your residential complex.",
+      "feature1": "Detailed property registry",
+      "feature2": "Owners and residents database",
+      "feature3": "Vehicles and parking management",
+      "feature4": "Pets registry and control"
+    },
+    "assemblies": {
+      "title": "Assembly Management",
+      "description": "Transform your assemblies into efficient events with digital tools that streamline the entire process.",
+      "feature1": "Automated scheduling and convening",
+      "feature2": "Digital quorum verification",
+      "feature3": "Real-time voting system",
+      "feature4": "Digital creation and signing of minutes"
+    },
+    "financial": {
+      "title": "Financial Management",
+      "description": "Manage your complex's resources with transparency and precision through advanced financial tools.",
+      "feature1": "Real-time budgets and tracking",
+      "feature2": "Automatic fee generation",
+      "feature3": "Payment registration and tracking",
+      "feature4": "Detailed financial reports"
+    },
+    "resident": {
+      "title": "Resident Portal",
+      "description": "Provide residents with a complete digital experience to manage all their complex-related matters."
+    },
+    "pqr": {
+      "title": "PQR System",
+      "description": "Efficiently manage petitions, complaints and claims with an organized system that improves communication."
+    },
+    "reception": {
+      "title": "Reception and Security",
+      "description": "Optimize security and access control with digital tools designed for security personnel."
+    }
+  },
+  "statistics": {
+    "complexesManaged": "Managed Complexes",
+    "satisfiedResidents": "Satisfied Residents",
+    "userSatisfaction": "User Satisfaction",
+    "timeReduction": "Administrative Time Reduction"
+  },
+  "video": {
+    "title": "See Armonía in Action",
+    "description": "Discover how Armonía transforms residential complex management through this comprehensive demonstration."
+  },
+  "pricing": {
+    "title": "Plans Designed for Your Complex",
+    "description": "Choose the plan that best fits your residential complex needs."
+  },
+  "contact": {
+    "title": "Ready to Transform Your Complex?",
+    "description": "Contact us today and discover how Armonía can revolutionize your residential complex administration."
+  }
+}

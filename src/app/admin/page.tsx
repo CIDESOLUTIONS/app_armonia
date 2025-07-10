@@ -1,55 +1,60 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, Users, BarChart, Settings } from 'lucide-react';
+'use client';
 
-export default function AppAdminDashboardPage() {
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import AdminHeader from '@/components/admin/layout/AdminHeader';
+import AdminSidebar from '@/components/admin/layout/AdminSidebar';
+import { AdminDashboardContent } from '@/components/admin/dashboard/AdminDashboardContent';
+import { Loader2 } from 'lucide-react';
+
+export default function AdminDashboard() {
+  const { user, loading, logout } = useAuth();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user || user.role !== 'ADMIN') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Acceso Denegado</h1>
+          <p className="text-gray-600">No tienes permisos para acceder a esta página.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Dashboard de Administración de la Aplicación</h2>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header específico del dashboard */}
+      <AdminHeader 
+        adminName={user?.name || "Administrador"}
+        complexName="Conjunto Residencial Armonía"
+        onLogout={logout}
+      />
+      
+      <div className="flex">
+        {/* Sidebar */}
+        <AdminSidebar 
+          collapsed={sidebarCollapsed}
+          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        />
+        
+        {/* Main Content */}
+        <main className={`flex-1 transition-all duration-300 ${
+          sidebarCollapsed ? 'ml-16' : 'ml-64'
+        }`}>
+          <div className="p-6">
+            <AdminDashboardContent />
+          </div>
+        </main>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ingresos Totales</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">$45,231.89</div>
-            <p className="text-xs text-muted-foreground">+20.1% desde el mes pasado</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Conjuntos Registrados</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+235</div>
-            <p className="text-xs text-muted-foreground">+180 desde el mes pasado</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Uso de la Plataforma</CardTitle>
-            <BarChart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+573%</div>
-            <p className="text-xs text-muted-foreground">+201 desde el mes pasado</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Planes Premium Activos</CardTitle>
-            <Settings className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">+3 desde el mes pasado</p>
-          </CardContent>
-        </Card>
-      </div>
-      {/* Aquí se añadirán más componentes para la gestión de conjuntos, licencias, etc. */}
     </div>
   );
 }

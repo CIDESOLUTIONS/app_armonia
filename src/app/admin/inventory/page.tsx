@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import AdminHeader from '@/components/admin/layout/AdminHeader';
 import AdminSidebar from '@/components/admin/layout/AdminSidebar';
 import { Loader2, Building2, Users, Car, PawPrint, Plus, Search, Filter, Home, Settings } from 'lucide-react';
@@ -16,7 +16,7 @@ interface DashboardStats {
 }
 
 export default function InventoryPage() {
-  const { user, loading: authLoading, logout } = useAuth();
+  const { user, loading: authLoading, logout } = useAuthStore();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loadingStats, setLoadingStats] = useState(true);

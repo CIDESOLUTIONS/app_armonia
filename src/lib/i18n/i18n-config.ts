@@ -77,7 +77,8 @@ export const i18nConfig: Config = {
     'assembly',     // Módulo de asambleas
     'payments',     // Pagos y facturación
     'biometrics',   // Accesos biométricos
-    'notifications' // Notificaciones
+    'notifications', // Notificaciones
+    'landing'      // Landing page
   ],
   defaultNS: 'common',
 

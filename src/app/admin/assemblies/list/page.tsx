@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import AdminHeader from '@/components/admin/layout/AdminHeader';
 import AdminSidebar from '@/components/admin/layout/AdminSidebar';
 import { Loader2, PlusCircle, Edit, Trash2, Eye } from 'lucide-react';
@@ -25,7 +25,7 @@ interface Assembly {
 }
 
 export default function AssembliesPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
   const [assemblies, setAssemblies] = useState<Assembly[]>([]);
   const [loading, setLoading] = useState(true);
