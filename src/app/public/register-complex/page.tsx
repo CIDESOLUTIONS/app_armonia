@@ -33,11 +33,13 @@ const texts = {
     standardPlanFeature4: "Históricos de hasta 3 años",
     selectStandardPlan: "Seleccionar Plan Estándar",
     premiumPlan: "Plan Premium",
-    premiumPlanDesc: "Para conjuntos de hasta 120 unidades.",
+    premiumPlanDesc: "Para conjuntos de hasta 90 unidades. ($USD 1/mes por unidad residencial adicional)",
     premiumPlanFeature1: "Todas las funcionalidades estándar",
     premiumPlanFeature2: "Módulo financiero avanzado",
     premiumPlanFeature3: "Personalización de la plataforma",
     premiumPlanFeature4: "API para integraciones",
+    premiumPlanFeature5: "Históricos completos hasta 5 años",
+    premiumPlanFeature6: "Soporte prioritario",
     paymentVerified: "Pago verificado",
     paymentNotVerified: "Pago pendiente de verificación",
     selectPremiumPlan: "Seleccionar Plan Premium",
@@ -107,18 +109,20 @@ const texts = {
     selectBasicPlan: "Select Basic Plan",
     standardPlan: "Standard Plan",
     recommended: "RECOMMENDED",
-    standardPlanDesc: "For complexes with up to 50 units.",
+    standardPlanDesc: "For complexes with up to 40 units. ($USD 1/month per additional residential unit)",
     standardPlanFeature1: "All basic features",
     standardPlanFeature2: "Assembly and voting management",
     standardPlanFeature3: "Advanced PQR system",
     standardPlanFeature4: "Up to 3 years of historical data",
     selectStandardPlan: "Select Standard Plan",
     premiumPlan: "Premium Plan",
-    premiumPlanDesc: "For complexes with up to 120 units.",
+    premiumPlanDesc: "For complexes with up to 90 units. ($USD 1/month per additional residential unit)",
     premiumPlanFeature1: "All standard features",
     premiumPlanFeature2: "Advanced financial module",
     premiumPlanFeature3: "Platform customization",
     premiumPlanFeature4: "API for integrations",
+    premiumPlanFeature5: "Complete historical data up to 5 years",
+    premiumPlanFeature6: "Priority support",
     paymentVerified: "Payment verified",
     paymentNotVerified: "Payment pending verification",
     selectPremiumPlan: "Select Premium Plan",
@@ -331,13 +335,13 @@ export default function RegisterComplex() {
           isValid = false;
         } else {
           // Validar límites según el plan
-          if (plan === "basic" && unitsNum > 30) {
+          if (plan === "basic" && unitsNum > 25) {
             errors.units = t.basicPlanLimit;
             isValid = false;
-          } else if (plan === "standard" && unitsNum > 50) {
+          } else if (plan === "standard" && unitsNum > 40) {
             errors.units = t.standardPlanLimit;
             isValid = false;
-          } else if (plan === "premium" && unitsNum > 120) {
+          } else if (plan === "premium" && unitsNum > 90) {
             errors.units = t.premiumPlanLimit;
             isValid = false;
           }
@@ -855,13 +859,13 @@ export default function RegisterComplex() {
                       <p className="mt-1 text-sm text-red-600">{validationErrors.units}</p>
                     ) : (
                       <>
-                        {plan === "basic" && parseInt(formData.units) > 30 && (
+                        {plan === "basic" && parseInt(formData.units) > 25 && (
                           <p className="mt-1 text-sm text-red-600">{t.basicPlanLimit}</p>
                         )}
-                        {plan === "standard" && parseInt(formData.units) > 50 && (
+                        {plan === "standard" && parseInt(formData.units) > 40 && (
                           <p className="mt-1 text-sm text-red-600">{t.standardPlanLimit}</p>
                         )}
-                        {plan === "premium" && parseInt(formData.units) > 120 && (
+                        {plan === "premium" && parseInt(formData.units) > 90 && (
                           <p className="mt-1 text-sm text-red-600">{t.premiumPlanLimit}</p>
                         )}
                       </>
