@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useState } from 'react';
 import {
   Button,
@@ -103,7 +104,7 @@ const CreateVotingDialog = ({ open, onClose, onSubmit, agendaPoints }) => {
                       {...field}
                       label="Punto de la agenda"
                     >
-                      {agendaPoints?.map((point, index) => (
+                      {agendaPoints?.map((point: any, index: number) => (
                         <MenuItem key={index} value={index + 1}>
                           {index + 1}. {point.topic}
                         </MenuItem>

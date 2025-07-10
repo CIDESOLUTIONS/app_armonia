@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import { ROUTES } from '@/constants/routes';
 import { AlertCircle, Building, Shield, ArrowLeft, User } from 'lucide-react';
 
@@ -24,7 +24,7 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const portalParam = searchParams.get('portal') as 'admin' | 'resident' | 'reception' | null;
   
-  const { login } = useAuth();
+  const { login } = useAuthStore();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -98,10 +98,7 @@ export default function LoginPage() {
       
       await login(formData.email, formData.password);
       
-      console.log('[LoginPage] Login exitoso, AuthContext manejará la redirección...');
       
-      // El AuthContext ya maneja la redirección según el rol
-      // No necesitamos redirigir manualmente aquí
       
     } catch (err: unknown) {
       console.error('[LoginPage] Error de autenticación:', err);

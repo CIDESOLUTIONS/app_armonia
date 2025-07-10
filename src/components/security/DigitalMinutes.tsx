@@ -31,14 +31,14 @@ import {
   Loader2
 } from 'lucide-react';
 import { useDigitalLogs, DigitalLog, CreateDigitalLogData } from '@/hooks/useDigitalLogs';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 
 interface DigitalMinutesProps {
   complexId?: number;
 }
 
 export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const {
     digitalLogs,
     selectedLog,

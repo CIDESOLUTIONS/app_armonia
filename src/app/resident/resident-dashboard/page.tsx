@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { getResidentDashboardStats } from '@/services/residentDashboardService';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 
 interface ResidentDashboardStats {
   totalResidentsInProperty: number;
@@ -42,7 +42,7 @@ interface MonthlyExpenseData {
 }
 
 export default function ResidentDashboard() {
-  const { user, loading: authLoading, logout } = useAuth();
+  const { user, loading: authLoading, logout } = useAuthStore();
   const [stats, setStats] = useState<ResidentDashboardStats | null>(null);
   const [monthlyExpensesTrend, setMonthlyExpensesTrend] = useState<MonthlyExpenseData[]>([]);
   const [loading, setLoading] = useState(true);

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import React, { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { useAuthStore } from '@/store/authStore';
 import { Loader2, Key, PlusCircle, Trash2, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,7 +19,7 @@ interface ApiKey {
 }
 
 export default function ApiKeysPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([
     // Mock data

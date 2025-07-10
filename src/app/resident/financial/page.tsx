@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import { Loader2, CreditCard, History, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,7 +32,7 @@ interface PendingFee {
 }
 
 export default function ResidentFinancialPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuthStore();
   const [summary, setSummary] = useState<FinancialSummary | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [pendingFees, setPendingFees] = useState<PendingFee[]>([]);

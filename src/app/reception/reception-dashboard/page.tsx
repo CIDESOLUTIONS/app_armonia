@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -69,7 +69,7 @@ interface DashboardData {
 }
 
 export default function ReceptionDashboard() {
-  const { isLoggedIn, token, schemaName, userName, language = 'Español', themeMode = 'light'  } = useAuth();
+  const { isLoggedIn, token, schemaName, user: { name: userName, language, themeMode } = {} } = useAuthStore();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);

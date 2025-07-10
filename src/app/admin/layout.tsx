@@ -7,9 +7,6 @@ export const metadata: Metadata = {
   description: 'Portal de administración para complejos residenciales'
 };
 
-import { AuthProvider } from '@/context/AuthContext';
-import { AdminHeader } from '@/components/admin/layout/AdminHeader';
-import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from 'next-themes';
 

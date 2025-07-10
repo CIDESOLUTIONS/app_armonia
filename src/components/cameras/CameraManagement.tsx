@@ -33,14 +33,14 @@ import {
   MapPin
 } from 'lucide-react';
 import { useCameras, Camera as CameraType, RegisterCameraData } from '@/hooks/useCameras';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 
 interface CameraManagementProps {
   complexId?: number;
 }
 
 export function CameraManagement({ complexId }: CameraManagementProps) {
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const {
     cameras,
     stats,

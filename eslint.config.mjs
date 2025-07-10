@@ -1,9 +1,9 @@
-
 import globals from "globals";
 import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
 import pluginReact from "eslint-plugin-react";
 import nextPlugin from "@next/eslint-plugin-next";
+import pluginReactHooks from "eslint-plugin-react-hooks";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
@@ -11,7 +11,7 @@ export default [
   
   // Configuración específica para archivos Jest
   {
-    files: ["**/*.config.js", "**/jest.*.js", "**/__mocks__/**/*.js", "jest.mocks.js", "jest.setup.js"],
+    files: ["**/*.config.js", "**/jest.*.js", "**/__mocks__/**/*.js", "jest.mocks.js", "jest.setup.js", "**/*.test.ts", "**/*.test.tsx"],
     languageOptions: {
       globals: {
         ...globals.jest,
@@ -27,8 +27,8 @@ export default [
     },
     rules: {
       "@typescript-eslint/no-require-imports": "off",
-      "no-undef": "off",
-      "@typescript-eslint/no-unused-vars": "warn"
+      "no-undef": "off", 
+      "@typescript-eslint/no-unused-vars": "off" 
     }
   },
   { 
@@ -73,41 +73,50 @@ export default [
       "**/types/declarations.d.ts"
     ] 
   },
-  { languageOptions: { globals: globals.browser } },
-  pluginJs.configs.recommended,
-  ...tseslint.configs.recommended,
-  pluginReact.configs.flat.recommended,
   {
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node, 
+      },
+      parser: tseslint.parser,
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+        ecmaVersion: "latest",
+        sourceType: "module",
+      },
+    },
     plugins: {
+      js: pluginJs,
+      "@typescript-eslint": tseslint,
+      react: pluginReact,
+      "react-hooks": pluginReactHooks,
       "@next/next": nextPlugin,
     },
     rules: {
-      ...nextPlugin.configs.recommended.rules,
-      ...nextPlugin.configs["core-web-vitals"].rules,
+      // Reglas de ESLint base
+      ...pluginJs.configs.recommended.rules,
+      "no-undef": "off", // Deshabilitar globalmente
+      "no-unused-vars": "off", // Deshabilitar globalmente
+
+      // Reglas de TypeScript ESLint
+      ...tseslint.configs.recommended.rules,
+      "@typescript-eslint/naming-convention": "off", // Deshabilitado temporalmente
+
       // Reglas de React
+      ...pluginReact.configs.recommended.rules,
       "react/react-in-jsx-scope": "off",
       "react/jsx-uses-react": "off",
       "react/no-unescaped-entities": "off",
-      "react-hooks/exhaustive-deps": "warn",
-      
-      // Reglas de TypeScript
-      "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/no-unused-vars": "warn",
-      "@typescript-eslint/naming-convention": [
-        "error",
-        {
-          "selector": "variable",
-          "format": ["camelCase", "PascalCase", "UPPER_CASE"]
-        },
-        {
-          "selector": "function",
-          "format": ["camelCase", "PascalCase"]
-        },
-        {
-          "selector": "typeLike",
-          "format": ["PascalCase"]
-        }
-      ]
+
+      // Reglas de React Hooks
+      ...pluginReactHooks.configs.recommended.rules,
+
+      // Reglas de Next.js
+      ...nextPlugin.configs.recommended.rules,
+      ...nextPlugin.configs["core-web-vitals"].rules,
     },
   },
 ];

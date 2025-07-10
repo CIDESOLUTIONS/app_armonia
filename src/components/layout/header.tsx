@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Globe, Sun, Moon, DollarSign, User, LogOut, Menu, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { ROUTES } from '@/constants/routes';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 
 // Traducciones para el header
 const headerTexts = {
@@ -56,7 +56,7 @@ export function Header({
   hideNavLinks = false,
 }: HeaderProps) {
   const router = useRouter();
-  const { user, changeUserRole } = useAuth(); // Obtener el usuario y la función changeUserRole
+  const { user, changeUserRole } = useAuthStore(); // Obtener el usuario y la función changeUserRole
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState(user?.role || '');

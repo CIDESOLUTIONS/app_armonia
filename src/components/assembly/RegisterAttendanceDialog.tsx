@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+/* eslint-disable react/prop-types */
+import React from 'react';
 import {
   Box,
   Button,
@@ -47,7 +48,7 @@ const attendanceTypes = [
 // Componente para registrar asistencia a una asamblea
 const RegisterAttendanceDialog = ({ open, onClose, onSubmit, propertyUnits, owners }) => {
   // Configuración del formulario
-  const { control, handleSubmit, watch, formState: { errors }, reset } = useForm({
+  const { control, handleSubmit, watch, formState: { errors }, reset, setValue } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
       propertyUnitId: '',
@@ -69,7 +70,7 @@ const RegisterAttendanceDialog = ({ open, onClose, onSubmit, propertyUnits, owne
   };
   
   // Manejar envío del formulario
-  const handleFormSubmit = (data) => {
+  const handleFormSubmit = (data: any) => {
     // Agregar información del dispositivo para asistencia virtual
     if (data.attendanceType === 'VIRTUAL') {
       data.ipAddress = window.location.hostname;
@@ -81,12 +82,21 @@ const RegisterAttendanceDialog = ({ open, onClose, onSubmit, propertyUnits, owne
   };
   
   // Actualizar coeficiente automáticamente al seleccionar unidad
-  const updateCoefficient = (propertyUnitId) => {
+  const updateCoefficient = (propertyUnitId: number) => {
     if (!propertyUnitId) return '';
     
-    const unit = propertyUnits.find(u => u.id === propertyUnitId);
+    const unit = propertyUnits.find((u: any) => u.id === propertyUnitId);
     return unit ? unit.coefficient : '';
   };
+
+  useEffect(() => {
+    if (watchPropertyUnitId) {
+      const coef = updateCoefficient(watchPropertyUnitId);
+      if (coef) {
+        setValue('coefficient', coef);
+      }
+    }
+  }, [watchPropertyUnitId, setValue, updateCoefficient]);
   
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
@@ -108,13 +118,13 @@ const RegisterAttendanceDialog = ({ open, onClose, onSubmit, propertyUnits, owne
                       onChange={(e) => {
                         field.onChange(e);
                         // Actualizar coeficiente automáticamente
-                        const coef = updateCoefficient(e.target.value);
+                        const coef = updateCoefficient(e.target.value as number);
                         if (coef) {
-                          control.setValue('coefficient', coef);
+                          setValue('coefficient', coef);
                         }
                       }}
                     >
-                      {propertyUnits?.map((unit) => (
+                      {propertyUnits?.map((unit: any) => (
                         <MenuItem key={unit.id} value={unit.id}>
                           {unit.number} - {unit.ownerName}
                         </MenuItem>
@@ -191,7 +201,7 @@ const RegisterAttendanceDialog = ({ open, onClose, onSubmit, propertyUnits, owne
                           {...field}
                           label="Propietario que otorga el poder"
                         >
-                          {owners?.map((owner) => (
+                          {owners?.map((owner: any) => (
                             <MenuItem key={owner.id} value={owner.id}>
                               {owner.name}
                             </MenuItem>
