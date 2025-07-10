@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { getResidentFinancialSummary, getResidentPayments, getResidentPendingFees } from '@/services/residentFinancialService';
 
 interface FinancialSummary {
@@ -155,30 +156,30 @@ export default function ResidentFinancialPage() {
         <CardContent>
           {payments.length > 0 ? (
             <div className="overflow-x-auto">
-              <table className="min-w-full leading-normal">
-                <thead>
-                  <tr>
-                    <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Concepto</th>
-                    <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Monto</th>
-                    <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha</th>
-                    <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Estado</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Concepto</TableHead>
+                    <TableHead className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Monto</TableHead>
+                    <TableHead className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha</TableHead>
+                    <TableHead className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Estado</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {payments.map((payment) => (
-                    <tr key={payment.id}>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{payment.billNumber}</td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{formatCurrency(payment.amount)}</td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{new Date(payment.paidAt).toLocaleDateString()}</td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                    <TableRow key={payment.id}>
+                      <TableCell className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{payment.billNumber}</TableCell>
+                      <TableCell className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{formatCurrency(payment.amount)}</TableCell>
+                      <TableCell className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{new Date(payment.paidAt).toLocaleDateString()}</TableCell>
+                      <TableCell className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                         <Badge variant={payment.status === 'PAID' ? 'default' : 'secondary'}>
                           {payment.status}
                         </Badge>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
           ) : (
             <p className="text-gray-500 text-center">No hay historial de pagos.</p>

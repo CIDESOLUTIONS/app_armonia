@@ -6,6 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Header } from '@/components/layout/header';
 import { Check, ArrowLeft, AlertCircle } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
+import { FormField } from '@/components/common/FormField';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Checkbox } from '@/components/ui/checkbox';
 
 // Textos para soportar múltiples idiomas
 const texts = {
@@ -823,22 +827,27 @@ export default function RegisterComplex() {
                     </div>
                     <div>
                       <label htmlFor="country" className="block mb-2 text-sm font-medium text-gray-700">{t.country}</label>
-                      <select 
-                        id="country" 
-                        name="country" 
-                        value={formData.country} 
-                        onChange={handleChange} 
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                        required
-                        title={language === "Español" ? "Por favor seleccione una opción" : "Please select an option"}
+                      <Select
+                        value={formData.country}
+                        onValueChange={(value) => handleChange({ target: { name: 'country', value } } as React.ChangeEvent<HTMLSelectElement>)}
                       >
-                        <option value="Colombia">Colombia</option>
-                        <option value="México">México</option>
-                        <option value="España">España</option>
-                        <option value="Argentina">Argentina</option>
-                        <option value="Chile">Chile</option>
-                        <option value="Perú">Perú</option>
-                      </select>
+                        <SelectTrigger
+                          id="country"
+                          name="country"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                          title={language === "Español" ? "Por favor seleccione una opción" : "Please select an option"}
+                        >
+                          <SelectValue placeholder="Seleccione un país" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Colombia">Colombia</SelectItem>
+                          <SelectItem value="México">México</SelectItem>
+                          <SelectItem value="España">España</SelectItem>
+                          <SelectItem value="Argentina">Argentina</SelectItem>
+                          <SelectItem value="Chile">Chile</SelectItem>
+                          <SelectItem value="Perú">Perú</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                   
@@ -1039,25 +1048,18 @@ export default function RegisterComplex() {
                     )}
                   </div>
                   
-                  <div>
-                    <label htmlFor="confirmPassword" className="block mb-2 text-sm font-medium text-gray-700">{t.confirmPassword}</label>
-                    <input 
-                      type="password" 
-                      id="confirmPassword" 
-                      name="confirmPassword" 
-                      value={formData.confirmPassword} 
-                      onChange={handleChange} 
-                      className={`w-full px-4 py-2 border ${validationErrors.confirmPassword ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-indigo-500 focus:border-indigo-500`}
-                      placeholder={t.confirmPasswordPlaceholder}
-                      minLength={8}
-                      required
-                    />
-                    {validationErrors.confirmPassword ? (
-                      <p className="mt-1 text-sm text-red-600">{validationErrors.confirmPassword}</p>
-                    ) : formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                      <p className="mt-1 text-sm text-red-600">{t.passwordsDoNotMatch}</p>
-                    )}
-                  </div>
+                  <FormField
+                    label={t.confirmPassword}
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder={t.confirmPasswordPlaceholder}
+                    error={validationErrors.confirmPassword || (formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword ? t.passwordsDoNotMatch : null)}
+                    minLength={8}
+                    required
+                  />
                   
                   <div className="flex items-start">
                     <input 

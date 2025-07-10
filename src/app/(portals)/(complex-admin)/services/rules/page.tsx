@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/components/ui/use-toast';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { getReservationRules, createReservationRule, updateReservationRule, deleteReservationRule } from '@/services/reservationRuleService';
 
 interface ReservationRule {
@@ -211,39 +212,39 @@ export default function ReservationRulesPage() {
       </div>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full leading-normal">
-          <thead>
-            <tr>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nombre</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Área Común</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Duración Máx. (horas)</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Anticipación Mín. (días)</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Activa</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100"></th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Área Común</TableHead>
+              <TableHead>Duración Máx. (horas)</TableHead>
+              <TableHead>Anticipación Mín. (días)</TableHead>
+              <TableHead>Activa</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rules.map((rule) => (
-              <tr key={rule.id}>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{rule.name}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{rule.commonAreaName}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{rule.maxDurationHours}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{rule.minAdvanceDays}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+              <TableRow key={rule.id}>
+                <TableCell>{rule.name}</TableCell>
+                <TableCell>{rule.commonAreaName}</TableCell>
+                <TableCell>{rule.maxDurationHours}</TableCell>
+                <TableCell>{rule.minAdvanceDays}</TableCell>
+                <TableCell>
                   {rule.isActive ? <Badge variant="default">Sí</Badge> : <Badge variant="destructive">No</Badge>}
-                </td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right">
+                </TableCell>
+                <TableCell className="text-right">
                   <Button variant="ghost" size="sm" onClick={() => handleEditRule(rule)} className="mr-2">
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button variant="ghost" size="sm" onClick={() => handleDeleteRule(rule.id)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

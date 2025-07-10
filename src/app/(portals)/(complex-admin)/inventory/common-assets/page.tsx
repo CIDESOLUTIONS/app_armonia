@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/store/authStore';
-import { Loader2, PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -184,43 +185,43 @@ export default function CommonAssetsPage() {
       </div>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full leading-normal">
-          <thead>
-            <tr>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nombre</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Descripción</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Ubicación</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tipo de Activo</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha de Compra</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Valor</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Activo</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100"></th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Descripción</TableHead>
+              <TableHead>Ubicación</TableHead>
+              <TableHead>Tipo de Activo</TableHead>
+              <TableHead>Fecha de Compra</TableHead>
+              <TableHead>Valor</TableHead>
+              <TableHead>Activo</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {commonAssets.map((asset) => (
-              <tr key={asset.id}>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{asset.name}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{asset.description}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{asset.location}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{asset.assetType}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{asset.purchaseDate ? new Date(asset.purchaseDate).toLocaleDateString() : 'N/A'}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{asset.value}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+              <TableRow key={asset.id}>
+                <TableCell>{asset.name}</TableCell>
+                <TableCell>{asset.description}</TableCell>
+                <TableCell>{asset.location}</TableCell>
+                <TableCell>{asset.assetType}</TableCell>
+                <TableCell>{asset.purchaseDate ? new Date(asset.purchaseDate).toLocaleDateString() : 'N/A'}</TableCell>
+                <TableCell>{asset.value}</TableCell>
+                <TableCell>
                   {asset.isActive ? <Badge variant="default">Sí</Badge> : <Badge variant="destructive">No</Badge>}
-                </td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right">
+                </TableCell>
+                <TableCell className="text-right">
                   <Button variant="ghost" size="sm" onClick={() => handleEditCommonAsset(asset)} className="mr-2">
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button variant="ghost" size="sm" onClick={() => handleDeleteCommonAsset(asset.id)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

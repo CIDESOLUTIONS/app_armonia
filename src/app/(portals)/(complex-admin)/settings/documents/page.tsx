@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
-import { Loader2, Upload, FileText, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -146,40 +147,40 @@ export default function DocumentsSettingsPage() {
       <div className="bg-white shadow-md rounded-lg p-6">
         <h2 className="text-xl font-semibold mb-4">Documentos Existentes</h2>
         <div className="overflow-x-auto">
-          <table className="min-w-full leading-normal">
-            <thead>
-              <tr>
-                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nombre</th>
-                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha de Subida</th>
-                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100"></th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nombre</TableHead>
+                <TableHead>Fecha de Subida</TableHead>
+                <TableHead></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {documents.length > 0 ? (
                 documents.map((doc) => (
-                  <tr key={doc.id}>
-                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                  <TableRow key={doc.id}>
+                    <TableCell>
                       <a href={doc.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline flex items-center">
                         <FileText className="mr-2 h-4 w-4" /> {doc.name}
                       </a>
-                    </td>
-                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{doc.uploadedAt}</td>
-                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right">
+                    </TableCell>
+                    <TableCell>{doc.uploadedAt}</TableCell>
+                    <TableCell className="text-right">
                       <Button variant="ghost" size="sm" onClick={() => handleDeleteDocument(doc.id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))
               ) : (
-                <tr>
-                  <td colSpan={3} className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+                <TableRow>
+                  <TableCell colSpan={3} className="text-center py-5">
                     No hay documentos registrados.
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function AccountPage() {
   const { user } = useAuthStore();
@@ -41,38 +42,38 @@ export default function AccountPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4">Historial de Pagos</h2>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Concepto</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Monto</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                <tr>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">15 Nov 2024</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Cuota de Administración</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$150,000</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                      Pagado
-                    </span>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">15 Oct 2024</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Cuota de Administración</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$150,000</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                      Pagado
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <Table>
+            <TableHeader className="bg-gray-50">
+              <TableRow>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Concepto</TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Monto</TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="bg-white divide-y divide-gray-200">
+              <TableRow>
+                <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">15 Nov 2024</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Cuota de Administración</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$150,000</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap">
+                  <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                    Pagado
+                  </span>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">15 Oct 2024</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Cuota de Administración</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$150,000</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap">
+                  <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                    Pagado
+                  </span>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
           </div>
         </div>
       </div>

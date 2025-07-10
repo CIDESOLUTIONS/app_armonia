@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
-import { Loader2, PlusCircle, Edit, Trash2, Eye, Filter, Search } from 'lucide-react';
+import { Filter, Search } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -143,33 +145,33 @@ export default function ProjectListPage() {
       </div>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full leading-normal">
-          <thead>
-            <tr>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nombre</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Estado</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha Inicio</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha Fin</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Asignado A</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Creado Por</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100"></th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead>Fecha Inicio</TableHead>
+              <TableHead>Fecha Fin</TableHead>
+              <TableHead>Asignado A</TableHead>
+              <TableHead>Creado Por</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {projects.length > 0 ? (
               projects.map((project) => (
-                <tr key={project.id}>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{project.name}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                <TableRow key={project.id}>
+                  <TableCell>{project.name}</TableCell>
+                  <TableCell>
                     <Badge variant={project.status === 'COMPLETED' ? 'default' : project.status === 'PENDING' ? 'secondary' : 'outline'}>
                       {project.status}
                     </Badge>
-                  </td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{new Date(project.startDate).toLocaleDateString()}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{project.endDate ? new Date(project.endDate).toLocaleDateString() : 'N/A'}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{project.assignedToName || 'N/A'}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{project.createdByName}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right">
+                  </TableCell>
+                  <TableCell>{new Date(project.startDate).toLocaleDateString()}</TableCell>
+                  <TableCell>{project.endDate ? new Date(project.endDate).toLocaleDateString() : 'N/A'}</TableCell>
+                  <TableCell>{project.assignedToName || 'N/A'}</TableCell>
+                  <TableCell>{project.createdByName}</TableCell>
+                  <TableCell className="text-right">
                     <Link href={`/admin/projects/${project.id}/view`}>
                       <Button variant="ghost" size="sm" className="mr-2">
                         <Eye className="h-4 w-4" />
@@ -183,18 +185,18 @@ export default function ProjectListPage() {
                     <Button variant="ghost" size="sm" onClick={() => handleDeleteProject(project.id)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))
             ) : (
-              <tr>
-                <td colSpan={7} className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-5">
                   No hay proyectos registrados.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

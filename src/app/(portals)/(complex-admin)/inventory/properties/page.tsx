@@ -188,45 +188,45 @@ export default function PropertiesPage() {
       </div>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full leading-normal">
-          <thead>
-            <tr>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Número de Unidad</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Dirección</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tipo</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Área (m²)</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Habitaciones</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Baños</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Parqueaderos</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Activa</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100"></th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Número de Unidad</TableHead>
+              <TableHead>Dirección</TableHead>
+              <TableHead>Tipo</TableHead>
+              <TableHead>Área (m²)</TableHead>
+              <TableHead>Habitaciones</TableHead>
+              <TableHead>Baños</TableHead>
+              <TableHead>Parqueaderos</TableHead>
+              <TableHead>Activa</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {properties.map((property) => (
-              <tr key={property.id}>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{property.unitNumber}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{property.address}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{property.type}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{property.area}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{property.bedrooms}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{property.bathrooms}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{property.parkingSpaces}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+              <TableRow key={property.id}>
+                <TableCell>{property.unitNumber}</TableCell>
+                <TableCell>{property.address}</TableCell>
+                <TableCell>{property.type}</TableCell>
+                <TableCell>{property.area}</TableCell>
+                <TableCell>{property.bedrooms}</TableCell>
+                <TableCell>{property.bathrooms}</TableCell>
+                <TableCell>{property.parkingSpaces}</TableCell>
+                <TableCell>
                   {property.isActive ? <Badge variant="default">Sí</Badge> : <Badge variant="destructive">No</Badge>}
-                </td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right">
+                </TableCell>
+                <TableCell className="text-right">
                   <Button variant="ghost" size="sm" onClick={() => handleEditProperty(property)} className="mr-2">
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button variant="ghost" size="sm" onClick={() => handleDeleteProperty(property.id)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

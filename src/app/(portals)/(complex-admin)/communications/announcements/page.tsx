@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/components/ui/use-toast';
 import { getAnnouncements, createAnnouncement, updateAnnouncement, deleteAnnouncement } from '@/services/announcementService';
 
@@ -182,47 +183,47 @@ export default function AnnouncementsPage() {
       </div>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full leading-normal">
-          <thead>
-            <tr>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Título</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Publicado</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Expira</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Activo</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Roles Objetivo</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100"></th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Título</TableHead>
+              <TableHead>Publicado</TableHead>
+              <TableHead>Expira</TableHead>
+              <TableHead>Activo</TableHead>
+              <TableHead>Roles Objetivo</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {announcements.length > 0 ? (
               announcements.map((announcement) => (
-                <tr key={announcement.id}>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{announcement.title}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{new Date(announcement.publishedAt).toLocaleDateString()}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{announcement.expiresAt ? new Date(announcement.expiresAt).toLocaleDateString() : 'N/A'}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                <TableRow key={announcement.id}>
+                  <TableCell>{announcement.title}</TableCell>
+                  <TableCell>{new Date(announcement.publishedAt).toLocaleDateString()}</TableCell>
+                  <TableCell>{announcement.expiresAt ? new Date(announcement.expiresAt).toLocaleDateString() : 'N/A'}</TableCell>
+                  <TableCell>
                     {announcement.isActive ? <Badge variant="default">Sí</Badge> : <Badge variant="destructive">No</Badge>}
-                  </td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{announcement.targetRoles.join(', ')}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right">
+                  </TableCell>
+                  <TableCell>{announcement.targetRoles.join(', ')}</TableCell>
+                  <TableCell className="text-right">
                     <Button variant="ghost" size="sm" onClick={() => handleEditAnnouncement(announcement)} className="mr-2">
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => handleDeleteAnnouncement(announcement.id)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))
             ) : (
-              <tr>
-                <td colSpan={6} className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-5">
                   No hay anuncios registrados.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

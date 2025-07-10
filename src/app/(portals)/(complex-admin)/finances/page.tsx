@@ -4,6 +4,7 @@ import { useAuthStore } from '@/store/authStore';
 import AdminHeader from '@/components/admin/layout/AdminHeader';
 import AdminSidebar from '@/components/admin/layout/AdminSidebar';
 import { Loader2 } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function FinancesPage() {
   const { user, loading, logout } = useAuthStore();
@@ -91,23 +92,23 @@ export default function FinancesPage() {
               <div className="p-6">
                 <h2 className="text-lg font-semibold mb-4">Movimientos Recientes</h2>
                 <div className="overflow-x-auto">
-                  <table className="w-full table-auto">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left py-2">Concepto</th>
-                        <th className="text-left py-2">Monto</th>
-                        <th className="text-left py-2">Fecha</th>
-                        <th className="text-left py-2">Estado</th>
-                        <th className="text-left py-2">Acciones</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-left py-2">Concepto</TableHead>
+                        <TableHead className="text-left py-2">Monto</TableHead>
+                        <TableHead className="text-left py-2">Fecha</TableHead>
+                        <TableHead className="text-left py-2">Estado</TableHead>
+                        <TableHead className="text-left py-2">Acciones</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
                       {finances.pagosRecientes.map((pago) => (
-                        <tr key={pago.id} className="border-b">
-                          <td className="py-3">{pago.concepto}</td>
-                          <td className="py-3">${pago.monto.toLocaleString()}</td>
-                          <td className="py-3">{pago.fecha}</td>
-                          <td className="py-3">
+                        <TableRow key={pago.id} className="border-b">
+                          <TableCell className="py-3">{pago.concepto}</TableCell>
+                          <TableCell className="py-3">${pago.monto.toLocaleString()}</TableCell>
+                          <TableCell className="py-3">{pago.fecha}</TableCell>
+                          <TableCell className="py-3">
                             <span className={`px-2 py-1 rounded-full text-xs ${
                               pago.estado === 'Pagado' 
                                 ? 'bg-green-100 text-green-800' 
@@ -115,19 +116,19 @@ export default function FinancesPage() {
                             }`}>
                               {pago.estado}
                             </span>
-                          </td>
-                          <td className="py-3">
+                          </TableCell>
+                          <TableCell className="py-3">
                             <button className="text-blue-600 hover:text-blue-800 mr-2">
                               Ver
                             </button>
                             <button className="text-green-600 hover:text-green-800">
                               Editar
                             </button>
-                          </td>
-                        </tr>
+                          </TableCell>
+                        </TableRow>
                       ))}
-                    </tbody>
-                  </table>
+                    </TableBody>
+                  </Table>
                 </div>
               </div>
             </div>

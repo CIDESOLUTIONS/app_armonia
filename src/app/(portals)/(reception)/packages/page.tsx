@@ -13,7 +13,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-;
 import { Textarea } from '@/components/ui/textarea';
 import { Package, Mail, Search, Camera, Clock, AlertCircle, CheckCircle, PlusCircle, X, FileText } from 'lucide-react';
 import { format } from 'date-fns';

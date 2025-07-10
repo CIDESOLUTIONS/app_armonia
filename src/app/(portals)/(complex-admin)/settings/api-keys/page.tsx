@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface ApiKey {
   id: string;
@@ -146,49 +147,49 @@ export default function ApiKeysPage() {
       <div className="bg-white shadow-md rounded-lg p-6">
         <h2 className="text-xl font-semibold mb-4">Claves API Existentes</h2>
         <div className="overflow-x-auto">
-          <table className="min-w-full leading-normal">
-            <thead>
-              <tr>
-                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nombre</th>
-                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Clave</th>
-                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Creada</th>
-                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Último Uso</th>
-                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Activa</th>
-                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100"></th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nombre</TableHead>
+                <TableHead>Clave</TableHead>
+                <TableHead>Creada</TableHead>
+                <TableHead>Último Uso</TableHead>
+                <TableHead>Activa</TableHead>
+                <TableHead></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {apiKeys.length > 0 ? (
                 apiKeys.map((key) => (
-                  <tr key={key.id}>
-                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{key.name}</td>
-                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm flex items-center">
+                  <TableRow key={key.id}>
+                    <TableCell>{key.name}</TableCell>
+                    <TableCell className="flex items-center">
                       <span className="font-mono text-gray-700 mr-2">{key.key.substring(0, 8)}...</span>
                       <Button variant="ghost" size="sm" onClick={() => handleCopyKey(key.key)}>
                         <Copy className="h-4 w-4" />
                       </Button>
-                    </td>
-                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{key.createdAt}</td>
-                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{key.lastUsed || 'Nunca'}</td>
-                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                    </TableCell>
+                    <TableCell>{key.createdAt}</TableCell>
+                    <TableCell>{key.lastUsed || 'Nunca'}</TableCell>
+                    <TableCell>
                       {key.isActive ? <Badge variant="default">Sí</Badge> : <Badge variant="destructive">No</Badge>}
-                    </td>
-                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right">
+                    </TableCell>
+                    <TableCell className="text-right">
                       <Button variant="ghost" size="sm" onClick={() => handleDeleteKey(key.id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))
               ) : (
-                <tr>
-                  <td colSpan={6} className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-5">
                     No hay claves API registradas.
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
     </div>

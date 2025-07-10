@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
-import { Loader2, PlusCircle, Edit, Trash2, FileText } from 'lucide-react';
+import { Trash2, FileText } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -162,41 +163,41 @@ export default function DigitalLogsPage() {
       </div>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full leading-normal">
-          <thead>
-            <tr>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Título</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Creado Por</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100"></th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Título</TableHead>
+              <TableHead>Fecha</TableHead>
+              <TableHead>Creado Por</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {logs.length > 0 ? (
               logs.map((log) => (
-                <tr key={log.id}>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{log.title}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{new Date(log.logDate).toLocaleString()}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{log.createdByName}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right">
+                <TableRow key={log.id}>
+                  <TableCell>{log.title}</TableCell>
+                  <TableCell>{new Date(log.logDate).toLocaleString()}</TableCell>
+                  <TableCell>{log.createdByName}</TableCell>
+                  <TableCell className="text-right">
                     <Button variant="ghost" size="sm" onClick={() => handleEditLog(log)} className="mr-2">
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => handleDeleteLog(log.id)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))
             ) : (
-              <tr>
-                <td colSpan={4} className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-5">
                   No hay minutas digitales registradas.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/authStore';
 import { Loader2, PlusCircle, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import Link from 'next/link';
 import { useToast } from '@/components/ui/use-toast';
 import { getPQRs } from '@/services/pqrService';
@@ -78,50 +79,50 @@ export default function ResidentPQRPage() {
       </div>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full leading-normal">
-          <thead>
-            <tr>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Asunto</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Estado</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Prioridad</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha Creación</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100"></th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Asunto</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead>Prioridad</TableHead>
+              <TableHead>Fecha Creación</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {pqrs.length > 0 ? (
               pqrs.map((pqr) => (
-                <tr key={pqr.id}>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{pqr.subject}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                <TableRow key={pqr.id}>
+                  <TableCell>{pqr.subject}</TableCell>
+                  <TableCell>
                     <Badge variant={pqr.status === 'OPEN' ? 'destructive' : pqr.status === 'IN_PROGRESS' ? 'secondary' : 'default'}>
                       {pqr.status}
                     </Badge>
-                  </td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                  </TableCell>
+                  <TableCell>
                     <Badge variant={pqr.priority === 'HIGH' ? 'destructive' : pqr.priority === 'MEDIUM' ? 'secondary' : 'default'}>
                       {pqr.priority}
                     </Badge>
-                  </td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{new Date(pqr.createdAt).toLocaleDateString()}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right">
+                  </TableCell>
+                  <TableCell>{new Date(pqr.createdAt).toLocaleDateString()}</TableCell>
+                  <TableCell className="text-right">
                     <Link href={`/resident/pqr/${pqr.id}/view`}>
                       <Button variant="ghost" size="sm">
                         <Eye className="h-4 w-4" />
                       </Button>
                     </Link>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))
             ) : (
-              <tr>
-                <td colSpan={5} className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-5">
                   No has reportado ninguna PQR.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

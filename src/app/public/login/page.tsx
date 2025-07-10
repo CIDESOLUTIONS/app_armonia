@@ -135,37 +135,29 @@ export default function LoginPage() {
 
           <div className="p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <Label htmlFor="email">
-                  {language === 'Español' ? 'Email' : 'Email'}
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                  disabled={loading}
-                  className="mt-1"
-                  placeholder={language === 'Español' ? 'Tu correo electrónico' : 'Your email'}
-                />
-              </div>
+              <FormField
+                label={language === 'Español' ? 'Email' : 'Email'}
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                required
+                disabled={loading}
+                placeholder={language === 'Español' ? 'Tu correo electrónico' : 'Your email'}
+              />
 
-              <div>
-                <Label htmlFor="password">
-                  {language === 'Español' ? 'Contraseña' : 'Password'}
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, password: e.target.value })}
-                  required
-                  disabled={loading}
-                  className="mt-1"
-                  placeholder={language === 'Español' ? 'Tu contraseña' : 'Your password'}
-                />
-              </div>
+              <FormField
+                label={language === 'Español' ? 'Contraseña' : 'Password'}
+                id="password"
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                required
+                disabled={loading}
+                placeholder={language === 'Español' ? 'Tu contraseña' : 'Your password'}
+              />
 
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded text-sm flex items-start">

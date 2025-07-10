@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/components/ui/use-toast';
 import { getCommunityEvents, createCommunityEvent, updateCommunityEvent, deleteCommunityEvent } from '@/services/communityEventService';
 
@@ -174,49 +175,49 @@ export default function CommunityEventsPage() {
       </div>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full leading-normal">
-          <thead>
-            <tr>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Título</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Descripción</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Inicio</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fin</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Ubicación</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Público</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100"></th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Título</TableHead>
+              <TableHead>Descripción</TableHead>
+              <TableHead>Inicio</TableHead>
+              <TableHead>Fin</TableHead>
+              <TableHead>Ubicación</TableHead>
+              <TableHead>Público</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {events.length > 0 ? (
               events.map((event) => (
-                <tr key={event.id}>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{event.title}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{event.description}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{new Date(event.startDateTime).toLocaleString()}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{new Date(event.endDateTime).toLocaleString()}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{event.location}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                <TableRow key={event.id}>
+                  <TableCell>{event.title}</TableCell>
+                  <TableCell>{event.description}</TableCell>
+                  <TableCell>{new Date(event.startDateTime).toLocaleString()}</TableCell>
+                  <TableCell>{new Date(event.endDateTime).toLocaleString()}</TableCell>
+                  <TableCell>{event.location}</TableCell>
+                  <TableCell>
                     {event.isPublic ? <Badge variant="default">Sí</Badge> : <Badge variant="destructive">No</Badge>}
-                  </td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right">
+                  </TableCell>
+                  <TableCell className="text-right">
                     <Button variant="ghost" size="sm" onClick={() => handleEditEvent(event)} className="mr-2">
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => handleDeleteEvent(event.id)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))
             ) : (
-              <tr>
-                <td colSpan={7} className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-5">
                   No hay eventos comunitarios registrados.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
