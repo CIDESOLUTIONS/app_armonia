@@ -294,3 +294,8 @@ Fase 2: Desarrollo y Alineación Funcional
 
   He guardado este plan en mi memoria para guiar nuestras próximas interacciones.
 
+Gemini CLI
+prompt ajustado
+
+Estás ubicado en el directorio raíz del proyecto Armonía, una aplicación web y móvil con especificaciones técnicas detalladas en la carpeta docs; tu tarea es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto para generar un resumen técnico, funcional y de estilo, identificar diferencias y proponer un plan sistemático para alinear el desarrollo con los requisitos. Evalúa qué funcionalidades deben ajustarse (desde la landing page hasta todos los flujos), qué prácticas deben corregirse según estándares modernos de calidad y si es necesario desarrollar nuevo código, verifica primero en el historial de la carpeta .git para rescatar posibles descartes; si no existe, desarrolla desde cero siguiendo el estilo actual. Incluye la reorganización de la estructura del proyecto si mejora la eficiencia, migración de .js a .ts, eliminación de dependencias o funciones innecesarias y optimización del código. Posteriormente, define y ejecuta pruebas individuales y E2E, y deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado con todas las tareas necesarias y mantenlo en memoria como guía principal hasta la ejecución completa.
+
