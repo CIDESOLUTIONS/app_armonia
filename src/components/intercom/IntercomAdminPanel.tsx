@@ -31,19 +31,11 @@ const schema = yup.object({
   retryDelay: yup.number().required('El tiempo entre reintentos es obligatorio').min(5, 'Mínimo 5 segundos')
 }).required();
 
-
+const IntercomAdminPanel = () => {
   // Estados
+  const { toast } = useToast();
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingData, setLoadingData] = useState<boolean>(true);
-  const [notification, setNotification] = useState<{
-    open: boolean;
-    message: string;
-    severity: 'success' | 'error' | 'info';
-  }>({
-    open: false,
-    message: '',
-    severity: 'info'
-  });
 
   // Configuración del formulario
   const { control, handleSubmit, setValue, watch, formState: { errors } } = useForm({
@@ -71,7 +63,6 @@ const schema = yup.object({
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        // En un caso real, estos datos vendrían de la API
         const settings = await intercomService.getSettings();
         
         if (settings) {
@@ -88,10 +79,10 @@ const schema = yup.object({
         }
       } catch (error) {
         console.error('Error al cargar configuración:', error);
-        setNotification({
-          open: true,
-          message: 'Error al cargar la configuración',
-          severity: 'error'
+        toast({
+          title: 'Error',
+          description: 'No se pudo cargar la configuración.',
+          variant: 'destructive',
         });
       } finally {
         setLoadingData(false);
@@ -99,13 +90,12 @@ const schema = yup.object({
     };
 
     fetchSettings();
-  }, [setValue]);
+  }, [setValue, toast]);
 
   // Manejar envío del formulario
   const onSubmit = async (data: any) => {
     setLoading(true);
     try {
-      // Configurar datos específicos del proveedor de WhatsApp
       if (data.whatsappEnabled) {
         if (data.whatsappProvider === 'twilio') {
           data.whatsappConfig = {
@@ -121,14 +111,12 @@ const schema = yup.object({
         }
       }
 
-      // Configurar datos específicos de Telegram
       if (data.telegramEnabled) {
         data.telegramConfig = {
           webhookUrl: data.telegramWebhookUrl
         };
       }
 
-      // Limpiar campos temporales
       delete data.twilioAccountSid;
       delete data.twilioAuthToken;
       delete data.twilioFromNumber;
@@ -136,21 +124,18 @@ const schema = yup.object({
       delete data.messagebirdChannelId;
       delete data.telegramWebhookUrl;
 
-      // Guardar configuración
       await intercomService.updateSettings(data);
 
-      // Mostrar notificación de éxito
-      setNotification({
-        open: true,
-        message: 'Configuración guardada correctamente',
-        severity: 'success'
+      toast({
+        title: 'Éxito',
+        description: 'Configuración guardada correctamente.',
       });
     } catch (error) {
       console.error('Error al guardar configuración:', error);
-      setNotification({
-        open: true,
-        message: 'Error al guardar la configuración',
-        severity: 'error'
+      toast({
+        title: 'Error',
+        description: 'No se pudo guardar la configuración.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -167,33 +152,31 @@ const schema = yup.object({
 
   return (
     <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <AdminPanelSettings className="mr-2 h-6 w-6" />
+          Panel de Administración de Citofonía Virtual
+        </CardTitle>
+      </CardHeader>
       <CardContent>
-        <CardHeader>
-          <CardTitle>
-            <AdminPanelSettings className="mr-2 h-6 w-6 inline-block" />
-            Panel de Administración de Citofonía Virtual
-          </CardTitle>
-        </CardHeader>
-
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <Grid container spacing={3}>
-            {/* Configuración de WhatsApp */}
+          
+          {/* Configuración de WhatsApp */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Configuración de WhatsApp</h3>
-            
             <div className="flex items-center space-x-2">
               <Controller
                 name="whatsappEnabled"
                 control={control}
                 render={({ field }) => (
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  <Switch checked={field.value} onCheckedChange={field.onChange} id="whatsappEnabled" />
                 )}
               />
               <Label htmlFor="whatsappEnabled">Habilitar integración con WhatsApp</Label>
             </div>
 
             {watchWhatsappEnabled && (
-              <div className="space-y-4 mt-4">
+              <div className="space-y-4 mt-4 pl-6 border-l-2">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="whatsappProvider">Proveedor de WhatsApp</Label>
@@ -201,11 +184,8 @@ const schema = yup.object({
                       name="whatsappProvider"
                       control={control}
                       render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger id="whatsappProvider">
                             <SelectValue placeholder="Seleccione un proveedor" />
                           </SelectTrigger>
                           <SelectContent>
@@ -218,9 +198,7 @@ const schema = yup.object({
                       )}
                     />
                     {errors.whatsappProvider && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.whatsappProvider.message}
-                      </p>
+                      <p className="text-red-500 text-sm mt-1">{errors.whatsappProvider.message}</p>
                     )}
                   </div>
                 </div>
@@ -229,49 +207,15 @@ const schema = yup.object({
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                     <div>
                       <Label htmlFor="twilioAccountSid">Account SID</Label>
-                      <Controller
-                        name="twilioAccountSid"
-                        control={control}
-                        defaultValue=""
-                        render={({ field }) => (
-                          <Input
-                            {...field}
-                            id="twilioAccountSid"
-                            placeholder="Account SID"
-                          />
-                        )}
-                      />
+                      <Controller name="twilioAccountSid" control={control} defaultValue="" render={({ field }) => <Input {...field} id="twilioAccountSid" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxx" />} />
                     </div>
                     <div>
                       <Label htmlFor="twilioAuthToken">Auth Token</Label>
-                      <Controller
-                        name="twilioAuthToken"
-                        control={control}
-                        defaultValue=""
-                        render={({ field }) => (
-                          <Input
-                            {...field}
-                            id="twilioAuthToken"
-                            type="password"
-                            placeholder="Auth Token"
-                          />
-                        )}
-                      />
+                      <Controller name="twilioAuthToken" control={control} defaultValue="" render={({ field }) => <Input {...field} id="twilioAuthToken" type="password" placeholder="Your Auth Token" />} />
                     </div>
                     <div>
-                      <Label htmlFor="twilioFromNumber">Número de WhatsApp</Label>
-                      <Controller
-                        name="twilioFromNumber"
-                        control={control}
-                        defaultValue=""
-                        render={({ field }) => (
-                          <Input
-                            {...field}
-                            id="twilioFromNumber"
-                            placeholder="+573001234567"
-                          />
-                        )}
-                      />
+                      <Label htmlFor="twilioFromNumber">Número de WhatsApp (Twilio)</Label>
+                      <Controller name="twilioFromNumber" control={control} defaultValue="" render={({ field }) => <Input {...field} id="twilioFromNumber" placeholder="whatsapp:+14155238886" />} />
                     </div>
                   </div>
                 )}
@@ -280,148 +224,73 @@ const schema = yup.object({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div>
                       <Label htmlFor="messagebirdApiKey">API Key</Label>
-                      <Controller
-                        name="messagebirdApiKey"
-                        control={control}
-                        defaultValue=""
-                        render={({ field }) => (
-                          <Input
-                            {...field}
-                            id="messagebirdApiKey"
-                            placeholder="API Key"
-                          />
-                        )}
-                      />
+                      <Controller name="messagebirdApiKey" control={control} defaultValue="" render={({ field }) => <Input {...field} id="messagebirdApiKey" placeholder="Your API Key" />} />
                     </div>
                     <div>
                       <Label htmlFor="messagebirdChannelId">Channel ID</Label>
-                      <Controller
-                        name="messagebirdChannelId"
-                        control={control}
-                        defaultValue=""
-                        render={({ field }) => (
-                          <Input
-                            {...field}
-                            id="messagebirdChannelId"
-                            placeholder="Channel ID"
-                          />
-                        )}
-                      />
+                      <Controller name="messagebirdChannelId" control={control} defaultValue="" render={({ field }) => <Input {...field} id="messagebirdChannelId" placeholder="Your Channel ID" />} />
                     </div>
                   </div>
                 )}
               </div>
             )}
+          </div>
 
-            {/* Configuración de Telegram */}
+          {/* Configuración de Telegram */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Configuración de Telegram</h3>
-            
             <div className="flex items-center space-x-2">
               <Controller
                 name="telegramEnabled"
                 control={control}
                 render={({ field }) => (
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  <Switch checked={field.value} onCheckedChange={field.onChange} id="telegramEnabled" />
                 )}
               />
               <Label htmlFor="telegramEnabled">Habilitar integración con Telegram</Label>
             </div>
 
             {watchTelegramEnabled && (
-              <div className="space-y-4 mt-4">
+              <div className="space-y-4 mt-4 pl-6 border-l-2">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="telegramBotToken">Token del Bot</Label>
-                    <Controller
-                      name="telegramBotToken"
-                      control={control}
-                      render={({ field }) => (
-                        <Input
-                          {...field}
-                          id="telegramBotToken"
-                          placeholder="Token del Bot"
-                        />
-                      )}
-                    />
+                    <Controller name="telegramBotToken" control={control} render={({ field }) => <Input {...field} id="telegramBotToken" placeholder="Token del Bot" />} />
                     {errors.telegramBotToken && (
                       <p className="text-red-500 text-sm mt-1">{errors.telegramBotToken.message}</p>
                     )}
                   </div>
                   <div>
                     <Label htmlFor="telegramWebhookUrl">URL del Webhook</Label>
-                    <Controller
-                      name="telegramWebhookUrl"
-                      control={control}
-                      defaultValue=""
-                      render={({ field }) => (
-                        <Input
-                          {...field}
-                          id="telegramWebhookUrl"
-                          placeholder="https://tu-dominio.com/api/webhooks/telegram"
-                        />
-                      )}
-                    />
+                    <Controller name="telegramWebhookUrl" control={control} defaultValue="" render={({ field }) => <Input {...field} id="telegramWebhookUrl" placeholder="https://tu-dominio.com/api/webhooks/telegram" />} />
                   </div>
                 </div>
-                <p className="text-sm text-gray-500 mt-1">
-                  Para crear un bot de Telegram, contacta a @BotFather en Telegram y sigue las instrucciones
-                </p>
+                <p className="text-sm text-gray-500 mt-1">Para crear un bot de Telegram, contacta a @BotFather en Telegram y sigue las instrucciones.</p>
               </div>
             )}
+          </div>
 
-            {/* Configuración general */}
+          {/* Configuración General */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Configuración General</h3>
-            
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="defaultResponseTimeout">Tiempo de espera para respuesta (segundos)</Label>
-                <Controller
-                  name="defaultResponseTimeout"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      id="defaultResponseTimeout"
-                      type="number"
-                    />
-                  )}
-                />
+                <Label htmlFor="defaultResponseTimeout">Tiempo de espera (segundos)</Label>
+                <Controller name="defaultResponseTimeout" control={control} render={({ field }) => <Input {...field} id="defaultResponseTimeout" type="number" />} />
                 {errors.defaultResponseTimeout && (
                   <p className="text-red-500 text-sm mt-1">{errors.defaultResponseTimeout.message}</p>
                 )}
               </div>
               <div>
                 <Label htmlFor="maxRetries">Máximo de reintentos</Label>
-                <Controller
-                  name="maxRetries"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      id="maxRetries"
-                      type="number"
-                    />
-                  )}
-                />
+                <Controller name="maxRetries" control={control} render={({ field }) => <Input {...field} id="maxRetries" type="number" />} />
                 {errors.maxRetries && (
                   <p className="text-red-500 text-sm mt-1">{errors.maxRetries.message}</p>
                 )}
               </div>
               <div>
                 <Label htmlFor="retryDelay">Tiempo entre reintentos (segundos)</Label>
-                <Controller
-                  name="retryDelay"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      id="retryDelay"
-                      type="number"
-                    />
-                  )}
-                />
+                <Controller name="retryDelay" control={control} render={({ field }) => <Input {...field} id="retryDelay" type="number" />} />
                 {errors.retryDelay && (
                   <p className="text-red-500 text-sm mt-1">{errors.retryDelay.message}</p>
                 )}
@@ -429,85 +298,53 @@ const schema = yup.object({
             </div>
           </div>
 
-            {/* Plantillas de mensajes */}
+          {/* Plantillas de Mensajes */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Plantillas de Mensajes</h3>
-            
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <Label htmlFor="whatsappTemplate">Plantilla para WhatsApp</Label>
+                <Label htmlFor="whatsappTemplate">Plantilla para WhatsApp (Notificación de Visitante)</Label>
                 <Controller
                   name="messageTemplates.WHATSAPP.visitor_notification"
                   control={control}
                   defaultValue="¡Hola! Tienes un visitante: {{visitor.name}} para {{unit.number}}. Motivo: {{purpose}}"
-                  render={({ field }) => (
-                    <Textarea
-                      {...field}
-                      id="whatsappTemplate"
-                      rows={3}
-                    />
-                  )}
+                  render={({ field }) => <Textarea {...field} id="whatsappTemplate" rows={3} />}
                 />
-                <p className="text-sm text-gray-500 mt-1">
-                  Variables disponibles: {{visitor.name}}, {{visitor.type}}, {{unit.number}}, {{purpose}}
-                </p>
+                <p className="text-sm text-gray-500 mt-1">Variables: {`{{visitor.name}}`}, {`{{visitor.type}}`}, {`{{unit.number}}`}, {`{{purpose}}`}</p>
               </div>
-              
               <div>
-                <Label htmlFor="telegramTemplate">Plantilla para Telegram</Label>
+                <Label htmlFor="telegramTemplate">Plantilla para Telegram (Notificación de Visitante)</Label>
                 <Controller
                   name="messageTemplates.TELEGRAM.visitor_notification"
                   control={control}
-                  defaultValue="🔔 <b>Nuevo visitante</b>
+                  defaultValue="🔔 *Nuevo visitante*
 
-Nombre: {{visitor.name}}
-Tipo: {{visitor.type}}
-Unidad: {{unit.number}}
-Motivo: {{purpose}}"
-                  render={({ field }) => (
-                    <Textarea
-                      {...field}
-                      id="telegramTemplate"
-                      rows={3}
-                    />
-                  )}
+*Nombre:* {{visitor.name}}
+*Tipo:* {{visitor.type}}
+*Unidad:* {{unit.number}}
+*Motivo:* {{purpose}}"
+                  render={({ field }) => <Textarea {...field} id="telegramTemplate" rows={4} />}
                 />
-                <p className="text-sm text-gray-500 mt-1">
-                  Variables disponibles: {{visitor.name}}, {{visitor.type}}, {{unit.number}}, {{purpose}}. Soporta formato HTML.
-                </p>
+                <p className="text-sm text-gray-500 mt-1">Variables: {`{{visitor.name}}`}, {`{{visitor.type}}`}, {`{{unit.number}}`}, {`{{purpose}}`}. Soporta Markdown.</p>
               </div>
             </div>
           </div>
 
-            {/* Botones de acción */}
-            {/* Botones de acción */}
-            {/* Botones de acción */}
-            <div className="flex justify-end space-x-4 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => window.location.reload()}
-              >
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Recargar
-              </Button>
-              <Button
-                type="submit"
-                disabled={loading}
-              >
-                {loading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="mr-2 h-4 w-4" />
-                )}
-                Guardar Configuración
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+          {/* Botones de acción */}
+          <div className="flex justify-end space-x-4 pt-4">
+            <Button type="button" variant="outline" onClick={() => window.location.reload()}>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Recargar
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              Guardar Configuración
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 
-
+export default IntercomAdminPanel;

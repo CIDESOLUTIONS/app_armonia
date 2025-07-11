@@ -70,7 +70,7 @@ interface PaymentGatewayAdapter {
 }
 
 // Implementación de adaptador para PayU Latam
-class PayUAdapter implements PaymentGatewayAdapter {
+export class PayUAdapter implements PaymentGatewayAdapter {
   private apiKey: string;
   private apiSecret: string;
   private merchantId: string;
@@ -178,7 +178,7 @@ class PayUAdapter implements PaymentGatewayAdapter {
 }
 
 // Implementación de adaptador para Wompi
-class WompiAdapter implements PaymentGatewayAdapter {
+export class WompiAdapter implements PaymentGatewayAdapter {
   private apiKey: string;
   private apiSecret: string;
   private testMode: boolean;
