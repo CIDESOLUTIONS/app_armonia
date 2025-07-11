@@ -6,17 +6,17 @@ import { TextEncoder, TextDecoder } from 'util';
 
 if (typeof global !== 'undefined') {
   if (typeof global.TextEncoder === 'undefined') {
-    global.TextEncoder = TextEncoder;
+    (global as any).TextEncoder = TextEncoder;
   }
   if (typeof global.TextDecoder === 'undefined') {
-    global.TextDecoder = TextDecoder;
+    (global as any).TextDecoder = TextDecoder;
   }
 }
 
 // Polyfill for Request and Response in JSDOM environment
 if (typeof global !== 'undefined' && !global.Request) {
-  global.Request = Request;
+  (global as any).Request = Request;
 }
 if (typeof global !== 'undefined' && !global.Response) {
-  global.Response = Response;
+  (global as any).Response = Response;
 }
