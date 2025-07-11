@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { 
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
   ChevronLeft,
   Home,
   Building2,
@@ -19,10 +19,10 @@ import {
   ClipboardList,
   Megaphone,
   Shield,
-  Camera
-} from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+  Camera,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface AdminSidebarProps {
   collapsed: boolean;
@@ -31,98 +31,107 @@ interface AdminSidebarProps {
 
 const menuItems = [
   {
-    title: 'Dashboard',
+    title: "Dashboard",
     icon: Home,
-    href: '/admin',
-    description: 'Panel principal'
+    href: "/admin",
+    description: "Panel principal",
   },
   {
-    title: 'Inventario',
+    title: "Inventario",
     icon: Building2,
-    href: '/admin/inventory',
-    description: 'Gestión de inventario',
+    href: "/admin/inventory",
+    description: "Gestión de inventario",
     submenu: [
-      { title: 'Propiedades', href: '/admin/inventory/properties', icon: Building2 },
-      { title: 'Residentes', href: '/admin/inventory/residents', icon: Users },
-      { title: 'Vehículos', href: '/admin/inventory/vehicles', icon: Car },
-      { title: 'Mascotas', href: '/admin/inventory/pets', icon: PawPrint }
-    ]
+      {
+        title: "Propiedades",
+        href: "/admin/inventory/properties",
+        icon: Building2,
+      },
+      { title: "Residentes", href: "/admin/inventory/residents", icon: Users },
+      { title: "Vehículos", href: "/admin/inventory/vehicles", icon: Car },
+      { title: "Mascotas", href: "/admin/inventory/pets", icon: PawPrint },
+    ],
   },
   {
-    title: 'Asambleas',
+    title: "Asambleas",
     icon: Calendar,
-    href: '/admin/assemblies',
-    description: 'Gestión de asambleas',
+    href: "/admin/assemblies",
+    description: "Gestión de asambleas",
   },
   {
-    title: 'Finanzas',
+    title: "Finanzas",
     icon: DollarSign,
-    href: '/(auth)/dashboard/finances',
-    description: 'Gestión financiera'
+    href: "/(auth)/dashboard/finances",
+    description: "Gestión financiera",
   },
   {
-    title: 'PQR',
+    title: "PQR",
     icon: MessageSquare,
-    href: '/(auth)/dashboard/pqr',
-    description: 'Peticiones, quejas y reclamos'
+    href: "/(auth)/dashboard/pqr",
+    description: "Peticiones, quejas y reclamos",
   },
   {
-    title: 'Servicios',
+    title: "Servicios",
     icon: ClipboardList,
-    href: '/(auth)/dashboard/services',
-    description: 'Servicios comunes'
+    href: "/(auth)/dashboard/services",
+    description: "Servicios comunes",
   },
   {
-    title: 'Comunicaciones',
+    title: "Comunicaciones",
     icon: Megaphone,
-    href: '/(auth)/dashboard/communications',
-    description: 'Comunicaciones'
+    href: "/(auth)/dashboard/communications",
+    description: "Comunicaciones",
   },
   {
-    title: 'Seguridad',
+    title: "Seguridad",
     icon: Shield,
-    href: '/(auth)/dashboard/security',
-    description: 'Seguridad'
+    href: "/(auth)/dashboard/security",
+    description: "Seguridad",
   },
   {
-    title: 'Reportes',
+    title: "Reportes",
     icon: BarChart3,
-    href: '/(auth)/dashboard/reports',
-    description: 'Reportes y estadísticas'
+    href: "/(auth)/dashboard/reports",
+    description: "Reportes y estadísticas",
   },
   {
-    title: 'Configuración',
+    title: "Configuración",
     icon: Settings,
-    href: '/(auth)/dashboard/settings',
-    description: 'Configuración del sistema'
-  }
+    href: "/(auth)/dashboard/settings",
+    description: "Configuración del sistema",
+  },
 ];
 
-export default function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
+export default function AdminSidebar({
+  collapsed,
+  onToggle,
+}: AdminSidebarProps) {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
   const toggleExpanded = (title: string) => {
     if (collapsed) return;
-    setExpandedItems(prev => 
-      prev.includes(title) 
-        ? prev.filter(item => item !== title)
-        : [...prev, title]
+    setExpandedItems((prev) =>
+      prev.includes(title)
+        ? prev.filter((item) => item !== title)
+        : [...prev, title],
     );
   };
 
   const isActive = (href: string) => {
-    if (href === '/admin') {
-      return pathname === '/admin';
+    if (href === "/admin") {
+      return pathname === "/admin";
     }
     return pathname.startsWith(href);
   };
 
   return (
-    <div className={cn(
-      "fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 transition-all duration-300 z-40",
-      collapsed ? "w-16" : "w-64"
-    )}>
+    <div
+      className={cn(
+        "fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 transition-all duration-300 z-40",
+        collapsed ? "w-16" : "w-64",
+      )}
+    >
       {/* Toggle Button */}
       <div className="flex items-center justify-end p-4 border-b border-gray-200">
         <Button
@@ -131,10 +140,12 @@ export default function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps)
           onClick={onToggle}
           className="h-8 w-8 p-0"
         >
-          <ChevronLeft className={cn(
-            "h-4 w-4 transition-transform",
-            collapsed && "rotate-180"
-          )} />
+          <ChevronLeft
+            className={cn(
+              "h-4 w-4 transition-transform",
+              collapsed && "rotate-180",
+            )}
+          />
         </Button>
       </div>
 
@@ -152,11 +163,11 @@ export default function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps)
               <div
                 className={cn(
                   "flex items-center rounded-lg transition-colors cursor-pointer",
-                  itemIsActive 
-                    ? "bg-indigo-50 text-indigo-700" 
-                    : "text-gray-700 hover:bg-gray-100"
+                  itemIsActive
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-gray-700 hover:bg-gray-100",
                 )}
-                onClick={() => hasSubmenu ? toggleExpanded(item.title) : null}
+                onClick={() => (hasSubmenu ? toggleExpanded(item.title) : null)}
               >
                 {hasSubmenu ? (
                   <div className="flex items-center w-full p-2">
@@ -166,15 +177,20 @@ export default function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps)
                         <span className="ml-3 text-sm font-medium flex-1">
                           {item.title}
                         </span>
-                        <ChevronLeft className={cn(
-                          "h-4 w-4 transition-transform",
-                          isExpanded && "rotate-90"
-                        )} />
+                        <ChevronLeft
+                          className={cn(
+                            "h-4 w-4 transition-transform",
+                            isExpanded && "rotate-90",
+                          )}
+                        />
                       </>
                     )}
                   </div>
                 ) : (
-                  <Link href={item.href} className="flex items-center w-full p-2">
+                  <Link
+                    href={item.href}
+                    className="flex items-center w-full p-2"
+                  >
                     <Icon className="h-5 w-5 flex-shrink-0" />
                     {!collapsed && (
                       <span className="ml-3 text-sm font-medium">
@@ -191,7 +207,7 @@ export default function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps)
                   {item.submenu!.map((subItem) => {
                     const SubIcon = subItem.icon;
                     const subIsActive = isActive(subItem.href);
-                    
+
                     return (
                       <Link
                         key={subItem.href}
@@ -200,7 +216,7 @@ export default function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps)
                           "flex items-center p-2 rounded-lg text-sm transition-colors",
                           subIsActive
                             ? "bg-indigo-50 text-indigo-700"
-                            : "text-gray-600 hover:bg-gray-100"
+                            : "text-gray-600 hover:bg-gray-100",
                         )}
                       >
                         <SubIcon className="h-4 w-4 flex-shrink-0" />
@@ -227,4 +243,3 @@ export default function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps)
     </div>
   );
 }
-

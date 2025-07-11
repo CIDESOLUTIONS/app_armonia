@@ -1,9 +1,9 @@
 "use client";
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode } from "react";
 
 // Tipos de idiomas soportados
-type Language = 'Español' | 'English';
+type Language = "Español" | "English";
 
 // Interfaz para el contexto de traducción
 interface TranslationContextType {
@@ -13,7 +13,7 @@ interface TranslationContextType {
 
 // Crear el contexto con valores por defecto
 const TranslationContext = createContext<TranslationContextType>({
-  language: 'Español', // Idioma por defecto
+  language: "Español", // Idioma por defecto
   setLanguage: () => {}, // Función vacía por defecto
 });
 
@@ -25,9 +25,11 @@ interface TranslationProviderProps {
   children: ReactNode;
 }
 
-export const TranslationProvider: React.FC<TranslationProviderProps> = ({ children }) => {
+export const TranslationProvider: React.FC<TranslationProviderProps> = ({
+  children,
+}) => {
   // Estado para almacenar el idioma actual
-  const [language, setLanguage] = useState<Language>('Español');
+  const [language, setLanguage] = useState<Language>("Español");
 
   // Valor del contexto
   const value = {

@@ -3,7 +3,7 @@
  * Compatible con Next.js 15 y React 19
  */
 
-import { getPrisma } from '@/lib/prisma';
+import { getPrisma } from "@/lib/prisma";
 
 // Cliente Prisma con soporte para múltiples esquemas
 const prismaClientSingleton = () => {
@@ -17,7 +17,7 @@ const globalForPrisma = globalThis as unknown as {
 
 export const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 /**
  * Resuelve el esquema de base de datos basado en el nombre del esquema
@@ -26,14 +26,14 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
  */
 export function resolveSchema(schemaName: string) {
   if (!schemaName) {
-    throw new Error('Nombre de esquema no proporcionado');
+    throw new Error("Nombre de esquema no proporcionado");
   }
-  
+
   // Validación básica del nombre del esquema para evitar inyección SQL
   if (!/^[a-zA-Z0-9_]+$/.test(schemaName)) {
-    throw new Error('Nombre de esquema inválido');
+    throw new Error("Nombre de esquema inválido");
   }
-  
+
   return prisma.$extends({
     query: {
       $allModels: {
@@ -58,13 +58,13 @@ export function resolveSchema(schemaName: string) {
  */
 export function getSchemaFromRequest(req: any) {
   // Intentar obtener el esquema de diferentes fuentes
-  const schemaName = 
-    req?.query?.schemaName || 
-    req?.headers?.['x-schema-name'] || 
-    req?.cookies?.['schema-name'] ||
-    process.env.DEFAULT_SCHEMA || 
-    'public';
-  
+  const schemaName =
+    req?.query?.schemaName ||
+    req?.headers?.["x-schema-name"] ||
+    req?.cookies?.["schema-name"] ||
+    process.env.DEFAULT_SCHEMA ||
+    "public";
+
   return schemaName;
 }
 

@@ -1,20 +1,31 @@
 // src/app/(auth)/layout.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Header } from '@/components/layout/header';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Header } from "@/components/layout/header";
 import Sidebar from "@/components/layout/Sidebar";
-import { useAuthStore } from '@/store/authStore';
-import { Loader2 } from 'lucide-react';
-import { ROUTES } from '@/constants/routes';
-import { useToast } from '@/components/ui/use-toast';
+import { useAuthStore } from "@/store/authStore";
+import { Loader2 } from "lucide-react";
+import { ROUTES } from "@/constants/routes";
+import { useToast } from "@/components/ui/use-toast";
 
-export default function AuthLayout({ children }: { children: React.ReactNode }) {
-  const { isLoggedIn, loading, adminName, complexName, logout: authLogout, initializeAuth } = useAuthStore();
+export default function AuthLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const {
+    isLoggedIn,
+    loading,
+    adminName,
+    complexName,
+    logout: authLogout,
+    initializeAuth,
+  } = useAuthStore();
   const router = useRouter();
   const { toast } = useToast();
-  
+
   const [isLoading, setIsLoading] = useState(true);
   const [language, _setLanguage] = useState("Español");
   const [_theme, _setTheme] = useState("Claro");
@@ -26,17 +37,19 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   }, [initializeAuth]);
 
   useEffect(() => {
-    console.log('[AuthLayout] useEffect ejecutado');
-    console.log('[AuthLayout] Estado de autenticación:', isLoggedIn);
-    console.log('[AuthLayout] Estado de carga:', loading);
-    console.log('[AuthLayout] URL actual:', window.location.pathname);
+    console.log("[AuthLayout] useEffect ejecutado");
+    console.log("[AuthLayout] Estado de autenticación:", isLoggedIn);
+    console.log("[AuthLayout] Estado de carga:", loading);
+    console.log("[AuthLayout] URL actual:", window.location.pathname);
 
     if (!loading) {
       if (!isLoggedIn) {
-        console.log('[AuthLayout] No autenticado, redirigiendo a portal selector');
+        console.log(
+          "[AuthLayout] No autenticado, redirigiendo a portal selector",
+        );
         router.push(ROUTES.PORTAL_SELECTOR);
       } else {
-        console.log('[AuthLayout] Autenticado, mostrando layout');
+        console.log("[AuthLayout] Autenticado, mostrando layout");
         setIsLoading(false);
       }
     }
@@ -44,22 +57,22 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
   const handleLogout = async () => {
     try {
-      console.log('[AuthLayout] Iniciando proceso de logout');
-      const response = await fetch('/api/auth/logout', { method: 'POST' });
-      
+      console.log("[AuthLayout] Iniciando proceso de logout");
+      const response = await fetch("/api/auth/logout", { method: "POST" });
+
       if (response.ok) {
-        console.log('[AuthLayout] Logout exitoso en el API');
+        console.log("[AuthLayout] Logout exitoso en el API");
         await authLogout();
         toast({
           description: "Sesión cerrada exitosamente",
-          variant: "default"
+          variant: "default",
         });
       } else {
         console.error("[AuthLayout] Error al cerrar sesión");
         toast({
           title: "Error",
           description: "Error al cerrar sesión",
-          variant: "destructive"
+          variant: "destructive",
         });
       }
     } catch (error) {
@@ -67,7 +80,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       toast({
         title: "Error",
         description: "Error en el proceso de cierre de sesión",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
@@ -76,7 +89,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     return (
       <div className="flex justify-center items-center h-screen bg-gray-100 dark:bg-gray-900">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
-        <span className="ml-2 text-gray-700 dark:text-gray-300">Cargando...</span>
+        <span className="ml-2 text-gray-700 dark:text-gray-300">
+          Cargando...
+        </span>
       </div>
     );
   }
@@ -87,10 +102,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
-      <div className={`fixed z-20 h-full ${isSidebarCollapsed ? 'w-16' : 'w-64'} transition-all duration-300`}>
+      <div
+        className={`fixed z-20 h-full ${isSidebarCollapsed ? "w-16" : "w-64"} transition-all duration-300`}
+      >
         <Sidebar
           language={language}
-          theme={theme || 'light'}
+          theme={theme || "light"}
           currency={currency}
           adminName={adminName}
           complexName={complexName}
@@ -99,7 +116,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           setIsCollapsed={setIsSidebarCollapsed}
         />
       </div>
-      <div className={`flex-1 ${isSidebarCollapsed ? 'ml-16' : 'ml-64'} transition-all duration-300 flex flex-col min-h-screen`}>
+      <div
+        className={`flex-1 ${isSidebarCollapsed ? "ml-16" : "ml-64"} transition-all duration-300 flex flex-col min-h-screen`}
+      >
         <Header
           theme={theme}
           setTheme={setTheme}
@@ -112,9 +131,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           complexName={complexName}
           adminName={adminName}
         />
-        <main className="pt-16 px-6 flex-1 overflow-y-auto">
-          {children}
-        </main>
+        <main className="pt-16 px-6 flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
   );

@@ -1,18 +1,18 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { verifyToken } from '@/lib/auth';
-import { validateRequest } from '@/lib/validation';
-import { 
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { verifyToken } from "@/lib/auth";
+import { validateRequest } from "@/lib/validation";
+import {
   GetVotingQuestionsSchema,
   CreateVotingQuestionSchema,
-  type CreateVotingQuestionRequest
-} from '@/validators/assemblies/voting.validator';
+  type CreateVotingQuestionRequest,
+} from "@/validators/assemblies/voting.validator";
 
 export async function GET(req: Request) {
-  const token = req.headers.get('Authorization')?.replace('Bearer ', '');
+  const token = req.headers.get("Authorization")?.replace("Bearer ", "");
   const { searchParams } = new URL(req.url);
   const queryParams = {
-    assemblyId: searchParams.get('assemblyId')
+    assemblyId: searchParams.get("assemblyId"),
   };
 
   // Validar parámetros
@@ -24,7 +24,8 @@ export async function GET(req: Request) {
   const validatedParams = validation.data;
   const assemblyId = parseInt(validatedParams.assemblyId);
 
-  if (!token) return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
+  if (!token)
+    return NextResponse.json({ message: "No autorizado" }, { status: 401 });
 
   try {
     const decoded = await verifyToken(token);
@@ -33,21 +34,25 @@ export async function GET(req: Request) {
 
     const questions = await prisma.$queryRawUnsafe(
       `SELECT * FROM "${schemaName}"."Question" WHERE "assemblyId" = $1`,
-      assemblyId
+      assemblyId,
     );
     return NextResponse.json({ questions }, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ message: 'Error al obtener preguntas', error: String(error) }, { status: 500 });
+    return NextResponse.json(
+      { message: "Error al obtener preguntas", error: String(error) },
+      { status: 500 },
+    );
   }
 }
 
 export async function POST(req: Request) {
-  const token = req.headers.get('Authorization')?.replace('Bearer ', '');
-  if (!token) return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
+  const token = req.headers.get("Authorization")?.replace("Bearer ", "");
+  if (!token)
+    return NextResponse.json({ message: "No autorizado" }, { status: 401 });
 
   try {
     const body = await req.json();
-    
+
     // Validar datos
     const validation = validateRequest(CreateVotingQuestionSchema, body);
     if (!validation.success) {
@@ -55,14 +60,14 @@ export async function POST(req: Request) {
     }
 
     const validatedData: CreateVotingQuestionRequest = validation.data;
-    
+
     const decoded = await verifyToken(token);
     const schemaName = decoded.schemaName.toLowerCase();
     prisma.setTenantSchema(schemaName);
 
     const questionExists = await prisma.$queryRawUnsafe(
       `SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = $1 AND table_name = 'Question')`,
-      schemaName
+      schemaName,
     );
     if (!questionExists[0].exists) {
       await prisma.$executeRawUnsafe(
@@ -76,23 +81,31 @@ export async function POST(req: Request) {
           "isOpen" BOOLEAN DEFAULT false,
           "votingEndTime" TIMESTAMP,
           "options" JSONB
-        )`
+        )`,
       );
     }
 
     // Preparar datos adicionales si existen
-    const options = validatedData.options ? JSON.stringify(validatedData.options) : null;
-    const votingEndTime = validatedData.votingTime ? 
-      new Date(Date.now() + validatedData.votingTime * 60000).toISOString() : 
-      null;
+    const options = validatedData.options
+      ? JSON.stringify(validatedData.options)
+      : null;
+    const votingEndTime = validatedData.votingTime
+      ? new Date(Date.now() + validatedData.votingTime * 60000).toISOString()
+      : null;
 
     const result = await prisma.$queryRawUnsafe(
       `INSERT INTO "${schemaName}"."Question" ("assemblyId", text, options, "votingEndTime") 
        VALUES ($1, $2, $3, $4) RETURNING id`,
-      validatedData.assemblyId, validatedData.text, options, votingEndTime
+      validatedData.assemblyId,
+      validatedData.text,
+      options,
+      votingEndTime,
     );
     return NextResponse.json({ questionId: result[0].id }, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ message: 'Error al agregar pregunta', error: String(error) }, { status: 500 });
+    return NextResponse.json(
+      { message: "Error al agregar pregunta", error: String(error) },
+      { status: 500 },
+    );
   }
 }

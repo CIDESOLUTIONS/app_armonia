@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface TableColumn<T> {
   key: string;
@@ -21,8 +21,8 @@ const Table = <T extends Record<string, any>>({
   data,
   loading = false,
   onRowClick,
-  className = '',
-  emptyText = 'No hay datos disponibles'
+  className = "",
+  emptyText = "No hay datos disponibles",
 }: TableProps<T>) => {
   return (
     <div className={`w-full overflow-x-auto ${className}`}>
@@ -35,7 +35,7 @@ const Table = <T extends Record<string, any>>({
                 key={column.key}
                 className={`
                   px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider
-                  ${column.width ? `w-[${column.width}]` : ''}
+                  ${column.width ? `w-[${column.width}]` : ""}
                 `}
               >
                 {column.title}
@@ -48,7 +48,7 @@ const Table = <T extends Record<string, any>>({
         <tbody className="bg-white divide-y divide-gray-200">
           {loading ? (
             <tr>
-              <td 
+              <td
                 colSpan={columns.length}
                 className="px-6 py-4 text-center text-sm text-gray-500"
               >
@@ -57,7 +57,7 @@ const Table = <T extends Record<string, any>>({
             </tr>
           ) : data.length === 0 ? (
             <tr>
-              <td 
+              <td
                 colSpan={columns.length}
                 className="px-6 py-4 text-center text-sm text-gray-500"
               >
@@ -69,7 +69,7 @@ const Table = <T extends Record<string, any>>({
               <tr
                 key={index}
                 onClick={() => onRowClick?.(record)}
-                className={onRowClick ? 'cursor-pointer hover:bg-gray-50' : ''}
+                className={onRowClick ? "cursor-pointer hover:bg-gray-50" : ""}
               >
                 {columns.map((column) => (
                   <td

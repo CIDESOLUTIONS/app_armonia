@@ -1,12 +1,17 @@
 /**
  * Servicio para la generación de métricas y análisis del sistema PQR
- * 
+ *
  * Este servicio implementa la lógica para generar métricas, indicadores
  * y análisis de rendimiento del sistema PQR.
  */
 
-import { PrismaClient, PQRStatus, PQRPriority, PQRCategory } from '@prisma/client';
-import { getSchemaFromRequest } from '../lib/prisma';
+import {
+  PrismaClient,
+  PQRStatus,
+  PQRPriority,
+  PQRCategory,
+} from "@prisma/client";
+import { getSchemaFromRequest } from "../lib/prisma";
 
 // Interfaces para métricas
 interface SummaryMetrics {
@@ -102,7 +107,7 @@ export class PQRMetricsService {
    * Constructor del servicio
    * @param schema Esquema de base de datos a utilizar
    */
-  constructor(schema: string = 'public') {
+  constructor(schema: string = "public") {
     this.schema = schema;
     this.prisma = getSchemaFromRequest(schema);
   }
@@ -112,7 +117,9 @@ export class PQRMetricsService {
    * @param filter Filtros opcionales para las métricas
    * @returns Objeto con todas las métricas del dashboard
    */
-  async generateDashboardMetrics(filter?: MetricsFilter): Promise<DashboardMetrics> {
+  async generateDashboardMetrics(
+    filter?: MetricsFilter,
+  ): Promise<DashboardMetrics> {
     try {
       // Ejecutar todas las consultas en paralelo para optimizar rendimiento
       const [
@@ -123,7 +130,7 @@ export class PQRMetricsService {
         timeTrend,
         slaMetrics,
         topAssignees,
-        recentActivity
+        recentActivity,
       ] = await Promise.all([
         this.getSummaryMetrics(filter),
         this.getCategoryDistribution(filter),
@@ -132,7 +139,7 @@ export class PQRMetricsService {
         this.getTimeTrend(filter),
         this.getSLAMetrics(filter),
         this.getTopAssignees(filter),
-        this.getRecentActivity(filter)
+        this.getRecentActivity(filter),
       ]);
 
       return {
@@ -143,10 +150,10 @@ export class PQRMetricsService {
         timeTrend,
         slaMetrics,
         topAssignees,
-        recentActivity
+        recentActivity,
       };
     } catch (error) {
-      console.error('Error al generar métricas del dashboard:', error);
+      console.error("Error al generar métricas del dashboard:", error);
       throw error;
     }
   }
@@ -162,34 +169,36 @@ export class PQRMetricsService {
       const whereConditions = this.buildWhereConditions(filter);
 
       // Obtener conteos por estado
-      const totalCount = await this.prisma.pQR.count({ where: whereConditions });
-      
+      const totalCount = await this.prisma.pQR.count({
+        where: whereConditions,
+      });
+
       const openCount = await this.prisma.pQR.count({
         where: {
           ...whereConditions,
-          status: PQRStatus.OPEN
-        }
+          status: PQRStatus.OPEN,
+        },
       });
-      
+
       const inProgressCount = await this.prisma.pQR.count({
         where: {
           ...whereConditions,
-          status: PQRStatus.IN_PROGRESS
-        }
+          status: PQRStatus.IN_PROGRESS,
+        },
       });
-      
+
       const resolvedCount = await this.prisma.pQR.count({
         where: {
           ...whereConditions,
-          status: PQRStatus.RESOLVED
-        }
+          status: PQRStatus.RESOLVED,
+        },
       });
-      
+
       const closedCount = await this.prisma.pQR.count({
         where: {
           ...whereConditions,
-          status: PQRStatus.CLOSED
-        }
+          status: PQRStatus.CLOSED,
+        },
       });
 
       // Calcular tiempos promedio
@@ -208,7 +217,7 @@ export class PQRMetricsService {
       const satisfactionMetrics = await this.prisma.$queryRaw`
         SELECT AVG(satisfaction_rating) as "avgSatisfaction"
         FROM pqr_satisfaction_survey
-        WHERE ${this.buildRawWhereConditions(filter, 'pqr_id')}
+        WHERE ${this.buildRawWhereConditions(filter, "pqr_id")}
         AND satisfaction_rating IS NOT NULL
       `;
 
@@ -221,10 +230,10 @@ export class PQRMetricsService {
         averageResponseTime: timeMetrics[0]?.avgResponseTime || 0,
         averageResolutionTime: timeMetrics[0]?.avgResolutionTime || 0,
         slaComplianceRate: timeMetrics[0]?.slaComplianceRate || 0,
-        satisfactionRate: satisfactionMetrics[0]?.avgSatisfaction || 0
+        satisfactionRate: satisfactionMetrics[0]?.avgSatisfaction || 0,
       };
     } catch (error) {
-      console.error('Error al obtener métricas de resumen:', error);
+      console.error("Error al obtener métricas de resumen:", error);
       return {
         totalCount: 0,
         openCount: 0,
@@ -234,7 +243,7 @@ export class PQRMetricsService {
         averageResponseTime: 0,
         averageResolutionTime: 0,
         slaComplianceRate: 0,
-        satisfactionRate: 0
+        satisfactionRate: 0,
       };
     }
   }
@@ -244,13 +253,17 @@ export class PQRMetricsService {
    * @param filter Filtros opcionales
    * @returns Distribución por categoría
    */
-  async getCategoryDistribution(filter?: MetricsFilter): Promise<CategoryDistribution[]> {
+  async getCategoryDistribution(
+    filter?: MetricsFilter,
+  ): Promise<CategoryDistribution[]> {
     try {
       // Construir condiciones de filtro
       const whereConditions = this.buildWhereConditions(filter);
 
       // Obtener conteo total para calcular porcentajes
-      const totalCount = await this.prisma.pQR.count({ where: whereConditions });
+      const totalCount = await this.prisma.pQR.count({
+        where: whereConditions,
+      });
 
       if (totalCount === 0) {
         return [];
@@ -258,21 +271,23 @@ export class PQRMetricsService {
 
       // Agrupar por categoría
       const distribution = await this.prisma.pQR.groupBy({
-        by: ['category'],
+        by: ["category"],
         where: whereConditions,
         _count: {
-          category: true
-        }
+          category: true,
+        },
       });
 
       // Formatear resultados
-      return distribution.map(item => ({
+      return distribution.map((item) => ({
         category: item.category,
         count: item._count.category,
-        percentage: parseFloat(((item._count.category * 100) / totalCount).toFixed(2))
+        percentage: parseFloat(
+          ((item._count.category * 100) / totalCount).toFixed(2),
+        ),
       }));
     } catch (error) {
-      console.error('Error al obtener distribución por categoría:', error);
+      console.error("Error al obtener distribución por categoría:", error);
       return [];
     }
   }
@@ -282,13 +297,17 @@ export class PQRMetricsService {
    * @param filter Filtros opcionales
    * @returns Distribución por prioridad
    */
-  async getPriorityDistribution(filter?: MetricsFilter): Promise<PriorityDistribution[]> {
+  async getPriorityDistribution(
+    filter?: MetricsFilter,
+  ): Promise<PriorityDistribution[]> {
     try {
       // Construir condiciones de filtro
       const whereConditions = this.buildWhereConditions(filter);
 
       // Obtener conteo total para calcular porcentajes
-      const totalCount = await this.prisma.pQR.count({ where: whereConditions });
+      const totalCount = await this.prisma.pQR.count({
+        where: whereConditions,
+      });
 
       if (totalCount === 0) {
         return [];
@@ -296,21 +315,23 @@ export class PQRMetricsService {
 
       // Agrupar por prioridad
       const distribution = await this.prisma.pQR.groupBy({
-        by: ['priority'],
+        by: ["priority"],
         where: whereConditions,
         _count: {
-          priority: true
-        }
+          priority: true,
+        },
       });
 
       // Formatear resultados
-      return distribution.map(item => ({
+      return distribution.map((item) => ({
         priority: item.priority,
         count: item._count.priority,
-        percentage: parseFloat(((item._count.priority * 100) / totalCount).toFixed(2))
+        percentage: parseFloat(
+          ((item._count.priority * 100) / totalCount).toFixed(2),
+        ),
       }));
     } catch (error) {
-      console.error('Error al obtener distribución por prioridad:', error);
+      console.error("Error al obtener distribución por prioridad:", error);
       return [];
     }
   }
@@ -320,13 +341,17 @@ export class PQRMetricsService {
    * @param filter Filtros opcionales
    * @returns Distribución por estado
    */
-  async getStatusDistribution(filter?: MetricsFilter): Promise<StatusDistribution[]> {
+  async getStatusDistribution(
+    filter?: MetricsFilter,
+  ): Promise<StatusDistribution[]> {
     try {
       // Construir condiciones de filtro
       const whereConditions = this.buildWhereConditions(filter);
 
       // Obtener conteo total para calcular porcentajes
-      const totalCount = await this.prisma.pQR.count({ where: whereConditions });
+      const totalCount = await this.prisma.pQR.count({
+        where: whereConditions,
+      });
 
       if (totalCount === 0) {
         return [];
@@ -334,21 +359,23 @@ export class PQRMetricsService {
 
       // Agrupar por estado
       const distribution = await this.prisma.pQR.groupBy({
-        by: ['status'],
+        by: ["status"],
         where: whereConditions,
         _count: {
-          status: true
-        }
+          status: true,
+        },
       });
 
       // Formatear resultados
-      return distribution.map(item => ({
+      return distribution.map((item) => ({
         status: item.status,
         count: item._count.status,
-        percentage: parseFloat(((item._count.status * 100) / totalCount).toFixed(2))
+        percentage: parseFloat(
+          ((item._count.status * 100) / totalCount).toFixed(2),
+        ),
       }));
     } catch (error) {
-      console.error('Error al obtener distribución por estado:', error);
+      console.error("Error al obtener distribución por estado:", error);
       return [];
     }
   }
@@ -361,7 +388,9 @@ export class PQRMetricsService {
   async getTimeTrend(filter?: MetricsFilter): Promise<TimeTrend[]> {
     try {
       // Determinar período de análisis
-      const startDate = filter?.startDate || new Date(new Date().setMonth(new Date().getMonth() - 6));
+      const startDate =
+        filter?.startDate ||
+        new Date(new Date().setMonth(new Date().getMonth() - 6));
       const endDate = filter?.endDate || new Date();
 
       // Consulta SQL para obtener tendencia por mes
@@ -380,14 +409,14 @@ export class PQRMetricsService {
       `;
 
       // Formatear resultados
-      return (trend as any[]).map(item => ({
+      return (trend as any[]).map((item) => ({
         period: item.period,
         count: parseInt(item.count),
         resolvedCount: parseInt(item.resolved_count || 0),
-        averageResolutionTime: parseFloat(item.avg_resolution_time || 0)
+        averageResolutionTime: parseFloat(item.avg_resolution_time || 0),
       }));
     } catch (error) {
-      console.error('Error al obtener tendencia temporal:', error);
+      console.error("Error al obtener tendencia temporal:", error);
       return [];
     }
   }
@@ -407,20 +436,20 @@ export class PQRMetricsService {
         where: {
           ...whereConditions,
           status: {
-            in: [PQRStatus.RESOLVED, PQRStatus.CLOSED]
+            in: [PQRStatus.RESOLVED, PQRStatus.CLOSED],
           },
           resolvedAt: {
-            not: null
+            not: null,
           },
           dueDate: {
-            not: null
-          }
+            not: null,
+          },
         },
         select: {
           id: true,
           resolvedAt: true,
-          dueDate: true
-        }
+          dueDate: true,
+        },
       });
 
       if (resolvedPQRs.length === 0) {
@@ -428,7 +457,7 @@ export class PQRMetricsService {
           compliantCount: 0,
           nonCompliantCount: 0,
           complianceRate: 0,
-          averageDeviationTime: 0
+          averageDeviationTime: 0,
         };
       }
 
@@ -439,7 +468,7 @@ export class PQRMetricsService {
       for (const pqr of resolvedPQRs) {
         const resolvedAt = new Date(pqr.resolvedAt!);
         const dueDate = new Date(pqr.dueDate!);
-        
+
         if (resolvedAt <= dueDate) {
           compliantCount++;
         } else {
@@ -452,21 +481,22 @@ export class PQRMetricsService {
 
       const nonCompliantCount = resolvedPQRs.length - compliantCount;
       const complianceRate = (compliantCount * 100) / resolvedPQRs.length;
-      const averageDeviationTime = nonCompliantCount > 0 ? totalDeviationHours / nonCompliantCount : 0;
+      const averageDeviationTime =
+        nonCompliantCount > 0 ? totalDeviationHours / nonCompliantCount : 0;
 
       return {
         compliantCount,
         nonCompliantCount,
         complianceRate: parseFloat(complianceRate.toFixed(2)),
-        averageDeviationTime: parseFloat(averageDeviationTime.toFixed(2))
+        averageDeviationTime: parseFloat(averageDeviationTime.toFixed(2)),
       };
     } catch (error) {
-      console.error('Error al obtener métricas de SLA:', error);
+      console.error("Error al obtener métricas de SLA:", error);
       return {
         compliantCount: 0,
         nonCompliantCount: 0,
         complianceRate: 0,
-        averageDeviationTime: 0
+        averageDeviationTime: 0,
       };
     }
   }
@@ -477,7 +507,10 @@ export class PQRMetricsService {
    * @param limit Límite de resultados
    * @returns Métricas de asignados
    */
-  async getTopAssignees(filter?: MetricsFilter, limit: number = 5): Promise<AssigneeMetrics[]> {
+  async getTopAssignees(
+    filter?: MetricsFilter,
+    limit: number = 5,
+  ): Promise<AssigneeMetrics[]> {
     try {
       // Construir condiciones de filtro
       const whereConditions = this.buildWhereConditions(filter);
@@ -485,26 +518,26 @@ export class PQRMetricsService {
       // Obtener usuarios con PQRs asignados
       const assignees = await this.prisma.user.findMany({
         where: {
-          role: 'STAFF',
+          role: "STAFF",
           assignedPQRs: {
-            some: whereConditions
-          }
+            some: whereConditions,
+          },
         },
         select: {
           id: true,
           name: true,
           _count: {
             select: {
-              assignedPQRs: true
-            }
-          }
+              assignedPQRs: true,
+            },
+          },
         },
         orderBy: {
           assignedPQRs: {
-            _count: 'desc'
-          }
+            _count: "desc",
+          },
         },
-        take: limit
+        take: limit,
       });
 
       // Obtener métricas detalladas para cada asignado
@@ -516,9 +549,9 @@ export class PQRMetricsService {
               ...whereConditions,
               assignedToId: assignee.id,
               status: {
-                in: [PQRStatus.RESOLVED, PQRStatus.CLOSED]
-              }
-            }
+                in: [PQRStatus.RESOLVED, PQRStatus.CLOSED],
+              },
+            },
           });
 
           // Calcular tiempo promedio de resolución
@@ -537,15 +570,19 @@ export class PQRMetricsService {
             assigneeName: assignee.name,
             totalAssigned: assignee._count.assignedPQRs,
             resolvedCount,
-            averageResolutionTime: parseFloat((timeMetrics[0]?.avgResolutionTime || 0).toFixed(2)),
-            slaComplianceRate: parseFloat((timeMetrics[0]?.slaComplianceRate || 0).toFixed(2))
+            averageResolutionTime: parseFloat(
+              (timeMetrics[0]?.avgResolutionTime || 0).toFixed(2),
+            ),
+            slaComplianceRate: parseFloat(
+              (timeMetrics[0]?.slaComplianceRate || 0).toFixed(2),
+            ),
           };
-        })
+        }),
       );
 
       return assigneeMetrics;
     } catch (error) {
-      console.error('Error al obtener métricas de asignados:', error);
+      console.error("Error al obtener métricas de asignados:", error);
       return [];
     }
   }
@@ -556,7 +593,10 @@ export class PQRMetricsService {
    * @param limit Límite de resultados
    * @returns Actividad reciente
    */
-  async getRecentActivity(filter?: MetricsFilter, limit: number = 10): Promise<RecentActivity[]> {
+  async getRecentActivity(
+    filter?: MetricsFilter,
+    limit: number = 10,
+  ): Promise<RecentActivity[]> {
     try {
       // Construir condiciones de filtro
       const whereConditions = this.buildWhereConditions(filter);
@@ -564,33 +604,33 @@ export class PQRMetricsService {
       // Obtener historial de estados reciente
       const statusHistory = await this.prisma.pQRStatusHistory.findMany({
         where: {
-          pqr: whereConditions
+          pqr: whereConditions,
         },
         include: {
           pqr: {
             select: {
               id: true,
               ticketNumber: true,
-              title: true
-            }
-          }
+              title: true,
+            },
+          },
         },
         orderBy: {
-          changedAt: 'desc'
+          changedAt: "desc",
         },
-        take: limit
+        take: limit,
       });
 
       // Formatear resultados
-      return statusHistory.map(history => ({
+      return statusHistory.map((history) => ({
         date: history.changedAt,
-        action: `Cambio de estado: ${history.previousStatus || 'NUEVO'} → ${history.status}`,
+        action: `Cambio de estado: ${history.previousStatus || "NUEVO"} → ${history.status}`,
         pqrId: history.pqrId,
         ticketNumber: history.pqr.ticketNumber,
-        title: history.pqr.title
+        title: history.pqr.title,
       }));
     } catch (error) {
-      console.error('Error al obtener actividad reciente:', error);
+      console.error("Error al obtener actividad reciente:", error);
       return [];
     }
   }
@@ -610,14 +650,14 @@ export class PQRMetricsService {
     if (filter.startDate) {
       conditions.createdAt = {
         ...conditions.createdAt,
-        gte: filter.startDate
+        gte: filter.startDate,
       };
     }
 
     if (filter.endDate) {
       conditions.createdAt = {
         ...conditions.createdAt,
-        lte: filter.endDate
+        lte: filter.endDate,
       };
     }
 
@@ -650,8 +690,11 @@ export class PQRMetricsService {
    * @param idField Nombre del campo ID (para joins)
    * @returns Condiciones WHERE en formato SQL
    */
-  private buildRawWhereConditions(filter?: MetricsFilter, idField: string = 'id'): any {
-    const conditions = ['1=1']; // Siempre verdadero como base
+  private buildRawWhereConditions(
+    filter?: MetricsFilter,
+    idField: string = "id",
+  ): any {
+    const conditions = ["1=1"]; // Siempre verdadero como base
 
     if (!filter) {
       return this.prisma.$raw`1=1`;
@@ -685,6 +728,6 @@ export class PQRMetricsService {
       conditions.push(`complex_id = ${filter.complexId}`);
     }
 
-    return this.prisma.$raw`${conditions.join(' AND ')}`;
+    return this.prisma.$raw`${conditions.join(" AND ")}`;
   }
 }

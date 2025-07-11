@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Users,
   Car,
@@ -13,10 +13,10 @@ import {
   Package,
   Phone,
   Activity,
-  BarChart3
-} from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import Link from 'next/link';
+  BarChart3,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 // Importar servicios para obtener datos (aún no implementados, se asume su existencia)
 // import { getReceptionDashboardStats, getRecentReceptionActivity } from '@/services/receptionDashboardService';
 
@@ -32,16 +32,18 @@ interface ReceptionDashboardStats {
 
 interface RecentReceptionActivity {
   id: string;
-  type: 'visitor' | 'package' | 'incident' | 'pqr';
+  type: "visitor" | "package" | "incident" | "pqr";
   title: string;
   description: string;
   timestamp: string;
-  status: 'success' | 'warning' | 'error' | 'info';
+  status: "success" | "warning" | "error" | "info";
 }
 
 export function ReceptionDashboardContent() {
   const [stats, setStats] = useState<ReceptionDashboardStats | null>(null);
-  const [recentActivity, setRecentActivity] = useState<RecentReceptionActivity[]>([]);
+  const [recentActivity, setRecentActivity] = useState<
+    RecentReceptionActivity[]
+  >([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -49,7 +51,7 @@ export function ReceptionDashboardContent() {
     const fetchData = async () => {
       setLoading(true);
       // Aquí se llamarían a los servicios reales
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simular retardo de red
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simular retardo de red
       setStats({
         currentVisitors: 15,
         commonAreasInUse: 3,
@@ -60,10 +62,38 @@ export function ReceptionDashboardContent() {
         pendingPackages: 12,
       });
       setRecentActivity([
-        { id: '1', type: 'visitor', title: 'Nuevo visitante registrado', description: 'Acceso de Juan Pérez a apto 301', timestamp: new Date().toISOString(), status: 'info' },
-        { id: '2', type: 'package', title: 'Paquete recibido', description: 'Paquete para apto 502 de Amazon', timestamp: new Date().toISOString(), status: 'success' },
-        { id: '3', type: 'incident', title: 'Incidente de seguridad', description: 'Alarma activada en zona común', timestamp: new Date().toISOString(), status: 'error' },
-        { id: '4', type: 'pqr', title: 'Nueva PQR', description: 'Reporte de ruido en apto 203', timestamp: new Date().toISOString(), status: 'warning' },
+        {
+          id: "1",
+          type: "visitor",
+          title: "Nuevo visitante registrado",
+          description: "Acceso de Juan Pérez a apto 301",
+          timestamp: new Date().toISOString(),
+          status: "info",
+        },
+        {
+          id: "2",
+          type: "package",
+          title: "Paquete recibido",
+          description: "Paquete para apto 502 de Amazon",
+          timestamp: new Date().toISOString(),
+          status: "success",
+        },
+        {
+          id: "3",
+          type: "incident",
+          title: "Incidente de seguridad",
+          description: "Alarma activada en zona común",
+          timestamp: new Date().toISOString(),
+          status: "error",
+        },
+        {
+          id: "4",
+          type: "pqr",
+          title: "Nueva PQR",
+          description: "Reporte de ruido en apto 203",
+          timestamp: new Date().toISOString(),
+          status: "warning",
+        },
       ]);
       setLoading(false);
     };
@@ -72,21 +102,31 @@ export function ReceptionDashboardContent() {
 
   const getActivityIcon = (type: string) => {
     switch (type) {
-      case 'visitor': return <Users className="h-4 w-4" />;
-      case 'package': return <Package className="h-4 w-4" />;
-      case 'incident': return <AlertCircle className="h-4 w-4" />;
-      case 'pqr': return <MessageSquare className="h-4 w-4" />;
-      default: return <Activity className="h-4 w-4" />;
+      case "visitor":
+        return <Users className="h-4 w-4" />;
+      case "package":
+        return <Package className="h-4 w-4" />;
+      case "incident":
+        return <AlertCircle className="h-4 w-4" />;
+      case "pqr":
+        return <MessageSquare className="h-4 w-4" />;
+      default:
+        return <Activity className="h-4 w-4" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'success': return 'bg-green-100 text-green-800';
-      case 'warning': return 'bg-yellow-100 text-yellow-800';
-      case 'error': return 'bg-red-100 text-red-800';
-      case 'info': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "success":
+        return "bg-green-100 text-green-800";
+      case "warning":
+        return "bg-yellow-100 text-yellow-800";
+      case "error":
+        return "bg-red-100 text-red-800";
+      case "info":
+        return "bg-blue-100 text-blue-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -112,8 +152,13 @@ export function ReceptionDashboardContent() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard Recepción</h1>
-          <p className="text-gray-600 mt-1">Panel de control y métricas clave para el personal de recepción y vigilancia</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Dashboard Recepción
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Panel de control y métricas clave para el personal de recepción y
+            vigilancia
+          </p>
         </div>
         <div className="flex space-x-3">
           <Button variant="outline" size="sm">
@@ -132,21 +177,23 @@ export function ReceptionDashboardContent() {
         {/* Visitantes Actuales */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Visitantes Actuales</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Visitantes Actuales
+            </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.currentVisitors}</div>
-            <p className="text-xs text-muted-foreground">
-              En el conjunto
-            </p>
+            <p className="text-xs text-muted-foreground">En el conjunto</p>
           </CardContent>
         </Card>
 
         {/* Servicios Comunes en Uso */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Áreas Comunes en Uso</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Áreas Comunes en Uso
+            </CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -160,11 +207,15 @@ export function ReceptionDashboardContent() {
         {/* Alertas Pendientes */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Alertas Pendientes</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Alertas Pendientes
+            </CardTitle>
             <AlertCircle className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{stats.pendingAlerts}</div>
+            <div className="text-2xl font-bold text-red-600">
+              {stats.pendingAlerts}
+            </div>
             <p className="text-xs text-muted-foreground">
               Incidencias de seguridad o sistema
             </p>
@@ -174,11 +225,15 @@ export function ReceptionDashboardContent() {
         {/* Cámaras Online */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Cámaras Online</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Cámaras Online
+            </CardTitle>
             <Camera className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.camerasOnline}</div>
+            <div className="text-2xl font-bold text-green-600">
+              {stats.camerasOnline}
+            </div>
             <p className="text-xs text-muted-foreground">
               Sistemas de vigilancia activos
             </p>
@@ -188,11 +243,15 @@ export function ReceptionDashboardContent() {
         {/* Novedades Turno Anterior */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Novedades Turno Anterior</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Novedades Turno Anterior
+            </CardTitle>
             <ClipboardList className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.previousShiftIncidents}</div>
+            <div className="text-2xl font-bold">
+              {stats.previousShiftIncidents}
+            </div>
             <p className="text-xs text-muted-foreground">
               Registradas en minuta digital
             </p>
@@ -202,7 +261,9 @@ export function ReceptionDashboardContent() {
         {/* PQRs Asignados */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">PQRs Asignados</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              PQRs Asignados
+            </CardTitle>
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -216,7 +277,9 @@ export function ReceptionDashboardContent() {
         {/* Paquetes Pendientes */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Paquetes Pendientes</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Paquetes Pendientes
+            </CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -241,15 +304,24 @@ export function ReceptionDashboardContent() {
           <CardContent>
             <div className="space-y-4">
               {recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50">
-                  <div className={`p-2 rounded-full ${getStatusColor(activity.status)}`}>
+                <div
+                  key={activity.id}
+                  className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50"
+                >
+                  <div
+                    className={`p-2 rounded-full ${getStatusColor(activity.status)}`}
+                  >
                     {getActivityIcon(activity.type)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">{activity.title}</p>
-                    <p className="text-sm text-gray-500">{activity.description}</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {activity.title}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {activity.description}
+                    </p>
                     <p className="text-xs text-gray-400 mt-1">
-                      {new Date(activity.timestamp).toLocaleString('es-CO')}
+                      {new Date(activity.timestamp).toLocaleString("es-CO")}
                     </p>
                   </div>
                 </div>
@@ -272,31 +344,51 @@ export function ReceptionDashboardContent() {
           </CardHeader>
           <CardContent className="space-y-3">
             <Link href="/reception/visitors/register">
-              <Button variant="outline" size="sm" className="w-full justify-start">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start"
+              >
                 <Users className="h-4 w-4 mr-2" />
                 Registrar Visitante
               </Button>
             </Link>
             <Link href="/reception/packages/register">
-              <Button variant="outline" size="sm" className="w-full justify-start">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start"
+              >
                 <Package className="h-4 w-4 mr-2" />
                 Registrar Paquete
               </Button>
             </Link>
             <Link href="/reception/incidents/create">
-              <Button variant="outline" size="sm" className="w-full justify-start">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start"
+              >
                 <AlertCircle className="h-4 w-4 mr-2" />
                 Reportar Incidente
               </Button>
             </Link>
             <Link href="/reception/intercom">
-              <Button variant="outline" size="sm" className="w-full justify-start">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start"
+              >
                 <Phone className="h-4 w-4 mr-2" />
                 Citofonía Virtual
               </Button>
             </Link>
             <Link href="/reception/minuta">
-              <Button variant="outline" size="sm" className="w-full justify-start">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start"
+              >
                 <ClipboardList className="h-4 w-4 mr-2" />
                 Minuta Digital
               </Button>

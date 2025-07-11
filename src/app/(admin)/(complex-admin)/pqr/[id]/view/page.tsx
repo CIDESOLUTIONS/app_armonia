@@ -1,26 +1,48 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Label } from '@/components/ui/label';
-import { useRouter, useParams } from 'next/navigation';
-import Link from 'next/link';
-import { useAuthStore } from '@/store/authStore';
-import { Loader2, Edit, Trash2, MessageSquare, User, Tag, Clock, CheckCircle, XCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/components/ui/use-toast';
-import { getPQRById, updatePQR, deletePQR, addPQRComment, assignPQR } from '@/services/pqrService';
+import React, { useState, useEffect, useCallback } from "react";
+import { Label } from "@/components/ui/label";
+import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
+import { useAuthStore } from "@/store/authStore";
+import {
+  Loader2,
+  Edit,
+  Trash2,
+  MessageSquare,
+  User,
+  Tag,
+  Clock,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  getPQRById,
+  updatePQR,
+  deletePQR,
+  addPQRComment,
+  assignPQR,
+} from "@/services/pqrService";
 
 interface PQR {
   id: number;
   subject: string;
   description: string;
-  status: 'OPEN' | 'IN_PROGRESS' | 'CLOSED' | 'REJECTED';
-  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+  status: "OPEN" | "IN_PROGRESS" | "CLOSED" | "REJECTED";
+  priority: "LOW" | "MEDIUM" | "HIGH";
   category: string;
   reportedById: number;
   reportedByName: string;
@@ -49,9 +71,9 @@ export default function ViewPQRPage() {
 
   const [pqr, setPqr] = useState<PQR | null>(null);
   const [loading, setLoading] = useState(true);
-  const [newComment, setNewComment] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState<PQR['status'] | ''>('');
-  const [selectedAssignee, setSelectedAssignee] = useState<string | number>(''); // Assuming assignee ID or name
+  const [newComment, setNewComment] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState<PQR["status"] | "">("");
+  const [selectedAssignee, setSelectedAssignee] = useState<string | number>(""); // Assuming assignee ID or name
 
   const fetchPQR = useCallback(async () => {
     setLoading(true);
@@ -59,15 +81,15 @@ export default function ViewPQRPage() {
       const data = await getPQRById(pqrId as number);
       setPqr(data);
       setSelectedStatus(data.status);
-      setSelectedAssignee(data.assignedToId || '');
+      setSelectedAssignee(data.assignedToId || "");
     } catch (error) {
-      console.error('Error fetching PQR:', error);
+      console.error("Error fetching PQR:", error);
       toast({
-        title: 'Error',
-        description: 'No se pudo cargar la PQR.',
-        variant: 'destructive',
+        title: "Error",
+        description: "No se pudo cargar la PQR.",
+        variant: "destructive",
       });
-      router.push('/admin/pqr/list');
+      router.push("/admin/pqr/list");
     } finally {
       setLoading(false);
     }
@@ -83,18 +105,18 @@ export default function ViewPQRPage() {
     if (!pqrId || !newComment.trim()) return;
     try {
       await addPQRComment(pqrId, newComment);
-      setNewComment('');
+      setNewComment("");
       toast({
-        title: 'Éxito',
-        description: 'Comentario añadido correctamente.',
+        title: "Éxito",
+        description: "Comentario añadido correctamente.",
       });
       fetchPQR();
     } catch (error) {
-      console.error('Error adding comment:', error);
+      console.error("Error adding comment:", error);
       toast({
-        title: 'Error',
-        description: 'Error al añadir comentario.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Error al añadir comentario.",
+        variant: "destructive",
       });
     }
   };
@@ -104,16 +126,16 @@ export default function ViewPQRPage() {
     try {
       await updatePQR(pqrId, { status: selectedStatus });
       toast({
-        title: 'Éxito',
-        description: 'Estado de PQR actualizado correctamente.',
+        title: "Éxito",
+        description: "Estado de PQR actualizado correctamente.",
       });
       fetchPQR();
     } catch (error) {
-      console.error('Error updating PQR status:', error);
+      console.error("Error updating PQR status:", error);
       toast({
-        title: 'Error',
-        description: 'Error al actualizar estado.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Error al actualizar estado.",
+        variant: "destructive",
       });
     }
   };
@@ -123,35 +145,35 @@ export default function ViewPQRPage() {
     try {
       await assignPQR(pqrId, selectedAssignee as number); // Assuming selectedAssignee is ID
       toast({
-        title: 'Éxito',
-        description: 'PQR asignada correctamente.',
+        title: "Éxito",
+        description: "PQR asignada correctamente.",
       });
       fetchPQR();
     } catch (error) {
-      console.error('Error assigning PQR:', error);
+      console.error("Error assigning PQR:", error);
       toast({
-        title: 'Error',
-        description: 'Error al asignar PQR.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Error al asignar PQR.",
+        variant: "destructive",
       });
     }
   };
 
   const handleDeletePQR = async () => {
-    if (confirm('¿Estás seguro de que quieres eliminar esta PQR?')) {
+    if (confirm("¿Estás seguro de que quieres eliminar esta PQR?")) {
       try {
         await deletePQR(pqrId as number);
         toast({
-          title: 'Éxito',
-          description: 'PQR eliminada correctamente.',
+          title: "Éxito",
+          description: "PQR eliminada correctamente.",
         });
-        router.push('/admin/pqr/list');
+        router.push("/admin/pqr/list");
       } catch (error) {
-        console.error('Error deleting PQR:', error);
+        console.error("Error deleting PQR:", error);
         toast({
-          title: 'Error',
-          description: 'Error al eliminar la PQR.',
-          variant: 'destructive',
+          title: "Error",
+          description: "Error al eliminar la PQR.",
+          variant: "destructive",
         });
       }
     }
@@ -165,12 +187,22 @@ export default function ViewPQRPage() {
     );
   }
 
-  if (!user || (user.role !== 'ADMIN' && user.role !== 'COMPLEX_ADMIN' && user.role !== 'STAFF' && user.role !== 'RESIDENT')) {
+  if (
+    !user ||
+    (user.role !== "ADMIN" &&
+      user.role !== "COMPLEX_ADMIN" &&
+      user.role !== "STAFF" &&
+      user.role !== "RESIDENT")
+  ) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Acceso Denegado</h1>
-          <p className="text-gray-600">No tienes permisos para acceder a esta página.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Acceso Denegado
+          </h1>
+          <p className="text-gray-600">
+            No tienes permisos para acceder a esta página.
+          </p>
         </div>
       </div>
     );
@@ -183,7 +215,9 @@ export default function ViewPQRPage() {
   return (
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Detalles de PQR: {pqr.subject}</h1>
+        <h1 className="text-3xl font-bold text-gray-900">
+          Detalles de PQR: {pqr.subject}
+        </h1>
         <div className="flex space-x-2">
           <Link href={`/admin/pqr/${pqr.id}/edit`}>
             <Button variant="outline">
@@ -201,27 +235,61 @@ export default function ViewPQRPage() {
           <CardTitle>Información General</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <p><strong>Descripción:</strong> {pqr.description}</p>
-          <p><strong>Reportado por:</strong> {pqr.reportedByName}</p>
-          <p><strong>Categoría:</strong> {pqr.category}</p>
-          <p><strong>Prioridad:</strong> 
-            <Badge variant={pqr.priority === 'HIGH' ? 'destructive' : pqr.priority === 'MEDIUM' ? 'secondary' : 'default'}>
+          <p>
+            <strong>Descripción:</strong> {pqr.description}
+          </p>
+          <p>
+            <strong>Reportado por:</strong> {pqr.reportedByName}
+          </p>
+          <p>
+            <strong>Categoría:</strong> {pqr.category}
+          </p>
+          <p>
+            <strong>Prioridad:</strong>
+            <Badge
+              variant={
+                pqr.priority === "HIGH"
+                  ? "destructive"
+                  : pqr.priority === "MEDIUM"
+                    ? "secondary"
+                    : "default"
+              }
+            >
               {pqr.priority}
             </Badge>
           </p>
-          <p><strong>Estado:</strong> 
-            <Badge variant={pqr.status === 'OPEN' ? 'destructive' : pqr.status === 'IN_PROGRESS' ? 'secondary' : 'default'}>
+          <p>
+            <strong>Estado:</strong>
+            <Badge
+              variant={
+                pqr.status === "OPEN"
+                  ? "destructive"
+                  : pqr.status === "IN_PROGRESS"
+                    ? "secondary"
+                    : "default"
+              }
+            >
               {pqr.status}
             </Badge>
           </p>
-          <p><strong>Asignado a:</strong> {pqr.assignedToName || 'N/A'}</p>
-          <p><strong>Fecha de Creación:</strong> {new Date(pqr.createdAt).toLocaleString()}</p>
-          <p><strong>Última Actualización:</strong> {new Date(pqr.updatedAt).toLocaleString()}</p>
+          <p>
+            <strong>Asignado a:</strong> {pqr.assignedToName || "N/A"}
+          </p>
+          <p>
+            <strong>Fecha de Creación:</strong>{" "}
+            {new Date(pqr.createdAt).toLocaleString()}
+          </p>
+          <p>
+            <strong>Última Actualización:</strong>{" "}
+            {new Date(pqr.updatedAt).toLocaleString()}
+          </p>
         </CardContent>
       </Card>
 
       {/* Gestión de Estado y Asignación */}
-      {(user?.role === 'ADMIN' || user?.role === 'COMPLEX_ADMIN' || user?.role === 'STAFF') && (
+      {(user?.role === "ADMIN" ||
+        user?.role === "COMPLEX_ADMIN" ||
+        user?.role === "STAFF") && (
         <Card className="mb-6">
           <CardHeader>
             <CardTitle>Gestión de PQR</CardTitle>
@@ -229,7 +297,12 @@ export default function ViewPQRPage() {
           <CardContent className="grid gap-4">
             <div>
               <Label htmlFor="status-select">Cambiar Estado</Label>
-              <Select value={selectedStatus} onValueChange={(value: PQR['status']) => setSelectedStatus(value)}>
+              <Select
+                value={selectedStatus}
+                onValueChange={(value: PQR["status"]) =>
+                  setSelectedStatus(value)
+                }
+              >
                 <SelectTrigger id="status-select">
                   <SelectValue placeholder="Seleccionar estado" />
                 </SelectTrigger>
@@ -240,21 +313,32 @@ export default function ViewPQRPage() {
                   <SelectItem value="REJECTED">Rechazada</SelectItem>
                 </SelectContent>
               </Select>
-              <Button onClick={handleUpdateStatus} className="mt-2">Actualizar Estado</Button>
+              <Button onClick={handleUpdateStatus} className="mt-2">
+                Actualizar Estado
+              </Button>
             </div>
             <div>
               <Label htmlFor="assignee-select">Asignar a</Label>
-              <Select value={selectedAssignee} onValueChange={(value: string) => setSelectedAssignee(parseInt(value))}>
+              <Select
+                value={selectedAssignee}
+                onValueChange={(value: string) =>
+                  setSelectedAssignee(parseInt(value))
+                }
+              >
                 <SelectTrigger id="assignee-select">
                   <SelectValue placeholder="Seleccionar responsable" />
                 </SelectTrigger>
                 <SelectContent>
                   {/* Aquí se cargarían dinámicamente los usuarios STAFF/ADMIN/COMPLEX_ADMIN */}
-                  <SelectItem value={user?.id || ''}>{user?.name || 'Yo'}</SelectItem>
+                  <SelectItem value={user?.id || ""}>
+                    {user?.name || "Yo"}
+                  </SelectItem>
                   {/* Ejemplo: <SelectItem value="2">Juan Pérez (Mantenimiento)</SelectItem> */}
                 </SelectContent>
               </Select>
-              <Button onClick={handleAssignPQR} className="mt-2">Asignar PQR</Button>
+              <Button onClick={handleAssignPQR} className="mt-2">
+                Asignar PQR
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -272,7 +356,12 @@ export default function ViewPQRPage() {
             {pqr.comments.length > 0 ? (
               pqr.comments.map((comment) => (
                 <div key={comment.id} className="border-b pb-2">
-                  <p className="text-sm font-semibold">{comment.authorName} <span className="text-gray-500 text-xs">({new Date(comment.createdAt).toLocaleString()})</span></p>
+                  <p className="text-sm font-semibold">
+                    {comment.authorName}{" "}
+                    <span className="text-gray-500 text-xs">
+                      ({new Date(comment.createdAt).toLocaleString()})
+                    </span>
+                  </p>
                   <p className="text-gray-700">{comment.comment}</p>
                 </div>
               ))
@@ -281,10 +370,10 @@ export default function ViewPQRPage() {
             )}
           </div>
           <div className="flex flex-col gap-2">
-            <Textarea 
-              placeholder="Añadir un comentario..." 
-              value={newComment} 
-              onChange={(e) => setNewComment(e.target.value)} 
+            <Textarea
+              placeholder="Añadir un comentario..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
               rows={3}
             />
             <Button onClick={handleAddComment} disabled={!newComment.trim()}>

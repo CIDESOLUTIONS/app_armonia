@@ -13,15 +13,15 @@
  */
 export function formatCurrency(
   value: number | string,
-  locale: string = 'es-CO',
-  currency: string = 'COP'
+  locale: string = "es-CO",
+  currency: string = "COP",
 ): string {
-  const numValue = typeof value === 'string' ? parseFloat(value) : value;
-  
+  const numValue = typeof value === "string" ? parseFloat(value) : value;
+
   return new Intl.NumberFormat(locale, {
-    style: 'currency',
+    style: "currency",
     currency,
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0
+    maximumFractionDigits: 0,
   }).format(numValue);
 }

@@ -1,11 +1,11 @@
 // src/hooks/use-toast.ts
-import { useState, useCallback } from 'react';
-import { toast as hotToast } from 'react-hot-toast';
+import { useState, useCallback } from "react";
+import { toast as hotToast } from "react-hot-toast";
 
 interface ToastOptions {
   title?: string;
   description: string;
-  variant?: 'default' | 'destructive' | 'success';
+  variant?: "default" | "destructive" | "success";
 }
 
 export const useToast = () => ({

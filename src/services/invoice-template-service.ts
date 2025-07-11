@@ -3,9 +3,9 @@
  * Proporciona funcionalidades para la gestión de plantillas de facturas.
  */
 
-import { PrismaClient, InvoiceTemplate } from '@prisma/client';
-import { ServerLogger } from '../logging/server-logger';
-import * as handlebars from 'handlebars';
+import { PrismaClient, InvoiceTemplate } from "@prisma/client";
+import { ServerLogger } from "../logging/server-logger";
+import * as handlebars from "handlebars";
 
 const logger = ServerLogger;
 
@@ -22,7 +22,9 @@ export class InvoiceTemplateService {
    */
   constructor(schemaName: string) {
     if (!schemaName) {
-      throw new Error('Se requiere un nombre de esquema para el servicio de plantillas de facturas');
+      throw new Error(
+        "Se requiere un nombre de esquema para el servicio de plantillas de facturas",
+      );
     }
 
     this.schemaName = schemaName;
@@ -34,7 +36,9 @@ export class InvoiceTemplateService {
       },
     });
 
-    logger.info(`Servicio de plantillas de facturas inicializado para esquema: ${schemaName}`);
+    logger.info(
+      `Servicio de plantillas de facturas inicializado para esquema: ${schemaName}`,
+    );
   }
 
   /**
@@ -45,7 +49,7 @@ export class InvoiceTemplateService {
     try {
       const templates = await this.prisma.invoiceTemplate.findMany({
         orderBy: {
-          updatedAt: 'desc',
+          updatedAt: "desc",
         },
       });
 
@@ -65,7 +69,7 @@ export class InvoiceTemplateService {
   async getTemplateById(id: string): Promise<InvoiceTemplate | null> {
     try {
       if (!id) {
-        throw new Error('Se requiere un ID para obtener la plantilla');
+        throw new Error("Se requiere un ID para obtener la plantilla");
       }
 
       const template = await this.prisma.invoiceTemplate.findUnique({
@@ -80,7 +84,9 @@ export class InvoiceTemplateService {
       logger.info(`Recuperada plantilla de factura: ${id}`);
       return template;
     } catch (error: any) {
-      logger.error(`Error al obtener plantilla de factura ${id}: ${error.message}`);
+      logger.error(
+        `Error al obtener plantilla de factura ${id}: ${error.message}`,
+      );
       throw error;
     }
   }
@@ -90,10 +96,12 @@ export class InvoiceTemplateService {
    * @param {Partial<InvoiceTemplate>} templateData - Datos de la plantilla.
    * @returns {Promise<InvoiceTemplate>} - Plantilla creada.
    */
-  async createTemplate(templateData: Partial<InvoiceTemplate>): Promise<InvoiceTemplate> {
+  async createTemplate(
+    templateData: Partial<InvoiceTemplate>,
+  ): Promise<InvoiceTemplate> {
     try {
       if (!templateData || !templateData.name || !templateData.content) {
-        throw new Error('Datos de plantilla incompletos');
+        throw new Error("Datos de plantilla incompletos");
       }
 
       if (templateData.isDefault) {
@@ -106,10 +114,10 @@ export class InvoiceTemplateService {
       const template = await this.prisma.invoiceTemplate.create({
         data: {
           name: templateData.name,
-          description: templateData.description || '',
+          description: templateData.description || "",
           content: templateData.content as string,
           isDefault: templateData.isDefault || false,
-          createdBy: templateData.createdBy || 'system',
+          createdBy: templateData.createdBy || "system",
         },
       });
 
@@ -127,10 +135,13 @@ export class InvoiceTemplateService {
    * @param {Partial<InvoiceTemplate>} templateData - Datos a actualizar.
    * @returns {Promise<InvoiceTemplate | null>} - Plantilla actualizada.
    */
-  async updateTemplate(id: string, templateData: Partial<InvoiceTemplate>): Promise<InvoiceTemplate | null> {
+  async updateTemplate(
+    id: string,
+    templateData: Partial<InvoiceTemplate>,
+  ): Promise<InvoiceTemplate | null> {
     try {
       if (!id) {
-        throw new Error('Se requiere un ID para actualizar la plantilla');
+        throw new Error("Se requiere un ID para actualizar la plantilla");
       }
 
       const existingTemplate = await this.prisma.invoiceTemplate.findUnique({
@@ -138,7 +149,9 @@ export class InvoiceTemplateService {
       });
 
       if (!existingTemplate) {
-        logger.warn(`Plantilla de factura no encontrada para actualizar: ${id}`);
+        logger.warn(
+          `Plantilla de factura no encontrada para actualizar: ${id}`,
+        );
         return null;
       }
 
@@ -163,7 +176,9 @@ export class InvoiceTemplateService {
       logger.info(`Actualizada plantilla de factura: ${id}`);
       return updatedTemplate;
     } catch (error: any) {
-      logger.error(`Error al actualizar plantilla de factura ${id}: ${error.message}`);
+      logger.error(
+        `Error al actualizar plantilla de factura ${id}: ${error.message}`,
+      );
       throw error;
     }
   }
@@ -176,7 +191,7 @@ export class InvoiceTemplateService {
   async deleteTemplate(id: string): Promise<boolean> {
     try {
       if (!id) {
-        throw new Error('Se requiere un ID para eliminar la plantilla');
+        throw new Error("Se requiere un ID para eliminar la plantilla");
       }
 
       const existingTemplate = await this.getTemplateById(id);
@@ -188,7 +203,7 @@ export class InvoiceTemplateService {
 
       if (existingTemplate.isDefault) {
         logger.warn(`No se puede eliminar la plantilla por defecto: ${id}`);
-        throw new Error('No se puede eliminar la plantilla por defecto');
+        throw new Error("No se puede eliminar la plantilla por defecto");
       }
 
       await this.prisma.invoiceTemplate.delete({
@@ -198,7 +213,9 @@ export class InvoiceTemplateService {
       logger.info(`Eliminada plantilla de factura: ${id}`);
       return true;
     } catch (error: any) {
-      logger.error(`Error al eliminar plantilla de factura ${id}: ${error.message}`);
+      logger.error(
+        `Error al eliminar plantilla de factura ${id}: ${error.message}`,
+      );
       throw error;
     }
   }
@@ -209,10 +226,13 @@ export class InvoiceTemplateService {
    * @param {Record<string, any>} invoiceData - Datos de la factura.
    * @returns {Promise<string>} - HTML renderizado.
    */
-  async renderInvoice(templateId: string | null, invoiceData: Record<string, any>): Promise<string> {
+  async renderInvoice(
+    templateId: string | null,
+    invoiceData: Record<string, any>,
+  ): Promise<string> {
     try {
       if (!invoiceData) {
-        throw new Error('Se requieren datos de factura para renderizar');
+        throw new Error("Se requieren datos de factura para renderizar");
       }
 
       let template: InvoiceTemplate | null = null;
@@ -220,11 +240,13 @@ export class InvoiceTemplateService {
       if (templateId) {
         template = await this.getTemplateById(templateId);
       } else {
-        template = await this.prisma.invoiceTemplate.findFirst({ where: { isDefault: true } });
+        template = await this.prisma.invoiceTemplate.findFirst({
+          where: { isDefault: true },
+        });
       }
 
       if (!template) {
-        throw new Error('No se encontró plantilla para renderizar la factura');
+        throw new Error("No se encontró plantilla para renderizar la factura");
       }
 
       const compiledTemplate = handlebars.compile(template.content as string);
@@ -244,9 +266,11 @@ export class InvoiceTemplateService {
   async disconnect() {
     try {
       await this.prisma.$disconnect();
-      logger.info('Conexión a base de datos cerrada');
+      logger.info("Conexión a base de datos cerrada");
     } catch (error: any) {
-      logger.error(`Error al cerrar conexión a base de datos: ${error.message}`);
+      logger.error(
+        `Error al cerrar conexión a base de datos: ${error.message}`,
+      );
     }
   }
 }

@@ -1,8 +1,15 @@
 // src/components/inventory/PropertiesTable.tsx
-import { useState } from 'react';
-import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Plus, Edit, Trash } from 'lucide-react';
+import { useState } from "react";
+import {
+  Table,
+  TableHead,
+  TableRow,
+  TableHeader,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Plus, Edit, Trash } from "lucide-react";
 
 interface Property {
   id: number;
@@ -23,17 +30,17 @@ interface PropertiesTableProps {
   onDelete?: (id: number) => void;
 }
 
-export function PropertiesTable({ 
-  properties, 
-  onAdd, 
-  onEdit, 
-  onDelete 
+export function PropertiesTable({
+  properties,
+  onAdd,
+  onEdit,
+  onDelete,
 }: PropertiesTableProps) {
-  const [sortBy, setSortBy] = useState('unitNumber');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortBy, setSortBy] = useState("unitNumber");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   const sortedProperties = [...properties].sort((a, b) => {
-    if (sortOrder === 'asc') {
+    if (sortOrder === "asc") {
       return a[sortBy] > b[sortBy] ? 1 : -1;
     }
     return a[sortBy] < b[sortBy] ? 1 : -1;
@@ -53,13 +60,13 @@ export function PropertiesTable({
         <Table>
           <TableHead>
             <TableRow>
-              <TableHeader 
+              <TableHeader
                 className="cursor-pointer"
                 onClick={() => {
-                  if (sortBy === 'unitNumber') {
-                    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                  if (sortBy === "unitNumber") {
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
                   }
-                  setSortBy('unitNumber');
+                  setSortBy("unitNumber");
                 }}
               >
                 Número/Nomenclatura
@@ -79,11 +86,13 @@ export function PropertiesTable({
                 <TableCell>{property.unitNumber}</TableCell>
                 <TableCell>{property.type}</TableCell>
                 <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    property.status === 'AVAILABLE' 
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-blue-100 text-blue-800'
-                  }`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      property.status === "AVAILABLE"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-blue-100 text-blue-800"
+                    }`}
+                  >
                     {property.status}
                   </span>
                 </TableCell>
@@ -94,7 +103,9 @@ export function PropertiesTable({
                   {property.ownerName ? (
                     <div>
                       <div>{property.ownerName}</div>
-                      <div className="text-sm text-gray-500">{property.ownerEmail}</div>
+                      <div className="text-sm text-gray-500">
+                        {property.ownerEmail}
+                      </div>
                     </div>
                   ) : (
                     <span className="text-gray-400">Sin asignar</span>

@@ -1,28 +1,41 @@
 // src/components/pqr/CreatePQRForm.tsx
 "use client";
 
-import { useState } from 'react';
-import { useAuth } from '@/hooks/use-auth';
-import { apiClient } from '@/lib/api-client';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
+import { apiClient } from "@/lib/api-client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 enum PQRType {
-  PETITION = 'PETITION',
-  COMPLAINT = 'COMPLAINT',
-  CLAIM = 'CLAIM'
+  PETITION = "PETITION",
+  COMPLAINT = "COMPLAINT",
+  CLAIM = "CLAIM",
 }
 
 enum PQRPriority {
-  LOW = 'LOW',
-  MEDIUM = 'MEDIUM',
-  HIGH = 'HIGH',
-  URGENT = 'URGENT'
+  LOW = "LOW",
+  MEDIUM = "MEDIUM",
+  HIGH = "HIGH",
+  URGENT = "URGENT",
 }
 
 interface CreatePQRFormProps {
@@ -34,7 +47,7 @@ interface CreatePQRFormProps {
 export function CreatePQRForm({
   onSuccess,
   onCancel,
-  isInCard = false
+  isInCard = false,
 }: CreatePQRFormProps) {
   // Estados para el formulario
   const [formData, setFormData] = useState({
@@ -45,14 +58,14 @@ export function CreatePQRForm({
     category: "",
     propertyUnit: "",
   });
-  
+
   // Estados para la carga y errores
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Hook de autenticación
   const { user } = useAuth();
-  
+
   // Categorías disponibles
   const categories = [
     { id: "infrastructure", name: "Infraestructura" },
@@ -62,49 +75,51 @@ export function CreatePQRForm({
     { id: "services", name: "Servicios comunes" },
     { id: "other", name: "Otro" },
   ];
-  
+
   // Manejar cambios en el formulario
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  
+
   // Manejar cambios en selects
   const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  
+
   // Validar el formulario
   const validateForm = () => {
     if (!formData.title.trim()) {
       setError("El título es obligatorio");
       return false;
     }
-    
+
     if (!formData.description.trim()) {
       setError("La descripción es obligatoria");
       return false;
     }
-    
+
     if (!formData.category) {
       setError("La categoría es obligatoria");
       return false;
     }
-    
+
     return true;
   };
-  
+
   // Manejar envío del formulario
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       // Crear PQR usando el cliente API seguro
       const response = await apiClient.pqr.create({
@@ -116,9 +131,9 @@ export function CreatePQRForm({
         propertyUnit: formData.propertyUnit.trim() || undefined,
         submittedBy: user?.id,
       });
-      
+
       console.log("PQR creado exitosamente:", response.data);
-      
+
       // Limpiar formulario
       setFormData({
         title: "",
@@ -128,17 +143,21 @@ export function CreatePQRForm({
         category: "",
         propertyUnit: "",
       });
-      
+
       // Notificar éxito
       onSuccess();
     } catch (err) {
       console.error("Error al crear PQR:", err);
-      setError(err instanceof Error ? err.message : "No se pudo crear la solicitud. Intenta nuevamente.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "No se pudo crear la solicitud. Intenta nuevamente.",
+      );
     } finally {
       setLoading(false);
     }
   };
-  
+
   // Componente del formulario
   const FormContent = (
     <>
@@ -154,7 +173,7 @@ export function CreatePQRForm({
             required
           />
         </div>
-        
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <Label htmlFor="type">Tipo</Label>
@@ -172,7 +191,7 @@ export function CreatePQRForm({
               </SelectContent>
             </Select>
           </div>
-          
+
           <div>
             <Label htmlFor="priority">Prioridad</Label>
             <Select
@@ -191,7 +210,7 @@ export function CreatePQRForm({
             </Select>
           </div>
         </div>
-        
+
         <div>
           <Label htmlFor="category">Categoría</Label>
           <Select
@@ -210,7 +229,7 @@ export function CreatePQRForm({
             </SelectContent>
           </Select>
         </div>
-        
+
         <div>
           <Label htmlFor="propertyUnit">Unidad (opcional)</Label>
           <Input
@@ -221,7 +240,7 @@ export function CreatePQRForm({
             placeholder="Ej: A-101"
           />
         </div>
-        
+
         <div>
           <Label htmlFor="description">Descripción detallada</Label>
           <Textarea
@@ -234,14 +253,14 @@ export function CreatePQRForm({
             required
           />
         </div>
-        
+
         {error && (
           <Alert variant="destructive">
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
       </div>
-      
+
       <div className="flex justify-end gap-2 mt-4">
         <Button
           type="button"
@@ -251,16 +270,13 @@ export function CreatePQRForm({
         >
           Cancelar
         </Button>
-        <Button
-          type="submit"
-          disabled={loading}
-        >
+        <Button type="submit" disabled={loading}>
           {loading ? "Enviando..." : "Enviar solicitud"}
         </Button>
       </div>
     </>
   );
-  
+
   // Si está dentro de una tarjeta, devolver solo el contenido
   if (!isInCard) {
     return (
@@ -269,18 +285,18 @@ export function CreatePQRForm({
       </form>
     );
   }
-  
+
   // Si no, devolver una tarjeta con el formulario
   return (
     <Card>
       <CardHeader>
         <CardTitle>Nueva solicitud</CardTitle>
-        <CardDescription>Reporta un problema o realiza una petición</CardDescription>
+        <CardDescription>
+          Reporta un problema o realiza una petición
+        </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
-        <CardContent>
-          {FormContent}
-        </CardContent>
+        <CardContent>{FormContent}</CardContent>
         <CardFooter className="flex justify-end gap-2">
           <Button
             type="button"
@@ -290,10 +306,7 @@ export function CreatePQRForm({
           >
             Cancelar
           </Button>
-          <Button
-            type="submit"
-            disabled={loading}
-          >
+          <Button type="submit" disabled={loading}>
             {loading ? "Enviando..." : "Enviar solicitud"}
           </Button>
         </CardFooter>

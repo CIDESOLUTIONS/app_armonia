@@ -2,9 +2,9 @@
  * @fileoverview Módulo de integración para notificaciones de asambleas.
  */
 
-import { ServerLogger } from '../../lib/logging/server-logger';
+import { ServerLogger } from "../../lib/logging/server-logger";
 
-const logger = new ServerLogger('AssemblyNotifications');
+const logger = new ServerLogger("AssemblyNotifications");
 
 interface Assembly {
   id: string;
@@ -32,16 +32,18 @@ interface Minutes {
 export async function notifyAssemblyConvocation(
   schemaName: string,
   assembly: Assembly,
-  recipients: Recipient[]
+  recipients: Recipient[],
 ): Promise<boolean> {
   try {
     logger.info(
-      `[${schemaName}] Enviando notificaciones de convocatoria para asamblea ${assembly.id} a ${recipients.length} destinatarios`
+      `[${schemaName}] Enviando notificaciones de convocatoria para asamblea ${assembly.id} a ${recipients.length} destinatarios`,
     );
     // Implementación real para enviar notificaciones (email, SMS, push, etc.)
     return true;
   } catch (error: any) {
-    logger.error(`Error al enviar notificaciones de convocatoria: ${error.message}`);
+    logger.error(
+      `Error al enviar notificaciones de convocatoria: ${error.message}`,
+    );
     return false;
   }
 }
@@ -56,11 +58,11 @@ export async function notifyAssemblyConvocation(
 export async function notifyQuorumReached(
   schemaName: string,
   assembly: Assembly,
-  boardMembers: Recipient[]
+  boardMembers: Recipient[],
 ): Promise<boolean> {
   try {
     logger.info(
-      `[${schemaName}] Notificando quórum alcanzado para asamblea ${assembly.id} a ${boardMembers.length} miembros de la junta`
+      `[${schemaName}] Notificando quórum alcanzado para asamblea ${assembly.id} a ${boardMembers.length} miembros de la junta`,
     );
     // Implementación real para enviar notificaciones
     return true;
@@ -80,11 +82,11 @@ export async function notifyQuorumReached(
 export async function sendAssemblyReminder(
   schemaName: string,
   assembly: Assembly,
-  recipients: Recipient[]
+  recipients: Recipient[],
 ): Promise<boolean> {
   try {
     logger.info(
-      `[${schemaName}] Enviando recordatorios para asamblea ${assembly.id} a ${recipients.length} destinatarios`
+      `[${schemaName}] Enviando recordatorios para asamblea ${assembly.id} a ${recipients.length} destinatarios`,
     );
     // Implementación real para enviar recordatorios
     return true;
@@ -106,11 +108,11 @@ export async function sendAssemblyMinutes(
   schemaName: string,
   assembly: Assembly,
   minutes: Minutes,
-  recipients: Recipient[]
+  recipients: Recipient[],
 ): Promise<boolean> {
   try {
     logger.info(
-      `[${schemaName}] Enviando acta de asamblea ${assembly.id} a ${recipients.length} destinatarios`
+      `[${schemaName}] Enviando acta de asamblea ${assembly.id} a ${recipients.length} destinatarios`,
     );
     // Implementación real para enviar el acta
     return true;

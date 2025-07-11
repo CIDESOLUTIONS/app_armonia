@@ -1,8 +1,7 @@
+import { PrismaClient } from "@prisma/client";
+import { ServerLogger } from "../logging/server-logger";
 
-import { PrismaClient } from '@prisma/client';
-import { ServerLogger } from '../logging/server-logger';
-
-const logger = new ServerLogger('FreemiumService');
+const logger = new ServerLogger("FreemiumService");
 
 interface PlanDetails {
   maxUnits: number;
@@ -14,18 +13,31 @@ const PLANS: Record<string, PlanDetails> = {
   BASIC: {
     maxUnits: 25,
     historyYears: 1,
-    features: ['Gestión de propiedades y residentes', 'Funcionalidad básica de comunicaciones']
+    features: [
+      "Gestión de propiedades y residentes",
+      "Funcionalidad básica de comunicaciones",
+    ],
   },
   STANDARD: {
     maxUnits: 40,
     historyYears: 3,
-    features: ['Todas las funcionalidades básicas', 'Gestión completa de asambleas y votaciones', 'Sistema de PQR avanzado']
+    features: [
+      "Todas las funcionalidades básicas",
+      "Gestión completa de asambleas y votaciones",
+      "Sistema de PQR avanzado",
+    ],
   },
   PREMIUM: {
     maxUnits: 90,
     historyYears: 5,
-    features: ['Todas las funcionalidades estándar', 'Módulo financiero avanzado', 'Personalización de la plataforma', 'API para integración', 'Soporte prioritario']
-  }
+    features: [
+      "Todas las funcionalidades estándar",
+      "Módulo financiero avanzado",
+      "Personalización de la plataforma",
+      "API para integración",
+      "Soporte prioritario",
+    ],
+  },
 };
 
 export class FreemiumService {
@@ -33,19 +45,21 @@ export class FreemiumService {
 
   constructor(db: PrismaClient) {
     this.db = db;
-    logger.info('FreemiumService initialized');
+    logger.info("FreemiumService initialized");
   }
 
   public async getComplexPlan(complexId: number): Promise<string> {
     try {
       const complex = await this.db.complex.findUnique({
         where: { id: complexId },
-        select: { planType: true }
+        select: { planType: true },
       });
-      return complex?.planType || 'BASIC';
+      return complex?.planType || "BASIC";
     } catch (error: any) {
-      logger.error(`Error getting complex plan for ${complexId}: ${error.message}`);
-      return 'BASIC'; // Default to basic on error
+      logger.error(
+        `Error getting complex plan for ${complexId}: ${error.message}`,
+      );
+      return "BASIC"; // Default to basic on error
     }
   }
 
@@ -53,11 +67,13 @@ export class FreemiumService {
     return PLANS[planType.toUpperCase()];
   }
 
-  public async checkUnitLimit(complexId: number): Promise<{ withinLimit: boolean; currentUnits: number; maxUnits: number }> {
+  public async checkUnitLimit(
+    complexId: number,
+  ): Promise<{ withinLimit: boolean; currentUnits: number; maxUnits: number }> {
     try {
       const complex = await this.db.complex.findUnique({
         where: { id: complexId },
-        select: { planType: true, unitsCount: true }
+        select: { planType: true, unitsCount: true },
       });
 
       if (!complex) {
@@ -66,7 +82,9 @@ export class FreemiumService {
 
       const planDetails = this.getPlanDetails(complex.planType);
       if (!planDetails) {
-        throw new Error(`Plan details not found for plan type: ${complex.planType}`);
+        throw new Error(
+          `Plan details not found for plan type: ${complex.planType}`,
+        );
       }
 
       const currentUnits = complex.unitsCount || 0; // Assuming unitsCount field exists
@@ -74,7 +92,9 @@ export class FreemiumService {
 
       return { withinLimit: currentUnits <= maxUnits, currentUnits, maxUnits };
     } catch (error: any) {
-      logger.error(`Error checking unit limit for complex ${complexId}: ${error.message}`);
+      logger.error(
+        `Error checking unit limit for complex ${complexId}: ${error.message}`,
+      );
       return { withinLimit: false, currentUnits: 0, maxUnits: 0 }; // Assume not within limit on error
     }
   }

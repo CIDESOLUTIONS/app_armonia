@@ -1,2 +1,2 @@
-export { default } from './DashboardSidebar';
-export type { DashboardSidebarProps } from './DashboardSidebar';
+export { default } from "./DashboardSidebar";
+export type { DashboardSidebarProps } from "./DashboardSidebar";

@@ -1,2 +1,2 @@
-export { default } from './TrendChart';
-export type { TrendChartProps } from './TrendChart';
+export { default } from "./TrendChart";
+export type { TrendChartProps } from "./TrendChart";

@@ -1,19 +1,19 @@
-import React from 'react';
-import { Users, CheckCircle } from 'lucide-react';
-import Button from '@/components/common/Button';
+import React from "react";
+import { Users, CheckCircle } from "lucide-react";
+import Button from "@/components/common/Button";
 
 interface Participant {
   id: string;
   nombre: string;
   unidad: string;
-  poder?: string;  // Para votos por poder
+  poder?: string; // Para votos por poder
   confirmado: boolean;
 }
 
 interface QuorumVerificationProps {
   participants: Participant[];
   totalUnits: number;
-  requiredQuorum: number;  // Porcentaje requerido
+  requiredQuorum: number; // Porcentaje requerido
   onConfirmParticipant: (participantId: string) => void;
   onRegisterProxy: (participantId: string, proxyDetails: string) => void;
 }
@@ -23,9 +23,9 @@ const QuorumVerification: React.FC<QuorumVerificationProps> = ({
   totalUnits,
   requiredQuorum,
   onConfirmParticipant,
-  onRegisterProxy
+  onRegisterProxy,
 }) => {
-  const confirmedCount = participants.filter(p => p.confirmado).length;
+  const confirmedCount = participants.filter((p) => p.confirmado).length;
   const currentPercentage = (confirmedCount / totalUnits) * 100;
   const quorumReached = currentPercentage >= requiredQuorum;
 
@@ -70,7 +70,7 @@ const QuorumVerification: React.FC<QuorumVerificationProps> = ({
               className={`
                 shadow-none flex flex-col text-center whitespace-nowrap text-white 
                 justify-center transition-all duration-500
-                ${quorumReached ? 'bg-green-500' : 'bg-blue-500'}
+                ${quorumReached ? "bg-green-500" : "bg-blue-500"}
               `}
             />
           </div>
@@ -85,9 +85,7 @@ const QuorumVerification: React.FC<QuorumVerificationProps> = ({
       {/* Lista de Participantes */}
       <div className="bg-white rounded-lg border border-gray-200">
         <div className="px-4 py-3 border-b border-gray-200">
-          <h4 className="text-sm font-medium text-gray-900">
-            Participantes
-          </h4>
+          <h4 className="text-sm font-medium text-gray-900">Participantes</h4>
         </div>
         <div className="divide-y divide-gray-200">
           {participants.map((participant) => (
@@ -114,7 +112,7 @@ const QuorumVerification: React.FC<QuorumVerificationProps> = ({
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => onRegisterProxy(participant.id, '')}
+                      onClick={() => onRegisterProxy(participant.id, "")}
                     >
                       Registrar Poder
                     </Button>

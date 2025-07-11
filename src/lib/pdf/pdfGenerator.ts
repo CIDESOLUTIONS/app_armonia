@@ -3,8 +3,10 @@
 export async function generatePDF(
   template: string,
   data: any,
-  outputPath: string
+  outputPath: string,
 ): Promise<string> {
-  console.warn('generatePDF en pdfGenerator.ts es un stub. Usa generateReceipt de receipt-service.ts en su lugar.');
+  console.warn(
+    "generatePDF en pdfGenerator.ts es un stub. Usa generateReceipt de receipt-service.ts en su lugar.",
+  );
   return outputPath;
 }

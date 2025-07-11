@@ -1,9 +1,9 @@
 // src/app/(resident)/layout.tsx
-import { Metadata } from 'next';
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Portal Residente - Armonía',
-  description: 'Portal para residentes de complejos habitacionales'
+  title: "Portal Residente - Armonía",
+  description: "Portal para residentes de complejos habitacionales",
 };
 
 export default function ResidentLayout({
@@ -11,9 +11,5 @@ export default function ResidentLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div className="resident-portal">
-      {children}
-    </div>
-  );
+  return <div className="resident-portal">{children}</div>;
 }

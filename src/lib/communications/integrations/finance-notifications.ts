@@ -1,39 +1,49 @@
 /**
  * Integraciones del sistema de comunicaciones con el módulo financiero
- * 
+ *
  * Este archivo proporciona funciones para enviar notificaciones automáticas
  * relacionadas con eventos del módulo financiero.
  */
 
-import { notifyUser, notifyByRole } from '@/lib/communications/notification-service';
-import { getPrisma } from '@/lib/prisma';
+import {
+  notifyUser,
+  notifyByRole,
+} from "@/lib/communications/notification-service";
+import { getPrisma } from "@/lib/prisma";
 
 const prisma = getPrisma();
 
 /**
  * Envía notificación de nueva cuota generada
  */
-export async function notifyNewFee(userId: number, feeId: number, title: string, amount: number, dueDate: Date, propertyUnit: string) {
+export async function notifyNewFee(
+  userId: number,
+  feeId: number,
+  title: string,
+  amount: number,
+  dueDate: Date,
+  propertyUnit: string,
+) {
   try {
     // Notificar al residente específico
     await notifyUser(userId, {
-      type: 'info',
-      title: 'Nueva cuota generada',
+      type: "info",
+      title: "Nueva cuota generada",
       message: `Se ha generado una nueva cuota: ${title} por valor de ${formatCurrency(amount)}. Fecha límite de pago: ${dueDate.toLocaleDateString()}.`,
-      priority: 'medium',
+      priority: "medium",
       link: `/resident/payments/${feeId}`,
       data: {
         feeId,
         title,
         amount,
         dueDate: dueDate.toISOString(),
-        propertyUnit
-      }
+        propertyUnit,
+      },
     });
-    
+
     return true;
   } catch (error) {
-    console.error('Error al enviar notificación de nueva cuota:', error);
+    console.error("Error al enviar notificación de nueva cuota:", error);
     throw error;
   }
 }
@@ -41,27 +51,34 @@ export async function notifyNewFee(userId: number, feeId: number, title: string,
 /**
  * Envía recordatorio de pago próximo a vencer
  */
-export async function notifyPaymentReminder(userId: number, feeId: number, title: string, amount: number, dueDate: Date, daysRemaining: number) {
+export async function notifyPaymentReminder(
+  userId: number,
+  feeId: number,
+  title: string,
+  amount: number,
+  dueDate: Date,
+  daysRemaining: number,
+) {
   try {
     // Notificar al residente específico
     await notifyUser(userId, {
-      type: 'warning',
-      title: 'Recordatorio de pago',
+      type: "warning",
+      title: "Recordatorio de pago",
       message: `Su cuota "${title}" por valor de ${formatCurrency(amount)} vence en ${daysRemaining} días (${dueDate.toLocaleDateString()}). Por favor, realice el pago a tiempo.`,
-      priority: 'high',
+      priority: "high",
       link: `/resident/payments/${feeId}`,
       data: {
         feeId,
         title,
         amount,
         dueDate: dueDate.toISOString(),
-        daysRemaining
-      }
+        daysRemaining,
+      },
     });
-    
+
     return true;
   } catch (error) {
-    console.error('Error al enviar recordatorio de pago:', error);
+    console.error("Error al enviar recordatorio de pago:", error);
     throw error;
   }
 }
@@ -69,14 +86,21 @@ export async function notifyPaymentReminder(userId: number, feeId: number, title
 /**
  * Envía notificación de pago vencido
  */
-export async function notifyOverdueFee(userId: number, feeId: number, title: string, amount: number, dueDate: Date, daysOverdue: number) {
+export async function notifyOverdueFee(
+  userId: number,
+  feeId: number,
+  title: string,
+  amount: number,
+  dueDate: Date,
+  daysOverdue: number,
+) {
   try {
     // Notificar al residente específico
     await notifyUser(userId, {
-      type: 'error',
-      title: 'Pago vencido',
+      type: "error",
+      title: "Pago vencido",
       message: `Su cuota "${title}" por valor de ${formatCurrency(amount)} está vencida por ${daysOverdue} días. Por favor, realice el pago lo antes posible para evitar recargos adicionales.`,
-      priority: 'urgent',
+      priority: "urgent",
       requireConfirmation: true,
       link: `/resident/payments/${feeId}`,
       data: {
@@ -84,13 +108,13 @@ export async function notifyOverdueFee(userId: number, feeId: number, title: str
         title,
         amount,
         dueDate: dueDate.toISOString(),
-        daysOverdue
-      }
+        daysOverdue,
+      },
     });
-    
+
     return true;
   } catch (error) {
-    console.error('Error al enviar notificación de pago vencido:', error);
+    console.error("Error al enviar notificación de pago vencido:", error);
     throw error;
   }
 }
@@ -98,14 +122,22 @@ export async function notifyOverdueFee(userId: number, feeId: number, title: str
 /**
  * Envía confirmación de pago recibido
  */
-export async function notifyPaymentReceived(userId: number, paymentId: number, feeId: number, title: string, amount: number, method: string, reference: string) {
+export async function notifyPaymentReceived(
+  userId: number,
+  paymentId: number,
+  feeId: number,
+  title: string,
+  amount: number,
+  method: string,
+  reference: string,
+) {
   try {
     // Notificar al residente específico
     await notifyUser(userId, {
-      type: 'success',
-      title: 'Pago recibido',
+      type: "success",
+      title: "Pago recibido",
       message: `Su pago por ${formatCurrency(amount)} para la cuota "${title}" ha sido recibido y procesado correctamente. Método: ${getMethodName(method)}. Referencia: ${reference}.`,
-      priority: 'medium',
+      priority: "medium",
       link: `/resident/payments/receipt/${paymentId}`,
       data: {
         paymentId,
@@ -113,13 +145,13 @@ export async function notifyPaymentReceived(userId: number, paymentId: number, f
         title,
         amount,
         method,
-        reference
-      }
+        reference,
+      },
     });
-    
+
     return true;
   } catch (error) {
-    console.error('Error al enviar confirmación de pago:', error);
+    console.error("Error al enviar confirmación de pago:", error);
     throw error;
   }
 }
@@ -127,27 +159,36 @@ export async function notifyPaymentReceived(userId: number, paymentId: number, f
 /**
  * Envía notificación de nuevo presupuesto aprobado
  */
-export async function notifyBudgetApproved(budgetId: number, year: number, month: number, totalIncome: number, totalExpense: number) {
+export async function notifyBudgetApproved(
+  budgetId: number,
+  year: number,
+  month: number,
+  totalIncome: number,
+  totalExpense: number,
+) {
   try {
     // Notificar a todos los residentes
-    await notifyByRole('resident', {
-      type: 'info',
+    await notifyByRole("resident", {
+      type: "info",
       title: `Presupuesto aprobado: ${getMonthName(month)} ${year}`,
       message: `El presupuesto para ${getMonthName(month)} ${year} ha sido aprobado. Ingresos: ${formatCurrency(totalIncome)}. Gastos: ${formatCurrency(totalExpense)}.`,
-      priority: 'medium',
+      priority: "medium",
       link: `/resident/finances/budget/${budgetId}`,
       data: {
         budgetId,
         year,
         month,
         totalIncome,
-        totalExpense
-      }
+        totalExpense,
+      },
     });
-    
+
     return true;
   } catch (error) {
-    console.error('Error al enviar notificación de presupuesto aprobado:', error);
+    console.error(
+      "Error al enviar notificación de presupuesto aprobado:",
+      error,
+    );
     throw error;
   }
 }
@@ -155,26 +196,32 @@ export async function notifyBudgetApproved(budgetId: number, year: number, month
 /**
  * Envía notificación de recibo generado
  */
-export async function notifyReceiptGenerated(userId: number, receiptId: number, paymentId: number, title: string, amount: number) {
+export async function notifyReceiptGenerated(
+  userId: number,
+  receiptId: number,
+  paymentId: number,
+  title: string,
+  amount: number,
+) {
   try {
     // Notificar al residente específico
     await notifyUser(userId, {
-      type: 'info',
-      title: 'Recibo disponible',
+      type: "info",
+      title: "Recibo disponible",
       message: `Su recibo para el pago de "${title}" por valor de ${formatCurrency(amount)} ya está disponible para descarga.`,
-      priority: 'low',
+      priority: "low",
       link: `/resident/payments/receipt/${receiptId}`,
       data: {
         receiptId,
         paymentId,
         title,
-        amount
-      }
+        amount,
+      },
     });
-    
+
     return true;
   } catch (error) {
-    console.error('Error al enviar notificación de recibo generado:', error);
+    console.error("Error al enviar notificación de recibo generado:", error);
     throw error;
   }
 }
@@ -182,54 +229,69 @@ export async function notifyReceiptGenerated(userId: number, receiptId: number, 
 /**
  * Envía notificación de reporte financiero disponible
  */
-export async function notifyFinancialReportAvailable(reportId: number, title: string, period: string, type: string) {
+export async function notifyFinancialReportAvailable(
+  reportId: number,
+  title: string,
+  period: string,
+  type: string,
+) {
   try {
     // Notificar a todos los residentes
-    await notifyByRole('resident', {
-      type: 'info',
-      title: 'Reporte financiero disponible',
+    await notifyByRole("resident", {
+      type: "info",
+      title: "Reporte financiero disponible",
       message: `El reporte financiero "${title}" para el período ${period} ya está disponible para consulta.`,
-      priority: 'low',
+      priority: "low",
       link: `/resident/finances/reports/${reportId}`,
       data: {
         reportId,
         title,
         period,
-        type
-      }
+        type,
+      },
     });
-    
+
     return true;
   } catch (error) {
-    console.error('Error al enviar notificación de reporte disponible:', error);
+    console.error("Error al enviar notificación de reporte disponible:", error);
     throw error;
   }
 }
 
 // Funciones auxiliares
 function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: 'COP',
-    minimumFractionDigits: 0
+  return new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    minimumFractionDigits: 0,
   }).format(amount);
 }
 
 function getMonthName(month: number) {
   const months = [
-    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
   ];
-  return months[month - 1] || '';
+  return months[month - 1] || "";
 }
 
 function getMethodName(method: string) {
   const methods: Record<string, string> = {
-    'cash': 'Efectivo',
-    'transfer': 'Transferencia',
-    'check': 'Cheque',
-    'card': 'Tarjeta'
+    cash: "Efectivo",
+    transfer: "Transferencia",
+    check: "Cheque",
+    card: "Tarjeta",
   };
-  
+
   return methods[method] || method;
 }

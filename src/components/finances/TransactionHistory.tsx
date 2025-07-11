@@ -1,16 +1,42 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import { toast } from '@/components/ui/use-toast';
+import React, { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { toast } from "@/components/ui/use-toast";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext } from '@/components/ui/pagination';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationPrevious,
+  PaginationLink,
+  PaginationNext,
+} from "@/components/ui/pagination";
 
 import {
   ReceiptText as ReceiptIcon,
@@ -20,26 +46,51 @@ import {
   XCircle as ErrorIcon,
   Hourglass as PendingIcon,
   Ban as CancelIcon,
-  Loader2
-} from 'lucide-react';
+  Loader2,
+} from "lucide-react";
 
 // Servicios y utilidades
-import { getTransactions, downloadReceipt } from '@/lib/api/payments';
-import { formatCurrency, formatDate } from '@/lib/utils/format';
+import { getTransactions, downloadReceipt } from "@/lib/api/payments";
+import { formatCurrency, formatDate } from "@/lib/utils/format";
 
 // Componente para mostrar el estado de la transacción
 const TransactionStatusBadge = ({ status }: { status: string }) => {
   const statusConfig = {
-    PENDING: { label: 'Pendiente', variant: 'secondary', icon: <PendingIcon className="h-3 w-3 mr-1" /> },
-    PROCESSING: { label: 'Procesando', variant: 'secondary', icon: <PendingIcon className="h-3 w-3 mr-1" /> },
-    COMPLETED: { label: 'Completado', variant: 'default', icon: <SuccessIcon className="h-3 w-3 mr-1" /> },
-    FAILED: { label: 'Fallido', variant: 'destructive', icon: <ErrorIcon className="h-3 w-3 mr-1" /> },
-    REFUNDED: { label: 'Reembolsado', variant: 'outline', icon: <ReceiptIcon className="h-3 w-3 mr-1" /> },
-    CANCELLED: { label: 'Cancelado', variant: 'outline', icon: <CancelIcon className="h-3 w-3 mr-1" /> }
+    PENDING: {
+      label: "Pendiente",
+      variant: "secondary",
+      icon: <PendingIcon className="h-3 w-3 mr-1" />,
+    },
+    PROCESSING: {
+      label: "Procesando",
+      variant: "secondary",
+      icon: <PendingIcon className="h-3 w-3 mr-1" />,
+    },
+    COMPLETED: {
+      label: "Completado",
+      variant: "default",
+      icon: <SuccessIcon className="h-3 w-3 mr-1" />,
+    },
+    FAILED: {
+      label: "Fallido",
+      variant: "destructive",
+      icon: <ErrorIcon className="h-3 w-3 mr-1" />,
+    },
+    REFUNDED: {
+      label: "Reembolsado",
+      variant: "outline",
+      icon: <ReceiptIcon className="h-3 w-3 mr-1" />,
+    },
+    CANCELLED: {
+      label: "Cancelado",
+      variant: "outline",
+      icon: <CancelIcon className="h-3 w-3 mr-1" />,
+    },
   };
-  
-  const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
-  
+
+  const config =
+    statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
+
   return (
     <Badge variant={config.variant as any} className="flex items-center w-fit">
       {config.icon}
@@ -52,7 +103,7 @@ const TransactionStatusBadge = ({ status }: { status: string }) => {
 const TransactionHistory = () => {
   const router = useRouter();
   const { data: session } = useSession();
-  
+
   // Estados
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,11 +111,11 @@ const TransactionHistory = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
   const [filters, setFilters] = useState({
-    status: '',
-    startDate: '',
-    endDate: ''
+    status: "",
+    startDate: "",
+    endDate: "",
   });
-  
+
   // Cargar transacciones
   const loadTransactions = useCallback(async () => {
     try {
@@ -72,64 +123,64 @@ const TransactionHistory = () => {
       const result = await getTransactions({
         page: page,
         limit: rowsPerPage,
-        ...filters
+        ...filters,
       });
-      
+
       setTransactions(result.data);
       setTotalCount(result.pagination.total);
     } catch (error) {
-      console.error('Error al cargar transacciones:', error);
+      console.error("Error al cargar transacciones:", error);
       toast({
-        title: 'Error',
-        description: 'Error al cargar el historial de transacciones',
-        variant: 'destructive',
+        title: "Error",
+        description: "Error al cargar el historial de transacciones",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
   }, [page, rowsPerPage, filters]);
-  
+
   // Cargar al montar y cuando cambien los filtros o paginación
   useEffect(() => {
     if (session) {
       loadTransactions();
     }
   }, [session, loadTransactions]);
-  
+
   // Manejar cambio de página
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
   };
-  
+
   // Manejar cambio de filas por página
   const handleRowsPerPageChange = (value: string) => {
     setRowsPerPage(parseInt(value, 10));
     setPage(1); // Reset page to 1 when rows per page changes
   };
-  
+
   // Manejar clic en ver detalles
   const handleViewDetails = (transactionId: string) => {
     router.push(`/payments/details/${transactionId}`);
   };
-  
+
   // Manejar descarga de recibo
   const handleDownloadReceipt = async (transactionId: string) => {
     try {
       await downloadReceipt(transactionId);
       toast({
-        title: 'Éxito',
-        description: 'Recibo descargado correctamente',
+        title: "Éxito",
+        description: "Recibo descargado correctamente",
       });
     } catch (error) {
-      console.error('Error al descargar recibo:', error);
+      console.error("Error al descargar recibo:", error);
       toast({
-        title: 'Error',
-        description: 'Error al descargar el recibo',
-        variant: 'destructive',
+        title: "Error",
+        description: "Error al descargar el recibo",
+        variant: "destructive",
       });
     }
   };
-  
+
   // Renderizar tabla de transacciones
   const renderTransactionsTable = () => {
     if (loading && transactions.length === 0) {
@@ -139,7 +190,7 @@ const TransactionHistory = () => {
         </div>
       );
     }
-    
+
     if (transactions.length === 0) {
       return (
         <div className="text-center py-4 text-gray-500">
@@ -147,7 +198,7 @@ const TransactionHistory = () => {
         </div>
       );
     }
-    
+
     return (
       <>
         <Table>
@@ -169,7 +220,7 @@ const TransactionHistory = () => {
                 <TableCell>{formatDate(transaction.createdAt)}</TableCell>
                 <TableCell>{transaction.description}</TableCell>
                 <TableCell>{formatCurrency(transaction.amount)}</TableCell>
-                <TableCell>{transaction.method?.name || '-'}</TableCell>
+                <TableCell>{transaction.method?.name || "-"}</TableCell>
                 <TableCell>
                   <TransactionStatusBadge status={transaction.status} />
                 </TableCell>
@@ -182,7 +233,7 @@ const TransactionHistory = () => {
                   >
                     <ViewIcon className="h-4 w-4" />
                   </Button>
-                  {transaction.status === 'COMPLETED' && (
+                  {transaction.status === "COMPLETED" && (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -197,9 +248,12 @@ const TransactionHistory = () => {
             ))}
           </TableBody>
         </Table>
-        
+
         <div className="flex justify-end items-center space-x-2 p-4">
-          <Select value={String(rowsPerPage)} onValueChange={handleRowsPerPageChange}>
+          <Select
+            value={String(rowsPerPage)}
+            onValueChange={handleRowsPerPageChange}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filas por página" />
             </SelectTrigger>
@@ -213,17 +267,22 @@ const TransactionHistory = () => {
           <Pagination>
             <PaginationContent>
               <PaginationItem>
-                <PaginationPrevious 
-                  href="#" 
-                  onClick={() => handlePageChange(page - 1)} 
-                  className={page === 1 ? "pointer-events-none opacity-50" : undefined}
+                <PaginationPrevious
+                  href="#"
+                  onClick={() => handlePageChange(page - 1)}
+                  className={
+                    page === 1 ? "pointer-events-none opacity-50" : undefined
+                  }
                 />
               </PaginationItem>
-              {Array.from({ length: Math.ceil(totalCount / rowsPerPage) }, (_, i) => i + 1).map(p => (
+              {Array.from(
+                { length: Math.ceil(totalCount / rowsPerPage) },
+                (_, i) => i + 1,
+              ).map((p) => (
                 <PaginationItem key={p}>
-                  <PaginationLink 
-                    href="#" 
-                    isActive={p === page} 
+                  <PaginationLink
+                    href="#"
+                    isActive={p === page}
                     onClick={() => handlePageChange(p)}
                   >
                     {p}
@@ -231,10 +290,14 @@ const TransactionHistory = () => {
                 </PaginationItem>
               ))}
               <PaginationItem>
-                <PaginationNext 
-                  href="#" 
-                  onClick={() => handlePageChange(page + 1)} 
-                  className={page === Math.ceil(totalCount / rowsPerPage) ? "pointer-events-none opacity-50" : undefined}
+                <PaginationNext
+                  href="#"
+                  onClick={() => handlePageChange(page + 1)}
+                  className={
+                    page === Math.ceil(totalCount / rowsPerPage)
+                      ? "pointer-events-none opacity-50"
+                      : undefined
+                  }
                 />
               </PaginationItem>
             </PaginationContent>
@@ -243,7 +306,7 @@ const TransactionHistory = () => {
       </>
     );
   };
-  
+
   return (
     <Card>
       <CardHeader>
@@ -255,10 +318,8 @@ const TransactionHistory = () => {
       </CardHeader>
       <CardContent>
         {/* Filtros - Se pueden expandir según necesidades */}
-        <div className="mb-3">
-          {/* Aquí irían los filtros */}
-        </div>
-        
+        <div className="mb-3">{/* Aquí irían los filtros */}</div>
+
         {/* Tabla de transacciones */}
         {renderTransactionsTable()}
       </CardContent>

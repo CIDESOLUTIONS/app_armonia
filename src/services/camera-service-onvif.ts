@@ -4,8 +4,8 @@
  * Maneja discovery, conexión, streams y control PTZ
  */
 
-import { getPrisma } from '@/lib/prisma';
-import { encryptData, decryptData } from '@/lib/security/encryption';
+import { getPrisma } from "@/lib/prisma";
+import { encryptData, decryptData } from "@/lib/security/encryption";
 
 // Definición de interfaces
 export interface CameraDevice {
@@ -19,7 +19,7 @@ export interface CameraDevice {
   model?: string;
   firmwareVersion?: string;
   capabilities: CameraCapabilities;
-  status: 'ONLINE' | 'OFFLINE' | 'UNKNOWN' | 'ERROR';
+  status: "ONLINE" | "OFFLINE" | "UNKNOWN" | "ERROR";
   lastStatusCheck?: Date;
 }
 
@@ -94,12 +94,15 @@ export class CameraServiceONVIF {
   /**
    * Descubre cámaras IP en la red usando ONVIF
    */
-  async discoverCameras(complexId: number, timeout: number = 30000): Promise<CameraDevice[]> {
+  async discoverCameras(
+    complexId: number,
+    timeout: number = 30000,
+  ): Promise<CameraDevice[]> {
     try {
-      console.log('[CAMERA DISCOVERY] Iniciando búsqueda de cámaras ONVIF...');
-      
+      console.log("[CAMERA DISCOVERY] Iniciando búsqueda de cámaras ONVIF...");
+
       // En modo desarrollo, simular discovery
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === "development") {
         return this.simulateDiscovery();
       }
 
@@ -110,13 +113,14 @@ export class CameraServiceONVIF {
       // });
 
       // return this.processDiscoveredDevices(devices, complexId);
-      
+
       // Por ahora, retornar simulación
       return this.simulateDiscovery();
-
     } catch (error) {
-      console.error('[CAMERA DISCOVERY] Error:', error);
-      throw new Error(`Error en discovery de cámaras: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error("[CAMERA DISCOVERY] Error:", error);
+      throw new Error(
+        `Error en discovery de cámaras: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     }
   }
 
@@ -126,12 +130,12 @@ export class CameraServiceONVIF {
   private simulateDiscovery(): CameraDevice[] {
     return [
       {
-        name: 'Cámara Entrada Principal',
-        ipAddress: '192.168.1.100',
+        name: "Cámara Entrada Principal",
+        ipAddress: "192.168.1.100",
         port: 554,
-        manufacturer: 'Hikvision',
-        model: 'DS-2CD2142FWD-I',
-        firmwareVersion: '5.5.0',
+        manufacturer: "Hikvision",
+        model: "DS-2CD2142FWD-I",
+        firmwareVersion: "5.5.0",
         capabilities: {
           hasVideo: true,
           hasAudio: false,
@@ -139,18 +143,18 @@ export class CameraServiceONVIF {
           hasPresets: false,
           hasEvents: true,
           hasRecording: true,
-          supportedProfiles: ['Profile_1', 'Profile_2'],
-          supportedResolutions: ['1920x1080', '1280x720', '640x480']
+          supportedProfiles: ["Profile_1", "Profile_2"],
+          supportedResolutions: ["1920x1080", "1280x720", "640x480"],
         },
-        status: 'UNKNOWN'
+        status: "UNKNOWN",
       },
       {
-        name: 'Cámara PTZ Parking',
-        ipAddress: '192.168.1.101',
+        name: "Cámara PTZ Parking",
+        ipAddress: "192.168.1.101",
         port: 554,
-        manufacturer: 'Dahua',
-        model: 'SD6C230I-HC',
-        firmwareVersion: '2.840.0000000.23.R',
+        manufacturer: "Dahua",
+        model: "SD6C230I-HC",
+        firmwareVersion: "2.840.0000000.23.R",
         capabilities: {
           hasVideo: true,
           hasAudio: true,
@@ -158,11 +162,11 @@ export class CameraServiceONVIF {
           hasPresets: true,
           hasEvents: true,
           hasRecording: true,
-          supportedProfiles: ['MainStream', 'SubStream'],
-          supportedResolutions: ['1920x1080', '1280x720']
+          supportedProfiles: ["MainStream", "SubStream"],
+          supportedResolutions: ["1920x1080", "1280x720"],
         },
-        status: 'UNKNOWN'
-      }
+        status: "UNKNOWN",
+      },
     ];
   }
 
@@ -173,20 +177,22 @@ export class CameraServiceONVIF {
     try {
       const camera = await this.getCameraById(cameraId);
       if (!camera) {
-        throw new Error('Cámara no encontrada');
+        throw new Error("Cámara no encontrada");
       }
 
-      console.log(`[CAMERA CONNECT] Conectando a ${camera.name} (${camera.ipAddress})`);
+      console.log(
+        `[CAMERA CONNECT] Conectando a ${camera.name} (${camera.ipAddress})`,
+      );
 
       // En desarrollo, simular conexión
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === "development") {
         this.connectedCameras.set(cameraId, {
           id: cameraId,
           connected: true,
-          lastPing: new Date()
+          lastPing: new Date(),
         });
-        
-        await this.updateCameraStatus(cameraId, 'ONLINE');
+
+        await this.updateCameraStatus(cameraId, "ONLINE");
         return true;
       }
 
@@ -203,13 +209,15 @@ export class CameraServiceONVIF {
       // await device.connect();
 
       // this.connectedCameras.set(cameraId, device);
-      await this.updateCameraStatus(cameraId, 'ONLINE');
-      
-      return true;
+      await this.updateCameraStatus(cameraId, "ONLINE");
 
+      return true;
     } catch (error) {
-      console.error(`[CAMERA CONNECT] Error conectando cámara ${cameraId}:`, error);
-      await this.updateCameraStatus(cameraId, 'ERROR');
+      console.error(
+        `[CAMERA CONNECT] Error conectando cámara ${cameraId}:`,
+        error,
+      );
+      await this.updateCameraStatus(cameraId, "ERROR");
       return false;
     }
   }
@@ -221,45 +229,46 @@ export class CameraServiceONVIF {
     try {
       const device = this.connectedCameras.get(cameraId);
       if (!device) {
-        throw new Error('Cámara no conectada');
+        throw new Error("Cámara no conectada");
       }
 
-      console.log(`[STREAM PROFILES] Obteniendo perfiles para cámara ${cameraId}`);
+      console.log(
+        `[STREAM PROFILES] Obteniendo perfiles para cámara ${cameraId}`,
+      );
 
       // En desarrollo, retornar perfiles simulados
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === "development") {
         return [
           {
-            name: 'MainStream',
-            token: 'Profile_1',
+            name: "MainStream",
+            token: "Profile_1",
             videoEncoderConfiguration: {
-              encoding: 'H264',
+              encoding: "H264",
               resolution: { width: 1920, height: 1080 },
-              rateControl: { frameRateLimit: 25, bitrateLimit: 4096 }
+              rateControl: { frameRateLimit: 25, bitrateLimit: 4096 },
             },
             rtspUri: `rtsp://192.168.1.100:554/Streaming/Channels/101`,
-            snapshotUri: `http://192.168.1.100/ISAPI/Streaming/channels/1/picture`
+            snapshotUri: `http://192.168.1.100/ISAPI/Streaming/channels/1/picture`,
           },
           {
-            name: 'SubStream',
-            token: 'Profile_2',
+            name: "SubStream",
+            token: "Profile_2",
             videoEncoderConfiguration: {
-              encoding: 'H264',
+              encoding: "H264",
               resolution: { width: 640, height: 480 },
-              rateControl: { frameRateLimit: 15, bitrateLimit: 1024 }
+              rateControl: { frameRateLimit: 15, bitrateLimit: 1024 },
             },
             rtspUri: `rtsp://192.168.1.100:554/Streaming/Channels/102`,
-            snapshotUri: `http://192.168.1.100/ISAPI/Streaming/channels/2/picture`
-          }
+            snapshotUri: `http://192.168.1.100/ISAPI/Streaming/channels/2/picture`,
+          },
         ];
       }
 
       // En producción, usar ONVIF real
       // const profiles = await device.getProfiles();
       // return this.parseOnvifProfiles(profiles);
-      
-      return [];
 
+      return [];
     } catch (error) {
       console.error(`[STREAM PROFILES] Error:`, error);
       throw error;
@@ -269,15 +278,18 @@ export class CameraServiceONVIF {
   /**
    * Obtiene el URI del stream RTSP
    */
-  async getStreamUri(cameraId: number, profileToken: string = 'Profile_1'): Promise<string> {
+  async getStreamUri(
+    cameraId: number,
+    profileToken: string = "Profile_1",
+  ): Promise<string> {
     try {
       const device = this.connectedCameras.get(cameraId);
       if (!device) {
-        throw new Error('Cámara no conectada');
+        throw new Error("Cámara no conectada");
       }
 
       // En desarrollo, retornar URI simulado
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === "development") {
         const camera = await this.getCameraById(cameraId);
         return `rtsp://${camera?.ipAddress}:554/Streaming/Channels/101`;
       }
@@ -289,9 +301,8 @@ export class CameraServiceONVIF {
       //   profileToken
       // });
       // return streamUri.uri;
-      
-      return '';
 
+      return "";
     } catch (error) {
       console.error(`[STREAM URI] Error:`, error);
       throw error;
@@ -305,24 +316,26 @@ export class CameraServiceONVIF {
     try {
       const device = this.connectedCameras.get(cameraId);
       if (!device) {
-        throw new Error('Cámara no conectada');
+        throw new Error("Cámara no conectada");
       }
 
       console.log(`[SNAPSHOT] Capturando imagen de cámara ${cameraId}`);
 
       // En desarrollo, crear imagen simulada
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === "development") {
         // Crear un buffer simulado (en producción sería la imagen real)
-        const simulatedImage = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64');
+        const simulatedImage = Buffer.from(
+          "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+          "base64",
+        );
         return simulatedImage;
       }
 
       // En producción, capturar imagen real
       // const snapshot = await device.getSnapshot();
       // return snapshot;
-      
-      return Buffer.alloc(0);
 
+      return Buffer.alloc(0);
     } catch (error) {
       console.error(`[SNAPSHOT] Error:`, error);
       throw error;
@@ -332,41 +345,44 @@ export class CameraServiceONVIF {
   /**
    * Control PTZ (Pan-Tilt-Zoom)
    */
-  async controlPTZ(cameraId: number, action: 'move' | 'stop' | 'preset', params?: any): Promise<boolean> {
+  async controlPTZ(
+    cameraId: number,
+    action: "move" | "stop" | "preset",
+    params?: any,
+  ): Promise<boolean> {
     try {
       const device = this.connectedCameras.get(cameraId);
       if (!device) {
-        throw new Error('Cámara no conectada');
+        throw new Error("Cámara no conectada");
       }
 
       const camera = await this.getCameraById(cameraId);
       if (!camera?.ptzEnabled) {
-        throw new Error('Cámara no soporta PTZ');
+        throw new Error("Cámara no soporta PTZ");
       }
 
       console.log(`[PTZ CONTROL] ${action} en cámara ${cameraId}`, params);
 
       // En desarrollo, simular control PTZ
-      if (process.env.NODE_ENV === 'development') {
-        await new Promise(resolve => setTimeout(resolve, 100)); // Simular delay
+      if (process.env.NODE_ENV === "development") {
+        await new Promise((resolve) => setTimeout(resolve, 100)); // Simular delay
         return true;
       }
 
       // En producción, usar control PTZ real
       switch (action) {
-        case 'move':
+        case "move":
           // await device.absoluteMove(params);
           break;
-        case 'stop':
+        case "stop":
           // await device.stop();
           break;
-        case 'preset':
+        case "preset":
           // await device.gotoPreset(params.presetToken);
           break;
       }
 
       return true;
-
     } catch (error) {
       console.error(`[PTZ CONTROL] Error:`, error);
       return false;
@@ -379,17 +395,19 @@ export class CameraServiceONVIF {
   async checkCamerasStatus(complexId: number): Promise<void> {
     try {
       const cameras = await this.getAllCameras(complexId);
-      
+
       for (const camera of cameras) {
         try {
           await this.pingCamera(camera.id!);
         } catch (error) {
-          console.error(`[STATUS CHECK] Error verificando cámara ${camera.id}:`, error);
+          console.error(
+            `[STATUS CHECK] Error verificando cámara ${camera.id}:`,
+            error,
+          );
         }
       }
-
     } catch (error) {
-      console.error('[STATUS CHECK] Error general:', error);
+      console.error("[STATUS CHECK] Error general:", error);
     }
   }
 
@@ -402,9 +420,12 @@ export class CameraServiceONVIF {
       if (!camera) return false;
 
       // En desarrollo, simular ping
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === "development") {
         const isOnline = Math.random() > 0.1; // 90% probabilidad online
-        await this.updateCameraStatus(cameraId, isOnline ? 'ONLINE' : 'OFFLINE');
+        await this.updateCameraStatus(
+          cameraId,
+          isOnline ? "ONLINE" : "OFFLINE",
+        );
         return isOnline;
       }
 
@@ -414,11 +435,10 @@ export class CameraServiceONVIF {
       // const isOnline = response.status === 200;
       // await this.updateCameraStatus(cameraId, isOnline ? 'ONLINE' : 'OFFLINE');
       // return isOnline;
-      
-      return true;
 
+      return true;
     } catch (error) {
-      await this.updateCameraStatus(cameraId, 'OFFLINE');
+      await this.updateCameraStatus(cameraId, "OFFLINE");
       return false;
     }
   }
@@ -431,15 +451,20 @@ export class CameraServiceONVIF {
       clearInterval(this.discoveryInterval);
     }
 
-    this.discoveryInterval = setInterval(async () => {
-      try {
-        await this.checkCamerasStatus(complexId);
-      } catch (error) {
-        console.error('[MONITORING] Error:', error);
-      }
-    }, intervalMinutes * 60 * 1000);
+    this.discoveryInterval = setInterval(
+      async () => {
+        try {
+          await this.checkCamerasStatus(complexId);
+        } catch (error) {
+          console.error("[MONITORING] Error:", error);
+        }
+      },
+      intervalMinutes * 60 * 1000,
+    );
 
-    console.log(`[MONITORING] Iniciado para complejo ${complexId} cada ${intervalMinutes} minutos`);
+    console.log(
+      `[MONITORING] Iniciado para complejo ${complexId} cada ${intervalMinutes} minutos`,
+    );
   }
 
   /**
@@ -449,7 +474,7 @@ export class CameraServiceONVIF {
     if (this.discoveryInterval) {
       clearInterval(this.discoveryInterval);
       this.discoveryInterval = null;
-      console.log('[MONITORING] Detenido');
+      console.log("[MONITORING] Detenido");
     }
   }
 
@@ -461,44 +486,51 @@ export class CameraServiceONVIF {
       include: {
         zone: true,
         createdBy: {
-          select: { id: true, name: true, email: true }
-        }
-      }
+          select: { id: true, name: true, email: true },
+        },
+      },
     });
   }
 
   private async getAllCameras(complexId: number): Promise<any[]> {
     const prisma = getPrisma();
     return await prisma.camera.findMany({
-      where: { 
+      where: {
         // Asumir que hay relación con complejo via zona o directamente
         zone: {
-          complexId: complexId
-        }
+          complexId: complexId,
+        },
       },
       include: {
-        zone: true
-      }
+        zone: true,
+      },
     });
   }
 
-  private async updateCameraStatus(cameraId: number, status: string): Promise<void> {
+  private async updateCameraStatus(
+    cameraId: number,
+    status: string,
+  ): Promise<void> {
     const prisma = getPrisma();
     await prisma.camera.update({
       where: { id: cameraId },
       data: {
         status,
-        lastStatusCheck: new Date()
-      }
+        lastStatusCheck: new Date(),
+      },
     });
   }
 
   /**
    * Registra una nueva cámara en la base de datos
    */
-  async registerCamera(cameraData: CameraDevice, complexId: number, zoneId?: number): Promise<number> {
+  async registerCamera(
+    cameraData: CameraDevice,
+    complexId: number,
+    zoneId?: number,
+  ): Promise<number> {
     const prisma = getPrisma();
-    
+
     const camera = await prisma.camera.create({
       data: {
         name: cameraData.name,
@@ -514,24 +546,29 @@ export class CameraServiceONVIF {
         recordingEnabled: cameraData.capabilities.hasRecording,
         streamSettings: {
           profiles: cameraData.capabilities.supportedProfiles,
-          resolutions: cameraData.capabilities.supportedResolutions
+          resolutions: cameraData.capabilities.supportedResolutions,
         },
         zoneId: zoneId,
-        isActive: true
-      }
+        isActive: true,
+      },
     });
 
-    console.log(`[CAMERA REGISTER] Cámara ${camera.name} registrada con ID ${camera.id}`);
+    console.log(
+      `[CAMERA REGISTER] Cámara ${camera.name} registrada con ID ${camera.id}`,
+    );
     return camera.id;
   }
 
   /**
    * Actualiza configuración de una cámara
    */
-  async updateCamera(cameraId: number, updates: Partial<CameraDevice>): Promise<boolean> {
+  async updateCamera(
+    cameraId: number,
+    updates: Partial<CameraDevice>,
+  ): Promise<boolean> {
     try {
       const prisma = getPrisma();
-      
+
       const updateData: any = {};
       if (updates.name) updateData.name = updates.name;
       if (updates.ipAddress) updateData.ipAddress = updates.ipAddress;
@@ -543,14 +580,13 @@ export class CameraServiceONVIF {
 
       await prisma.camera.update({
         where: { id: cameraId },
-        data: updateData
+        data: updateData,
       });
 
       console.log(`[CAMERA UPDATE] Cámara ${cameraId} actualizada`);
       return true;
-
     } catch (error) {
-      console.error('[CAMERA UPDATE] Error:', error);
+      console.error("[CAMERA UPDATE] Error:", error);
       return false;
     }
   }
@@ -561,21 +597,20 @@ export class CameraServiceONVIF {
   async deleteCamera(cameraId: number): Promise<boolean> {
     try {
       const prisma = getPrisma();
-      
+
       // Desconectar si está conectada
       if (this.connectedCameras.has(cameraId)) {
         this.connectedCameras.delete(cameraId);
       }
 
       await prisma.camera.delete({
-        where: { id: cameraId }
+        where: { id: cameraId },
       });
 
       console.log(`[CAMERA DELETE] Cámara ${cameraId} eliminada`);
       return true;
-
     } catch (error) {
-      console.error('[CAMERA DELETE] Error:', error);
+      console.error("[CAMERA DELETE] Error:", error);
       return false;
     }
   }
@@ -591,15 +626,15 @@ export class CameraServiceONVIF {
     unknown: number;
   }> {
     const prisma = getPrisma();
-    
+
     const cameras = await this.getAllCameras(complexId);
-    
+
     const stats = {
       total: cameras.length,
-      online: cameras.filter(c => c.status === 'ONLINE').length,
-      offline: cameras.filter(c => c.status === 'OFFLINE').length,
-      error: cameras.filter(c => c.status === 'ERROR').length,
-      unknown: cameras.filter(c => c.status === 'UNKNOWN').length
+      online: cameras.filter((c) => c.status === "ONLINE").length,
+      offline: cameras.filter((c) => c.status === "OFFLINE").length,
+      error: cameras.filter((c) => c.status === "ERROR").length,
+      unknown: cameras.filter((c) => c.status === "UNKNOWN").length,
     };
 
     return stats;

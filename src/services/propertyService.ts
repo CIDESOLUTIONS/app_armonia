@@ -1,4 +1,4 @@
-import { fetchApi } from '@/lib/api';
+import { fetchApi } from "@/lib/api";
 
 interface Property {
   id: number;
@@ -36,36 +36,41 @@ interface UpdatePropertyData {
 
 export async function getProperties(): Promise<Property[]> {
   try {
-    const response = await fetchApi('/api/inventory/properties');
+    const response = await fetchApi("/api/inventory/properties");
     return response;
   } catch (error) {
-    console.error('Error fetching properties:', error);
+    console.error("Error fetching properties:", error);
     throw error;
   }
 }
 
-export async function createProperty(data: CreatePropertyData): Promise<Property> {
+export async function createProperty(
+  data: CreatePropertyData,
+): Promise<Property> {
   try {
-    const response = await fetchApi('/api/inventory/properties', {
-      method: 'POST',
+    const response = await fetchApi("/api/inventory/properties", {
+      method: "POST",
       body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
-    console.error('Error creating property:', error);
+    console.error("Error creating property:", error);
     throw error;
   }
 }
 
-export async function updateProperty(id: number, data: UpdatePropertyData): Promise<Property> {
+export async function updateProperty(
+  id: number,
+  data: UpdatePropertyData,
+): Promise<Property> {
   try {
-    const response = await fetchApi('/api/inventory/properties', {
-      method: 'PUT',
+    const response = await fetchApi("/api/inventory/properties", {
+      method: "PUT",
       body: JSON.stringify({ id, ...data }),
     });
     return response;
   } catch (error) {
-    console.error('Error updating property:', error);
+    console.error("Error updating property:", error);
     throw error;
   }
 }
@@ -73,10 +78,10 @@ export async function updateProperty(id: number, data: UpdatePropertyData): Prom
 export async function deleteProperty(id: number): Promise<void> {
   try {
     await fetchApi(`/api/inventory/properties/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   } catch (error) {
-    console.error('Error deleting property:', error);
+    console.error("Error deleting property:", error);
     throw error;
   }
 }

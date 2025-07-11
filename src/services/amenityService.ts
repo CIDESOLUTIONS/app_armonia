@@ -1,4 +1,4 @@
-import { fetchApi } from '@/lib/api';
+import { fetchApi } from "@/lib/api";
 
 interface Amenity {
   id: number;
@@ -36,36 +36,39 @@ interface UpdateAmenityData {
 
 export async function getAmenities(): Promise<Amenity[]> {
   try {
-    const response = await fetchApi('/api/inventory/amenities');
+    const response = await fetchApi("/api/inventory/amenities");
     return response;
   } catch (error) {
-    console.error('Error fetching amenities:', error);
+    console.error("Error fetching amenities:", error);
     throw error;
   }
 }
 
 export async function createAmenity(data: CreateAmenityData): Promise<Amenity> {
   try {
-    const response = await fetchApi('/api/inventory/amenities', {
-      method: 'POST',
+    const response = await fetchApi("/api/inventory/amenities", {
+      method: "POST",
       body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
-    console.error('Error creating amenity:', error);
+    console.error("Error creating amenity:", error);
     throw error;
   }
 }
 
-export async function updateAmenity(id: number, data: UpdateAmenityData): Promise<Amenity> {
+export async function updateAmenity(
+  id: number,
+  data: UpdateAmenityData,
+): Promise<Amenity> {
   try {
-    const response = await fetchApi('/api/inventory/amenities', {
-      method: 'PUT',
+    const response = await fetchApi("/api/inventory/amenities", {
+      method: "PUT",
       body: JSON.stringify({ id, ...data }),
     });
     return response;
   } catch (error) {
-    console.error('Error updating amenity:', error);
+    console.error("Error updating amenity:", error);
     throw error;
   }
 }
@@ -73,10 +76,10 @@ export async function updateAmenity(id: number, data: UpdateAmenityData): Promis
 export async function deleteAmenity(id: number): Promise<void> {
   try {
     await fetchApi(`/api/services/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   } catch (error) {
-    console.error('Error deleting amenity:', error);
+    console.error("Error deleting amenity:", error);
     throw error;
   }
 }

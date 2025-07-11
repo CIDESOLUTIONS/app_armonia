@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface DashboardPageHeaderProps {
   title: string;
@@ -6,7 +6,11 @@ interface DashboardPageHeaderProps {
   actions?: React.ReactNode;
 }
 
-export function DashboardPageHeader({ title, description, actions }: DashboardPageHeaderProps) {
+export function DashboardPageHeader({
+  title,
+  description,
+  actions,
+}: DashboardPageHeaderProps) {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
       <div>
@@ -19,11 +23,9 @@ export function DashboardPageHeader({ title, description, actions }: DashboardPa
           </p>
         )}
       </div>
-      
+
       {actions && (
-        <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
-          {actions}
-        </div>
+        <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">{actions}</div>
       )}
     </div>
   );

@@ -8,17 +8,17 @@
  * @enum {string}
  */
 export const PQRCategory = {
-  MAINTENANCE: 'MAINTENANCE',
-  SECURITY: 'SECURITY',
-  NOISE: 'NOISE',
-  PAYMENTS: 'PAYMENTS',
-  SERVICES: 'SERVICES',
-  COMMON_AREAS: 'COMMON_AREAS',
-  ADMINISTRATION: 'ADMINISTRATION',
-  NEIGHBORS: 'NEIGHBORS',
-  PETS: 'PETS',
-  PARKING: 'PARKING',
-  OTHER: 'OTHER',
+  MAINTENANCE: "MAINTENANCE",
+  SECURITY: "SECURITY",
+  NOISE: "NOISE",
+  PAYMENTS: "PAYMENTS",
+  SERVICES: "SERVICES",
+  COMMON_AREAS: "COMMON_AREAS",
+  ADMINISTRATION: "ADMINISTRATION",
+  NEIGHBORS: "NEIGHBORS",
+  PETS: "PETS",
+  PARKING: "PARKING",
+  OTHER: "OTHER",
 } as const;
 
 export type PQRCategory = (typeof PQRCategory)[keyof typeof PQRCategory];
@@ -28,16 +28,16 @@ export type PQRCategory = (typeof PQRCategory)[keyof typeof PQRCategory];
  * @enum {string}
  */
 export const PQRStatus = {
-  DRAFT: 'DRAFT',
-  SUBMITTED: 'SUBMITTED',
-  IN_REVIEW: 'IN_REVIEW',
-  ASSIGNED: 'ASSIGNED',
-  IN_PROGRESS: 'IN_PROGRESS',
-  WAITING_INFO: 'WAITING_INFO',
-  RESOLVED: 'RESOLVED',
-  CLOSED: 'CLOSED',
-  CANCELLED: 'CANCELLED',
-  REJECTED: 'REJECTED',
+  DRAFT: "DRAFT",
+  SUBMITTED: "SUBMITTED",
+  IN_REVIEW: "IN_REVIEW",
+  ASSIGNED: "ASSIGNED",
+  IN_PROGRESS: "IN_PROGRESS",
+  WAITING_INFO: "WAITING_INFO",
+  RESOLVED: "RESOLVED",
+  CLOSED: "CLOSED",
+  CANCELLED: "CANCELLED",
+  REJECTED: "REJECTED",
 } as const;
 
 export type PQRStatus = (typeof PQRStatus)[keyof typeof PQRStatus];
@@ -47,10 +47,10 @@ export type PQRStatus = (typeof PQRStatus)[keyof typeof PQRStatus];
  * @enum {string}
  */
 export const PQRPriority = {
-  LOW: 'LOW',
-  MEDIUM: 'MEDIUM',
-  HIGH: 'HIGH',
-  CRITICAL: 'CRITICAL',
+  LOW: "LOW",
+  MEDIUM: "MEDIUM",
+  HIGH: "HIGH",
+  CRITICAL: "CRITICAL",
 } as const;
 
 export type PQRPriority = (typeof PQRPriority)[keyof typeof PQRPriority];
@@ -60,10 +60,10 @@ export type PQRPriority = (typeof PQRPriority)[keyof typeof PQRPriority];
  * @enum {string}
  */
 export const PQRType = {
-  PETITION: 'PETITION',
-  COMPLAINT: 'COMPLAINT',
-  CLAIM: 'CLAIM',
-  SUGGESTION: 'SUGGESTION',
+  PETITION: "PETITION",
+  COMPLAINT: "COMPLAINT",
+  CLAIM: "CLAIM",
+  SUGGESTION: "SUGGESTION",
 } as const;
 
 export type PQRType = (typeof PQRType)[keyof typeof PQRType];
@@ -73,12 +73,12 @@ export type PQRType = (typeof PQRType)[keyof typeof PQRType];
  * @enum {string}
  */
 export const PQRChannel = {
-  WEB: 'WEB',
-  MOBILE: 'MOBILE',
-  EMAIL: 'EMAIL',
-  PHONE: 'PHONE',
-  IN_PERSON: 'IN_PERSON',
-  OTHER: 'OTHER',
+  WEB: "WEB",
+  MOBILE: "MOBILE",
+  EMAIL: "EMAIL",
+  PHONE: "PHONE",
+  IN_PERSON: "IN_PERSON",
+  OTHER: "OTHER",
 } as const;
 
 export type PQRChannel = (typeof PQRChannel)[keyof typeof PQRChannel];
@@ -88,15 +88,15 @@ export type PQRChannel = (typeof PQRChannel)[keyof typeof PQRChannel];
  * @enum {string}
  */
 export const PQRNotificationTemplate = {
-  CREATED: 'PQR_CREATED',
-  ASSIGNED: 'PQR_ASSIGNED',
-  STATUS_CHANGED: 'PQR_STATUS_CHANGED',
-  COMMENT_ADDED: 'PQR_COMMENT_ADDED',
-  RESOLVED: 'PQR_RESOLVED',
-  CLOSED: 'PQR_CLOSED',
-  REOPENED: 'PQR_REOPENED',
-  REMINDER: 'PQR_REMINDER',
-  ESCALATED: 'PQR_ESCALATED',
+  CREATED: "PQR_CREATED",
+  ASSIGNED: "PQR_ASSIGNED",
+  STATUS_CHANGED: "PQR_STATUS_CHANGED",
+  COMMENT_ADDED: "PQR_COMMENT_ADDED",
+  RESOLVED: "PQR_RESOLVED",
+  CLOSED: "PQR_CLOSED",
+  REOPENED: "PQR_REOPENED",
+  REMINDER: "PQR_REMINDER",
+  ESCALATED: "PQR_ESCALATED",
 } as const;
 
 export type PQRNotificationTemplate =
@@ -107,11 +107,11 @@ export type PQRNotificationTemplate =
  * @enum {string}
  */
 export const PQRUserRole = {
-  REQUESTER: 'REQUESTER',
-  ASSIGNEE: 'ASSIGNEE',
-  SUPERVISOR: 'SUPERVISOR',
-  ADMIN: 'ADMIN',
-  VIEWER: 'VIEWER',
+  REQUESTER: "REQUESTER",
+  ASSIGNEE: "ASSIGNEE",
+  SUPERVISOR: "SUPERVISOR",
+  ADMIN: "ADMIN",
+  VIEWER: "VIEWER",
 } as const;
 
 export type PQRUserRole = (typeof PQRUserRole)[keyof typeof PQRUserRole];
@@ -142,10 +142,10 @@ export const PQRTimeConfig = {
 export const PQRAssignmentConfig = {
   ENABLED: true,
   CATEGORIES: {
-    MAINTENANCE: 'maintenance_team',
-    SECURITY: 'security_team',
-    PAYMENTS: 'finance_team',
-    DEFAULT: 'admin_team',
+    MAINTENANCE: "maintenance_team",
+    SECURITY: "security_team",
+    PAYMENTS: "finance_team",
+    DEFAULT: "admin_team",
   },
   LOAD_BALANCING: true,
   MAX_ASSIGNMENTS_PER_USER: 10,

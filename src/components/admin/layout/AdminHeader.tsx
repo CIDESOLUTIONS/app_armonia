@@ -1,10 +1,20 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Bell, Search, User, LogOut, Settings, Moon, Sun, Globe, DollarSign } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { useState } from "react";
+import {
+  Bell,
+  Search,
+  User,
+  LogOut,
+  Settings,
+  Moon,
+  Sun,
+  Globe,
+  DollarSign,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 interface AdminHeaderProps {
   adminName?: string;
@@ -27,9 +37,9 @@ export default function AdminHeader({
   onThemeToggle,
   onLanguageToggle,
   onCurrencyToggle,
-  onLogout
+  onLogout,
 }: AdminHeaderProps) {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
@@ -46,7 +56,7 @@ export default function AdminHeader({
               Panel de Administración
             </p>
           </div>
-          
+
           <div className="relative ml-8">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
@@ -63,9 +73,9 @@ export default function AdminHeader({
         <div className="flex items-center space-x-4">
           {/* Notifications */}
           <div className="relative">
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               className="relative"
               onClick={() => setShowNotifications(!showNotifications)}
             >
@@ -74,7 +84,7 @@ export default function AdminHeader({
                 3
               </Badge>
             </Button>
-            
+
             {showNotifications && (
               <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
                 <div className="p-4 border-b border-gray-200 dark:border-gray-700">
@@ -83,15 +93,21 @@ export default function AdminHeader({
                 <div className="p-2">
                   <div className="p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded">
                     <p className="text-sm font-medium">Nueva PQR recibida</p>
-                    <p className="text-xs text-gray-500">Queja sobre ruido en área común</p>
+                    <p className="text-xs text-gray-500">
+                      Queja sobre ruido en área común
+                    </p>
                   </div>
                   <div className="p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded">
                     <p className="text-sm font-medium">Pago pendiente</p>
-                    <p className="text-xs text-gray-500">Apartamento 301 - Cuota de administración</p>
+                    <p className="text-xs text-gray-500">
+                      Apartamento 301 - Cuota de administración
+                    </p>
                   </div>
                   <div className="p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded">
                     <p className="text-sm font-medium">Asamblea programada</p>
-                    <p className="text-xs text-gray-500">15 de junio - 7:00 PM</p>
+                    <p className="text-xs text-gray-500">
+                      15 de junio - 7:00 PM
+                    </p>
                   </div>
                 </div>
               </div>
@@ -103,9 +119,17 @@ export default function AdminHeader({
             variant="ghost"
             size="sm"
             onClick={onThemeToggle}
-            title={theme === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'}
+            title={
+              theme === "dark"
+                ? "Cambiar a tema claro"
+                : "Cambiar a tema oscuro"
+            }
           >
-            {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            {theme === "dark" ? (
+              <Sun className="w-5 h-5" />
+            ) : (
+              <Moon className="w-5 h-5" />
+            )}
           </Button>
 
           {/* Language toggle */}
@@ -116,7 +140,9 @@ export default function AdminHeader({
             title="Cambiar idioma"
           >
             <Globe className="w-5 h-5" />
-            <span className="text-xs font-medium ml-1">{language?.toUpperCase() || 'ES'}</span>
+            <span className="text-xs font-medium ml-1">
+              {language?.toUpperCase() || "ES"}
+            </span>
           </Button>
 
           {/* Currency toggle */}
@@ -124,16 +150,20 @@ export default function AdminHeader({
             variant="ghost"
             size="sm"
             onClick={onCurrencyToggle}
-            title={currency === 'Dólares' ? 'Cambiar a Pesos' : 'Cambiar a Dólares'}
+            title={
+              currency === "Dólares" ? "Cambiar a Pesos" : "Cambiar a Dólares"
+            }
           >
             <DollarSign className="w-5 h-5" />
-            <span className="text-xs font-medium">{currency?.substring(0, 1) || 'P'}</span>
+            <span className="text-xs font-medium">
+              {currency?.substring(0, 1) || "P"}
+            </span>
           </Button>
 
           {/* User menu */}
           <div className="relative">
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               className="flex items-center space-x-2"
               onClick={() => setShowUserMenu(!showUserMenu)}
             >
@@ -145,7 +175,7 @@ export default function AdminHeader({
                 <span className="text-xs text-gray-500">Administrador</span>
               </div>
             </Button>
-            
+
             {showUserMenu && (
               <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
                 <div className="p-2 border-b border-gray-200 dark:border-gray-700">
@@ -161,7 +191,7 @@ export default function AdminHeader({
                     Configuración
                   </button>
                   <hr className="my-1" />
-                  <button 
+                  <button
                     onClick={onLogout}
                     className="w-full text-left p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded flex items-center text-red-600"
                   >
@@ -177,4 +207,3 @@ export default function AdminHeader({
     </header>
   );
 }
-

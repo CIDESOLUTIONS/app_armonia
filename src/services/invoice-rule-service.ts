@@ -3,9 +3,9 @@
  * Proporciona funcionalidades para la gestión de reglas de facturación.
  */
 
-import { PrismaClient, InvoiceRule } from '@prisma/client';
-import { ServerLogger } from '../logging/server-logger';
-import { evaluate } from 'mathjs';
+import { PrismaClient, InvoiceRule } from "@prisma/client";
+import { ServerLogger } from "../logging/server-logger";
+import { evaluate } from "mathjs";
 
 const logger = ServerLogger;
 
@@ -37,7 +37,9 @@ export class InvoiceRuleService {
    */
   constructor(schemaName: string) {
     if (!schemaName) {
-      throw new Error('Se requiere un nombre de esquema para el servicio de reglas de facturación');
+      throw new Error(
+        "Se requiere un nombre de esquema para el servicio de reglas de facturación",
+      );
     }
 
     this.schemaName = schemaName;
@@ -49,7 +51,9 @@ export class InvoiceRuleService {
       },
     });
 
-    logger.info(`Servicio de reglas de facturación inicializado para esquema: ${schemaName}`);
+    logger.info(
+      `Servicio de reglas de facturación inicializado para esquema: ${schemaName}`,
+    );
   }
 
   /**
@@ -75,7 +79,7 @@ export class InvoiceRuleService {
         skip,
         take,
         orderBy: {
-          priority: 'asc',
+          priority: "asc",
         },
       });
 
@@ -95,7 +99,7 @@ export class InvoiceRuleService {
   async getRuleById(id: string): Promise<InvoiceRule | null> {
     try {
       if (!id) {
-        throw new Error('Se requiere un ID para obtener la regla');
+        throw new Error("Se requiere un ID para obtener la regla");
       }
 
       const rule = await this.prisma.invoiceRule.findUnique({
@@ -110,7 +114,9 @@ export class InvoiceRuleService {
       logger.info(`Recuperada regla de facturación: ${id}`);
       return rule;
     } catch (error: any) {
-      logger.error(`Error al obtener regla de facturación ${id}: ${error.message}`);
+      logger.error(
+        `Error al obtener regla de facturación ${id}: ${error.message}`,
+      );
       throw error;
     }
   }
@@ -123,21 +129,21 @@ export class InvoiceRuleService {
   async createRule(ruleData: Partial<InvoiceRule>): Promise<InvoiceRule> {
     try {
       if (!ruleData || !ruleData.name || !ruleData.formula) {
-        throw new Error('Datos de regla incompletos');
+        throw new Error("Datos de regla incompletos");
       }
 
       const rule = await this.prisma.invoiceRule.create({
         data: {
           name: ruleData.name,
-          description: ruleData.description || '',
-          category: ruleData.category || 'GENERAL',
+          description: ruleData.description || "",
+          category: ruleData.category || "GENERAL",
           formula: ruleData.formula,
           parameters: ruleData.parameters || {},
           priority: ruleData.priority || 100,
           active: ruleData.active !== undefined ? ruleData.active : true,
           startDate: ruleData.startDate || new Date(),
           endDate: ruleData.endDate || null,
-          createdBy: ruleData.createdBy || 'system',
+          createdBy: ruleData.createdBy || "system",
         },
       });
 
@@ -155,10 +161,13 @@ export class InvoiceRuleService {
    * @param {Partial<InvoiceRule>} ruleData - Datos a actualizar.
    * @returns {Promise<InvoiceRule | null>} - Regla actualizada.
    */
-  async updateRule(id: string, ruleData: Partial<InvoiceRule>): Promise<InvoiceRule | null> {
+  async updateRule(
+    id: string,
+    ruleData: Partial<InvoiceRule>,
+  ): Promise<InvoiceRule | null> {
     try {
       if (!id) {
-        throw new Error('Se requiere un ID para actualizar la regla');
+        throw new Error("Se requiere un ID para actualizar la regla");
       }
 
       const existingRule = await this.prisma.invoiceRule.findUnique({
@@ -166,7 +175,9 @@ export class InvoiceRuleService {
       });
 
       if (!existingRule) {
-        logger.warn(`Regla de facturación no encontrada para actualizar: ${id}`);
+        logger.warn(
+          `Regla de facturación no encontrada para actualizar: ${id}`,
+        );
         return null;
       }
 
@@ -181,7 +192,9 @@ export class InvoiceRuleService {
       logger.info(`Actualizada regla de facturación: ${id}`);
       return updatedRule;
     } catch (error: any) {
-      logger.error(`Error al actualizar regla de facturación ${id}: ${error.message}`);
+      logger.error(
+        `Error al actualizar regla de facturación ${id}: ${error.message}`,
+      );
       throw error;
     }
   }
@@ -194,7 +207,7 @@ export class InvoiceRuleService {
   async deleteRule(id: string): Promise<boolean> {
     try {
       if (!id) {
-        throw new Error('Se requiere un ID para eliminar la regla');
+        throw new Error("Se requiere un ID para eliminar la regla");
       }
 
       await this.prisma.invoiceRule.delete({
@@ -204,7 +217,9 @@ export class InvoiceRuleService {
       logger.info(`Eliminada regla de facturación: ${id}`);
       return true;
     } catch (error: any) {
-      logger.error(`Error al eliminar regla de facturación ${id}: ${error.message}`);
+      logger.error(
+        `Error al eliminar regla de facturación ${id}: ${error.message}`,
+      );
       throw error;
     }
   }
@@ -215,14 +230,17 @@ export class InvoiceRuleService {
    * @param {Record<string, any>} data - Datos para evaluación.
    * @returns {Promise<EvaluationResult>} - Resultado de la evaluación.
    */
-  async evaluateRule(ruleId: string, data: Record<string, any>): Promise<EvaluationResult> {
+  async evaluateRule(
+    ruleId: string,
+    data: Record<string, any>,
+  ): Promise<EvaluationResult> {
     try {
       if (!ruleId) {
-        throw new Error('Se requiere un ID de regla para evaluar');
+        throw new Error("Se requiere un ID de regla para evaluar");
       }
 
       if (!data) {
-        throw new Error('Se requieren datos para evaluar la regla');
+        throw new Error("Se requieren datos para evaluar la regla");
       }
 
       const rule = await this.getRuleById(ruleId);
@@ -235,7 +253,7 @@ export class InvoiceRuleService {
         logger.warn(`Intentando evaluar regla inactiva: ${ruleId}`);
         return {
           success: false,
-          error: 'La regla está inactiva',
+          error: "La regla está inactiva",
           result: null,
         };
       }
@@ -252,7 +270,9 @@ export class InvoiceRuleService {
           ruleName: rule.name,
         };
       } catch (evalError: any) {
-        logger.error(`Error al evaluar fórmula de regla ${ruleId}: ${evalError.message}`);
+        logger.error(
+          `Error al evaluar fórmula de regla ${ruleId}: ${evalError.message}`,
+        );
         return {
           success: false,
           error: evalError.message,
@@ -271,9 +291,11 @@ export class InvoiceRuleService {
   async disconnect() {
     try {
       await this.prisma.$disconnect();
-      logger.info('Conexión a base de datos cerrada');
+      logger.info("Conexión a base de datos cerrada");
     } catch (error: any) {
-      logger.error(`Error al cerrar conexión a base de datos: ${error.message}`);
+      logger.error(
+        `Error al cerrar conexión a base de datos: ${error.message}`,
+      );
     }
   }
 }

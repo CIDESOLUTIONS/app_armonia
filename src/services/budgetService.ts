@@ -1,17 +1,17 @@
-import { getPrisma } from '@/lib/prisma';
-import { ServerLogger } from '@/lib/logging/server-logger';
-import { PrismaClient } from '@prisma/client';
+import { getPrisma } from "@/lib/prisma";
+import { ServerLogger } from "@/lib/logging/server-logger";
+import { PrismaClient } from "@prisma/client";
 
 interface BudgetItemData {
   category: string;
   description: string;
   amount: number;
-  type: 'INCOME' | 'EXPENSE';
+  type: "INCOME" | "EXPENSE";
 }
 
 interface BudgetData {
   year: number;
-  status: 'DRAFT' | 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED';
+  status: "DRAFT" | "PENDING_APPROVAL" | "APPROVED" | "REJECTED";
   notes?: string;
   items: BudgetItemData[];
 }
@@ -32,11 +32,14 @@ export class BudgetService {
         include: {
           items: true,
         },
-        orderBy: { year: 'desc' },
+        orderBy: { year: "desc" },
       });
       return budgets;
     } catch (error) {
-      ServerLogger.error(`[BudgetService] Error al obtener presupuestos para ${this.schemaName}:`, error);
+      ServerLogger.error(
+        `[BudgetService] Error al obtener presupuestos para ${this.schemaName}:`,
+        error,
+      );
       throw error;
     }
   }
@@ -51,7 +54,10 @@ export class BudgetService {
       });
       return budget;
     } catch (error) {
-      ServerLogger.error(`[BudgetService] Error al obtener presupuesto ${id} para ${this.schemaName}:`, error);
+      ServerLogger.error(
+        `[BudgetService] Error al obtener presupuesto ${id} para ${this.schemaName}:`,
+        error,
+      );
       throw error;
     }
   }
@@ -67,7 +73,7 @@ export class BudgetService {
           createdAt: new Date(),
           updatedAt: new Date(),
           items: {
-            create: data.items.map(item => ({
+            create: data.items.map((item) => ({
               category: item.category,
               description: item.description,
               amount: item.amount,
@@ -81,15 +87,24 @@ export class BudgetService {
           items: true,
         },
       });
-      ServerLogger.info(`[BudgetService] Presupuesto ${newBudget.id} creado para ${this.schemaName}`);
+      ServerLogger.info(
+        `[BudgetService] Presupuesto ${newBudget.id} creado para ${this.schemaName}`,
+      );
       return newBudget;
     } catch (error) {
-      ServerLogger.error(`[BudgetService] Error al crear presupuesto para ${this.schemaName}:`, error);
+      ServerLogger.error(
+        `[BudgetService] Error al crear presupuesto para ${this.schemaName}:`,
+        error,
+      );
       throw error;
     }
   }
 
-  async updateBudget(id: number, complexId: number, data: Partial<BudgetData>): Promise<any> {
+  async updateBudget(
+    id: number,
+    complexId: number,
+    data: Partial<BudgetData>,
+  ): Promise<any> {
     try {
       const updatedBudget = await this.prisma.budget.update({
         where: { id, complexId },
@@ -105,10 +120,15 @@ export class BudgetService {
           items: true,
         },
       });
-      ServerLogger.info(`[BudgetService] Presupuesto ${id} actualizado para ${this.schemaName}`);
+      ServerLogger.info(
+        `[BudgetService] Presupuesto ${id} actualizado para ${this.schemaName}`,
+      );
       return updatedBudget;
     } catch (error) {
-      ServerLogger.error(`[BudgetService] Error al actualizar presupuesto ${id} para ${this.schemaName}:`, error);
+      ServerLogger.error(
+        `[BudgetService] Error al actualizar presupuesto ${id} para ${this.schemaName}:`,
+        error,
+      );
       throw error;
     }
   }
@@ -118,9 +138,14 @@ export class BudgetService {
       await this.prisma.budget.delete({
         where: { id, complexId },
       });
-      ServerLogger.info(`[BudgetService] Presupuesto ${id} eliminado para ${this.schemaName}`);
+      ServerLogger.info(
+        `[BudgetService] Presupuesto ${id} eliminado para ${this.schemaName}`,
+      );
     } catch (error) {
-      ServerLogger.error(`[BudgetService] Error al eliminar presupuesto ${id} para ${this.schemaName}:`, error);
+      ServerLogger.error(
+        `[BudgetService] Error al eliminar presupuesto ${id} para ${this.schemaName}:`,
+        error,
+      );
       throw error;
     }
   }

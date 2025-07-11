@@ -3,32 +3,23 @@ export interface ICommonServiceService {
   createService(
     data: CreateCommonServiceDTO,
     userId: string,
-    complexId: string
+    complexId: string,
   ): Promise<ICommonService>;
-  
-  getService(
-    id: string,
-    complexId: string
-  ): Promise<ICommonService>;
-  
+
+  getService(id: string, complexId: string): Promise<ICommonService>;
+
   updateService(
     id: string,
     data: UpdateCommonServiceDTO,
-    complexId: string
+    complexId: string,
   ): Promise<ICommonService>;
-  
-  deleteService(
-    id: string,
-    complexId: string
-  ): Promise<void>;
-  
+
+  deleteService(id: string, complexId: string): Promise<void>;
+
   getServices(
     complexId: string,
-    onlyEnabled?: boolean
+    onlyEnabled?: boolean,
   ): Promise<ICommonService[]>;
-  
-  toggleServiceStatus(
-    id: string,
-    complexId: string
-  ): Promise<ICommonService>;
+
+  toggleServiceStatus(id: string, complexId: string): Promise<ICommonService>;
 }

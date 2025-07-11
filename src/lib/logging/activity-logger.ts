@@ -1,6 +1,6 @@
 /**
  * Mock para el módulo de logging
- * 
+ *
  * Este archivo proporciona mocks para las funciones del módulo de logging
  * que son utilizadas por los servicios de PQR durante las pruebas.
  */
@@ -16,7 +16,7 @@ export class ActivityLogger {
    */
   static async log(data: any): Promise<void> {
     // En pruebas, simplemente simulamos el registro
-    console.log('Mock ActivityLogger.log called with:', data);
+    console.log("Mock ActivityLogger.log called with:", data);
     return Promise.resolve();
   }
 }

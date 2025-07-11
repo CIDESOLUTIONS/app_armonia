@@ -1,25 +1,25 @@
 // src/components/auth/LoginForm.tsx
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function LoginForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const router = useRouter();
   const { setUser } = useAuthStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
       });
@@ -27,42 +27,41 @@ export function LoginForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Error al iniciar sesión');
+        throw new Error(data.message || "Error al iniciar sesión");
       }
 
       // Guardar el token y la información del usuario en el store de Zustand
       setUser(data.user, data.token);
       toast({
-        title: 'Inicio de sesión exitoso',
-        description: 'Redirigiendo...',
+        title: "Inicio de sesión exitoso",
+        description: "Redirigiendo...",
       });
 
       // Redirigir según el rol del usuario
       switch (data.user.role) {
-        case 'ADMIN':
-        case 'COMPLEX_ADMIN':
-          router.push('/admin/dashboard');
+        case "ADMIN":
+        case "COMPLEX_ADMIN":
+          router.push("/admin/dashboard");
           break;
-        case 'RESIDENT':
-          router.push('/resident/dashboard');
+        case "RESIDENT":
+          router.push("/resident/dashboard");
           break;
-        case 'RECEPTION':
-          router.push('/reception/dashboard');
+        case "RECEPTION":
+          router.push("/reception/dashboard");
           break;
-        case 'APP_ADMIN':
-          router.push('/app-admin/dashboard');
+        case "APP_ADMIN":
+          router.push("/app-admin/dashboard");
           break;
         default:
-          router.push('/portal-selector');
+          router.push("/portal-selector");
       }
-
     } catch (err: any) {
-      console.error('Error:', err);
-      setError(err.message || 'Error al iniciar sesión');
+      console.error("Error:", err);
+      setError(err.message || "Error al iniciar sesión");
       toast({
-        title: 'Error',
-        description: err.message || 'Error al iniciar sesión',
-        variant: 'destructive',
+        title: "Error",
+        description: err.message || "Error al iniciar sesión",
+        variant: "destructive",
       });
     }
   };
@@ -70,8 +69,8 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-6">
       {error && (
-        <div 
-          data-testid="error-message" 
+        <div
+          data-testid="error-message"
           className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded"
         >
           {error}
@@ -86,7 +85,9 @@ export function LoginForm() {
           className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
           placeholder="Correo electrónico"
           value={email}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setEmail(e.target.value)
+          }
         />
       </div>
 
@@ -98,7 +99,9 @@ export function LoginForm() {
           className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
           placeholder="Contraseña"
           value={password}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPassword(e.target.value)
+          }
         />
       </div>
 

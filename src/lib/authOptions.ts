@@ -1,20 +1,20 @@
-import { NextAuthOptions } from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
-import { JWTPayload } from './auth'; // Importar la interfaz JWTPayload
-import { ServerLogger } from './logging/server-logger';
+import { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaClient } from "@prisma/client";
+import * as bcrypt from "bcrypt";
+import { JWTPayload } from "./auth"; // Importar la interfaz JWTPayload
+import { ServerLogger } from "./logging/server-logger";
 
 const prisma = new PrismaClient();
 
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      name: 'Credentials',
+      name: "Credentials",
       credentials: {
-        email: { label: 'Email', type: 'text' },
-        password: { label: 'Password', type: 'password' },
-        schemaName: { label: 'Schema Name', type: 'text', optional: true },
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
+        schemaName: { label: "Schema Name", type: "text", optional: true },
       },
       async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
@@ -31,7 +31,9 @@ export const authOptions: NextAuthOptions = {
             // Conectar a un esquema específico si se proporciona
             targetPrisma = new PrismaClient({
               datasources: {
-                db: { url: process.env.DATABASE_URL?.replace('armonia', schemaName) },
+                db: {
+                  url: process.env.DATABASE_URL?.replace("armonia", schemaName),
+                },
               },
             });
           }
@@ -41,14 +43,18 @@ export const authOptions: NextAuthOptions = {
           });
 
           if (!user) {
-            ServerLogger.warn(`Intento de login fallido: Usuario no encontrado para ${email} en esquema ${schemaName || 'principal'}`);
+            ServerLogger.warn(
+              `Intento de login fallido: Usuario no encontrado para ${email} en esquema ${schemaName || "principal"}`,
+            );
             return null;
           }
 
           const passwordMatch = await bcrypt.compare(password, user.password);
 
           if (!passwordMatch) {
-            ServerLogger.warn(`Intento de login fallido: Contraseña incorrecta para ${email} en esquema ${schemaName || 'principal'}`);
+            ServerLogger.warn(
+              `Intento de login fallido: Contraseña incorrecta para ${email} en esquema ${schemaName || "principal"}`,
+            );
             return null;
           }
 
@@ -60,10 +66,13 @@ export const authOptions: NextAuthOptions = {
             name: user.name,
             role: user.role,
             complexId: user.complexId?.toString(), // Convertir a string si existe
-            schemaName: schemaName || 'armonia', // Usar el schemaName proporcionado o 'armonia'
+            schemaName: schemaName || "armonia", // Usar el schemaName proporcionado o 'armonia'
           };
         } catch (error) {
-          ServerLogger.error('Error en la autorización de credenciales:', error);
+          ServerLogger.error(
+            "Error en la autorización de credenciales:",
+            error,
+          );
           return null;
         } finally {
           if (schemaName) {
@@ -74,7 +83,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   session: {
-    strategy: 'jwt',
+    strategy: "jwt",
   },
   jwt: {
     secret: process.env.NEXTAUTH_SECRET,
@@ -106,8 +115,8 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: '/login',
-    error: '/login', // Redirigir a la página de login en caso de error
+    signIn: "/login",
+    error: "/login", // Redirigir a la página de login en caso de error
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

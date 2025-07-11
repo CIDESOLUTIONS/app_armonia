@@ -4,48 +4,48 @@
  * aplicación y experiencia de usuario, así como la gestión de alertas y notificaciones.
  */
 
-import { PrismaClient } from '@prisma/client';
-import { getTenantPrismaClient } from '@/lib/prisma';
-import { ServerLogger } from '@/lib/logging/server-logger';
-import { NotificationService } from '@/lib/services/notification-service';
-import axios from 'axios';
-import { performance } from 'perf_hooks';
+import { PrismaClient } from "@prisma/client";
+import { getTenantPrismaClient } from "@/lib/prisma";
+import { ServerLogger } from "@/lib/logging/server-logger";
+import { NotificationService } from "@/lib/services/notification-service";
+import axios from "axios";
+import { performance } from "perf_hooks";
 
 // Tipos de monitoreo soportados
 export enum MonitoringType {
-  INFRASTRUCTURE = 'INFRASTRUCTURE',
-  APPLICATION = 'APPLICATION',
-  USER_EXPERIENCE = 'USER_EXPERIENCE'
+  INFRASTRUCTURE = "INFRASTRUCTURE",
+  APPLICATION = "APPLICATION",
+  USER_EXPERIENCE = "USER_EXPERIENCE",
 }
 
 // Estados de monitoreo
 export enum MonitoringStatus {
-  SUCCESS = 'SUCCESS',
-  WARNING = 'WARNING',
-  ERROR = 'ERROR',
-  CRITICAL = 'CRITICAL'
+  SUCCESS = "SUCCESS",
+  WARNING = "WARNING",
+  ERROR = "ERROR",
+  CRITICAL = "CRITICAL",
 }
 
 // Estados de alerta
 export enum AlertStatus {
-  ACTIVE = 'ACTIVE',
-  ACKNOWLEDGED = 'ACKNOWLEDGED',
-  RESOLVED = 'RESOLVED'
+  ACTIVE = "ACTIVE",
+  ACKNOWLEDGED = "ACKNOWLEDGED",
+  RESOLVED = "RESOLVED",
 }
 
 // Severidad de alertas
 export enum AlertSeverity {
-  INFO = 'INFO',
-  WARNING = 'WARNING',
-  ERROR = 'ERROR',
-  CRITICAL = 'CRITICAL'
+  INFO = "INFO",
+  WARNING = "WARNING",
+  ERROR = "ERROR",
+  CRITICAL = "CRITICAL",
 }
 
 // Canales de notificación
 export enum NotificationChannel {
-  EMAIL = 'EMAIL',
-  SMS = 'SMS',
-  WEBHOOK = 'WEBHOOK'
+  EMAIL = "EMAIL",
+  SMS = "SMS",
+  WEBHOOK = "WEBHOOK",
 }
 
 // Interfaz para configuración de monitoreo
@@ -113,20 +113,20 @@ export default class MonitoringService {
           targetResource: data.targetResource,
           parameters: data.parameters || {},
           alertThresholds: data.alertThresholds,
-          isActive: data.isActive !== undefined ? data.isActive : true
-        }
+          isActive: data.isActive !== undefined ? data.isActive : true,
+        },
       });
 
       ServerLogger.info(`Configuración de monitoreo creada: ${config.id}`, {
         userId,
         tenantId: this.tenantId,
-        configId: config.id
+        configId: config.id,
       });
 
       return config;
     } catch (error) {
-      ServerLogger.error('Error al crear configuración de monitoreo:', error);
-      throw new Error('Error al crear configuración de monitoreo');
+      ServerLogger.error("Error al crear configuración de monitoreo:", error);
+      throw new Error("Error al crear configuración de monitoreo");
     }
   }
 
@@ -137,7 +137,11 @@ export default class MonitoringService {
    * @param userId ID del usuario que actualiza la configuración
    * @returns Configuración actualizada
    */
-  async updateMonitoringConfig(id: number, data: Partial<MonitoringConfigData>, userId: number) {
+  async updateMonitoringConfig(
+    id: number,
+    data: Partial<MonitoringConfigData>,
+    userId: number,
+  ) {
     try {
       const config = await this.prisma.monitoringConfig.update({
         where: { id },
@@ -149,20 +153,23 @@ export default class MonitoringService {
           targetResource: data.targetResource,
           parameters: data.parameters,
           alertThresholds: data.alertThresholds,
-          isActive: data.isActive
-        }
+          isActive: data.isActive,
+        },
       });
 
       ServerLogger.info(`Configuración de monitoreo actualizada: ${id}`, {
         userId,
         tenantId: this.tenantId,
-        configId: id
+        configId: id,
       });
 
       return config;
     } catch (error) {
-      ServerLogger.error(`Error al actualizar configuración de monitoreo ${id}:`, error);
-      throw new Error('Error al actualizar configuración de monitoreo');
+      ServerLogger.error(
+        `Error al actualizar configuración de monitoreo ${id}:`,
+        error,
+      );
+      throw new Error("Error al actualizar configuración de monitoreo");
     }
   }
 
@@ -176,41 +183,47 @@ export default class MonitoringService {
     try {
       // Primero eliminamos resultados y alertas asociadas
       await this.prisma.monitoringResult.deleteMany({
-        where: { configId: id }
+        where: { configId: id },
       });
 
       // Eliminamos notificaciones de alertas
       const alerts = await this.prisma.alert.findMany({
         where: { configId: id },
-        select: { id: true }
+        select: { id: true },
       });
 
-      const alertIds = alerts.map(alert => alert.id);
-      
+      const alertIds = alerts.map((alert) => alert.id);
+
       await this.prisma.notificationLog.deleteMany({
-        where: { alertId: { in: alertIds } }
+        where: { alertId: { in: alertIds } },
       });
 
       // Eliminamos alertas
       await this.prisma.alert.deleteMany({
-        where: { configId: id }
+        where: { configId: id },
       });
 
       // Finalmente eliminamos la configuración
       await this.prisma.monitoringConfig.delete({
-        where: { id }
+        where: { id },
       });
 
       ServerLogger.info(`Configuración de monitoreo eliminada: ${id}`, {
         userId,
         tenantId: this.tenantId,
-        configId: id
+        configId: id,
       });
 
-      return { success: true, message: 'Configuración eliminada correctamente' };
+      return {
+        success: true,
+        message: "Configuración eliminada correctamente",
+      };
     } catch (error) {
-      ServerLogger.error(`Error al eliminar configuración de monitoreo ${id}:`, error);
-      throw new Error('Error al eliminar configuración de monitoreo');
+      ServerLogger.error(
+        `Error al eliminar configuración de monitoreo ${id}:`,
+        error,
+      );
+      throw new Error("Error al eliminar configuración de monitoreo");
     }
   }
 
@@ -223,18 +236,21 @@ export default class MonitoringService {
     try {
       const where = {
         tenantId: this.tenantId,
-        ...(includeInactive ? {} : { isActive: true })
+        ...(includeInactive ? {} : { isActive: true }),
       };
 
       const configs = await this.prisma.monitoringConfig.findMany({
         where,
-        orderBy: { name: 'asc' }
+        orderBy: { name: "asc" },
       });
 
       return configs;
     } catch (error) {
-      ServerLogger.error('Error al obtener configuraciones de monitoreo:', error);
-      throw new Error('Error al obtener configuraciones de monitoreo');
+      ServerLogger.error(
+        "Error al obtener configuraciones de monitoreo:",
+        error,
+      );
+      throw new Error("Error al obtener configuraciones de monitoreo");
     }
   }
 
@@ -246,17 +262,20 @@ export default class MonitoringService {
   async getMonitoringConfigById(id: number) {
     try {
       const config = await this.prisma.monitoringConfig.findUnique({
-        where: { id }
+        where: { id },
       });
 
       if (!config) {
-        throw new Error('Configuración de monitoreo no encontrada');
+        throw new Error("Configuración de monitoreo no encontrada");
       }
 
       return config;
     } catch (error) {
-      ServerLogger.error(`Error al obtener configuración de monitoreo ${id}:`, error);
-      throw new Error('Error al obtener configuración de monitoreo');
+      ServerLogger.error(
+        `Error al obtener configuración de monitoreo ${id}:`,
+        error,
+      );
+      throw new Error("Error al obtener configuración de monitoreo");
     }
   }
 
@@ -268,9 +287,9 @@ export default class MonitoringService {
   async executeCheck(configId: number) {
     try {
       const config = await this.getMonitoringConfigById(configId);
-      
+
       if (!config.isActive) {
-        return { skipped: true, message: 'Configuración inactiva' };
+        return { skipped: true, message: "Configuración inactiva" };
       }
 
       let result: MonitoringResultData;
@@ -287,7 +306,9 @@ export default class MonitoringService {
           result = await this.checkUserExperience(config);
           break;
         default:
-          throw new Error(`Tipo de monitoreo no soportado: ${config.monitoringType}`);
+          throw new Error(
+            `Tipo de monitoreo no soportado: ${config.monitoringType}`,
+          );
       }
 
       // Guardar resultado
@@ -298,17 +319,21 @@ export default class MonitoringService {
 
       return savedResult;
     } catch (error) {
-      ServerLogger.error(`Error al ejecutar verificación para configuración ${configId}:`, error);
-      
+      ServerLogger.error(
+        `Error al ejecutar verificación para configuración ${configId}:`,
+        error,
+      );
+
       // Guardar resultado de error
       const errorResult: MonitoringResultData = {
         status: MonitoringStatus.ERROR,
-        errorMessage: error instanceof Error ? error.message : 'Error desconocido'
+        errorMessage:
+          error instanceof Error ? error.message : "Error desconocido",
       };
-      
+
       await this.saveMonitoringResult(configId, errorResult);
-      
-      throw new Error('Error al ejecutar verificación de monitoreo');
+
+      throw new Error("Error al ejecutar verificación de monitoreo");
     }
   }
 
@@ -326,17 +351,17 @@ export default class MonitoringService {
           const result = await this.executeCheck(config.id);
           results.push({ configId: config.id, result });
         } catch (error) {
-          results.push({ 
-            configId: config.id, 
-            error: error instanceof Error ? error.message : 'Error desconocido' 
+          results.push({
+            configId: config.id,
+            error: error instanceof Error ? error.message : "Error desconocido",
           });
         }
       }
 
       return results;
     } catch (error) {
-      ServerLogger.error('Error al ejecutar todas las verificaciones:', error);
-      throw new Error('Error al ejecutar verificaciones de monitoreo');
+      ServerLogger.error("Error al ejecutar todas las verificaciones:", error);
+      throw new Error("Error al ejecutar verificaciones de monitoreo");
     }
   }
 
@@ -345,9 +370,11 @@ export default class MonitoringService {
    * @param config Configuración de monitoreo
    * @returns Resultado de la verificación
    */
-  private async checkInfrastructure(config: any): Promise<MonitoringResultData> {
+  private async checkInfrastructure(
+    config: any,
+  ): Promise<MonitoringResultData> {
     const startTime = performance.now();
-    
+
     try {
       const { targetResource, parameters } = config;
       let value: number | undefined;
@@ -355,50 +382,54 @@ export default class MonitoringService {
       let status = MonitoringStatus.SUCCESS;
 
       // Implementación según el tipo de recurso
-      if (targetResource.startsWith('server:')) {
+      if (targetResource.startsWith("server:")) {
         // Monitoreo de servidor (CPU, memoria, disco)
-        const resource = targetResource.split(':')[1];
-        
+        const resource = targetResource.split(":")[1];
+
         // Aquí se implementaría la lógica real para obtener métricas del servidor
         // Este es un ejemplo simulado
         switch (resource) {
-          case 'cpu':
+          case "cpu":
             value = Math.random() * 100; // Simulación de uso de CPU
             break;
-          case 'memory':
+          case "memory":
             value = Math.random() * 100; // Simulación de uso de memoria
             break;
-          case 'disk':
+          case "disk":
             value = Math.random() * 100; // Simulación de uso de disco
             break;
           default:
             throw new Error(`Recurso de servidor no soportado: ${resource}`);
         }
-        
-        details = { resource, unit: '%' };
-      } else if (targetResource.startsWith('database:')) {
+
+        details = { resource, unit: "%" };
+      } else if (targetResource.startsWith("database:")) {
         // Monitoreo de base de datos
-        const dbResource = targetResource.split(':')[1];
-        
+        const dbResource = targetResource.split(":")[1];
+
         // Simulación de métricas de base de datos
         switch (dbResource) {
-          case 'connections':
+          case "connections":
             value = Math.floor(Math.random() * 100);
-            details = { resource: dbResource, unit: 'connections' };
+            details = { resource: dbResource, unit: "connections" };
             break;
-          case 'queries':
+          case "queries":
             value = Math.floor(Math.random() * 1000);
-            details = { resource: dbResource, unit: 'queries/sec' };
+            details = { resource: dbResource, unit: "queries/sec" };
             break;
-          case 'latency':
+          case "latency":
             value = Math.random() * 500;
-            details = { resource: dbResource, unit: 'ms' };
+            details = { resource: dbResource, unit: "ms" };
             break;
           default:
-            throw new Error(`Recurso de base de datos no soportado: ${dbResource}`);
+            throw new Error(
+              `Recurso de base de datos no soportado: ${dbResource}`,
+            );
         }
       } else {
-        throw new Error(`Tipo de recurso de infraestructura no soportado: ${targetResource}`);
+        throw new Error(
+          `Tipo de recurso de infraestructura no soportado: ${targetResource}`,
+        );
       }
 
       // Determinar estado según umbrales
@@ -406,27 +437,34 @@ export default class MonitoringService {
       if (value !== undefined) {
         if (thresholds.critical !== undefined && value >= thresholds.critical) {
           status = MonitoringStatus.CRITICAL;
-        } else if (thresholds.error !== undefined && value >= thresholds.error) {
+        } else if (
+          thresholds.error !== undefined &&
+          value >= thresholds.error
+        ) {
           status = MonitoringStatus.ERROR;
-        } else if (thresholds.warning !== undefined && value >= thresholds.warning) {
+        } else if (
+          thresholds.warning !== undefined &&
+          value >= thresholds.warning
+        ) {
           status = MonitoringStatus.WARNING;
         }
       }
 
       const responseTime = Math.round(performance.now() - startTime);
-      
+
       return {
         status,
         responseTime,
         value,
-        details
+        details,
       };
     } catch (error) {
       ServerLogger.error(`Error en verificación de infraestructura:`, error);
       return {
         status: MonitoringStatus.ERROR,
         responseTime: Math.round(performance.now() - startTime),
-        errorMessage: error instanceof Error ? error.message : 'Error desconocido'
+        errorMessage:
+          error instanceof Error ? error.message : "Error desconocido",
       };
     }
   }
@@ -438,7 +476,7 @@ export default class MonitoringService {
    */
   private async checkApplication(config: any): Promise<MonitoringResultData> {
     const startTime = performance.now();
-    
+
     try {
       const { targetResource, parameters } = config;
       let responseTime: number | undefined;
@@ -446,13 +484,13 @@ export default class MonitoringService {
       let status = MonitoringStatus.SUCCESS;
 
       // Verificar endpoint de API
-      if (targetResource.startsWith('api:')) {
-        const endpoint = targetResource.split(':')[1];
-        const method = parameters?.method || 'GET';
+      if (targetResource.startsWith("api:")) {
+        const endpoint = targetResource.split(":")[1];
+        const method = parameters?.method || "GET";
         const timeout = parameters?.timeout || 5000;
         const headers = parameters?.headers || {};
         const data = parameters?.data;
-        
+
         try {
           const requestStartTime = performance.now();
           const response = await axios({
@@ -460,45 +498,54 @@ export default class MonitoringService {
             url: endpoint,
             headers,
             data,
-            timeout
+            timeout,
           });
-          
+
           responseTime = Math.round(performance.now() - requestStartTime);
-          
+
           details = {
             statusCode: response.status,
-            contentLength: response.headers['content-length'],
-            contentType: response.headers['content-type']
+            contentLength: response.headers["content-length"],
+            contentType: response.headers["content-type"],
           };
-          
+
           // Verificar código de estado HTTP
           if (response.status >= 500) {
             status = MonitoringStatus.ERROR;
           } else if (response.status >= 400) {
             status = MonitoringStatus.WARNING;
           }
-          
+
           // Verificar tiempo de respuesta contra umbrales
           const thresholds = config.alertThresholds;
           if (responseTime !== undefined) {
-            if (thresholds.critical !== undefined && responseTime >= thresholds.critical) {
+            if (
+              thresholds.critical !== undefined &&
+              responseTime >= thresholds.critical
+            ) {
               status = MonitoringStatus.CRITICAL;
-            } else if (thresholds.error !== undefined && responseTime >= thresholds.error) {
+            } else if (
+              thresholds.error !== undefined &&
+              responseTime >= thresholds.error
+            ) {
               status = MonitoringStatus.ERROR;
-            } else if (thresholds.warning !== undefined && responseTime >= thresholds.warning) {
+            } else if (
+              thresholds.warning !== undefined &&
+              responseTime >= thresholds.warning
+            ) {
               status = MonitoringStatus.WARNING;
             }
           }
         } catch (error) {
           if (axios.isAxiosError(error)) {
-            if (error.code === 'ECONNABORTED') {
+            if (error.code === "ECONNABORTED") {
               status = MonitoringStatus.CRITICAL;
-              details = { error: 'Timeout' };
+              details = { error: "Timeout" };
             } else if (error.response) {
               status = MonitoringStatus.ERROR;
               details = {
                 statusCode: error.response.status,
-                statusText: error.response.statusText
+                statusText: error.response.statusText,
               };
             } else {
               status = MonitoringStatus.CRITICAL;
@@ -508,32 +555,38 @@ export default class MonitoringService {
             throw error;
           }
         }
-      } else if (targetResource.startsWith('service:')) {
+      } else if (targetResource.startsWith("service:")) {
         // Verificar estado de servicio interno
-        const service = targetResource.split(':')[1];
-        
+        const service = targetResource.split(":")[1];
+
         // Aquí se implementaría la lógica real para verificar servicios internos
         // Este es un ejemplo simulado
-        const serviceStatus = Math.random() > 0.9 ? 'error' : 'ok';
-        status = serviceStatus === 'ok' ? MonitoringStatus.SUCCESS : MonitoringStatus.ERROR;
+        const serviceStatus = Math.random() > 0.9 ? "error" : "ok";
+        status =
+          serviceStatus === "ok"
+            ? MonitoringStatus.SUCCESS
+            : MonitoringStatus.ERROR;
         details = { service, status: serviceStatus };
       } else {
-        throw new Error(`Tipo de recurso de aplicación no soportado: ${targetResource}`);
+        throw new Error(
+          `Tipo de recurso de aplicación no soportado: ${targetResource}`,
+        );
       }
 
       const totalResponseTime = Math.round(performance.now() - startTime);
-      
+
       return {
         status,
         responseTime: responseTime || totalResponseTime,
-        details
+        details,
       };
     } catch (error) {
       ServerLogger.error(`Error en verificación de aplicación:`, error);
       return {
         status: MonitoringStatus.ERROR,
         responseTime: Math.round(performance.now() - startTime),
-        errorMessage: error instanceof Error ? error.message : 'Error desconocido'
+        errorMessage:
+          error instanceof Error ? error.message : "Error desconocido",
       };
     }
   }
@@ -543,9 +596,11 @@ export default class MonitoringService {
    * @param config Configuración de monitoreo
    * @returns Resultado de la verificación
    */
-  private async checkUserExperience(config: any): Promise<MonitoringResultData> {
+  private async checkUserExperience(
+    config: any,
+  ): Promise<MonitoringResultData> {
     const startTime = performance.now();
-    
+
     try {
       const { targetResource, parameters } = config;
       let value: number | undefined;
@@ -553,23 +608,25 @@ export default class MonitoringService {
       let status = MonitoringStatus.SUCCESS;
 
       // Implementación según el tipo de métrica de UX
-      if (targetResource.startsWith('pageload:')) {
+      if (targetResource.startsWith("pageload:")) {
         // Simulación de tiempo de carga de página
-        const page = targetResource.split(':')[1];
+        const page = targetResource.split(":")[1];
         value = Math.random() * 5000; // Tiempo en ms
-        details = { page, unit: 'ms' };
-      } else if (targetResource.startsWith('errors:')) {
+        details = { page, unit: "ms" };
+      } else if (targetResource.startsWith("errors:")) {
         // Simulación de tasa de errores del cliente
-        const errorType = targetResource.split(':')[1];
+        const errorType = targetResource.split(":")[1];
         value = Math.random() * 5; // Porcentaje de errores
-        details = { errorType, unit: '%' };
-      } else if (targetResource.startsWith('interaction:')) {
+        details = { errorType, unit: "%" };
+      } else if (targetResource.startsWith("interaction:")) {
         // Simulación de métricas de interacción
-        const interaction = targetResource.split(':')[1];
+        const interaction = targetResource.split(":")[1];
         value = Math.random() * 2000; // Tiempo en ms
-        details = { interaction, unit: 'ms' };
+        details = { interaction, unit: "ms" };
       } else {
-        throw new Error(`Tipo de métrica de experiencia de usuario no soportado: ${targetResource}`);
+        throw new Error(
+          `Tipo de métrica de experiencia de usuario no soportado: ${targetResource}`,
+        );
       }
 
       // Determinar estado según umbrales
@@ -577,27 +634,37 @@ export default class MonitoringService {
       if (value !== undefined) {
         if (thresholds.critical !== undefined && value >= thresholds.critical) {
           status = MonitoringStatus.CRITICAL;
-        } else if (thresholds.error !== undefined && value >= thresholds.error) {
+        } else if (
+          thresholds.error !== undefined &&
+          value >= thresholds.error
+        ) {
           status = MonitoringStatus.ERROR;
-        } else if (thresholds.warning !== undefined && value >= thresholds.warning) {
+        } else if (
+          thresholds.warning !== undefined &&
+          value >= thresholds.warning
+        ) {
           status = MonitoringStatus.WARNING;
         }
       }
 
       const responseTime = Math.round(performance.now() - startTime);
-      
+
       return {
         status,
         responseTime,
         value,
-        details
+        details,
       };
     } catch (error) {
-      ServerLogger.error(`Error en verificación de experiencia de usuario:`, error);
+      ServerLogger.error(
+        `Error en verificación de experiencia de usuario:`,
+        error,
+      );
       return {
         status: MonitoringStatus.ERROR,
         responseTime: Math.round(performance.now() - startTime),
-        errorMessage: error instanceof Error ? error.message : 'Error desconocido'
+        errorMessage:
+          error instanceof Error ? error.message : "Error desconocido",
       };
     }
   }
@@ -608,7 +675,10 @@ export default class MonitoringService {
    * @param result Resultado de la verificación
    * @returns Resultado guardado
    */
-  private async saveMonitoringResult(configId: number, result: MonitoringResultData) {
+  private async saveMonitoringResult(
+    configId: number,
+    result: MonitoringResultData,
+  ) {
     try {
       const savedResult = await this.prisma.monitoringResult.create({
         data: {
@@ -617,14 +687,17 @@ export default class MonitoringService {
           responseTime: result.responseTime,
           value: result.value,
           details: result.details || {},
-          errorMessage: result.errorMessage
-        }
+          errorMessage: result.errorMessage,
+        },
       });
 
       return savedResult;
     } catch (error) {
-      ServerLogger.error(`Error al guardar resultado de monitoreo para configuración ${configId}:`, error);
-      throw new Error('Error al guardar resultado de monitoreo');
+      ServerLogger.error(
+        `Error al guardar resultado de monitoreo para configuración ${configId}:`,
+        error,
+      );
+      throw new Error("Error al guardar resultado de monitoreo");
     }
   }
 
@@ -638,7 +711,7 @@ export default class MonitoringService {
     try {
       // Determinar si se debe generar una alerta según el estado
       let severity: AlertSeverity | null = null;
-      
+
       switch (result.status) {
         case MonitoringStatus.CRITICAL:
           severity = AlertSeverity.CRITICAL;
@@ -658,8 +731,8 @@ export default class MonitoringService {
       const existingAlert = await this.prisma.alert.findFirst({
         where: {
           configId: config.id,
-          status: AlertStatus.ACTIVE
-        }
+          status: AlertStatus.ACTIVE,
+        },
       });
 
       if (existingAlert) {
@@ -679,10 +752,10 @@ export default class MonitoringService {
           details: {
             result: result.details || {},
             value: result.value,
-            errorMessage: result.errorMessage
+            errorMessage: result.errorMessage,
           },
-          status: AlertStatus.ACTIVE
-        }
+          status: AlertStatus.ACTIVE,
+        },
       });
 
       // Enviar notificaciones
@@ -690,7 +763,10 @@ export default class MonitoringService {
 
       return alert;
     } catch (error) {
-      ServerLogger.error(`Error al verificar alertas para configuración ${config.id}:`, error);
+      ServerLogger.error(
+        `Error al verificar alertas para configuración ${config.id}:`,
+        error,
+      );
       // No propagar el error para no interrumpir el flujo principal
       return null;
     }
@@ -702,12 +778,15 @@ export default class MonitoringService {
    * @param result Resultado de la verificación
    * @returns Mensaje de alerta
    */
-  private generateAlertMessage(config: any, result: MonitoringResultData): string {
+  private generateAlertMessage(
+    config: any,
+    result: MonitoringResultData,
+  ): string {
     const resourceName = config.name;
     const status = result.status;
-    
+
     let message = `[${status}] ${resourceName}: `;
-    
+
     if (result.errorMessage) {
       message += result.errorMessage;
     } else if (result.value !== undefined) {
@@ -716,9 +795,9 @@ export default class MonitoringService {
         message += ` ${result.details.unit}`;
       }
     } else {
-      message += 'Problema detectado';
+      message += "Problema detectado";
     }
-    
+
     return message;
   }
 
@@ -730,29 +809,29 @@ export default class MonitoringService {
     try {
       // Obtener configuración de monitoreo
       const config = await this.getMonitoringConfigById(alert.configId);
-      
+
       // Obtener destinatarios de notificaciones (esto dependería de la implementación específica)
       const recipients = await this.getAlertRecipients(config);
-      
+
       for (const recipient of recipients) {
         try {
           // Enviar notificación según el canal
-          let status = 'SENT';
+          let status = "SENT";
           let errorMessage = null;
-          
+
           try {
             switch (recipient.channel) {
               case NotificationChannel.EMAIL:
                 await this.notificationService.sendEmail({
                   to: recipient.address,
                   subject: `Alerta: ${alert.message}`,
-                  body: this.formatAlertEmailBody(alert, config)
+                  body: this.formatAlertEmailBody(alert, config),
                 });
                 break;
               case NotificationChannel.SMS:
                 await this.notificationService.sendSMS({
                   to: recipient.address,
-                  message: alert.message
+                  message: alert.message,
                 });
                 break;
               case NotificationChannel.WEBHOOK:
@@ -762,24 +841,27 @@ export default class MonitoringService {
                     severity: alert.severity,
                     message: alert.message,
                     details: alert.details,
-                    timestamp: alert.timestamp
+                    timestamp: alert.timestamp,
                   },
                   config: {
                     id: config.id,
                     name: config.name,
                     type: config.monitoringType,
-                    resource: config.targetResource
-                  }
+                    resource: config.targetResource,
+                  },
                 });
                 break;
               default:
-                throw new Error(`Canal de notificación no soportado: ${recipient.channel}`);
+                throw new Error(
+                  `Canal de notificación no soportado: ${recipient.channel}`,
+                );
             }
           } catch (error) {
-            status = 'FAILED';
-            errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+            status = "FAILED";
+            errorMessage =
+              error instanceof Error ? error.message : "Error desconocido";
           }
-          
+
           // Registrar notificación
           await this.prisma.notificationLog.create({
             data: {
@@ -787,16 +869,22 @@ export default class MonitoringService {
               channel: recipient.channel,
               recipient: recipient.address,
               status,
-              errorMessage
-            }
+              errorMessage,
+            },
           });
         } catch (error) {
-          ServerLogger.error(`Error al enviar notificación a ${recipient.address}:`, error);
+          ServerLogger.error(
+            `Error al enviar notificación a ${recipient.address}:`,
+            error,
+          );
           // Continuar con el siguiente destinatario
         }
       }
     } catch (error) {
-      ServerLogger.error(`Error al enviar notificaciones para alerta ${alert.id}:`, error);
+      ServerLogger.error(
+        `Error al enviar notificaciones para alerta ${alert.id}:`,
+        error,
+      );
       // No propagar el error para no interrumpir el flujo principal
     }
   }
@@ -809,11 +897,11 @@ export default class MonitoringService {
   private async getAlertRecipients(config: any) {
     // Esta implementación dependería de la lógica específica de la aplicación
     // Por ejemplo, podría obtener administradores del sistema, usuarios suscritos, etc.
-    
+
     // Ejemplo simplificado
     return [
-      { channel: NotificationChannel.EMAIL, address: 'admin@example.com' },
-      { channel: NotificationChannel.EMAIL, address: 'alerts@example.com' },
+      { channel: NotificationChannel.EMAIL, address: "admin@example.com" },
+      { channel: NotificationChannel.EMAIL, address: "alerts@example.com" },
       // Otros destinatarios...
     ];
   }
@@ -833,7 +921,7 @@ export default class MonitoringService {
       <h3>Detalles</h3>
       <p><strong>Recurso monitoreado:</strong> ${config.name} (${config.targetResource})</p>
       <p><strong>Tipo de monitoreo:</strong> ${config.monitoringType}</p>
-      ${alert.details ? `<pre>${JSON.stringify(alert.details, null, 2)}</pre>` : ''}
+      ${alert.details ? `<pre>${JSON.stringify(alert.details, null, 2)}</pre>` : ""}
       <p>Acceda al <a href="#">panel de monitoreo</a> para más información.</p>
     `;
   }
@@ -845,36 +933,33 @@ export default class MonitoringService {
    */
   async getActiveAlerts(includeAcknowledged: boolean = false) {
     try {
-      const statuses = includeAcknowledged 
-        ? [AlertStatus.ACTIVE, AlertStatus.ACKNOWLEDGED] 
+      const statuses = includeAcknowledged
+        ? [AlertStatus.ACTIVE, AlertStatus.ACKNOWLEDGED]
         : [AlertStatus.ACTIVE];
-      
+
       const alerts = await this.prisma.alert.findMany({
         where: {
           status: { in: statuses },
           config: {
-            tenantId: this.tenantId
-          }
+            tenantId: this.tenantId,
+          },
         },
         include: {
           config: {
             select: {
               name: true,
               monitoringType: true,
-              targetResource: true
-            }
-          }
+              targetResource: true,
+            },
+          },
         },
-        orderBy: [
-          { severity: 'desc' },
-          { timestamp: 'desc' }
-        ]
+        orderBy: [{ severity: "desc" }, { timestamp: "desc" }],
       });
 
       return alerts;
     } catch (error) {
-      ServerLogger.error('Error al obtener alertas activas:', error);
-      throw new Error('Error al obtener alertas');
+      ServerLogger.error("Error al obtener alertas activas:", error);
+      throw new Error("Error al obtener alertas");
     }
   }
 
@@ -891,15 +976,15 @@ export default class MonitoringService {
         data: {
           status: AlertStatus.ACKNOWLEDGED,
           acknowledgedById: userId,
-          acknowledgedAt: new Date()
-        }
+          acknowledgedAt: new Date(),
+        },
       });
 
       ServerLogger.info(`Alerta ${alertId} reconocida por usuario ${userId}`);
       return alert;
     } catch (error) {
       ServerLogger.error(`Error al reconocer alerta ${alertId}:`, error);
-      throw new Error('Error al reconocer alerta');
+      throw new Error("Error al reconocer alerta");
     }
   }
 
@@ -915,15 +1000,15 @@ export default class MonitoringService {
         where: { id: alertId },
         data: {
           status: AlertStatus.RESOLVED,
-          resolvedAt: new Date()
-        }
+          resolvedAt: new Date(),
+        },
       });
 
       ServerLogger.info(`Alerta ${alertId} resuelta por usuario ${userId}`);
       return alert;
     } catch (error) {
       ServerLogger.error(`Error al resolver alerta ${alertId}:`, error);
-      throw new Error('Error al resolver alerta');
+      throw new Error("Error al resolver alerta");
     }
   }
 
@@ -934,19 +1019,26 @@ export default class MonitoringService {
    * @param offset Desplazamiento para paginación
    * @returns Lista de resultados
    */
-  async getMonitoringResults(configId: number, limit: number = 100, offset: number = 0) {
+  async getMonitoringResults(
+    configId: number,
+    limit: number = 100,
+    offset: number = 0,
+  ) {
     try {
       const results = await this.prisma.monitoringResult.findMany({
         where: { configId },
-        orderBy: { timestamp: 'desc' },
+        orderBy: { timestamp: "desc" },
         take: limit,
-        skip: offset
+        skip: offset,
       });
 
       return results;
     } catch (error) {
-      ServerLogger.error(`Error al obtener resultados de monitoreo para configuración ${configId}:`, error);
-      throw new Error('Error al obtener resultados de monitoreo');
+      ServerLogger.error(
+        `Error al obtener resultados de monitoreo para configuración ${configId}:`,
+        error,
+      );
+      throw new Error("Error al obtener resultados de monitoreo");
     }
   }
 
@@ -965,31 +1057,40 @@ export default class MonitoringService {
       const results = await this.prisma.monitoringResult.findMany({
         where: {
           configId,
-          timestamp: { gte: startDate }
+          timestamp: { gte: startDate },
         },
-        orderBy: { timestamp: 'asc' }
+        orderBy: { timestamp: "asc" },
       });
 
       // Calcular estadísticas
       const totalChecks = results.length;
-      const successChecks = results.filter(r => r.status === MonitoringStatus.SUCCESS).length;
-      const warningChecks = results.filter(r => r.status === MonitoringStatus.WARNING).length;
-      const errorChecks = results.filter(r => r.status === MonitoringStatus.ERROR).length;
-      const criticalChecks = results.filter(r => r.status === MonitoringStatus.CRITICAL).length;
+      const successChecks = results.filter(
+        (r) => r.status === MonitoringStatus.SUCCESS,
+      ).length;
+      const warningChecks = results.filter(
+        (r) => r.status === MonitoringStatus.WARNING,
+      ).length;
+      const errorChecks = results.filter(
+        (r) => r.status === MonitoringStatus.ERROR,
+      ).length;
+      const criticalChecks = results.filter(
+        (r) => r.status === MonitoringStatus.CRITICAL,
+      ).length;
 
       // Calcular disponibilidad
-      const availability = totalChecks > 0 
-        ? (successChecks / totalChecks) * 100 
-        : 0;
+      const availability =
+        totalChecks > 0 ? (successChecks / totalChecks) * 100 : 0;
 
       // Calcular tiempo de respuesta promedio
       const responseTimes = results
-        .filter(r => r.responseTime !== null && r.responseTime !== undefined)
-        .map(r => r.responseTime as number);
-      
-      const avgResponseTime = responseTimes.length > 0 
-        ? responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length 
-        : 0;
+        .filter((r) => r.responseTime !== null && r.responseTime !== undefined)
+        .map((r) => r.responseTime as number);
+
+      const avgResponseTime =
+        responseTimes.length > 0
+          ? responseTimes.reduce((sum, time) => sum + time, 0) /
+            responseTimes.length
+          : 0;
 
       // Agrupar por día para gráficos
       const dailyStats = this.groupResultsByDay(results, startDate, new Date());
@@ -1002,11 +1103,14 @@ export default class MonitoringService {
         criticalChecks,
         availability,
         avgResponseTime,
-        dailyStats
+        dailyStats,
       };
     } catch (error) {
-      ServerLogger.error(`Error al obtener estadísticas de monitoreo para configuración ${configId}:`, error);
-      throw new Error('Error al obtener estadísticas de monitoreo');
+      ServerLogger.error(
+        `Error al obtener estadísticas de monitoreo para configuración ${configId}:`,
+        error,
+      );
+      throw new Error("Error al obtener estadísticas de monitoreo");
     }
   }
 
@@ -1020,56 +1124,65 @@ export default class MonitoringService {
   private groupResultsByDay(results: any[], startDate: Date, endDate: Date) {
     const dailyStats: any[] = [];
     const currentDate = new Date(startDate);
-    
+
     // Iterar por cada día en el rango
     while (currentDate <= endDate) {
       const dayStart = new Date(currentDate);
       const dayEnd = new Date(currentDate);
       dayEnd.setHours(23, 59, 59, 999);
-      
+
       // Filtrar resultados para este día
-      const dayResults = results.filter(r => {
+      const dayResults = results.filter((r) => {
         const timestamp = new Date(r.timestamp);
         return timestamp >= dayStart && timestamp <= dayEnd;
       });
-      
+
       // Calcular estadísticas del día
       const totalChecks = dayResults.length;
-      const successChecks = dayResults.filter(r => r.status === MonitoringStatus.SUCCESS).length;
-      const warningChecks = dayResults.filter(r => r.status === MonitoringStatus.WARNING).length;
-      const errorChecks = dayResults.filter(r => r.status === MonitoringStatus.ERROR).length;
-      const criticalChecks = dayResults.filter(r => r.status === MonitoringStatus.CRITICAL).length;
-      
+      const successChecks = dayResults.filter(
+        (r) => r.status === MonitoringStatus.SUCCESS,
+      ).length;
+      const warningChecks = dayResults.filter(
+        (r) => r.status === MonitoringStatus.WARNING,
+      ).length;
+      const errorChecks = dayResults.filter(
+        (r) => r.status === MonitoringStatus.ERROR,
+      ).length;
+      const criticalChecks = dayResults.filter(
+        (r) => r.status === MonitoringStatus.CRITICAL,
+      ).length;
+
       // Calcular disponibilidad del día
-      const availability = totalChecks > 0 
-        ? (successChecks / totalChecks) * 100 
-        : 0;
-      
+      const availability =
+        totalChecks > 0 ? (successChecks / totalChecks) * 100 : 0;
+
       // Calcular tiempo de respuesta promedio del día
       const responseTimes = dayResults
-        .filter(r => r.responseTime !== null && r.responseTime !== undefined)
-        .map(r => r.responseTime as number);
-      
-      const avgResponseTime = responseTimes.length > 0 
-        ? responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length 
-        : 0;
-      
+        .filter((r) => r.responseTime !== null && r.responseTime !== undefined)
+        .map((r) => r.responseTime as number);
+
+      const avgResponseTime =
+        responseTimes.length > 0
+          ? responseTimes.reduce((sum, time) => sum + time, 0) /
+            responseTimes.length
+          : 0;
+
       // Añadir estadísticas del día
       dailyStats.push({
-        date: new Date(currentDate).toISOString().split('T')[0],
+        date: new Date(currentDate).toISOString().split("T")[0],
         totalChecks,
         successChecks,
         warningChecks,
         errorChecks,
         criticalChecks,
         availability,
-        avgResponseTime
+        avgResponseTime,
       });
-      
+
       // Avanzar al siguiente día
       currentDate.setDate(currentDate.getDate() + 1);
     }
-    
+
     return dailyStats;
   }
 }

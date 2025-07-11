@@ -1,14 +1,14 @@
 // frontend/src/app/api/financial/payments/export/route.ts
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { pool } from '@/lib/db';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { pool } from "@/lib/db";
 
 // GET /api/financial/payments/export
 export async function GET(_req: unknown) {
   try {
     const { searchParams } = new URL(req.url);
-    const startDate = searchParams.get('startDate');
-    const endDate = searchParams.get('endDate');
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
 
     let query = `
       SELECT 
@@ -40,10 +40,10 @@ export async function GET(_req: unknown) {
     const _result = await pool.query(query, params);
     return NextResponse.json(result.rows);
   } catch (error) {
-    console.error('Error exporting payments:', error);
+    console.error("Error exporting payments:", error);
     return NextResponse.json(
-      { error: 'Error al exportar pagos' },
-      { status: 500 }
+      { error: "Error al exportar pagos" },
+      { status: 500 },
     );
   }
 }

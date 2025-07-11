@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { usePathname } from 'next/navigation';
+import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Calendar, Users, Vote, FileText, ChevronRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Calendar, Users, Vote, FileText, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface AssembliesLayoutProps {
   children: React.ReactNode;
@@ -30,12 +30,12 @@ const menuItems = [
     title: "Actas y Documentos",
     href: "/dashboard/assemblies/documents",
     icon: FileText,
-  }
+  },
 ];
 
 const AssembliesLayout: React.FC<AssembliesLayoutProps> = ({ children }) => {
   const pathname = usePathname();
-  
+
   // Cuando estemos en /dashboard/assemblies, mostramos el sidebar y el contenido principal
   // Cuando estemos en una subpágina como scheduling, attendance, etc., solo mostramos el contenido
   const isMainAssembliesPage = pathname === "/dashboard/assemblies";
@@ -62,7 +62,7 @@ const AssembliesLayout: React.FC<AssembliesLayoutProps> = ({ children }) => {
                     "flex items-center gap-2 px-3 py-2 rounded-md transition-colors",
                     pathname === item.href
                       ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300"
-                      : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                      : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700",
                   )}
                 >
                   <item.icon className="h-4 w-4" />

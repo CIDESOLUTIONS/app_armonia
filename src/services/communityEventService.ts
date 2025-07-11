@@ -1,6 +1,6 @@
-import { getPrisma } from '@/lib/prisma';
-import { ServerLogger } from '@/lib/logging/server-logger';
-import { PrismaClient } from '@prisma/client';
+import { getPrisma } from "@/lib/prisma";
+import { ServerLogger } from "@/lib/logging/server-logger";
+import { PrismaClient } from "@prisma/client";
 
 interface CommunityEventData {
   title: string;
@@ -25,7 +25,11 @@ export class CommunityEventService {
     this.prisma = getPrisma(schemaName);
   }
 
-  async getEvents(complexId: number, filters: any, userRole: string): Promise<any[]> {
+  async getEvents(
+    complexId: number,
+    filters: any,
+    userRole: string,
+  ): Promise<any[]> {
     try {
       const where: any = { complexId };
 
@@ -57,17 +61,17 @@ export class CommunityEventService {
       }
 
       // Filtrar por roles si no es admin
-      if (userRole !== 'ADMIN' && userRole !== 'COMPLEX_ADMIN') {
+      if (userRole !== "ADMIN" && userRole !== "COMPLEX_ADMIN") {
         where.OR = [
           ...(where.OR || []),
-          { visibility: 'public' },
+          { visibility: "public" },
           { targetRoles: { has: userRole } },
         ];
       }
 
       const events = await this.prisma.communityEvent.findMany({
         where,
-        orderBy: { startDate: 'asc' },
+        orderBy: { startDate: "asc" },
         include: {
           createdBy: { select: { id: true, name: true } },
           attendees: { select: { userId: true, name: true, status: true } },
@@ -76,7 +80,10 @@ export class CommunityEventService {
 
       return events;
     } catch (error) {
-      ServerLogger.error(`[CommunityEventService] Error al obtener eventos para ${this.schemaName}:`, error);
+      ServerLogger.error(
+        `[CommunityEventService] Error al obtener eventos para ${this.schemaName}:`,
+        error,
+      );
       throw error;
     }
   }
@@ -92,7 +99,10 @@ export class CommunityEventService {
       });
       return event;
     } catch (error) {
-      ServerLogger.error(`[CommunityEventService] Error al obtener evento ${id} para ${this.schemaName}:`, error);
+      ServerLogger.error(
+        `[CommunityEventService] Error al obtener evento ${id} para ${this.schemaName}:`,
+        error,
+      );
       throw error;
     }
   }
@@ -114,15 +124,24 @@ export class CommunityEventService {
           complexId: data.complexId,
         },
       });
-      ServerLogger.info(`[CommunityEventService] Evento ${newEvent.id} creado para ${this.schemaName}`);
+      ServerLogger.info(
+        `[CommunityEventService] Evento ${newEvent.id} creado para ${this.schemaName}`,
+      );
       return newEvent;
     } catch (error) {
-      ServerLogger.error(`[CommunityEventService] Error al crear evento para ${this.schemaName}:`, error);
+      ServerLogger.error(
+        `[CommunityEventService] Error al crear evento para ${this.schemaName}:`,
+        error,
+      );
       throw error;
     }
   }
 
-  async updateEvent(id: number, complexId: number, data: Partial<CommunityEventData>): Promise<any> {
+  async updateEvent(
+    id: number,
+    complexId: number,
+    data: Partial<CommunityEventData>,
+  ): Promise<any> {
     try {
       const updatedEvent = await this.prisma.communityEvent.update({
         where: { id, complexId },
@@ -139,10 +158,15 @@ export class CommunityEventService {
           updatedAt: new Date(),
         },
       });
-      ServerLogger.info(`[CommunityEventService] Evento ${id} actualizado para ${this.schemaName}`);
+      ServerLogger.info(
+        `[CommunityEventService] Evento ${id} actualizado para ${this.schemaName}`,
+      );
       return updatedEvent;
     } catch (error) {
-      ServerLogger.error(`[CommunityEventService] Error al actualizar evento ${id} para ${this.schemaName}:`, error);
+      ServerLogger.error(
+        `[CommunityEventService] Error al actualizar evento ${id} para ${this.schemaName}:`,
+        error,
+      );
       throw error;
     }
   }
@@ -152,9 +176,14 @@ export class CommunityEventService {
       await this.prisma.communityEvent.delete({
         where: { id, complexId },
       });
-      ServerLogger.info(`[CommunityEventService] Evento ${id} eliminado para ${this.schemaName}`);
+      ServerLogger.info(
+        `[CommunityEventService] Evento ${id} eliminado para ${this.schemaName}`,
+      );
     } catch (error) {
-      ServerLogger.error(`[CommunityEventService] Error al eliminar evento ${id} para ${this.schemaName}:`, error);
+      ServerLogger.error(
+        `[CommunityEventService] Error al eliminar evento ${id} para ${this.schemaName}:`,
+        error,
+      );
       throw error;
     }
   }

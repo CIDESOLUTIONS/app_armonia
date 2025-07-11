@@ -1,6 +1,10 @@
-import React from 'react';
+import React from "react";
 
-export default function ReceptionLayout({ children }: { children: React.ReactNode }) {
+export default function ReceptionLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <h1>Portal de Recepción</h1>

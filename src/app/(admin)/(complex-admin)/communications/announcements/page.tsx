@@ -1,18 +1,36 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useAuthStore } from '@/store/authStore';
-import { Loader2, PlusCircle, Edit, Trash2, Eye } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/components/ui/use-toast';
-import { getAnnouncements, createAnnouncement, updateAnnouncement, deleteAnnouncement } from '@/services/announcementService';
+import React, { useState, useEffect, useCallback } from "react";
+import { useAuthStore } from "@/store/authStore";
+import { Loader2, PlusCircle, Edit, Trash2, Eye } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  getAnnouncements,
+  createAnnouncement,
+  updateAnnouncement,
+  deleteAnnouncement,
+} from "@/services/announcementService";
 
 interface Announcement {
   id: number;
@@ -30,12 +48,13 @@ export default function AnnouncementsPage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentAnnouncement, setCurrentAnnouncement] = useState<Announcement | null>(null);
+  const [currentAnnouncement, setCurrentAnnouncement] =
+    useState<Announcement | null>(null);
   const [formData, setFormData] = useState({
-    title: '',
-    content: '',
-    publishedAt: '',
-    expiresAt: '',
+    title: "",
+    content: "",
+    publishedAt: "",
+    expiresAt: "",
     isActive: true,
     targetRoles: [] as string[],
   });
@@ -46,11 +65,11 @@ export default function AnnouncementsPage() {
       const data = await getAnnouncements();
       setAnnouncements(data);
     } catch (error) {
-      console.error('Error fetching announcements:', error);
+      console.error("Error fetching announcements:", error);
       toast({
-        title: 'Error',
-        description: 'No se pudieron cargar los anuncios.',
-        variant: 'destructive',
+        title: "Error",
+        description: "No se pudieron cargar los anuncios.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -63,19 +82,22 @@ export default function AnnouncementsPage() {
     }
   }, [authLoading, user, fetchAnnouncements]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value, type } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+      [name]:
+        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
   };
 
   const handleRoleChange = (role: string, isChecked: boolean) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const newRoles = isChecked
         ? [...prev.targetRoles, role]
-        : prev.targetRoles.filter(r => r !== role);
+        : prev.targetRoles.filter((r) => r !== role);
       return { ...prev, targetRoles: newRoles };
     });
   };
@@ -83,10 +105,10 @@ export default function AnnouncementsPage() {
   const handleAddAnnouncement = () => {
     setCurrentAnnouncement(null);
     setFormData({
-      title: '',
-      content: '',
+      title: "",
+      content: "",
       publishedAt: new Date().toISOString().slice(0, 16),
-      expiresAt: '',
+      expiresAt: "",
       isActive: true,
       targetRoles: [],
     });
@@ -98,8 +120,12 @@ export default function AnnouncementsPage() {
     setFormData({
       title: announcement.title,
       content: announcement.content,
-      publishedAt: new Date(announcement.publishedAt).toISOString().slice(0, 16),
-      expiresAt: announcement.expiresAt ? new Date(announcement.expiresAt).toISOString().slice(0, 16) : '',
+      publishedAt: new Date(announcement.publishedAt)
+        .toISOString()
+        .slice(0, 16),
+      expiresAt: announcement.expiresAt
+        ? new Date(announcement.expiresAt).toISOString().slice(0, 16)
+        : "",
       isActive: announcement.isActive,
       targetRoles: announcement.targetRoles,
     });
@@ -112,43 +138,43 @@ export default function AnnouncementsPage() {
       if (currentAnnouncement) {
         await updateAnnouncement(currentAnnouncement.id, formData);
         toast({
-          title: 'Éxito',
-          description: 'Anuncio actualizado correctamente.',
+          title: "Éxito",
+          description: "Anuncio actualizado correctamente.",
         });
       } else {
         await createAnnouncement(formData);
         toast({
-          title: 'Éxito',
-          description: 'Anuncio creado correctamente.',
+          title: "Éxito",
+          description: "Anuncio creado correctamente.",
         });
       }
       setIsModalOpen(false);
       fetchAnnouncements();
     } catch (error) {
-      console.error('Error saving announcement:', error);
+      console.error("Error saving announcement:", error);
       toast({
-        title: 'Error',
-        description: 'Error al guardar el anuncio.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Error al guardar el anuncio.",
+        variant: "destructive",
       });
     }
   };
 
   const handleDeleteAnnouncement = async (id: number) => {
-    if (confirm('¿Estás seguro de que quieres eliminar este anuncio?')) {
+    if (confirm("¿Estás seguro de que quieres eliminar este anuncio?")) {
       try {
         await deleteAnnouncement(id);
         toast({
-          title: 'Éxito',
-          description: 'Anuncio eliminado correctamente.',
+          title: "Éxito",
+          description: "Anuncio eliminado correctamente.",
         });
         fetchAnnouncements();
       } catch (error) {
-        console.error('Error deleting announcement:', error);
+        console.error("Error deleting announcement:", error);
         toast({
-          title: 'Error',
-          description: 'Error al eliminar el anuncio.',
-          variant: 'destructive',
+          title: "Error",
+          description: "Error al eliminar el anuncio.",
+          variant: "destructive",
         });
       }
     }
@@ -162,12 +188,16 @@ export default function AnnouncementsPage() {
     );
   }
 
-  if (!user || (user.role !== 'ADMIN' && user.role !== 'COMPLEX_ADMIN')) {
+  if (!user || (user.role !== "ADMIN" && user.role !== "COMPLEX_ADMIN")) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Acceso Denegado</h1>
-          <p className="text-gray-600">No tienes permisos para acceder a esta página.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Acceso Denegado
+          </h1>
+          <p className="text-gray-600">
+            No tienes permisos para acceder a esta página.
+          </p>
         </div>
       </div>
     );
@@ -175,8 +205,10 @@ export default function AnnouncementsPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Gestión de Anuncios</h1>
-      
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        Gestión de Anuncios
+      </h1>
+
       <div className="flex justify-end mb-4">
         <Button onClick={handleAddAnnouncement}>
           <PlusCircle className="mr-2 h-4 w-4" /> Crear Anuncio
@@ -200,17 +232,36 @@ export default function AnnouncementsPage() {
               announcements.map((announcement) => (
                 <TableRow key={announcement.id}>
                   <TableCell>{announcement.title}</TableCell>
-                  <TableCell>{new Date(announcement.publishedAt).toLocaleDateString()}</TableCell>
-                  <TableCell>{announcement.expiresAt ? new Date(announcement.expiresAt).toLocaleDateString() : 'N/A'}</TableCell>
                   <TableCell>
-                    {announcement.isActive ? <Badge variant="default">Sí</Badge> : <Badge variant="destructive">No</Badge>}
+                    {new Date(announcement.publishedAt).toLocaleDateString()}
                   </TableCell>
-                  <TableCell>{announcement.targetRoles.join(', ')}</TableCell>
+                  <TableCell>
+                    {announcement.expiresAt
+                      ? new Date(announcement.expiresAt).toLocaleDateString()
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    {announcement.isActive ? (
+                      <Badge variant="default">Sí</Badge>
+                    ) : (
+                      <Badge variant="destructive">No</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>{announcement.targetRoles.join(", ")}</TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" onClick={() => handleEditAnnouncement(announcement)} className="mr-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEditAnnouncement(announcement)}
+                      className="mr-2"
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDeleteAnnouncement(announcement.id)}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteAnnouncement(announcement.id)}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </TableCell>
@@ -230,38 +281,88 @@ export default function AnnouncementsPage() {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>{currentAnnouncement ? 'Editar Anuncio' : 'Crear Nuevo Anuncio'}</DialogTitle>
+            <DialogTitle>
+              {currentAnnouncement ? "Editar Anuncio" : "Crear Nuevo Anuncio"}
+            </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="title" className="text-right">Título</Label>
-              <Input id="title" name="title" value={formData.title} onChange={handleInputChange} className="col-span-3" required />
+              <Label htmlFor="title" className="text-right">
+                Título
+              </Label>
+              <Input
+                id="title"
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                className="col-span-3"
+                required
+              />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="content" className="text-right">Contenido</Label>
-              <Textarea id="content" name="content" value={formData.content} onChange={handleInputChange} className="col-span-3" required />
+              <Label htmlFor="content" className="text-right">
+                Contenido
+              </Label>
+              <Textarea
+                id="content"
+                name="content"
+                value={formData.content}
+                onChange={handleInputChange}
+                className="col-span-3"
+                required
+              />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="publishedAt" className="text-right">Fecha Publicación</Label>
-              <Input id="publishedAt" name="publishedAt" type="datetime-local" value={formData.publishedAt} onChange={handleInputChange} className="col-span-3" required />
+              <Label htmlFor="publishedAt" className="text-right">
+                Fecha Publicación
+              </Label>
+              <Input
+                id="publishedAt"
+                name="publishedAt"
+                type="datetime-local"
+                value={formData.publishedAt}
+                onChange={handleInputChange}
+                className="col-span-3"
+                required
+              />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="expiresAt" className="text-right">Fecha Expiración</Label>
-              <Input id="expiresAt" name="expiresAt" type="datetime-local" value={formData.expiresAt} onChange={handleInputChange} className="col-span-3" />
+              <Label htmlFor="expiresAt" className="text-right">
+                Fecha Expiración
+              </Label>
+              <Input
+                id="expiresAt"
+                name="expiresAt"
+                type="datetime-local"
+                value={formData.expiresAt}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
             </div>
             <div className="flex items-center space-x-2">
-              <Checkbox id="isActive" name="isActive" checked={formData.isActive} onCheckedChange={(checked) => handleInputChange({ target: { name: 'isActive', value: checked } } as React.ChangeEvent<HTMLInputElement>)} />
+              <Checkbox
+                id="isActive"
+                name="isActive"
+                checked={formData.isActive}
+                onCheckedChange={(checked) =>
+                  handleInputChange({
+                    target: { name: "isActive", value: checked },
+                  } as React.ChangeEvent<HTMLInputElement>)
+                }
+              />
               <Label htmlFor="isActive">Activo</Label>
             </div>
             <div className="grid gap-2 col-span-full">
               <Label>Roles Objetivo</Label>
               <div className="flex flex-wrap gap-2">
-                {[ 'ADMIN', 'COMPLEX_ADMIN', 'RESIDENT', 'STAFF'].map(role => (
+                {["ADMIN", "COMPLEX_ADMIN", "RESIDENT", "STAFF"].map((role) => (
                   <div key={role} className="flex items-center space-x-2">
                     <Checkbox
                       id={`role-${role}`}
                       checked={formData.targetRoles.includes(role)}
-                      onCheckedChange={(checked) => handleRoleChange(role, checked as boolean)}
+                      onCheckedChange={(checked) =>
+                        handleRoleChange(role, checked as boolean)
+                      }
                     />
                     <Label htmlFor={`role-${role}`}>{role}</Label>
                   </div>
@@ -269,7 +370,9 @@ export default function AnnouncementsPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button type="submit">{currentAnnouncement ? 'Guardar Cambios' : 'Crear Anuncio'}</Button>
+              <Button type="submit">
+                {currentAnnouncement ? "Guardar Cambios" : "Crear Anuncio"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>

@@ -1,11 +1,11 @@
-import { fetchApi } from '@/lib/api';
+import { fetchApi } from "@/lib/api";
 
 interface PQR {
   id: number;
   subject: string;
   description: string;
-  status: 'OPEN' | 'IN_PROGRESS' | 'CLOSED' | 'REJECTED';
-  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+  status: "OPEN" | "IN_PROGRESS" | "CLOSED" | "REJECTED";
+  priority: "LOW" | "MEDIUM" | "HIGH";
   category: string;
   reportedById: number;
   reportedByName: string;
@@ -26,8 +26,8 @@ interface PQRComment {
 }
 
 interface GetPQRParams {
-  status?: 'OPEN' | 'IN_PROGRESS' | 'CLOSED' | 'REJECTED';
-  priority?: 'LOW' | 'MEDIUM' | 'HIGH';
+  status?: "OPEN" | "IN_PROGRESS" | "CLOSED" | "REJECTED";
+  priority?: "LOW" | "MEDIUM" | "HIGH";
   search?: string;
 }
 
@@ -35,7 +35,7 @@ interface CreatePQRData {
   subject: string;
   description: string;
   category: string;
-  priority?: 'LOW' | 'MEDIUM' | 'HIGH';
+  priority?: "LOW" | "MEDIUM" | "HIGH";
   reportedById: number;
 }
 
@@ -43,8 +43,8 @@ interface UpdatePQRData {
   id: number;
   subject?: string;
   description?: string;
-  status?: 'OPEN' | 'IN_PROGRESS' | 'CLOSED' | 'REJECTED';
-  priority?: 'LOW' | 'MEDIUM' | 'HIGH';
+  status?: "OPEN" | "IN_PROGRESS" | "CLOSED" | "REJECTED";
+  priority?: "LOW" | "MEDIUM" | "HIGH";
   category?: string;
   assignedToId?: number;
 }
@@ -52,14 +52,14 @@ interface UpdatePQRData {
 export async function getPQRs(params?: GetPQRParams): Promise<PQR[]> {
   try {
     const query = new URLSearchParams();
-    if (params?.status) query.append('status', params.status);
-    if (params?.priority) query.append('priority', params.priority);
-    if (params?.search) query.append('search', params.search);
+    if (params?.status) query.append("status", params.status);
+    if (params?.priority) query.append("priority", params.priority);
+    if (params?.search) query.append("search", params.search);
 
     const response = await fetchApi(`/api/pqr?${query.toString()}`);
     return response;
   } catch (error) {
-    console.error('Error fetching PQRs:', error);
+    console.error("Error fetching PQRs:", error);
     throw error;
   }
 }
@@ -76,64 +76,73 @@ export async function getPQRById(id: number): Promise<PQR> {
 
 export async function createPQR(data: CreatePQRData): Promise<PQR> {
   try {
-    const response = await fetchApi('/api/pqr', {
-      method: 'POST',
+    const response = await fetchApi("/api/pqr", {
+      method: "POST",
       body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
-    console.error('Error creating PQR:', error);
+    console.error("Error creating PQR:", error);
     throw error;
   }
 }
 
-export async function updatePQR(id: number, data: Partial<UpdatePQRData>): Promise<PQR> {
+export async function updatePQR(
+  id: number,
+  data: Partial<UpdatePQRData>,
+): Promise<PQR> {
   try {
-    const response = await fetchApi('/api/pqr', {
-      method: 'PUT',
+    const response = await fetchApi("/api/pqr", {
+      method: "PUT",
       body: JSON.stringify({ id, ...data }),
     });
     return response;
   } catch (error) {
-    console.error('Error updating PQR:', error);
+    console.error("Error updating PQR:", error);
     throw error;
   }
 }
 
 export async function deletePQR(id: number): Promise<void> {
   try {
-    await fetchApi('/api/pqr', {
-      method: 'DELETE',
+    await fetchApi("/api/pqr", {
+      method: "DELETE",
       body: JSON.stringify({ id }),
     });
   } catch (error) {
-    console.error('Error deleting PQR:', error);
+    console.error("Error deleting PQR:", error);
     throw error;
   }
 }
 
-export async function addPQRComment(pqrId: number, comment: string): Promise<PQRComment> {
+export async function addPQRComment(
+  pqrId: number,
+  comment: string,
+): Promise<PQRComment> {
   try {
-    const response = await fetchApi('/api/pqr/comment', {
-      method: 'POST',
+    const response = await fetchApi("/api/pqr/comment", {
+      method: "POST",
       body: JSON.stringify({ pqrId, comment }),
     });
     return response;
   } catch (error) {
-    console.error('Error adding PQR comment:', error);
+    console.error("Error adding PQR comment:", error);
     throw error;
   }
 }
 
-export async function assignPQR(pqrId: number, assignedToId: number): Promise<PQR> {
+export async function assignPQR(
+  pqrId: number,
+  assignedToId: number,
+): Promise<PQR> {
   try {
-    const response = await fetchApi('/api/pqr/assign', {
-      method: 'PUT',
+    const response = await fetchApi("/api/pqr/assign", {
+      method: "PUT",
       body: JSON.stringify({ pqrId, assignedToId }),
     });
     return response;
   } catch (error) {
-    console.error('Error assigning PQR:', error);
+    console.error("Error assigning PQR:", error);
     throw error;
   }
 }

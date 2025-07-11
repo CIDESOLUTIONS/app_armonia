@@ -1,13 +1,25 @@
 "use client";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Pencil, Eye, Trash2, Clock, MessagesSquare } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Pencil, Eye, Trash2, Clock, MessagesSquare } from "lucide-react";
 
-export type PQRType = 'PETITION' | 'COMPLAINT' | 'CLAIM';
-export type PQRPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
-export type PQRStatus = 'NEW' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED' | 'CANCELLED';
+export type PQRType = "PETITION" | "COMPLAINT" | "CLAIM";
+export type PQRPriority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+export type PQRStatus =
+  | "NEW"
+  | "IN_PROGRESS"
+  | "RESOLVED"
+  | "CLOSED"
+  | "CANCELLED";
 
 export interface PQR {
   id: number;
@@ -32,42 +44,48 @@ interface PQRListProps {
   language: string;
 }
 
-export default function PQRList({ pqrs, onView, onEdit, onDelete, language }: PQRListProps) {
+export default function PQRList({
+  pqrs,
+  onView,
+  onEdit,
+  onDelete,
+  language,
+}: PQRListProps) {
   // Helper to render appropriate status badge
   const renderStatusBadge = (status: PQRStatus) => {
-    let bgColor = '';
-    let textColor = '';
-    let label = '';
+    let bgColor = "";
+    let textColor = "";
+    let label = "";
 
     switch (status) {
-      case 'NEW':
-        bgColor = 'bg-blue-100';
-        textColor = 'text-blue-800';
-        label = language === 'Español' ? 'Nuevo' : 'New';
+      case "NEW":
+        bgColor = "bg-blue-100";
+        textColor = "text-blue-800";
+        label = language === "Español" ? "Nuevo" : "New";
         break;
-      case 'IN_PROGRESS':
-        bgColor = 'bg-yellow-100';
-        textColor = 'text-yellow-800';
-        label = language === 'Español' ? 'En Progreso' : 'In Progress';
+      case "IN_PROGRESS":
+        bgColor = "bg-yellow-100";
+        textColor = "text-yellow-800";
+        label = language === "Español" ? "En Progreso" : "In Progress";
         break;
-      case 'RESOLVED':
-        bgColor = 'bg-green-100';
-        textColor = 'text-green-800';
-        label = language === 'Español' ? 'Resuelto' : 'Resolved';
+      case "RESOLVED":
+        bgColor = "bg-green-100";
+        textColor = "text-green-800";
+        label = language === "Español" ? "Resuelto" : "Resolved";
         break;
-      case 'CLOSED':
-        bgColor = 'bg-gray-100';
-        textColor = 'text-gray-800';
-        label = language === 'Español' ? 'Cerrado' : 'Closed';
+      case "CLOSED":
+        bgColor = "bg-gray-100";
+        textColor = "text-gray-800";
+        label = language === "Español" ? "Cerrado" : "Closed";
         break;
-      case 'CANCELLED':
-        bgColor = 'bg-red-100';
-        textColor = 'text-red-800';
-        label = language === 'Español' ? 'Cancelado' : 'Cancelled';
+      case "CANCELLED":
+        bgColor = "bg-red-100";
+        textColor = "text-red-800";
+        label = language === "Español" ? "Cancelado" : "Cancelled";
         break;
       default:
-        bgColor = 'bg-gray-100';
-        textColor = 'text-gray-800';
+        bgColor = "bg-gray-100";
+        textColor = "text-gray-800";
         label = status;
     }
 
@@ -76,34 +94,34 @@ export default function PQRList({ pqrs, onView, onEdit, onDelete, language }: PQ
 
   // Helper to render appropriate priority badge
   const renderPriorityBadge = (priority: PQRPriority) => {
-    let bgColor = '';
-    let textColor = '';
-    let label = '';
+    let bgColor = "";
+    let textColor = "";
+    let label = "";
 
     switch (priority) {
-      case 'LOW':
-        bgColor = 'bg-green-100';
-        textColor = 'text-green-800';
-        label = language === 'Español' ? 'Baja' : 'Low';
+      case "LOW":
+        bgColor = "bg-green-100";
+        textColor = "text-green-800";
+        label = language === "Español" ? "Baja" : "Low";
         break;
-      case 'MEDIUM':
-        bgColor = 'bg-blue-100';
-        textColor = 'text-blue-800';
-        label = language === 'Español' ? 'Media' : 'Medium';
+      case "MEDIUM":
+        bgColor = "bg-blue-100";
+        textColor = "text-blue-800";
+        label = language === "Español" ? "Media" : "Medium";
         break;
-      case 'HIGH':
-        bgColor = 'bg-orange-100';
-        textColor = 'text-orange-800';
-        label = language === 'Español' ? 'Alta' : 'High';
+      case "HIGH":
+        bgColor = "bg-orange-100";
+        textColor = "text-orange-800";
+        label = language === "Español" ? "Alta" : "High";
         break;
-      case 'URGENT':
-        bgColor = 'bg-red-100';
-        textColor = 'text-red-800';
-        label = language === 'Español' ? 'Urgente' : 'Urgent';
+      case "URGENT":
+        bgColor = "bg-red-100";
+        textColor = "text-red-800";
+        label = language === "Español" ? "Urgente" : "Urgent";
         break;
       default:
-        bgColor = 'bg-gray-100';
-        textColor = 'text-gray-800';
+        bgColor = "bg-gray-100";
+        textColor = "text-gray-800";
         label = priority;
     }
 
@@ -112,29 +130,29 @@ export default function PQRList({ pqrs, onView, onEdit, onDelete, language }: PQ
 
   // Helper to render appropriate type badge
   const renderTypeBadge = (type: PQRType) => {
-    let bgColor = '';
-    let textColor = '';
-    let label = '';
+    let bgColor = "";
+    let textColor = "";
+    let label = "";
 
     switch (type) {
-      case 'PETITION':
-        bgColor = 'bg-indigo-100';
-        textColor = 'text-indigo-800';
-        label = language === 'Español' ? 'Petición' : 'Petition';
+      case "PETITION":
+        bgColor = "bg-indigo-100";
+        textColor = "text-indigo-800";
+        label = language === "Español" ? "Petición" : "Petition";
         break;
-      case 'COMPLAINT':
-        bgColor = 'bg-purple-100';
-        textColor = 'text-purple-800';
-        label = language === 'Español' ? 'Queja' : 'Complaint';
+      case "COMPLAINT":
+        bgColor = "bg-purple-100";
+        textColor = "text-purple-800";
+        label = language === "Español" ? "Queja" : "Complaint";
         break;
-      case 'CLAIM':
-        bgColor = 'bg-pink-100';
-        textColor = 'text-pink-800';
-        label = language === 'Español' ? 'Reclamo' : 'Claim';
+      case "CLAIM":
+        bgColor = "bg-pink-100";
+        textColor = "text-pink-800";
+        label = language === "Español" ? "Reclamo" : "Claim";
         break;
       default:
-        bgColor = 'bg-gray-100';
-        textColor = 'text-gray-800';
+        bgColor = "bg-gray-100";
+        textColor = "text-gray-800";
         label = type;
     }
 
@@ -146,12 +164,12 @@ export default function PQRList({ pqrs, onView, onEdit, onDelete, language }: PQ
       <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 text-center">
         <MessagesSquare className="mx-auto h-12 w-12 text-gray-400" />
         <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-gray-100">
-          {language === 'Español' ? 'No hay solicitudes' : 'No requests'}
+          {language === "Español" ? "No hay solicitudes" : "No requests"}
         </h3>
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          {language === 'Español'
-            ? 'No se encontraron peticiones, quejas o reclamos'
-            : 'No petitions, complaints or claims found'}
+          {language === "Español"
+            ? "No se encontraron peticiones, quejas o reclamos"
+            : "No petitions, complaints or claims found"}
         </p>
       </div>
     );
@@ -163,15 +181,25 @@ export default function PQRList({ pqrs, onView, onEdit, onDelete, language }: PQ
         <TableHeader>
           <TableRow>
             <TableHead>ID</TableHead>
-            <TableHead>{language === 'Español' ? 'Título' : 'Title'}</TableHead>
-            <TableHead>{language === 'Español' ? 'Tipo' : 'Type'}</TableHead>
-            <TableHead>{language === 'Español' ? 'Estado' : 'Status'}</TableHead>
-            <TableHead>{language === 'Español' ? 'Prioridad' : 'Priority'}</TableHead>
-            <TableHead>{language === 'Español' ? 'Unidad' : 'Unit'}</TableHead>
-            <TableHead>{language === 'Español' ? 'Residente' : 'Resident'}</TableHead>
-            <TableHead>{language === 'Español' ? 'Asignado' : 'Assigned'}</TableHead>
-            <TableHead>{language === 'Español' ? 'Fecha' : 'Date'}</TableHead>
-            <TableHead className="text-right">{language === 'Español' ? 'Acciones' : 'Actions'}</TableHead>
+            <TableHead>{language === "Español" ? "Título" : "Title"}</TableHead>
+            <TableHead>{language === "Español" ? "Tipo" : "Type"}</TableHead>
+            <TableHead>
+              {language === "Español" ? "Estado" : "Status"}
+            </TableHead>
+            <TableHead>
+              {language === "Español" ? "Prioridad" : "Priority"}
+            </TableHead>
+            <TableHead>{language === "Español" ? "Unidad" : "Unit"}</TableHead>
+            <TableHead>
+              {language === "Español" ? "Residente" : "Resident"}
+            </TableHead>
+            <TableHead>
+              {language === "Español" ? "Asignado" : "Assigned"}
+            </TableHead>
+            <TableHead>{language === "Español" ? "Fecha" : "Date"}</TableHead>
+            <TableHead className="text-right">
+              {language === "Español" ? "Acciones" : "Actions"}
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -184,13 +212,15 @@ export default function PQRList({ pqrs, onView, onEdit, onDelete, language }: PQ
               <TableCell>{renderTypeBadge(pqr.type)}</TableCell>
               <TableCell>{renderStatusBadge(pqr.status)}</TableCell>
               <TableCell>{renderPriorityBadge(pqr.priority)}</TableCell>
-              <TableCell>{pqr.propertyUnit || '-'}</TableCell>
-              <TableCell>{pqr.residentName || '-'}</TableCell>
-              <TableCell>{pqr.assignedTo || (
-                <span className="text-gray-500 italic">
-                  {language === 'Español' ? 'Sin asignar' : 'Unassigned'}
-                </span>
-              )}</TableCell>
+              <TableCell>{pqr.propertyUnit || "-"}</TableCell>
+              <TableCell>{pqr.residentName || "-"}</TableCell>
+              <TableCell>
+                {pqr.assignedTo || (
+                  <span className="text-gray-500 italic">
+                    {language === "Español" ? "Sin asignar" : "Unassigned"}
+                  </span>
+                )}
+              </TableCell>
               <TableCell className="whitespace-nowrap">
                 <div className="flex items-center">
                   <Clock className="h-3 w-3 mr-1 text-gray-500" />

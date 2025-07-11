@@ -3,16 +3,13 @@
  * Incluye funcionalidades para procesamiento de pagos con múltiples pasarelas
  */
 
-import { prisma } from '@/lib/prisma';
-import { ServerLogger } from '@/lib/logging/server-logger';
-import { ActivityLogger } from '@/lib/logging/activity-logger';
-import { NotificationService } from '@/lib/communications/notification-service';
-import { generateReceipt, sendReceiptByEmail } from '@/lib/pdf/receipt-service';
-import { encrypt, decrypt } from '@/lib/security/encryption-service';
-import { 
-  TransactionStatus,
-  DiscountType
-} from '@prisma/client';
+import { prisma } from "@/lib/prisma";
+import { ServerLogger } from "@/lib/logging/server-logger";
+import { ActivityLogger } from "@/lib/logging/activity-logger";
+import { NotificationService } from "@/lib/communications/notification-service";
+import { generateReceipt, sendReceiptByEmail } from "@/lib/pdf/receipt-service";
+import { encrypt, decrypt } from "@/lib/security/encryption-service";
+import { TransactionStatus, DiscountType } from "@prisma/client";
 
 // Interfaces para DTOs
 export interface CreateTransactionDto {
@@ -82,14 +79,14 @@ export class PayUAdapter implements PaymentGatewayAdapter {
       this.apiKey = config.apiKey;
       this.apiSecret = config.apiSecret;
       this.merchantId = config.merchantId;
-      this.accountId = config.accountId || '';
+      this.accountId = config.accountId || "";
       this.testMode = config.testMode || false;
-      
+
       // Validar credenciales con una llamada de prueba
       // Implementación simplificada para el ejemplo
       return true;
     } catch (error) {
-      ServerLogger.error('Error inicializando PayU', error);
+      ServerLogger.error("Error inicializando PayU", error);
       throw error;
     }
   }
@@ -97,18 +94,18 @@ export class PayUAdapter implements PaymentGatewayAdapter {
   async createPayment(transaction: any): Promise<any> {
     try {
       // Implementación simplificada - en producción se haría una llamada real a la API de PayU
-      const paymentUrl = this.testMode 
+      const paymentUrl = this.testMode
         ? `https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu/payment/${transaction.id}`
         : `https://checkout.payulatam.com/ppp-web-gateway-payu/payment/${transaction.id}`;
-      
+
       return {
         success: true,
         paymentUrl,
         gatewayReference: `PAYU_${Date.now()}_${transaction.id}`,
-        status: 'PENDING'
+        status: "PENDING",
       };
     } catch (error) {
-      ServerLogger.error('Error creando pago en PayU', error);
+      ServerLogger.error("Error creando pago en PayU", error);
       throw error;
     }
   }
@@ -119,15 +116,15 @@ export class PayUAdapter implements PaymentGatewayAdapter {
       return {
         success: true,
         gatewayReference: `PAYU_${Date.now()}_${transactionId}`,
-        status: 'COMPLETED',
+        status: "COMPLETED",
         response: {
           authorizationCode: `AUTH_${Math.floor(Math.random() * 1000000)}`,
-          processorResponseCode: '00',
-          transactionDate: new Date().toISOString()
-        }
+          processorResponseCode: "00",
+          transactionDate: new Date().toISOString(),
+        },
       };
     } catch (error) {
-      ServerLogger.error('Error procesando pago en PayU', error);
+      ServerLogger.error("Error procesando pago en PayU", error);
       throw error;
     }
   }
@@ -137,15 +134,15 @@ export class PayUAdapter implements PaymentGatewayAdapter {
       // Implementación simplificada - en producción se verificaría el estado con PayU
       return {
         success: true,
-        status: 'COMPLETED',
+        status: "COMPLETED",
         response: {
-          authorizationCode: gatewayReference.split('_')[2],
-          processorResponseCode: '00',
-          transactionDate: new Date().toISOString()
-        }
+          authorizationCode: gatewayReference.split("_")[2],
+          processorResponseCode: "00",
+          transactionDate: new Date().toISOString(),
+        },
       };
     } catch (error) {
-      ServerLogger.error('Error verificando pago en PayU', error);
+      ServerLogger.error("Error verificando pago en PayU", error);
       throw error;
     }
   }
@@ -156,11 +153,11 @@ export class PayUAdapter implements PaymentGatewayAdapter {
       return {
         success: true,
         refundReference: `REFUND_${gatewayReference}`,
-        status: 'REFUNDED',
-        amount: amount
+        status: "REFUNDED",
+        amount: amount,
       };
     } catch (error) {
-      ServerLogger.error('Error reembolsando pago en PayU', error);
+      ServerLogger.error("Error reembolsando pago en PayU", error);
       throw error;
     }
   }
@@ -171,7 +168,7 @@ export class PayUAdapter implements PaymentGatewayAdapter {
       // Ejemplo: HMAC-SHA256 del payload con el secreto
       return true;
     } catch (error) {
-      ServerLogger.error('Error validando webhook de PayU', error);
+      ServerLogger.error("Error validando webhook de PayU", error);
       throw error;
     }
   }
@@ -188,12 +185,12 @@ export class WompiAdapter implements PaymentGatewayAdapter {
       this.apiKey = config.apiKey;
       this.apiSecret = config.apiSecret;
       this.testMode = config.testMode || false;
-      
+
       // Validar credenciales con una llamada de prueba
       // Implementación simplificada para el ejemplo
       return true;
     } catch (error) {
-      ServerLogger.error('Error inicializando Wompi', error);
+      ServerLogger.error("Error inicializando Wompi", error);
       throw error;
     }
   }
@@ -201,18 +198,18 @@ export class WompiAdapter implements PaymentGatewayAdapter {
   async createPayment(transaction: any): Promise<any> {
     try {
       // Implementación simplificada - en producción se haría una llamada real a la API de Wompi
-      const paymentUrl = this.testMode 
+      const paymentUrl = this.testMode
         ? `https://sandbox.checkout.wompi.co/p/${transaction.id}`
         : `https://checkout.wompi.co/p/${transaction.id}`;
-      
+
       return {
         success: true,
         paymentUrl,
         gatewayReference: `WOMPI_${Date.now()}_${transaction.id}`,
-        status: 'PENDING'
+        status: "PENDING",
       };
     } catch (error) {
-      ServerLogger.error('Error creando pago en Wompi', error);
+      ServerLogger.error("Error creando pago en Wompi", error);
       throw error;
     }
   }
@@ -223,15 +220,15 @@ export class WompiAdapter implements PaymentGatewayAdapter {
       return {
         success: true,
         gatewayReference: `WOMPI_${Date.now()}_${transactionId}`,
-        status: 'COMPLETED',
+        status: "COMPLETED",
         response: {
           authorizationCode: `AUTH_${Math.floor(Math.random() * 1000000)}`,
-          processorResponseCode: 'APPROVED',
-          transactionDate: new Date().toISOString()
-        }
+          processorResponseCode: "APPROVED",
+          transactionDate: new Date().toISOString(),
+        },
       };
     } catch (error) {
-      ServerLogger.error('Error procesando pago en Wompi', error);
+      ServerLogger.error("Error procesando pago en Wompi", error);
       throw error;
     }
   }
@@ -241,15 +238,15 @@ export class WompiAdapter implements PaymentGatewayAdapter {
       // Implementación simplificada - en producción se verificaría el estado con Wompi
       return {
         success: true,
-        status: 'COMPLETED',
+        status: "COMPLETED",
         response: {
-          authorizationCode: gatewayReference.split('_')[2],
-          processorResponseCode: 'APPROVED',
-          transactionDate: new Date().toISOString()
-        }
+          authorizationCode: gatewayReference.split("_")[2],
+          processorResponseCode: "APPROVED",
+          transactionDate: new Date().toISOString(),
+        },
       };
     } catch (error) {
-      ServerLogger.error('Error verificando pago en Wompi', error);
+      ServerLogger.error("Error verificando pago en Wompi", error);
       throw error;
     }
   }
@@ -260,11 +257,11 @@ export class WompiAdapter implements PaymentGatewayAdapter {
       return {
         success: true,
         refundReference: `REFUND_${gatewayReference}`,
-        status: 'REFUNDED',
-        amount: amount
+        status: "REFUNDED",
+        amount: amount,
       };
     } catch (error) {
-      ServerLogger.error('Error reembolsando pago en Wompi', error);
+      ServerLogger.error("Error reembolsando pago en Wompi", error);
       throw error;
     }
   }
@@ -274,7 +271,7 @@ export class WompiAdapter implements PaymentGatewayAdapter {
       // Implementación simplificada - en producción se validaría la firma con el algoritmo correcto
       return true;
     } catch (error) {
-      ServerLogger.error('Error validando webhook de Wompi', error);
+      ServerLogger.error("Error validando webhook de Wompi", error);
       throw error;
     }
   }
@@ -284,9 +281,9 @@ export class WompiAdapter implements PaymentGatewayAdapter {
 export class PaymentGatewayFactory {
   static createAdapter(gatewayName: string): PaymentGatewayAdapter | null {
     switch (gatewayName.toLowerCase()) {
-      case 'payu':
+      case "payu":
         return new PayUAdapter();
-      case 'wompi':
+      case "wompi":
         return new WompiAdapter();
       default:
         ServerLogger.error(`Pasarela no soportada: ${gatewayName}`);
@@ -304,34 +301,38 @@ export class PaymentService {
     try {
       // Validar datos básicos
       if (!data.amount || data.amount <= 0) {
-        throw new Error('El monto debe ser mayor a cero');
+        throw new Error("El monto debe ser mayor a cero");
       }
 
       // Obtener configuración de la pasarela
       const gateway = await prisma.paymentGateway.findUnique({
-        where: { id: data.gatewayId, isActive: true }
+        where: { id: data.gatewayId, isActive: true },
       });
 
       if (!gateway) {
-        throw new Error('Pasarela de pago no encontrada o inactiva');
+        throw new Error("Pasarela de pago no encontrada o inactiva");
       }
 
       // Obtener método de pago
       const paymentMethod = await prisma.paymentMethod.findUnique({
-        where: { id: data.methodId, isActive: true }
+        where: { id: data.methodId, isActive: true },
       });
 
       if (!paymentMethod) {
-        throw new Error('Método de pago no encontrado o inactivo');
+        throw new Error("Método de pago no encontrado o inactivo");
       }
 
       // Validar límites del método de pago
       if (paymentMethod.minAmount && data.amount < paymentMethod.minAmount) {
-        throw new Error(`El monto mínimo para este método de pago es ${paymentMethod.minAmount}`);
+        throw new Error(
+          `El monto mínimo para este método de pago es ${paymentMethod.minAmount}`,
+        );
       }
 
       if (paymentMethod.maxAmount && data.amount > paymentMethod.maxAmount) {
-        throw new Error(`El monto máximo para este método de pago es ${paymentMethod.maxAmount}`);
+        throw new Error(
+          `El monto máximo para este método de pago es ${paymentMethod.maxAmount}`,
+        );
       }
 
       // Aplicar recargo si corresponde
@@ -346,7 +347,7 @@ export class PaymentService {
           userId: data.userId,
           invoiceId: data.invoiceId,
           amount: finalAmount,
-          currency: data.currency || 'COP',
+          currency: data.currency || "COP",
           description: data.description,
           status: TransactionStatus.PENDING,
           gatewayId: data.gatewayId,
@@ -355,23 +356,25 @@ export class PaymentService {
           metadata: data.metadata || {},
           ipAddress: data.ipAddress,
           userAgent: data.userAgent,
-          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 horas por defecto
-        }
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 horas por defecto
+        },
       });
 
       // Registrar actividad
       await ActivityLogger.log({
-        action: 'payment.transaction.create',
+        action: "payment.transaction.create",
         userId: data.userId,
-        entityType: 'transaction',
+        entityType: "transaction",
         entityId: transaction.id,
-        details: { amount: finalAmount, currency: transaction.currency }
+        details: { amount: finalAmount, currency: transaction.currency },
       });
 
       // Crear pago en la pasarela
       const adapter = PaymentGatewayFactory.createAdapter(gateway.name);
       if (!adapter) {
-        throw new Error(`No se pudo crear adaptador para la pasarela ${gateway.name}`);
+        throw new Error(
+          `No se pudo crear adaptador para la pasarela ${gateway.name}`,
+        );
       }
 
       // Inicializar adaptador con configuración
@@ -381,7 +384,7 @@ export class PaymentService {
         merchantId: gateway.merchantId,
         accountId: gateway.accountId,
         testMode: gateway.testMode,
-        ...gateway.config
+        ...gateway.config,
       };
 
       await adapter.initialize(gatewayConfig);
@@ -394,7 +397,7 @@ export class PaymentService {
         description: transaction.description,
         userId: transaction.userId,
         invoiceId: transaction.invoiceId,
-        paymentData: transaction.paymentData
+        paymentData: transaction.paymentData,
       });
 
       // Actualizar transacción con datos de la pasarela
@@ -404,14 +407,14 @@ export class PaymentService {
           gatewayReference: gatewayResponse.gatewayReference,
           paymentUrl: gatewayResponse.paymentUrl,
           gatewayResponse: gatewayResponse,
-          status: this.mapGatewayStatus(gatewayResponse.status)
-        }
+          status: this.mapGatewayStatus(gatewayResponse.status),
+        },
       });
 
       return updatedTransaction;
     } catch (error) {
-      ServerLogger.error('Error al crear transacción de pago', error);
-      throw new Error('No se pudo crear la transacción de pago');
+      ServerLogger.error("Error al crear transacción de pago", error);
+      throw new Error("No se pudo crear la transacción de pago");
     }
   }
 
@@ -423,38 +426,46 @@ export class PaymentService {
       const transaction = await prisma.transaction.findUnique({
         where: { id: transactionId },
         include: {
-          gateway: true
-        }
+          gateway: true,
+        },
       });
 
       if (!transaction) {
-        throw new Error('Transacción no encontrada');
+        throw new Error("Transacción no encontrada");
       }
 
       if (!transaction.gatewayReference) {
-        throw new Error('La transacción no tiene referencia de pasarela');
+        throw new Error("La transacción no tiene referencia de pasarela");
       }
 
       // Verificar estado en la pasarela
-      const adapter = PaymentGatewayFactory.createAdapter(transaction.gateway.name);
+      const adapter = PaymentGatewayFactory.createAdapter(
+        transaction.gateway.name,
+      );
       if (!adapter) {
-        throw new Error(`No se pudo crear adaptador para la pasarela ${transaction.gateway.name}`);
+        throw new Error(
+          `No se pudo crear adaptador para la pasarela ${transaction.gateway.name}`,
+        );
       }
 
       // Inicializar adaptador con configuración
       const gatewayConfig = {
         apiKey: await EncryptionService.decrypt(transaction.gateway.apiKey),
-        apiSecret: await EncryptionService.decrypt(transaction.gateway.apiSecret),
+        apiSecret: await EncryptionService.decrypt(
+          transaction.gateway.apiSecret,
+        ),
         merchantId: transaction.gateway.merchantId,
         accountId: transaction.gateway.accountId,
         testMode: transaction.gateway.testMode,
-        ...transaction.gateway.config
+        ...transaction.gateway.config,
       };
 
       await adapter.initialize(gatewayConfig);
 
       // Verificar pago
-      const gatewayResponse = await adapter.verifyPayment(transaction.gatewayReference);
+      const gatewayResponse = await adapter.verifyPayment(
+        transaction.gatewayReference,
+      );
 
       // Determinar estado final
       const finalStatus = this.mapGatewayStatus(gatewayResponse.status);
@@ -468,8 +479,8 @@ export class PaymentService {
           data: {
             status: finalStatus,
             gatewayResponse: gatewayResponse,
-            completedAt: isCompleted ? new Date() : transaction.completedAt
-          }
+            completedAt: isCompleted ? new Date() : transaction.completedAt,
+          },
         });
 
         // Si el pago fue completado y no estaba completado antes
@@ -479,45 +490,47 @@ export class PaymentService {
             await prisma.invoice.update({
               where: { id: transaction.invoiceId },
               data: {
-                status: 'PAID',
+                status: "PAID",
                 paidAt: new Date(),
-                paidAmount: transaction.amount
-              }
+                paidAmount: transaction.amount,
+              },
             });
           }
 
           // Generar recibo
-          const receipt = await ReceiptService.generatePaymentReceipt(transaction.id);
-          
+          const receipt = await ReceiptService.generatePaymentReceipt(
+            transaction.id,
+          );
+
           // Actualizar transacción con recibo
           await prisma.transaction.update({
             where: { id: transaction.id },
             data: {
               receiptId: receipt.id,
-              receiptUrl: receipt.url
-            }
+              receiptUrl: receipt.url,
+            },
           });
 
           // Enviar notificación al usuario
           await NotificationService.sendNotification({
             userId: transaction.userId,
-            title: 'Pago confirmado',
+            title: "Pago confirmado",
             content: `Su pago por ${transaction.amount} ${transaction.currency} ha sido confirmado.`,
-            type: 'PAYMENT',
-            actionUrl: `/payments/receipt/${receipt.id}`
+            type: "PAYMENT",
+            actionUrl: `/payments/receipt/${receipt.id}`,
           });
 
           // Registrar actividad
           await ActivityLogger.log({
-            action: 'payment.transaction.completed',
+            action: "payment.transaction.completed",
             userId: transaction.userId,
-            entityType: 'transaction',
+            entityType: "transaction",
             entityId: transaction.id,
-            details: { 
-              amount: transaction.amount, 
+            details: {
+              amount: transaction.amount,
               currency: transaction.currency,
-              gatewayReference: transaction.gatewayReference
-            }
+              gatewayReference: transaction.gatewayReference,
+            },
           });
         }
 
@@ -526,22 +539,26 @@ export class PaymentService {
 
       return transaction;
     } catch (error) {
-      ServerLogger.error('Error al verificar transacción', error);
-      throw new Error('No se pudo verificar la transacción');
+      ServerLogger.error("Error al verificar transacción", error);
+      throw new Error("No se pudo verificar la transacción");
     }
   }
 
   /**
    * Procesa un webhook de pasarela de pago
    */
-  static async processWebhook(gatewayName: string, payload: any, signature: string): Promise<any> {
+  static async processWebhook(
+    gatewayName: string,
+    payload: any,
+    signature: string,
+  ): Promise<any> {
     try {
       // Obtener configuración de la pasarela
       const gateway = await prisma.paymentGateway.findFirst({
-        where: { 
-          name: { equals: gatewayName, mode: 'insensitive' },
-          isActive: true 
-        }
+        where: {
+          name: { equals: gatewayName, mode: "insensitive" },
+          isActive: true,
+        },
       });
 
       if (!gateway) {
@@ -551,29 +568,38 @@ export class PaymentService {
       // Crear adaptador
       const adapter = PaymentGatewayFactory.createAdapter(gateway.name);
       if (!adapter) {
-        throw new Error(`No se pudo crear adaptador para la pasarela ${gateway.name}`);
+        throw new Error(
+          `No se pudo crear adaptador para la pasarela ${gateway.name}`,
+        );
       }
 
       // Validar firma del webhook
       const isValid = adapter.validateWebhook(payload, signature);
       if (!isValid) {
-        throw new Error('Firma de webhook inválida');
+        throw new Error("Firma de webhook inválida");
       }
 
       // Extraer referencia de transacción del payload
       // Nota: Esto depende de la estructura específica del webhook de cada pasarela
-      const gatewayReference = this.extractGatewayReference(gateway.name, payload);
+      const gatewayReference = this.extractGatewayReference(
+        gateway.name,
+        payload,
+      );
       if (!gatewayReference) {
-        throw new Error('No se pudo extraer referencia de transacción del webhook');
+        throw new Error(
+          "No se pudo extraer referencia de transacción del webhook",
+        );
       }
 
       // Buscar transacción por referencia de pasarela
       const transaction = await prisma.transaction.findFirst({
-        where: { gatewayReference }
+        where: { gatewayReference },
       });
 
       if (!transaction) {
-        throw new Error(`Transacción con referencia ${gatewayReference} no encontrada`);
+        throw new Error(
+          `Transacción con referencia ${gatewayReference} no encontrada`,
+        );
       }
 
       // Extraer estado del payload
@@ -586,8 +612,11 @@ export class PaymentService {
         data: {
           status: newStatus,
           gatewayResponse: payload,
-          completedAt: newStatus === TransactionStatus.COMPLETED ? new Date() : transaction.completedAt
-        }
+          completedAt:
+            newStatus === TransactionStatus.COMPLETED
+              ? new Date()
+              : transaction.completedAt,
+        },
       });
 
       // Verificar transacción para procesar lógica adicional
@@ -595,61 +624,74 @@ export class PaymentService {
 
       return { success: true };
     } catch (error) {
-      ServerLogger.error('Error al procesar webhook', error);
-      throw new Error('No se pudo procesar el webhook');
+      ServerLogger.error("Error al procesar webhook", error);
+      throw new Error("No se pudo procesar el webhook");
     }
   }
 
   /**
    * Reembolsa una transacción
    */
-  static async refundTransaction(transactionId: string, amount?: number, reason?: string): Promise<any> {
+  static async refundTransaction(
+    transactionId: string,
+    amount?: number,
+    reason?: string,
+  ): Promise<any> {
     try {
       const transaction = await prisma.transaction.findUnique({
         where: { id: transactionId },
         include: {
-          gateway: true
-        }
+          gateway: true,
+        },
       });
 
       if (!transaction) {
-        throw new Error('Transacción no encontrada');
+        throw new Error("Transacción no encontrada");
       }
 
       if (transaction.status !== TransactionStatus.COMPLETED) {
-        throw new Error('Solo se pueden reembolsar transacciones completadas');
+        throw new Error("Solo se pueden reembolsar transacciones completadas");
       }
 
       if (!transaction.gatewayReference) {
-        throw new Error('La transacción no tiene referencia de pasarela');
+        throw new Error("La transacción no tiene referencia de pasarela");
       }
 
       // Validar monto de reembolso
       const refundAmount = amount || transaction.amount;
       if (refundAmount <= 0 || refundAmount > transaction.amount) {
-        throw new Error('Monto de reembolso inválido');
+        throw new Error("Monto de reembolso inválido");
       }
 
       // Procesar reembolso en la pasarela
-      const adapter = PaymentGatewayFactory.createAdapter(transaction.gateway.name);
+      const adapter = PaymentGatewayFactory.createAdapter(
+        transaction.gateway.name,
+      );
       if (!adapter) {
-        throw new Error(`No se pudo crear adaptador para la pasarela ${transaction.gateway.name}`);
+        throw new Error(
+          `No se pudo crear adaptador para la pasarela ${transaction.gateway.name}`,
+        );
       }
 
       // Inicializar adaptador con configuración
       const gatewayConfig = {
         apiKey: await EncryptionService.decrypt(transaction.gateway.apiKey),
-        apiSecret: await EncryptionService.decrypt(transaction.gateway.apiSecret),
+        apiSecret: await EncryptionService.decrypt(
+          transaction.gateway.apiSecret,
+        ),
         merchantId: transaction.gateway.merchantId,
         accountId: transaction.gateway.accountId,
         testMode: transaction.gateway.testMode,
-        ...transaction.gateway.config
+        ...transaction.gateway.config,
       };
 
       await adapter.initialize(gatewayConfig);
 
       // Procesar reembolso
-      const refundResponse = await adapter.refundPayment(transaction.gatewayReference, refundAmount);
+      const refundResponse = await adapter.refundPayment(
+        transaction.gatewayReference,
+        refundAmount,
+      );
 
       // Actualizar transacción
       const updatedTransaction = await prisma.transaction.update({
@@ -658,17 +700,17 @@ export class PaymentService {
           status: TransactionStatus.REFUNDED,
           gatewayResponse: {
             ...transaction.gatewayResponse,
-            refund: refundResponse
+            refund: refundResponse,
           },
           metadata: {
             ...transaction.metadata,
             refund: {
               amount: refundAmount,
-              reason: reason || 'Reembolso solicitado',
-              date: new Date()
-            }
-          }
-        }
+              reason: reason || "Reembolso solicitado",
+              date: new Date(),
+            },
+          },
+        },
       });
 
       // Si hay factura asociada, actualizar su estado
@@ -676,38 +718,38 @@ export class PaymentService {
         await prisma.invoice.update({
           where: { id: transaction.invoiceId },
           data: {
-            status: 'UNPAID',
-            paidAmount: 0
-          }
+            status: "UNPAID",
+            paidAmount: 0,
+          },
         });
       }
 
       // Enviar notificación al usuario
       await NotificationService.sendNotification({
         userId: transaction.userId,
-        title: 'Reembolso procesado',
+        title: "Reembolso procesado",
         content: `Su pago por ${refundAmount} ${transaction.currency} ha sido reembolsado.`,
-        type: 'PAYMENT',
-        actionUrl: `/payments/transaction/${transaction.id}`
+        type: "PAYMENT",
+        actionUrl: `/payments/transaction/${transaction.id}`,
       });
 
       // Registrar actividad
       await ActivityLogger.log({
-        action: 'payment.transaction.refunded',
+        action: "payment.transaction.refunded",
         userId: transaction.userId,
-        entityType: 'transaction',
+        entityType: "transaction",
         entityId: transaction.id,
-        details: { 
-          amount: refundAmount, 
+        details: {
+          amount: refundAmount,
           currency: transaction.currency,
-          reason: reason || 'Reembolso solicitado'
-        }
+          reason: reason || "Reembolso solicitado",
+        },
       });
 
       return updatedTransaction;
     } catch (error) {
-      ServerLogger.error('Error al reembolsar transacción', error);
-      throw new Error('No se pudo reembolsar la transacción');
+      ServerLogger.error("Error al reembolsar transacción", error);
+      throw new Error("No se pudo reembolsar la transacción");
     }
   }
 
@@ -733,11 +775,11 @@ export class PaymentService {
       // Si este token será el predeterminado, quitar ese estado de otros tokens
       if (data.isDefault) {
         await prisma.paymentToken.updateMany({
-          where: { 
+          where: {
             userId: data.userId,
-            isDefault: true
+            isDefault: true,
           },
-          data: { isDefault: false }
+          data: { isDefault: false },
         });
       }
 
@@ -753,21 +795,21 @@ export class PaymentService {
           expiryMonth: data.expiryMonth,
           expiryYear: data.expiryYear,
           holderName: data.holderName,
-          isDefault: data.isDefault || false
-        }
+          isDefault: data.isDefault || false,
+        },
       });
 
       // Registrar actividad
       await ActivityLogger.log({
-        action: 'payment.token.create',
+        action: "payment.token.create",
         userId: data.userId,
-        entityType: 'paymentToken',
+        entityType: "paymentToken",
         entityId: paymentToken.id,
-        details: { 
+        details: {
           type: data.type,
           brand: data.brand,
-          lastFour: data.lastFour
-        }
+          lastFour: data.lastFour,
+        },
       });
 
       return {
@@ -778,11 +820,11 @@ export class PaymentService {
         expiryMonth: paymentToken.expiryMonth,
         expiryYear: paymentToken.expiryYear,
         holderName: paymentToken.holderName,
-        isDefault: paymentToken.isDefault
+        isDefault: paymentToken.isDefault,
       };
     } catch (error) {
-      ServerLogger.error('Error al guardar token de pago', error);
-      throw new Error('No se pudo guardar el token de pago');
+      ServerLogger.error("Error al guardar token de pago", error);
+      throw new Error("No se pudo guardar el token de pago");
     }
   }
 
@@ -792,25 +834,22 @@ export class PaymentService {
   static async getUserPaymentTokens(userId: number): Promise<any> {
     try {
       const tokens = await prisma.paymentToken.findMany({
-        where: { 
+        where: {
           userId,
-          isActive: true
+          isActive: true,
         },
         include: {
           gateway: {
             select: {
-              name: true
-            }
-          }
+              name: true,
+            },
+          },
         },
-        orderBy: [
-          { isDefault: 'desc' },
-          { createdAt: 'desc' }
-        ]
+        orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
       });
 
       // No devolver el token encriptado
-      return tokens.map(token => ({
+      return tokens.map((token) => ({
         id: token.id,
         type: token.type,
         lastFour: token.lastFour,
@@ -820,54 +859,60 @@ export class PaymentService {
         holderName: token.holderName,
         isDefault: token.isDefault,
         gateway: token.gateway.name,
-        createdAt: token.createdAt
+        createdAt: token.createdAt,
       }));
     } catch (error) {
-      ServerLogger.error(`Error al obtener tokens de pago del usuario ${userId}`, error);
-      throw new Error('No se pudieron obtener los tokens de pago');
+      ServerLogger.error(
+        `Error al obtener tokens de pago del usuario ${userId}`,
+        error,
+      );
+      throw new Error("No se pudieron obtener los tokens de pago");
     }
   }
 
   /**
    * Elimina un token de pago
    */
-  static async deletePaymentToken(tokenId: string, userId: number): Promise<any> {
+  static async deletePaymentToken(
+    tokenId: string,
+    userId: number,
+  ): Promise<any> {
     try {
       // Verificar que el token pertenece al usuario
       const token = await prisma.paymentToken.findFirst({
         where: {
           id: tokenId,
-          userId
-        }
+          userId,
+        },
       });
 
       if (!token) {
-        throw new Error('Token de pago no encontrado');
+        throw new Error("Token de pago no encontrado");
       }
 
       // Desactivar token en lugar de eliminarlo
       await prisma.paymentToken.update({
         where: { id: tokenId },
-        data: { isActive: false }
+        data: { isActive: false },
       });
 
       // Registrar actividad
       await ActivityLogger.log({
-        action: 'payment.token.delete',
+        action: "payment.token.delete",
         userId,
-        entityType: 'paymentToken',
+        entityType: "paymentToken",
         entityId: tokenId,
-        details: { 
+        details: {
           type: token.type,
           brand: token.brand,
-          lastFour: token.lastFour
-        }
+          lastFour: token.lastFour,
+        },
       });
 
       return { success: true };
     } catch (error) {
       ServerLogger.error(`Error al eliminar token de pago ${tokenId}`, error);
-      throw new Error('No se pudo eliminar el token de pago');
+      throw new Error("No se pudo eliminar el token de pago");
     }
   }
 
@@ -878,13 +923,15 @@ export class PaymentService {
     try {
       // Encriptar credenciales
       const encryptedApiKey = await EncryptionService.encrypt(data.apiKey);
-      const encryptedApiSecret = await EncryptionService.encrypt(data.apiSecret);
+      const encryptedApiSecret = await EncryptionService.encrypt(
+        data.apiSecret,
+      );
 
       // Buscar si ya existe la pasarela
       const existingGateway = await prisma.paymentGateway.findFirst({
         where: {
-          name: { equals: data.name, mode: 'insensitive' }
-        }
+          name: { equals: data.name, mode: "insensitive" },
+        },
       });
 
       let gateway;
@@ -897,14 +944,17 @@ export class PaymentService {
             apiSecret: encryptedApiSecret,
             merchantId: data.merchantId,
             accountId: data.accountId,
-            testMode: data.testMode !== undefined ? data.testMode : existingGateway.testMode,
+            testMode:
+              data.testMode !== undefined
+                ? data.testMode
+                : existingGateway.testMode,
             supportedMethods: data.supportedMethods,
             webhookUrl: data.webhookUrl,
             webhookSecret: data.webhookSecret,
             config: data.config,
             isActive: true,
-            updatedAt: new Date()
-          }
+            updatedAt: new Date(),
+          },
         });
       } else {
         // Crear nueva pasarela
@@ -920,15 +970,17 @@ export class PaymentService {
             webhookUrl: data.webhookUrl,
             webhookSecret: data.webhookSecret,
             config: data.config,
-            isActive: true
-          }
+            isActive: true,
+          },
         });
       }
 
       // Validar configuración con la pasarela
       const adapter = PaymentGatewayFactory.createAdapter(gateway.name);
       if (!adapter) {
-        throw new Error(`No se pudo crear adaptador para la pasarela ${gateway.name}`);
+        throw new Error(
+          `No se pudo crear adaptador para la pasarela ${gateway.name}`,
+        );
       }
 
       const gatewayConfig = {
@@ -937,12 +989,14 @@ export class PaymentService {
         merchantId: data.merchantId,
         accountId: data.accountId,
         testMode: gateway.testMode,
-        ...data.config
+        ...data.config,
       };
 
       const isValid = await adapter.initialize(gatewayConfig);
       if (!isValid) {
-        throw new Error(`Configuración inválida para la pasarela ${gateway.name}`);
+        throw new Error(
+          `Configuración inválida para la pasarela ${gateway.name}`,
+        );
       }
 
       return {
@@ -950,11 +1004,11 @@ export class PaymentService {
         name: gateway.name,
         supportedMethods: gateway.supportedMethods,
         testMode: gateway.testMode,
-        isActive: gateway.isActive
+        isActive: gateway.isActive,
       };
     } catch (error) {
-      ServerLogger.error('Error al configurar pasarela de pago', error);
-      throw new Error('No se pudo configurar la pasarela de pago');
+      ServerLogger.error("Error al configurar pasarela de pago", error);
+      throw new Error("No se pudo configurar la pasarela de pago");
     }
   }
 
@@ -966,8 +1020,8 @@ export class PaymentService {
       // Buscar si ya existe el método
       const existingMethod = await prisma.paymentMethod.findFirst({
         where: {
-          code: { equals: data.code, mode: 'insensitive' }
-        }
+          code: { equals: data.code, mode: "insensitive" },
+        },
       });
 
       let paymentMethod;
@@ -979,13 +1033,16 @@ export class PaymentService {
             name: data.name,
             icon: data.icon,
             gatewayMethods: data.gatewayMethods,
-            surcharge: data.surcharge !== undefined ? data.surcharge : existingMethod.surcharge,
+            surcharge:
+              data.surcharge !== undefined
+                ? data.surcharge
+                : existingMethod.surcharge,
             minAmount: data.minAmount,
             maxAmount: data.maxAmount,
             instructions: data.instructions,
             isActive: true,
-            updatedAt: new Date()
-          }
+            updatedAt: new Date(),
+          },
         });
       } else {
         // Crear nuevo método
@@ -999,51 +1056,56 @@ export class PaymentService {
             minAmount: data.minAmount,
             maxAmount: data.maxAmount,
             instructions: data.instructions,
-            isActive: true
-          }
+            isActive: true,
+          },
         });
       }
 
       return paymentMethod;
     } catch (error) {
-      ServerLogger.error('Error al configurar método de pago', error);
-      throw new Error('No se pudo configurar el método de pago');
+      ServerLogger.error("Error al configurar método de pago", error);
+      throw new Error("No se pudo configurar el método de pago");
     }
   }
 
   /**
    * Obtiene transacciones de un usuario
    */
-  static async getUserTransactions(userId: number, page = 1, limit = 10, status?: TransactionStatus): Promise<any> {
+  static async getUserTransactions(
+    userId: number,
+    page = 1,
+    limit = 10,
+    status?: TransactionStatus,
+  ): Promise<any> {
     try {
       const skip = (page - 1) * limit;
-      
+
       const where = {
         userId,
-        ...(status && { status })
+        ...(status && { status }),
       };
 
       const total = await prisma.transaction.count({ where });
-      
+
       const transactions = await prisma.transaction.findMany({
         where,
         include: {
           gateway: {
             select: {
-              name: true
-            }
+              name: true,
+            },
           },
           method: {
             select: {
               name: true,
               code: true,
-              icon: true
-            }
-          }
+              icon: true,
+            },
+          },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         skip,
-        take: limit
+        take: limit,
       });
 
       return {
@@ -1052,12 +1114,15 @@ export class PaymentService {
           total,
           page,
           limit,
-          pages: Math.ceil(total / limit)
-        }
+          pages: Math.ceil(total / limit),
+        },
       };
     } catch (error) {
-      ServerLogger.error(`Error al obtener transacciones del usuario ${userId}`, error);
-      throw new Error('No se pudieron obtener las transacciones');
+      ServerLogger.error(
+        `Error al obtener transacciones del usuario ${userId}`,
+        error,
+      );
+      throw new Error("No se pudieron obtener las transacciones");
     }
   }
 
@@ -1072,56 +1137,61 @@ export class PaymentService {
 
       // Total de transacciones por estado
       const transactionsByStatus = await prisma.transaction.groupBy({
-        by: ['status'],
+        by: ["status"],
         where: {
           createdAt: {
             gte: fromDate,
-            lte: toDate
-          }
+            lte: toDate,
+          },
         },
         _count: true,
         _sum: {
-          amount: true
-        }
+          amount: true,
+        },
       });
 
       // Transacciones por método de pago
       const transactionsByMethod = await prisma.transaction.groupBy({
-        by: ['methodId'],
+        by: ["methodId"],
         where: {
           status: TransactionStatus.COMPLETED,
           createdAt: {
             gte: fromDate,
-            lte: toDate
-          }
+            lte: toDate,
+          },
         },
         _count: true,
         _sum: {
-          amount: true
-        }
+          amount: true,
+        },
       });
 
       // Obtener nombres de métodos
-      const methodIds = transactionsByMethod.map(item => item.methodId);
+      const methodIds = transactionsByMethod.map((item) => item.methodId);
       const methods = await prisma.paymentMethod.findMany({
         where: {
-          id: { in: methodIds }
+          id: { in: methodIds },
         },
         select: {
           id: true,
           name: true,
-          code: true
-        }
+          code: true,
+        },
       });
 
       // Mapear IDs a nombres
-      const methodMap = new Map(methods.map(method => [method.id, { name: method.name, code: method.code }]));
-      const paymentsByMethod = transactionsByMethod.map(item => ({
+      const methodMap = new Map(
+        methods.map((method) => [
+          method.id,
+          { name: method.name, code: method.code },
+        ]),
+      );
+      const paymentsByMethod = transactionsByMethod.map((item) => ({
         methodId: item.methodId,
-        methodName: methodMap.get(item.methodId)?.name || 'Desconocido',
-        methodCode: methodMap.get(item.methodId)?.code || 'unknown',
+        methodName: methodMap.get(item.methodId)?.name || "Desconocido",
+        methodCode: methodMap.get(item.methodId)?.code || "unknown",
         count: item._count,
-        amount: item._sum.amount
+        amount: item._sum.amount,
       }));
 
       // Transacciones por día
@@ -1143,12 +1213,12 @@ export class PaymentService {
         transactionsByDay,
         period: {
           from: fromDate,
-          to: toDate
-        }
+          to: toDate,
+        },
       };
     } catch (error) {
-      ServerLogger.error('Error al obtener estadísticas de pagos', error);
-      throw new Error('No se pudieron obtener las estadísticas');
+      ServerLogger.error("Error al obtener estadísticas de pagos", error);
+      throw new Error("No se pudieron obtener las estadísticas");
     }
   }
 
@@ -1157,47 +1227,50 @@ export class PaymentService {
    */
   private static mapGatewayStatus(gatewayStatus: string): TransactionStatus {
     const status = gatewayStatus.toUpperCase();
-    
-    if (['COMPLETED', 'APPROVED', 'SUCCESS', 'SUCCESSFUL'].includes(status)) {
+
+    if (["COMPLETED", "APPROVED", "SUCCESS", "SUCCESSFUL"].includes(status)) {
       return TransactionStatus.COMPLETED;
     }
-    
-    if (['PENDING', 'CREATED', 'INITIALIZED'].includes(status)) {
+
+    if (["PENDING", "CREATED", "INITIALIZED"].includes(status)) {
       return TransactionStatus.PENDING;
     }
-    
-    if (['PROCESSING', 'IN_PROGRESS', 'WAITING'].includes(status)) {
+
+    if (["PROCESSING", "IN_PROGRESS", "WAITING"].includes(status)) {
       return TransactionStatus.PROCESSING;
     }
-    
-    if (['FAILED', 'DECLINED', 'REJECTED', 'ERROR'].includes(status)) {
+
+    if (["FAILED", "DECLINED", "REJECTED", "ERROR"].includes(status)) {
       return TransactionStatus.FAILED;
     }
-    
-    if (['REFUNDED', 'REVERSED'].includes(status)) {
+
+    if (["REFUNDED", "REVERSED"].includes(status)) {
       return TransactionStatus.REFUNDED;
     }
-    
-    if (['CANCELLED', 'CANCELED'].includes(status)) {
+
+    if (["CANCELLED", "CANCELED"].includes(status)) {
       return TransactionStatus.CANCELLED;
     }
-    
-    if (['EXPIRED', 'TIMEOUT'].includes(status)) {
+
+    if (["EXPIRED", "TIMEOUT"].includes(status)) {
       return TransactionStatus.EXPIRED;
     }
-    
+
     return TransactionStatus.PENDING;
   }
 
   /**
    * Método privado para extraer referencia de transacción de un webhook
    */
-  private static extractGatewayReference(gatewayName: string, payload: any): string | null {
+  private static extractGatewayReference(
+    gatewayName: string,
+    payload: any,
+  ): string | null {
     try {
       switch (gatewayName.toLowerCase()) {
-        case 'payu':
+        case "payu":
           return payload.reference_sale || payload.referenceCode;
-        case 'wompi':
+        case "wompi":
           return payload.data?.transaction?.id || payload.data?.reference;
         default:
           return null;
@@ -1210,18 +1283,25 @@ export class PaymentService {
   /**
    * Método privado para extraer estado de un webhook
    */
-  private static extractGatewayStatus(gatewayName: string, payload: any): string {
+  private static extractGatewayStatus(
+    gatewayName: string,
+    payload: any,
+  ): string {
     try {
       switch (gatewayName.toLowerCase()) {
-        case 'payu':
-          return payload.state_pol || payload.transactionState || 'PENDING';
-        case 'wompi':
-          return payload.data?.transaction?.status || payload.data?.status || 'PENDING';
+        case "payu":
+          return payload.state_pol || payload.transactionState || "PENDING";
+        case "wompi":
+          return (
+            payload.data?.transaction?.status ||
+            payload.data?.status ||
+            "PENDING"
+          );
         default:
-          return 'PENDING';
+          return "PENDING";
       }
     } catch (error) {
-      return 'PENDING';
+      return "PENDING";
     }
   }
 }

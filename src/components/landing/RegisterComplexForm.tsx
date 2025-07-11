@@ -1,19 +1,26 @@
 "use client";
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { toast } from '@/components/ui/use-toast';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { toast } from "@/components/ui/use-toast";
 
 const formSchema = z.object({
-  complexName: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
-  adminName: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
-  email: z.string().email('Email inválido'),
-  phone: z.string().min(7, 'Teléfono inválido'),
+  complexName: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
+  adminName: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
+  email: z.string().email("Email inválido"),
+  phone: z.string().min(7, "Teléfono inválido"),
 });
 
 type RegisterComplexFormValues = z.infer<typeof formSchema>;
@@ -23,10 +30,10 @@ export function RegisterComplexForm() {
   const form = useForm<RegisterComplexFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      complexName: '',
-      adminName: '',
-      email: '',
-      phone: '',
+      complexName: "",
+      adminName: "",
+      email: "",
+      phone: "",
     },
   });
 
@@ -34,18 +41,20 @@ export function RegisterComplexForm() {
     setLoading(true);
     try {
       // Aquí se haría la llamada a la API para registrar el conjunto
-      console.log('Registrando conjunto:', data);
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simular llamada a API
+      console.log("Registrando conjunto:", data);
+      await new Promise((resolve) => setTimeout(resolve, 1500)); // Simular llamada a API
       toast({
-        title: '¡Registro Exitoso!',
-        description: 'Hemos recibido tu solicitud. Pronto nos pondremos en contacto contigo.',
+        title: "¡Registro Exitoso!",
+        description:
+          "Hemos recibido tu solicitud. Pronto nos pondremos en contacto contigo.",
       });
       form.reset();
     } catch (error) {
       toast({
-        title: 'Error en el Registro',
-        description: 'No pudimos procesar tu solicitud. Por favor, inténtalo de nuevo.',
-        variant: 'destructive',
+        title: "Error en el Registro",
+        description:
+          "No pudimos procesar tu solicitud. Por favor, inténtalo de nuevo.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -54,8 +63,12 @@ export function RegisterComplexForm() {
 
   return (
     <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-lg dark:bg-gray-800">
-      <h2 className="text-2xl font-bold text-center">Registra tu Conjunto Residencial</h2>
-      <p className="text-center text-gray-600 dark:text-gray-400">Inicia hoy y descubre una nueva forma de administrar.</p>
+      <h2 className="text-2xl font-bold text-center">
+        Registra tu Conjunto Residencial
+      </h2>
+      <p className="text-center text-gray-600 dark:text-gray-400">
+        Inicia hoy y descubre una nueva forma de administrar.
+      </p>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
@@ -65,7 +78,10 @@ export function RegisterComplexForm() {
               <FormItem>
                 <FormLabel>Nombre del Conjunto</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ej: Conjunto Residencial El Bosque" {...field} />
+                  <Input
+                    placeholder="Ej: Conjunto Residencial El Bosque"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -111,7 +127,7 @@ export function RegisterComplexForm() {
             )}
           />
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Enviando...' : t('freeTrialButton')}
+            {loading ? "Enviando..." : t("freeTrialButton")}
           </Button>
         </form>
       </Form>

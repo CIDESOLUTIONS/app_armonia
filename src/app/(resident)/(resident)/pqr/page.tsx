@@ -1,21 +1,28 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { useAuthStore } from '@/store/authStore';
-import { Loader2, PlusCircle, Eye } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import Link from 'next/link';
-import { useToast } from '@/components/ui/use-toast';
-import { getPQRs } from '@/services/pqrService';
+import { useState, useEffect, useCallback } from "react";
+import { useAuthStore } from "@/store/authStore";
+import { Loader2, PlusCircle, Eye } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import Link from "next/link";
+import { useToast } from "@/components/ui/use-toast";
+import { getPQRs } from "@/services/pqrService";
 
 interface PQR {
   id: number;
   subject: string;
   description: string;
-  status: 'OPEN' | 'IN_PROGRESS' | 'CLOSED' | 'REJECTED';
-  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+  status: "OPEN" | "IN_PROGRESS" | "CLOSED" | "REJECTED";
+  priority: "LOW" | "MEDIUM" | "HIGH";
   category: string;
   reportedById: number;
   reportedByName: string;
@@ -37,11 +44,11 @@ export default function ResidentPQRPage() {
       const data = await getPQRs({ reportedById: user?.id }); // Fetch PQRs reported by current user
       setPqrs(data);
     } catch (error) {
-      console.error('Error fetching resident PQRs:', error);
+      console.error("Error fetching resident PQRs:", error);
       toast({
-        title: 'Error',
-        description: 'No se pudieron cargar tus PQRs.',
-        variant: 'destructive',
+        title: "Error",
+        description: "No se pudieron cargar tus PQRs.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -68,8 +75,10 @@ export default function ResidentPQRPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Mis Peticiones, Quejas y Reclamos</h1>
-      
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        Mis Peticiones, Quejas y Reclamos
+      </h1>
+
       <div className="flex justify-end mb-4">
         <Link href="/resident/pqr/create">
           <Button>
@@ -95,16 +104,34 @@ export default function ResidentPQRPage() {
                 <TableRow key={pqr.id}>
                   <TableCell>{pqr.subject}</TableCell>
                   <TableCell>
-                    <Badge variant={pqr.status === 'OPEN' ? 'destructive' : pqr.status === 'IN_PROGRESS' ? 'secondary' : 'default'}>
+                    <Badge
+                      variant={
+                        pqr.status === "OPEN"
+                          ? "destructive"
+                          : pqr.status === "IN_PROGRESS"
+                            ? "secondary"
+                            : "default"
+                      }
+                    >
                       {pqr.status}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={pqr.priority === 'HIGH' ? 'destructive' : pqr.priority === 'MEDIUM' ? 'secondary' : 'default'}>
+                    <Badge
+                      variant={
+                        pqr.priority === "HIGH"
+                          ? "destructive"
+                          : pqr.priority === "MEDIUM"
+                            ? "secondary"
+                            : "default"
+                      }
+                    >
                       {pqr.priority}
                     </Badge>
                   </TableCell>
-                  <TableCell>{new Date(pqr.createdAt).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    {new Date(pqr.createdAt).toLocaleDateString()}
+                  </TableCell>
                   <TableCell className="text-right">
                     <Link href={`/resident/pqr/${pqr.id}/view`}>
                       <Button variant="ghost" size="sm">

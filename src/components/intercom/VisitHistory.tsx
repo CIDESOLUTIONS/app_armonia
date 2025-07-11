@@ -1,34 +1,55 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  CardDescription
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Calendar as CalendarIcon } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { cn } from '@/lib/utils';
-import { 
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Calendar as CalendarIcon } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+import {
   History as HistoryIcon,
   Filter as FilterIcon,
   CheckCircle,
   XCircle,
   Hourglass,
   User,
-  Loader2
-} from 'lucide-react';
-import { intercomService } from '../../lib/services/intercom-service';
-import { VisitStatus, NotificationStatus } from '@prisma/client';
-import { Pagination, PaginationContent, PaginationItem } from '@/components/ui/pagination';
+  Loader2,
+} from "lucide-react";
+import { intercomService } from "../../lib/services/intercom-service";
+import { VisitStatus, NotificationStatus } from "@prisma/client";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+} from "@/components/ui/pagination";
 
 // Interfaces
 interface Visit {
@@ -70,7 +91,7 @@ const VisitHistory: React.FC = () => {
   const [filters, setFilters] = useState<FilterOptions>({
     status: undefined,
     startDate: null,
-    endDate: null
+    endDate: null,
   });
 
   // Función para obtener visitas
@@ -79,21 +100,25 @@ const VisitHistory: React.FC = () => {
     try {
       // En un caso real, esto vendría de la API con el ID de la unidad del usuario actual
       const unitId = 1; // Ejemplo
-      
+
       const options = {
         status: filters.status,
-        startDate: filters.startDate ? format(filters.startDate, 'yyyy-MM-dd') : undefined,
-        endDate: filters.endDate ? format(filters.endDate, 'yyyy-MM-dd') : undefined,
+        startDate: filters.startDate
+          ? format(filters.startDate, "yyyy-MM-dd")
+          : undefined,
+        endDate: filters.endDate
+          ? format(filters.endDate, "yyyy-MM-dd")
+          : undefined,
         page: page,
-        pageSize: rowsPerPage
+        pageSize: rowsPerPage,
       };
-      
+
       const result = await intercomService.getVisitHistory(unitId, options);
-      
+
       setVisits(result.data);
       setTotalRows(result.pagination.total);
     } catch (error) {
-      console.error('Error al cargar visitas:', error);
+      console.error("Error al cargar visitas:", error);
     } finally {
       setLoading(false);
     }
@@ -117,9 +142,9 @@ const VisitHistory: React.FC = () => {
 
   // Manejar cambio de filtros
   const handleFilterChange = (field: keyof FilterOptions, value: any) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -128,53 +153,60 @@ const VisitHistory: React.FC = () => {
     setFilters({
       status: undefined,
       startDate: null,
-      endDate: null
+      endDate: null,
     });
     setPage(1);
   };
 
   // Renderizar badge de estado
   const renderStatusBadge = (status: VisitStatus) => {
-    const statusConfig: Record<VisitStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ReactNode }> = {
-      [VisitStatus.PENDING]: { 
-        label: 'Pendiente', 
-        variant: 'secondary',
-        icon: <Hourglass className="h-3 w-3 mr-1" />
-      },
-      [VisitStatus.NOTIFIED]: { 
-        label: 'Notificado', 
-        variant: 'outline',
-        icon: <Hourglass className="h-3 w-3 mr-1" />
-      },
-      [VisitStatus.APPROVED]: { 
-        label: 'Aprobado', 
-        variant: 'default',
-        icon: <CheckCircle className="h-3 w-3 mr-1" />
-      },
-      [VisitStatus.REJECTED]: { 
-        label: 'Rechazado', 
-        variant: 'destructive',
-        icon: <XCircle className="h-3 w-3 mr-1" />
-      },
-      [VisitStatus.IN_PROGRESS]: { 
-        label: 'En progreso', 
-        variant: 'default',
-        icon: <Hourglass className="h-3 w-3 mr-1" />
-      },
-      [VisitStatus.COMPLETED]: { 
-        label: 'Completado', 
-        variant: 'default',
-        icon: <CheckCircle className="h-3 w-3 mr-1" />
-      },
-      [VisitStatus.CANCELLED]: { 
-        label: 'Cancelado', 
-        variant: 'destructive',
-        icon: <XCircle className="h-3 w-3 mr-1" />
+    const statusConfig: Record<
+      VisitStatus,
+      {
+        label: string;
+        variant: "default" | "secondary" | "destructive" | "outline";
+        icon: React.ReactNode;
       }
+    > = {
+      [VisitStatus.PENDING]: {
+        label: "Pendiente",
+        variant: "secondary",
+        icon: <Hourglass className="h-3 w-3 mr-1" />,
+      },
+      [VisitStatus.NOTIFIED]: {
+        label: "Notificado",
+        variant: "outline",
+        icon: <Hourglass className="h-3 w-3 mr-1" />,
+      },
+      [VisitStatus.APPROVED]: {
+        label: "Aprobado",
+        variant: "default",
+        icon: <CheckCircle className="h-3 w-3 mr-1" />,
+      },
+      [VisitStatus.REJECTED]: {
+        label: "Rechazado",
+        variant: "destructive",
+        icon: <XCircle className="h-3 w-3 mr-1" />,
+      },
+      [VisitStatus.IN_PROGRESS]: {
+        label: "En progreso",
+        variant: "default",
+        icon: <Hourglass className="h-3 w-3 mr-1" />,
+      },
+      [VisitStatus.COMPLETED]: {
+        label: "Completado",
+        variant: "default",
+        icon: <CheckCircle className="h-3 w-3 mr-1" />,
+      },
+      [VisitStatus.CANCELLED]: {
+        label: "Cancelado",
+        variant: "destructive",
+        icon: <XCircle className="h-3 w-3 mr-1" />,
+      },
     };
 
     const config = statusConfig[status];
-    
+
     return (
       <Badge variant={config.variant} className="flex items-center w-fit">
         {config.icon}
@@ -190,22 +222,28 @@ const VisitHistory: React.FC = () => {
           <HistoryIcon className="mr-2 h-5 w-5" />
           Historial de Visitas
         </CardTitle>
-        <CardDescription>Consulte el registro de ingresos y salidas de visitantes.</CardDescription>
+        <CardDescription>
+          Consulte el registro de ingresos y salidas de visitantes.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {/* Filtros */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           <Select
-            value={filters.status || ''}
-            onValueChange={(value) => handleFilterChange('status', value || undefined)}
+            value={filters.status || ""}
+            onValueChange={(value) =>
+              handleFilterChange("status", value || undefined)
+            }
           >
             <SelectTrigger>
               <SelectValue placeholder="Filtrar por estado" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">Todos</SelectItem>
-              {Object.values(VisitStatus).map(status => (
-                <SelectItem key={status} value={status}>{status}</SelectItem>
+              {Object.values(VisitStatus).map((status) => (
+                <SelectItem key={status} value={status}>
+                  {status}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -216,18 +254,22 @@ const VisitHistory: React.FC = () => {
                 variant={"outline"}
                 className={cn(
                   "w-full justify-start text-left font-normal",
-                  !filters.startDate && "text-muted-foreground"
+                  !filters.startDate && "text-muted-foreground",
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {filters.startDate ? format(filters.startDate, "PPP", { locale: es }) : <span>Fecha inicio</span>}
+                {filters.startDate ? (
+                  format(filters.startDate, "PPP", { locale: es })
+                ) : (
+                  <span>Fecha inicio</span>
+                )}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
               <CalendarIcon
                 mode="single"
                 selected={filters.startDate || undefined}
-                onSelect={(date) => handleFilterChange('startDate', date)}
+                onSelect={(date) => handleFilterChange("startDate", date)}
                 initialFocus
                 locale={es}
               />
@@ -240,24 +282,28 @@ const VisitHistory: React.FC = () => {
                 variant={"outline"}
                 className={cn(
                   "w-full justify-start text-left font-normal",
-                  !filters.endDate && "text-muted-foreground"
+                  !filters.endDate && "text-muted-foreground",
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {filters.endDate ? format(filters.endDate, "PPP", { locale: es }) : <span>Fecha fin</span>}
+                {filters.endDate ? (
+                  format(filters.endDate, "PPP", { locale: es })
+                ) : (
+                  <span>Fecha fin</span>
+                )}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
               <CalendarIcon
                 mode="single"
                 selected={filters.endDate || undefined}
-                onSelect={(date) => handleFilterChange('endDate', date)}
+                onSelect={(date) => handleFilterChange("endDate", date)}
                 initialFocus
                 locale={es}
               />
             </PopoverContent>
           </Popover>
-          
+
           <Button onClick={handleResetFilters} variant="outline">
             <FilterIcon className="mr-2 h-4 w-4" />
             Limpiar filtros
@@ -287,7 +333,10 @@ const VisitHistory: React.FC = () => {
                 </TableRow>
               ) : visits.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                  <TableCell
+                    colSpan={6}
+                    className="text-center py-8 text-gray-500"
+                  >
                     No se encontraron visitas con los filtros seleccionados
                   </TableCell>
                 </TableRow>
@@ -305,17 +354,23 @@ const VisitHistory: React.FC = () => {
                     <TableCell>{visit.visitor.type.name}</TableCell>
                     <TableCell>{visit.purpose}</TableCell>
                     <TableCell>
-                      {format(new Date(visit.createdAt), 'dd/MM/yyyy HH:mm', { locale: es })}
+                      {format(new Date(visit.createdAt), "dd/MM/yyyy HH:mm", {
+                        locale: es,
+                      })}
                     </TableCell>
-                    <TableCell>
-                      {renderStatusBadge(visit.status)}
-                    </TableCell>
+                    <TableCell>{renderStatusBadge(visit.status)}</TableCell>
                     <TableCell>
                       {visit.entryTime && (
                         <div className="text-sm">
-                          <p>Entrada: {format(new Date(visit.entryTime), 'HH:mm')}</p>
+                          <p>
+                            Entrada:{" "}
+                            {format(new Date(visit.entryTime), "HH:mm")}
+                          </p>
                           {visit.exitTime && (
-                            <p>Salida: {format(new Date(visit.exitTime), 'HH:mm')}</p>
+                            <p>
+                              Salida:{" "}
+                              {format(new Date(visit.exitTime), "HH:mm")}
+                            </p>
                           )}
                         </div>
                       )}
@@ -326,9 +381,12 @@ const VisitHistory: React.FC = () => {
             </TableBody>
           </Table>
         </div>
-        
+
         <div className="flex justify-end items-center space-x-2 mt-4">
-          <Select value={String(rowsPerPage)} onValueChange={handleChangeRowsPerPage}>
+          <Select
+            value={String(rowsPerPage)}
+            onValueChange={handleChangeRowsPerPage}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filas por página" />
             </SelectTrigger>
@@ -342,18 +400,21 @@ const VisitHistory: React.FC = () => {
           <Pagination>
             <PaginationContent>
               <PaginationItem>
-                <Button 
-                  variant="ghost" 
-                  onClick={() => handleChangePage(page - 1)} 
+                <Button
+                  variant="ghost"
+                  onClick={() => handleChangePage(page - 1)}
                   disabled={page === 1}
                 >
                   Anterior
                 </Button>
               </PaginationItem>
-              {Array.from({ length: Math.ceil(totalRows / rowsPerPage) }, (_, i) => i + 1).map(p => (
+              {Array.from(
+                { length: Math.ceil(totalRows / rowsPerPage) },
+                (_, i) => i + 1,
+              ).map((p) => (
                 <PaginationItem key={p}>
-                  <Button 
-                    variant={p === page ? "default" : "ghost"} 
+                  <Button
+                    variant={p === page ? "default" : "ghost"}
                     onClick={() => handleChangePage(p)}
                   >
                     {p}
@@ -361,9 +422,9 @@ const VisitHistory: React.FC = () => {
                 </PaginationItem>
               ))}
               <PaginationItem>
-                <Button 
-                  variant="ghost" 
-                  onClick={() => handleChangePage(page + 1)} 
+                <Button
+                  variant="ghost"
+                  onClick={() => handleChangePage(page + 1)}
                   disabled={page === Math.ceil(totalRows / rowsPerPage)}
                 >
                   Siguiente

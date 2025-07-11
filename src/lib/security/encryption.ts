@@ -3,11 +3,12 @@
  * Compatible con Next.js 15 y React 19
  */
 
-import crypto from 'crypto';
+import crypto from "crypto";
 
 // Configuración de encriptación
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'armonia-default-encryption-key-32chars';
-const ALGORITHM = 'aes-256-cbc';
+const ENCRYPTION_KEY =
+  process.env.ENCRYPTION_KEY || "armonia-default-encryption-key-32chars";
+const ALGORITHM = "aes-256-cbc";
 const IV_LENGTH = 16; // Para AES, esto es siempre 16 bytes
 
 /**
@@ -18,15 +19,19 @@ const IV_LENGTH = 16; // Para AES, esto es siempre 16 bytes
 export function encrypt(text: string): string {
   try {
     const iv = crypto.randomBytes(IV_LENGTH);
-    const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(ENCRYPTION_KEY), iv);
-    
+    const cipher = crypto.createCipheriv(
+      ALGORITHM,
+      Buffer.from(ENCRYPTION_KEY),
+      iv,
+    );
+
     let encrypted = cipher.update(text);
     encrypted = Buffer.concat([encrypted, cipher.final()]);
-    
-    return iv.toString('hex') + ':' + encrypted.toString('hex');
+
+    return iv.toString("hex") + ":" + encrypted.toString("hex");
   } catch (error) {
-    console.error('Error en encriptación:', error);
-    throw new Error('Error al encriptar datos');
+    console.error("Error en encriptación:", error);
+    throw new Error("Error al encriptar datos");
   }
 }
 
@@ -37,18 +42,22 @@ export function encrypt(text: string): string {
  */
 export function decrypt(text: string): string {
   try {
-    const textParts = text.split(':');
-    const iv = Buffer.from(textParts.shift() || '', 'hex');
-    const encryptedText = Buffer.from(textParts.join(':'), 'hex');
-    const decipher = crypto.createDecipheriv(ALGORITHM, Buffer.from(ENCRYPTION_KEY), iv);
-    
+    const textParts = text.split(":");
+    const iv = Buffer.from(textParts.shift() || "", "hex");
+    const encryptedText = Buffer.from(textParts.join(":"), "hex");
+    const decipher = crypto.createDecipheriv(
+      ALGORITHM,
+      Buffer.from(ENCRYPTION_KEY),
+      iv,
+    );
+
     let decrypted = decipher.update(encryptedText);
     decrypted = Buffer.concat([decrypted, decipher.final()]);
-    
+
     return decrypted.toString();
   } catch (error) {
-    console.error('Error en desencriptación:', error);
-    throw new Error('Error al desencriptar datos');
+    console.error("Error en desencriptación:", error);
+    throw new Error("Error al desencriptar datos");
   }
 }
 
@@ -58,7 +67,7 @@ export function decrypt(text: string): string {
  * @returns Hash de la contraseña
  */
 export function hashPassword(password: string): string {
-  return crypto.createHash('sha256').update(password).digest('hex');
+  return crypto.createHash("sha256").update(password).digest("hex");
 }
 
 /**
@@ -76,5 +85,5 @@ export default {
   encrypt,
   decrypt,
   hashPassword,
-  verifyPassword
+  verifyPassword,
 };

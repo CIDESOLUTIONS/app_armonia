@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import React, { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface AssemblyFormData {
-  tipo: 'ordinaria' | 'extraordinaria';
+  tipo: "ordinaria" | "extraordinaria";
   titulo: string;
   fecha: string;
   hora: string;
@@ -26,19 +32,23 @@ const AssemblyForm: React.FC<AssemblyFormProps> = ({
   initialData = {},
   onSubmit,
   onCancel,
-  isLoading = false
+  isLoading = false,
 }) => {
   const [formData, setFormData] = useState<AssemblyFormData>({
-    tipo: 'ordinaria',
-    titulo: '',
-    fecha: '',
-    hora: '',
-    descripcion: '',
+    tipo: "ordinaria",
+    titulo: "",
+    fecha: "",
+    hora: "",
+    descripcion: "",
     quorumRequerido: 50,
-    ...initialData
+    ...initialData,
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
+  ) => {
     const { name, value } = e.target;
     let processedValue: string | number = value;
 
@@ -46,7 +56,7 @@ const AssemblyForm: React.FC<AssemblyFormProps> = ({
       processedValue = value === "" ? 0 : Number(value);
     }
 
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: processedValue,
     }));
@@ -61,13 +71,16 @@ const AssemblyForm: React.FC<AssemblyFormProps> = ({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <Label htmlFor="tipo">
-            Tipo de Asamblea
-          </Label>
+          <Label htmlFor="tipo">Tipo de Asamblea</Label>
           <Select
             name="tipo"
             value={formData.tipo}
-            onValueChange={(value) => setFormData(prev => ({ ...prev, tipo: value as 'ordinaria' | 'extraordinaria' }))}
+            onValueChange={(value) =>
+              setFormData((prev) => ({
+                ...prev,
+                tipo: value as "ordinaria" | "extraordinaria",
+              }))
+            }
           >
             <SelectTrigger>
               <SelectValue placeholder="Seleccionar tipo" />
@@ -106,9 +119,7 @@ const AssemblyForm: React.FC<AssemblyFormProps> = ({
         />
 
         <div className="md:col-span-2">
-          <Label htmlFor="descripcion">
-            Descripción
-          </Label>
+          <Label htmlFor="descripcion">Descripción</Label>
           <Textarea
             name="descripcion"
             rows={4}
@@ -139,10 +150,7 @@ const AssemblyForm: React.FC<AssemblyFormProps> = ({
         >
           Cancelar
         </Button>
-        <Button
-          type="submit"
-          disabled={isLoading}
-        >
+        <Button type="submit" disabled={isLoading}>
           Guardar Asamblea
         </Button>
       </div>

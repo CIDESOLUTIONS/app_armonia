@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Bell, LogOut, User, Settings, HelpCircle } from 'lucide-react';
+import { useState } from "react";
+import { Bell, LogOut, User, Settings, HelpCircle } from "lucide-react";
 
 interface ResidentHeaderProps {
   residentName: string;
@@ -9,7 +9,11 @@ interface ResidentHeaderProps {
   onLogout: () => void;
 }
 
-export default function ResidentHeader({ residentName, complexName, onLogout }: ResidentHeaderProps) {
+export default function ResidentHeader({
+  residentName,
+  complexName,
+  onLogout,
+}: ResidentHeaderProps) {
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   return (
@@ -23,7 +27,9 @@ export default function ResidentHeader({ residentName, complexName, onLogout }: 
                 <span className="text-white font-bold text-sm">A</span>
               </div>
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">Portal Residentes</h1>
+                <h1 className="text-xl font-semibold text-gray-900">
+                  Portal Residentes
+                </h1>
                 <p className="text-sm text-gray-500">{complexName}</p>
               </div>
             </div>
@@ -44,7 +50,7 @@ export default function ResidentHeader({ residentName, complexName, onLogout }: 
 
             {/* Menú de usuario */}
             <div className="relative">
-              <button 
+              <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center space-x-3 p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               >
@@ -65,7 +71,7 @@ export default function ResidentHeader({ residentName, complexName, onLogout }: 
                     <span>Mi Perfil</span>
                   </button>
                   <hr className="my-1" />
-                  <button 
+                  <button
                     onClick={onLogout}
                     className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"
                   >
@@ -81,4 +87,3 @@ export default function ResidentHeader({ residentName, complexName, onLogout }: 
     </header>
   );
 }
-

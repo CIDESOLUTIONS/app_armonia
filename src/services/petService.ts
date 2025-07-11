@@ -1,4 +1,4 @@
-import { fetchApi } from '@/lib/api';
+import { fetchApi } from "@/lib/api";
 
 interface Pet {
   id: number;
@@ -31,36 +31,36 @@ interface UpdatePetData {
 
 export async function getPets(): Promise<Pet[]> {
   try {
-    const response = await fetchApi('/api/inventory/pets');
+    const response = await fetchApi("/api/inventory/pets");
     return response;
   } catch (error) {
-    console.error('Error fetching pets:', error);
+    console.error("Error fetching pets:", error);
     throw error;
   }
 }
 
 export async function createPet(data: CreatePetData): Promise<Pet> {
   try {
-    const response = await fetchApi('/api/inventory/pets', {
-      method: 'POST',
+    const response = await fetchApi("/api/inventory/pets", {
+      method: "POST",
       body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
-    console.error('Error creating pet:', error);
+    console.error("Error creating pet:", error);
     throw error;
   }
 }
 
 export async function updatePet(id: number, data: UpdatePetData): Promise<Pet> {
   try {
-    const response = await fetchApi('/api/inventory/pets', {
-      method: 'PUT',
+    const response = await fetchApi("/api/inventory/pets", {
+      method: "PUT",
       body: JSON.stringify({ id, ...data }),
     });
     return response;
   } catch (error) {
-    console.error('Error updating pet:', error);
+    console.error("Error updating pet:", error);
     throw error;
   }
 }
@@ -68,10 +68,10 @@ export async function updatePet(id: number, data: UpdatePetData): Promise<Pet> {
 export async function deletePet(id: number): Promise<void> {
   try {
     await fetchApi(`/api/inventory/pets/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   } catch (error) {
-    console.error('Error deleting pet:', error);
+    console.error("Error deleting pet:", error);
     throw error;
   }
 }

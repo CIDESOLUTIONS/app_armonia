@@ -1,8 +1,8 @@
-import React from 'react';
-import { AlertCircle, CheckCircle, Info, X, AlertTriangle } from 'lucide-react';
+import React from "react";
+import { AlertCircle, CheckCircle, Info, X, AlertTriangle } from "lucide-react";
 
 interface AlertProps {
-  type?: 'info' | 'success' | 'warning' | 'error';
+  type?: "info" | "success" | "warning" | "error";
   title?: string;
   children: React.ReactNode;
   onClose?: () => void;
@@ -10,48 +10,48 @@ interface AlertProps {
 }
 
 const Alert: React.FC<AlertProps> = ({
-  type = 'info',
+  type = "info",
   title,
   children,
   onClose,
-  className = ''
+  className = "",
 }) => {
   const styles = {
     info: {
-      container: 'bg-blue-50 border-blue-200',
-      icon: 'text-blue-400',
-      title: 'text-blue-800',
-      text: 'text-blue-700',
-      closeButton: 'text-blue-500 hover:bg-blue-100'
+      container: "bg-blue-50 border-blue-200",
+      icon: "text-blue-400",
+      title: "text-blue-800",
+      text: "text-blue-700",
+      closeButton: "text-blue-500 hover:bg-blue-100",
     },
     success: {
-      container: 'bg-green-50 border-green-200',
-      icon: 'text-green-400',
-      title: 'text-green-800',
-      text: 'text-green-700',
-      closeButton: 'text-green-500 hover:bg-green-100'
+      container: "bg-green-50 border-green-200",
+      icon: "text-green-400",
+      title: "text-green-800",
+      text: "text-green-700",
+      closeButton: "text-green-500 hover:bg-green-100",
     },
     warning: {
-      container: 'bg-yellow-50 border-yellow-200',
-      icon: 'text-yellow-400',
-      title: 'text-yellow-800',
-      text: 'text-yellow-700',
-      closeButton: 'text-yellow-500 hover:bg-yellow-100'
+      container: "bg-yellow-50 border-yellow-200",
+      icon: "text-yellow-400",
+      title: "text-yellow-800",
+      text: "text-yellow-700",
+      closeButton: "text-yellow-500 hover:bg-yellow-100",
     },
     error: {
-      container: 'bg-red-50 border-red-200',
-      icon: 'text-red-400',
-      title: 'text-red-800',
-      text: 'text-red-700',
-      closeButton: 'text-red-500 hover:bg-red-100'
-    }
+      container: "bg-red-50 border-red-200",
+      icon: "text-red-400",
+      title: "text-red-800",
+      text: "text-red-700",
+      closeButton: "text-red-500 hover:bg-red-100",
+    },
   };
 
   const icons = {
     info: <Info className="h-5 w-5" />,
     success: <CheckCircle className="h-5 w-5" />,
     warning: <AlertTriangle className="h-5 w-5" />,
-    error: <AlertCircle className="h-5 w-5" />
+    error: <AlertCircle className="h-5 w-5" />,
   };
 
   return (
@@ -71,7 +71,9 @@ const Alert: React.FC<AlertProps> = ({
               {title}
             </h3>
           )}
-          <div className={`text-sm ${styles[type].text} ${title ? 'mt-2' : ''}`}>
+          <div
+            className={`text-sm ${styles[type].text} ${title ? "mt-2" : ""}`}
+          >
             {children}
           </div>
         </div>

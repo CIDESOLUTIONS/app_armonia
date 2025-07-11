@@ -1,45 +1,45 @@
-import React from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { Home, Users, Calendar, FileText, Settings, X } from 'lucide-react';
+import React from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { Home, Users, Calendar, FileText, Settings, X } from "lucide-react";
 
 interface DashboardSidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ 
-  isOpen, 
-  onClose 
+const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
+  isOpen,
+  onClose,
 }) => {
   const _router = useRouter();
 
   const menuItems = [
     {
-      label: 'Dashboard',
+      label: "Dashboard",
       icon: Home,
-      href: '/admin/dashboard'
+      href: "/admin/dashboard",
     },
     {
-      label: 'Asambleas',
+      label: "Asambleas",
       icon: Calendar,
-      href: '/admin/assemblies'
+      href: "/admin/assemblies",
     },
     {
-      label: 'Residentes',
+      label: "Residentes",
       icon: Users,
-      href: '/admin/residents'
+      href: "/admin/residents",
     },
     {
-      label: 'Documentos',
+      label: "Documentos",
       icon: FileText,
-      href: '/admin/documents'
+      href: "/admin/documents",
     },
     {
-      label: 'Configuración',
+      label: "Configuración",
       icon: Settings,
-      href: '/admin/settings'
-    }
+      href: "/admin/settings",
+    },
   ];
 
   return (
@@ -53,11 +53,13 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       )}
 
       {/* Sidebar */}
-      <aside className={`
+      <aside
+        className={`
         fixed top-0 left-0 z-40 h-screen w-64
         bg-white shadow-lg transform transition-transform duration-300
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
+        ${isOpen ? "translate-x-0" : "-translate-x-full"}
+      `}
+      >
         {/* Close button for mobile */}
         <button
           onClick={onClose}
@@ -68,9 +70,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
 
         {/* Logo */}
         <div className="px-6 py-8">
-          <h2 className="text-2xl font-bold text-gray-800">
-            Armonía
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-800">Armonía</h2>
         </div>
 
         {/* Navigation */}
@@ -83,9 +83,10 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                 href={href}
                 className={`
                   flex items-center px-4 py-2 text-sm font-medium rounded-lg
-                  ${isActive 
-                    ? 'bg-blue-50 text-blue-700' 
-                    : 'text-gray-600 hover:bg-gray-50'
+                  ${
+                    isActive
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-gray-600 hover:bg-gray-50"
                   }
                 `}
               >

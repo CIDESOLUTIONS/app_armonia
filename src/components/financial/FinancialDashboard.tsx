@@ -1,77 +1,83 @@
 // src/components/financial/FinancialDashboard.tsx
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  DollarSign, 
-  TrendingUp, 
-  TrendingDown, 
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
   Calendar,
   FileText,
   CreditCard,
   Clock,
-  AlertTriangle
-} from 'lucide-react';
-import { useFinancialBilling } from '@/hooks/useFinancialBilling';
-import { useFreemiumPlan } from '@/hooks/useFreemiumPlan';
+  AlertTriangle,
+} from "lucide-react";
+import { useFinancialBilling } from "@/hooks/useFinancialBilling";
+import { useFreemiumPlan } from "@/hooks/useFreemiumPlan";
 
 interface FinancialDashboardProps {
   complexId: number;
 }
 
 export function FinancialDashboard({ complexId }: FinancialDashboardProps) {
-  const { 
-    bills, 
-    stats, 
-    loading, 
-    error, 
-    generateBills, 
-    loadBills, 
-    loadStats, 
-    refreshData 
+  const {
+    bills,
+    stats,
+    loading,
+    error,
+    generateBills,
+    loadBills,
+    loadStats,
+    refreshData,
   } = useFinancialBilling();
-  
-  const { 
-    hasFeatureAccess, 
-    isUpgradeRequired, 
-    getUpgradeMessage, 
+
+  const {
+    hasFeatureAccess,
+    isUpgradeRequired,
+    getUpgradeMessage,
     currentPlan,
-    isTrialActive 
+    isTrialActive,
   } = useFreemiumPlan();
 
   const [selectedPeriod, setSelectedPeriod] = useState(() => {
     const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   });
 
   useEffect(() => {
-    if (hasFeatureAccess('dashboard_financiero')) {
+    if (hasFeatureAccess("dashboard_financiero")) {
       refreshData();
     }
   }, [hasFeatureAccess, refreshData]);
 
   const handleGenerateBills = async () => {
-    if (isUpgradeRequired('facturación_automática')) {
-      alert(getUpgradeMessage('facturación_automática'));
+    if (isUpgradeRequired("facturación_automática")) {
+      alert(getUpgradeMessage("facturación_automática"));
       return;
     }
 
-    const [year, month] = selectedPeriod.split('-').map(Number);
+    const [year, month] = selectedPeriod.split("-").map(Number);
     try {
       await generateBills(year, month);
-      alert('Facturas generadas exitosamente');
+      alert("Facturas generadas exitosamente");
     } catch (error) {
-      console.error('Error:', error);
-      alert('Error generando facturas');
+      console.error("Error:", error);
+      alert("Error generando facturas");
     }
   };
 
   // Verificar acceso a dashboard financiero
-  if (isUpgradeRequired('dashboard_financiero')) {
+  if (isUpgradeRequired("dashboard_financiero")) {
     return (
       <Card className="w-full">
         <CardHeader>
@@ -84,10 +90,14 @@ export function FinancialDashboard({ complexId }: FinancialDashboardProps) {
           <Alert>
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              {getUpgradeMessage('dashboard_financiero')}
+              {getUpgradeMessage("dashboard_financiero")}
               <div className="mt-2">
                 <Badge variant="outline">Plan Actual: {currentPlan}</Badge>
-                {isTrialActive && <Badge variant="secondary" className="ml-2">Trial Activo</Badge>}
+                {isTrialActive && (
+                  <Badge variant="secondary" className="ml-2">
+                    Trial Activo
+                  </Badge>
+                )}
               </div>
             </AlertDescription>
           </Alert>
@@ -135,7 +145,7 @@ export function FinancialDashboard({ complexId }: FinancialDashboardProps) {
             Gestión integral de facturación y pagos
           </p>
         </div>
-        
+
         <div className="flex gap-2">
           <input
             type="month"
@@ -158,7 +168,9 @@ export function FinancialDashboard({ complexId }: FinancialDashboardProps) {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Facturado</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Facturado
+              </CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -173,7 +185,9 @@ export function FinancialDashboard({ complexId }: FinancialDashboardProps) {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Recaudado</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Recaudado
+              </CardTitle>
               <TrendingUp className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
@@ -234,7 +248,9 @@ export function FinancialDashboard({ complexId }: FinancialDashboardProps) {
             <div className="text-center py-8 text-muted-foreground">
               <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>No hay facturas para mostrar</p>
-              <p className="text-sm">Genera facturas para el período seleccionado</p>
+              <p className="text-sm">
+                Genera facturas para el período seleccionado
+              </p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -264,17 +280,17 @@ export function FinancialDashboard({ complexId }: FinancialDashboardProps) {
                     <div className="flex items-center gap-2">
                       <Badge
                         variant={
-                          bill.status === 'PAID' 
-                            ? 'default' 
-                            : bill.status === 'OVERDUE' 
-                            ? 'destructive' 
-                            : 'secondary'
+                          bill.status === "PAID"
+                            ? "default"
+                            : bill.status === "OVERDUE"
+                              ? "destructive"
+                              : "secondary"
                         }
                       >
-                        {bill.status === 'PAID' && 'Pagado'}
-                        {bill.status === 'PENDING' && 'Pendiente'}
-                        {bill.status === 'PARTIAL' && 'Parcial'}
-                        {bill.status === 'OVERDUE' && 'Vencido'}
+                        {bill.status === "PAID" && "Pagado"}
+                        {bill.status === "PENDING" && "Pendiente"}
+                        {bill.status === "PARTIAL" && "Parcial"}
+                        {bill.status === "OVERDUE" && "Vencido"}
                       </Badge>
                     </div>
                   </div>

@@ -3,8 +3,8 @@
  * Proporciona funcionalidades para envío de mensajes WhatsApp
  */
 
-import { ServerLogger } from '../logging/server-logger';
-import twilio from 'twilio';
+import { ServerLogger } from "../logging/server-logger";
+import twilio from "twilio";
 
 const logger = ServerLogger;
 
@@ -23,25 +23,31 @@ const client = twilio(accountSid, authToken);
  * @param options.media - Objeto con información de medios adjuntos (opcional)
  * @returns Resultado del envío
  */
-export async function sendWhatsAppMessage(options: { to: string; message: string; media?: any }): Promise<any> {
+export async function sendWhatsAppMessage(options: {
+  to: string;
+  message: string;
+  media?: any;
+}): Promise<any> {
   try {
     if (!options || !options.to || !options.message) {
-      throw new Error('Datos de WhatsApp incompletos');
+      throw new Error("Datos de WhatsApp incompletos");
     }
 
     if (!accountSid || !authToken || !twilioWhatsAppNumber) {
-      logger.warn('Credenciales de Twilio para WhatsApp no configuradas. Usando mock de WhatsApp.');
+      logger.warn(
+        "Credenciales de Twilio para WhatsApp no configuradas. Usando mock de WhatsApp.",
+      );
       // Fallback a mock si las credenciales no están configuradas
       return {
         success: true,
         messageId: `mock_whatsapp_${Date.now()}`,
         to: options.to,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
-    
+
     logger.info(`Enviando WhatsApp a ${options.to}`);
-    
+
     const messageOptions: any = {
       body: options.message,
       from: `whatsapp:${twilioWhatsAppNumber}`,
@@ -53,21 +59,21 @@ export async function sendWhatsAppMessage(options: { to: string; message: string
     }
 
     const message = await client.messages.create(messageOptions);
-    
+
     const result = {
       success: true,
       messageId: message.sid,
       to: options.to,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
-    
+
     logger.info(`WhatsApp enviado correctamente: ${result.messageId}`);
     return result;
   } catch (error: any) {
     logger.error(`Error al enviar WhatsApp: ${error.message}`);
     return {
       success: false,
-      error: error.message
+      error: error.message,
     };
   }
 }
@@ -79,60 +85,72 @@ export async function sendWhatsAppMessage(options: { to: string; message: string
  * @param media - Objeto con información de medios adjuntos (opcional)
  * @returns Resultado del envío
  */
-export async function sendBulkWhatsAppMessage(phoneNumbers: string[], message: string, media?: any): Promise<any> {
+export async function sendBulkWhatsAppMessage(
+  phoneNumbers: string[],
+  message: string,
+  media?: any,
+): Promise<any> {
   try {
-    if (!phoneNumbers || !Array.isArray(phoneNumbers) || phoneNumbers.length === 0) {
-      throw new Error('Se requiere al menos un número de teléfono');
+    if (
+      !phoneNumbers ||
+      !Array.isArray(phoneNumbers) ||
+      phoneNumbers.length === 0
+    ) {
+      throw new Error("Se requiere al menos un número de teléfono");
     }
-    
+
     if (!message) {
-      throw new Error('Se requiere un mensaje');
+      throw new Error("Se requiere un mensaje");
     }
-    
+
     logger.info(`Enviando WhatsApp masivo a ${phoneNumbers.length} números`);
-    
+
     const results = {
       success: true,
       total: phoneNumbers.length,
       sent: 0,
       failed: 0,
-      results: [] as any[]
+      results: [] as any[],
     };
-    
+
     // Enviar a cada número
     for (const phoneNumber of phoneNumbers) {
       try {
         const result = await sendWhatsAppMessage({
           to: phoneNumber,
           message,
-          media
+          media,
         });
-        
+
         results.results.push({
           phoneNumber,
           success: result.success,
-          messageId: result.messageId
+          messageId: result.messageId,
         });
-        
+
         if (result.success) {
           results.sent++;
         } else {
           results.failed++;
         }
       } catch (phoneError: any) {
-        logger.error(`Error al enviar a número ${phoneNumber}: ${phoneError.message}`);
+        logger.error(
+          `Error al enviar a número ${phoneNumber}: ${phoneError.message}`,
+        );
         results.failed++;
         results.results.push({
           phoneNumber,
           success: false,
-          error: phoneError.message
+          error: phoneError.message,
         });
       }
     }
-    
+
     results.success = results.sent > 0;
-    
-    logger.info(`WhatsApp masivo enviado a ${results.sent}/${results.total} números`);
+
+    logger.info(
+      `WhatsApp masivo enviado a ${results.sent}/${results.total} números`,
+    );
     return results;
   } catch (error: any) {
     logger.error(`Error al enviar WhatsApp masivo: ${error.message}`);
@@ -141,7 +159,7 @@ export async function sendBulkWhatsAppMessage(phoneNumbers: string[], message: s
       error: error.message,
       total: phoneNumbers ? phoneNumbers.length : 0,
       sent: 0,
-      failed: phoneNumbers ? phoneNumbers.length : 0
+      failed: phoneNumbers ? phoneNumbers.length : 0,
     };
   }
 }

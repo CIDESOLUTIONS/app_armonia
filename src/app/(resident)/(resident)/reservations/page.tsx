@@ -1,14 +1,27 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { useAuthStore } from '@/store/authStore';
-import { Loader2, PlusCircle, Eye, Calendar as CalendarIcon, DollarSign } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import Link from 'next/link';
-import { useToast } from '@/components/ui/use-toast';
-import { getReservations } from '@/services/reservationService';
+import { useState, useEffect, useCallback } from "react";
+import { useAuthStore } from "@/store/authStore";
+import {
+  Loader2,
+  PlusCircle,
+  Eye,
+  Calendar as CalendarIcon,
+  DollarSign,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import Link from "next/link";
+import { useToast } from "@/components/ui/use-toast";
+import { getReservations } from "@/services/reservationService";
 
 interface Reservation {
   id: number;
@@ -22,7 +35,7 @@ interface Reservation {
   description?: string;
   startDateTime: string;
   endDateTime: string;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED' | 'COMPLETED';
+  status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "COMPLETED";
   attendees: number;
   requiresPayment: boolean;
   paymentAmount?: number;
@@ -48,11 +61,11 @@ export default function ResidentReservationsPage() {
       const data = await getReservations(); // This will fetch only resident's reservations due to authMiddleware
       setReservations(data);
     } catch (error) {
-      console.error('Error fetching resident reservations:', error);
+      console.error("Error fetching resident reservations:", error);
       toast({
-        title: 'Error',
-        description: 'No se pudieron cargar tus reservas.',
-        variant: 'destructive',
+        title: "Error",
+        description: "No se pudieron cargar tus reservas.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -79,8 +92,10 @@ export default function ResidentReservationsPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Mis Reservas de Áreas Comunes</h1>
-      
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        Mis Reservas de Áreas Comunes
+      </h1>
+
       <div className="flex justify-end mb-4">
         <Link href="/resident/reservations/create">
           <Button>
@@ -107,26 +122,43 @@ export default function ResidentReservationsPage() {
                 <TableRow key={reservation.id}>
                   <TableCell>{reservation.commonAreaName}</TableCell>
                   <TableCell>{reservation.title}</TableCell>
-                  <TableCell>{new Date(reservation.startDateTime).toLocaleString()}</TableCell>
-                  <TableCell>{new Date(reservation.endDateTime).toLocaleString()}</TableCell>
                   <TableCell>
-                    <Badge variant={reservation.status === 'APPROVED' ? 'default' : reservation.status === 'PENDING' ? 'secondary' : 'destructive'}>
+                    {new Date(reservation.startDateTime).toLocaleString()}
+                  </TableCell>
+                  <TableCell>
+                    {new Date(reservation.endDateTime).toLocaleString()}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        reservation.status === "APPROVED"
+                          ? "default"
+                          : reservation.status === "PENDING"
+                            ? "secondary"
+                            : "destructive"
+                      }
+                    >
                       {reservation.status}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Link href={`/resident/reservations/${reservation.id}/view`}>
+                    <Link
+                      href={`/resident/reservations/${reservation.id}/view`}
+                    >
                       <Button variant="ghost" size="sm">
                         <Eye className="h-4 w-4" />
                       </Button>
                     </Link>
-                    {reservation.requiresPayment && reservation.paymentStatus !== 'PAID' && (
-                      <Link href={`/resident/reservations/${reservation.id}/pay`}>
-                        <Button variant="ghost" size="sm" className="ml-2">
-                          <DollarSign className="h-4 w-4 text-green-600" />
-                        </Button>
-                      </Link>
-                    )}
+                    {reservation.requiresPayment &&
+                      reservation.paymentStatus !== "PAID" && (
+                        <Link
+                          href={`/resident/reservations/${reservation.id}/pay`}
+                        >
+                          <Button variant="ghost" size="sm" className="ml-2">
+                            <DollarSign className="h-4 w-4 text-green-600" />
+                          </Button>
+                        </Link>
+                      )}
                   </TableCell>
                 </TableRow>
               ))

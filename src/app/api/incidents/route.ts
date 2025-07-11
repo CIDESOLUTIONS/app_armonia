@@ -1,16 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { incidentService } from '@/services/incidentService';
-import { validateCsrfToken } from '@/lib/security/csrf-protection';
-import { sanitizeData } from '@/lib/security/xss-protection';
-import { logAuditAction } from '@/lib/security/audit-trail';
-import { getServerSession } from 'next-auth';
-import { withValidation, validateRequest } from '@/lib/validation';
-import { 
+import { NextRequest, NextResponse } from "next/server";
+import { incidentService } from "@/services/incidentService";
+import { validateCsrfToken } from "@/lib/security/csrf-protection";
+import { sanitizeData } from "@/lib/security/xss-protection";
+import { logAuditAction } from "@/lib/security/audit-trail";
+import { getServerSession } from "next-auth";
+import { withValidation, validateRequest } from "@/lib/validation";
+import {
   GetIncidentsSchema,
   CreateIncidentSchema,
   type GetIncidentsRequest,
-  type CreateIncidentRequest
-} from '@/validators/incidents/incident.validator';
+  type CreateIncidentRequest,
+} from "@/validators/incidents/incident.validator";
 
 /**
  * GET /api/incidents
@@ -21,29 +21,26 @@ export async function GET(request: NextRequest) {
     // Obtener sesión del usuario
     const session = await getServerSession();
     if (!session || !session.user) {
-      return NextResponse.json(
-        { error: 'No autorizado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
     // Obtener parámetros de consulta
     const searchParams = request.nextUrl.searchParams;
     const queryParams = {
-      page: searchParams.get('page'),
-      limit: searchParams.get('limit'),
-      status: searchParams.get('status'),
-      category: searchParams.get('category'),
-      priority: searchParams.get('priority'),
-      search: searchParams.get('search'),
-      startDate: searchParams.get('startDate'),
-      endDate: searchParams.get('endDate'),
-      unitNumber: searchParams.get('unitNumber'),
-      reportedById: searchParams.get('reportedById'),
-      assignedToId: searchParams.get('assignedToId'),
-      isPublic: searchParams.get('isPublic'),
-      isEmergency: searchParams.get('isEmergency'),
-      tags: searchParams.get('tags')
+      page: searchParams.get("page"),
+      limit: searchParams.get("limit"),
+      status: searchParams.get("status"),
+      category: searchParams.get("category"),
+      priority: searchParams.get("priority"),
+      search: searchParams.get("search"),
+      startDate: searchParams.get("startDate"),
+      endDate: searchParams.get("endDate"),
+      unitNumber: searchParams.get("unitNumber"),
+      reportedById: searchParams.get("reportedById"),
+      assignedToId: searchParams.get("assignedToId"),
+      isPublic: searchParams.get("isPublic"),
+      isEmergency: searchParams.get("isEmergency"),
+      tags: searchParams.get("tags"),
     };
 
     // Validar parámetros
@@ -53,11 +50,12 @@ export async function GET(request: NextRequest) {
     }
 
     const validatedParams = validation.data;
-    
+
     // Filtrar acceso según rol
-    const isAdmin = session.user.role === 'ADMIN' || session.user.role === 'COMPLEX_ADMIN';
-    const isStaff = session.user.role === 'STAFF';
-    const isResident = session.user.role === 'RESIDENT';
+    const isAdmin =
+      session.user.role === "ADMIN" || session.user.role === "COMPLEX_ADMIN";
+    const isStaff = session.user.role === "STAFF";
+    const isResident = session.user.role === "RESIDENT";
 
     // Aplicar restricciones según rol
     const finalParams: any = { ...validatedParams };
@@ -82,21 +80,21 @@ export async function GET(request: NextRequest) {
     // Registrar evento de auditoría
     await logAuditEvent({
       userId: session.user.id,
-      entityType: 'INCIDENT',
-      entityId: 'LIST',
-      action: 'INCIDENT_LIST_VIEWED',
+      entityType: "INCIDENT",
+      entityId: "LIST",
+      action: "INCIDENT_LIST_VIEWED",
       details: JSON.stringify({
         filters: finalParams,
-        resultCount: result.pagination.total
-      })
+        resultCount: result.pagination.total,
+      }),
     });
 
     return NextResponse.json(result);
   } catch (error: any) {
-    console.error('Error al obtener incidentes:', error);
+    console.error("Error al obtener incidentes:", error);
     return NextResponse.json(
-      { error: error.message || 'Error al obtener incidentes' },
-      { status: 500 }
+      { error: error.message || "Error al obtener incidentes" },
+      { status: 500 },
     );
   }
 }
@@ -105,23 +103,23 @@ export async function GET(request: NextRequest) {
  * POST /api/incidents
  * Crea un nuevo incidente
  */
-async function createIncidentHandler(validatedData: CreateIncidentRequest, request: NextRequest) {
+async function createIncidentHandler(
+  validatedData: CreateIncidentRequest,
+  request: NextRequest,
+) {
   try {
     // Obtener sesión del usuario
     const session = await getServerSession();
     if (!session || !session.user) {
-      return NextResponse.json(
-        { error: 'No autorizado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
     // Validar token CSRF
     const csrfValidation = await validateCsrfToken(request);
     if (!csrfValidation.valid) {
       return NextResponse.json(
-        { error: 'Token CSRF inválido' },
-        { status: 403 }
+        { error: "Token CSRF inválido" },
+        { status: 403 },
       );
     }
 
@@ -131,17 +129,27 @@ async function createIncidentHandler(validatedData: CreateIncidentRequest, reque
       title: sanitizeInput(validatedData.title),
       description: sanitizeInput(validatedData.description),
       category: sanitizeInput(validatedData.category),
-      subcategory: validatedData.subcategory ? sanitizeInput(validatedData.subcategory) : undefined,
+      subcategory: validatedData.subcategory
+        ? sanitizeInput(validatedData.subcategory)
+        : undefined,
       priority: validatedData.priority,
-      impact: validatedData.impact ? sanitizeInput(validatedData.impact) : undefined,
+      impact: validatedData.impact
+        ? sanitizeInput(validatedData.impact)
+        : undefined,
       location: sanitizeInput(validatedData.location),
-      unitNumber: validatedData.unitNumber ? sanitizeInput(validatedData.unitNumber) : undefined,
+      unitNumber: validatedData.unitNumber
+        ? sanitizeInput(validatedData.unitNumber)
+        : undefined,
       area: validatedData.area ? sanitizeInput(validatedData.area) : undefined,
       reportedById: session.user.id,
-      reportedByName: session.user.name || 'Usuario',
+      reportedByName: session.user.name || "Usuario",
       reportedByRole: session.user.role,
-      tags: validatedData.tags ? validatedData.tags.map((tag: string) => sanitizeInput(tag)) : [],
-      mainPhotoUrl: validatedData.mainPhotoUrl ? sanitizeInput(validatedData.mainPhotoUrl) : undefined,
+      tags: validatedData.tags
+        ? validatedData.tags.map((tag: string) => sanitizeInput(tag))
+        : [],
+      mainPhotoUrl: validatedData.mainPhotoUrl
+        ? sanitizeInput(validatedData.mainPhotoUrl)
+        : undefined,
     };
 
     // Crear incidente
@@ -150,22 +158,22 @@ async function createIncidentHandler(validatedData: CreateIncidentRequest, reque
     // Registrar evento de auditoría
     await logAuditEvent({
       userId: session.user.id,
-      entityType: 'INCIDENT',
+      entityType: "INCIDENT",
       entityId: incident.id.toString(),
-      action: 'INCIDENT_CREATED',
+      action: "INCIDENT_CREATED",
       details: JSON.stringify({
         title: incident.title,
         category: incident.category,
-        priority: incident.priority
-      })
+        priority: incident.priority,
+      }),
     });
 
     return NextResponse.json(incident, { status: 201 });
   } catch (error: any) {
-    console.error('Error al crear incidente:', error);
+    console.error("Error al crear incidente:", error);
     return NextResponse.json(
-      { error: error.message || 'Error al crear incidente' },
-      { status: 500 }
+      { error: error.message || "Error al crear incidente" },
+      { status: 500 },
     );
   }
 }
