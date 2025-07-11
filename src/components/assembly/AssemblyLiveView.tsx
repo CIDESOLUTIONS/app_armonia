@@ -436,13 +436,13 @@ const AssemblyLiveView = () => {
             <CardContent className="p-0">
               <div className="max-h-[400px] overflow-y-auto">
                 <Table>
-                  <TableHeader></TableHeader>
+                  <TableHeader>
                     <TableRow>
                       <TableHead>Unidad</TableHead>
                       <TableHead>Coeficiente</TableHead>
                       <TableHead>Tipo</TableHead>
                     </TableRow>
-                  </TableHead>
+                  </TableHeader>
                   <TableBody>
                     {attendees.length === 0 ? (
                       <TableRow>
@@ -539,7 +539,7 @@ const AssemblyLiveView = () => {
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <Table>
-                  <TableHeader></TableHeader>
+                  <TableHeader>
                     <TableRow>
                       <TableHead>Título</TableHead>
                       <TableHead>Tipo</TableHead>
