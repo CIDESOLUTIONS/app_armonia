@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, User, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -23,13 +23,7 @@ export default function ResidentDirectoryPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchResidents();
-    }
-  }, [authLoading, user]);
-
-  const fetchResidents = async () => {
+  const fetchResidents = useCallback(async () => {
     setLoading(true);
     try {
       // Fetch all residents, then filter on client-side for simplicity
@@ -46,7 +40,13 @@ export default function ResidentDirectoryPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchResidents();
+    }
+  }, [authLoading, user, fetchResidents]);
 
   const filteredResidents = residents.filter(resident =>
     resident.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

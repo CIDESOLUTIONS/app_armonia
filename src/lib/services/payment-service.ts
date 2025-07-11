@@ -90,7 +90,7 @@ export class PayUAdapter implements PaymentGatewayAdapter {
       return true;
     } catch (error) {
       ServerLogger.error('Error inicializando PayU', error);
-      return false;
+      throw error;
     }
   }
 
@@ -109,7 +109,7 @@ export class PayUAdapter implements PaymentGatewayAdapter {
       };
     } catch (error) {
       ServerLogger.error('Error creando pago en PayU', error);
-      throw new Error('No se pudo crear el pago en PayU');
+      throw error;
     }
   }
 
@@ -128,7 +128,7 @@ export class PayUAdapter implements PaymentGatewayAdapter {
       };
     } catch (error) {
       ServerLogger.error('Error procesando pago en PayU', error);
-      throw new Error('No se pudo procesar el pago en PayU');
+      throw error;
     }
   }
 
@@ -146,7 +146,7 @@ export class PayUAdapter implements PaymentGatewayAdapter {
       };
     } catch (error) {
       ServerLogger.error('Error verificando pago en PayU', error);
-      throw new Error('No se pudo verificar el pago en PayU');
+      throw error;
     }
   }
 
@@ -161,7 +161,7 @@ export class PayUAdapter implements PaymentGatewayAdapter {
       };
     } catch (error) {
       ServerLogger.error('Error reembolsando pago en PayU', error);
-      throw new Error('No se pudo reembolsar el pago en PayU');
+      throw error;
     }
   }
 
@@ -172,7 +172,7 @@ export class PayUAdapter implements PaymentGatewayAdapter {
       return true;
     } catch (error) {
       ServerLogger.error('Error validando webhook de PayU', error);
-      return false;
+      throw error;
     }
   }
 }
@@ -194,7 +194,7 @@ export class WompiAdapter implements PaymentGatewayAdapter {
       return true;
     } catch (error) {
       ServerLogger.error('Error inicializando Wompi', error);
-      return false;
+      throw error;
     }
   }
 
@@ -213,7 +213,7 @@ export class WompiAdapter implements PaymentGatewayAdapter {
       };
     } catch (error) {
       ServerLogger.error('Error creando pago en Wompi', error);
-      throw new Error('No se pudo crear el pago en Wompi');
+      throw error;
     }
   }
 
@@ -232,7 +232,7 @@ export class WompiAdapter implements PaymentGatewayAdapter {
       };
     } catch (error) {
       ServerLogger.error('Error procesando pago en Wompi', error);
-      throw new Error('No se pudo procesar el pago en Wompi');
+      throw error;
     }
   }
 
@@ -250,7 +250,7 @@ export class WompiAdapter implements PaymentGatewayAdapter {
       };
     } catch (error) {
       ServerLogger.error('Error verificando pago en Wompi', error);
-      throw new Error('No se pudo verificar el pago en Wompi');
+      throw error;
     }
   }
 
@@ -265,7 +265,7 @@ export class WompiAdapter implements PaymentGatewayAdapter {
       };
     } catch (error) {
       ServerLogger.error('Error reembolsando pago en Wompi', error);
-      throw new Error('No se pudo reembolsar el pago en Wompi');
+      throw error;
     }
   }
 
@@ -275,13 +275,13 @@ export class WompiAdapter implements PaymentGatewayAdapter {
       return true;
     } catch (error) {
       ServerLogger.error('Error validando webhook de Wompi', error);
-      return false;
+      throw error;
     }
   }
 }
 
 // Fábrica de adaptadores de pasarelas
-class PaymentGatewayFactory {
+export class PaymentGatewayFactory {
   static createAdapter(gatewayName: string): PaymentGatewayAdapter | null {
     switch (gatewayName.toLowerCase()) {
       case 'payu':

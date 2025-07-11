@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, MessageSquare, User, Tag, Clock } from 'lucide-react';
@@ -48,13 +48,7 @@ export default function ViewResidentPQRPage() {
   const [loading, setLoading] = useState(true);
   const [newComment, setNewComment] = useState('');
 
-  useEffect(() => {
-    if (!authLoading && user && pqrId) {
-      fetchPQR();
-    }
-  }, [authLoading, user, pqrId]);
-
-  const fetchPQR = async () => {
+  const fetchPQR = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getPQRById(pqrId as number);
@@ -70,7 +64,13 @@ export default function ViewResidentPQRPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [pqrId, router, toast]);
+
+  useEffect(() => {
+    if (!authLoading && user && pqrId) {
+      fetchPQR();
+    }
+  }, [authLoading, user, pqrId, fetchPQR]);
 
   const handleAddComment = async () => {
     if (!pqrId || !newComment.trim()) return;

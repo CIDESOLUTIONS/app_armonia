@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -70,7 +68,7 @@ export default function ReceptionDashboard() {
   // const { notifications, unreadNotificationsCount } = useRealTimeCommunication();
 
   // Datos de ejemplo para desarrollo y pruebas
-  const mockData: DashboardData = {
+  const mockData: DashboardData = useMemo(() => ({
     activeVisitors: [
       {
         id: "v1",
@@ -175,7 +173,31 @@ export default function ReceptionDashboard() {
       activeIncidents: 3,
       securityAlerts: 0
     }
-  };
+  }), []);
+
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // En un entorno real, esto sería una llamada a la API
+      // const response = await fetch('/api/dashboard');
+      // const result = await response.json();
+      // if (!response.ok) throw new Error(result.message || 'Error al cargar datos');
+      // setData(result);
+      
+      // Simulamos un retraso en la carga de datos
+      setTimeout(() => {
+        setData(mockData);
+        setLoading(false);
+      }, 1000);
+      
+    } catch (err: any) {
+      console.error("[ReceptionDashboard] Error:", err);
+      setError(err.message || 'Error al cargar datos del dashboard');
+      setLoading(false);
+    }
+  }, [mockData]);
 
   useEffect(() => {
     if (!isLoggedIn || !token || !schemaName) {
@@ -183,32 +205,8 @@ export default function ReceptionDashboard() {
       return;
     }
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // En un entorno real, esto sería una llamada a la API
-        // // Variable response eliminada por lint
-        // const _result = await response.json();
-        // if (!response.ok) throw new Error(result.message || 'Error al cargar datos');
-        // setData(result);
-        
-        // Simulamos un retraso en la carga de datos
-        setTimeout(() => {
-          setData(mockData);
-          setLoading(false);
-        }, 1000);
-        
-      } catch (err) {
-        console.error("[ReceptionDashboard] Error:", err);
-        setError(err.message || 'Error al cargar datos del dashboard');
-        setLoading(false);
-      }
-    };
-
     fetchData();
-  }, [isLoggedIn, token, schemaName, router]);
+  }, [isLoggedIn, token, schemaName, router, fetchData]);
 
   // Función para formatear fechas y horas
   const formatDateTime = (dateTimeStr: string) => {

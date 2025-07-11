@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -34,13 +34,7 @@ export default function GeneralSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState<Partial<ComplexInfo>>({});
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchComplexInfo();
-    }
-  }, [authLoading, user]);
-
-  const fetchComplexInfo = async () => {
+  const fetchComplexInfo = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getComplexInfo();
@@ -56,7 +50,13 @@ export default function GeneralSettingsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchComplexInfo();
+    }
+  }, [authLoading, user, fetchComplexInfo]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;

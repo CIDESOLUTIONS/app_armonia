@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, PlusCircle, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -31,13 +31,7 @@ export default function ResidentPQRPage() {
   const [pqrs, setPqrs] = useState<PQR[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchPQRs();
-    }
-  }, [authLoading, user]);
-
-  const fetchPQRs = async () => {
+  const fetchPQRs = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getPQRs({ reportedById: user?.id }); // Fetch PQRs reported by current user
@@ -52,7 +46,13 @@ export default function ResidentPQRPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast, user?.id]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchPQRs();
+    }
+  }, [authLoading, user, fetchPQRs]);
 
   if (authLoading || loading) {
     return (

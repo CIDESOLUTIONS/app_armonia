@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, PlusCircle, Edit, Trash2 } from 'lucide-react';
@@ -42,13 +42,7 @@ export default function PropertiesPage() {
     isActive: true,
   });
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchProperties();
-    }
-  }, [authLoading, user]);
-
-  const fetchProperties = async () => {
+  const fetchProperties = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getProperties();
@@ -63,7 +57,13 @@ export default function PropertiesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchProperties();
+    }
+  }, [authLoading, user, fetchProperties]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;

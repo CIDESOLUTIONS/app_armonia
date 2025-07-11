@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, Calendar, MapPin, FileText, Users, CheckCircle, XCircle, Edit, Clock } from 'lucide-react';
@@ -34,18 +34,12 @@ export default function ViewAssemblyPage() {
   const [assembly, setAssembly] = useState<Assembly | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!authLoading && user && assemblyId) {
-      fetchAssembly();
-    }
-  }, [authLoading, user, assemblyId]);
-
-  const fetchAssembly = async () => {
+  const fetchAssembly = useCallback(async () => {
     setLoading(true);
     try {
       // For simplicity, fetching all and filtering. In a real app, you'd have a getAssemblyById endpoint.
       const response = await getAssemblies(); 
-      const foundAssembly = response.data.find(a => a.id === assemblyId);
+      const foundAssembly = response.data.find((a: Assembly) => a.id === assemblyId);
       if (foundAssembly) {
         setAssembly(foundAssembly);
       } else {
@@ -67,7 +61,13 @@ export default function ViewAssemblyPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [assemblyId, router, toast]);
+
+  useEffect(() => {
+    if (!authLoading && user && assemblyId) {
+      fetchAssembly();
+    }
+  }, [authLoading, user, assemblyId, fetchAssembly]);
 
   if (authLoading || loading) {
     return (

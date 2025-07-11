@@ -1,6 +1,4 @@
-"use client";
-
-import { useState, useEffect } from 'react';
+"import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,7 +22,7 @@ export default function SurveillancePage() {
   const { user, loading } = useAuthStore();
   const router = useRouter();
   const [cameras, setCameras] = useState<CameraFeed[]>([]);
-  const [selectedCamera, setSelectedCamera] = useState<string>('all');
+  const [selectedCamera, setSelectedCamera] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
 
   // Datos de ejemplo para desarrollo
@@ -59,6 +57,14 @@ export default function SurveillancePage() {
     }
   ];
 
+  const fetchData = useCallback(() => {
+    // Simular carga de datos
+    setTimeout(() => {
+      setCameras(mockCameras);
+      setIsLoading(false);
+    }, 1000);
+  }, [mockCameras]);
+
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login?portal=reception');
@@ -70,12 +76,8 @@ export default function SurveillancePage() {
       return;
     }
 
-    // Simular carga de datos
-    setTimeout(() => {
-      setCameras(mockCameras);
-      setIsLoading(false);
-    }, 1000);
-  }, [user, loading, router]);
+    fetchData();
+  }, [user, loading, router, fetchData]);
 
   const getStatusColor = (status: string) => {
     switch (status) {

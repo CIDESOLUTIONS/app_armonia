@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, PlusCircle, Edit, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -43,13 +43,7 @@ export default function CommonAreasPage() {
     isActive: true,
   });
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchAmenities();
-    }
-  }, [authLoading, user]);
-
-  const fetchAmenities = async () => {
+  const fetchAmenities = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getAmenities();
@@ -64,7 +58,13 @@ export default function CommonAreasPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchAmenities();
+    }
+  }, [authLoading, user, fetchAmenities]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;

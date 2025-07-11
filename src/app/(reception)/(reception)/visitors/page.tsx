@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { Card, CardContent } from '@/components/ui/card';
@@ -16,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { UserPlus, LogOut, Search, Camera, IdCard, User, AlertCircle, CheckCircle, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import Image from 'next/image';
 
 interface Visitor {
   id: string;
@@ -88,38 +87,38 @@ export default function ReceptionVisitorsPage() {
     }
   ];
 
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      _setError(null);
+      
+      // En un entorno real, esto sería una llamada a la API
+      // const response = await fetch('/api/visitors');
+      // const result = await response.json();
+      // if (!response.ok) throw new Error(result.message || 'Error al cargar datos');
+      // setVisitors(result.visitors);
+      
+      // Simulamos un retraso en la carga de datos
+      setTimeout(() => {
+        setVisitors(mockVisitors);
+        setLoading(false);
+      }, 1000);
+      
+    } catch (err: any) {
+      console.error("[ReceptionVisitors] Error:", err);
+      _setError(err.message || 'Error al cargar datos de visitantes');
+      setLoading(false);
+    }
+  }, [mockVisitors, _setError, setVisitors, setLoading]);
+
   useEffect(() => {
-    if (!isLoggedIn || !token || !schemaName) {
-      router.push('/login');
+    if (!isLoggedIn || !_token || !schemaName) {
+      _router.push('/login');
       return;
     }
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // En un entorno real, esto sería una llamada a la API
-        // // Variable response eliminada por lint
-        // const _result = await response.json();
-        // if (!response.ok) throw new Error(result.message || 'Error al cargar datos');
-        // setVisitors(result.visitors);
-        
-        // Simulamos un retraso en la carga de datos
-        setTimeout(() => {
-          setVisitors(mockVisitors);
-          setLoading(false);
-        }, 1000);
-        
-      } catch (err) {
-        console.error("[ReceptionVisitors] Error:", err);
-        setError(err.message || 'Error al cargar datos de visitantes');
-        setLoading(false);
-      }
-    };
-
     fetchData();
-  }, [isLoggedIn, token, schemaName, router]);
+  }, [isLoggedIn, _token, schemaName, _router, fetchData]);
 
   // Función para formatear fechas
   const formatDate = (dateString: string | undefined) => {
@@ -408,10 +407,12 @@ export default function ReceptionVisitorsPage() {
                   <TableRow key={visitor.id}>
                     <TableCell>
                       {visitor.photoUrl ? (
-                        <img 
+                        <Image 
                           src={visitor.photoUrl} 
                           alt={visitor.name} 
-                          className="h-10 w-10 rounded-full object-cover"
+                          width={40}
+                          height={40}
+                          className="rounded-full object-cover"
                         />
                       ) : (
                         <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
@@ -568,11 +569,13 @@ export default function ReceptionVisitorsPage() {
               </div>
               {newVisitorForm.photo && (
                 <div className="mt-2 flex items-center bg-gray-50 p-2 rounded-md">
-                  <img 
-                    src={URL.createObjectURL(newVisitorForm.photo)} 
-                    alt="Preview" 
-                    className="h-10 w-10 rounded-md object-cover mr-3"
-                  />
+                  <Image 
+                  src={URL.createObjectURL(newVisitorForm.photo)} 
+                  alt="Preview" 
+                  width={40}
+                  height={40}
+                  className="h-10 w-10 rounded-md object-cover mr-3"
+                />
                   <span className="text-sm truncate flex-grow">{newVisitorForm.photo.name}</span>
                   <Button 
                     variant="ghost" 

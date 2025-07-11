@@ -62,7 +62,7 @@ export class PQRNotificationService {
    * @param comment Comentario opcional sobre el cambio
    * @returns true si la notificación fue enviada correctamente
    */
-  export async function notifyStatusChange(
+  async notifyStatusChange(
     pqrId: number,
     newStatus: string,
     previousStatus?: string,
@@ -166,7 +166,7 @@ export class PQRNotificationService {
    * Envía recordatorios para PQRs próximos a vencer
    * @returns Número de recordatorios enviados
    */
-  export async function sendDueDateReminders(): Promise<number> {
+  async sendDueDateReminders(): Promise<number> {
     try {
       // Simular envío de recordatorios para 3 PQRs
       return 3;

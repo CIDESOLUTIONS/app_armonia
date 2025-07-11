@@ -1,6 +1,4 @@
-"use client";
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -40,7 +38,7 @@ export default function RealTimeVoting({
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
-  const fetchVotingStats = async () => {
+  const fetchVotingStats = useCallback(async () => {
     try {
       const response = await fetch(`/api/assemblies/${assemblyId}/agenda/${agendaNumeral}/votes`);
       
@@ -52,13 +50,13 @@ export default function RealTimeVoting({
       setStats(data);
       setLastUpdate(new Date());
       setError(null);
-    } catch (err) {
+    } catch (err: any) {
       console.error('[RealTimeVoting] Error:', err);
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [assemblyId, agendaNumeral, language]);
 
   const submitVote = async (value: 'YES' | 'NO') => {
     if (submitting) return;
@@ -87,7 +85,7 @@ export default function RealTimeVoting({
       // Actualizar estadísticas y notificar al componente padre
       fetchVotingStats();
       onVoteSubmitted();
-    } catch (err) {
+    } catch (err: any) {
       console.error('[RealTimeVoting] Error submitting vote:', err);
       toast({
         title: language === 'Español' ? 'Error' : 'Error',
@@ -109,7 +107,7 @@ export default function RealTimeVoting({
     }, 15000);
     
     return () => clearInterval(intervalId);
-  }, [assemblyId, agendaNumeral]);
+  }, [assemblyId, agendaNumeral, fetchVotingStats]);
 
   if (loading) {
     return (

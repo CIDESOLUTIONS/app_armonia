@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, PlusCircle, Edit, Trash2 } from 'lucide-react';
@@ -40,13 +40,7 @@ export default function ResidentsPage() {
     isActive: true,
   });
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchResidents();
-    }
-  }, [authLoading, user]);
-
-  const fetchResidents = async () => {
+  const fetchResidents = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getResidents();
@@ -61,7 +55,13 @@ export default function ResidentsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchResidents();
+    }
+  }, [authLoading, user, fetchResidents]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;

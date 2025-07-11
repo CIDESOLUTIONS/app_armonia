@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, PlusCircle, Edit, Trash2, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -40,13 +40,7 @@ export default function AnnouncementsPage() {
     targetRoles: [] as string[],
   });
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchAnnouncements();
-    }
-  }, [authLoading, user]);
-
-  const fetchAnnouncements = async () => {
+  const fetchAnnouncements = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getAnnouncements();
@@ -61,7 +55,13 @@ export default function AnnouncementsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchAnnouncements();
+    }
+  }, [authLoading, user, fetchAnnouncements]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;

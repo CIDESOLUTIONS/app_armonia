@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, PlusCircle, Eye, Calendar as CalendarIcon, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -42,13 +42,7 @@ export default function ResidentReservationsPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchReservations();
-    }
-  }, [authLoading, user]);
-
-  const fetchReservations = async () => {
+  const fetchReservations = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getReservations(); // This will fetch only resident's reservations due to authMiddleware
@@ -63,7 +57,13 @@ export default function ResidentReservationsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchReservations();
+    }
+  }, [authLoading, user, fetchReservations]);
 
   if (authLoading || loading) {
     return (

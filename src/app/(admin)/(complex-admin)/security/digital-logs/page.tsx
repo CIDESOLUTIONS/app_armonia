@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, PlusCircle, Edit, Trash2, FileText } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -34,13 +34,7 @@ export default function DigitalLogsPage() {
     logDate: new Date().toISOString().slice(0, 16),
   });
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchLogs();
-    }
-  }, [authLoading, user]);
-
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getDigitalLogs();
@@ -55,7 +49,13 @@ export default function DigitalLogsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchLogs();
+    }
+  }, [authLoading, user, fetchLogs]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
