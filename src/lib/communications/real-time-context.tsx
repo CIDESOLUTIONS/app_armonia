@@ -139,7 +139,7 @@ export function RealTimeCommunicationProvider({ children }: { children: ReactNod
     return () => {
       socketInstance.disconnect();
     };
-  }, [user, token]);
+  }, [user, token, fetchInitialData]);
   
   // Cargar datos iniciales
   const fetchInitialData = async () => {

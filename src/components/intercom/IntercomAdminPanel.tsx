@@ -31,7 +31,7 @@ const schema = yup.object({
   retryDelay: yup.number().required('El tiempo entre reintentos es obligatorio').min(5, 'Mínimo 5 segundos')
 }).required();
 
-const IntercomAdminPanel: React.FC = () => {
+
   // Estados
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingData, setLoadingData] = useState<boolean>(true);
@@ -156,8 +156,6 @@ const IntercomAdminPanel: React.FC = () => {
       setLoading(false);
     }
   };
-
-  
 
   if (loadingData) {
     return (
@@ -512,6 +510,4 @@ Motivo: {{purpose}}"
   );
 };
 
-export default IntercomAdminPanel;
 
-export default IntercomAdminPanel;

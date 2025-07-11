@@ -21,6 +21,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { getDashboardStats, getRecentActivity, getUpcomingEvents } from '@/services/dashboardService'; // Added getUpcomingEvents
+import { DashboardCharts } from '@/components/admin/dashboard/DashboardCharts';
 
 interface DashboardStats {
   totalProperties: number;

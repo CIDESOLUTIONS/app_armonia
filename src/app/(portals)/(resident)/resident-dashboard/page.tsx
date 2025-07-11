@@ -19,8 +19,10 @@ import {
   TrendingDown,
   Clock,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Loader2
 } from 'lucide-react';
+import Link from 'next/link';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { getResidentDashboardStats } from '@/services/residentDashboardService';
 import { useAuthStore } from '@/store/authStore';

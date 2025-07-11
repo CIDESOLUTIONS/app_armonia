@@ -169,30 +169,3 @@ function ToastContainer() {
   );
 }
 
-// Helpers para uso directo
-export const _toast = {
-  success: (message: string, title?: string) => {
-    const context = useContext(ToastContext);
-    if (context) {
-      context.toast({ title, description: message, variant: 'success' });
-    }
-  },
-  error: (message: string, title?: string) => {
-    const context = useContext(ToastContext);
-    if (context) {
-      context.toast({ title, description: message, variant: 'destructive' });
-    }
-  },
-  info: (message: string, title?: string) => {
-    const context = useContext(ToastContext);
-    if (context) {
-      context.toast({ title, description: message, variant: 'default' });
-    }
-  },
-  warning: (message: string, title?: string) => {
-    const context = useContext(ToastContext);
-    if (context) {
-      context.toast({ title, description: message, variant: 'warning' });
-    }
-  }
-};

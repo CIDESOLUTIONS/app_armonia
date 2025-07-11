@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useAuthStore } from '@/store/authStore';
 import { ROUTES } from '@/constants/routes';
 import { AlertCircle, Building, Shield, ArrowLeft, User } from 'lucide-react';
+import { FormField } from '@/components/common/FormField';
 
 interface PortalInfo {
   type: 'admin' | 'resident' | 'reception' | null;

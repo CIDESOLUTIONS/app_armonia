@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
       absolute: true,
       relative: true,
       continuous: true,
-      presets: true,
+      
       home: true,
       zoom: true,
       focus: false,

@@ -39,12 +39,12 @@ import { es } from 'date-fns/locale';
 import AssemblyAdvancedService from '@/lib/services/assembly-advanced-service';
 import { WebSocketService } from '@/lib/communications/websocket-service';
 import { useAuth } from '@/lib/auth';
-import { AssemblyStatus, QuorumStatus } from '@prisma/client';
+import { AssemblyStatus } from '@prisma/client';
 import CreateVotingDialog from './CreateVotingDialog';
 import VotingResultsDialog from './VotingResultsDialog';
 
 // Componente para mostrar el estado del quórum
-const QuorumStatus = ({ 
+const QuorumStatusComponent = ({ 
   current, 
   required, 
   status 
@@ -229,7 +229,7 @@ const AssemblyLiveView = () => {
         }));
         break;
         
-      case 'VOTING_STARTED':
+      case 'VOTING_STARTED': {
         // Actualizar la votación iniciada
         setVotings(prev => prev.map(v => 
           v.id === data.votingId 
@@ -243,6 +243,7 @@ const AssemblyLiveView = () => {
           setActiveVoting({ ...startedVoting, status: 'ACTIVE', startTime: data.startTime });
         }
         break;
+      }
         
       case 'VOTE_CAST':
         // Actualizar contador de votos
@@ -459,7 +460,7 @@ const AssemblyLiveView = () => {
           <Card sx={{ mb: 3 }}>
             <CardHeader title="Quórum" />
             <CardContent>
-              <QuorumStatus 
+              <QuorumStatusComponent 
                 current={assembly.currentCoefficient} 
                 required={assembly.requiredCoefficient}
                 status={assembly.quorumStatus}

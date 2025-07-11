@@ -30,21 +30,24 @@ export async function POST(request: NextRequest) {
       case 'ALL':
         usersToNotify = await tenantPrisma.user.findMany({ where: { complexId: payload.complexId } });
         break;
-      case 'RESIDENT':
+      case 'RESIDENT': {
         // Assuming recipientId is a resident ID, find associated user
         const resident = await tenantPrisma.resident.findUnique({ where: { id: parseInt(validatedData.recipientId as string) }, include: { user: true } });
         if (resident?.user) usersToNotify.push(resident.user);
         break;
-      case 'PROPERTY':
+      }
+      case 'PROPERTY': {
         // Assuming recipientId is a property ID, find associated residents/owners
         const propertyUsers = await tenantPrisma.user.findMany({ where: { propertyId: parseInt(validatedData.recipientId as string) } });
         usersToNotify = propertyUsers;
         break;
-      case 'USER':
+      }
+      case 'USER': {
         // Assuming recipientId is a user ID
         const user = await tenantPrisma.user.findUnique({ where: { id: parseInt(validatedData.recipientId as string) } });
         if (user) usersToNotify.push(user);
         break;
+      }
       default:
         break;
     }

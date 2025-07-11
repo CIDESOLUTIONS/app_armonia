@@ -110,6 +110,7 @@ export default [
       "react/react-in-jsx-scope": "off",
       "react/jsx-uses-react": "off",
       "react/no-unescaped-entities": "off",
+      "react/prop-types": "off", // Deshabilitar validación de prop-types
 
       // Reglas de React Hooks
       ...pluginReactHooks.configs.recommended.rules,
@@ -117,6 +118,13 @@ export default [
       // Reglas de Next.js
       ...nextPlugin.configs.recommended.rules,
       ...nextPlugin.configs["core-web-vitals"].rules,
+    },
+  },
+  {
+    files: ["src/lib/constants/*.ts"],
+    rules: {
+      "no-redeclare": "off",
+      "@typescript-eslint/no-redeclare": "off",
     },
   },
 ];

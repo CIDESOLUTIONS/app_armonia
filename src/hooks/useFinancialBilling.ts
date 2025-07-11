@@ -142,7 +142,7 @@ export function useFinancialBilling(): UseFinancialBillingReturn {
     } finally {
       setLoading(false);
     }
-  }, [stats]);
+  }, [stats, loadBills, loadStats]);
 
   const loadBills = useCallback(async (filters?: { 
     period?: string; 

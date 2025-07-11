@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/store/authStore';
-import { Trash2, Video } from 'lucide-react';
+import { Loader2, PlusCircle, Edit, Trash2, Video } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

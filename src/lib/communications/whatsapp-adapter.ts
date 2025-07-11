@@ -109,7 +109,7 @@ export class WhatsAppAdapter implements MessageAdapter {
 
   private normalizePhoneNumber(phone: string): string {
     // Eliminar espacios, guiones y paréntesis
-    let normalized = phone.replace(/[\s\-\(\)]/g, '');
+    let normalized = phone.replace(/[\s\-()]/g, '');
     
     // Asegurar que tenga el código de país
     if (!normalized.startsWith('+')) {

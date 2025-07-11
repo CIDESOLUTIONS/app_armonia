@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { useRouter, useParams } from 'next/navigation';
+import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, Edit, Trash2, MessageSquare, User, Tag, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';

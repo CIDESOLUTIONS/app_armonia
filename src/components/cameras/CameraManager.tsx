@@ -19,7 +19,15 @@ import {
   Select,
   MenuItem,
   CircularProgress,
-  Tooltip
+  Tooltip,
+  FormControlLabel,
+  Checkbox,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody
 } from '@mui/material';
 import { 
   Videocam as VideocamIcon,
@@ -32,7 +40,8 @@ import {
   Add as AddIcon,
   Search as SearchIcon,
   FiberManualRecord as RecordIcon,
-  Stop as StopIcon
+  Stop as StopIcon,
+  Close as CloseIcon
 } from '@mui/icons-material';
 import { useSession } from 'next-auth/react';
 import { toast } from 'react-hot-toast';

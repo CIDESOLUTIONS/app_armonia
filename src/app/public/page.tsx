@@ -74,7 +74,7 @@ export default function LandingPage() {
         <BlogSection />
       </FadeIn>
 
-      <Plans theme={theme} currency={currency} />
+      <PricingPlans theme={theme} currency={currency} />
       <ContactSection />
     </div>
   );
