@@ -260,7 +260,7 @@ export function useCameras(): UseCamerasReturn {
       setError(errorMessage);
       console.error('Error cargando cámaras:', err);
     }
-  }, []);
+  }, [setCameras, setError]);
 
   const loadStats = useCallback(async (): Promise<void> => {
     try {

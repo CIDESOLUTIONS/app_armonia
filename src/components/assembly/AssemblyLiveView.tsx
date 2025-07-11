@@ -549,7 +549,6 @@ const AssemblyLiveView = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                  <TableBody>
                     {votings.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={5} className="text-center">

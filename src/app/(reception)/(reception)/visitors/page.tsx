@@ -52,7 +52,7 @@ export default function ReceptionVisitorsPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Datos de ejemplo para desarrollo y pruebas
-  const mockVisitors: Visitor[] = [
+  const mockVisitors: Visitor[] = useMemo(() => [
     {
       id: "vis1",
       name: "Carlos Ramírez",
@@ -85,7 +85,7 @@ export default function ReceptionVisitorsPage() {
       entryTime: "2025-05-29T11:45:00",
       status: 'active'
     }
-  ];
+  ], []);
 
   const fetchData = useCallback(async () => {
     try {

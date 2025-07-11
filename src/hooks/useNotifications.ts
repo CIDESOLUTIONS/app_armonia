@@ -85,6 +85,23 @@ export function useNotifications(): UseNotificationsReturn {
   const [templates, setTemplates] = useState<Record<string, NotificationTemplate>>({});
   const [history, setHistory] = useState<NotificationHistory[]>([]);
 
+  const loadHistory = useCallback(async () => {
+    try {
+      setError(null);
+      
+      const response = await apiClient.get('/notifications/send');
+      
+      if (response.success) {
+        setHistory(response.notifications || []);
+      }
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error cargando historial';
+      setError(errorMessage);
+      console.error('Error cargando historial:', err);
+    }
+  }, [setHistory, setError]); // Dependencias: setters de estado
+
   const sendNotification = useCallback(async (
     payload: SendNotificationPayload,
     target: NotificationTarget,
@@ -102,7 +119,7 @@ export function useNotifications(): UseNotificationsReturn {
 
       if (response.success) {
         // Recargar historial después del envío
-        await loadHistory();
+        await loadHistory(); // Ahora loadHistory es una dependencia estable
         return true;
       }
 
@@ -116,7 +133,7 @@ export function useNotifications(): UseNotificationsReturn {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [loadHistory, setLoading, setError]); // Añadir loadHistory y setters como dependencia
 
   const sendTemplateNotification = useCallback(async (
     type: string,
@@ -135,7 +152,7 @@ export function useNotifications(): UseNotificationsReturn {
 
       if (response.success) {
         // Recargar historial después del envío
-        await loadHistory();
+        await loadHistory(); // Ahora loadHistory es una dependencia estable
         return true;
       }
 
@@ -149,7 +166,7 @@ export function useNotifications(): UseNotificationsReturn {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [loadHistory, setLoading, setError]); // Añadir loadHistory y setters como dependencia
 
   const loadTemplates = useCallback(async () => {
     try {
@@ -166,24 +183,7 @@ export function useNotifications(): UseNotificationsReturn {
       setError(errorMessage);
       console.error('Error cargando plantillas:', err);
     }
-  }, []);
-
-  const loadHistory = useCallback(async () => {
-    try {
-      setError(null);
-      
-      const response = await apiClient.get('/notifications/send');
-      
-      if (response.success) {
-        setHistory(response.notifications || []);
-      }
-
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error cargando historial';
-      setError(errorMessage);
-      console.error('Error cargando historial:', err);
-    }
-  }, []);
+  }, [setTemplates, setError]); // Dependencias: setters de estado
 
   // Métodos de conveniencia para casos comunes
   const sendPaymentReminder = useCallback(async (

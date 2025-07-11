@@ -39,7 +39,7 @@ export default function ReportsPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   // Datos de ejemplo para desarrollo
-  const mockReportData: ReportData = {
+  const mockReportData: ReportData = useMemo(() => ({
     visitors: {
       total: 1247,
       today: 23,
@@ -57,7 +57,7 @@ export default function ReportsPage() {
       pending: 6,
       critical: 2
     }
-  };
+  }), []);
 
   const fetchData = useCallback(() => {
     // Simular carga de datos

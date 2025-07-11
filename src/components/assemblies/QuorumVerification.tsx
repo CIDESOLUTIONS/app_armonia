@@ -66,7 +66,7 @@ export default function QuorumVerification({
     } finally {
       setLoading(false);
     }
-  }, [assemblyId, language, token, totalUnits, quorumPercentage]);
+  }, [totalUnits, quorumPercentage, _setError, setStats, setLoading]);
 
   // Efecto inicial para cargar datos
   useEffect(() => {

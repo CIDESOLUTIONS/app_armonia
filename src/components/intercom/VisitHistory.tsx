@@ -1,35 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Box,
-  Button,
   Card,
   CardContent,
-  Chip,
-  CircularProgress,
-  FormControl,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  TextField,
-  Typography
-} from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { es } from 'date-fns/locale';
+  CardHeader,
+  CardTitle,
+  CardDescription
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Calendar as CalendarIcon } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
-import { History, FilterList, CheckCircle, Cancel, HourglassEmpty, Person } from '@mui/icons-material';
+import { es } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
+import { 
+  History as HistoryIcon,
+  Filter as FilterIcon,
+  CheckCircle,
+  XCircle,
+  Hourglass,
+  User,
+  Loader2
+} from 'lucide-react';
 import { intercomService } from '../../lib/services/intercom-service';
 import { VisitStatus, NotificationStatus } from '@prisma/client';
+import { Pagination, PaginationContent, PaginationItem } from '@/components/ui/pagination';
 
 // Interfaces
 interface Visit {
@@ -65,7 +64,7 @@ const VisitHistory: React.FC = () => {
   // Estados
   const [visits, setVisits] = useState<Visit[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [page, setPage] = useState<number>(0);
+  const [page, setPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [totalRows, setTotalRows] = useState<number>(0);
   const [filters, setFilters] = useState<FilterOptions>({
@@ -74,13 +73,8 @@ const VisitHistory: React.FC = () => {
     endDate: null
   });
 
-  // Cargar datos
-  useEffect(() => {
-    fetchVisits();
-  }, [page, rowsPerPage, filters]);
-
   // Función para obtener visitas
-  const fetchVisits = async () => {
+  const fetchVisits = useCallback(async () => {
     setLoading(true);
     try {
       // En un caso real, esto vendría de la API con el ID de la unidad del usuario actual
@@ -90,7 +84,7 @@ const VisitHistory: React.FC = () => {
         status: filters.status,
         startDate: filters.startDate ? format(filters.startDate, 'yyyy-MM-dd') : undefined,
         endDate: filters.endDate ? format(filters.endDate, 'yyyy-MM-dd') : undefined,
-        page: page + 1,
+        page: page,
         pageSize: rowsPerPage
       };
       
@@ -103,17 +97,22 @@ const VisitHistory: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, page, rowsPerPage]);
+
+  // Cargar datos
+  useEffect(() => {
+    fetchVisits();
+  }, [fetchVisits]);
 
   // Manejar cambio de página
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (newPage: number) => {
     setPage(newPage);
   };
 
   // Manejar cambio de filas por página
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+  const handleChangeRowsPerPage = (value: string) => {
+    setRowsPerPage(parseInt(value, 10));
+    setPage(1);
   };
 
   // Manejar cambio de filtros
@@ -122,7 +121,6 @@ const VisitHistory: React.FC = () => {
       ...prev,
       [field]: value
     }));
-    setPage(0);
   };
 
   // Resetear filtros
@@ -132,202 +130,194 @@ const VisitHistory: React.FC = () => {
       startDate: null,
       endDate: null
     });
-    setPage(0);
+    setPage(1);
   };
 
-  // Renderizar chip de estado
-  const renderStatusChip = (status: VisitStatus) => {
-    const statusConfig: Record<VisitStatus, { label: string; color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'; icon: React.ReactNode }> = {
+  // Renderizar badge de estado
+  const renderStatusBadge = (status: VisitStatus) => {
+    const statusConfig: Record<VisitStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ReactNode }> = {
       [VisitStatus.PENDING]: { 
         label: 'Pendiente', 
-        color: 'default',
-        icon: <HourglassEmpty fontSize="small" />
+        variant: 'secondary',
+        icon: <Hourglass className="h-3 w-3 mr-1" />
       },
       [VisitStatus.NOTIFIED]: { 
         label: 'Notificado', 
-        color: 'info',
-        icon: <HourglassEmpty fontSize="small" />
+        variant: 'outline',
+        icon: <Hourglass className="h-3 w-3 mr-1" />
       },
       [VisitStatus.APPROVED]: { 
         label: 'Aprobado', 
-        color: 'success',
-        icon: <CheckCircle fontSize="small" />
+        variant: 'default',
+        icon: <CheckCircle className="h-3 w-3 mr-1" />
       },
       [VisitStatus.REJECTED]: { 
         label: 'Rechazado', 
-        color: 'error',
-        icon: <Cancel fontSize="small" />
+        variant: 'destructive',
+        icon: <XCircle className="h-3 w-3 mr-1" />
       },
       [VisitStatus.IN_PROGRESS]: { 
         label: 'En progreso', 
-        color: 'primary',
-        icon: <Person fontSize="small" />
+        variant: 'default',
+        icon: <Hourglass className="h-3 w-3 mr-1" />
       },
       [VisitStatus.COMPLETED]: { 
         label: 'Completado', 
-        color: 'success',
-        icon: <CheckCircle fontSize="small" />
+        variant: 'default',
+        icon: <CheckCircle className="h-3 w-3 mr-1" />
       },
       [VisitStatus.CANCELLED]: { 
         label: 'Cancelado', 
-        color: 'warning',
-        icon: <Cancel fontSize="small" />
+        variant: 'destructive',
+        icon: <XCircle className="h-3 w-3 mr-1" />
       }
     };
 
     const config = statusConfig[status];
     
     return (
-      <Chip 
-        icon={config.icon}
-        label={config.label} 
-        color={config.color} 
-        size="small" 
-      />
+      <Badge variant={config.variant} className="flex items-center w-fit">
+        {config.icon}
+        {config.label}
+      </Badge>
     );
   };
 
   return (
-    <Card elevation={3}>
-      <CardContent>
-        <Typography variant="h5" component="h2" gutterBottom>
-          <History sx={{ mr: 1, verticalAlign: 'middle' }} />
+    <Card className="shadow-sm">
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <HistoryIcon className="mr-2 h-5 w-5" />
           Historial de Visitas
-        </Typography>
-
+        </CardTitle>
+        <CardDescription>Consulte el registro de ingresos y salidas de visitantes.</CardDescription>
+      </CardHeader>
+      <CardContent>
         {/* Filtros */}
-        <Paper elevation={0} sx={{ p: 2, mb: 3, bgcolor: 'background.default' }}>
-          <Box mb={2}>
-            <Typography variant="subtitle1" gutterBottom>
-              <FilterList sx={{ mr: 1, verticalAlign: 'middle' }} />
-              Filtros
-            </Typography>
-          </Box>
-          
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} sm={6} md={3}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Estado</InputLabel>
-                <Select
-                  value={filters.status || ''}
-                  label="Estado"
-                  onChange={(e) => handleFilterChange('status', e.target.value || undefined)}
-                >
-                  <MenuItem value="">Todos</MenuItem>
-                  <MenuItem value={VisitStatus.PENDING}>Pendiente</MenuItem>
-                  <MenuItem value={VisitStatus.NOTIFIED}>Notificado</MenuItem>
-                  <MenuItem value={VisitStatus.APPROVED}>Aprobado</MenuItem>
-                  <MenuItem value={VisitStatus.REJECTED}>Rechazado</MenuItem>
-                  <MenuItem value={VisitStatus.IN_PROGRESS}>En progreso</MenuItem>
-                  <MenuItem value={VisitStatus.COMPLETED}>Completado</MenuItem>
-                  <MenuItem value={VisitStatus.CANCELLED}>Cancelado</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            
-            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
-              <Grid item xs={12} sm={6} md={3}>
-                <DatePicker
-                  label="Fecha inicio"
-                  value={filters.startDate}
-                  onChange={(date) => handleFilterChange('startDate', date)}
-                  slotProps={{
-                    textField: {
-                      size: 'small',
-                      fullWidth: true
-                    }
-                  }}
-                />
-              </Grid>
-              
-              <Grid item xs={12} sm={6} md={3}>
-                <DatePicker
-                  label="Fecha fin"
-                  value={filters.endDate}
-                  onChange={(date) => handleFilterChange('endDate', date)}
-                  slotProps={{
-                    textField: {
-                      size: 'small',
-                      fullWidth: true
-                    }
-                  }}
-                />
-              </Grid>
-            </LocalizationProvider>
-            
-            <Grid item xs={12} sm={6} md={3}>
-              <Button 
-                variant="outlined" 
-                onClick={handleResetFilters}
-                fullWidth
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+          <Select
+            value={filters.status || ''}
+            onValueChange={(value) => handleFilterChange('status', value || undefined)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Filtrar por estado" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Todos</SelectItem>
+              {Object.values(VisitStatus).map(status => (
+                <SelectItem key={status} value={status}>{status}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !filters.startDate && "text-muted-foreground"
+                )}
               >
-                Limpiar filtros
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {filters.startDate ? format(filters.startDate, "PPP", { locale: es }) : <span>Fecha inicio</span>}
               </Button>
-            </Grid>
-          </Grid>
-        </Paper>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <CalendarIcon
+                mode="single"
+                selected={filters.startDate || undefined}
+                onSelect={(date) => handleFilterChange('startDate', date)}
+                initialFocus
+                locale={es}
+              />
+            </PopoverContent>
+          </Popover>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !filters.endDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {filters.endDate ? format(filters.endDate, "PPP", { locale: es }) : <span>Fecha fin</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <CalendarIcon
+                mode="single"
+                selected={filters.endDate || undefined}
+                onSelect={(date) => handleFilterChange('endDate', date)}
+                initialFocus
+                locale={es}
+              />
+            </PopoverContent>
+          </Popover>
+          
+          <Button onClick={handleResetFilters} variant="outline">
+            <FilterIcon className="mr-2 h-4 w-4" />
+            Limpiar filtros
+          </Button>
+        </div>
 
         {/* Tabla de visitas */}
-        <TableContainer>
-          <Table size="medium">
-            <TableHead>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell>Visitante</TableCell>
-                <TableCell>Tipo</TableCell>
-                <TableCell>Propósito</TableCell>
-                <TableCell>Fecha</TableCell>
-                <TableCell>Estado</TableCell>
-                <TableCell>Entrada/Salida</TableCell>
+                <TableHead>Visitante</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Propósito</TableHead>
+                <TableHead>Fecha</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead>Entrada/Salida</TableHead>
               </TableRow>
-            </TableHead>
+            </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={6} align="center">
-                    <CircularProgress size={40} sx={{ my: 3 }} />
+                  <TableCell colSpan={6} className="text-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+                    <p className="mt-2">Cargando visitas...</p>
                   </TableCell>
                 </TableRow>
               ) : visits.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} align="center">
-                    <Typography variant="body2" sx={{ py: 3 }}>
-                      No se encontraron visitas con los filtros seleccionados
-                    </Typography>
+                  <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                    No se encontraron visitas con los filtros seleccionados
                   </TableCell>
                 </TableRow>
               ) : (
                 visits.map((visit) => (
-                  <TableRow key={visit.id} hover>
+                  <TableRow key={visit.id}>
                     <TableCell>
-                      <Typography variant="body2" fontWeight="medium">
-                        {visit.visitor.name}
-                      </Typography>
+                      <p className="font-medium">{visit.visitor.name}</p>
                       {visit.visitor.identification && (
-                        <Typography variant="caption" color="textSecondary">
+                        <p className="text-xs text-gray-500">
                           ID: {visit.visitor.identification}
-                        </Typography>
+                        </p>
                       )}
                     </TableCell>
                     <TableCell>{visit.visitor.type.name}</TableCell>
                     <TableCell>{visit.purpose}</TableCell>
                     <TableCell>
-                      {format(new Date(visit.createdAt), 'dd/MM/yyyy HH:mm')}
+                      {format(new Date(visit.createdAt), 'dd/MM/yyyy HH:mm', { locale: es })}
                     </TableCell>
                     <TableCell>
-                      {renderStatusChip(visit.status)}
+                      {renderStatusBadge(visit.status)}
                     </TableCell>
                     <TableCell>
                       {visit.entryTime && (
-                        <Box>
-                          <Typography variant="caption" display="block">
-                            Entrada: {format(new Date(visit.entryTime), 'HH:mm')}
-                          </Typography>
+                        <div className="text-sm">
+                          <p>Entrada: {format(new Date(visit.entryTime), 'HH:mm')}</p>
                           {visit.exitTime && (
-                            <Typography variant="caption" display="block">
-                              Salida: {format(new Date(visit.exitTime), 'HH:mm')}
-                            </Typography>
+                            <p>Salida: {format(new Date(visit.exitTime), 'HH:mm')}</p>
                           )}
-                        </Box>
+                        </div>
                       )}
                     </TableCell>
                   </TableRow>
@@ -335,21 +325,53 @@ const VisitHistory: React.FC = () => {
               )}
             </TableBody>
           </Table>
-        </TableContainer>
+        </div>
         
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={totalRows}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage="Filas por página:"
-          labelDisplayedRows={({ from, to, count }) => 
-            `${from}-${to} de ${count !== -1 ? count : `más de ${to}`}`
-          }
-        />
+        <div className="flex justify-end items-center space-x-2 mt-4">
+          <Select value={String(rowsPerPage)} onValueChange={handleChangeRowsPerPage}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filas por página" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="5">5 por página</SelectItem>
+              <SelectItem value="10">10 por página</SelectItem>
+              <SelectItem value="25">25 por página</SelectItem>
+              <SelectItem value="50">50 por página</SelectItem>
+            </SelectContent>
+          </Select>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => handleChangePage(page - 1)} 
+                  disabled={page === 1}
+                >
+                  Anterior
+                </Button>
+              </PaginationItem>
+              {Array.from({ length: Math.ceil(totalRows / rowsPerPage) }, (_, i) => i + 1).map(p => (
+                <PaginationItem key={p}>
+                  <Button 
+                    variant={p === page ? "default" : "ghost"} 
+                    onClick={() => handleChangePage(p)}
+                  >
+                    {p}
+                  </Button>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => handleChangePage(page + 1)} 
+                  disabled={page === Math.ceil(totalRows / rowsPerPage)}
+                >
+                  Siguiente
+                </Button>
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
       </CardContent>
     </Card>
   );
