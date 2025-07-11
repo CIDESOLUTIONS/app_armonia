@@ -9,7 +9,6 @@ import { ROUTES } from '@/constants/routes';
 import { FormField } from '@/components/common/FormField';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Checkbox } from '@/components/ui/checkbox';
 
 // Textos para soportar múltiples idiomas
 const texts = {

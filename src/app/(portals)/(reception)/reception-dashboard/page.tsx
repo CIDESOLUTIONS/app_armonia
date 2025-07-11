@@ -25,15 +25,7 @@ interface Visitor {
   status: 'active' | 'completed';
 }
 
-interface Package {
-  id: string;
-  description: string;
-  recipient: string;
-  unit: string;
-  receivedAt: string;
-  deliveredAt: string | null;
-  status: 'pending' | 'delivered';
-}
+
 
 interface Incident {
   id: string;

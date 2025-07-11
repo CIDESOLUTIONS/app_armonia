@@ -19,5 +19,5 @@ export function usePassiveEvent(
     return () => {
       element.removeEventListener(eventName, handler);
     };
-  }, [element, eventName, handler, options.passive, options.capture]);
+  }, [element, eventName, handler, options]);
 }

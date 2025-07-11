@@ -2,6 +2,7 @@
 'use client';
 
 import { createContext, useContext, useState, useCallback } from 'react';
+import { Toast } from '@/components/ui/toast';
 
 interface NotificationContextType {
   addToast: (message: string, type: 'success' | 'error' | 'info') => void;
