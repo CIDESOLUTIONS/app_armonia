@@ -62,7 +62,7 @@ const AssemblyStatusBadge = ({ status }) => {
 const AssemblyLiveView = () => {
     var _a;
     const router = useRouter();
-    const { id } = router.query;
+    const { id } = useParams();
     const { user } = useAuthStore(); // Assuming useAuthStore provides user info
     // Estados
     const [assembly, setAssembly] = useState(null);

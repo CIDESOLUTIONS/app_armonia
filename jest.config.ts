@@ -11,7 +11,7 @@ const config: Config = {
     '^.+\.(jpg|jpeg|png|gif|webp|svg)$' : '<rootDir>/__mocks__/fileMock.ts',
   },
   transform: {
-    '^.+\.(ts|tsx|js|jsx|mjs)$' : 'babel-jest',
+    '^.+\.(ts|tsx|js|jsx|mjs)$' : ['babel-jest', { configFile: './babel.config.jest.js' }],
   },
   transformIgnorePatterns: [
     '/node_modules/(?!lucide-react|jose)/',
