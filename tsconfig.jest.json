@@ -1,6 +1,8 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "outDir": "./dist-jest", // Directorio de salida para los archivos transpilados
+    "noEmit": false, // Permitir la emisión de archivos JavaScript
   }
 }

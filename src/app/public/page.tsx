@@ -26,6 +26,12 @@ const FadeIn: FC<{ children: ReactNode, delay?: number }> = ({ children, delay =
   );
 };
 
+export const metadata: Metadata = {
+  title: 'Armonía - Gestión Inteligente de Conjuntos Residenciales',
+  description: 'Transforma la administración de tu conjunto residencial con Armonía. Plataforma todo-en-uno para finanzas, asambleas, seguridad, y comunicación.',
+  keywords: ['administración de condominios', 'software para conjuntos residenciales', 'gestión de propiedades', 'asambleas virtuales', 'seguridad residencial'],
+};
+
 export default function LandingPage() {
   const router = useRouter();
   const [currency, setCurrency] = useState("Pesos");
@@ -57,25 +63,34 @@ export default function LandingPage() {
         setCurrency={setCurrency}
       />
 
-      <HeroSection />
-      <FeaturesOverview />
-      <MainFeatures />
-      <AdditionalFeatures />
-      <StatisticsSection />
-      <VideoDemo />
+      <FadeInWhenVisible><HeroSection /></FadeInWhenVisible>
+      <FadeInWhenVisible><FeaturesOverview /></FadeInWhenVisible>
+      <FadeInWhenVisible><MainFeatures /></FadeInWhenVisible>
+      <FadeInWhenVisible><AdditionalFeatures /></FadeInWhenVisible>
+      <FadeInWhenVisible><StatisticsSection /></FadeInWhenVisible>
+      <FadeInWhenVisible><VideoDemo /></FadeInWhenVisible>
 
       {/* Testimonials */}
-      <FadeIn delay={0.2}>
+      <FadeInWhenVisible>
         <Testimonials />
-      </FadeIn>
+      </FadeInWhenVisible>
 
       {/* Blog Section */}
-      <FadeIn delay={0.2}>
+      <FadeInWhenVisible>
         <BlogSection />
-      </FadeIn>
+      </FadeInWhenVisible>
 
-      <PricingPlans theme={theme} currency={currency} />
-      <ContactSection />
+      <FadeInWhenVisible><PricingPlans theme={theme} currency={currency} /></FadeInWhenVisible>
+
+      <section className="py-16 md:py-24 bg-gray-50 dark:bg-gray-800">
+        <div className="container mx-auto px-4 flex justify-center">
+          <FadeInWhenVisible>
+            <RegisterComplexForm />
+          </FadeInWhenVisible>
+        </div>
+      </section>
+
+      <FadeInWhenVisible><ContactSection /></FadeInWhenVisible>
     </div>
   );
 }

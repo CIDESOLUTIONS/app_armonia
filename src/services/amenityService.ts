@@ -72,9 +72,8 @@ export async function updateAmenity(id: number, data: UpdateAmenityData): Promis
 
 export async function deleteAmenity(id: number): Promise<void> {
   try {
-    await fetchApi('/api/inventory/amenities', {
+    await fetchApi(`/api/services/${id}`, {
       method: 'DELETE',
-      body: JSON.stringify({ id }),
     });
   } catch (error) {
     console.error('Error deleting amenity:', error);

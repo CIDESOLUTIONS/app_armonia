@@ -1,269 +1,102 @@
-// C:\Users\meciz\Documents\armonia\frontend\src\app\api\financial\budgets[id]\route.ts
-import { NextResponse } from 'next/server';
-import { getPrisma } from '@/lib/prisma';
-import { verifyToken } from '@/lib/auth';
+import { NextRequest, NextResponse } from 'next/server';
+import { authMiddleware } from '@/lib/auth';
+import { ServerLogger } from '@/lib/logging/server-logger';
+import { BudgetService } from '@/services/budgetService';
+import { z } from 'zod';
 
-export async function GET(_req:unknown, { params }: { params: { id: string } }) {
+const BudgetUpdateSchema = z.object({
+  year: z.number().int().min(2000, "El año debe ser un número válido.").optional(),
+  status: z.enum(['DRAFT', 'PENDING_APPROVAL', 'APPROVED', 'REJECTED']).optional(),
+  notes: z.string().optional(),
+  items: z.array(z.object({
+    id: z.number().int().optional(), // ID es opcional para nuevos ítems
+    category: z.string().min(1, "La categoría es requerida."),
+    description: z.string().optional(),
+    amount: z.number().min(0, "El monto debe ser un número positivo."),
+    type: z.enum(['INCOME', 'EXPENSE']), 
+  })).optional(),
+});
+
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
+    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN']);
+    if (!authResult.proceed) {
+      return authResult.response;
+    }
+    const { payload } = authResult;
+
     const budgetId = parseInt(params.id);
-    const _token = req.headers.get("Authorization")?.replace("Bearer ", "");
-    if (!token) {
-      return NextResponse.json({ message: "No autorizado" }, { status: 401 });
+
+    if (!payload.complexId || !payload.schemaName) {
+      return NextResponse.json({ message: 'Usuario sin complejo asociado' }, { status: 400 });
     }
 
-    // Variable decoded eliminada por lint
-    const { searchParams } = new URL(req.url);
-    const _schemaName = searchParams.get("schemaName");
+    const budgetService = new BudgetService(payload.schemaName);
+    const budget = await budgetService.getBudgetById(budgetId, payload.complexId);
 
-    if (!schemaName) {
-      return NextResponse.json({ message: "Schema name es requerido" }, { status: 400 });
+    if (!budget) {
+      return NextResponse.json({ message: 'Presupuesto no encontrado' }, { status: 404 });
     }
 
-    const prisma = getPrisma(schemaName);
-
-    try {
-      // Obtenemos el presupuesto
-      const budget = await prisma.$queryRawUnsafe(`
-        SELECT 
-          id, 
-          year, 
-          status, 
-          notes,
-          "createdAt",
-          "updatedAt"
-        FROM "${schemaName}"."Budget"
-        WHERE id = $1
-      `, budgetId);
-
-      if (!budget || !Array.isArray(budget) || budget.length === 0) {
-        return NextResponse.json({ message: "Presupuesto no encontrado" }, { status: 404 });
-      }
-
-      // Obtenemos los items del presupuesto
-      const items = await prisma.$queryRawUnsafe(`
-        SELECT 
-          id, 
-          category, 
-          description, 
-          amount, 
-          type
-        FROM "${schemaName}"."BudgetItem"
-        WHERE "budgetId" = $1
-      `, budgetId);
-
-      const completeBudget = {
-        ...budget[0],
-        items
-      };
-
-      return NextResponse.json({ budget: completeBudget });
-    } catch (dbError) {
-      console.error("Error al consultar presupuesto:", dbError);
-      // Si hay error, devolvemos un dato de demostración
-      const mockBudget = {
-        id: budgetId,
-        year: 2024,
-        status: 'DRAFT',
-        notes: 'Presupuesto de demostración',
-        items: [
-          { id: 1, category: 'Cuotas', description: 'Ingresos por cuotas', amount: 50000000, type: 'INCOME' },
-          { id: 2, category: 'Mantenimiento', description: 'Gastos de mantenimiento', amount: 20000000, type: 'EXPENSE' }
-        ],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        demo: true
-      };
-      
-      return NextResponse.json({ 
-        budget: mockBudget,
-        demo: true
-      });
-    }
+    ServerLogger.info(`Presupuesto ${budgetId} obtenido para el complejo ${payload.complexId}`);
+    return NextResponse.json(budget, { status: 200 });
   } catch (error) {
-    console.error("Error en API budget GET:", error);
-    return NextResponse.json(
-      { message: "Error al obtener el presupuesto" },
-      { status: 500 }
-    );
+    ServerLogger.error(`Error al obtener presupuesto ${params.id}:`, error);
+    return NextResponse.json({ message: 'Error al obtener presupuesto' }, { status: 500 });
   }
 }
 
-export async function PUT(_req:unknown, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
+    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN']);
+    if (!authResult.proceed) {
+      return authResult.response;
+    }
+    const { payload } = authResult;
+
     const budgetId = parseInt(params.id);
-    const _token = req.headers.get("Authorization")?.replace("Bearer ", "");
-    if (!token) {
-      return NextResponse.json({ message: "No autorizado" }, { status: 401 });
+    const body = await request.json();
+    const validatedData = BudgetUpdateSchema.parse(body);
+
+    if (!payload.complexId || !payload.schemaName) {
+      return NextResponse.json({ message: 'Usuario sin complejo asociado' }, { status: 400 });
     }
 
-    // Variable decoded eliminada por lint
-    const _data = await req.json();
-    const { schemaName, complexId, items, notes, year, status } = data;
+    const budgetService = new BudgetService(payload.schemaName);
+    const updatedBudget = await budgetService.updateBudget(budgetId, payload.complexId, validatedData);
 
-    if (!schemaName || !complexId) {
-      return NextResponse.json({ message: "Datos incompletos" }, { status: 400 });
-    }
-
-    const prisma = getPrisma(schemaName);
-
-    try {
-      // Primero actualizamos el presupuesto
-      await prisma.$queryRawUnsafe(`
-        UPDATE "${schemaName}"."Budget"
-        SET 
-          notes = $1,
-          year = $2,
-          status = $3,
-          "updatedAt" = $4
-        WHERE id = $5
-      `, 
-        notes || '',
-        year,
-        status || 'DRAFT',
-        new Date(),
-        budgetId
-      );
-
-      // Eliminamos los items anteriores
-      await prisma.$queryRawUnsafe(`
-        DELETE FROM "${schemaName}"."BudgetItem"
-        WHERE "budgetId" = $1
-      `, budgetId);
-
-      // Creamos los nuevos items
-      for (const item of items) {
-        await prisma.$queryRawUnsafe(`
-          INSERT INTO "${schemaName}"."BudgetItem" (
-            category, 
-            description, 
-            amount, 
-            type, 
-            "budgetId",
-            "createdAt",
-            "updatedAt"
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-        `, 
-          item.category,
-          item.description,
-          item.amount,
-          item.type,
-          budgetId,
-          new Date(),
-          new Date()
-        );
-      }
-
-      // Obtenemos el presupuesto actualizado
-      const budget = await prisma.$queryRawUnsafe(`
-        SELECT 
-          id, 
-          year, 
-          status, 
-          notes,
-          "createdAt",
-          "updatedAt"
-        FROM "${schemaName}"."Budget"
-        WHERE id = $1
-      `, budgetId);
-
-      // Obtenemos los items actualizados
-      const updatedItems = await prisma.$queryRawUnsafe(`
-        SELECT 
-          id, 
-          category, 
-          description, 
-          amount, 
-          type
-        FROM "${schemaName}"."BudgetItem"
-        WHERE "budgetId" = $1
-      `, budgetId);
-
-      const completeBudget = {
-        ...budget[0],
-        items: updatedItems
-      };
-
-      return NextResponse.json({ 
-        message: "Presupuesto actualizado exitosamente", 
-        budget: completeBudget
-      });
-    } catch (dbError) {
-      console.error("Error al actualizar presupuesto:", dbError);
-      // Si hay error, simulamos una respuesta exitosa
-      return NextResponse.json({ 
-        message: "Presupuesto actualizado en modo de demostración", 
-        budget: {
-          id: budgetId,
-          year,
-          status,
-          notes,
-          items,
-          demo: true
-        }
-      });
-    }
+    ServerLogger.info(`Presupuesto ${budgetId} actualizado en complejo ${payload.complexId}`);
+    return NextResponse.json(updatedBudget, { status: 200 });
   } catch (error) {
-    console.error("Error en PUT budget:", error);
-    // Simulamos una respuesta exitosa para modo de demostración
-    const _data = await req.json();
-    return NextResponse.json({ 
-      message: "Presupuesto actualizado en modo de demostración", 
-      budget: {
-        id: parseInt(params.id),
-        ...data,
-        demo: true
-      }
-    });
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ message: 'Error de validación', errors: error.errors }, { status: 400 });
+    }
+    ServerLogger.error(`Error al actualizar presupuesto ${params.id}:`, error);
+    return NextResponse.json({ message: 'Error al actualizar presupuesto' }, { status: 500 });
   }
 }
 
-export async function DELETE(_req:unknown, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
+    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN']);
+    if (!authResult.proceed) {
+      return authResult.response;
+    }
+    const { payload } = authResult;
+
     const budgetId = parseInt(params.id);
-    const _token = req.headers.get("Authorization")?.replace("Bearer ", "");
-    if (!token) {
-      return NextResponse.json({ message: "No autorizado" }, { status: 401 });
+
+    if (!payload.complexId || !payload.schemaName) {
+      return NextResponse.json({ message: 'Usuario sin complejo asociado' }, { status: 400 });
     }
 
-    // Variable decoded eliminada por lint
-    const { searchParams } = new URL(req.url);
-    const _schemaName = searchParams.get("schemaName");
+    const budgetService = new BudgetService(payload.schemaName);
+    await budgetService.deleteBudget(budgetId, payload.complexId);
 
-    if (!schemaName) {
-      return NextResponse.json({ message: "Schema name es requerido" }, { status: 400 });
-    }
-
-    const prisma = getPrisma(schemaName);
-
-    try {
-      // Primero eliminamos los items del presupuesto
-      await prisma.$queryRawUnsafe(`
-        DELETE FROM "${schemaName}"."BudgetItem"
-        WHERE "budgetId" = $1
-      `, budgetId);
-
-      // Luego eliminamos el presupuesto
-      await prisma.$queryRawUnsafe(`
-        DELETE FROM "${schemaName}"."Budget"
-        WHERE id = $1
-      `, budgetId);
-
-      return NextResponse.json({ 
-        message: "Presupuesto eliminado exitosamente" 
-      });
-    } catch (dbError) {
-      console.error("Error al eliminar presupuesto:", dbError);
-      // Si hay error, simulamos una respuesta exitosa
-      return NextResponse.json({ 
-        message: "Presupuesto eliminado en modo de demostración",
-        demo: true
-      });
-    }
+    ServerLogger.info(`Presupuesto ${budgetId} eliminado del complejo ${payload.complexId}`);
+    return NextResponse.json({ message: 'Presupuesto eliminado exitosamente' }, { status: 200 });
   } catch (error) {
-    console.error("Error en DELETE budget:", error);
-    return NextResponse.json({ 
-      message: "Presupuesto eliminado en modo de demostración",
-      demo: true
-    });
+    ServerLogger.error(`Error al eliminar presupuesto ${params.id}:`, error);
+    return NextResponse.json({ message: 'Error al eliminar presupuesto' }, { status: 500 });
   }
 }

@@ -67,9 +67,8 @@ export async function updateResident(id: number, data: UpdateResidentData): Prom
 
 export async function deleteResident(id: number): Promise<void> {
   try {
-    await fetchApi('/api/inventory/residents', {
+    await fetchApi(`/api/inventory/residents/${id}`, {
       method: 'DELETE',
-      body: JSON.stringify({ id }),
     });
   } catch (error) {
     console.error('Error deleting resident:', error);

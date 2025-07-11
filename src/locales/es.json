@@ -1,0 +1,15 @@
+{
+  "Header": {
+    "features": "Funcionalidades",
+    "plans": "Planes",
+    "contact": "Contáctenos",
+    "login": "Iniciar Sesión",
+    "logout": "Cerrar Sesión",
+    "roleSelector": "Seleccionar Rol"
+  },
+  "LandingPage": {
+    "registerTitle": "Registra tu Conjunto Residencial",
+    "registerSubtitle": "Inicia hoy y descubre una nueva forma de administrar.",
+    "freeTrialButton": "Iniciar Prueba Gratuita"
+  }
+}

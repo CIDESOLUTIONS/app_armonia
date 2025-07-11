@@ -1,0 +1,120 @@
+"use client";
+
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { toast } from '@/components/ui/use-toast';
+
+const formSchema = z.object({
+  complexName: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
+  adminName: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
+  email: z.string().email('Email inválido'),
+  phone: z.string().min(7, 'Teléfono inválido'),
+});
+
+type RegisterComplexFormValues = z.infer<typeof formSchema>;
+
+export function RegisterComplexForm() {
+  const [loading, setLoading] = useState(false);
+  const form = useForm<RegisterComplexFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      complexName: '',
+      adminName: '',
+      email: '',
+      phone: '',
+    },
+  });
+
+  const onSubmit = async (data: RegisterComplexFormValues) => {
+    setLoading(true);
+    try {
+      // Aquí se haría la llamada a la API para registrar el conjunto
+      console.log('Registrando conjunto:', data);
+      await new Promise(resolve => setTimeout(resolve, 1500)); // Simular llamada a API
+      toast({
+        title: '¡Registro Exitoso!',
+        description: 'Hemos recibido tu solicitud. Pronto nos pondremos en contacto contigo.',
+      });
+      form.reset();
+    } catch (error) {
+      toast({
+        title: 'Error en el Registro',
+        description: 'No pudimos procesar tu solicitud. Por favor, inténtalo de nuevo.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-lg dark:bg-gray-800">
+      <h2 className="text-2xl font-bold text-center">Registra tu Conjunto Residencial</h2>
+      <p className="text-center text-gray-600 dark:text-gray-400">Inicia hoy y descubre una nueva forma de administrar.</p>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <FormField
+            control={form.control}
+            name="complexName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nombre del Conjunto</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ej: Conjunto Residencial El Bosque" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="adminName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tu Nombre Completo</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ej: Ana Pérez" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email de Contacto</FormLabel>
+                <FormControl>
+                  <Input placeholder="tu@email.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Teléfono de Contacto</FormLabel>
+                <FormControl>
+                  <Input placeholder="300 123 4567" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? 'Enviando...' : t('freeTrialButton')}
+          </Button>
+        </form>
+      </Form>
+    </div>
+  );
+}

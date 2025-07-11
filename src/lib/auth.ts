@@ -103,8 +103,8 @@ export async function verifyToken(token: string): Promise<JWTPayload | null> {
 // Función para verificar token de restablecimiento de contraseña
 export async function verifyPasswordResetToken(token: string): Promise<JWTPayload | null> {
   try {
-    const secretKey = getJwtSecret();
-    const { payload } = await jwtVerify(token, secretKey);
+    const publicKey = getJwtPublicKey();
+    const { payload } = await jwtVerify(token, publicKey);
 
     if (payload.type !== 'password-reset') {
       ServerLogger.warn('Token de restablecimiento de contraseña inválido: tipo incorrecto');

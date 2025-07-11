@@ -73,9 +73,8 @@ export async function updateVehicle(id: number, data: UpdateVehicleData): Promis
 
 export async function deleteVehicle(id: number): Promise<void> {
   try {
-    await fetchApi('/api/inventory/vehicles', {
+    await fetchApi(`/api/inventory/vehicles/${id}`, {
       method: 'DELETE',
-      body: JSON.stringify({ id }),
     });
   } catch (error) {
     console.error('Error deleting vehicle:', error);

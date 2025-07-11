@@ -1,114 +1,89 @@
 import { NextRequest, NextResponse } from 'next/server';
-import communicationService from '@/services/communicationService';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { authMiddleware } from '@/lib/auth';
 import { ServerLogger } from '@/lib/logging/server-logger';
+import { NotificationService } from '@/services/notificationService';
 
-/**
- * GET /api/communications/notifications/[id]
- * Obtiene los detalles de una notificación específica
- */
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    // Verificar autenticación
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json(
-        { error: 'No autorizado' },
-        { status: 401 }
-      );
+    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN', 'RESIDENT', 'STAFF']);
+    if (!authResult.proceed) {
+      return authResult.response;
+    }
+    const { payload } = authResult;
+
+    const notificationId = parseInt(params.id);
+
+    if (!payload.complexId || !payload.schemaName || !payload.id) {
+      return NextResponse.json({ message: 'Usuario sin complejo asociado o ID de usuario faltante' }, { status: 400 });
     }
 
-    const id = params.id;
-    if (!id) {
-      return NextResponse.json(
-        { error: 'ID inválido' },
-        { status: 400 }
-      );
+    const notificationService = new NotificationService(payload.schemaName);
+    const notification = await notificationService.getNotifications(payload.id, payload.complexId, { id: notificationId });
+
+    if (!notification || notification.length === 0) {
+      return NextResponse.json({ message: 'Notificación no encontrada' }, { status: 404 });
     }
 
-    // Obtener notificación
-    const notification = await prisma.notification.findUnique({
-      where: { id },
-    });
-
-    if (!notification) {
-      return NextResponse.json(
-        { error: 'Notificación no encontrada' },
-        { status: 404 }
-      );
+    // Asegurar que la notificación pertenece al usuario o que es admin/complex_admin
+    const targetNotification = notification[0];
+    if (targetNotification.userId !== payload.id && !['ADMIN', 'COMPLEX_ADMIN'].includes(payload.role)) {
+      return NextResponse.json({ message: 'No tiene permiso para ver esta notificación' }, { status: 403 });
     }
 
-    // Verificar que la notificación pertenece al usuario
-    if (notification.recipientId !== session.user.id) {
-      return NextResponse.json(
-        { error: 'No tiene permiso para ver esta notificación' },
-        { status: 403 }
-      );
-    }
-
-    return NextResponse.json(notification);
+    ServerLogger.info(`Notificación ${notificationId} obtenida para el usuario ${payload.id} en complejo ${payload.complexId}`);
+    return NextResponse.json(targetNotification, { status: 200 });
   } catch (error) {
-    serverLogger.error('Error al obtener notificación', { error, id: params.id });
-    return NextResponse.json(
-      { error: 'Error al obtener notificación' },
-      { status: 500 }
-    );
+    ServerLogger.error(`Error al obtener notificación ${params.id}:`, error);
+    return NextResponse.json({ message: 'Error al obtener notificación' }, { status: 500 });
   }
 }
 
-/**
- * PUT /api/communications/notifications/[id]/read
- * Marca una notificación como leída
- */
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    // Verificar autenticación
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json(
-        { error: 'No autorizado' },
-        { status: 401 }
-      );
+    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN', 'RESIDENT', 'STAFF']);
+    if (!authResult.proceed) {
+      return authResult.response;
+    }
+    const { payload } = authResult;
+
+    const notificationId = parseInt(params.id);
+
+    if (!payload.complexId || !payload.schemaName || !payload.id) {
+      return NextResponse.json({ message: 'Usuario sin complejo asociado o ID de usuario faltante' }, { status: 400 });
     }
 
-    const id = params.id;
-    if (!id) {
-      return NextResponse.json(
-        { error: 'ID inválido' },
-        { status: 400 }
-      );
-    }
+    const notificationService = new NotificationService(payload.schemaName);
+    const updatedNotification = await notificationService.markAsRead(notificationId);
 
-    // Marcar notificación como leída
-    const updatedNotification = await communicationService.markNotificationAsRead(
-      id,
-      session.user.id
-    );
-
-    return NextResponse.json(updatedNotification);
+    ServerLogger.info(`Notificación ${notificationId} marcada como leída por el usuario ${payload.id} en complejo ${payload.complexId}`);
+    return NextResponse.json(updatedNotification, { status: 200 });
   } catch (error) {
-    serverLogger.error('Error al marcar notificación como leída', { error, id: params.id });
-    
-    // Manejar errores específicos
-    if (error instanceof Error) {
-      if (error.message === 'Notificación no encontrada o no pertenece al usuario') {
-        return NextResponse.json(
-          { error: error.message },
-          { status: 400 }
-        );
-      }
+    ServerLogger.error(`Error al marcar notificación ${params.id} como leída:`, error);
+    return NextResponse.json({ message: 'Error al marcar notificación como leída' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN']);
+    if (!authResult.proceed) {
+      return authResult.response;
     }
-    
-    return NextResponse.json(
-      { error: 'Error al marcar notificación como leída' },
-      { status: 500 }
-    );
+    const { payload } = authResult;
+
+    const notificationId = parseInt(params.id);
+
+    if (!payload.complexId || !payload.schemaName) {
+      return NextResponse.json({ message: 'Usuario sin complejo asociado' }, { status: 400 });
+    }
+
+    const notificationService = new NotificationService(payload.schemaName);
+    await notificationService.deleteNotification(notificationId);
+
+    ServerLogger.info(`Notificación ${notificationId} eliminada por el usuario ${payload.id} en complejo ${payload.complexId}`);
+    return NextResponse.json({ message: 'Notificación eliminada exitosamente' }, { status: 200 });
+  } catch (error) {
+    ServerLogger.error(`Error al eliminar notificación ${params.id}:`, error);
+    return NextResponse.json({ message: 'Error al eliminar notificación' }, { status: 500 });
   }
 }

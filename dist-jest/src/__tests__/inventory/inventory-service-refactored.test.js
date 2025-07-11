@@ -1,0 +1,543 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+// src/__tests__/inventory/inventory-service-refactored.test.ts
+import { InventoryServiceRefactored } from '@/lib/services/inventory-service-refactored';
+// Mock de Prisma
+jest.mock('@/lib/prisma', () => ({
+    getPrisma: jest.fn(() => ({
+        property: {
+            findMany: jest.fn(),
+            create: jest.fn(),
+            update: jest.fn(),
+            count: jest.fn()
+        },
+        pet: {
+            findMany: jest.fn(),
+            create: jest.fn(),
+            count: jest.fn()
+        },
+        vehicle: {
+            findMany: jest.fn(),
+            create: jest.fn(),
+            count: jest.fn()
+        },
+        resident: {
+            findMany: jest.fn(),
+            update: jest.fn(),
+            count: jest.fn()
+        },
+        commonService: {
+            findMany: jest.fn(),
+            count: jest.fn()
+        }
+    }))
+}));
+describe('InventoryServiceRefactored', () => {
+    let service;
+    let mockPrisma;
+    beforeEach(() => {
+        service = new InventoryServiceRefactored();
+        const { getPrisma } = require('@/lib/prisma');
+        mockPrisma = getPrisma();
+        jest.clearAllMocks();
+    });
+    describe('Properties', () => {
+        describe('getProperties', () => {
+            it('should return properties with owner and resident count', () => __awaiter(void 0, void 0, void 0, function* () {
+                const mockProperties = [
+                    {
+                        id: 1,
+                        complexId: 1,
+                        unitNumber: '101A',
+                        type: 'APARTMENT',
+                        status: 'OCCUPIED',
+                        area: 85.5,
+                        block: 'A',
+                        zone: 'Torre 1',
+                        ownerId: 1,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                        owner: {
+                            id: 1,
+                            name: 'Juan Pérez',
+                            email: 'juan.perez@example.com'
+                        },
+                        residents: [{ id: 1 }, { id: 2 }]
+                    }
+                ];
+                mockPrisma.property.findMany.mockResolvedValue(mockProperties);
+                const result = yield service.getProperties(1);
+                expect(result).toHaveLength(1);
+                expect(result[0]).toMatchObject({
+                    id: 1,
+                    unitNumber: '101A',
+                    type: 'APARTMENT',
+                    status: 'OCCUPIED',
+                    ownerName: 'Juan Pérez',
+                    ownerEmail: 'juan.perez@example.com',
+                    totalResidents: 2
+                });
+                expect(mockPrisma.property.findMany).toHaveBeenCalledWith({
+                    where: { complexId: 1 },
+                    include: {
+                        owner: {
+                            select: { id: true, name: true, email: true }
+                        },
+                        residents: {
+                            select: { id: true },
+                            where: { status: 'ACTIVE' }
+                        }
+                    },
+                    orderBy: { unitNumber: 'asc' }
+                });
+            }));
+            it('should handle properties without owner', () => __awaiter(void 0, void 0, void 0, function* () {
+                const mockProperties = [
+                    {
+                        id: 1,
+                        complexId: 1,
+                        unitNumber: '102B',
+                        type: 'APARTMENT',
+                        status: 'AVAILABLE',
+                        area: null,
+                        block: null,
+                        zone: null,
+                        ownerId: null,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                        owner: null,
+                        residents: []
+                    }
+                ];
+                mockPrisma.property.findMany.mockResolvedValue(mockProperties);
+                const result = yield service.getProperties(1);
+                expect(result[0]).toMatchObject({
+                    id: 1,
+                    unitNumber: '102B',
+                    ownerName: undefined,
+                    ownerEmail: undefined,
+                    totalResidents: 0
+                });
+            }));
+            it('should throw error on database failure', () => __awaiter(void 0, void 0, void 0, function* () {
+                mockPrisma.property.findMany.mockRejectedValue(new Error('Database error'));
+                yield expect(service.getProperties(1)).rejects.toThrow('Error obteniendo propiedades');
+            }));
+        });
+        describe('createProperty', () => {
+            it('should create property successfully', () => __awaiter(void 0, void 0, void 0, function* () {
+                const propertyData = {
+                    complexId: 1,
+                    unitNumber: '103C',
+                    type: 'APARTMENT',
+                    status: 'AVAILABLE',
+                    area: 90,
+                    block: 'C',
+                    zone: 'Torre 2',
+                    ownerId: 2
+                };
+                const mockCreatedProperty = Object.assign(Object.assign({ id: 3 }, propertyData), { createdAt: new Date(), updatedAt: new Date(), owner: {
+                        id: 2,
+                        name: 'María García',
+                        email: 'maria.garcia@example.com'
+                    } });
+                mockPrisma.property.create.mockResolvedValue(mockCreatedProperty);
+                const result = yield service.createProperty(propertyData);
+                expect(result).toEqual(mockCreatedProperty);
+                expect(mockPrisma.property.create).toHaveBeenCalledWith({
+                    data: propertyData,
+                    include: {
+                        owner: {
+                            select: { id: true, name: true, email: true }
+                        }
+                    }
+                });
+            }));
+            it('should handle creation errors', () => __awaiter(void 0, void 0, void 0, function* () {
+                const propertyData = {
+                    complexId: 1,
+                    unitNumber: '104D',
+                    type: 'APARTMENT'
+                };
+                mockPrisma.property.create.mockRejectedValue(new Error('Unique constraint violation'));
+                yield expect(service.createProperty(propertyData)).rejects.toThrow('Error creando propiedad');
+            }));
+        });
+        describe('updateProperty', () => {
+            it('should update property successfully', () => __awaiter(void 0, void 0, void 0, function* () {
+                const updateData = {
+                    status: 'OCCUPIED',
+                    ownerId: 3
+                };
+                const mockUpdatedProperty = {
+                    id: 1,
+                    complexId: 1,
+                    unitNumber: '101A',
+                    type: 'APARTMENT',
+                    status: 'OCCUPIED',
+                    ownerId: 3,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    owner: {
+                        id: 3,
+                        name: 'Carlos López',
+                        email: 'carlos.lopez@example.com'
+                    }
+                };
+                mockPrisma.property.update.mockResolvedValue(mockUpdatedProperty);
+                const result = yield service.updateProperty(1, updateData);
+                expect(result).toEqual(mockUpdatedProperty);
+                expect(mockPrisma.property.update).toHaveBeenCalledWith({
+                    where: { id: 1 },
+                    data: updateData,
+                    include: {
+                        owner: {
+                            select: { id: true, name: true, email: true }
+                        }
+                    }
+                });
+            }));
+        });
+    });
+    describe('Pets', () => {
+        describe('getPets', () => {
+            it('should return pets with property and resident details', () => __awaiter(void 0, void 0, void 0, function* () {
+                const mockPets = [
+                    {
+                        id: 1,
+                        name: 'Firulais',
+                        type: 'DOG',
+                        breed: 'Golden Retriever',
+                        age: 3,
+                        weight: 25.5,
+                        color: 'Dorado',
+                        vaccinated: true,
+                        vaccineExpiryDate: new Date('2025-12-31'),
+                        notes: 'Muy amigable',
+                        propertyId: 1,
+                        residentId: 1,
+                        createdAt: new Date(),
+                        property: {
+                            id: 1,
+                            unitNumber: '101A'
+                        },
+                        resident: {
+                            id: 1,
+                            name: 'Juan Pérez'
+                        }
+                    }
+                ];
+                mockPrisma.pet.findMany.mockResolvedValue(mockPets);
+                const result = yield service.getPets(1);
+                expect(result).toHaveLength(1);
+                expect(result[0]).toMatchObject({
+                    id: 1,
+                    name: 'Firulais',
+                    type: 'DOG',
+                    breed: 'Golden Retriever',
+                    unitNumber: '101A',
+                    residentName: 'Juan Pérez'
+                });
+                expect(mockPrisma.pet.findMany).toHaveBeenCalledWith({
+                    where: {
+                        property: { complexId: 1 }
+                    },
+                    include: {
+                        property: {
+                            select: { id: true, unitNumber: true }
+                        },
+                        resident: {
+                            select: { id: true, name: true }
+                        }
+                    },
+                    orderBy: { name: 'asc' }
+                });
+            }));
+            it('should filter by propertyId when provided', () => __awaiter(void 0, void 0, void 0, function* () {
+                mockPrisma.pet.findMany.mockResolvedValue([]);
+                yield service.getPets(1, 5);
+                expect(mockPrisma.pet.findMany).toHaveBeenCalledWith({
+                    where: {
+                        property: { complexId: 1 },
+                        propertyId: 5
+                    },
+                    include: {
+                        property: {
+                            select: { id: true, unitNumber: true }
+                        },
+                        resident: {
+                            select: { id: true, name: true }
+                        }
+                    },
+                    orderBy: { name: 'asc' }
+                });
+            }));
+        });
+        describe('createPet', () => {
+            it('should create pet successfully', () => __awaiter(void 0, void 0, void 0, function* () {
+                const petData = {
+                    name: 'Miau',
+                    type: 'CAT',
+                    breed: 'Persa',
+                    age: 2,
+                    weight: 4.2,
+                    color: 'Blanco',
+                    propertyId: 1,
+                    residentId: 1,
+                    vaccinated: true,
+                    vaccineExpiryDate: '2025-06-15T00:00:00.000Z',
+                    notes: 'Gato muy tranquilo'
+                };
+                const mockCreatedPet = {
+                    id: 2,
+                    name: 'Miau',
+                    type: 'CAT',
+                    breed: 'Persa',
+                    age: 2,
+                    weight: 4.2,
+                    color: 'Blanco',
+                    propertyId: 1,
+                    residentId: 1,
+                    vaccinated: true,
+                    vaccineExpiryDate: new Date('2025-06-15T00:00:00.000Z'),
+                    notes: 'Gato muy tranquilo',
+                    createdAt: new Date(),
+                    property: {
+                        unitNumber: '101A'
+                    },
+                    resident: {
+                        name: 'Juan Pérez'
+                    }
+                };
+                mockPrisma.pet.create.mockResolvedValue(mockCreatedPet);
+                const result = yield service.createPet(petData);
+                expect(result).toEqual(mockCreatedPet);
+                expect(mockPrisma.pet.create).toHaveBeenCalledWith({
+                    data: {
+                        name: 'Miau',
+                        type: 'CAT',
+                        breed: 'Persa',
+                        age: 2,
+                        weight: 4.2,
+                        color: 'Blanco',
+                        propertyId: 1,
+                        residentId: 1,
+                        vaccinated: true,
+                        vaccineExpiryDate: new Date('2025-06-15T00:00:00.000Z'),
+                        notes: 'Gato muy tranquilo'
+                    },
+                    include: {
+                        property: {
+                            select: { unitNumber: true }
+                        },
+                        resident: {
+                            select: { name: true }
+                        }
+                    }
+                });
+            }));
+        });
+    });
+    describe('Vehicles', () => {
+        describe('getVehicles', () => {
+            it('should return vehicles with property and resident details', () => __awaiter(void 0, void 0, void 0, function* () {
+                const mockVehicles = [
+                    {
+                        id: 1,
+                        licensePlate: 'ABC123',
+                        brand: 'Toyota',
+                        model: 'Corolla',
+                        year: 2020,
+                        color: 'Blanco',
+                        type: 'CAR',
+                        parkingSpot: 'A15',
+                        notes: 'Vehículo principal',
+                        propertyId: 1,
+                        residentId: 1,
+                        createdAt: new Date(),
+                        property: {
+                            id: 1,
+                            unitNumber: '101A'
+                        },
+                        resident: {
+                            id: 1,
+                            name: 'Juan Pérez'
+                        }
+                    }
+                ];
+                mockPrisma.vehicle.findMany.mockResolvedValue(mockVehicles);
+                const result = yield service.getVehicles(1);
+                expect(result).toHaveLength(1);
+                expect(result[0]).toMatchObject({
+                    id: 1,
+                    licensePlate: 'ABC123',
+                    brand: 'Toyota',
+                    model: 'Corolla',
+                    unitNumber: '101A',
+                    residentName: 'Juan Pérez'
+                });
+            }));
+        });
+        describe('createVehicle', () => {
+            it('should create vehicle with uppercase license plate', () => __awaiter(void 0, void 0, void 0, function* () {
+                const vehicleData = {
+                    licensePlate: 'def456',
+                    brand: 'Honda',
+                    model: 'Civic',
+                    year: 2019,
+                    color: 'Azul',
+                    type: 'CAR',
+                    parkingSpot: 'B20',
+                    notes: 'Segundo vehículo',
+                    propertyId: 1,
+                    residentId: 1
+                };
+                const mockCreatedVehicle = {
+                    id: 2,
+                    licensePlate: 'DEF456',
+                    brand: 'Honda',
+                    model: 'Civic',
+                    year: 2019,
+                    color: 'Azul',
+                    type: 'CAR',
+                    parkingSpot: 'B20',
+                    notes: 'Segundo vehículo',
+                    propertyId: 1,
+                    residentId: 1,
+                    createdAt: new Date(),
+                    property: {
+                        unitNumber: '101A'
+                    },
+                    resident: {
+                        name: 'Juan Pérez'
+                    }
+                };
+                mockPrisma.vehicle.create.mockResolvedValue(mockCreatedVehicle);
+                const result = yield service.createVehicle(vehicleData);
+                expect(result).toEqual(mockCreatedVehicle);
+                expect(mockPrisma.vehicle.create).toHaveBeenCalledWith({
+                    data: Object.assign(Object.assign({}, vehicleData), { licensePlate: 'DEF456' // Should be uppercase
+                     }),
+                    include: {
+                        property: {
+                            select: { unitNumber: true }
+                        },
+                        resident: {
+                            select: { name: true }
+                        }
+                    }
+                });
+            }));
+        });
+    });
+    describe('Statistics', () => {
+        describe('getInventoryStats', () => {
+            it('should return comprehensive inventory statistics', () => __awaiter(void 0, void 0, void 0, function* () {
+                // Mock de conteos
+                mockPrisma.property.count
+                    .mockResolvedValueOnce(100) // total properties
+                    .mockResolvedValueOnce(85); // occupied properties
+                mockPrisma.resident.count.mockResolvedValue(180);
+                mockPrisma.pet.count.mockResolvedValue(45);
+                mockPrisma.vehicle.count.mockResolvedValue(120);
+                mockPrisma.commonService.count.mockResolvedValue(8);
+                const result = yield service.getInventoryStats(1);
+                expect(result).toEqual({
+                    properties: {
+                        total: 100,
+                        occupied: 85,
+                        available: 15,
+                        occupancyRate: 85
+                    },
+                    residents: {
+                        total: 180,
+                        averagePerProperty: 1.8
+                    },
+                    pets: {
+                        total: 45,
+                        averagePerProperty: 0.45
+                    },
+                    vehicles: {
+                        total: 120,
+                        averagePerProperty: 1.2
+                    },
+                    services: {
+                        total: 8
+                    }
+                });
+                expect(mockPrisma.property.count).toHaveBeenCalledTimes(2);
+                expect(mockPrisma.resident.count).toHaveBeenCalledWith({
+                    where: {
+                        property: { complexId: 1 },
+                        status: 'ACTIVE'
+                    }
+                });
+            }));
+            it('should handle zero properties correctly', () => __awaiter(void 0, void 0, void 0, function* () {
+                mockPrisma.property.count
+                    .mockResolvedValueOnce(0) // total properties
+                    .mockResolvedValueOnce(0); // occupied properties
+                mockPrisma.resident.count.mockResolvedValue(0);
+                mockPrisma.pet.count.mockResolvedValue(0);
+                mockPrisma.vehicle.count.mockResolvedValue(0);
+                mockPrisma.commonService.count.mockResolvedValue(0);
+                const result = yield service.getInventoryStats(1);
+                expect(result).toEqual({
+                    properties: {
+                        total: 0,
+                        occupied: 0,
+                        available: 0,
+                        occupancyRate: 0
+                    },
+                    residents: {
+                        total: 0,
+                        averagePerProperty: 0
+                    },
+                    pets: {
+                        total: 0,
+                        averagePerProperty: 0
+                    },
+                    vehicles: {
+                        total: 0,
+                        averagePerProperty: 0
+                    },
+                    services: {
+                        total: 0
+                    }
+                });
+            }));
+        });
+    });
+    describe('Error Handling', () => {
+        it('should handle database connection errors', () => __awaiter(void 0, void 0, void 0, function* () {
+            mockPrisma.property.findMany.mockRejectedValue(new Error('Connection refused'));
+            yield expect(service.getProperties(1)).rejects.toThrow('Error obteniendo propiedades');
+        }));
+        it('should handle constraint violations', () => __awaiter(void 0, void 0, void 0, function* () {
+            const duplicateData = {
+                complexId: 1,
+                unitNumber: '101A', // Duplicate
+                type: 'APARTMENT'
+            };
+            mockPrisma.property.create.mockRejectedValue(new Error('Unique constraint failed on the fields: (`complexId`,`unitNumber`)'));
+            yield expect(service.createProperty(duplicateData)).rejects.toThrow('Error creando propiedad');
+        }));
+        it('should handle invalid foreign key references', () => __awaiter(void 0, void 0, void 0, function* () {
+            const invalidPetData = {
+                name: 'Rex',
+                type: 'DOG',
+                propertyId: 999, // Non-existent property
+                residentId: 999 // Non-existent resident
+            };
+            mockPrisma.pet.create.mockRejectedValue(new Error('Foreign key constraint failed'));
+            yield expect(service.createPet(invalidPetData)).rejects.toThrow('Error creando mascota');
+        }));
+    });
+});

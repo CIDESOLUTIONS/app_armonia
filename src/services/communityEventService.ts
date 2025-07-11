@@ -1,80 +1,161 @@
-import { fetchApi } from '@/lib/api';
+import { getPrisma } from '@/lib/prisma';
+import { ServerLogger } from '@/lib/logging/server-logger';
+import { PrismaClient } from '@prisma/client';
 
-interface CommunityEvent {
-  id: number;
+interface CommunityEventData {
   title: string;
   description?: string;
-  startDateTime: string;
-  endDateTime: string;
+  startDate: Date;
+  endDate: Date;
   location: string;
-  isPublic: boolean;
-  createdBy: number;
-  createdAt: string;
+  type: string;
+  visibility: string;
+  targetRoles: string[];
+  maxAttendees?: number;
+  createdById: number;
+  complexId: number;
 }
 
-interface CreateCommunityEventData {
-  title: string;
-  description?: string;
-  startDateTime: string;
-  endDateTime: string;
-  location: string;
-  isPublic?: boolean;
-}
+export class CommunityEventService {
+  private prisma: PrismaClient;
+  private schemaName: string;
 
-interface UpdateCommunityEventData {
-  id: number;
-  title?: string;
-  description?: string;
-  startDateTime?: string;
-  endDateTime?: string;
-  location?: string;
-  isPublic?: boolean;
-}
-
-export async function getCommunityEvents(): Promise<CommunityEvent[]> {
-  try {
-    const response = await fetchApi('/api/communications/events');
-    return response;
-  } catch (error) {
-    console.error('Error fetching community events:', error);
-    throw error;
+  constructor(schemaName: string) {
+    this.schemaName = schemaName;
+    this.prisma = getPrisma(schemaName);
   }
-}
 
-export async function createCommunityEvent(data: CreateCommunityEventData): Promise<CommunityEvent> {
-  try {
-    const response = await fetchApi('/api/communications/events', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-    return response;
-  } catch (error) {
-    console.error('Error creating community event:', error);
-    throw error;
+  async getEvents(complexId: number, filters: any, userRole: string): Promise<any[]> {
+    try {
+      const where: any = { complexId };
+
+      if (filters.startDate && filters.endDate) {
+        where.OR = [
+          {
+            startDate: {
+              gte: new Date(filters.startDate),
+              lte: new Date(filters.endDate),
+            },
+          },
+          {
+            endDate: {
+              gte: new Date(filters.startDate),
+              lte: new Date(filters.endDate),
+            },
+          },
+          {
+            AND: [
+              { startDate: { lte: new Date(filters.startDate) } },
+              { endDate: { gte: new Date(filters.endDate) } },
+            ],
+          },
+        ];
+      }
+
+      if (filters.type) {
+        where.type = filters.type;
+      }
+
+      // Filtrar por roles si no es admin
+      if (userRole !== 'ADMIN' && userRole !== 'COMPLEX_ADMIN') {
+        where.OR = [
+          ...(where.OR || []),
+          { visibility: 'public' },
+          { targetRoles: { has: userRole } },
+        ];
+      }
+
+      const events = await this.prisma.communityEvent.findMany({
+        where,
+        orderBy: { startDate: 'asc' },
+        include: {
+          createdBy: { select: { id: true, name: true } },
+          attendees: { select: { userId: true, name: true, status: true } },
+        },
+      });
+
+      return events;
+    } catch (error) {
+      ServerLogger.error(`[CommunityEventService] Error al obtener eventos para ${this.schemaName}:`, error);
+      throw error;
+    }
   }
-}
 
-export async function updateCommunityEvent(id: number, data: UpdateCommunityEventData): Promise<CommunityEvent> {
-  try {
-    const response = await fetchApi('/api/communications/events', {
-      method: 'PUT',
-      body: JSON.stringify({ id, ...data }),
-    });
-    return response;
-  } catch (error) {
-    console.error('Error updating community event:', error);
-    throw error;
+  async getEventById(id: number, complexId: number): Promise<any | null> {
+    try {
+      const event = await this.prisma.communityEvent.findUnique({
+        where: { id, complexId },
+        include: {
+          createdBy: { select: { id: true, name: true } },
+          attendees: { select: { userId: true, name: true, status: true } },
+        },
+      });
+      return event;
+    } catch (error) {
+      ServerLogger.error(`[CommunityEventService] Error al obtener evento ${id} para ${this.schemaName}:`, error);
+      throw error;
+    }
   }
-}
 
-export async function deleteCommunityEvent(id: number): Promise<void> {
-  try {
-    await fetchApi('/api/communications/events', {
-      method: 'DELETE',
-      body: JSON.stringify({ id }),
-    });
-  } catch (error) {
-    console.error('Error deleting community event:', error);
-    throw error;
+  async createEvent(data: CommunityEventData): Promise<any> {
+    try {
+      const newEvent = await this.prisma.communityEvent.create({
+        data: {
+          title: data.title,
+          description: data.description,
+          startDate: data.startDate,
+          endDate: data.endDate,
+          location: data.location,
+          type: data.type,
+          visibility: data.visibility,
+          targetRoles: data.targetRoles,
+          maxAttendees: data.maxAttendees,
+          createdById: data.createdById,
+          complexId: data.complexId,
+        },
+      });
+      ServerLogger.info(`[CommunityEventService] Evento ${newEvent.id} creado para ${this.schemaName}`);
+      return newEvent;
+    } catch (error) {
+      ServerLogger.error(`[CommunityEventService] Error al crear evento para ${this.schemaName}:`, error);
+      throw error;
+    }
+  }
+
+  async updateEvent(id: number, complexId: number, data: Partial<CommunityEventData>): Promise<any> {
+    try {
+      const updatedEvent = await this.prisma.communityEvent.update({
+        where: { id, complexId },
+        data: {
+          title: data.title,
+          description: data.description,
+          startDate: data.startDate,
+          endDate: data.endDate,
+          location: data.location,
+          type: data.type,
+          visibility: data.visibility,
+          targetRoles: data.targetRoles,
+          maxAttendees: data.maxAttendees,
+          updatedAt: new Date(),
+        },
+      });
+      ServerLogger.info(`[CommunityEventService] Evento ${id} actualizado para ${this.schemaName}`);
+      return updatedEvent;
+    } catch (error) {
+      ServerLogger.error(`[CommunityEventService] Error al actualizar evento ${id} para ${this.schemaName}:`, error);
+      throw error;
+    }
+  }
+
+  async deleteEvent(id: number, complexId: number): Promise<void> {
+    try {
+      await this.prisma.communityEvent.delete({
+        where: { id, complexId },
+      });
+      ServerLogger.info(`[CommunityEventService] Evento ${id} eliminado para ${this.schemaName}`);
+    } catch (error) {
+      ServerLogger.error(`[CommunityEventService] Error al eliminar evento ${id} para ${this.schemaName}:`, error);
+      throw error;
+    }
   }
 }

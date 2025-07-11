@@ -7,6 +7,7 @@ export default {
   plugins: [
     ['@babel/plugin-transform-runtime', { regenerator: true }],
     'istanbul',
-    '@babel/plugin-syntax-import-attributes'
+    '@babel/plugin-syntax-import-attributes',
+    'babel-plugin-transform-typescript-metadata',
   ]
 };

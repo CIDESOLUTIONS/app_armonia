@@ -56,16 +56,17 @@ export function Header({
   hideNavLinks = false,
 }: HeaderProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = useLocale();
+  const t = useTranslations('Header');
   const { user, changeUserRole } = useAuthStore(); // Obtener el usuario y la función changeUserRole
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState(user?.role || '');
-  
-  // Obtenemos las traducciones según el idioma
-  const t = langlanguage === 'Español' ? headerTexts.es : headerTexts.en;
 
   const toggleLanguage = () => {
-    setLanglanguage(langlanguage === 'Español' ? 'English' : 'Español');
+    const nextLocale = locale === 'es' ? 'en' : 'es';
+    router.replace(pathname, {locale: nextLocale});
   };
 
   const toggleTheme = () => {
@@ -143,7 +144,7 @@ export function Header({
               title={langlanguage === 'Español' ? 'Cambiar a Inglés' : 'Switch to Spanish'}
             >
               <Globe className="w-5 h-5" />
-              <span className="text-xs">{langlanguage?.substring(0, 2) || 'Es'}</span>
+              <span className="text-xs">{locale.toUpperCase()}</span>
             </button>
             <button
               onClick={toggleTheme}
@@ -257,7 +258,7 @@ export function Header({
                 className="text-white hover:text-indigo-200 focus:outline-none flex items-center gap-1"
               >
                 <Globe className="w-5 h-5" />
-                <span className="text-xs">{langlanguage?.substring(0, 2) || 'Es'}</span>
+                <span className="text-xs">{locale.toUpperCase()}</span>
               </button>
               <button
                 onClick={toggleTheme}

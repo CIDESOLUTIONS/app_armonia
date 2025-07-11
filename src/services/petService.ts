@@ -67,9 +67,8 @@ export async function updatePet(id: number, data: UpdatePetData): Promise<Pet> {
 
 export async function deletePet(id: number): Promise<void> {
   try {
-    await fetchApi('/api/inventory/pets', {
+    await fetchApi(`/api/inventory/pets/${id}`, {
       method: 'DELETE',
-      body: JSON.stringify({ id }),
     });
   } catch (error) {
     console.error('Error deleting pet:', error);

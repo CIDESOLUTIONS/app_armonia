@@ -72,9 +72,8 @@ export async function updateProperty(id: number, data: UpdatePropertyData): Prom
 
 export async function deleteProperty(id: number): Promise<void> {
   try {
-    await fetchApi('/api/inventory/properties', {
+    await fetchApi(`/api/inventory/properties/${id}`, {
       method: 'DELETE',
-      body: JSON.stringify({ id }),
     });
   } catch (error) {
     console.error('Error deleting property:', error);
