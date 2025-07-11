@@ -1,0 +1,15 @@
+{
+  "Header": {
+    "features": "Features",
+    "plans": "Plans",
+    "contact": "Contact Us",
+    "login": "Login",
+    "logout": "Logout",
+    "roleSelector": "Select Role"
+  },
+  "LandingPage": {
+    "registerTitle": "Register Your Residential Complex",
+    "registerSubtitle": "Start today and discover a new way of management.",
+    "freeTrialButton": "Start Free Trial"
+  }
+}

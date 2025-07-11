@@ -98,7 +98,7 @@ const AssemblyStatusBadge = ({ status }: { status: string }) => {
 // Componente principal para gestionar una asamblea en tiempo real
 const AssemblyLiveView = () => {
   const router = useRouter();
-  const { id } = router.query;
+  const { id } = useParams();
   const { user } = useAuthStore(); // Assuming useAuthStore provides user info
 
   // Estados
@@ -436,7 +436,7 @@ const AssemblyLiveView = () => {
             <CardContent className="p-0">
               <div className="max-h-[400px] overflow-y-auto">
                 <Table>
-                  <TableHeader>
+                  <TableHeader></TableHeader>
                     <TableRow>
                       <TableHead>Unidad</TableHead>
                       <TableHead>Coeficiente</TableHead>
@@ -539,7 +539,7 @@ const AssemblyLiveView = () => {
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <Table>
-                  <TableHeader>
+                  <TableHeader></TableHeader>
                     <TableRow>
                       <TableHead>Título</TableHead>
                       <TableHead>Tipo</TableHead>

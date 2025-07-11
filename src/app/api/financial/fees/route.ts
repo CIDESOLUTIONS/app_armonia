@@ -1,120 +1,91 @@
-// frontend/src/app/api/financial/fees/route.ts
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { pool } from '@/lib/db';
+import { NextRequest, NextResponse } from 'next/server';
+import { authMiddleware } from '@/lib/auth';
+import { ServerLogger } from '@/lib/logging/server-logger';
+import { FeeService } from '@/services/feeService';
+import { z } from 'zod';
 
-// GET /api/financial/fees
-export async function GET(_req: unknown) {
+const FeeFilterSchema = z.object({
+  type: z.string().optional(),
+  status: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+});
+
+const BulkFeeCreateSchema = z.object({
+  feeType: z.string().min(1, "El tipo de cuota es requerido."),
+  baseAmount: z.number().min(0, "El monto base debe ser un número positivo."),
+  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Formato de fecha inválido (YYYY-MM-DD)."),
+  endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Formato de fecha inválido (YYYY-MM-DD)."),
+  unitIds: z.array(z.number().int().positive("ID de unidad inválido.")).min(1, "Se requiere al menos un ID de unidad."),
+});
+
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const type = searchParams.get('type');
-    const status = searchParams.get('status');
-    const startDate = searchParams.get('startDate');
-    const endDate = searchParams.get('endDate');
+    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN', 'RESIDENT']);
+    if (!authResult.proceed) {
+      return authResult.response;
+    }
+    const { payload } = authResult;
 
-    let query = `
-      SELECT 
-        f.id,
-        f.type,
-        f.amount,
-        f.due_date,
-        f.status,
-        f.payment_date,
-        u.unit_number,
-        COALESCE(json_build_object(
-          'id', p.id,
-          'amount', p.amount,
-          'payment_date', p.payment_date,
-          'payment_method', p.payment_method,
-          'reference', p.reference
-        ), null) as payment
-      FROM fees f
-      JOIN units u ON f.unit_id = u.id
-      LEFT JOIN payments p ON f.id = p.fee_id
-      WHERE 1=1
-    `;
-    const params: unknown[] = [];
-
-    if (type) {
-      params.push(type);
-      query += ` AND f.type = $${params.length}`;
-    }
-    if (status) {
-      params.push(status);
-      query += ` AND f.status = $${params.length}`;
-    }
-    if (startDate) {
-      params.push(startDate);
-      query += ` AND f.due_date >= $${params.length}`;
-    }
-    if (endDate) {
-      params.push(endDate);
-      query += ` AND f.due_date <= $${params.length}`;
+    if (!payload.complexId || !payload.schemaName) {
+      return NextResponse.json({ message: 'Usuario sin complejo asociado' }, { status: 400 });
     }
 
-    query += ` ORDER BY f.due_date DESC`;
+    const { searchParams } = new URL(request.url);
+    const filters = {
+      type: searchParams.get('type') || undefined,
+      status: searchParams.get('status') || undefined,
+      startDate: searchParams.get('startDate') || undefined,
+      endDate: searchParams.get('endDate') || undefined,
+    };
 
-    const _result = await pool.query(query, params);
-    return NextResponse.json(result.rows);
+    const validatedFilters = FeeFilterSchema.parse(filters);
+
+    const feeService = new FeeService(payload.schemaName);
+    const fees = await feeService.getFees(validatedFilters);
+
+    ServerLogger.info(`Cuotas listadas para el complejo ${payload.complexId}`);
+    return NextResponse.json(fees, { status: 200 });
   } catch (error) {
-    console.error('Error fetching fees:', error);
-    return NextResponse.json(
-      { error: 'Error al obtener cuotas' },
-      { status: 500 }
-    );
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ message: 'Error de validación', errors: error.errors }, { status: 400 });
+    }
+    ServerLogger.error('Error al obtener cuotas:', error);
+    return NextResponse.json({ message: 'Error al obtener cuotas' }, { status: 500 });
   }
 }
 
-// POST /api/financial/fees/bulk
-export async function POST(_req: unknown) {
+export async function POST(request: NextRequest) {
   try {
-    const body = await req.json();
-    const { feeType, baseAmount, startDate, endDate, unitIds } = body;
-
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-
-      // Generar fechas de vencimiento
-      const dates = [];
-      const currentDate = new Date(startDate);
-      const endDateTime = new Date(endDate);
-      
-      while (currentDate <= endDateTime) {
-        dates.push(new Date(currentDate));
-        currentDate.setMonth(currentDate.getMonth() + 1);
-      }
-
-      // Insertar cuotas para cada unidad
-      for (const unitId of unitIds) {
-        for (const dueDate of dates) {
-          await client.query(`
-            INSERT INTO fees (
-              unit_id,
-              type,
-              amount,
-              due_date,
-              status,
-              created_at,
-              updated_at
-            ) VALUES ($1, $2, $3, $4, 'PENDING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-          `, [unitId, feeType, baseAmount, dueDate]);
-        }
-      }
-
-      await client.query('COMMIT');
-      return NextResponse.json({ success: true });
-    } catch (error) {
-      await client.query('ROLLBACK');
-      throw error;
-    } finally {
-      client.release();
+    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN']);
+    if (!authResult.proceed) {
+      return authResult.response;
     }
-  } catch (error) {
-    console.error('Error creating fees:', error);
-    return NextResponse.json(
-      { error: 'Error al crear cuotas' },
-      { status: 500 }
+    const { payload } = authResult;
+
+    if (!payload.complexId || !payload.schemaName) {
+      return NextResponse.json({ message: 'Usuario sin complejo asociado' }, { status: 400 });
+    }
+
+    const body = await request.json();
+    const validatedData = BulkFeeCreateSchema.parse(body);
+
+    const feeService = new FeeService(payload.schemaName);
+    await feeService.createBulkFees(
+      validatedData.feeType,
+      validatedData.baseAmount,
+      validatedData.startDate,
+      validatedData.endDate,
+      validatedData.unitIds
     );
+
+    ServerLogger.info(`Cuotas masivas creadas para el complejo ${payload.complexId}`);
+    return NextResponse.json({ message: 'Cuotas creadas exitosamente' }, { status: 201 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ message: 'Error de validación', errors: error.errors }, { status: 400 });
+    }
+    ServerLogger.error('Error al crear cuotas:', error);
+    return NextResponse.json({ message: 'Error al crear cuotas' }, { status: 500 });
   }
 }

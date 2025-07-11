@@ -83,13 +83,18 @@ async function loginHandler(validatedData: LoginRequest, req: Request) {
     
     console.log(`[LOGIN] Token generado para: ${email}`);
     
-    return NextResponse.json({ 
-      token, 
-      user: payload 
+    const response = NextResponse.json({ user: payload });
+    response.cookies.set('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24, // 1 day
     });
+    return response;
 
   } catch (error) {
-    console.error('[LOGIN] Error en API:', error);
+    ServerLogger.error('[LOGIN] Error en API:', error);
     return NextResponse.json(
       { message: "Error interno del servidor" },
       { status: 500 }

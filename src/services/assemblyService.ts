@@ -82,9 +82,8 @@ export async function updateAssembly(data: UpdateAssemblyData): Promise<Assembly
 
 export async function deleteAssembly(id: number): Promise<void> {
   try {
-    await fetchApi('/api/assemblies', {
+    await fetchApi(`/api/assemblies/${id}`, {
       method: 'DELETE',
-      body: JSON.stringify({ id }),
     });
   } catch (error) {
     console.error('Error deleting assembly:', error);

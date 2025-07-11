@@ -7,30 +7,63 @@ import { useRouter } from 'next/navigation';
 export function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, _setError] = useState('');
-  const _router = useRouter();
+  const [error, setError] = useState('');
+  const router = useRouter();
+  const { setUser } = useAuthStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     try {
-      // Variable response eliminada por lint
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-      const _data = await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.message || 'Error al iniciar sesión');
       }
 
-      // Guardar el token
-      localStorage.setItem('token', data.token);
-      
-      // Redirigir al dashboard usando window.location para forzar un refresh completo
-      window.location.href = '/dashboard';
-    } catch (err) {
+      // Guardar el token y la información del usuario en el store de Zustand
+      setUser(data.user, data.token);
+      toast({
+        title: 'Inicio de sesión exitoso',
+        description: 'Redirigiendo...',
+      });
+
+      // Redirigir según el rol del usuario
+      switch (data.user.role) {
+        case 'ADMIN':
+        case 'COMPLEX_ADMIN':
+          router.push('/admin/dashboard');
+          break;
+        case 'RESIDENT':
+          router.push('/resident/dashboard');
+          break;
+        case 'RECEPTION':
+          router.push('/reception/dashboard');
+          break;
+        case 'APP_ADMIN':
+          router.push('/app-admin/dashboard');
+          break;
+        default:
+          router.push('/portal-selector');
+      }
+
+    } catch (err: any) {
       console.error('Error:', err);
-      setError('Error al iniciar sesión');
+      setError(err.message || 'Error al iniciar sesión');
+      toast({
+        title: 'Error',
+        description: err.message || 'Error al iniciar sesión',
+        variant: 'destructive',
+      });
     }
   };
 

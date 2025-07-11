@@ -106,7 +106,7 @@ export default function EditAssemblyPage() {
     if (!assemblyId) return;
 
     try {
-      await updateAssembly({ id: assemblyId, ...formData });
+      await updateAssembly(assemblyId, formData);
       toast({
         title: 'Éxito',
         description: 'Asamblea actualizada correctamente.',

@@ -1,143 +1,93 @@
 import { NextRequest, NextResponse } from 'next/server';
-import communicationService from '@/services/communicationService';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { getPrisma } from '@/lib/prisma';
+import { authMiddleware } from '@/lib/auth';
+import { z } from 'zod';
 import { ServerLogger } from '@/lib/logging/server-logger';
 
-/**
- * GET /api/communications/announcements/[id]
- * Obtiene los detalles de un anuncio específico
- */
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+const AnnouncementUpdateSchema = z.object({
+  title: z.string().min(1, "El título es requerido.").optional(),
+  content: z.string().min(1, "El contenido es requerido.").optional(),
+  publishedAt: z.string().datetime("Fecha de publicación inválida.").optional(),
+  expiresAt: z.string().datetime("Fecha de expiración inválida.").optional().nullable(),
+  isActive: z.boolean().optional(),
+  targetRoles: z.array(z.string()).optional(),
+});
+
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    // Verificar autenticación
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json(
-        { error: 'No autorizado' },
-        { status: 401 }
-      );
+    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN', 'RESIDENT', 'STAFF']);
+    if (!authResult.proceed) {
+      return authResult.response;
     }
+    const { payload } = authResult;
 
-    const id = params.id;
-    if (!id) {
-      return NextResponse.json(
-        { error: 'ID inválido' },
-        { status: 400 }
-      );
-    }
+    const announcementId = parseInt(params.id);
 
-    // Obtener anuncio
-    const announcement = await prisma.announcement.findUnique({
-      where: { id },
-      include: {
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            image: true
-          }
-        },
-        readBy: {
-          where: {
-            userId: session.user.id
-          }
-        },
-        attachments: true
-      }
+    const tenantPrisma = getPrisma(payload.schemaName);
+    const announcement = await tenantPrisma.announcement.findUnique({
+      where: { id: announcementId, complexId: payload.complexId },
     });
 
     if (!announcement) {
-      return NextResponse.json(
-        { error: 'Anuncio no encontrado' },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: 'Anuncio no encontrado' }, { status: 404 });
     }
 
-    // Verificar permisos de acceso según visibilidad
-    if (announcement.visibility !== 'public' && 
-        announcement.visibility === 'role-based' && 
-        !announcement.targetRoles.includes(session.user.role) &&
-        session.user.role !== 'admin' && 
-        session.user.role !== 'super_admin') {
-      return NextResponse.json(
-        { error: 'No tiene permiso para ver este anuncio' },
-        { status: 403 }
-      );
-    }
-
-    // Formatear respuesta
-    const formattedAnnouncement = {
-      id: announcement.id,
-      title: announcement.title,
-      content: announcement.content,
-      type: announcement.type,
-      createdAt: announcement.createdAt,
-      expiresAt: announcement.expiresAt,
-      createdBy: announcement.createdBy,
-      attachments: announcement.attachments.map(attachment => ({
-        id: attachment.id,
-        name: attachment.name,
-        url: attachment.url,
-        type: attachment.type,
-        size: attachment.size
-      })),
-      readBy: announcement.readBy,
-      requiresConfirmation: announcement.requiresConfirmation,
-      isRead: announcement.readBy.length > 0
-    };
-
-    return NextResponse.json(formattedAnnouncement);
+    ServerLogger.info(`Anuncio ${announcementId} obtenido para el complejo ${payload.complexId}`);
+    return NextResponse.json(announcement, { status: 200 });
   } catch (error) {
-    serverLogger.error('Error al obtener anuncio', { error, id: params.id });
-    return NextResponse.json(
-      { error: 'Error al obtener anuncio' },
-      { status: 500 }
-    );
+    ServerLogger.error(`Error al obtener anuncio ${params.id}:`, error);
+    return NextResponse.json({ message: 'Error al obtener anuncio' }, { status: 500 });
   }
 }
 
-/**
- * PUT /api/communications/announcements/[id]/read
- * Marca un anuncio como leído
- */
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    // Verificar autenticación
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json(
-        { error: 'No autorizado' },
-        { status: 401 }
-      );
+    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN']);
+    if (!authResult.proceed) {
+      return authResult.response;
     }
+    const { payload } = authResult;
 
-    const id = params.id;
-    if (!id) {
-      return NextResponse.json(
-        { error: 'ID inválido' },
-        { status: 400 }
-      );
-    }
+    const announcementId = parseInt(params.id);
+    const body = await request.json();
+    const validatedData = AnnouncementUpdateSchema.parse(body);
 
-    // Marcar anuncio como leído
-    const readRecord = await communicationService.markAnnouncementAsRead(
-      id,
-      session.user.id
-    );
+    const tenantPrisma = getPrisma(payload.schemaName);
+    const updatedAnnouncement = await tenantPrisma.announcement.update({
+      where: { id: announcementId, complexId: payload.complexId },
+      data: validatedData,
+    });
 
-    return NextResponse.json(readRecord);
+    ServerLogger.info(`Anuncio ${announcementId} actualizado en complejo ${payload.complexId}`);
+    return NextResponse.json(updatedAnnouncement, { status: 200 });
   } catch (error) {
-    serverLogger.error('Error al marcar anuncio como leído', { error, id: params.id });
-    return NextResponse.json(
-      { error: 'Error al marcar anuncio como leído' },
-      { status: 500 }
-    );
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ message: 'Error de validación', errors: error.errors }, { status: 400 });
+    }
+    ServerLogger.error(`Error al actualizar anuncio ${params.id}:`, error);
+    return NextResponse.json({ message: 'Error al actualizar anuncio' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN']);
+    if (!authResult.proceed) {
+      return authResult.response;
+    }
+    const { payload } = authResult;
+
+    const announcementId = parseInt(params.id);
+
+    const tenantPrisma = getPrisma(payload.schemaName);
+    await tenantPrisma.announcement.delete({
+      where: { id: announcementId, complexId: payload.complexId },
+    });
+
+    ServerLogger.info(`Anuncio ${announcementId} eliminado del complejo ${payload.complexId}`);
+    return NextResponse.json({ message: 'Anuncio eliminado exitosamente' }, { status: 200 });
+  } catch (error) {
+    ServerLogger.error(`Error al eliminar anuncio ${params.id}:`, error);
+    return NextResponse.json({ message: 'Error al eliminar anuncio' }, { status: 500 });
   }
 }

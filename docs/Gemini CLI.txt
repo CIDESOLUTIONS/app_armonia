@@ -295,7 +295,21 @@ Fase 2: Desarrollo y Alineación Funcional
   He guardado este plan en mi memoria para guiar nuestras próximas interacciones.
 
 Gemini CLI
+
+Inicio rápido
+Requisitos previos: asegúrese de tener instalada la versión 20 o superior de Node.js.
+Ejecute la CLI: ejecute el siguiente comando en su terminal:
+
+npx https://github.com/google-gemini/gemini-cli
+
+O instálalo con:
+npm install -g @google/gemini-cli
+gemini
+
+
 prompt ajustado
 
 Estás ubicado en el directorio raíz del proyecto Armonía, una aplicación web y móvil con especificaciones técnicas detalladas en la carpeta docs; tu tarea es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto para generar un resumen técnico, funcional y de estilo, identificar diferencias y proponer un plan sistemático para alinear el desarrollo con los requisitos. Evalúa qué funcionalidades deben ajustarse (desde la landing page hasta todos los flujos), qué prácticas deben corregirse según estándares modernos de calidad y si es necesario desarrollar nuevo código, verifica primero en el historial de la carpeta .git para rescatar posibles descartes; si no existe, desarrolla desde cero siguiendo el estilo actual. Incluye la reorganización de la estructura del proyecto si mejora la eficiencia, migración de .js a .ts, eliminación de dependencias o funciones innecesarias y optimización del código. Posteriormente, define y ejecuta pruebas individuales y E2E, y deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado con todas las tareas necesarias y mantenlo en memoria como guía principal hasta la ejecución completa.
 
+Nueva iteración
+Interacciones solo en español. Compórtese como un experto en desarrollo y auditoria de aplicaciones web y móvil aplicando las últimas y mejores practicas de desarrollo. Estás ubicado en el directorio raíz del proyecto Armonía, una aplicación web y móvil con especificaciones técnicas detalladas en la carpeta docs; tu tarea es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto para generar un resumen técnico, funcional y de estilo, identificar diferencias y proponer un plan sistemático para alinear el desarrollo con los requisitos. Evalúa qué funcionalidades deben ajustarse desde la landing page pasando a todos los portales (Administrador del conjunto residencial, Residentes, Recepción/Vigilancia y la consola de administración de la aplicación) y sus funciones, qué prácticas deben corregirse según estándares modernos de calidad y si es necesario desarrollar nuevo código, verifica primero en el historial de la carpeta .git para rescatar posibles descartes; si no existe, desarrolla desde cero siguiendo el estilo actual. Incluye la reorganización de la estructura del proyecto si mejora la eficiencia, migración, eliminación de dependencias o funciones innecesarias y optimización del código. Posteriormente, define y ejecuta pruebas individuales y E2E, y deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado con todas las tareas necesarias y mantenlo en memoria como guía principal hasta la ejecución completa.

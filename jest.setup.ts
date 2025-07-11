@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import '@testing-library/jest-dom';
 import { Request, Response } from 'node-fetch';
 

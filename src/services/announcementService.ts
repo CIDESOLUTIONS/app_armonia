@@ -67,9 +67,8 @@ export async function updateAnnouncement(id: number, data: UpdateAnnouncementDat
 
 export async function deleteAnnouncement(id: number): Promise<void> {
   try {
-    await fetchApi('/api/communications/announcements', {
+    await fetchApi(`/api/communications/announcements/${id}`, {
       method: 'DELETE',
-      body: JSON.stringify({ id }),
     });
   } catch (error) {
     console.error('Error deleting announcement:', error);

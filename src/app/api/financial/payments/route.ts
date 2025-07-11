@@ -1,70 +1,52 @@
-// frontend/src/app/api/financial/payments/route.ts
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { pool } from '@/lib/db';
+import { NextRequest, NextResponse } from 'next/server';
+import { authMiddleware } from '@/lib/auth';
+import { ServerLogger } from '@/lib/logging/server-logger';
+import { PaymentService } from '@/services/paymentService';
+import { z } from 'zod';
 
-// GET /api/financial/payments
-export async function GET(_req: unknown) {
+const PaymentFilterSchema = z.object({
+  status: z.string().optional(),
+  paymentMethod: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  sortField: z.enum(['paymentDate', 'amount', 'unitNumber', 'status']).default('paymentDate'),
+  sortDirection: z.enum(['asc', 'desc']).default('desc'),
+});
+
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const status = searchParams.get('status');
-    const paymentMethod = searchParams.get('paymentMethod');
-    const startDate = searchParams.get('startDate');
-    const endDate = searchParams.get('endDate');
-    const sortField = searchParams.get('sortField') || 'payment_date';
-    const sortDirection = searchParams.get('sortDirection') || 'DESC';
+    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN', 'RESIDENT']);
+    if (!authResult.proceed) {
+      return authResult.response;
+    }
+    const { payload } = authResult;
 
-    let query = `
-      SELECT 
-        p.id,
-        p.amount,
-        p.payment_date,
-        p.payment_method,
-        p.reference,
-        p.status,
-        f.type as fee_type,
-        f.due_date as fee_due_date,
-        u.unit_number
-      FROM payments p
-      JOIN fees f ON p.fee_id = f.id
-      JOIN units u ON f.unit_id = u.id
-      WHERE 1=1
-    `;
-    const params: unknown[] = [];
-
-    if (status) {
-      params.push(status);
-      query += ` AND p.status = $${params.length}`;
-    }
-    if (paymentMethod) {
-      params.push(paymentMethod);
-      query += ` AND p.payment_method = $${params.length}`;
-    }
-    if (startDate) {
-      params.push(startDate);
-      query += ` AND p.payment_date >= $${params.length}`;
-    }
-    if (endDate) {
-      params.push(endDate);
-      query += ` AND p.payment_date <= $${params.length}`;
+    if (!payload.complexId || !payload.schemaName) {
+      return NextResponse.json({ message: 'Usuario sin complejo asociado' }, { status: 400 });
     }
 
-    // Validar campo de ordenamiento para prevenir SQL injection
-    const validSortFields = ['payment_date', 'amount', 'unit_number', 'status'];
-    const validSortDirections = ['ASC', 'DESC'];
-    
-    const finalSortField = validSortFields.includes(sortField) ? sortField : 'payment_date';
-    const finalSortDirection = validSortDirections.includes(sortDirection) ? sortDirection : 'DESC';
+    const { searchParams } = new URL(request.url);
+    const filters = {
+      status: searchParams.get('status') || undefined,
+      paymentMethod: searchParams.get('paymentMethod') || undefined,
+      startDate: searchParams.get('startDate') || undefined,
+      endDate: searchParams.get('endDate') || undefined,
+      sortField: (searchParams.get('sortField') as 'paymentDate' | 'amount' | 'unitNumber' | 'status') || undefined,
+      sortDirection: (searchParams.get('sortDirection') as 'asc' | 'desc') || undefined,
+    };
 
-    query += ` ORDER BY ${finalSortField} ${finalSortDirection}`;
+    const validatedFilters = PaymentFilterSchema.parse(filters);
 
-    const _result = await pool.query(query, params);
-    return NextResponse.json(result.rows);
+    const paymentService = new PaymentService(payload.schemaName);
+    const payments = await paymentService.getPayments(validatedFilters);
+
+    ServerLogger.info(`Pagos listados para el complejo ${payload.complexId}`);
+    return NextResponse.json(payments, { status: 200 });
   } catch (error) {
-    console.error('Error fetching payments:', error);
-    return NextResponse.json(
-      { error: 'Error al obtener pagos' },
-      { status: 500 }
-    );
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ message: 'Error de validación', errors: error.errors }, { status: 400 });
+    }
+    ServerLogger.error('Error al obtener pagos:', error);
+    return NextResponse.json({ message: 'Error al obtener pagos' }, { status: 500 });
   }
 }

@@ -4,6 +4,7 @@ import tseslint from "typescript-eslint";
 import pluginReact from "eslint-plugin-react";
 import nextPlugin from "@next/eslint-plugin-next";
 import pluginReactHooks from "eslint-plugin-react-hooks";
+import pluginPrettier from "eslint-plugin-prettier";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
@@ -98,19 +99,38 @@ export default [
     rules: {
       // Reglas de ESLint base
       ...pluginJs.configs.recommended.rules,
-      "no-undef": "off", // Deshabilitar globalmente
-      "no-unused-vars": "off", // Deshabilitar globalmente
+      "no-undef": "error",
+      "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
 
       // Reglas de TypeScript ESLint
       ...tseslint.configs.recommended.rules,
-      "@typescript-eslint/naming-convention": "off", // Deshabilitado temporalmente
+      "@typescript-eslint/naming-convention": [
+        "error",
+        {
+          selector: "variableLike",
+          format: ["camelCase", "PascalCase", "UPPER_CASE"],
+          leadingUnderscore: "allow",
+        },
+        {
+          selector: "function",
+          format: ["camelCase", "PascalCase"],
+        },
+        {
+          selector: "typeLike",
+          format: ["PascalCase"],
+        },
+        {
+          selector: "enumMember",
+          format: ["PascalCase", "UPPER_CASE"],
+        },
+      ],
 
       // Reglas de React
       ...pluginReact.configs.recommended.rules,
       "react/react-in-jsx-scope": "off",
       "react/jsx-uses-react": "off",
       "react/no-unescaped-entities": "off",
-      "react/prop-types": "off", // Deshabilitar validación de prop-types
+      "react/prop-types": "error", // Habilitado
 
       // Reglas de React Hooks
       ...pluginReactHooks.configs.recommended.rules,
@@ -118,7 +138,11 @@ export default [
       // Reglas de Next.js
       ...nextPlugin.configs.recommended.rules,
       ...nextPlugin.configs["core-web-vitals"].rules,
+      // Reglas de Prettier
+      "prettier/prettier": "error",
     },
+  },
+  pluginPrettier.configs.recommended,,
   },
   {
     files: ["src/lib/constants/*.ts"],
