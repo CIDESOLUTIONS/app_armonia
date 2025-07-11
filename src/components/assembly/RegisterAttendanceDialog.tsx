@@ -1,24 +1,17 @@
- 
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
-  Box,
-  Button,
   Dialog,
-  DialogActions,
   DialogContent,
+  DialogHeader,
   DialogTitle,
-  FormControl,
-  FormControlLabel,
-  FormHelperText,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Select,
-  TextField,
-  Typography
-} from '@mui/material';
+  DialogDescription,
+  DialogFooter
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -46,7 +39,19 @@ const attendanceTypes = [
 ];
 
 // Componente para registrar asistencia a una asamblea
-const RegisterAttendanceDialog = ({ open, onClose, onSubmit, propertyUnits, owners }) => {
+const RegisterAttendanceDialog = ({
+  open,
+  onClose,
+  onSubmit,
+  propertyUnits,
+  owners
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSubmit: (data: any) => void;
+  propertyUnits: any[];
+  owners: any[];
+}) => {
   // Configuración del formulario
   const { control, handleSubmit, watch, formState: { errors }, reset, setValue } = useForm({
     resolver: yupResolver(schema),
@@ -82,12 +87,12 @@ const RegisterAttendanceDialog = ({ open, onClose, onSubmit, propertyUnits, owne
   };
   
   // Actualizar coeficiente automáticamente al seleccionar unidad
-  const updateCoefficient = (propertyUnitId: number) => {
+  const updateCoefficient = useCallback((propertyUnitId: number) => {
     if (!propertyUnitId) return '';
     
     const unit = propertyUnits.find((u: any) => u.id === propertyUnitId);
     return unit ? unit.coefficient : '';
-  };
+  }, [propertyUnits]);
 
   useEffect(() => {
     if (watchPropertyUnitId) {
@@ -99,157 +104,161 @@ const RegisterAttendanceDialog = ({ open, onClose, onSubmit, propertyUnits, owne
   }, [watchPropertyUnitId, setValue, updateCoefficient]);
   
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-      <DialogTitle>Registrar Asistencia</DialogTitle>
-      <form onSubmit={handleSubmit(handleFormSubmit)}>
-        <DialogContent>
-          <Grid container spacing={3}>
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-[600px]">
+        <DialogHeader>
+          <DialogTitle>Registrar Asistencia</DialogTitle>
+          <DialogDescription>Complete los datos para registrar la asistencia a la asamblea.</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="grid gap-4 py-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Unidad de propiedad */}
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth error={!!errors.propertyUnitId}>
-                <InputLabel>Unidad</InputLabel>
-                <Controller
-                  name="propertyUnitId"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      label="Unidad"
-                      onChange={(e) => {
-                        field.onChange(e);
-                        // Actualizar coeficiente automáticamente
-                        const coef = updateCoefficient(e.target.value as number);
-                        if (coef) {
-                          setValue('coefficient', coef);
-                        }
-                      }}
-                    >
+            <div className="grid gap-2">
+              <Label htmlFor="propertyUnitId">Unidad</Label>
+              <Controller
+                name="propertyUnitId"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={String(field.value)}
+                    onValueChange={(value) => {
+                      field.onChange(Number(value));
+                      const coef = updateCoefficient(Number(value));
+                      if (coef) {
+                        setValue('coefficient', coef);
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione una unidad" />
+                    </SelectTrigger>
+                    <SelectContent>
                       {propertyUnits?.map((unit: any) => (
-                        <MenuItem key={unit.id} value={unit.id}>
+                        <SelectItem key={unit.id} value={String(unit.id)}>
                           {unit.number} - {unit.ownerName}
-                        </MenuItem>
+                        </SelectItem>
                       ))}
-                    </Select>
-                  )}
-                />
-                {errors.propertyUnitId && (
-                  <FormHelperText error>{errors.propertyUnitId.message}</FormHelperText>
+                    </SelectContent>
+                  </Select>
                 )}
-              </FormControl>
-            </Grid>
+              />
+              {errors.propertyUnitId && (
+                <p className="text-red-500 text-sm mt-1">{errors.propertyUnitId.message}</p>
+              )}
+            </div>
             
             {/* Coeficiente */}
-            <Grid item xs={12} md={6}>
+            <div className="grid gap-2">
+              <Label htmlFor="coefficient">Coeficiente (%)</Label>
               <Controller
                 name="coefficient"
                 control={control}
                 render={({ field }) => (
-                  <TextField
+                  <Input
                     {...field}
-                    label="Coeficiente (%)"
+                    id="coefficient"
                     type="number"
-                    fullWidth
-                    InputProps={{ inputProps: { min: 0.01, max: 100, step: 0.01 } }}
-                    error={!!errors.coefficient}
-                    helperText={errors.coefficient?.message}
+                    step="0.01"
+                    placeholder="Ej: 0.5, 1.2"
                   />
                 )}
               />
-            </Grid>
-            
-            {/* Tipo de asistencia */}
-            <Grid item xs={12}>
-              <Typography variant="subtitle2" gutterBottom>
-                Tipo de asistencia
-              </Typography>
-              
-              <Controller
-                name="attendanceType"
-                control={control}
-                render={({ field }) => (
-                  <RadioGroup
-                    {...field}
-                    row
-                  >
-                    {attendanceTypes.map((type) => (
-                      <FormControlLabel 
-                        key={type.value}
-                        value={type.value} 
-                        control={<Radio />} 
-                        label={type.label} 
-                      />
-                    ))}
-                  </RadioGroup>
-                )}
-              />
-              {errors.attendanceType && (
-                <FormHelperText error>{errors.attendanceType.message}</FormHelperText>
+              {errors.coefficient && (
+                <p className="text-red-500 text-sm mt-1">{errors.coefficient.message}</p>
               )}
-            </Grid>
-            
-            {/* Campos adicionales para asistencia por poder */}
-            {watchAttendanceType === 'PROXY' && (
-              <>
-                <Grid item xs={12} md={6}>
-                  <FormControl fullWidth error={!!errors.proxyUserId}>
-                    <InputLabel>Propietario que otorga el poder</InputLabel>
-                    <Controller
-                      name="proxyUserId"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          {...field}
-                          label="Propietario que otorga el poder"
-                        >
-                          {owners?.map((owner: any) => (
-                            <MenuItem key={owner.id} value={owner.id}>
-                              {owner.name}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      )}
+            </div>
+          </div>
+          
+          {/* Tipo de asistencia */}
+          <div className="grid gap-2">
+            <Label>Tipo de asistencia</Label>
+            <Controller
+              name="attendanceType"
+              control={control}
+              render={({ field }) => (
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  className="flex space-x-4"
+                >
+                  {attendanceTypes.map((type) => (
+                    <div key={type.value} className="flex items-center">
+                      <RadioGroupItem value={type.value} id={type.value} />
+                      <Label htmlFor={type.value} className="ml-2">{type.label}</Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              )}
+            />
+            {errors.attendanceType && (
+              <p className="text-red-500 text-sm mt-1">{errors.attendanceType.message}</p>
+            )}
+          </div>
+          
+          {/* Campos adicionales para asistencia por poder */}
+          {watchAttendanceType === 'PROXY' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="proxyUserId">Propietario que otorga el poder</Label>
+                <Controller
+                  name="proxyUserId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={String(field.value)}
+                      onValueChange={(value) => field.onChange(Number(value))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccione propietario" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {owners?.map((owner: any) => (
+                          <SelectItem key={owner.id} value={String(owner.id)}>
+                            {owner.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.proxyUserId && (
+                  <p className="text-red-500 text-sm mt-1">{errors.proxyUserId.message}</p>
+                )}
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="proxyDocumentUrl">URL del documento de poder</Label>
+                <Controller
+                  name="proxyDocumentUrl"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="proxyDocumentUrl"
+                      placeholder="URL del documento"
                     />
-                    {errors.proxyUserId && (
-                      <FormHelperText error>{errors.proxyUserId.message}</FormHelperText>
-                    )}
-                  </FormControl>
-                </Grid>
-                
-                <Grid item xs={12} md={6}>
-                  <Controller
-                    name="proxyDocumentUrl"
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label="URL del documento de poder"
-                        fullWidth
-                        error={!!errors.proxyDocumentUrl}
-                        helperText={errors.proxyDocumentUrl?.message}
-                      />
-                    )}
-                  />
-                </Grid>
-              </>
-            )}
-            
-            {/* Información adicional para asistencia virtual */}
-            {watchAttendanceType === 'VIRTUAL' && (
-              <Grid item xs={12}>
-                <Typography variant="body2" color="text.secondary">
-                  La asistencia virtual registrará automáticamente su dirección IP y navegador para verificación.
-                </Typography>
-              </Grid>
-            )}
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancelar</Button>
-          <Button type="submit" variant="contained" color="primary">
-            Registrar Asistencia
-          </Button>
-        </DialogActions>
-      </form>
+                  )}
+                />
+                {errors.proxyDocumentUrl && (
+                  <p className="text-red-500 text-sm mt-1">{errors.proxyDocumentUrl.message}</p>
+                )}
+              </div>
+            </div>
+          )}
+          
+          {/* Información adicional para asistencia virtual */}
+          {watchAttendanceType === 'VIRTUAL' && (
+            <p className="text-sm text-gray-500">
+              La asistencia virtual registrará automáticamente su dirección IP y navegador para verificación.
+            </p>
+          )}
+          
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={handleClose}>Cancelar</Button>
+            <Button type="submit">Registrar Asistencia</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 };

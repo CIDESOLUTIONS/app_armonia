@@ -1,35 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { useToast } from '@/components/ui/use-toast';
 import { 
-  Box, 
-  Button, 
-  Card, 
-  CardContent, 
-  FormControl, 
-  FormHelperText, 
-  Grid, 
-  InputLabel, 
-  MenuItem, 
-  Select, 
-  TextField, 
-  Typography, 
-  CircularProgress,
-  Snackbar,
-  Alert
-} from '@mui/material';
+  UserPlus as PersonAddIcon,
+  Camera as CameraIcon,
+  Loader2
+} from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { PersonAdd, CameraAlt } from '@mui/icons-material';
 import { intercomService } from '../../lib/services/intercom-service';
+import Image from 'next/image';
 
 // Esquema de validación
 const schema = yup.object({
   name: yup.string().required('El nombre es obligatorio'),
   identification: yup.string().required('La identificación es obligatoria'),
-  phone: yup.string().matches(/^\+?[0-9]{10,15}$/, 'Formato de teléfono inválido'),
-  typeId: yup.number().required('El tipo de visitante es obligatorio'),
-  unitId: yup.number().required('La unidad a visitar es obligatoria'),
-  purpose: yup.string().required('El propósito de la visita es obligatorio')
+  phone: yup.string().matches(/^\+?[0-9]{10,15}$/, 'Formato de teléfono inválido').optional().nullable().transform(value => value === '' ? undefined : value),
+  typeId: yup.number().required('El tipo de visitante es obligatorio').min(1, 'Seleccione un tipo'),
+  unitId: yup.number().required('La unidad a visitar es obligatoria').min(1, 'Seleccione una unidad'),
+  purpose: yup.string().required('El propósito de la visita es obligatorio'),
+  company: yup.string().optional().nullable().transform(value => value === '' ? undefined : value)
 }).required();
 
 // Interfaz para tipos de visitantes
@@ -49,20 +52,12 @@ interface Unit {
 
 const VisitorRegistration: React.FC = () => {
   // Estados
+  const { toast } = useToast();
   const [visitorTypes, setVisitorTypes] = useState<VisitorType[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
-  const [notification, setNotification] = useState<{
-    open: boolean;
-    message: string;
-    severity: 'success' | 'error' | 'info';
-  }>({
-    open: false,
-    message: '',
-    severity: 'info'
-  });
 
   // Configuración del formulario
   const { control, handleSubmit, reset, formState: { errors } } = useForm({
@@ -79,29 +74,29 @@ const VisitorRegistration: React.FC = () => {
   });
 
   // Cargar datos iniciales
+  const fetchData = useCallback(async () => {
+    try {
+      // En un caso real, estos datos vendrían de la API
+      const typesResponse = await fetch('/api/intercom/visitor-types');
+      const typesData = await typesResponse.json();
+      setVisitorTypes(typesData);
+
+      const unitsResponse = await fetch('/api/intercom/units');
+      const unitsData = await unitsResponse.json();
+      setUnits(unitsData);
+    } catch (error) {
+      console.error('Error al cargar datos:', error);
+      toast({
+        title: 'Error',
+        description: 'Error al cargar datos iniciales',
+        variant: 'destructive'
+      });
+    }
+  }, [toast]);
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // En un caso real, estos datos vendrían de la API
-        const typesResponse = await fetch('/api/intercom/visitor-types');
-        const typesData = await typesResponse.json();
-        setVisitorTypes(typesData);
-
-        const unitsResponse = await fetch('/api/intercom/units');
-        const unitsData = await unitsResponse.json();
-        setUnits(unitsData);
-      } catch (error) {
-        console.error('Error al cargar datos:', error);
-        setNotification({
-          open: true,
-          message: 'Error al cargar datos iniciales',
-          severity: 'error'
-        });
-      }
-    };
-
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   // Manejar envío del formulario
   const onSubmit = async (data: any) => {
@@ -116,10 +111,10 @@ const VisitorRegistration: React.FC = () => {
       await intercomService.registerVisit(data, data.unitId, data.purpose);
 
       // Mostrar notificación de éxito
-      setNotification({
-        open: true,
-        message: 'Visita registrada correctamente',
-        severity: 'success'
+      toast({
+        title: 'Éxito',
+        description: 'Visita registrada correctamente',
+        variant: 'default'
       });
 
       // Resetear formulario
@@ -127,10 +122,10 @@ const VisitorRegistration: React.FC = () => {
       setPhotoUrl(null);
     } catch (error) {
       console.error('Error al registrar visita:', error);
-      setNotification({
-        open: true,
-        message: 'Error al registrar la visita',
-        severity: 'error'
+      toast({
+        title: 'Error',
+        description: 'Error al registrar la visita',
+        variant: 'destructive'
       });
     } finally {
       setLoading(false);
@@ -143,256 +138,239 @@ const VisitorRegistration: React.FC = () => {
     try {
       // En un entorno real, aquí se integraría con la cámara
       // Por ahora simulamos una URL de foto
-      setTimeout(() => {
-        setPhotoUrl('https://via.placeholder.com/150');
-        setTakingPhoto(false);
-      }, 1500);
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setPhotoUrl('https://via.placeholder.com/150');
     } catch (error) {
       console.error('Error al tomar foto:', error);
+      toast({
+        title: 'Error',
+        description: 'Error al tomar la foto',
+        variant: 'destructive'
+      });
+    } finally {
       setTakingPhoto(false);
     }
   };
 
-  // Cerrar notificación
-  const handleCloseNotification = () => {
-    setNotification({
-      ...notification,
-      open: false
-    });
-  };
-
   return (
-    <Card elevation={3}>
-      <CardContent>
-        <Typography variant="h5" component="h2" gutterBottom>
-          <PersonAdd sx={{ mr: 1, verticalAlign: 'middle' }} />
+    <Card className="shadow-sm">
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <PersonAddIcon className="mr-2 h-5 w-5" />
           Registro de Visitantes
-        </Typography>
-
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container spacing={3}>
+        </CardTitle>
+        <CardDescription>Registre el ingreso de nuevos visitantes al conjunto.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Información personal */}
-            <Grid item xs={12} md={6}>
+            <div className="grid gap-2">
+              <Label htmlFor="name">Nombre completo</Label>
               <Controller
                 name="name"
                 control={control}
                 render={({ field }) => (
-                  <TextField
+                  <Input
                     {...field}
-                    label="Nombre completo"
-                    variant="outlined"
-                    fullWidth
-                    error={!!errors.name}
-                    helperText={errors.name?.message}
+                    id="name"
+                    placeholder="Nombre completo del visitante"
                   />
                 )}
               />
-            </Grid>
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+              )}
+            </div>
 
-            <Grid item xs={12} md={6}>
+            <div className="grid gap-2">
+              <Label htmlFor="identification">Documento de identidad</Label>
               <Controller
                 name="identification"
                 control={control}
                 render={({ field }) => (
-                  <TextField
+                  <Input
                     {...field}
-                    label="Documento de identidad"
-                    variant="outlined"
-                    fullWidth
-                    error={!!errors.identification}
-                    helperText={errors.identification?.message}
+                    id="identification"
+                    placeholder="Número de identificación"
                   />
                 )}
               />
-            </Grid>
+              {errors.identification && (
+                <p className="text-red-500 text-sm mt-1">{errors.identification.message}</p>
+              )}
+            </div>
 
-            <Grid item xs={12} md={6}>
+            <div className="grid gap-2">
+              <Label htmlFor="phone">Teléfono (opcional)</Label>
               <Controller
                 name="phone"
                 control={control}
                 render={({ field }) => (
-                  <TextField
+                  <Input
                     {...field}
-                    label="Teléfono"
-                    variant="outlined"
-                    fullWidth
-                    error={!!errors.phone}
-                    helperText={errors.phone?.message}
+                    id="phone"
+                    placeholder="Número de teléfono"
                   />
                 )}
               />
-            </Grid>
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
+              )}
+            </div>
 
-            <Grid item xs={12} md={6}>
+            <div className="grid gap-2">
+              <Label htmlFor="company">Empresa (opcional)</Label>
               <Controller
                 name="company"
                 control={control}
                 render={({ field }) => (
-                  <TextField
+                  <Input
                     {...field}
-                    label="Empresa (opcional)"
-                    variant="outlined"
-                    fullWidth
+                    id="company"
+                    placeholder="Nombre de la empresa"
                   />
                 )}
               />
-            </Grid>
+            </div>
 
             {/* Tipo de visitante */}
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth error={!!errors.typeId}>
-                <InputLabel>Tipo de visitante</InputLabel>
-                <Controller
-                  name="typeId"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      label="Tipo de visitante"
-                    >
-                      <MenuItem value={0} disabled>Seleccione un tipo</MenuItem>
+            <div className="grid gap-2">
+              <Label htmlFor="typeId">Tipo de visitante</Label>
+              <Controller
+                name="typeId"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={String(field.value)}
+                    onValueChange={(value) => field.onChange(Number(value))}
+                  >
+                    <SelectTrigger id="typeId">
+                      <SelectValue placeholder="Seleccione un tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0" disabled>Seleccione un tipo</SelectItem>
                       {visitorTypes.map((type) => (
-                        <MenuItem key={type.id} value={type.id}>
+                        <SelectItem key={type.id} value={String(type.id)}>
                           {type.name}
-                        </MenuItem>
+                        </SelectItem>
                       ))}
-                    </Select>
-                  )}
-                />
-                {errors.typeId && (
-                  <FormHelperText>{errors.typeId.message}</FormHelperText>
+                    </SelectContent>
+                  </Select>
                 )}
-              </FormControl>
-            </Grid>
+              />
+              {errors.typeId && (
+                <p className="text-red-500 text-sm mt-1">{errors.typeId.message}</p>
+              )}
+            </div>
 
             {/* Unidad a visitar */}
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth error={!!errors.unitId}>
-                <InputLabel>Unidad a visitar</InputLabel>
-                <Controller
-                  name="unitId"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      label="Unidad a visitar"
-                    >
-                      <MenuItem value={0} disabled>Seleccione una unidad</MenuItem>
+            <div className="grid gap-2">
+              <Label htmlFor="unitId">Unidad a visitar</Label>
+              <Controller
+                name="unitId"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={String(field.value)}
+                    onValueChange={(value) => field.onChange(Number(value))}
+                  >
+                    <SelectTrigger id="unitId">
+                      <SelectValue placeholder="Seleccione una unidad" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0" disabled>Seleccione una unidad</SelectItem>
                       {units.map((unit) => (
-                        <MenuItem key={unit.id} value={unit.id}>
+                        <SelectItem key={unit.id} value={String(unit.id)}>
                           {unit.tower ? `${unit.tower} - ${unit.number}` : unit.number}
-                        </MenuItem>
+                        </SelectItem>
                       ))}
-                    </Select>
-                  )}
-                />
-                {errors.unitId && (
-                  <FormHelperText>{errors.unitId.message}</FormHelperText>
+                    </SelectContent>
+                  </Select>
                 )}
-              </FormControl>
-            </Grid>
+              />
+              {errors.unitId && (
+                <p className="text-red-500 text-sm mt-1">{errors.unitId.message}</p>
+              )}
+            </div>
 
             {/* Propósito de la visita */}
-            <Grid item xs={12}>
+            <div className="grid gap-2 col-span-full">
+              <Label htmlFor="purpose">Propósito de la visita</Label>
               <Controller
                 name="purpose"
                 control={control}
                 render={({ field }) => (
-                  <TextField
+                  <Textarea
                     {...field}
-                    label="Propósito de la visita"
-                    variant="outlined"
-                    fullWidth
-                    multiline
+                    id="purpose"
+                    placeholder="Propósito de la visita"
                     rows={2}
-                    error={!!errors.purpose}
-                    helperText={errors.purpose?.message}
                   />
                 )}
               />
-            </Grid>
+              {errors.purpose && (
+                <p className="text-red-500 text-sm mt-1">{errors.purpose.message}</p>
+              )}
+            </div>
 
             {/* Foto */}
-            <Grid item xs={12}>
-              <Box display="flex" alignItems="center" mb={2}>
-                <Button
-                  variant="outlined"
-                  startIcon={<CameraAlt />}
-                  onClick={handleTakePhoto}
-                  disabled={takingPhoto}
-                  sx={{ mr: 2 }}
-                >
-                  {takingPhoto ? 'Tomando foto...' : 'Tomar foto'}
-                </Button>
-                {takingPhoto && <CircularProgress size={24} />}
-              </Box>
-              {photoUrl && (
-                <Box mt={2} display="flex" justifyContent="center">
-                  <img 
-                    src={photoUrl} 
-                    alt="Foto del visitante" 
-                    style={{ 
-                      maxWidth: '150px', 
-                      maxHeight: '150px',
-                      border: '1px solid #ccc',
-                      borderRadius: '4px'
-                    }} 
-                  />
-                </Box>
-              )}
-            </Grid>
-
-            {/* Botones de acción */}
-            <Grid item xs={12}>
-              <Box display="flex" justifyContent="flex-end" mt={2}>
+            <div className="grid gap-2 col-span-full">
+              <Label>Foto del Visitante (Opcional)</Label>
+              <div className="flex items-center space-x-4">
                 <Button
                   type="button"
-                  variant="outlined"
-                  onClick={() => {
-                    reset();
-                    setPhotoUrl(null);
-                  }}
-                  sx={{ mr: 2 }}
-                  disabled={loading}
+                  variant="outline"
+                  onClick={handleTakePhoto}
+                  disabled={takingPhoto}
                 >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <CircularProgress size={24} sx={{ mr: 1 }} />
-                      Registrando...
-                    </>
+                  {takingPhoto ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
-                    'Registrar Visita'
+                    <CameraIcon className="mr-2 h-4 w-4" />
                   )}
+                  {takingPhoto ? 'Tomando foto...' : 'Tomar foto'}
                 </Button>
-              </Box>
-            </Grid>
-          </Grid>
+                {photoUrl && (
+                  <div className="relative w-24 h-24 rounded-md overflow-hidden">
+                    <Image 
+                      src={photoUrl} 
+                      alt="Foto del visitante" 
+                      layout="fill"
+                      objectFit="cover"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Botones de acción */}
+            <DialogFooter className="col-span-full">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  reset();
+                  setPhotoUrl(null);
+                }}
+                disabled={loading}
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  'Registrar Visita'
+                )}
+              </Button>
+            </DialogFooter>
+          </div>
         </form>
       </CardContent>
-
-      {/* Notificaciones */}
-      <Snackbar
-        open={notification.open}
-        autoHideDuration={6000}
-        onClose={handleCloseNotification}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
-        <Alert 
-          onClose={handleCloseNotification} 
-          severity={notification.severity}
-          variant="filled"
-        >
-          {notification.message}
-        </Alert>
-      </Snackbar>
     </Card>
   );
 };

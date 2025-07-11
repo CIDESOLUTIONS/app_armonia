@@ -282,13 +282,13 @@ export default function ReceptionIncidentsPage() {
   }, [mockIncidents, _setError, setIncidents, setLoading]);
 
   useEffect(() => {
-    if (!isLoggedIn || !token || !schemaName) {
+    if (!isLoggedIn || !schemaName) {
       _router.push('/login');
       return;
     }
 
     fetchData();
-  }, [isLoggedIn, token, schemaName, _router, fetchData]);
+  }, [isLoggedIn, schemaName, _router, fetchData]);
 
   // Función para formatear fechas
   const formatDate = (dateString: string | undefined) => {

@@ -60,6 +60,48 @@ export function useFinancialBilling(): UseFinancialBillingReturn {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const loadBills = useCallback(async (filters?: { 
+    period?: string; 
+    status?: string; 
+    propertyId?: number 
+  }) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const queryParams = new URLSearchParams();
+      if (filters?.period) queryParams.append('period', filters.period);
+      if (filters?.status) queryParams.append('status', filters.status);
+      if (filters?.propertyId) queryParams.append('propertyId', filters.propertyId.toString());
+
+      const response = await apiClient.get(`/financial/bills?${queryParams.toString()}`);
+      setBills(response.data || []);
+
+    } catch (err) {
+      console.error('Error cargando facturas:', err);
+      setError(err instanceof Error ? err.message : 'Error cargando facturas');
+    } finally {
+      setLoading(false);
+    }
+  }, [setBills, setError, setLoading]); // Dependencias: setters de estado
+
+  const loadStats = useCallback(async (startDate?: Date, endDate?: Date) => {
+    try {
+      setError(null);
+
+      const queryParams = new URLSearchParams();
+      if (startDate) queryParams.append('startDate', startDate.toISOString());
+      if (endDate) queryParams.append('endDate', endDate.toISOString());
+
+      const response = await apiClient.get(`/financial/stats?${queryParams.toString()}`);
+      setStats(response.data);
+
+    } catch (err) {
+      console.error('Error cargando estadísticas:', err);
+      setError(err instanceof Error ? err.message : 'Error cargando estadísticas financieras');
+    }
+  }, [setStats, setError]); // Dependencias: setters de estado
+
   const generateBills = useCallback(async (year: number, month: number) => {
     try {
       setLoading(true);
@@ -83,7 +125,7 @@ export function useFinancialBilling(): UseFinancialBillingReturn {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [loadBills, loadStats, setLoading, setError]); // Dependencias: loadBills, loadStats, setters
 
   const processPayment = useCallback(async (
     billId: number,
@@ -142,56 +184,14 @@ export function useFinancialBilling(): UseFinancialBillingReturn {
     } finally {
       setLoading(false);
     }
-  }, [stats, loadBills, loadStats]);
-
-  const loadBills = useCallback(async (filters?: { 
-    period?: string; 
-    status?: string; 
-    propertyId?: number 
-  }) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const queryParams = new URLSearchParams();
-      if (filters?.period) queryParams.append('period', filters.period);
-      if (filters?.status) queryParams.append('status', filters.status);
-      if (filters?.propertyId) queryParams.append('propertyId', filters.propertyId.toString());
-
-      const response = await apiClient.get(`/financial/bills?${queryParams.toString()}`);
-      setBills(response.data || []);
-
-    } catch (err) {
-      console.error('Error cargando facturas:', err);
-      setError(err instanceof Error ? err.message : 'Error cargando facturas');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const loadStats = useCallback(async (startDate?: Date, endDate?: Date) => {
-    try {
-      setError(null);
-
-      const queryParams = new URLSearchParams();
-      if (startDate) queryParams.append('startDate', startDate.toISOString());
-      if (endDate) queryParams.append('endDate', endDate.toISOString());
-
-      const response = await apiClient.get(`/financial/stats?${queryParams.toString()}`);
-      setStats(response.data);
-
-    } catch (err) {
-      console.error('Error cargando estadísticas:', err);
-      setError(err instanceof Error ? err.message : 'Error cargando estadísticas financieras');
-    }
-  }, []);
+  }, [stats, setBills, setStats, setError, setLoading, loadBills, loadStats]); // Dependencias: stats, setters
 
   const refreshData = useCallback(async () => {
     await Promise.all([
       loadBills(),
       loadStats()
     ]);
-  }, [loadBills, loadStats]);
+  }, [loadBills, loadStats]); // Dependencias: loadBills, loadStats
 
   return {
     bills,
