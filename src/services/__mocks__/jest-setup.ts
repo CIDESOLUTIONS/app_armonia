@@ -4,10 +4,10 @@
  */
 
 // Importar mocks de enums y constantes
-import { PQRCategory, PQRStatus, PQRPriority, PQRType } from './pqr-constants';
+import { PQRCategory, PQRStatus, PQRPriority, PQRType } from "./pqr-constants";
 
 // Configurar mocks globales para módulos externos
-jest.mock('@prisma/client', () => {
+jest.mock("@prisma/client", () => {
   return {
     PrismaClient: jest.fn().mockImplementation(() => ({
       $connect: jest.fn().mockResolvedValue({}),
@@ -18,39 +18,39 @@ jest.mock('@prisma/client', () => {
         findMany: jest.fn().mockResolvedValue([]),
         create: jest.fn().mockResolvedValue({}),
         update: jest.fn().mockResolvedValue({}),
-        delete: jest.fn().mockResolvedValue({})
+        delete: jest.fn().mockResolvedValue({}),
       },
       user: {
         findUnique: jest.fn().mockResolvedValue(null),
-        findMany: jest.fn().mockResolvedValue([])
+        findMany: jest.fn().mockResolvedValue([]),
       },
       pQRNotification: {
-        create: jest.fn().mockResolvedValue({})
-      }
+        create: jest.fn().mockResolvedValue({}),
+      },
     })),
     // Exportar enums para que sean accesibles como si vinieran de @prisma/client
     PQRCategory,
     PQRStatus,
     PQRPriority,
-    PQRType
+    PQRType,
   };
 });
 
 // Mock de módulos de comunicación
-jest.mock('../../lib/communications/email-service', () => ({
-  sendEmail: jest.fn().mockResolvedValue({ success: true })
+jest.mock("../../lib/communications/email-service", () => ({
+  sendEmail: jest.fn().mockResolvedValue({ success: true }),
 }));
 
-jest.mock('../../lib/communications/push-notification-service', () => ({
-  sendPushNotification: jest.fn().mockResolvedValue({ success: true })
+jest.mock("../../lib/communications/push-notification-service", () => ({
+  sendPushNotification: jest.fn().mockResolvedValue({ success: true }),
 }));
 
-jest.mock('../../lib/communications/sms-service', () => ({
-  sendSMS: jest.fn().mockResolvedValue({ success: true })
+jest.mock("../../lib/communications/sms-service", () => ({
+  sendSMS: jest.fn().mockResolvedValue({ success: true }),
 }));
 
 // Mock de utilidades
-jest.mock('../../lib/prisma', () => ({
+jest.mock("../../lib/prisma", () => ({
   getSchemaFromRequest: jest.fn().mockReturnValue({
     $connect: jest.fn().mockResolvedValue({}),
     $disconnect: jest.fn().mockResolvedValue({}),
@@ -60,16 +60,16 @@ jest.mock('../../lib/prisma', () => ({
       findMany: jest.fn().mockResolvedValue([]),
       create: jest.fn().mockResolvedValue({}),
       update: jest.fn().mockResolvedValue({}),
-      delete: jest.fn().mockResolvedValue({})
+      delete: jest.fn().mockResolvedValue({}),
     },
     user: {
       findUnique: jest.fn().mockResolvedValue(null),
-      findMany: jest.fn().mockResolvedValue([])
+      findMany: jest.fn().mockResolvedValue([]),
     },
     pQRNotification: {
-      create: jest.fn().mockResolvedValue({})
-    }
-  })
+      create: jest.fn().mockResolvedValue({}),
+    },
+  }),
 }));
 
 // Configuración global para pruebas
@@ -78,9 +78,4 @@ global.beforeEach(() => {
 });
 
 // Exportar enums y constantes para uso en pruebas
-export {
-  PQRCategory,
-  PQRStatus,
-  PQRPriority,
-  PQRType
-};
+export { PQRCategory, PQRStatus, PQRPriority, PQRType };

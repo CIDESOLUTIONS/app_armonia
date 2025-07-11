@@ -1,19 +1,39 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/authStore';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Camera, Monitor, AlertTriangle, CheckCircle, RefreshCw, Maximize, Settings } from 'lucide-react';
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Camera,
+  Monitor,
+  AlertTriangle,
+  CheckCircle,
+  RefreshCw,
+  Maximize,
+  Settings,
+} from "lucide-react";
 
 interface CameraFeed {
   id: string;
   name: string;
   location: string;
-  status: 'online' | 'offline' | 'maintenance';
+  status: "online" | "offline" | "maintenance";
   lastUpdate: string;
   streamUrl?: string;
 }
@@ -22,39 +42,39 @@ export default function SurveillancePage() {
   const { user, loading } = useAuthStore();
   const router = useRouter();
   const [cameras, setCameras] = useState<CameraFeed[]>([]);
-  const [selectedCamera, setSelectedCamera] = useState('all');
+  const [selectedCamera, setSelectedCamera] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
 
   // Datos de ejemplo para desarrollo
   const mockCameras: CameraFeed[] = [
     {
-      id: 'cam1',
-      name: 'Entrada Principal',
-      location: 'Portería',
-      status: 'online',
-      lastUpdate: '2025-07-05T01:30:00'
+      id: "cam1",
+      name: "Entrada Principal",
+      location: "Portería",
+      status: "online",
+      lastUpdate: "2025-07-05T01:30:00",
     },
     {
-      id: 'cam2',
-      name: 'Parqueadero Visitantes',
-      location: 'Zona de parqueo',
-      status: 'online',
-      lastUpdate: '2025-07-05T01:29:45'
+      id: "cam2",
+      name: "Parqueadero Visitantes",
+      location: "Zona de parqueo",
+      status: "online",
+      lastUpdate: "2025-07-05T01:29:45",
     },
     {
-      id: 'cam3',
-      name: 'Zona Común',
-      location: 'Salón comunal',
-      status: 'offline',
-      lastUpdate: '2025-07-05T00:15:30'
+      id: "cam3",
+      name: "Zona Común",
+      location: "Salón comunal",
+      status: "offline",
+      lastUpdate: "2025-07-05T00:15:30",
     },
     {
-      id: 'cam4',
-      name: 'Piscina',
-      location: 'Área recreativa',
-      status: 'maintenance',
-      lastUpdate: '2025-07-04T22:00:00'
-    }
+      id: "cam4",
+      name: "Piscina",
+      location: "Área recreativa",
+      status: "maintenance",
+      lastUpdate: "2025-07-04T22:00:00",
+    },
   ];
 
   const fetchData = useCallback(() => {
@@ -67,12 +87,12 @@ export default function SurveillancePage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/login?portal=reception');
+      router.push("/login?portal=reception");
       return;
     }
 
-    if (user && user.role !== 'reception' && user.role !== 'admin') {
-      router.push('/unauthorized');
+    if (user && user.role !== "reception" && user.role !== "admin") {
+      router.push("/unauthorized");
       return;
     }
 
@@ -81,19 +101,27 @@ export default function SurveillancePage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'online': return 'bg-green-100 text-green-800';
-      case 'offline': return 'bg-red-100 text-red-800';
-      case 'maintenance': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "online":
+        return "bg-green-100 text-green-800";
+      case "offline":
+        return "bg-red-100 text-red-800";
+      case "maintenance":
+        return "bg-yellow-100 text-yellow-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'online': return <CheckCircle className="h-4 w-4" />;
-      case 'offline': return <AlertTriangle className="h-4 w-4" />;
-      case 'maintenance': return <Settings className="h-4 w-4" />;
-      default: return <Camera className="h-4 w-4" />;
+      case "online":
+        return <CheckCircle className="h-4 w-4" />;
+      case "offline":
+        return <AlertTriangle className="h-4 w-4" />;
+      case "maintenance":
+        return <Settings className="h-4 w-4" />;
+      default:
+        return <Camera className="h-4 w-4" />;
     }
   };
 
@@ -113,16 +141,19 @@ export default function SurveillancePage() {
     );
   }
 
-  const filteredCameras = selectedCamera === 'all' 
-    ? cameras 
-    : cameras.filter(camera => camera.status === selectedCamera);
+  const filteredCameras =
+    selectedCamera === "all"
+      ? cameras
+      : cameras.filter((camera) => camera.status === selectedCamera);
 
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Sistema de Vigilancia</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Sistema de Vigilancia
+          </h1>
           <p className="text-gray-600 mt-2">
             Monitoreo en tiempo real de las cámaras de seguridad
           </p>
@@ -167,7 +198,7 @@ export default function SurveillancePage() {
               <div>
                 <p className="text-sm text-gray-600">En Línea</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {cameras.filter(c => c.status === 'online').length}
+                  {cameras.filter((c) => c.status === "online").length}
                 </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-600" />
@@ -180,7 +211,7 @@ export default function SurveillancePage() {
               <div>
                 <p className="text-sm text-gray-600">Fuera de Línea</p>
                 <p className="text-2xl font-bold text-red-600">
-                  {cameras.filter(c => c.status === 'offline').length}
+                  {cameras.filter((c) => c.status === "offline").length}
                 </p>
               </div>
               <AlertTriangle className="h-8 w-8 text-red-600" />
@@ -193,7 +224,7 @@ export default function SurveillancePage() {
               <div>
                 <p className="text-sm text-gray-600">Mantenimiento</p>
                 <p className="text-2xl font-bold text-yellow-600">
-                  {cameras.filter(c => c.status === 'maintenance').length}
+                  {cameras.filter((c) => c.status === "maintenance").length}
                 </p>
               </div>
               <Settings className="h-8 w-8 text-yellow-600" />
@@ -221,7 +252,7 @@ export default function SurveillancePage() {
             <CardContent className="p-0">
               {/* Placeholder para video feed */}
               <div className="aspect-video bg-gray-900 flex items-center justify-center relative group">
-                {camera.status === 'online' ? (
+                {camera.status === "online" ? (
                   <>
                     <div className="text-white text-center">
                       <Monitor className="h-12 w-12 mx-auto mb-2 opacity-50" />
@@ -243,7 +274,8 @@ export default function SurveillancePage() {
               </div>
               <div className="p-4">
                 <p className="text-xs text-gray-500">
-                  Última actualización: {new Date(camera.lastUpdate).toLocaleString('es-ES')}
+                  Última actualización:{" "}
+                  {new Date(camera.lastUpdate).toLocaleString("es-ES")}
                 </p>
               </div>
             </CardContent>
@@ -263,4 +295,3 @@ export default function SurveillancePage() {
     </div>
   );
 }
-

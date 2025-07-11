@@ -1,8 +1,7 @@
-
-import { ServerLogger } from '../logging/server-logger';
+import { ServerLogger } from "../logging/server-logger";
 // Importar SDKs de WhatsApp/Telegram aquí (ej. twilio, node-telegram-bot-api)
 
-const logger = new ServerLogger('MessagingService');
+const logger = new ServerLogger("MessagingService");
 
 interface MessageOptions {
   to: string; // Número de teléfono o ID de chat
@@ -12,7 +11,7 @@ interface MessageOptions {
 
 export class MessagingService {
   constructor() {
-    logger.info('MessagingService initialized');
+    logger.info("MessagingService initialized");
   }
 
   public async sendWhatsAppMessage(options: MessageOptions): Promise<boolean> {

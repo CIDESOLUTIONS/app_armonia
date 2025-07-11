@@ -1,10 +1,10 @@
 // src/components/assemblies/QuorumVerification.tsx
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, Users, CheckCircle, AlertCircle } from 'lucide-react';
+import { useState, useEffect, useCallback } from "react";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, Users, CheckCircle, AlertCircle } from "lucide-react";
 
 interface QuorumVerificationProps {
   assemblyId: number;
@@ -27,7 +27,7 @@ export default function QuorumVerification({
   token,
   language,
   totalUnits,
-  quorumPercentage
+  quorumPercentage,
 }: QuorumVerificationProps) {
   const [stats, setStats] = useState<AttendanceStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,14 +54,13 @@ export default function QuorumVerification({
         totalEligible: totalUnits,
         quorumReached: Math.random() > 0.5,
         quorumPercentage: quorumPercentage,
-        currentPercentage: (Math.random() * 100),
+        currentPercentage: Math.random() * 100,
       };
       setStats(mockStats);
       setLastUpdate(new Date());
       _setError(null);
-
     } catch (err: any) {
-      console.error('[QuorumVerification] Error:', err);
+      console.error("[QuorumVerification] Error:", err);
       _setError(err.message);
     } finally {
       setLoading(false);
@@ -71,12 +70,12 @@ export default function QuorumVerification({
   // Efecto inicial para cargar datos
   useEffect(() => {
     fetchQuorumStats();
-    
+
     // Configurar actualización en tiempo real cada 30 segundos
     const intervalId = setInterval(() => {
       fetchQuorumStats();
     }, 30000);
-    
+
     return () => clearInterval(intervalId);
   }, [assemblyId, token, fetchQuorumStats]);
 
@@ -84,7 +83,11 @@ export default function QuorumVerification({
     return (
       <div className="flex items-center justify-center p-4">
         <Loader2 className="w-6 h-6 animate-spin text-indigo-600 mr-2" />
-        <span>{language === 'Español' ? 'Verificando quórum...' : 'Verifying quorum...'}</span>
+        <span>
+          {language === "Español"
+            ? "Verificando quórum..."
+            : "Verifying quorum..."}
+        </span>
       </div>
     );
   }
@@ -108,43 +111,55 @@ export default function QuorumVerification({
     <div className="bg-white shadow-sm rounded-lg p-4 mb-6">
       <div className="flex justify-between items-center mb-3">
         <h3 className="text-lg font-medium">
-          {language === 'Español' ? 'Verificación de Quórum' : 'Quorum Verification'}
+          {language === "Español"
+            ? "Verificación de Quórum"
+            : "Quorum Verification"}
         </h3>
         <Badge variant={stats.quorumReached ? "success" : "outline"}>
-          {stats.quorumReached 
-            ? (language === 'Español' ? 'Quórum Alcanzado' : 'Quorum Reached') 
-            : (language === 'Español' ? 'Quórum Pendiente' : 'Quorum Pending')}
+          {stats.quorumReached
+            ? language === "Español"
+              ? "Quórum Alcanzado"
+              : "Quorum Reached"
+            : language === "Español"
+              ? "Quórum Pendiente"
+              : "Quorum Pending"}
         </Badge>
       </div>
-      
+
       <div className="mb-4">
         <div className="flex justify-between text-sm mb-1">
-          <span>{language === 'Español' ? 'Progreso actual' : 'Current progress'}</span>
-          <span className="font-medium">{Math.round(stats.currentPercentage)}%</span>
+          <span>
+            {language === "Español" ? "Progreso actual" : "Current progress"}
+          </span>
+          <span className="font-medium">
+            {Math.round(stats.currentPercentage)}%
+          </span>
         </div>
         <Progress value={stats.currentPercentage} className="h-2" />
       </div>
-      
+
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div className="flex items-center">
           <Users className="w-4 h-4 mr-2 text-gray-500" />
           <span>
-            {language === 'Español' ? 'Asistentes confirmados:' : 'Confirmed attendees:'} 
+            {language === "Español"
+              ? "Asistentes confirmados:"
+              : "Confirmed attendees:"}
             <span className="font-medium ml-1">{stats.confirmedAttendees}</span>
           </span>
         </div>
         <div className="flex items-center">
           <CheckCircle className="w-4 h-4 mr-2 text-gray-500" />
           <span>
-            {language === 'Español' ? 'Quórum requerido:' : 'Required quorum:'} 
+            {language === "Español" ? "Quórum requerido:" : "Required quorum:"}
             <span className="font-medium ml-1">{stats.quorumPercentage}%</span>
           </span>
         </div>
       </div>
-      
+
       <div className="mt-3 text-xs text-gray-500 text-right">
-        {language === 'Español' 
-          ? `Última actualización: ${lastUpdate.toLocaleTimeString()}` 
+        {language === "Español"
+          ? `Última actualización: ${lastUpdate.toLocaleTimeString()}`
           : `Last update: ${lastUpdate.toLocaleTimeString()}`}
       </div>
     </div>

@@ -1,20 +1,39 @@
 // src/components/cameras/CameraManagement.tsx
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Checkbox } from '@/components/ui/checkbox';
-import { 
-  Camera, 
-  Search, 
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Camera,
+  Search,
   Plus,
   Settings,
   Play,
@@ -31,10 +50,14 @@ import {
   Eye,
   Trash2,
   Edit,
-  MapPin
-} from 'lucide-react';
-import { useCameras, Camera as CameraType, RegisterCameraData } from '@/hooks/useCameras';
-import { useAuthStore } from '@/store/authStore';
+  MapPin,
+} from "lucide-react";
+import {
+  useCameras,
+  Camera as CameraType,
+  RegisterCameraData,
+} from "@/hooks/useCameras";
+import { useAuthStore } from "@/store/authStore";
 
 interface CameraManagementProps {
   complexId?: number;
@@ -59,11 +82,11 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
     gotoPreset,
     getPTZCapabilities,
     connectCamera,
-    checkCameraStatus
+    checkCameraStatus,
   } = useCameras();
 
   // Estados locales
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
   const [selectedCamera, setSelectedCamera] = useState<CameraType | null>(null);
   const [discoveredCameras, setDiscoveredCameras] = useState<CameraType[]>([]);
   const [isDiscovering, setIsDiscovering] = useState(false);
@@ -73,15 +96,15 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
 
   // Formulario de registro
   const [registerForm, setRegisterForm] = useState<RegisterCameraData>({
-    name: '',
-    ipAddress: '',
+    name: "",
+    ipAddress: "",
     port: 554,
-    username: '',
-    password: '',
-    manufacturer: '',
-    model: '',
+    username: "",
+    password: "",
+    manufacturer: "",
+    model: "",
     ptzEnabled: false,
-    recordingEnabled: true
+    recordingEnabled: true,
   });
 
   useEffect(() => {
@@ -94,10 +117,10 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
       const discovered = await discoverCameras(30000);
       setDiscoveredCameras(discovered);
       if (discovered.length > 0) {
-        setActiveTab('discovery');
+        setActiveTab("discovery");
       }
     } catch (error) {
-      console.error('Error en discovery:', error);
+      console.error("Error en discovery:", error);
     } finally {
       setIsDiscovering(false);
     }
@@ -108,15 +131,15 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
     if (success) {
       setRegisterDialogOpen(false);
       setRegisterForm({
-        name: '',
-        ipAddress: '',
+        name: "",
+        ipAddress: "",
         port: 554,
-        username: '',
-        password: '',
-        manufacturer: '',
-        model: '',
+        username: "",
+        password: "",
+        manufacturer: "",
+        model: "",
         ptzEnabled: false,
-        recordingEnabled: true
+        recordingEnabled: true,
       });
     }
   };
@@ -125,12 +148,12 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
     const connected = await connectCamera(camera.id);
     if (connected) {
       setSelectedCamera(camera);
-      setActiveTab('control');
-      
+      setActiveTab("control");
+
       // Obtener URL de stream
       const url = await getStreamUrl(camera.id);
       setStreamUrl(url);
-      
+
       // Obtener capacidades PTZ si está habilitado
       if (camera.ptzEnabled) {
         const capabilities = await getPTZCapabilities(camera.id);
@@ -139,18 +162,20 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
     }
   };
 
-  const handlePTZMove = async (direction: 'up' | 'down' | 'left' | 'right' | 'zoomIn' | 'zoomOut') => {
+  const handlePTZMove = async (
+    direction: "up" | "down" | "left" | "right" | "zoomIn" | "zoomOut",
+  ) => {
     if (!selectedCamera) return;
-    
+
     const moves = {
       up: { x: 0, y: 0.1 },
       down: { x: 0, y: -0.1 },
       left: { x: -0.1, y: 0 },
       right: { x: 0.1, y: 0 },
       zoomIn: { x: 0, y: 0, z: 0.1 },
-      zoomOut: { x: 0, y: 0, z: -0.1 }
+      zoomOut: { x: 0, y: 0, z: -0.1 },
     };
-    
+
     const { x, y, z } = moves[direction];
     await movePTZ(selectedCamera.id, x, y, z);
   };
@@ -159,27 +184,31 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
     const imageUrl = await captureSnapshot(camera.id);
     if (imageUrl) {
       // Abrir imagen en nueva ventana
-      window.open(imageUrl, '_blank');
+      window.open(imageUrl, "_blank");
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'ONLINE': return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case 'OFFLINE': return <WifiOff className="h-4 w-4 text-red-600" />;
-      case 'ERROR': return <AlertTriangle className="h-4 w-4 text-orange-600" />;
-      default: return <Wifi className="h-4 w-4 text-gray-600" />;
+      case "ONLINE":
+        return <CheckCircle className="h-4 w-4 text-green-600" />;
+      case "OFFLINE":
+        return <WifiOff className="h-4 w-4 text-red-600" />;
+      case "ERROR":
+        return <AlertTriangle className="h-4 w-4 text-orange-600" />;
+      default:
+        return <Wifi className="h-4 w-4 text-gray-600" />;
     }
   };
 
   const getStatusBadge = (status: string) => {
     const variants = {
-      'ONLINE': 'default',
-      'OFFLINE': 'destructive',
-      'ERROR': 'secondary',
-      'UNKNOWN': 'outline'
+      ONLINE: "default",
+      OFFLINE: "destructive",
+      ERROR: "secondary",
+      UNKNOWN: "outline",
     };
-    
+
     return (
       <Badge variant={variants[status as keyof typeof variants] as any}>
         {status}
@@ -188,7 +217,7 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
   };
 
   // Verificar permisos
-  if (!user || !['ADMIN', 'COMPLEX_ADMIN', 'RECEPTION'].includes(user.role)) {
+  if (!user || !["ADMIN", "COMPLEX_ADMIN", "RECEPTION"].includes(user.role)) {
     return (
       <Card>
         <CardContent className="p-6">
@@ -216,7 +245,7 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
             Gestión y monitoreo de cámaras de seguridad
           </p>
         </div>
-        
+
         <div className="flex items-center gap-2">
           <Button onClick={handleDiscovery} disabled={isDiscovering}>
             {isDiscovering ? (
@@ -226,8 +255,11 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
             )}
             Descubrir Cámaras
           </Button>
-          
-          <Dialog open={registerDialogOpen} onOpenChange={setRegisterDialogOpen}>
+
+          <Dialog
+            open={registerDialogOpen}
+            onOpenChange={setRegisterDialogOpen}
+          >
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
@@ -241,25 +273,32 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
                   Configura una nueva cámara IP en el sistema
                 </DialogDescription>
               </DialogHeader>
-              
+
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="name">Nombre</Label>
                   <Input
                     id="name"
                     value={registerForm.name}
-                    onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
+                    onChange={(e) =>
+                      setRegisterForm({ ...registerForm, name: e.target.value })
+                    }
                     placeholder="Ej: Cámara Entrada Principal"
                   />
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="ipAddress">Dirección IP</Label>
                     <Input
                       id="ipAddress"
                       value={registerForm.ipAddress}
-                      onChange={(e) => setRegisterForm({ ...registerForm, ipAddress: e.target.value })}
+                      onChange={(e) =>
+                        setRegisterForm({
+                          ...registerForm,
+                          ipAddress: e.target.value,
+                        })
+                      }
                       placeholder="192.168.1.100"
                     />
                   </div>
@@ -269,18 +308,28 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
                       id="port"
                       type="number"
                       value={registerForm.port}
-                      onChange={(e) => setRegisterForm({ ...registerForm, port: Number(e.target.value) })}
+                      onChange={(e) =>
+                        setRegisterForm({
+                          ...registerForm,
+                          port: Number(e.target.value),
+                        })
+                      }
                     />
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="username">Usuario</Label>
                     <Input
                       id="username"
                       value={registerForm.username}
-                      onChange={(e) => setRegisterForm({ ...registerForm, username: e.target.value })}
+                      onChange={(e) =>
+                        setRegisterForm({
+                          ...registerForm,
+                          username: e.target.value,
+                        })
+                      }
                     />
                   </div>
                   <div>
@@ -289,17 +338,27 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
                       id="password"
                       type="password"
                       value={registerForm.password}
-                      onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
+                      onChange={(e) =>
+                        setRegisterForm({
+                          ...registerForm,
+                          password: e.target.value,
+                        })
+                      }
                     />
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="manufacturer">Fabricante</Label>
                     <Select
                       value={registerForm.manufacturer}
-                      onValueChange={(value) => setRegisterForm({ ...registerForm, manufacturer: value })}
+                      onValueChange={(value) =>
+                        setRegisterForm({
+                          ...registerForm,
+                          manufacturer: value,
+                        })
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Seleccionar" />
@@ -319,34 +378,51 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
                     <Input
                       id="model"
                       value={registerForm.model}
-                      onChange={(e) => setRegisterForm({ ...registerForm, model: e.target.value })}
+                      onChange={(e) =>
+                        setRegisterForm({
+                          ...registerForm,
+                          model: e.target.value,
+                        })
+                      }
                     />
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-4">
                   <label className="flex items-center space-x-2">
                     <input
                       type="checkbox"
                       checked={registerForm.ptzEnabled}
-                      onChange={(e) => setRegisterForm({ ...registerForm, ptzEnabled: e.target.checked })}
+                      onChange={(e) =>
+                        setRegisterForm({
+                          ...registerForm,
+                          ptzEnabled: e.target.checked,
+                        })
+                      }
                     />
                     <span>PTZ Habilitado</span>
                   </label>
-                  
+
                   <label className="flex items-center space-x-2">
                     <input
                       type="checkbox"
                       checked={registerForm.recordingEnabled}
-                      onChange={(e) => setRegisterForm({ ...registerForm, recordingEnabled: e.target.checked })}
+                      onChange={(e) =>
+                        setRegisterForm({
+                          ...registerForm,
+                          recordingEnabled: e.target.checked,
+                        })
+                      }
                     />
                     <span>Grabación Habilitada</span>
                   </label>
                 </div>
-                
-                <Button 
-                  onClick={handleRegisterCamera} 
-                  disabled={loading || !registerForm.name || !registerForm.ipAddress}
+
+                <Button
+                  onClick={handleRegisterCamera}
+                  disabled={
+                    loading || !registerForm.name || !registerForm.ipAddress
+                  }
                   className="w-full"
                 >
                   {loading ? (
@@ -384,49 +460,59 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">En Línea</p>
-                  <p className="text-2xl font-bold text-green-600">{stats.online}</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {stats.online}
+                  </p>
                 </div>
                 <CheckCircle className="h-8 w-8 text-green-600" />
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Fuera de Línea</p>
-                  <p className="text-2xl font-bold text-red-600">{stats.offline}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Fuera de Línea
+                  </p>
+                  <p className="text-2xl font-bold text-red-600">
+                    {stats.offline}
+                  </p>
                 </div>
                 <WifiOff className="h-8 w-8 text-red-600" />
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Error</p>
-                  <p className="text-2xl font-bold text-orange-600">{stats.error}</p>
+                  <p className="text-2xl font-bold text-orange-600">
+                    {stats.error}
+                  </p>
                 </div>
                 <AlertTriangle className="h-8 w-8 text-orange-600" />
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Desconocido</p>
-                  <p className="text-2xl font-bold text-gray-600">{stats.unknown}</p>
+                  <p className="text-2xl font-bold text-gray-600">
+                    {stats.unknown}
+                  </p>
                 </div>
                 <Wifi className="h-8 w-8 text-gray-600" />
               </div>
@@ -458,7 +544,9 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
                 <div className="text-center py-8 text-muted-foreground">
                   <Camera className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>No hay cámaras registradas</p>
-                  <p className="text-sm">Usa "Descubrir Cámaras" o "Agregar Cámara" para comenzar</p>
+                  <p className="text-sm">
+                    Usa "Descubrir Cámaras" o "Agregar Cámara" para comenzar
+                  </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -474,39 +562,45 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
                           </div>
                           {getStatusIcon(camera.status)}
                         </div>
-                        
+
                         <div className="space-y-2 mb-4">
                           <div className="flex items-center justify-between">
                             <span className="text-sm">Estado:</span>
                             {getStatusBadge(camera.status)}
                           </div>
-                          
+
                           {camera.manufacturer && (
                             <div className="flex items-center justify-between">
                               <span className="text-sm">Fabricante:</span>
-                              <span className="text-sm">{camera.manufacturer}</span>
+                              <span className="text-sm">
+                                {camera.manufacturer}
+                              </span>
                             </div>
                           )}
-                          
+
                           <div className="flex items-center justify-between">
                             <span className="text-sm">PTZ:</span>
-                            <Badge variant={camera.ptzEnabled ? 'default' : 'outline'}>
-                              {camera.ptzEnabled ? 'Sí' : 'No'}
+                            <Badge
+                              variant={
+                                camera.ptzEnabled ? "default" : "outline"
+                              }
+                            >
+                              {camera.ptzEnabled ? "Sí" : "No"}
                             </Badge>
                           </div>
                         </div>
-                        
+
                         <div className="flex gap-2">
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             onClick={() => handleConnectCamera(camera)}
-                            disabled={camera.status === 'OFFLINE'}
+                            disabled={camera.status === "OFFLINE"}
                           >
                             <Eye className="h-4 w-4 mr-1" />
                             Ver
                           </Button>
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             variant="outline"
                             onClick={() => handleSnapshot(camera)}
                           >
@@ -537,12 +631,18 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
                 <div className="text-center py-8 text-muted-foreground">
                   <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>No se han descubierto cámaras</p>
-                  <p className="text-sm">Haz clic en "Descubrir Cámaras" para buscar dispositivos en la red</p>
+                  <p className="text-sm">
+                    Haz clic en "Descubrir Cámaras" para buscar dispositivos en
+                    la red
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {discoveredCameras.map((camera, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
                       <div className="flex items-center gap-4">
                         <Camera className="h-8 w-8 text-blue-600" />
                         <div>
@@ -555,12 +655,12 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
                           </p>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center gap-2">
                         <Badge variant="outline">
-                          {camera.capabilities.hasPTZ ? 'PTZ' : 'Fija'}
+                          {camera.capabilities.hasPTZ ? "PTZ" : "Fija"}
                         </Badge>
-                        <Button 
+                        <Button
                           size="sm"
                           onClick={() => {
                             setRegisterForm({
@@ -570,9 +670,10 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
                               manufacturer: camera.manufacturer,
                               model: camera.model,
                               ptzEnabled: camera.capabilities.hasPTZ,
-                              recordingEnabled: camera.capabilities.hasRecording,
-                              username: '',
-                              password: ''
+                              recordingEnabled:
+                                camera.capabilities.hasRecording,
+                              username: "",
+                              password: "",
                             });
                             setRegisterDialogOpen(true);
                           }}
@@ -646,42 +747,42 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
                     {/* Controles direccionales */}
                     <div className="grid grid-cols-3 gap-2 max-w-48 mx-auto">
                       <div></div>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
-                        onClick={() => handlePTZMove('up')}
+                        onClick={() => handlePTZMove("up")}
                       >
                         ↑
                       </Button>
                       <div></div>
-                      
-                      <Button 
-                        variant="outline" 
+
+                      <Button
+                        variant="outline"
                         size="sm"
-                        onClick={() => handlePTZMove('left')}
+                        onClick={() => handlePTZMove("left")}
                       >
                         ←
                       </Button>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => stopPTZ(selectedCamera.id)}
                       >
                         <Square className="h-4 w-4" />
                       </Button>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
-                        onClick={() => handlePTZMove('right')}
+                        onClick={() => handlePTZMove("right")}
                       >
                         →
                       </Button>
-                      
+
                       <div></div>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
-                        onClick={() => handlePTZMove('down')}
+                        onClick={() => handlePTZMove("down")}
                       >
                         ↓
                       </Button>
@@ -690,18 +791,18 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
 
                     {/* Controles de zoom */}
                     <div className="flex justify-center gap-2">
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
-                        onClick={() => handlePTZMove('zoomOut')}
+                        onClick={() => handlePTZMove("zoomOut")}
                       >
                         <ZoomOut className="h-4 w-4 mr-1" />
                         Zoom -
                       </Button>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
-                        onClick={() => handlePTZMove('zoomIn')}
+                        onClick={() => handlePTZMove("zoomIn")}
                       >
                         <ZoomIn className="h-4 w-4 mr-1" />
                         Zoom +
@@ -718,7 +819,9 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
                               key={preset.token}
                               variant="outline"
                               size="sm"
-                              onClick={() => gotoPreset(selectedCamera.id, preset.token)}
+                              onClick={() =>
+                                gotoPreset(selectedCamera.id, preset.token)
+                              }
                             >
                               <MapPin className="h-4 w-4 mr-1" />
                               {preset.name}
@@ -732,7 +835,9 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
                   <div className="text-center py-8 text-muted-foreground">
                     <Move className="h-12 w-12 mx-auto mb-4 opacity-50" />
                     <p>Esta cámara no soporta PTZ</p>
-                    <p className="text-sm">Selecciona una cámara con capacidades PTZ</p>
+                    <p className="text-sm">
+                      Selecciona una cámara con capacidades PTZ
+                    </p>
                   </div>
                 )}
               </CardContent>
@@ -752,7 +857,9 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
             <CardContent>
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium mb-3">Monitoreo Automático</h3>
+                  <h3 className="text-lg font-medium mb-3">
+                    Monitoreo Automático
+                  </h3>
                   <div className="space-y-2">
                     <label className="flex items-center space-x-2">
                       <input type="checkbox" defaultChecked />
@@ -760,7 +867,9 @@ export function CameraManagement({ complexId }: CameraManagementProps) {
                     </label>
                     <label className="flex items-center space-x-2">
                       <input type="checkbox" defaultChecked />
-                      <span>Enviar notificaciones cuando una cámara se desconecte</span>
+                      <span>
+                        Enviar notificaciones cuando una cámara se desconecte
+                      </span>
                     </label>
                   </div>
                 </div>

@@ -14,7 +14,7 @@ export const ServerLogger = {
    * @param meta Metadatos adicionales
    */
   info: (message: string, meta?: any): void => {
-    console.log(`[INFO] ${message}`, meta || '');
+    console.log(`[INFO] ${message}`, meta || "");
   },
 
   /**
@@ -23,7 +23,7 @@ export const ServerLogger = {
    * @param error Error o metadatos adicionales
    */
   error: (message: string, error?: any): void => {
-    console.error(`[ERROR] ${message}`, error || '');
+    console.error(`[ERROR] ${message}`, error || "");
   },
 
   /**
@@ -32,7 +32,7 @@ export const ServerLogger = {
    * @param meta Metadatos adicionales
    */
   warn: (message: string, meta?: any): void => {
-    console.warn(`[WARN] ${message}`, meta || '');
+    console.warn(`[WARN] ${message}`, meta || "");
   },
 
   /**
@@ -41,6 +41,6 @@ export const ServerLogger = {
    * @param meta Metadatos adicionales
    */
   debug: (message: string, meta?: any): void => {
-    console.debug(`[DEBUG] ${message}`, meta || '');
-  }
+    console.debug(`[DEBUG] ${message}`, meta || "");
+  },
 };

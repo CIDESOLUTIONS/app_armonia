@@ -1,28 +1,31 @@
 // src/app/api/assemblies/quorum/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { getPrisma } from '@/lib/prisma';
-import { verifyToken } from '@/lib/auth';
+import { NextRequest, NextResponse } from "next/server";
+import { getPrisma } from "@/lib/prisma";
+import { verifyToken } from "@/lib/auth";
 
 const prisma = getPrisma();
 
 export async function GET(req: NextRequest) {
   try {
     // Verificar autenticación
-    const token = req.headers.get('authorization')?.split(' ')[1];
+    const token = req.headers.get("authorization")?.split(" ")[1];
     if (!token) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
+      return NextResponse.json({ message: "No autorizado" }, { status: 401 });
     }
 
     const decoded = await verifyToken(token); // Asumiendo que verifyToken devuelve el payload decodificado o null
     if (!decoded) {
-      return NextResponse.json({ message: 'Token inválido' }, { status: 401 });
+      return NextResponse.json({ message: "Token inválido" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const assemblyId = searchParams.get('assemblyId');
-    
-    if (!assemblyId || typeof assemblyId !== 'string') {
-      return NextResponse.json({ message: 'ID de asamblea requerido' }, { status: 400 });
+    const assemblyId = searchParams.get("assemblyId");
+
+    if (!assemblyId || typeof assemblyId !== "string") {
+      return NextResponse.json(
+        { message: "ID de asamblea requerido" },
+        { status: 400 },
+      );
     }
 
     // Obtener datos de la asamblea
@@ -34,14 +37,17 @@ export async function GET(req: NextRequest) {
     });
 
     if (!assembly) {
-      return NextResponse.json({ message: 'Asamblea no encontrada' }, { status: 404 });
+      return NextResponse.json(
+        { message: "Asamblea no encontrada" },
+        { status: 404 },
+      );
     }
 
     // Obtener total de unidades elegibles para votar
     const totalEligible = await prisma.resident.count({
       where: {
         isActive: true,
-        residentType: 'OWNER', // Solo propietarios pueden votar
+        residentType: "OWNER", // Solo propietarios pueden votar
       },
     });
 
@@ -51,15 +57,21 @@ export async function GET(req: NextRequest) {
     const currentPercentage = (confirmedAttendees / totalEligible) * 100;
     const quorumReached = currentPercentage >= quorumPercentage;
 
-    return NextResponse.json({
-      confirmedAttendees,
-      totalEligible,
-      quorumReached,
-      quorumPercentage,
-      currentPercentage,
-    }, { status: 200 });
+    return NextResponse.json(
+      {
+        confirmedAttendees,
+        totalEligible,
+        quorumReached,
+        quorumPercentage,
+        currentPercentage,
+      },
+      { status: 200 },
+    );
   } catch (error) {
-    console.error('Error en API de quórum:', error);
-    return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
+    console.error("Error en API de quórum:", error);
+    return NextResponse.json(
+      { message: "Error interno del servidor" },
+      { status: 500 },
+    );
   }
 }

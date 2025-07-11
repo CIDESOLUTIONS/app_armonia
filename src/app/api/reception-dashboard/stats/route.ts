@@ -1,22 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getPrisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
-import { ServerLogger } from '@/lib/logging/server-logger';
+import { NextRequest, NextResponse } from "next/server";
+import { getPrisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import { ServerLogger } from "@/lib/logging/server-logger";
 
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const complexId = session.user.complexId;
     const schemaName = session.user.schemaName;
 
     if (!complexId || !schemaName) {
-      return NextResponse.json({ message: 'Complex ID or schema name not found in session' }, { status: 400 });
+      return NextResponse.json(
+        { message: "Complex ID or schema name not found in session" },
+        { status: 400 },
+      );
     }
 
     const tenantPrisma = getPrisma(schemaName);
@@ -33,7 +36,7 @@ export async function GET(req: NextRequest) {
       activeIncidents,
       securityAlerts,
       commonAreasInUse,
-      digitalLogsToday
+      digitalLogsToday,
     ] = await Promise.all([
       tenantPrisma.visitor.count({
         where: {
@@ -51,7 +54,7 @@ export async function GET(req: NextRequest) {
       tenantPrisma.incident.count({
         where: {
           complexId,
-          status: { in: ['OPEN', 'IN_PROGRESS'] },
+          status: { in: ["OPEN", "IN_PROGRESS"] },
         },
       }),
       // Placeholder for actual security alerts count
@@ -62,7 +65,7 @@ export async function GET(req: NextRequest) {
           complexId,
           startDateTime: { lte: new Date() },
           endDateTime: { gte: new Date() },
-          status: 'APPROVED',
+          status: "APPROVED",
         },
       }),
       tenantPrisma.digitalLog.count({
@@ -82,13 +85,21 @@ export async function GET(req: NextRequest) {
       digitalLogsToday,
     };
 
-    ServerLogger.info(`Dashboard de recepción para complejo ${complexId} obtenido.`);
+    ServerLogger.info(
+      `Dashboard de recepción para complejo ${complexId} obtenido.`,
+    );
     return NextResponse.json({ stats }, { status: 200 });
   } catch (error) {
-    ServerLogger.error('Error al obtener datos del dashboard de recepción:', error);
+    ServerLogger.error(
+      "Error al obtener datos del dashboard de recepción:",
+      error,
+    );
     return NextResponse.json(
-      { message: 'Error al obtener datos del dashboard de recepción', error: (error as Error).message },
-      { status: 500 }
+      {
+        message: "Error al obtener datos del dashboard de recepción",
+        error: (error as Error).message,
+      },
+      { status: 500 },
     );
   }
 }

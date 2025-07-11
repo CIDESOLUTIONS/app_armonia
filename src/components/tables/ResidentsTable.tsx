@@ -1,11 +1,18 @@
 // src/components/tables/ResidentsTable.tsx
 "use client";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Edit, Trash, Eye } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { useState } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Edit, Trash, Eye } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 interface Resident {
   id: number;
@@ -14,7 +21,7 @@ interface Resident {
   dni: string;
   birthDate: string;
   whatsapp: string;
-  residentType: 'permanente' | 'temporal';
+  residentType: "permanente" | "temporal";
   startDate: string;
   endDate?: string;
   status: string;
@@ -28,13 +35,13 @@ interface ResidentsTableProps {
   onView?: (resident: Resident) => void;
 }
 
-export function ResidentsTable({ 
-  residents = [], 
-  onEdit, 
+export function ResidentsTable({
+  residents = [],
+  onEdit,
   onDelete,
-  onView
+  onView,
 }: ResidentsTableProps) {
-  const [_searchTerm, _setSearchTerm] = useState('');
+  const [_searchTerm, _setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -52,7 +59,10 @@ export function ResidentsTable({
   // Calcular paginación
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredResidents.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredResidents.slice(
+    indexOfFirstItem,
+    indexOfLastItem,
+  );
   const totalPages = Math.ceil(filteredResidents.length / itemsPerPage);
 
   // Cambiar de página
@@ -60,14 +70,14 @@ export function ResidentsTable({
 
   // Formatear fecha
   const formatDate = (dateString: string) => {
-    if (!dateString) return '';
-    
+    if (!dateString) return "";
+
     try {
       const date = new Date(dateString);
-      return date.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
+      return date.toLocaleDateString("es-ES", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
       });
     } catch (e) {
       return dateString;
@@ -77,8 +87,8 @@ export function ResidentsTable({
   // Traducir tipo de residente
   const translateResidentType = (type: string) => {
     const typeMap: Record<string, string> = {
-      'permanente': 'Permanente',
-      'temporal': 'Temporal'
+      permanente: "Permanente",
+      temporal: "Temporal",
     };
     return typeMap[type] || type;
   };
@@ -86,9 +96,9 @@ export function ResidentsTable({
   // Traducir estado
   const translateStatus = (status: string) => {
     const statusMap: Record<string, string> = {
-      'activo': 'Activo',
-      'inactivo': 'Inactivo',
-      'suspendido': 'Suspendido'
+      activo: "Activo",
+      inactivo: "Inactivo",
+      suspendido: "Suspendido",
     };
     return statusMap[status] || status;
   };
@@ -99,7 +109,9 @@ export function ResidentsTable({
         <Input
           placeholder="Buscar por nombre, email, DNI o unidad..."
           value={searchTerm}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setSearchTerm(e.target.value)
+          }
           className="max-w-sm"
         />
       </div>
@@ -125,30 +137,33 @@ export function ResidentsTable({
                   <TableCell className="font-medium">{resident.name}</TableCell>
                   <TableCell>{resident.dni}</TableCell>
                   <TableCell>{resident.email}</TableCell>
-                  <TableCell>{resident.whatsapp || '-'}</TableCell>
+                  <TableCell>{resident.whatsapp || "-"}</TableCell>
                   <TableCell>
-                    <span 
+                    <span
                       className={`px-2 py-1 rounded-full text-xs ${
-                        resident.residentType === 'permanente'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-purple-100 text-purple-800'
+                        resident.residentType === "permanente"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-purple-100 text-purple-800"
                       }`}
                     >
                       {translateResidentType(resident.residentType)}
-                      {resident.residentType === 'temporal' && resident.endDate && (
-                        <span className="ml-1">({formatDate(resident.endDate)})</span>
-                      )}
+                      {resident.residentType === "temporal" &&
+                        resident.endDate && (
+                          <span className="ml-1">
+                            ({formatDate(resident.endDate)})
+                          </span>
+                        )}
                     </span>
                   </TableCell>
                   <TableCell>{resident.propertyNumber}</TableCell>
                   <TableCell>
-                    <span 
+                    <span
                       className={`px-2 py-1 rounded-full text-xs ${
-                        resident.status === 'activo'
-                          ? 'bg-green-100 text-green-800'
-                          : resident.status === 'inactivo'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-gray-100 text-gray-800'
+                        resident.status === "activo"
+                          ? "bg-green-100 text-green-800"
+                          : resident.status === "inactivo"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-gray-100 text-gray-800"
                       }`}
                     >
                       {translateStatus(resident.status)}
@@ -206,7 +221,7 @@ export function ResidentsTable({
         <div className="flex justify-between items-center mt-4">
           <div className="text-sm text-gray-600">
             Mostrando {indexOfFirstItem + 1}-
-            {Math.min(indexOfLastItem, filteredResidents.length)} de{' '}
+            {Math.min(indexOfLastItem, filteredResidents.length)} de{" "}
             {filteredResidents.length} residentes
           </div>
           <div className="flex space-x-2">

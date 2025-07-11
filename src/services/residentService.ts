@@ -1,4 +1,4 @@
-import { fetchApi } from '@/lib/api';
+import { fetchApi } from "@/lib/api";
 
 interface Resident {
   id: number;
@@ -31,36 +31,41 @@ interface UpdateResidentData {
 
 export async function getResidents(): Promise<Resident[]> {
   try {
-    const response = await fetchApi('/api/inventory/residents');
+    const response = await fetchApi("/api/inventory/residents");
     return response;
   } catch (error) {
-    console.error('Error fetching residents:', error);
+    console.error("Error fetching residents:", error);
     throw error;
   }
 }
 
-export async function createResident(data: CreateResidentData): Promise<Resident> {
+export async function createResident(
+  data: CreateResidentData,
+): Promise<Resident> {
   try {
-    const response = await fetchApi('/api/inventory/residents', {
-      method: 'POST',
+    const response = await fetchApi("/api/inventory/residents", {
+      method: "POST",
       body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
-    console.error('Error creating resident:', error);
+    console.error("Error creating resident:", error);
     throw error;
   }
 }
 
-export async function updateResident(id: number, data: UpdateResidentData): Promise<Resident> {
+export async function updateResident(
+  id: number,
+  data: UpdateResidentData,
+): Promise<Resident> {
   try {
-    const response = await fetchApi('/api/inventory/residents', {
-      method: 'PUT',
+    const response = await fetchApi("/api/inventory/residents", {
+      method: "PUT",
       body: JSON.stringify({ id, ...data }),
     });
     return response;
   } catch (error) {
-    console.error('Error updating resident:', error);
+    console.error("Error updating resident:", error);
     throw error;
   }
 }
@@ -68,10 +73,10 @@ export async function updateResident(id: number, data: UpdateResidentData): Prom
 export async function deleteResident(id: number): Promise<void> {
   try {
     await fetchApi(`/api/inventory/residents/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   } catch (error) {
-    console.error('Error deleting resident:', error);
+    console.error("Error deleting resident:", error);
     throw error;
   }
 }

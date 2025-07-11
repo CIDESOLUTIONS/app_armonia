@@ -1,10 +1,12 @@
-'use client';
+"use client";
 
 // Clase de utilidad para el logging en el cliente
 
 export class ClientLogger {
   static isEnabled() {
-    return typeof window !== 'undefined' && localStorage.getItem('debug') === 'true';
+    return (
+      typeof window !== "undefined" && localStorage.getItem("debug") === "true"
+    );
   }
 
   static debug(message: string, ...args: unknown[]) {
@@ -26,14 +28,25 @@ export class ClientLogger {
   }
 
   static apiRequest(method: string, url: string, options?: unknown) {
-    this.debug(`API Request: ${method} ${url}`, options ? { options } : '');
+    this.debug(`API Request: ${method} ${url}`, options ? { options } : "");
   }
 
-  static apiResponse(method: string, url: string, status: number, data?: unknown) {
+  static apiResponse(
+    method: string,
+    url: string,
+    status: number,
+    data?: unknown,
+  ) {
     if (status >= 400) {
-      this.error(`API Response: ${method} ${url} [${status}]`, data ? { data } : '');
+      this.error(
+        `API Response: ${method} ${url} [${status}]`,
+        data ? { data } : "",
+      );
     } else {
-      this.debug(`API Response: ${method} ${url} [${status}]`, data ? { data } : '');
+      this.debug(
+        `API Response: ${method} ${url} [${status}]`,
+        data ? { data } : "",
+      );
     }
   }
 
@@ -42,12 +55,12 @@ export class ClientLogger {
   }
 
   static userAction(action: string, details?: unknown) {
-    this.debug(`User Action: ${action}`, details ? { details } : '');
+    this.debug(`User Action: ${action}`, details ? { details } : "");
   }
 
   static componentRender(component: string, props?: unknown) {
     if (this.isEnabled()) {
-      this.debug(`Component Render: ${component}`, props ? { props } : '');
+      this.debug(`Component Render: ${component}`, props ? { props } : "");
     }
   }
 
@@ -57,10 +70,10 @@ export class ClientLogger {
 
   // Método para habilitar/deshabilitar debug logs
   static toggleDebug() {
-    if (typeof window !== 'undefined') {
-      const currentState = localStorage.getItem('debug') === 'true';
-      localStorage.setItem('debug', (!currentState).toString());
-      console.log(`Debug logs ${!currentState ? 'enabled' : 'disabled'}`);
+    if (typeof window !== "undefined") {
+      const currentState = localStorage.getItem("debug") === "true";
+      localStorage.setItem("debug", (!currentState).toString());
+      console.log(`Debug logs ${!currentState ? "enabled" : "disabled"}`);
       return !currentState;
     }
     return false;

@@ -1,4 +1,4 @@
-import { fetchApi } from '@/lib/api';
+import { fetchApi } from "@/lib/api";
 
 interface Announcement {
   id: number;
@@ -31,36 +31,41 @@ interface UpdateAnnouncementData {
 
 export async function getAnnouncements(): Promise<Announcement[]> {
   try {
-    const response = await fetchApi('/api/communications/announcements');
+    const response = await fetchApi("/api/communications/announcements");
     return response;
   } catch (error) {
-    console.error('Error fetching announcements:', error);
+    console.error("Error fetching announcements:", error);
     throw error;
   }
 }
 
-export async function createAnnouncement(data: CreateAnnouncementData): Promise<Announcement> {
+export async function createAnnouncement(
+  data: CreateAnnouncementData,
+): Promise<Announcement> {
   try {
-    const response = await fetchApi('/api/communications/announcements', {
-      method: 'POST',
+    const response = await fetchApi("/api/communications/announcements", {
+      method: "POST",
       body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
-    console.error('Error creating announcement:', error);
+    console.error("Error creating announcement:", error);
     throw error;
   }
 }
 
-export async function updateAnnouncement(id: number, data: UpdateAnnouncementData): Promise<Announcement> {
+export async function updateAnnouncement(
+  id: number,
+  data: UpdateAnnouncementData,
+): Promise<Announcement> {
   try {
-    const response = await fetchApi('/api/communications/announcements', {
-      method: 'PUT',
+    const response = await fetchApi("/api/communications/announcements", {
+      method: "PUT",
       body: JSON.stringify({ id, ...data }),
     });
     return response;
   } catch (error) {
-    console.error('Error updating announcement:', error);
+    console.error("Error updating announcement:", error);
     throw error;
   }
 }
@@ -68,10 +73,10 @@ export async function updateAnnouncement(id: number, data: UpdateAnnouncementDat
 export async function deleteAnnouncement(id: number): Promise<void> {
   try {
     await fetchApi(`/api/communications/announcements/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   } catch (error) {
-    console.error('Error deleting announcement:', error);
+    console.error("Error deleting announcement:", error);
     throw error;
   }
 }

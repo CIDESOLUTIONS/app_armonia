@@ -1,13 +1,13 @@
 /**
  * Servicio para la gestión de PQR en el sistema Armonía
- * 
+ *
  * Este archivo contiene las funciones necesarias para la integración
  * del sistema PQR con el resto de la aplicación.
  */
 
-import { PrismaClient } from '@prisma/client';
-import { getSchemaFromRequest } from '../../lib/prisma';
-import { ActivityLogger } from '../../lib/logging/activity-logger';
+import { PrismaClient } from "@prisma/client";
+import { getSchemaFromRequest } from "../../lib/prisma";
+import { ActivityLogger } from "../../lib/logging/activity-logger";
 
 /**
  * Clase que implementa el servicio de integración de PQR
@@ -20,7 +20,7 @@ export class PQRService {
    * Constructor del servicio
    * @param schema Esquema de base de datos a utilizar
    */
-  constructor(schema: string = 'public') {
+  constructor(schema: string = "public") {
     this.schema = schema;
     this.prisma = getSchemaFromRequest(schema);
   }
@@ -37,36 +37,36 @@ export class PQRService {
         this.prisma.pQR.count({
           where: {
             complexId,
-            status: 'OPEN'
-          }
+            status: "OPEN",
+          },
         }),
         this.prisma.pQR.count({
           where: {
             complexId,
-            status: 'IN_PROGRESS'
-          }
+            status: "IN_PROGRESS",
+          },
         }),
         this.prisma.pQR.count({
           where: {
             complexId,
-            status: 'RESOLVED'
-          }
+            status: "RESOLVED",
+          },
         }),
         this.prisma.pQR.count({
           where: {
             complexId,
-            status: 'CLOSED'
-          }
-        })
+            status: "CLOSED",
+          },
+        }),
       ]);
 
       // Obtener PQRs recientes
       const recentPQRs = await this.prisma.pQR.findMany({
         where: {
-          complexId
+          complexId,
         },
         orderBy: {
-          createdAt: 'desc'
+          createdAt: "desc",
         },
         take: 5,
         select: {
@@ -78,10 +78,10 @@ export class PQRService {
           createdAt: true,
           user: {
             select: {
-              name: true
-            }
-          }
-        }
+              name: true,
+            },
+          },
+        },
       });
 
       // Obtener PQRs próximos a vencer
@@ -93,15 +93,15 @@ export class PQRService {
         where: {
           complexId,
           status: {
-            in: ['OPEN', 'ASSIGNED', 'IN_PROGRESS']
+            in: ["OPEN", "ASSIGNED", "IN_PROGRESS"],
           },
           dueDate: {
             gte: now,
-            lte: tomorrow
-          }
+            lte: tomorrow,
+          },
         },
         orderBy: {
-          dueDate: 'asc'
+          dueDate: "asc",
         },
         take: 5,
         select: {
@@ -113,10 +113,10 @@ export class PQRService {
           dueDate: true,
           assignedTo: {
             select: {
-              name: true
-            }
-          }
-        }
+              name: true,
+            },
+          },
+        },
       });
 
       return {
@@ -125,13 +125,13 @@ export class PQRService {
           inProgress,
           resolved,
           closed,
-          total: open + inProgress + resolved + closed
+          total: open + inProgress + resolved + closed,
         },
         recentPQRs,
-        dueSoonPQRs
+        dueSoonPQRs,
       };
     } catch (error) {
-      console.error('Error al obtener resumen de PQRs:', error);
+      console.error("Error al obtener resumen de PQRs:", error);
       throw error;
     }
   }
@@ -149,8 +149,8 @@ export class PQRService {
         where: { id: pqrId },
         include: {
           user: true,
-          assignedTo: true
-        }
+          assignedTo: true,
+        },
       });
 
       if (!pqr) {
@@ -161,16 +161,16 @@ export class PQRService {
       await ActivityLogger.log({
         action: `PQR_${event}`,
         entityId: pqrId,
-        entityType: 'PQR',
+        entityType: "PQR",
         userId: data.userId || pqr.userId,
-        userName: data.userName || pqr.user?.name || 'Sistema',
-        userRole: data.userRole || 'SYSTEM',
+        userName: data.userName || pqr.user?.name || "Sistema",
+        userRole: data.userRole || "SYSTEM",
         details: {
           ticketNumber: pqr.ticketNumber,
           title: pqr.title,
           status: pqr.status,
-          ...data
-        }
+          ...data,
+        },
       });
 
       // Crear notificación en el sistema
@@ -179,12 +179,12 @@ export class PQRService {
           userId: pqr.userId,
           title: `PQR ${pqr.ticketNumber}: ${this.getEventTitle(event)}`,
           content: this.getEventContent(event, pqr, data),
-          type: 'PQR',
+          type: "PQR",
           read: false,
           entityId: pqrId,
-          entityType: 'PQR',
-          createdAt: new Date()
-        }
+          entityType: "PQR",
+          createdAt: new Date(),
+        },
       });
 
       // Si hay un usuario asignado, también notificarle
@@ -194,18 +194,18 @@ export class PQRService {
             userId: pqr.assignedToId,
             title: `PQR ${pqr.ticketNumber}: ${this.getEventTitle(event)}`,
             content: this.getEventContent(event, pqr, data),
-            type: 'PQR',
+            type: "PQR",
             read: false,
             entityId: pqrId,
-            entityType: 'PQR',
-            createdAt: new Date()
-          }
+            entityType: "PQR",
+            createdAt: new Date(),
+          },
         });
       }
 
       return true;
     } catch (error) {
-      console.error('Error al integrar con notificaciones:', error);
+      console.error("Error al integrar con notificaciones:", error);
       return false;
     }
   }
@@ -217,22 +217,22 @@ export class PQRService {
    */
   private getEventTitle(event: string): string {
     switch (event) {
-      case 'CREATED':
-        return 'Nuevo PQR creado';
-      case 'ASSIGNED':
-        return 'PQR asignado';
-      case 'STATUS_CHANGED':
-        return 'Cambio de estado';
-      case 'COMMENT_ADDED':
-        return 'Nuevo comentario';
-      case 'RESOLVED':
-        return 'PQR resuelto';
-      case 'CLOSED':
-        return 'PQR cerrado';
-      case 'REOPENED':
-        return 'PQR reabierto';
+      case "CREATED":
+        return "Nuevo PQR creado";
+      case "ASSIGNED":
+        return "PQR asignado";
+      case "STATUS_CHANGED":
+        return "Cambio de estado";
+      case "COMMENT_ADDED":
+        return "Nuevo comentario";
+      case "RESOLVED":
+        return "PQR resuelto";
+      case "CLOSED":
+        return "PQR cerrado";
+      case "REOPENED":
+        return "PQR reabierto";
       default:
-        return 'Actualización de PQR';
+        return "Actualización de PQR";
     }
   }
 
@@ -245,20 +245,20 @@ export class PQRService {
    */
   private getEventContent(event: string, pqr: any, data: any): string {
     switch (event) {
-      case 'CREATED':
+      case "CREATED":
         return `Se ha creado un nuevo PQR con número de ticket ${pqr.ticketNumber}: ${pqr.title}`;
-      case 'ASSIGNED':
-        return `El PQR ${pqr.ticketNumber} ha sido asignado a ${pqr.assignedTo?.name || 'un técnico'}`;
-      case 'STATUS_CHANGED':
-        return `El estado del PQR ${pqr.ticketNumber} ha cambiado de ${data.previousStatus || 'NUEVO'} a ${pqr.status}`;
-      case 'COMMENT_ADDED':
-        return `Se ha añadido un nuevo comentario al PQR ${pqr.ticketNumber}: "${data.comment || ''}"`;
-      case 'RESOLVED':
-        return `El PQR ${pqr.ticketNumber} ha sido resuelto. ${data.comment ? `Resolución: ${data.comment}` : ''}`;
-      case 'CLOSED':
+      case "ASSIGNED":
+        return `El PQR ${pqr.ticketNumber} ha sido asignado a ${pqr.assignedTo?.name || "un técnico"}`;
+      case "STATUS_CHANGED":
+        return `El estado del PQR ${pqr.ticketNumber} ha cambiado de ${data.previousStatus || "NUEVO"} a ${pqr.status}`;
+      case "COMMENT_ADDED":
+        return `Se ha añadido un nuevo comentario al PQR ${pqr.ticketNumber}: "${data.comment || ""}"`;
+      case "RESOLVED":
+        return `El PQR ${pqr.ticketNumber} ha sido resuelto. ${data.comment ? `Resolución: ${data.comment}` : ""}`;
+      case "CLOSED":
         return `El PQR ${pqr.ticketNumber} ha sido cerrado.`;
-      case 'REOPENED':
-        return `El PQR ${pqr.ticketNumber} ha sido reabierto. ${data.comment ? `Motivo: ${data.comment}` : ''}`;
+      case "REOPENED":
+        return `El PQR ${pqr.ticketNumber} ha sido reabierto. ${data.comment ? `Motivo: ${data.comment}` : ""}`;
       default:
         return `El PQR ${pqr.ticketNumber} ha sido actualizado.`;
     }
@@ -275,15 +275,15 @@ export class PQRService {
       // Determinar fechas según período
       const endDate = new Date();
       const startDate = new Date();
-      
+
       switch (period) {
-        case 'DAILY':
+        case "DAILY":
           startDate.setDate(startDate.getDate() - 1);
           break;
-        case 'WEEKLY':
+        case "WEEKLY":
           startDate.setDate(startDate.getDate() - 7);
           break;
-        case 'MONTHLY':
+        case "MONTHLY":
           startDate.setMonth(startDate.getMonth() - 1);
           break;
         default:
@@ -296,62 +296,64 @@ export class PQRService {
           complexId,
           createdAt: {
             gte: startDate,
-            lte: endDate
-          }
+            lte: endDate,
+          },
         },
         include: {
           user: {
             select: {
               name: true,
-              email: true
-            }
+              email: true,
+            },
           },
           assignedTo: {
             select: {
               name: true,
-              email: true
-            }
-          }
+              email: true,
+            },
+          },
         },
         orderBy: {
-          createdAt: 'desc'
-        }
+          createdAt: "desc",
+        },
       });
 
       // Calcular estadísticas
       const totalCount = pqrs.length;
-      
+
       const statusCounts = {
         OPEN: 0,
         ASSIGNED: 0,
         IN_PROGRESS: 0,
         RESOLVED: 0,
         CLOSED: 0,
-        REOPENED: 0
+        REOPENED: 0,
       };
 
       const categoryCounts: Record<string, number> = {};
       const priorityCounts: Record<string, number> = {};
-      
+
       let resolvedOnTime = 0;
       let resolvedLate = 0;
 
       for (const pqr of pqrs) {
         // Contar por estado
         statusCounts[pqr.status as keyof typeof statusCounts]++;
-        
+
         // Contar por categoría
         if (pqr.category) {
-          categoryCounts[pqr.category] = (categoryCounts[pqr.category] || 0) + 1;
+          categoryCounts[pqr.category] =
+            (categoryCounts[pqr.category] || 0) + 1;
         }
-        
+
         // Contar por prioridad
         if (pqr.priority) {
-          priorityCounts[pqr.priority] = (priorityCounts[pqr.priority] || 0) + 1;
+          priorityCounts[pqr.priority] =
+            (priorityCounts[pqr.priority] || 0) + 1;
         }
-        
+
         // Verificar cumplimiento de SLA
-        if (pqr.status === 'RESOLVED' || pqr.status === 'CLOSED') {
+        if (pqr.status === "RESOLVED" || pqr.status === "CLOSED") {
           if (pqr.resolvedAt && pqr.dueDate) {
             if (new Date(pqr.resolvedAt) <= new Date(pqr.dueDate)) {
               resolvedOnTime++;
@@ -365,16 +367,21 @@ export class PQRService {
       // Calcular tiempo promedio de resolución
       let totalResolutionTime = 0;
       let resolvedCount = 0;
-      
+
       for (const pqr of pqrs) {
         if (pqr.resolvedAt && pqr.assignedAt) {
-          const resolutionTime = new Date(pqr.resolvedAt).getTime() - new Date(pqr.assignedAt).getTime();
+          const resolutionTime =
+            new Date(pqr.resolvedAt).getTime() -
+            new Date(pqr.assignedAt).getTime();
           totalResolutionTime += resolutionTime;
           resolvedCount++;
         }
       }
-      
-      const averageResolutionTime = resolvedCount > 0 ? totalResolutionTime / resolvedCount / (1000 * 60 * 60) : 0;
+
+      const averageResolutionTime =
+        resolvedCount > 0
+          ? totalResolutionTime / resolvedCount / (1000 * 60 * 60)
+          : 0;
 
       return {
         period,
@@ -387,13 +394,13 @@ export class PQRService {
         slaCompliance: {
           onTime: resolvedOnTime,
           late: resolvedLate,
-          rate: resolvedCount > 0 ? (resolvedOnTime / resolvedCount) * 100 : 0
+          rate: resolvedCount > 0 ? (resolvedOnTime / resolvedCount) * 100 : 0,
         },
         averageResolutionTime,
-        pqrs
+        pqrs,
       };
     } catch (error) {
-      console.error('Error al generar datos para reporte:', error);
+      console.error("Error al generar datos para reporte:", error);
       throw error;
     }
   }

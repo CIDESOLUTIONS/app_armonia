@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getPrisma } from '@/lib/prisma';
-import { authMiddleware } from '@/lib/auth';
-import { z } from 'zod';
-import { ServerLogger } from '@/lib/logging/server-logger';
+import { NextRequest, NextResponse } from "next/server";
+import { getPrisma } from "@/lib/prisma";
+import { authMiddleware } from "@/lib/auth";
+import { z } from "zod";
+import { ServerLogger } from "@/lib/logging/server-logger";
 
 const ReservationSchema = z.object({
   commonAreaId: z.number().int().positive("ID de área común inválido."),
@@ -12,8 +12,13 @@ const ReservationSchema = z.object({
   description: z.string().optional(),
   startDateTime: z.string().datetime("Fecha y hora de inicio inválidas."),
   endDateTime: z.string().datetime("Fecha y hora de fin inválidas."),
-  status: z.enum(['PENDING', 'APPROVED', 'REJECTED', 'CANCELLED', 'COMPLETED']).default('PENDING'),
-  attendees: z.number().int().min(1, "El número de asistentes debe ser al menos 1."),
+  status: z
+    .enum(["PENDING", "APPROVED", "REJECTED", "CANCELLED", "COMPLETED"])
+    .default("PENDING"),
+  attendees: z
+    .number()
+    .int()
+    .min(1, "El número de asistentes debe ser al menos 1."),
   requiresPayment: z.boolean().default(false),
   paymentAmount: z.number().optional(),
   paymentStatus: z.string().optional(),
@@ -26,17 +31,21 @@ const ReservationSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN', 'RESIDENT']);
+    const authResult = await authMiddleware(request, [
+      "ADMIN",
+      "COMPLEX_ADMIN",
+      "RESIDENT",
+    ]);
     if (!authResult.proceed) {
       return authResult.response;
     }
     const { payload } = authResult;
 
     const tenantPrisma = getPrisma(payload.schemaName);
-    let where: any = { complexId: payload.complexId };
+    const where: any = { complexId: payload.complexId };
 
     // Si es residente, solo mostrar sus reservas
-    if (payload.role === 'RESIDENT') {
+    if (payload.role === "RESIDENT") {
       where.userId = payload.id;
     }
 
@@ -47,27 +56,36 @@ export async function GET(request: NextRequest) {
         user: { select: { name: true } },
         property: { select: { unitNumber: true } },
       },
-      orderBy: { startDateTime: 'desc' },
+      orderBy: { startDateTime: "desc" },
     });
 
-    const formattedReservations = reservations.map(res => ({
+    const formattedReservations = reservations.map((res) => ({
       ...res,
-      commonAreaName: res.commonArea?.name || 'N/A',
-      userName: res.user?.name || 'N/A',
-      unitNumber: res.property?.unitNumber || 'N/A',
+      commonAreaName: res.commonArea?.name || "N/A",
+      userName: res.user?.name || "N/A",
+      unitNumber: res.property?.unitNumber || "N/A",
     }));
 
-    ServerLogger.info(`Reservas listadas para el complejo ${payload.complexId}`);
+    ServerLogger.info(
+      `Reservas listadas para el complejo ${payload.complexId}`,
+    );
     return NextResponse.json(formattedReservations, { status: 200 });
   } catch (error) {
-    ServerLogger.error('Error al obtener reservas:', error);
-    return NextResponse.json({ message: 'Error al obtener reservas' }, { status: 500 });
+    ServerLogger.error("Error al obtener reservas:", error);
+    return NextResponse.json(
+      { message: "Error al obtener reservas" },
+      { status: 500 },
+    );
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN', 'RESIDENT']);
+    const authResult = await authMiddleware(request, [
+      "ADMIN",
+      "COMPLEX_ADMIN",
+      "RESIDENT",
+    ]);
     if (!authResult.proceed) {
       return authResult.response;
     }
@@ -77,22 +95,35 @@ export async function POST(request: NextRequest) {
     const validatedData = ReservationSchema.parse(body);
 
     const tenantPrisma = getPrisma(payload.schemaName);
-    const newReservation = await tenantPrisma.reservation.create({ data: validatedData });
+    const newReservation = await tenantPrisma.reservation.create({
+      data: validatedData,
+    });
 
-    ServerLogger.info(`Reserva creada: ${newReservation.title} en complejo ${payload.complexId}`);
+    ServerLogger.info(
+      `Reserva creada: ${newReservation.title} en complejo ${payload.complexId}`,
+    );
     return NextResponse.json(newReservation, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ message: 'Error de validación', errors: error.errors }, { status: 400 });
+      return NextResponse.json(
+        { message: "Error de validación", errors: error.errors },
+        { status: 400 },
+      );
     }
-    ServerLogger.error('Error al crear reserva:', error);
-    return NextResponse.json({ message: 'Error al crear reserva' }, { status: 500 });
+    ServerLogger.error("Error al crear reserva:", error);
+    return NextResponse.json(
+      { message: "Error al crear reserva" },
+      { status: 500 },
+    );
   }
 }
 
 export async function PUT(request: NextRequest) {
   try {
-    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN']);
+    const authResult = await authMiddleware(request, [
+      "ADMIN",
+      "COMPLEX_ADMIN",
+    ]);
     if (!authResult.proceed) {
       return authResult.response;
     }
@@ -102,7 +133,10 @@ export async function PUT(request: NextRequest) {
     const validatedData = ReservationSchema.partial().parse(updateData); // Partial para actualizaciones
 
     if (!id) {
-      return NextResponse.json({ message: 'ID de reserva requerido para actualizar' }, { status: 400 });
+      return NextResponse.json(
+        { message: "ID de reserva requerido para actualizar" },
+        { status: 400 },
+      );
     }
 
     const tenantPrisma = getPrisma(payload.schemaName);
@@ -111,20 +145,31 @@ export async function PUT(request: NextRequest) {
       data: validatedData,
     });
 
-    ServerLogger.info(`Reserva actualizada: ${updatedReservation.title} en complejo ${payload.complexId}`);
+    ServerLogger.info(
+      `Reserva actualizada: ${updatedReservation.title} en complejo ${payload.complexId}`,
+    );
     return NextResponse.json(updatedReservation, { status: 200 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ message: 'Error de validación', errors: error.errors }, { status: 400 });
+      return NextResponse.json(
+        { message: "Error de validación", errors: error.errors },
+        { status: 400 },
+      );
     }
-    ServerLogger.error('Error al actualizar reserva:', error);
-    return NextResponse.json({ message: 'Error al actualizar reserva' }, { status: 500 });
+    ServerLogger.error("Error al actualizar reserva:", error);
+    return NextResponse.json(
+      { message: "Error al actualizar reserva" },
+      { status: 500 },
+    );
   }
 }
 
 export async function DELETE(request: NextRequest) {
   try {
-    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN']);
+    const authResult = await authMiddleware(request, [
+      "ADMIN",
+      "COMPLEX_ADMIN",
+    ]);
     if (!authResult.proceed) {
       return authResult.response;
     }
@@ -133,16 +178,27 @@ export async function DELETE(request: NextRequest) {
     const { id } = await request.json();
 
     if (!id) {
-      return NextResponse.json({ message: 'ID de reserva requerido para eliminar' }, { status: 400 });
+      return NextResponse.json(
+        { message: "ID de reserva requerido para eliminar" },
+        { status: 400 },
+      );
     }
 
     const tenantPrisma = getPrisma(payload.schemaName);
     await tenantPrisma.reservation.delete({ where: { id: parseInt(id) } });
 
-    ServerLogger.info(`Reserva eliminada: ID ${id} en complejo ${payload.complexId}`);
-    return NextResponse.json({ message: 'Reserva eliminada exitosamente' }, { status: 200 });
+    ServerLogger.info(
+      `Reserva eliminada: ID ${id} en complejo ${payload.complexId}`,
+    );
+    return NextResponse.json(
+      { message: "Reserva eliminada exitosamente" },
+      { status: 200 },
+    );
   } catch (error) {
-    ServerLogger.error('Error al eliminar reserva:', error);
-    return NextResponse.json({ message: 'Error al eliminar reserva' }, { status: 500 });
+    ServerLogger.error("Error al eliminar reserva:", error);
+    return NextResponse.json(
+      { message: "Error al eliminar reserva" },
+      { status: 500 },
+    );
   }
 }

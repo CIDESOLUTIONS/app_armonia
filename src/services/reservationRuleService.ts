@@ -1,4 +1,4 @@
-import { fetchApi } from '@/lib/api';
+import { fetchApi } from "@/lib/api";
 
 interface ReservationRule {
   id: number;
@@ -53,48 +53,53 @@ interface UpdateReservationRuleData {
 
 export async function getReservationRules(): Promise<ReservationRule[]> {
   try {
-    const response = await fetchApi('/api/services/rules');
+    const response = await fetchApi("/api/services/rules");
     return response;
   } catch (error) {
-    console.error('Error fetching reservation rules:', error);
+    console.error("Error fetching reservation rules:", error);
     throw error;
   }
 }
 
-export async function createReservationRule(data: CreateReservationRuleData): Promise<ReservationRule> {
+export async function createReservationRule(
+  data: CreateReservationRuleData,
+): Promise<ReservationRule> {
   try {
-    const response = await fetchApi('/api/services/rules', {
-      method: 'POST',
+    const response = await fetchApi("/api/services/rules", {
+      method: "POST",
       body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
-    console.error('Error creating reservation rule:', error);
+    console.error("Error creating reservation rule:", error);
     throw error;
   }
 }
 
-export async function updateReservationRule(id: number, data: UpdateReservationRuleData): Promise<ReservationRule> {
+export async function updateReservationRule(
+  id: number,
+  data: UpdateReservationRuleData,
+): Promise<ReservationRule> {
   try {
-    const response = await fetchApi('/api/services/rules', {
-      method: 'PUT',
+    const response = await fetchApi("/api/services/rules", {
+      method: "PUT",
       body: JSON.stringify({ id, ...data }),
     });
     return response;
   } catch (error) {
-    console.error('Error updating reservation rule:', error);
+    console.error("Error updating reservation rule:", error);
     throw error;
   }
 }
 
 export async function deleteReservationRule(id: number): Promise<void> {
   try {
-    await fetchApi('/api/services/rules', {
-      method: 'DELETE',
+    await fetchApi("/api/services/rules", {
+      method: "DELETE",
       body: JSON.stringify({ id }),
     });
   } catch (error) {
-    console.error('Error deleting reservation rule:', error);
+    console.error("Error deleting reservation rule:", error);
     throw error;
   }
 }

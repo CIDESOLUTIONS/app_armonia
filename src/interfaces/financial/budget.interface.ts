@@ -10,7 +10,7 @@ export interface IBudget extends Document {
   residentialComplex: string;
   year: number;
   month: number;
-  status: 'draft' | 'approved' | 'executed' | 'closed';
+  status: "draft" | "approved" | "executed" | "closed";
   items: IBudgetItem[];
   totalPlanned: number;
   totalExecuted: number;
@@ -25,12 +25,12 @@ export interface IBudget extends Document {
 export interface CreateBudgetDTO {
   year: number;
   month: number;
-  items: Omit<IBudgetItem, 'executedAmount'>[];
+  items: Omit<IBudgetItem, "executedAmount">[];
   notes?: string;
 }
 
 export interface UpdateBudgetDTO {
-  items?: Omit<IBudgetItem, 'executedAmount'>[];
+  items?: Omit<IBudgetItem, "executedAmount">[];
   notes?: string;
 }
 

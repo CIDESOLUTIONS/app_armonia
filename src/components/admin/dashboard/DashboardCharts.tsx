@@ -1,5 +1,5 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ResponsiveContainer,
   LineChart,
@@ -11,7 +11,7 @@ import {
   Legend,
   BarChart,
   Bar,
-} from 'recharts';
+} from "recharts";
 
 interface ChartData {
   month: string;
@@ -23,7 +23,10 @@ interface DashboardChartsProps {
   commonAreaUsageTrend: ChartData[];
 }
 
-export function DashboardCharts({ revenueTrend, commonAreaUsageTrend }: DashboardChartsProps) {
+export function DashboardCharts({
+  revenueTrend,
+  commonAreaUsageTrend,
+}: DashboardChartsProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Gráfico de Ingresos Mensuales */}
@@ -37,9 +40,21 @@ export function DashboardCharts({ revenueTrend, commonAreaUsageTrend }: Dashboar
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
-              <Tooltip formatter={(value: number) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(value)} />
+              <Tooltip
+                formatter={(value: number) =>
+                  new Intl.NumberFormat("es-CO", {
+                    style: "currency",
+                    currency: "COP",
+                  }).format(value)
+                }
+              />
               <Legend />
-              <Line type="monotone" dataKey="value" stroke="#8884d8" name="Ingresos" />
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="#8884d8"
+                name="Ingresos"
+              />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>

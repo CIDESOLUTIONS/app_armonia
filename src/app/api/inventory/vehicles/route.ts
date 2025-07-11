@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getPrisma } from '@/lib/prisma';
-import { authMiddleware } from '@/lib/auth';
-import { z } from 'zod';
-import { ServerLogger } from '@/lib/logging/server-logger';
+import { NextRequest, NextResponse } from "next/server";
+import { getPrisma } from "@/lib/prisma";
+import { authMiddleware } from "@/lib/auth";
+import { z } from "zod";
+import { ServerLogger } from "@/lib/logging/server-logger";
 
 const VehicleSchema = z.object({
   licensePlate: z.string().min(1, "La placa es requerida."),
@@ -17,7 +17,10 @@ const VehicleSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN']);
+    const authResult = await authMiddleware(request, [
+      "ADMIN",
+      "COMPLEX_ADMIN",
+    ]);
     if (!authResult.proceed) {
       return authResult.response;
     }
@@ -30,22 +33,30 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const vehiclesWithUnitNumber = vehicles.map(vehicle => ({
+    const vehiclesWithUnitNumber = vehicles.map((vehicle) => ({
       ...vehicle,
-      unitNumber: vehicle.property?.unitNumber || 'N/A',
+      unitNumber: vehicle.property?.unitNumber || "N/A",
     }));
 
-    ServerLogger.info(`Vehículos listados para el complejo ${payload.complexId}`);
+    ServerLogger.info(
+      `Vehículos listados para el complejo ${payload.complexId}`,
+    );
     return NextResponse.json(vehiclesWithUnitNumber, { status: 200 });
   } catch (error) {
-    ServerLogger.error('Error al obtener vehículos:', error);
-    return NextResponse.json({ message: 'Error al obtener vehículos' }, { status: 500 });
+    ServerLogger.error("Error al obtener vehículos:", error);
+    return NextResponse.json(
+      { message: "Error al obtener vehículos" },
+      { status: 500 },
+    );
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN']);
+    const authResult = await authMiddleware(request, [
+      "ADMIN",
+      "COMPLEX_ADMIN",
+    ]);
     if (!authResult.proceed) {
       return authResult.response;
     }
@@ -55,16 +66,25 @@ export async function POST(request: NextRequest) {
     const validatedData = VehicleSchema.parse(body);
 
     const tenantPrisma = getPrisma(payload.schemaName);
-    const newVehicle = await tenantPrisma.vehicle.create({ data: validatedData });
+    const newVehicle = await tenantPrisma.vehicle.create({
+      data: validatedData,
+    });
 
-    ServerLogger.info(`Vehículo creado: ${newVehicle.licensePlate} en complejo ${payload.complexId}`);
+    ServerLogger.info(
+      `Vehículo creado: ${newVehicle.licensePlate} en complejo ${payload.complexId}`,
+    );
     return NextResponse.json(newVehicle, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ message: 'Error de validación', errors: error.errors }, { status: 400 });
+      return NextResponse.json(
+        { message: "Error de validación", errors: error.errors },
+        { status: 400 },
+      );
     }
-    ServerLogger.error('Error al crear vehículo:', error);
-    return NextResponse.json({ message: 'Error al crear vehículo' }, { status: 500 });
+    ServerLogger.error("Error al crear vehículo:", error);
+    return NextResponse.json(
+      { message: "Error al crear vehículo" },
+      { status: 500 },
+    );
   }
 }
-

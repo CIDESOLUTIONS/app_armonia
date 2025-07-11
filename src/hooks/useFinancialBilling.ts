@@ -1,8 +1,8 @@
 // src/hooks/useFinancialBilling.ts
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
-import { apiClient } from '@/lib/api-client';
+import { useState, useCallback } from "react";
+import { apiClient } from "@/lib/api-client";
 
 interface Bill {
   id: number;
@@ -10,7 +10,7 @@ interface Bill {
   billingPeriod: string;
   totalAmount: number;
   dueDate: string;
-  status: 'PENDING' | 'PARTIAL' | 'PAID' | 'OVERDUE';
+  status: "PENDING" | "PARTIAL" | "PAID" | "OVERDUE";
   property: {
     id: number;
     unitNumber: string;
@@ -48,8 +48,17 @@ interface UseFinancialBillingReturn {
   loading: boolean;
   error: string | null;
   generateBills: (year: number, month: number) => Promise<void>;
-  processPayment: (billId: number, amount: number, paymentMethod: string, reference?: string) => Promise<void>;
-  loadBills: (filters?: { period?: string; status?: string; propertyId?: number }) => Promise<void>;
+  processPayment: (
+    billId: number,
+    amount: number,
+    paymentMethod: string,
+    reference?: string,
+  ) => Promise<void>;
+  loadBills: (filters?: {
+    period?: string;
+    status?: string;
+    propertyId?: number;
+  }) => Promise<void>;
   loadStats: (startDate?: Date, endDate?: Date) => Promise<void>;
   refreshData: () => Promise<void>;
 }
@@ -60,137 +69,158 @@ export function useFinancialBilling(): UseFinancialBillingReturn {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadBills = useCallback(async (filters?: { 
-    period?: string; 
-    status?: string; 
-    propertyId?: number 
-  }) => {
-    try {
-      setLoading(true);
-      setError(null);
+  const loadBills = useCallback(
+    async (filters?: {
+      period?: string;
+      status?: string;
+      propertyId?: number;
+    }) => {
+      try {
+        setLoading(true);
+        setError(null);
 
-      const queryParams = new URLSearchParams();
-      if (filters?.period) queryParams.append('period', filters.period);
-      if (filters?.status) queryParams.append('status', filters.status);
-      if (filters?.propertyId) queryParams.append('propertyId', filters.propertyId.toString());
+        const queryParams = new URLSearchParams();
+        if (filters?.period) queryParams.append("period", filters.period);
+        if (filters?.status) queryParams.append("status", filters.status);
+        if (filters?.propertyId)
+          queryParams.append("propertyId", filters.propertyId.toString());
 
-      const response = await apiClient.get(`/financial/bills?${queryParams.toString()}`);
-      setBills(response.data || []);
-
-    } catch (err) {
-      console.error('Error cargando facturas:', err);
-      setError(err instanceof Error ? err.message : 'Error cargando facturas');
-    } finally {
-      setLoading(false);
-    }
-  }, [setBills, setError, setLoading]); // Dependencias: setters de estado
-
-  const loadStats = useCallback(async (startDate?: Date, endDate?: Date) => {
-    try {
-      setError(null);
-
-      const queryParams = new URLSearchParams();
-      if (startDate) queryParams.append('startDate', startDate.toISOString());
-      if (endDate) queryParams.append('endDate', endDate.toISOString());
-
-      const response = await apiClient.get(`/financial/stats?${queryParams.toString()}`);
-      setStats(response.data);
-
-    } catch (err) {
-      console.error('Error cargando estadísticas:', err);
-      setError(err instanceof Error ? err.message : 'Error cargando estadísticas financieras');
-    }
-  }, [setStats, setError]); // Dependencias: setters de estado
-
-  const generateBills = useCallback(async (year: number, month: number) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await apiClient.post('/financial/bills/generate', {
-        year,
-        month
-      });
-
-      if (response.success) {
-        // Recargar datos después de generar facturas
-        await loadBills();
-        await loadStats();
-      }
-
-    } catch (err) {
-      console.error('Error generando facturas:', err);
-      setError(err instanceof Error ? err.message : 'Error generando facturas');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [loadBills, loadStats, setLoading, setError]); // Dependencias: loadBills, loadStats, setters
-
-  const processPayment = useCallback(async (
-    billId: number,
-    amount: number,
-    paymentMethod: string,
-    reference?: string
-  ) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await apiClient.post('/financial/payments/process', {
-        billId,
-        amount,
-        paymentMethod,
-        reference
-      });
-
-      if (response.success) {
-        // Actualizar factura en estado local
-        setBills(prevBills =>
-          prevBills.map(bill =>
-            bill.id === billId
-              ? {
-                  ...bill,
-                  status: response.isFullPayment ? 'PAID' : 'PARTIAL',
-                  payments: [
-                    ...bill.payments,
-                    {
-                      id: Date.now(), // Temporal hasta reload
-                      amount,
-                      paymentMethod,
-                      paidAt: new Date().toISOString()
-                    }
-                  ]
-                }
-              : bill
-          )
+        const response = await apiClient.get(
+          `/financial/bills?${queryParams.toString()}`,
         );
-
-        // Actualizar estadísticas
-        if (stats) {
-          setStats(prevStats => ({
-            ...prevStats!,
-            totalCollected: prevStats!.totalCollected + amount,
-            pendingAmount: prevStats!.pendingAmount - amount,
-            collectionRate: ((prevStats!.totalCollected + amount) / prevStats!.totalBilled) * 100
-          }));
-        }
+        setBills(response.data || []);
+      } catch (err) {
+        console.error("Error cargando facturas:", err);
+        setError(
+          err instanceof Error ? err.message : "Error cargando facturas",
+        );
+      } finally {
+        setLoading(false);
       }
+    },
+    [setBills, setError, setLoading],
+  ); // Dependencias: setters de estado
 
-    } catch (err) {
-      console.error('Error procesando pago:', err);
-      setError(err instanceof Error ? err.message : 'Error procesando pago');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [stats, setBills, setStats, setError, setLoading, loadBills, loadStats]); // Dependencias: stats, setters
+  const loadStats = useCallback(
+    async (startDate?: Date, endDate?: Date) => {
+      try {
+        setError(null);
+
+        const queryParams = new URLSearchParams();
+        if (startDate) queryParams.append("startDate", startDate.toISOString());
+        if (endDate) queryParams.append("endDate", endDate.toISOString());
+
+        const response = await apiClient.get(
+          `/financial/stats?${queryParams.toString()}`,
+        );
+        setStats(response.data);
+      } catch (err) {
+        console.error("Error cargando estadísticas:", err);
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Error cargando estadísticas financieras",
+        );
+      }
+    },
+    [setStats, setError],
+  ); // Dependencias: setters de estado
+
+  const generateBills = useCallback(
+    async (year: number, month: number) => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await apiClient.post("/financial/bills/generate", {
+          year,
+          month,
+        });
+
+        if (response.success) {
+          // Recargar datos después de generar facturas
+          await loadBills();
+          await loadStats();
+        }
+      } catch (err) {
+        console.error("Error generando facturas:", err);
+        setError(
+          err instanceof Error ? err.message : "Error generando facturas",
+        );
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [loadBills, loadStats, setLoading, setError],
+  ); // Dependencias: loadBills, loadStats, setters
+
+  const processPayment = useCallback(
+    async (
+      billId: number,
+      amount: number,
+      paymentMethod: string,
+      reference?: string,
+    ) => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await apiClient.post("/financial/payments/process", {
+          billId,
+          amount,
+          paymentMethod,
+          reference,
+        });
+
+        if (response.success) {
+          // Actualizar factura en estado local
+          setBills((prevBills) =>
+            prevBills.map((bill) =>
+              bill.id === billId
+                ? {
+                    ...bill,
+                    status: response.isFullPayment ? "PAID" : "PARTIAL",
+                    payments: [
+                      ...bill.payments,
+                      {
+                        id: Date.now(), // Temporal hasta reload
+                        amount,
+                        paymentMethod,
+                        paidAt: new Date().toISOString(),
+                      },
+                    ],
+                  }
+                : bill,
+            ),
+          );
+
+          // Actualizar estadísticas
+          if (stats) {
+            setStats((prevStats) => ({
+              ...prevStats!,
+              totalCollected: prevStats!.totalCollected + amount,
+              pendingAmount: prevStats!.pendingAmount - amount,
+              collectionRate:
+                ((prevStats!.totalCollected + amount) /
+                  prevStats!.totalBilled) *
+                100,
+            }));
+          }
+        }
+      } catch (err) {
+        console.error("Error procesando pago:", err);
+        setError(err instanceof Error ? err.message : "Error procesando pago");
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [stats, setBills, setStats, setError, setLoading, loadBills, loadStats],
+  ); // Dependencias: stats, setters
 
   const refreshData = useCallback(async () => {
-    await Promise.all([
-      loadBills(),
-      loadStats()
-    ]);
+    await Promise.all([loadBills(), loadStats()]);
   }, [loadBills, loadStats]); // Dependencias: loadBills, loadStats
 
   return {
@@ -202,7 +232,7 @@ export function useFinancialBilling(): UseFinancialBillingReturn {
     processPayment,
     loadBills,
     loadStats,
-    refreshData
+    refreshData,
   };
 }
 

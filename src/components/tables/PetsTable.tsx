@@ -1,14 +1,26 @@
 // src/components/tables/PetsTable.tsx
 "use client";
 
-import { useState } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Edit, Trash, Plus, FileText } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Edit, Trash, Plus, FileText } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 interface Pet {
   id: number;
@@ -26,41 +38,41 @@ export function PetsTable() {
   const [pets, setPets] = useState<Pet[]>([
     {
       id: 1,
-      name: 'Luna',
-      type: 'Perro',
-      breed: 'Golden Retriever',
-      color: 'Dorado',
+      name: "Luna",
+      type: "Perro",
+      breed: "Golden Retriever",
+      color: "Dorado",
       age: 3,
-      ownerName: 'Carlos Rodríguez',
-      propertyNumber: 'A202',
-      hasVaccineRecord: true
+      ownerName: "Carlos Rodríguez",
+      propertyNumber: "A202",
+      hasVaccineRecord: true,
     },
     {
       id: 2,
-      name: 'Michi',
-      type: 'Gato',
-      breed: 'Siamés',
-      color: 'Blanco/Gris',
+      name: "Michi",
+      type: "Gato",
+      breed: "Siamés",
+      color: "Blanco/Gris",
       age: 2,
-      ownerName: 'Ana Martínez',
-      propertyNumber: 'B105',
-      hasVaccineRecord: true
-    }
+      ownerName: "Ana Martínez",
+      propertyNumber: "B105",
+      hasVaccineRecord: true,
+    },
   ]);
-  
-  const [_searchTerm, _setSearchTerm] = useState('');
+
+  const [_searchTerm, _setSearchTerm] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [currentPet, setCurrentPet] = useState<Pet | null>(null);
-  
+
   const [_formData, _setFormData] = useState<Partial<Pet>>({
-    name: '',
-    type: 'Perro',
-    breed: '',
-    color: '',
+    name: "",
+    type: "Perro",
+    breed: "",
+    color: "",
     age: 0,
-    ownerName: '',
-    propertyNumber: '',
-    hasVaccineRecord: false
+    ownerName: "",
+    propertyNumber: "",
+    hasVaccineRecord: false,
   });
 
   // Filtrar mascotas según término de búsqueda
@@ -75,17 +87,19 @@ export function PetsTable() {
     );
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value, type } = e.target as HTMLInputElement;
-    
+
     // Manejar diferentes tipos de input
-    if (type === 'checkbox') {
+    if (type === "checkbox") {
       const checked = (e.target as HTMLInputElement).checked;
-      setFormData(prev => ({ ...prev, [name]: checked }));
-    } else if (type === 'number') {
-      setFormData(prev => ({ ...prev, [name]: parseInt(value) || 0 }));
+      setFormData((prev) => ({ ...prev, [name]: checked }));
+    } else if (type === "number") {
+      setFormData((prev) => ({ ...prev, [name]: parseInt(value) || 0 }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -96,44 +110,44 @@ export function PetsTable() {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm('¿Está seguro de eliminar esta mascota?')) {
-      setPets(pets.filter(pet => pet.id !== id));
+    if (confirm("¿Está seguro de eliminar esta mascota?")) {
+      setPets(pets.filter((pet) => pet.id !== id));
     }
   };
 
   const handleAddNew = () => {
     setCurrentPet(null);
     setFormData({
-      name: '',
-      type: 'Perro',
-      breed: '',
-      color: '',
+      name: "",
+      type: "Perro",
+      breed: "",
+      color: "",
       age: 0,
-      ownerName: '',
-      propertyNumber: '',
-      hasVaccineRecord: false
+      ownerName: "",
+      propertyNumber: "",
+      hasVaccineRecord: false,
     });
     setModalOpen(true);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (currentPet) {
       // Actualizar mascota existente
-      const updatedPets = pets.map(pet => 
-        pet.id === currentPet.id ? { ...pet, ...formData } as Pet : pet
+      const updatedPets = pets.map((pet) =>
+        pet.id === currentPet.id ? ({ ...pet, ...formData } as Pet) : pet,
       );
       setPets(updatedPets);
     } else {
       // Añadir nueva mascota
       const newPet = {
-        id: Math.max(0, ...pets.map(p => p.id)) + 1,
-        ...formData
+        id: Math.max(0, ...pets.map((p) => p.id)) + 1,
+        ...formData,
       } as Pet;
       setPets([...pets, newPet]);
     }
-    
+
     setModalOpen(false);
   };
 
@@ -143,10 +157,12 @@ export function PetsTable() {
         <Input
           placeholder="Buscar por nombre, propietario, tipo..."
           value={searchTerm}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setSearchTerm(e.target.value)
+          }
           className="max-w-sm"
         />
-        <Button 
+        <Button
           onClick={handleAddNew}
           className="bg-green-600 hover:bg-green-700 text-white"
         >
@@ -237,10 +253,10 @@ export function PetsTable() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {currentPet ? 'Editar Mascota' : 'Nueva Mascota'}
+              {currentPet ? "Editar Mascota" : "Nueva Mascota"}
             </DialogTitle>
           </DialogHeader>
-          
+
           <form onSubmit={handleSubmit} className="space-y-4 mt-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -248,7 +264,7 @@ export function PetsTable() {
                 <Input
                   id="name"
                   name="name"
-                  value={formData.name || ''}
+                  value={formData.name || ""}
                   onChange={handleChange}
                   required
                 />
@@ -258,7 +274,7 @@ export function PetsTable() {
                 <select
                   id="type"
                   name="type"
-                  value={formData.type || ''}
+                  value={formData.type || ""}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
@@ -270,14 +286,14 @@ export function PetsTable() {
                 </select>
               </div>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="breed">Raza</Label>
                 <Input
                   id="breed"
                   name="breed"
-                  value={formData.breed || ''}
+                  value={formData.breed || ""}
                   onChange={handleChange}
                   required
                 />
@@ -287,13 +303,13 @@ export function PetsTable() {
                 <Input
                   id="color"
                   name="color"
-                  value={formData.color || ''}
+                  value={formData.color || ""}
                   onChange={handleChange}
                   required
                 />
               </div>
             </div>
-            
+
             <div>
               <Label htmlFor="age">Edad (años)</Label>
               <Input
@@ -307,39 +323,48 @@ export function PetsTable() {
                 required
               />
             </div>
-            
+
             <div>
               <Label htmlFor="ownerName">Propietario</Label>
               <Input
                 id="ownerName"
                 name="ownerName"
-                value={formData.ownerName || ''}
+                value={formData.ownerName || ""}
                 onChange={handleChange}
                 required
               />
             </div>
-            
+
             <div>
               <Label htmlFor="propertyNumber">Unidad</Label>
               <Input
                 id="propertyNumber"
                 name="propertyNumber"
-                value={formData.propertyNumber || ''}
+                value={formData.propertyNumber || ""}
                 onChange={handleChange}
                 required
               />
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="hasVaccineRecord"
                 name="hasVaccineRecord"
                 checked={formData.hasVaccineRecord || false}
-                onCheckedChange={(checked) => handleChange({ target: { name: 'hasVaccineRecord', checked: checked as boolean } } as React.ChangeEvent<HTMLInputElement>)}
+                onCheckedChange={(checked) =>
+                  handleChange({
+                    target: {
+                      name: "hasVaccineRecord",
+                      checked: checked as boolean,
+                    },
+                  } as React.ChangeEvent<HTMLInputElement>)
+                }
               />
-              <Label htmlFor="hasVaccineRecord">Carnet de vacunación al día</Label>
+              <Label htmlFor="hasVaccineRecord">
+                Carnet de vacunación al día
+              </Label>
             </div>
-            
+
             <div className="flex justify-end space-x-4 pt-4">
               <Button
                 type="button"
@@ -352,7 +377,7 @@ export function PetsTable() {
                 type="submit"
                 className="bg-indigo-600 hover:bg-indigo-700 text-white"
               >
-                {currentPet ? 'Actualizar' : 'Guardar'}
+                {currentPet ? "Actualizar" : "Guardar"}
               </Button>
             </div>
           </form>

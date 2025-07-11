@@ -1,19 +1,38 @@
 // src/components/security/DigitalMinutes.tsx
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { 
-  FileText, 
+import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  FileText,
   Plus,
   Search,
   Calendar,
@@ -28,10 +47,14 @@ import {
   Download,
   Shield,
   Camera,
-  Loader2
-} from 'lucide-react';
-import { useDigitalLogs, DigitalLog, CreateDigitalLogData } from '@/hooks/useDigitalLogs';
-import { useAuthStore } from '@/store/authStore';
+  Loader2,
+} from "lucide-react";
+import {
+  useDigitalLogs,
+  DigitalLog,
+  CreateDigitalLogData,
+} from "@/hooks/useDigitalLogs";
+import { useAuthStore } from "@/store/authStore";
 
 interface DigitalMinutesProps {
   complexId?: number;
@@ -52,32 +75,32 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
     reviewLog,
     setSelectedLog,
     clearError,
-    getLogStats
+    getLogStats,
   } = useDigitalLogs();
 
   // Estados locales
-  const [activeTab, setActiveTab] = useState('list');
+  const [activeTab, setActiveTab] = useState("list");
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [filters, setFilters] = useState({
-    startDate: '',
-    endDate: '',
-    logType: '',
-    priority: '',
-    status: '',
-    category: ''
+    startDate: "",
+    endDate: "",
+    logType: "",
+    priority: "",
+    status: "",
+    category: "",
   });
 
   // Formulario de creación
   const [formData, setFormData] = useState<CreateDigitalLogData>({
-    shiftDate: new Date().toISOString().split('T')[0],
+    shiftDate: new Date().toISOString().split("T")[0],
     shiftStart: new Date().toISOString(),
-    title: '',
-    description: '',
-    logType: 'GENERAL',
-    priority: 'NORMAL',
-    category: 'OTHER',
-    requiresFollowUp: false
+    title: "",
+    description: "",
+    logType: "GENERAL",
+    priority: "NORMAL",
+    category: "OTHER",
+    requiresFollowUp: false,
   });
 
   const handleCreateLog = async () => {
@@ -85,49 +108,52 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
     if (success) {
       setCreateDialogOpen(false);
       setFormData({
-        shiftDate: new Date().toISOString().split('T')[0],
+        shiftDate: new Date().toISOString().split("T")[0],
         shiftStart: new Date().toISOString(),
-        title: '',
-        description: '',
-        logType: 'GENERAL',
-        priority: 'NORMAL',
-        category: 'OTHER',
-        requiresFollowUp: false
+        title: "",
+        description: "",
+        logType: "GENERAL",
+        priority: "NORMAL",
+        category: "OTHER",
+        requiresFollowUp: false,
       });
     }
   };
 
   const handleSearch = () => {
     const searchFilters = Object.fromEntries(
-      Object.entries(filters).filter(([_, value]) => value !== '')
+      Object.entries(filters).filter(([_, value]) => value !== ""),
     );
     searchLogs(searchFilters);
   };
 
   const getPriorityColor = (priority: string) => {
     const colors = {
-      'LOW': 'bg-gray-100 text-gray-800',
-      'NORMAL': 'bg-blue-100 text-blue-800',
-      'HIGH': 'bg-orange-100 text-orange-800',
-      'URGENT': 'bg-red-100 text-red-800',
-      'CRITICAL': 'bg-red-600 text-white'
+      LOW: "bg-gray-100 text-gray-800",
+      NORMAL: "bg-blue-100 text-blue-800",
+      HIGH: "bg-orange-100 text-orange-800",
+      URGENT: "bg-red-100 text-red-800",
+      CRITICAL: "bg-red-600 text-white",
     };
     return colors[priority as keyof typeof colors] || colors.NORMAL;
   };
 
   const getStatusColor = (status: string) => {
     const colors = {
-      'OPEN': 'bg-green-100 text-green-800',
-      'IN_REVIEW': 'bg-yellow-100 text-yellow-800',
-      'RESOLVED': 'bg-blue-100 text-blue-800',
-      'CLOSED': 'bg-gray-100 text-gray-800',
-      'CANCELLED': 'bg-red-100 text-red-800'
+      OPEN: "bg-green-100 text-green-800",
+      IN_REVIEW: "bg-yellow-100 text-yellow-800",
+      RESOLVED: "bg-blue-100 text-blue-800",
+      CLOSED: "bg-gray-100 text-gray-800",
+      CANCELLED: "bg-red-100 text-red-800",
     };
     return colors[status as keyof typeof colors] || colors.OPEN;
   };
 
   // Verificar permisos
-  if (!user || !['ADMIN', 'COMPLEX_ADMIN', 'RECEPTION', 'GUARD'].includes(user.role)) {
+  if (
+    !user ||
+    !["ADMIN", "COMPLEX_ADMIN", "RECEPTION", "GUARD"].includes(user.role)
+  ) {
     return (
       <Card>
         <CardContent className="p-6">
@@ -155,7 +181,7 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
             Registro digital de novedades y turnos de guardia
           </p>
         </div>
-        
+
         <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button>
@@ -170,7 +196,7 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
                 Registra las novedades del turno de seguridad
               </DialogDescription>
             </DialogHeader>
-            
+
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -179,7 +205,9 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
                     id="shiftDate"
                     type="date"
                     value={formData.shiftDate}
-                    onChange={(e) => setFormData({ ...formData, shiftDate: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, shiftDate: e.target.value })
+                    }
                   />
                 </div>
                 <div>
@@ -188,7 +216,12 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
                     id="shiftStart"
                     type="datetime-local"
                     value={formData.shiftStart?.slice(0, 16)}
-                    onChange={(e) => setFormData({ ...formData, shiftStart: new Date(e.target.value).toISOString() })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        shiftStart: new Date(e.target.value).toISOString(),
+                      })
+                    }
                   />
                 </div>
               </div>
@@ -196,7 +229,12 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="logType">Tipo de Registro</Label>
-                  <Select value={formData.logType} onValueChange={(value: any) => setFormData({ ...formData, logType: value })}>
+                  <Select
+                    value={formData.logType}
+                    onValueChange={(value: any) =>
+                      setFormData({ ...formData, logType: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -208,13 +246,20 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
                       <SelectItem value="PATROL">Ronda</SelectItem>
                       <SelectItem value="HANDOVER">Entrega de Turno</SelectItem>
                       <SelectItem value="EMERGENCY">Emergencia</SelectItem>
-                      <SelectItem value="SYSTEM_CHECK">Verificación de Sistemas</SelectItem>
+                      <SelectItem value="SYSTEM_CHECK">
+                        Verificación de Sistemas
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <Label htmlFor="priority">Prioridad</Label>
-                  <Select value={formData.priority} onValueChange={(value: any) => setFormData({ ...formData, priority: value })}>
+                  <Select
+                    value={formData.priority}
+                    onValueChange={(value: any) =>
+                      setFormData({ ...formData, priority: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -234,7 +279,9 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
                 <Input
                   id="title"
                   value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
                   placeholder="Ej: Incidente en zona de parqueadero"
                 />
               </div>
@@ -244,7 +291,9 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
                 <Textarea
                   id="description"
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                   placeholder="Describe detalladamente la novedad, personas involucradas, acciones tomadas..."
                   className="min-h-24"
                 />
@@ -255,27 +304,42 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
                   <Label htmlFor="location">Ubicación</Label>
                   <Input
                     id="location"
-                    value={formData.location || ''}
-                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    value={formData.location || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, location: e.target.value })
+                    }
                     placeholder="Ej: Torre A - Primer piso"
                   />
                 </div>
                 <div>
                   <Label htmlFor="category">Categoría</Label>
-                  <Select value={formData.category} onValueChange={(value: any) => setFormData({ ...formData, category: value })}>
+                  <Select
+                    value={formData.category}
+                    onValueChange={(value: any) =>
+                      setFormData({ ...formData, category: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="ACCESS_CONTROL">Control de Acceso</SelectItem>
-                      <SelectItem value="VISITOR_MGMT">Gestión de Visitantes</SelectItem>
+                      <SelectItem value="ACCESS_CONTROL">
+                        Control de Acceso
+                      </SelectItem>
+                      <SelectItem value="VISITOR_MGMT">
+                        Gestión de Visitantes
+                      </SelectItem>
                       <SelectItem value="INCIDENT">Incidentes</SelectItem>
                       <SelectItem value="MAINTENANCE">Mantenimiento</SelectItem>
                       <SelectItem value="SAFETY">Seguridad</SelectItem>
                       <SelectItem value="EMERGENCY">Emergencias</SelectItem>
                       <SelectItem value="PATROL">Rondas</SelectItem>
-                      <SelectItem value="SYSTEM_ALERT">Alertas del Sistema</SelectItem>
-                      <SelectItem value="COMMUNICATION">Comunicaciones</SelectItem>
+                      <SelectItem value="SYSTEM_ALERT">
+                        Alertas del Sistema
+                      </SelectItem>
+                      <SelectItem value="COMMUNICATION">
+                        Comunicaciones
+                      </SelectItem>
                       <SelectItem value="OTHER">Otros</SelectItem>
                     </SelectContent>
                   </Select>
@@ -287,13 +351,18 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
                   type="checkbox"
                   id="requiresFollowUp"
                   checked={formData.requiresFollowUp}
-                  onChange={(e) => setFormData({ ...formData, requiresFollowUp: e.target.checked })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      requiresFollowUp: e.target.checked,
+                    })
+                  }
                 />
                 <Label htmlFor="requiresFollowUp">Requiere seguimiento</Label>
               </div>
 
-              <Button 
-                onClick={handleCreateLog} 
+              <Button
+                onClick={handleCreateLog}
                 disabled={loading || !formData.title || !formData.description}
                 className="w-full"
               >
@@ -358,10 +427,9 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
                               </Badge>
                             </div>
                             <p className="text-sm text-muted-foreground mb-2">
-                              {log.description.length > 100 
-                                ? `${log.description.substring(0, 100)}...` 
-                                : log.description
-                              }
+                              {log.description.length > 100
+                                ? `${log.description.substring(0, 100)}...`
+                                : log.description}
                             </p>
                             <div className="flex items-center gap-4 text-xs text-muted-foreground">
                               <span className="flex items-center gap-1">
@@ -376,12 +444,10 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
                                 <User className="h-3 w-3" />
                                 {log.guard.name}
                               </span>
-                              {log.location && (
-                                <span>{log.location}</span>
-                              )}
+                              {log.location && <span>{log.location}</span>}
                             </div>
                           </div>
-                          
+
                           <div className="flex items-center gap-2">
                             {log.requiresFollowUp && (
                               <AlertTriangle className="h-4 w-4 text-orange-600" />
@@ -389,9 +455,9 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
                             {log.supervisorReview && (
                               <CheckCircle className="h-4 w-4 text-green-600" />
                             )}
-                            
-                            <Button 
-                              size="sm" 
+
+                            <Button
+                              size="sm"
                               variant="outline"
                               onClick={() => {
                                 setSelectedLog(log);
@@ -400,19 +466,23 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
                             >
                               <Eye className="h-4 w-4" />
                             </Button>
-                            
-                            {['ADMIN', 'COMPLEX_ADMIN'].includes(user?.role || '') && (
+
+                            {["ADMIN", "COMPLEX_ADMIN"].includes(
+                              user?.role || "",
+                            ) && (
                               <>
-                                <Button 
-                                  size="sm" 
+                                <Button
+                                  size="sm"
                                   variant="outline"
-                                  onClick={() => reviewLog(log.id, 'Revisado por supervisor')}
+                                  onClick={() =>
+                                    reviewLog(log.id, "Revisado por supervisor")
+                                  }
                                 >
                                   <Shield className="h-4 w-4" />
                                 </Button>
-                                
-                                <Button 
-                                  size="sm" 
+
+                                <Button
+                                  size="sm"
                                   variant="outline"
                                   onClick={() => deleteLog(log.id)}
                                 >
@@ -425,24 +495,28 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
                       </CardContent>
                     </Card>
                   ))}
-                  
+
                   {/* Paginación */}
                   {pagination && pagination.totalPages > 1 && (
                     <div className="flex justify-center gap-2 mt-4">
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         disabled={!pagination.hasPrevious}
-                        onClick={() => searchLogs({ ...filters, page: pagination.page - 1 })}
+                        onClick={() =>
+                          searchLogs({ ...filters, page: pagination.page - 1 })
+                        }
                       >
                         Anterior
                       </Button>
                       <span className="flex items-center px-4">
                         Página {pagination.page} de {pagination.totalPages}
                       </span>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         disabled={!pagination.hasNext}
-                        onClick={() => searchLogs({ ...filters, page: pagination.page + 1 })}
+                        onClick={() =>
+                          searchLogs({ ...filters, page: pagination.page + 1 })
+                        }
                       >
                         Siguiente
                       </Button>
@@ -467,25 +541,35 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold">{digitalLogs.length}</div>
-                  <div className="text-sm text-muted-foreground">Total Minutas</div>
+                  <div className="text-sm text-muted-foreground">
+                    Total Minutas
+                  </div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-orange-600">
-                    {digitalLogs.filter(log => log.requiresFollowUp).length}
+                    {digitalLogs.filter((log) => log.requiresFollowUp).length}
                   </div>
-                  <div className="text-sm text-muted-foreground">Requieren Seguimiento</div>
+                  <div className="text-sm text-muted-foreground">
+                    Requieren Seguimiento
+                  </div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600">
-                    {digitalLogs.filter(log => log.supervisorReview).length}
+                    {digitalLogs.filter((log) => log.supervisorReview).length}
                   </div>
                   <div className="text-sm text-muted-foreground">Revisadas</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-red-600">
-                    {digitalLogs.filter(log => ['HIGH', 'URGENT', 'CRITICAL'].includes(log.priority)).length}
+                    {
+                      digitalLogs.filter((log) =>
+                        ["HIGH", "URGENT", "CRITICAL"].includes(log.priority),
+                      ).length
+                    }
                   </div>
-                  <div className="text-sm text-muted-foreground">Alta Prioridad</div>
+                  <div className="text-sm text-muted-foreground">
+                    Alta Prioridad
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -509,7 +593,9 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
                     id="startDate"
                     type="date"
                     value={filters.startDate}
-                    onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+                    onChange={(e) =>
+                      setFilters({ ...filters, startDate: e.target.value })
+                    }
                   />
                 </div>
                 <div>
@@ -518,7 +604,9 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
                     id="endDate"
                     type="date"
                     value={filters.endDate}
-                    onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+                    onChange={(e) =>
+                      setFilters({ ...filters, endDate: e.target.value })
+                    }
                   />
                 </div>
               </div>
@@ -526,7 +614,12 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="logType">Tipo</Label>
-                  <Select value={filters.logType} onValueChange={(value) => setFilters({ ...filters, logType: value })}>
+                  <Select
+                    value={filters.logType}
+                    onValueChange={(value) =>
+                      setFilters({ ...filters, logType: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Todos los tipos" />
                     </SelectTrigger>
@@ -541,7 +634,12 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
                 </div>
                 <div>
                   <Label htmlFor="priority">Prioridad</Label>
-                  <Select value={filters.priority} onValueChange={(value) => setFilters({ ...filters, priority: value })}>
+                  <Select
+                    value={filters.priority}
+                    onValueChange={(value) =>
+                      setFilters({ ...filters, priority: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Todas las prioridades" />
                     </SelectTrigger>
@@ -584,17 +682,17 @@ export function DigitalMinutes({ complexId }: DigitalMinutesProps) {
                   <p>{selectedLog.guard.name}</p>
                 </div>
               </div>
-              
+
               <div>
                 <Label>Título</Label>
                 <p className="font-medium">{selectedLog.title}</p>
               </div>
-              
+
               <div>
                 <Label>Descripción</Label>
                 <p>{selectedLog.description}</p>
               </div>
-              
+
               <div className="flex gap-2">
                 <Badge className={getPriorityColor(selectedLog.priority)}>
                   {selectedLog.priority}

@@ -1,16 +1,34 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { useAuthStore } from '@/store/authStore';
-import { Loader2, PlusCircle, Edit, Trash2 } from 'lucide-react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/components/ui/use-toast';
-import { getPets, createPet, updatePet, deletePet } from '@/services/petService';
+import React, { useState, useEffect, useCallback } from "react";
+import { Badge } from "@/components/ui/badge";
+import { useAuthStore } from "@/store/authStore";
+import { Loader2, PlusCircle, Edit, Trash2 } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  getPets,
+  createPet,
+  updatePet,
+  deletePet,
+} from "@/services/petService";
 
 interface Pet {
   id: number;
@@ -31,10 +49,10 @@ export default function PetsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPet, setCurrentPet] = useState<Pet | null>(null);
   const [formData, setFormData] = useState({
-    name: '',
-    species: '',
-    breed: '',
-    ownerName: '',
+    name: "",
+    species: "",
+    breed: "",
+    ownerName: "",
     propertyId: 0,
     isActive: true,
   });
@@ -45,11 +63,11 @@ export default function PetsPage() {
       const data = await getPets();
       setPets(data);
     } catch (error) {
-      console.error('Error fetching pets:', error);
+      console.error("Error fetching pets:", error);
       toast({
-        title: 'Error',
-        description: 'No se pudieron cargar las mascotas.',
-        variant: 'destructive',
+        title: "Error",
+        description: "No se pudieron cargar las mascotas.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -62,17 +80,19 @@ export default function PetsPage() {
     }
   }, [authLoading, user, fetchPets]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value, type } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'number' ? parseInt(value) : value,
+      [name]: type === "number" ? parseInt(value) : value,
     }));
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: checked,
     }));
@@ -81,10 +101,10 @@ export default function PetsPage() {
   const handleAddPet = () => {
     setCurrentPet(null);
     setFormData({
-      name: '',
-      species: '',
-      breed: '',
-      ownerName: '',
+      name: "",
+      species: "",
+      breed: "",
+      ownerName: "",
       propertyId: 0,
       isActive: true,
     });
@@ -110,43 +130,43 @@ export default function PetsPage() {
       if (currentPet) {
         await updatePet(currentPet.id, formData);
         toast({
-          title: 'Éxito',
-          description: 'Mascota actualizada correctamente.',
+          title: "Éxito",
+          description: "Mascota actualizada correctamente.",
         });
       } else {
         await createPet(formData);
         toast({
-          title: 'Éxito',
-          description: 'Mascota creada correctamente.',
+          title: "Éxito",
+          description: "Mascota creada correctamente.",
         });
       }
       setIsModalOpen(false);
       fetchPets();
     } catch (error) {
-      console.error('Error saving pet:', error);
+      console.error("Error saving pet:", error);
       toast({
-        title: 'Error',
-        description: 'Error al guardar la mascota.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Error al guardar la mascota.",
+        variant: "destructive",
       });
     }
   };
 
   const handleDeletePet = async (id: number) => {
-    if (confirm('¿Estás seguro de que quieres eliminar esta mascota?')) {
+    if (confirm("¿Estás seguro de que quieres eliminar esta mascota?")) {
       try {
         await deletePet(id);
         toast({
-          title: 'Éxito',
-          description: 'Mascota eliminada correctamente.',
+          title: "Éxito",
+          description: "Mascota eliminada correctamente.",
         });
         fetchPets();
       } catch (error) {
-        console.error('Error deleting pet:', error);
+        console.error("Error deleting pet:", error);
         toast({
-          title: 'Error',
-          description: 'Error al eliminar la mascota.',
-          variant: 'destructive',
+          title: "Error",
+          description: "Error al eliminar la mascota.",
+          variant: "destructive",
         });
       }
     }
@@ -160,12 +180,16 @@ export default function PetsPage() {
     );
   }
 
-  if (!user || (user.role !== 'ADMIN' && user.role !== 'COMPLEX_ADMIN')) {
+  if (!user || (user.role !== "ADMIN" && user.role !== "COMPLEX_ADMIN")) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Acceso Denegado</h1>
-          <p className="text-gray-600">No tienes permisos para acceder a esta página.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Acceso Denegado
+          </h1>
+          <p className="text-gray-600">
+            No tienes permisos para acceder a esta página.
+          </p>
         </div>
       </div>
     );
@@ -173,8 +197,10 @@ export default function PetsPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Gestión de Mascotas</h1>
-      
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        Gestión de Mascotas
+      </h1>
+
       <div className="flex justify-end mb-4">
         <Button onClick={handleAddPet}>
           <PlusCircle className="mr-2 h-4 w-4" /> Añadir Mascota
@@ -203,13 +229,26 @@ export default function PetsPage() {
                 <TableCell>{pet.ownerName}</TableCell>
                 <TableCell>{pet.unitNumber}</TableCell>
                 <TableCell>
-                  {pet.isActive ? <Badge variant="default">Sí</Badge> : <Badge variant="destructive">No</Badge>}
+                  {pet.isActive ? (
+                    <Badge variant="default">Sí</Badge>
+                  ) : (
+                    <Badge variant="destructive">No</Badge>
+                  )}
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="sm" onClick={() => handleEditPet(pet)} className="mr-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEditPet(pet)}
+                    className="mr-2"
+                  >
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => handleDeletePet(pet.id)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDeletePet(pet.id)}
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </TableCell>
@@ -222,35 +261,91 @@ export default function PetsPage() {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>{currentPet ? 'Editar Mascota' : 'Añadir Nueva Mascota'}</DialogTitle>
+            <DialogTitle>
+              {currentPet ? "Editar Mascota" : "Añadir Nueva Mascota"}
+            </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">Nombre</Label>
-              <Input id="name" name="name" value={formData.name} onChange={handleInputChange} className="col-span-3" required />
+              <Label htmlFor="name" className="text-right">
+                Nombre
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                className="col-span-3"
+                required
+              />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="species" className="text-right">Especie</Label>
-              <Input id="species" name="species" value={formData.species} onChange={handleInputChange} className="col-span-3" required />
+              <Label htmlFor="species" className="text-right">
+                Especie
+              </Label>
+              <Input
+                id="species"
+                name="species"
+                value={formData.species}
+                onChange={handleInputChange}
+                className="col-span-3"
+                required
+              />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="breed" className="text-right">Raza</Label>
-              <Input id="breed" name="breed" value={formData.breed} onChange={handleInputChange} className="col-span-3" required />
+              <Label htmlFor="breed" className="text-right">
+                Raza
+              </Label>
+              <Input
+                id="breed"
+                name="breed"
+                value={formData.breed}
+                onChange={handleInputChange}
+                className="col-span-3"
+                required
+              />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="ownerName" className="text-right">Nombre Propietario</Label>
-              <Input id="ownerName" name="ownerName" value={formData.ownerName} onChange={handleInputChange} className="col-span-3" required />
+              <Label htmlFor="ownerName" className="text-right">
+                Nombre Propietario
+              </Label>
+              <Input
+                id="ownerName"
+                name="ownerName"
+                value={formData.ownerName}
+                onChange={handleInputChange}
+                className="col-span-3"
+                required
+              />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="propertyId" className="text-right">ID Propiedad</Label>
-              <Input id="propertyId" name="propertyId" type="number" value={formData.propertyId} onChange={handleInputChange} className="col-span-3" required />
+              <Label htmlFor="propertyId" className="text-right">
+                ID Propiedad
+              </Label>
+              <Input
+                id="propertyId"
+                name="propertyId"
+                type="number"
+                value={formData.propertyId}
+                onChange={handleInputChange}
+                className="col-span-3"
+                required
+              />
             </div>
             <div className="flex items-center space-x-2">
-              <Input id="isActive" name="isActive" type="checkbox" checked={formData.isActive} onChange={handleCheckboxChange} />
+              <Input
+                id="isActive"
+                name="isActive"
+                type="checkbox"
+                checked={formData.isActive}
+                onChange={handleCheckboxChange}
+              />
               <Label htmlFor="isActive">Activa</Label>
             </div>
             <DialogFooter>
-              <Button type="submit">{currentPet ? 'Guardar Cambios' : 'Añadir Mascota'}</Button>
+              <Button type="submit">
+                {currentPet ? "Guardar Cambios" : "Añadir Mascota"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>

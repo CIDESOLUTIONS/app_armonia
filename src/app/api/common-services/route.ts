@@ -1,6 +1,6 @@
 // C:\Users\meciz\Documents\armonia\frontend\src\app\api\common-services\route.ts
-import { NextResponse } from 'next/server';
-import { getPrisma } from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import { getPrisma } from "@/lib/prisma";
 
 const prisma = getPrisma();
 
@@ -11,16 +11,21 @@ export async function GET() {
     });
     return NextResponse.json(services);
   } catch (error) {
-    console.error('Error fetching services:', error);
-    return NextResponse.json({ error: 'Error al cargar servicios' }, { status: 500 });
+    console.error("Error fetching services:", error);
+    return NextResponse.json(
+      { error: "Error al cargar servicios" },
+      { status: 500 },
+    );
   }
 }
 
 export async function POST(request) {
   try {
     const _data = await request.json();
-    const complex = await prisma.residentialComplex.findUnique({ where: { id: data.complexId } });
-    if (!complex) throw new Error('Conjunto residencial no encontrado');
+    const complex = await prisma.residentialComplex.findUnique({
+      where: { id: data.complexId },
+    });
+    if (!complex) throw new Error("Conjunto residencial no encontrado");
     const service = await prisma.service.create({
       data: {
         name: data.name,
@@ -35,8 +40,11 @@ export async function POST(request) {
     });
     return NextResponse.json(service);
   } catch (error) {
-    console.error('Error creating service:', error);
-    return NextResponse.json({ error: error.message || 'Error al crear servicio' }, { status: 500 });
+    console.error("Error creating service:", error);
+    return NextResponse.json(
+      { error: error.message || "Error al crear servicio" },
+      { status: 500 },
+    );
   }
 }
 
@@ -44,8 +52,10 @@ export async function PUT(request) {
   try {
     const _data = await request.json();
     const { id } = data;
-    const complex = await prisma.residentialComplex.findUnique({ where: { id: data.complexId } });
-    if (!complex) throw new Error('Conjunto residencial no encontrado');
+    const complex = await prisma.residentialComplex.findUnique({
+      where: { id: data.complexId },
+    });
+    if (!complex) throw new Error("Conjunto residencial no encontrado");
     const service = await prisma.service.update({
       where: { id: parseInt(id) },
       data: {
@@ -61,7 +71,10 @@ export async function PUT(request) {
     });
     return NextResponse.json(service);
   } catch (error) {
-    console.error('Error updating service:', error);
-    return NextResponse.json({ error: error.message || 'Error al actualizar servicio' }, { status: 500 });
+    console.error("Error updating service:", error);
+    return NextResponse.json(
+      { error: error.message || "Error al actualizar servicio" },
+      { status: 500 },
+    );
   }
 }

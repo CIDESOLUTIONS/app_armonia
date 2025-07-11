@@ -1,13 +1,22 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getPrisma } from '@/lib/prisma';
-import { authMiddleware } from '@/lib/auth';
-import { z } from 'zod';
-import { ServerLogger } from '@/lib/logging/server-logger';
-import { UpdateAssemblySchema, DeleteAssemblySchema } from '@/validators/assemblies/assemblies.validator';
+import { NextRequest, NextResponse } from "next/server";
+import { getPrisma } from "@/lib/prisma";
+import { authMiddleware } from "@/lib/auth";
+import { z } from "zod";
+import { ServerLogger } from "@/lib/logging/server-logger";
+import {
+  UpdateAssemblySchema,
+  DeleteAssemblySchema,
+} from "@/validators/assemblies/assemblies.validator";
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
-    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN']);
+    const authResult = await authMiddleware(request, [
+      "ADMIN",
+      "COMPLEX_ADMIN",
+    ]);
     if (!authResult.proceed) {
       return authResult.response;
     }
@@ -23,7 +32,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       data: {
         title: validatedData.title,
         description: validatedData.description,
-        scheduledDate: validatedData.scheduledDate ? new Date(validatedData.scheduledDate) : undefined,
+        scheduledDate: validatedData.scheduledDate
+          ? new Date(validatedData.scheduledDate)
+          : undefined,
         location: validatedData.location,
         type: validatedData.type,
         agenda: validatedData.agenda,
@@ -31,20 +42,31 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       },
     });
 
-    ServerLogger.info(`[ASSEMBLIES] Asamblea actualizada: ${updatedAssembly.id} por ${payload.email}`);
+    ServerLogger.info(
+      `[ASSEMBLIES] Asamblea actualizada: ${updatedAssembly.id} por ${payload.email}`,
+    );
     return NextResponse.json(updatedAssembly, { status: 200 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ message: 'Error de validación', errors: error.errors }, { status: 400 });
+      return NextResponse.json(
+        { message: "Error de validación", errors: error.errors },
+        { status: 400 },
+      );
     }
-    ServerLogger.error('[ASSEMBLIES PUT] Error:', error);
-    return NextResponse.json({ message: 'Error interno' }, { status: 500 });
+    ServerLogger.error("[ASSEMBLIES PUT] Error:", error);
+    return NextResponse.json({ message: "Error interno" }, { status: 500 });
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
-    const authResult = await authMiddleware(request, ['ADMIN', 'COMPLEX_ADMIN']);
+    const authResult = await authMiddleware(request, [
+      "ADMIN",
+      "COMPLEX_ADMIN",
+    ]);
     if (!authResult.proceed) {
       return authResult.response;
     }
@@ -57,10 +79,15 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       where: { id: id, complexId: payload.complexId },
     });
 
-    ServerLogger.info(`[ASSEMBLIES] Asamblea eliminada: ${id} por ${payload.email}`);
-    return NextResponse.json({ message: 'Asamblea eliminada exitosamente' }, { status: 200 });
+    ServerLogger.info(
+      `[ASSEMBLIES] Asamblea eliminada: ${id} por ${payload.email}`,
+    );
+    return NextResponse.json(
+      { message: "Asamblea eliminada exitosamente" },
+      { status: 200 },
+    );
   } catch (error) {
-    ServerLogger.error('[ASSEMBLIES DELETE] Error:', error);
-    return NextResponse.json({ message: 'Error interno' }, { status: 500 });
+    ServerLogger.error("[ASSEMBLIES DELETE] Error:", error);
+    return NextResponse.json({ message: "Error interno" }, { status: 500 });
   }
 }

@@ -1,45 +1,75 @@
 // src/components/pqr/PQRList.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue,  } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { PlusCircle, Search, SlidersHorizontal, X, RefreshCw } from 'lucide-react';
-import { Pagination } from '@/components/ui/pagination/pagination';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow,  } from '@/components/ui/table';
-import { formatDistanceToNow } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { usePQR } from '@/hooks/usePQR';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  PlusCircle,
+  Search,
+  SlidersHorizontal,
+  X,
+  RefreshCw,
+} from "lucide-react";
+import { Pagination } from "@/components/ui/pagination/pagination";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { formatDistanceToNow } from "date-fns";
+import { es } from "date-fns/locale";
+import { usePQR } from "@/hooks/usePQR";
 
 // PQR Enums
 enum PQRStatus {
-  OPEN = 'OPEN',
-  IN_PROGRESS = 'IN_PROGRESS',
-  RESOLVED = 'RESOLVED',
-  CLOSED = 'CLOSED',
-  REJECTED = 'REJECTED'
+  OPEN = "OPEN",
+  IN_PROGRESS = "IN_PROGRESS",
+  RESOLVED = "RESOLVED",
+  CLOSED = "CLOSED",
+  REJECTED = "REJECTED",
 }
 
 enum PQRPriority {
-  LOW = 'LOW',
-  MEDIUM = 'MEDIUM',
-  HIGH = 'HIGH',
-  URGENT = 'URGENT'
+  LOW = "LOW",
+  MEDIUM = "MEDIUM",
+  HIGH = "HIGH",
+  URGENT = "URGENT",
 }
 
 enum PQRType {
-  PETITION = 'PETITION',
-  COMPLAINT = 'COMPLAINT',
-  CLAIM = 'CLAIM'
+  PETITION = "PETITION",
+  COMPLAINT = "COMPLAINT",
+  CLAIM = "CLAIM",
 }
-import { PQRDetailDialog } from './PQRDetailDialog';
-import { CreatePQRForm } from './CreatePQRForm';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ErrorMessage } from '@/components/ui/error/ErrorBoundary';
+import { PQRDetailDialog } from "./PQRDetailDialog";
+import { CreatePQRForm } from "./CreatePQRForm";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ErrorMessage } from "@/components/ui/error/ErrorBoundary";
 
 interface PQRListProps {
   initialLimit?: number;
@@ -66,37 +96,30 @@ export function PQRList({
     search: "",
     showFilters: false,
   });
-  
+
   // Hook PQR con filtros
-  const {
-    pqrs,
-    loading,
-    error,
-    pagination,
-    refresh,
-    loadPage,
-    createPQR,
-  } = usePQR({
-    page: 1,
-    limit: initialLimit,
-    status: filters.status || undefined,
-    autoLoad: true,
-  });
-  
+  const { pqrs, loading, error, pagination, refresh, loadPage, createPQR } =
+    usePQR({
+      page: 1,
+      limit: initialLimit,
+      status: filters.status || undefined,
+      autoLoad: true,
+    });
+
   // Estados para diálogos
   const [selectedPQR, setSelectedPQR] = useState<number | null>(null);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  
+
   // Handle filter changes with debouncing
   useEffect(() => {
     const handler = setTimeout(() => {
       refresh();
     }, 300);
-    
+
     return () => clearTimeout(handler);
   }, [filters.status, filters.priority, filters.type, filters.search, refresh]);
-  
+
   // Función para obtener el color de badge según el estado
   const getStatusColor = (status: PQRStatus) => {
     switch (status) {
@@ -114,7 +137,7 @@ export function PQRList({
         return "bg-gray-400";
     }
   };
-  
+
   // Función para obtener el texto del estado
   const getStatusText = (status: PQRStatus) => {
     switch (status) {
@@ -132,7 +155,7 @@ export function PQRList({
         return status;
     }
   };
-  
+
   // Función para obtener el texto de la prioridad
   const getPriorityText = (priority: PQRPriority) => {
     switch (priority) {
@@ -148,7 +171,7 @@ export function PQRList({
         return priority;
     }
   };
-  
+
   // Función para obtener el color de la prioridad
   const getPriorityColor = (priority: PQRPriority) => {
     switch (priority) {
@@ -164,7 +187,7 @@ export function PQRList({
         return "bg-gray-400";
     }
   };
-  
+
   // Función para obtener el texto del tipo
   const getTypeText = (type: PQRType) => {
     switch (type) {
@@ -178,18 +201,18 @@ export function PQRList({
         return type;
     }
   };
-  
+
   // Función para abrir el detalle de un PQR
   const handleViewDetail = (pqrId: number) => {
     setSelectedPQR(pqrId);
     setShowDetailDialog(true);
   };
-  
+
   // Función para manejar cambio de página
   const handlePageChange = (page: number) => {
     loadPage(page);
   };
-  
+
   // Función para limpiar los filtros
   const clearFilters = () => {
     setFilters({
@@ -200,7 +223,7 @@ export function PQRList({
       showFilters: false,
     });
   };
-  
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -211,8 +234,8 @@ export function PQRList({
           </div>
           <div className="flex items-center gap-2 self-end">
             {showCreate && (
-              <Button 
-                variant="default" 
+              <Button
+                variant="default"
                 className="flex items-center gap-1"
                 onClick={() => setShowCreateDialog(true)}
               >
@@ -224,7 +247,12 @@ export function PQRList({
               <Button
                 variant={filters.showFilters ? "default" : "outline"}
                 className="flex items-center gap-1"
-                onClick={() => setFilters(prev => ({ ...prev, showFilters: !prev.showFilters }))}
+                onClick={() =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    showFilters: !prev.showFilters,
+                  }))
+                }
               >
                 <SlidersHorizontal className="h-4 w-4" />
                 {filters.showFilters ? "Ocultar filtros" : "Filtros"}
@@ -240,7 +268,7 @@ export function PQRList({
             </Button>
           </div>
         </div>
-        
+
         {/* Sección de filtros */}
         {showFilters && filters.showFilters && (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
@@ -248,7 +276,9 @@ export function PQRList({
               <Label htmlFor="filter-status">Estado</Label>
               <Select
                 value={filters.status}
-                onValueChange={(value) => setFilters(prev => ({ ...prev, status: value }))}
+                onValueChange={(value) =>
+                  setFilters((prev) => ({ ...prev, status: value }))
+                }
               >
                 <SelectTrigger id="filter-status">
                   <SelectValue placeholder="Todos los estados" />
@@ -256,19 +286,23 @@ export function PQRList({
                 <SelectContent>
                   <SelectItem value="">Todos los estados</SelectItem>
                   <SelectItem value={PQRStatus.PENDING}>Pendiente</SelectItem>
-                  <SelectItem value={PQRStatus.IN_PROGRESS}>En proceso</SelectItem>
+                  <SelectItem value={PQRStatus.IN_PROGRESS}>
+                    En proceso
+                  </SelectItem>
                   <SelectItem value={PQRStatus.RESOLVED}>Resuelto</SelectItem>
                   <SelectItem value={PQRStatus.CLOSED}>Cerrado</SelectItem>
                   <SelectItem value={PQRStatus.CANCELLED}>Cancelado</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label htmlFor="filter-priority">Prioridad</Label>
               <Select
                 value={filters.priority}
-                onValueChange={(value) => setFilters(prev => ({ ...prev, priority: value }))}
+                onValueChange={(value) =>
+                  setFilters((prev) => ({ ...prev, priority: value }))
+                }
               >
                 <SelectTrigger id="filter-priority">
                   <SelectValue placeholder="Todas las prioridades" />
@@ -282,12 +316,14 @@ export function PQRList({
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label htmlFor="filter-type">Tipo</Label>
               <Select
                 value={filters.type}
-                onValueChange={(value) => setFilters(prev => ({ ...prev, type: value }))}
+                onValueChange={(value) =>
+                  setFilters((prev) => ({ ...prev, type: value }))
+                }
               >
                 <SelectTrigger id="filter-type">
                   <SelectValue placeholder="Todos los tipos" />
@@ -300,7 +336,7 @@ export function PQRList({
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label htmlFor="filter-search">Buscar</Label>
               <div className="relative">
@@ -310,12 +346,16 @@ export function PQRList({
                   placeholder="Buscar por título o descripción..."
                   className="pl-8"
                   value={filters.search}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setFilters((prev) => ({ ...prev, search: e.target.value }))
+                  }
                 />
                 {filters.search && (
                   <button
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    onClick={() => setFilters(prev => ({ ...prev, search: "" }))}
+                    onClick={() =>
+                      setFilters((prev) => ({ ...prev, search: "" }))
+                    }
                     aria-label="Borrar búsqueda"
                   >
                     <X className="h-4 w-4" />
@@ -323,7 +363,7 @@ export function PQRList({
                 )}
               </div>
             </div>
-            
+
             {/* Botón para limpiar filtros */}
             <div className="col-span-full flex justify-end">
               <Button
@@ -339,16 +379,11 @@ export function PQRList({
           </div>
         )}
       </CardHeader>
-      
+
       <CardContent>
         {/* Mostrar error si existe */}
-        {error && (
-          <ErrorMessage 
-            message={error} 
-            retry={() => refresh()} 
-          />
-        )}
-        
+        {error && <ErrorMessage message={error} retry={() => refresh()} />}
+
         {/* Tabla de PQRs */}
         <div className="relative overflow-x-auto">
           <Table>
@@ -378,7 +413,9 @@ export function PQRList({
                 // Fila de no resultados
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-10">
-                    <p className="text-gray-500">No se encontraron solicitudes</p>
+                    <p className="text-gray-500">
+                      No se encontraron solicitudes
+                    </p>
                     <Button
                       variant="outline"
                       size="sm"
@@ -392,18 +429,32 @@ export function PQRList({
               ) : (
                 // Filas de datos
                 pqrs.map((item) => (
-                  <TableRow key={item.id} className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900">
-                    <TableCell onClick={() => handleViewDetail(item.id)}>{item.id}</TableCell>
-                    <TableCell onClick={() => handleViewDetail(item.id)} className="font-medium">
+                  <TableRow
+                    key={item.id}
+                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900"
+                  >
+                    <TableCell onClick={() => handleViewDetail(item.id)}>
+                      {item.id}
+                    </TableCell>
+                    <TableCell
+                      onClick={() => handleViewDetail(item.id)}
+                      className="font-medium"
+                    >
                       {item.title}
                     </TableCell>
                     <TableCell onClick={() => handleViewDetail(item.id)}>
-                      <Badge variant="outline" className={getStatusColor(item.status)}>
+                      <Badge
+                        variant="outline"
+                        className={getStatusColor(item.status)}
+                      >
                         {getStatusText(item.status)}
                       </Badge>
                     </TableCell>
                     <TableCell onClick={() => handleViewDetail(item.id)}>
-                      <Badge variant="outline" className={getPriorityColor(item.priority)}>
+                      <Badge
+                        variant="outline"
+                        className={getPriorityColor(item.priority)}
+                      >
                         {getPriorityText(item.priority)}
                       </Badge>
                     </TableCell>
@@ -411,9 +462,9 @@ export function PQRList({
                       {getTypeText(item.type)}
                     </TableCell>
                     <TableCell onClick={() => handleViewDetail(item.id)}>
-                      {formatDistanceToNow(new Date(item.createdAt), { 
+                      {formatDistanceToNow(new Date(item.createdAt), {
                         addSuffix: true,
-                        locale: es
+                        locale: es,
                       })}
                     </TableCell>
                     <TableCell className="text-right">
@@ -431,7 +482,7 @@ export function PQRList({
             </TableBody>
           </Table>
         </div>
-        
+
         {/* Paginación */}
         {showPagination && pqrs.length > 0 && pagination && (
           <div className="mt-4">
@@ -443,7 +494,7 @@ export function PQRList({
           </div>
         )}
       </CardContent>
-      
+
       {/* Diálogo de detalle */}
       <PQRDetailDialog
         isOpen={showDetailDialog}
@@ -451,7 +502,7 @@ export function PQRList({
         pqrId={selectedPQR}
         onStatusChange={() => refresh()}
       />
-      
+
       {/* Diálogo para crear nueva solicitud */}
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent className="max-w-2xl">

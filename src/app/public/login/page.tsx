@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useAuthStore } from '@/store/authStore';
-import { ROUTES } from '@/constants/routes';
-import { AlertCircle, Building, Shield, ArrowLeft, User } from 'lucide-react';
-import { FormField } from '@/components/common/FormField';
+import React, { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuthStore } from "@/store/authStore";
+import { ROUTES } from "@/constants/routes";
+import { AlertCircle, Building, Shield, ArrowLeft, User } from "lucide-react";
+import { FormField } from "@/components/common/FormField";
 
 interface PortalInfo {
-  type: 'admin' | 'resident' | 'reception' | null;
+  type: "admin" | "resident" | "reception" | null;
   title: string;
   description: string;
   icon: React.ReactNode;
@@ -23,59 +23,64 @@ interface PortalInfo {
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const portalParam = searchParams.get('portal') as 'admin' | 'resident' | 'reception' | null;
-  
+  const portalParam = searchParams.get("portal") as
+    | "admin"
+    | "resident"
+    | "reception"
+    | null;
+
   const { login } = useAuthStore();
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [language, setLanguage] = useState('Español'); // Por defecto en español
+  const [language, setLanguage] = useState("Español"); // Por defecto en español
 
   // Obtener información del portal
   const getPortalInfo = (): PortalInfo => {
     switch (portalParam) {
-      case 'admin':
+      case "admin":
         return {
-          type: 'admin',
-          title: 'Portal Administración',
-          description: 'Acceda al panel de gestión del conjunto residencial',
+          type: "admin",
+          title: "Portal Administración",
+          description: "Acceda al panel de gestión del conjunto residencial",
           icon: <Building className="h-6 w-6" />,
-          color: 'bg-indigo-600',
-          textColor: 'text-indigo-600',
-          redirectTo: ROUTES.DASHBOARD
+          color: "bg-indigo-600",
+          textColor: "text-indigo-600",
+          redirectTo: ROUTES.DASHBOARD,
         };
-      case 'resident':
+      case "resident":
         return {
-          type: 'resident',
-          title: 'Portal Residentes',
-          description: 'Acceda a su información como residente del conjunto',
+          type: "resident",
+          title: "Portal Residentes",
+          description: "Acceda a su información como residente del conjunto",
           icon: <User className="h-6 w-6" />,
-          color: 'bg-green-600',
-          textColor: 'text-green-600',
-          redirectTo: ROUTES.RESIDENT_DASHBOARD
+          color: "bg-green-600",
+          textColor: "text-green-600",
+          redirectTo: ROUTES.RESIDENT_DASHBOARD,
         };
-      case 'reception':
+      case "reception":
         return {
-          type: 'reception',
-          title: 'Portal Recepción',
-          description: 'Acceda al sistema de control de acceso y correspondencia',
+          type: "reception",
+          title: "Portal Recepción",
+          description:
+            "Acceda al sistema de control de acceso y correspondencia",
           icon: <Shield className="h-6 w-6" />,
-          color: 'bg-amber-600',
-          textColor: 'text-amber-600',
-          redirectTo: ROUTES.RECEPTION_DASHBOARD
+          color: "bg-amber-600",
+          textColor: "text-amber-600",
+          redirectTo: ROUTES.RECEPTION_DASHBOARD,
         };
       default:
         return {
           type: null,
-          title: 'Iniciar Sesión',
-          description: 'Acceda a su cuenta en la plataforma Armonía',
+          title: "Iniciar Sesión",
+          description: "Acceda a su cuenta en la plataforma Armonía",
           icon: <Building className="h-6 w-6" />,
-          color: 'bg-indigo-600',
-          textColor: 'text-indigo-600',
-          redirectTo: ROUTES.DASHBOARD
+          color: "bg-indigo-600",
+          textColor: "text-indigo-600",
+          redirectTo: ROUTES.DASHBOARD,
         };
     }
   };
@@ -86,26 +91,30 @@ export default function LoginPage() {
     e.preventDefault();
 
     if (!formData.email || !formData.password) {
-      setError(language === 'Español'
-        ? 'Por favor, completa todos los campos.'
-        : 'Please fill in all fields.');
+      setError(
+        language === "Español"
+          ? "Por favor, completa todos los campos."
+          : "Please fill in all fields.",
+      );
       return;
     }
 
     try {
       setLoading(true);
       setError(null);
-      console.log('[LoginPage] Intentando iniciar sesión para:', formData.email);
-      
+      console.log(
+        "[LoginPage] Intentando iniciar sesión para:",
+        formData.email,
+      );
+
       await login(formData.email, formData.password);
-      
-      
-      
     } catch (err: unknown) {
-      console.error('[LoginPage] Error de autenticación:', err);
-      setError(language === 'Español'
-        ? 'Credenciales inválidas. Por favor, verifica tu email y contraseña.'
-        : 'Invalid credentials. Please verify your email and password.');
+      console.error("[LoginPage] Error de autenticación:", err);
+      setError(
+        language === "Español"
+          ? "Credenciales inválidas. Por favor, verifica tu email y contraseña."
+          : "Invalid credentials. Please verify your email and password.",
+      );
     } finally {
       setLoading(false);
     }
@@ -115,8 +124,8 @@ export default function LoginPage() {
     <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
       <div className="w-full max-w-md">
         <div className="mb-4 flex">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={() => router.push(ROUTES.PORTAL_SELECTOR)}
             className={`${portalInfo.textColor}`}
           >
@@ -124,7 +133,7 @@ export default function LoginPage() {
             Volver al selector
           </Button>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
           <div className={`${portalInfo.color} p-6 text-white`}>
             <div className="flex items-center mb-4">
@@ -137,27 +146,37 @@ export default function LoginPage() {
           <div className="p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <FormField
-                label={language === 'Español' ? 'Email' : 'Email'}
+                label={language === "Español" ? "Email" : "Email"}
                 id="email"
                 name="email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 required
                 disabled={loading}
-                placeholder={language === 'Español' ? 'Tu correo electrónico' : 'Your email'}
+                placeholder={
+                  language === "Español"
+                    ? "Tu correo electrónico"
+                    : "Your email"
+                }
               />
 
               <FormField
-                label={language === 'Español' ? 'Contraseña' : 'Password'}
+                label={language === "Español" ? "Contraseña" : "Password"}
                 id="password"
                 name="password"
                 type="password"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
                 required
                 disabled={loading}
-                placeholder={language === 'Español' ? 'Tu contraseña' : 'Your password'}
+                placeholder={
+                  language === "Español" ? "Tu contraseña" : "Your password"
+                }
               />
 
               {error && (
@@ -173,8 +192,12 @@ export default function LoginPage() {
                 disabled={loading}
               >
                 {loading
-                  ? (language === 'Español' ? 'Iniciando sesión...' : 'Logging in...')
-                  : (language === 'Español' ? 'Iniciar Sesión' : 'Log In')}
+                  ? language === "Español"
+                    ? "Iniciando sesión..."
+                    : "Logging in..."
+                  : language === "Español"
+                    ? "Iniciar Sesión"
+                    : "Log In"}
               </Button>
 
               <div className="flex justify-between text-sm">
@@ -184,7 +207,7 @@ export default function LoginPage() {
                   onClick={() => router.push(ROUTES.HOME)}
                   className={`${portalInfo.textColor}`}
                 >
-                  {language === 'Español' ? 'Volver al inicio' : 'Back to home'}
+                  {language === "Español" ? "Volver al inicio" : "Back to home"}
                 </Button>
               </div>
             </form>

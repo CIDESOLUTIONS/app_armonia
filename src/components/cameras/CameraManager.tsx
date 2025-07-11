@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Grid, 
-  Card, 
-  CardContent, 
-  CardActions, 
-  Button, 
-  IconButton, 
-  Chip, 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  IconButton,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
   DialogActions,
   TextField,
   FormControl,
@@ -27,9 +27,9 @@ import {
   TableHead,
   TableRow,
   TableCell,
-  TableBody
-} from '@mui/material';
-import { 
+  TableBody,
+} from "@mui/material";
+import {
   Videocam as VideocamIcon,
   VideocamOff as VideocamOffIcon,
   Refresh as RefreshIcon,
@@ -41,11 +41,11 @@ import {
   Search as SearchIcon,
   FiberManualRecord as RecordIcon,
   Stop as StopIcon,
-  Close as CloseIcon
-} from '@mui/icons-material';
-import { useSession } from 'next-auth/react';
-import { toast } from 'react-hot-toast';
-import axios from 'axios';
+  Close as CloseIcon,
+} from "@mui/icons-material";
+import { useSession } from "next-auth/react";
+import { toast } from "react-hot-toast";
+import axios from "axios";
 
 /**
  * Componente principal para la gestión de cámaras IP
@@ -63,16 +63,16 @@ const CameraManager = () => {
   const [discoveredCameras, setDiscoveredCameras] = useState([]);
   const [discoveringCameras, setDiscoveringCameras] = useState(false);
   const [cameraFormData, setCameraFormData] = useState({
-    name: '',
-    description: '',
-    ipAddress: '',
+    name: "",
+    description: "",
+    ipAddress: "",
     port: 554,
-    username: '',
-    password: '',
-    zoneId: '',
+    username: "",
+    password: "",
+    zoneId: "",
     ptzEnabled: false,
     recordingEnabled: false,
-    motionDetection: false
+    motionDetection: false,
   });
   const [zones, setZones] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -81,7 +81,7 @@ const CameraManager = () => {
   // Verificar si el usuario es administrador
   useEffect(() => {
     if (session && session.user) {
-      setIsAdmin(session.user.role === 'ADMIN');
+      setIsAdmin(session.user.role === "ADMIN");
     }
   }, [session]);
 
@@ -95,11 +95,11 @@ const CameraManager = () => {
   const fetchCameras = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/cameras');
+      const response = await axios.get("/api/cameras");
       setCameras(response.data);
     } catch (error) {
-      console.error('Error al obtener cámaras:', error);
-      toast.error('Error al cargar cámaras');
+      console.error("Error al obtener cámaras:", error);
+      toast.error("Error al cargar cámaras");
     } finally {
       setLoading(false);
     }
@@ -108,10 +108,10 @@ const CameraManager = () => {
   // Obtener zonas
   const fetchZones = async () => {
     try {
-      const response = await axios.get('/api/zones');
+      const response = await axios.get("/api/zones");
       setZones(response.data);
     } catch (error) {
-      console.error('Error al obtener zonas:', error);
+      console.error("Error al obtener zonas:", error);
     }
   };
 
@@ -121,10 +121,10 @@ const CameraManager = () => {
       setRefreshing(true);
       await axios.post(`/api/cameras/${cameraId}/status`);
       await fetchCameras();
-      toast.success('Estado de cámara actualizado');
+      toast.success("Estado de cámara actualizado");
     } catch (error) {
-      console.error('Error al actualizar estado:', error);
-      toast.error('Error al actualizar estado de cámara');
+      console.error("Error al actualizar estado:", error);
+      toast.error("Error al actualizar estado de cámara");
     } finally {
       setRefreshing(false);
     }
@@ -134,11 +134,11 @@ const CameraManager = () => {
   const discoverCameras = async () => {
     try {
       setDiscoveringCameras(true);
-      const response = await axios.post('/api/cameras/discover');
+      const response = await axios.post("/api/cameras/discover");
       setDiscoveredCameras(response.data.cameras);
     } catch (error) {
-      console.error('Error al descubrir cámaras:', error);
-      toast.error('Error al descubrir cámaras en la red');
+      console.error("Error al descubrir cámaras:", error);
+      toast.error("Error al descubrir cámaras en la red");
     } finally {
       setDiscoveringCameras(false);
     }
@@ -147,17 +147,17 @@ const CameraManager = () => {
   // Añadir cámara descubierta
   const addDiscoveredCamera = async (camera) => {
     setCameraFormData({
-      name: camera.name || 'Nueva cámara',
-      description: `${camera.manufacturer || ''} ${camera.model || ''}`.trim(),
+      name: camera.name || "Nueva cámara",
+      description: `${camera.manufacturer || ""} ${camera.model || ""}`.trim(),
       ipAddress: camera.ipAddress,
       port: 554,
-      username: '',
-      password: '',
-      zoneId: '',
+      username: "",
+      password: "",
+      zoneId: "",
       ptzEnabled: false,
       recordingEnabled: false,
       motionDetection: false,
-      onvifUrl: camera.onvifUrl
+      onvifUrl: camera.onvifUrl,
     });
     setOpenDiscoverDialog(false);
     setOpenAddDialog(true);
@@ -168,20 +168,20 @@ const CameraManager = () => {
     const { name, value, type, checked } = e.target;
     setCameraFormData({
       ...cameraFormData,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     });
   };
 
   // Crear nueva cámara
   const handleCreateCamera = async () => {
     try {
-      await axios.post('/api/cameras', cameraFormData);
-      toast.success('Cámara creada correctamente');
+      await axios.post("/api/cameras", cameraFormData);
+      toast.success("Cámara creada correctamente");
       setOpenAddDialog(false);
       fetchCameras();
     } catch (error) {
-      console.error('Error al crear cámara:', error);
-      toast.error(error.response?.data?.error || 'Error al crear cámara');
+      console.error("Error al crear cámara:", error);
+      toast.error(error.response?.data?.error || "Error al crear cámara");
     }
   };
 
@@ -189,12 +189,12 @@ const CameraManager = () => {
   const handleUpdateCamera = async () => {
     try {
       await axios.put(`/api/cameras/${selectedCamera.id}`, cameraFormData);
-      toast.success('Cámara actualizada correctamente');
+      toast.success("Cámara actualizada correctamente");
       setOpenEditDialog(false);
       fetchCameras();
     } catch (error) {
-      console.error('Error al actualizar cámara:', error);
-      toast.error(error.response?.data?.error || 'Error al actualizar cámara');
+      console.error("Error al actualizar cámara:", error);
+      toast.error(error.response?.data?.error || "Error al actualizar cámara");
     }
   };
 
@@ -202,12 +202,12 @@ const CameraManager = () => {
   const handleDeleteCamera = async () => {
     try {
       await axios.delete(`/api/cameras/${selectedCamera.id}`);
-      toast.success('Cámara eliminada correctamente');
+      toast.success("Cámara eliminada correctamente");
       setOpenDeleteDialog(false);
       fetchCameras();
     } catch (error) {
-      console.error('Error al eliminar cámara:', error);
-      toast.error('Error al eliminar cámara');
+      console.error("Error al eliminar cámara:", error);
+      toast.error("Error al eliminar cámara");
     }
   };
 
@@ -215,12 +215,12 @@ const CameraManager = () => {
   const handleTakeSnapshot = async (cameraId) => {
     try {
       await axios.post(`/api/cameras/${cameraId}/snapshot`, {
-        description: 'Instantánea manual'
+        description: "Instantánea manual",
       });
-      toast.success('Instantánea tomada correctamente');
+      toast.success("Instantánea tomada correctamente");
     } catch (error) {
-      console.error('Error al tomar instantánea:', error);
-      toast.error('Error al tomar instantánea');
+      console.error("Error al tomar instantánea:", error);
+      toast.error("Error al tomar instantánea");
     }
   };
 
@@ -228,13 +228,13 @@ const CameraManager = () => {
   const handleStartRecording = async (cameraId) => {
     try {
       await axios.post(`/api/cameras/${cameraId}/recording/start`, {
-        duration: 60 // 1 minuto por defecto
+        duration: 60, // 1 minuto por defecto
       });
-      toast.success('Grabación iniciada');
+      toast.success("Grabación iniciada");
       fetchCameras(); // Actualizar estado
     } catch (error) {
-      console.error('Error al iniciar grabación:', error);
-      toast.error('Error al iniciar grabación');
+      console.error("Error al iniciar grabación:", error);
+      toast.error("Error al iniciar grabación");
     }
   };
 
@@ -242,11 +242,11 @@ const CameraManager = () => {
   const handleStopRecording = async (cameraId) => {
     try {
       await axios.post(`/api/cameras/${cameraId}/recording/stop`);
-      toast.success('Grabación detenida');
+      toast.success("Grabación detenida");
       fetchCameras(); // Actualizar estado
     } catch (error) {
-      console.error('Error al detener grabación:', error);
-      toast.error('Error al detener grabación');
+      console.error("Error al detener grabación:", error);
+      toast.error("Error al detener grabación");
     }
   };
 
@@ -255,15 +255,15 @@ const CameraManager = () => {
     setSelectedCamera(camera);
     setCameraFormData({
       name: camera.name,
-      description: camera.description || '',
+      description: camera.description || "",
       ipAddress: camera.ipAddress,
       port: camera.port,
-      username: camera.username || '',
-      password: '********', // Placeholder para contraseña
-      zoneId: camera.zoneId || '',
+      username: camera.username || "",
+      password: "********", // Placeholder para contraseña
+      zoneId: camera.zoneId || "",
       ptzEnabled: camera.ptzEnabled,
       recordingEnabled: camera.recordingEnabled,
-      motionDetection: camera.motionDetection
+      motionDetection: camera.motionDetection,
     });
     setOpenEditDialog(true);
   };
@@ -282,42 +282,49 @@ const CameraManager = () => {
 
   // Renderizar tarjeta de cámara
   const renderCameraCard = (camera) => {
-    const isOnline = camera.status === 'ONLINE';
-    const isRecording = camera.recordings?.some(r => r.status === 'RECORDING');
+    const isOnline = camera.status === "ONLINE";
+    const isRecording = camera.recordings?.some(
+      (r) => r.status === "RECORDING",
+    );
 
     return (
-      <Card 
-        key={camera.id} 
-        sx={{ 
-          height: '100%', 
-          display: 'flex', 
-          flexDirection: 'column',
-          borderLeft: isOnline ? '4px solid #4caf50' : '4px solid #f44336'
+      <Card
+        key={camera.id}
+        sx={{
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          borderLeft: isOnline ? "4px solid #4caf50" : "4px solid #f44336",
         }}
       >
         <CardContent sx={{ flexGrow: 1 }}>
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={1}
+          >
             <Typography variant="h6" component="div">
               {camera.name}
             </Typography>
-            <Chip 
+            <Chip
               icon={isOnline ? <VideocamIcon /> : <VideocamOffIcon />}
-              label={isOnline ? 'En línea' : 'Desconectada'}
-              color={isOnline ? 'success' : 'error'}
+              label={isOnline ? "En línea" : "Desconectada"}
+              color={isOnline ? "success" : "error"}
               size="small"
             />
           </Box>
-          
+
           <Typography variant="body2" color="text.secondary" gutterBottom>
             IP: {camera.ipAddress}
           </Typography>
-          
+
           {camera.zone && (
             <Typography variant="body2" color="text.secondary">
               Zona: {camera.zone.name}
             </Typography>
           )}
-          
+
           <Box mt={1}>
             {camera.ptzEnabled && (
               <Chip label="PTZ" size="small" sx={{ mr: 0.5, mb: 0.5 }} />
@@ -326,45 +333,49 @@ const CameraManager = () => {
               <Chip label="Grabación" size="small" sx={{ mr: 0.5, mb: 0.5 }} />
             )}
             {camera.motionDetection && (
-              <Chip label="Detección de movimiento" size="small" sx={{ mr: 0.5, mb: 0.5 }} />
+              <Chip
+                label="Detección de movimiento"
+                size="small"
+                sx={{ mr: 0.5, mb: 0.5 }}
+              />
             )}
             {isRecording && (
-              <Chip 
-                icon={<RecordIcon sx={{ color: 'red' }} />} 
-                label="Grabando" 
-                color="error" 
-                size="small" 
-                sx={{ mr: 0.5, mb: 0.5 }} 
+              <Chip
+                icon={<RecordIcon sx={{ color: "red" }} />}
+                label="Grabando"
+                color="error"
+                size="small"
+                sx={{ mr: 0.5, mb: 0.5 }}
               />
             )}
           </Box>
         </CardContent>
-        
+
         <CardActions>
           <Tooltip title="Ver cámara">
-            <IconButton 
-              size="small" 
+            <IconButton
+              size="small"
               onClick={() => openView(camera)}
               disabled={!isOnline}
             >
               <VisibilityIcon />
             </IconButton>
           </Tooltip>
-          
+
           <Tooltip title="Tomar instantánea">
-            <IconButton 
-              size="small" 
+            <IconButton
+              size="small"
               onClick={() => handleTakeSnapshot(camera.id)}
               disabled={!isOnline}
             >
               <PhotoCameraIcon />
             </IconButton>
           </Tooltip>
-          
+
           {isRecording ? (
             <Tooltip title="Detener grabación">
-              <IconButton 
-                size="small" 
+              <IconButton
+                size="small"
                 onClick={() => handleStopRecording(camera.id)}
               >
                 <StopIcon />
@@ -372,8 +383,8 @@ const CameraManager = () => {
             </Tooltip>
           ) : (
             <Tooltip title="Iniciar grabación">
-              <IconButton 
-                size="small" 
+              <IconButton
+                size="small"
                 onClick={() => handleStartRecording(camera.id)}
                 disabled={!isOnline || !camera.recordingEnabled}
               >
@@ -381,17 +392,17 @@ const CameraManager = () => {
               </IconButton>
             </Tooltip>
           )}
-          
+
           <Tooltip title="Actualizar estado">
-            <IconButton 
-              size="small" 
+            <IconButton
+              size="small"
               onClick={() => refreshCameraStatus(camera.id)}
               disabled={refreshing}
             >
               <RefreshIcon />
             </IconButton>
           </Tooltip>
-          
+
           {isAdmin && (
             <>
               <Tooltip title="Editar">
@@ -399,7 +410,7 @@ const CameraManager = () => {
                   <EditIcon />
                 </IconButton>
               </Tooltip>
-              
+
               <Tooltip title="Eliminar">
                 <IconButton size="small" onClick={() => openDelete(camera)}>
                   <DeleteIcon />
@@ -414,38 +425,43 @@ const CameraManager = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography variant="h4" component="h1">
           Gestión de Cámaras IP
         </Typography>
-        
+
         <Box>
           {isAdmin && (
             <>
-              <Button 
-                variant="outlined" 
-                startIcon={<SearchIcon />} 
+              <Button
+                variant="outlined"
+                startIcon={<SearchIcon />}
                 onClick={() => setOpenDiscoverDialog(true)}
                 sx={{ mr: 1 }}
               >
                 Descubrir
               </Button>
-              
-              <Button 
-                variant="contained" 
-                startIcon={<AddIcon />} 
+
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
                 onClick={() => {
                   setCameraFormData({
-                    name: '',
-                    description: '',
-                    ipAddress: '',
+                    name: "",
+                    description: "",
+                    ipAddress: "",
                     port: 554,
-                    username: '',
-                    password: '',
-                    zoneId: '',
+                    username: "",
+                    password: "",
+                    zoneId: "",
                     ptzEnabled: false,
                     recordingEnabled: false,
-                    motionDetection: false
+                    motionDetection: false,
                   });
                   setOpenAddDialog(true);
                 }}
@@ -462,21 +478,21 @@ const CameraManager = () => {
           <CircularProgress />
         </Box>
       ) : cameras.length === 0 ? (
-        <Box 
-          sx={{ 
-            p: 4, 
-            textAlign: 'center', 
-            border: '1px dashed #ccc',
-            borderRadius: 2
+        <Box
+          sx={{
+            p: 4,
+            textAlign: "center",
+            border: "1px dashed #ccc",
+            borderRadius: 2,
           }}
         >
           <Typography variant="h6" color="text.secondary" gutterBottom>
             No hay cámaras configuradas
           </Typography>
           {isAdmin && (
-            <Button 
-              variant="outlined" 
-              startIcon={<AddIcon />} 
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
               onClick={() => setOpenAddDialog(true)}
               sx={{ mt: 2 }}
             >
@@ -495,8 +511,8 @@ const CameraManager = () => {
       )}
 
       {/* Diálogo de visualización */}
-      <Dialog 
-        open={openViewDialog} 
+      <Dialog
+        open={openViewDialog}
         onClose={() => setOpenViewDialog(false)}
         maxWidth="md"
         fullWidth
@@ -508,107 +524,160 @@ const CameraManager = () => {
               <IconButton
                 aria-label="close"
                 onClick={() => setOpenViewDialog(false)}
-                sx={{ position: 'absolute', right: 8, top: 8 }}
+                sx={{ position: "absolute", right: 8, top: 8 }}
               >
                 <CloseIcon />
               </IconButton>
             </DialogTitle>
             <DialogContent>
-              <Box sx={{ position: 'relative', pt: '56.25%', mb: 2 }}>
+              <Box sx={{ position: "relative", pt: "56.25%", mb: 2 }}>
                 <Box
                   component="img"
                   src={`/api/cameras/${selectedCamera.id}/stream?quality=high&t=${Date.now()}`}
                   alt={selectedCamera.name}
                   sx={{
-                    position: 'absolute',
+                    position: "absolute",
                     top: 0,
                     left: 0,
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    bgcolor: 'black'
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    bgcolor: "black",
                   }}
                 />
               </Box>
-              
+
               {selectedCamera.ptzEnabled && (
-                <Box sx={{ mb: 2, textAlign: 'center' }}>
+                <Box sx={{ mb: 2, textAlign: "center" }}>
                   <Typography variant="subtitle1" gutterBottom>
                     Control PTZ
                   </Typography>
-                  <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-                    <Button 
-                      variant="outlined" 
-                      onClick={() => handlePtzControl(selectedCamera.id, 'move', { pan: 0, tilt: 1 })}
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", gap: 1 }}
+                  >
+                    <Button
+                      variant="outlined"
+                      onClick={() =>
+                        handlePtzControl(selectedCamera.id, "move", {
+                          pan: 0,
+                          tilt: 1,
+                        })
+                      }
                     >
                       Arriba
                     </Button>
                   </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, my: 1 }}>
-                    <Button 
-                      variant="outlined" 
-                      onClick={() => handlePtzControl(selectedCamera.id, 'move', { pan: -1, tilt: 0 })}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      gap: 1,
+                      my: 1,
+                    }}
+                  >
+                    <Button
+                      variant="outlined"
+                      onClick={() =>
+                        handlePtzControl(selectedCamera.id, "move", {
+                          pan: -1,
+                          tilt: 0,
+                        })
+                      }
                     >
                       Izquierda
                     </Button>
-                    <Button 
-                      variant="outlined" 
-                      onClick={() => handlePtzControl(selectedCamera.id, 'stop')}
+                    <Button
+                      variant="outlined"
+                      onClick={() =>
+                        handlePtzControl(selectedCamera.id, "stop")
+                      }
                     >
                       Stop
                     </Button>
-                    <Button 
-                      variant="outlined" 
-                      onClick={() => handlePtzControl(selectedCamera.id, 'move', { pan: 1, tilt: 0 })}
+                    <Button
+                      variant="outlined"
+                      onClick={() =>
+                        handlePtzControl(selectedCamera.id, "move", {
+                          pan: 1,
+                          tilt: 0,
+                        })
+                      }
                     >
                       Derecha
                     </Button>
                   </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-                    <Button 
-                      variant="outlined" 
-                      onClick={() => handlePtzControl(selectedCamera.id, 'move', { pan: 0, tilt: -1 })}
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", gap: 1 }}
+                  >
+                    <Button
+                      variant="outlined"
+                      onClick={() =>
+                        handlePtzControl(selectedCamera.id, "move", {
+                          pan: 0,
+                          tilt: -1,
+                        })
+                      }
                     >
                       Abajo
                     </Button>
                   </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 1 }}>
-                    <Button 
-                      variant="outlined" 
-                      onClick={() => handlePtzControl(selectedCamera.id, 'zoom', { zoom: 1 })}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      gap: 1,
+                      mt: 1,
+                    }}
+                  >
+                    <Button
+                      variant="outlined"
+                      onClick={() =>
+                        handlePtzControl(selectedCamera.id, "zoom", { zoom: 1 })
+                      }
                     >
                       Zoom +
                     </Button>
-                    <Button 
-                      variant="outlined" 
-                      onClick={() => handlePtzControl(selectedCamera.id, 'zoom', { zoom: -1 })}
+                    <Button
+                      variant="outlined"
+                      onClick={() =>
+                        handlePtzControl(selectedCamera.id, "zoom", {
+                          zoom: -1,
+                        })
+                      }
                     >
                       Zoom -
                     </Button>
                   </Box>
                 </Box>
               )}
-              
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                <Button 
-                  variant="contained" 
+
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
+              >
+                <Button
+                  variant="contained"
                   startIcon={<PhotoCameraIcon />}
                   onClick={() => handleTakeSnapshot(selectedCamera.id)}
                 >
                   Tomar Instantánea
                 </Button>
-                
+
                 {selectedCamera.recordingEnabled && (
-                  <Button 
-                    variant="contained" 
+                  <Button
+                    variant="contained"
                     color={selectedCamera.isRecording ? "error" : "primary"}
-                    startIcon={selectedCamera.isRecording ? <StopIcon /> : <RecordIcon />}
-                    onClick={() => selectedCamera.isRecording 
-                      ? handleStopRecording(selectedCamera.id) 
-                      : handleStartRecording(selectedCamera.id)
+                    startIcon={
+                      selectedCamera.isRecording ? <StopIcon /> : <RecordIcon />
+                    }
+                    onClick={() =>
+                      selectedCamera.isRecording
+                        ? handleStopRecording(selectedCamera.id)
+                        : handleStartRecording(selectedCamera.id)
                     }
                   >
-                    {selectedCamera.isRecording ? "Detener Grabación" : "Iniciar Grabación"}
+                    {selectedCamera.isRecording
+                      ? "Detener Grabación"
+                      : "Iniciar Grabación"}
                   </Button>
                 )}
               </Box>
@@ -618,8 +687,8 @@ const CameraManager = () => {
       </Dialog>
 
       {/* Diálogo de edición */}
-      <Dialog 
-        open={openEditDialog} 
+      <Dialog
+        open={openEditDialog}
         onClose={() => setOpenEditDialog(false)}
         maxWidth="sm"
         fullWidth
@@ -734,7 +803,9 @@ const CameraManager = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenEditDialog(false)}>Cancelar</Button>
-          <Button onClick={handleUpdateCamera} variant="contained">Guardar</Button>
+          <Button onClick={handleUpdateCamera} variant="contained">
+            Guardar
+          </Button>
         </DialogActions>
       </Dialog>
 
@@ -746,21 +817,25 @@ const CameraManager = () => {
         <DialogTitle>Confirmar eliminación</DialogTitle>
         <DialogContent>
           <Typography>
-            ¿Está seguro de que desea eliminar la cámara "{selectedCamera?.name}"?
-            Esta acción no se puede deshacer.
+            ¿Está seguro de que desea eliminar la cámara "{selectedCamera?.name}
+            "? Esta acción no se puede deshacer.
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDeleteDialog(false)}>Cancelar</Button>
-          <Button onClick={handleDeleteCamera} color="error" variant="contained">
+          <Button
+            onClick={handleDeleteCamera}
+            color="error"
+            variant="contained"
+          >
             Eliminar
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Diálogo de añadir cámara */}
-      <Dialog 
-        open={openAddDialog} 
+      <Dialog
+        open={openAddDialog}
         onClose={() => setOpenAddDialog(false)}
         maxWidth="sm"
         fullWidth
@@ -874,13 +949,15 @@ const CameraManager = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenAddDialog(false)}>Cancelar</Button>
-          <Button onClick={handleCreateCamera} variant="contained">Crear</Button>
+          <Button onClick={handleCreateCamera} variant="contained">
+            Crear
+          </Button>
         </DialogActions>
       </Dialog>
 
       {/* Diálogo de descubrimiento */}
-      <Dialog 
-        open={openDiscoverDialog} 
+      <Dialog
+        open={openDiscoverDialog}
         onClose={() => setOpenDiscoverDialog(false)}
         maxWidth="md"
         fullWidth
@@ -892,12 +969,18 @@ const CameraManager = () => {
               variant="contained"
               onClick={discoverCameras}
               disabled={discoveringCameras}
-              startIcon={discoveringCameras ? <CircularProgress size={20} /> : <SearchIcon />}
+              startIcon={
+                discoveringCameras ? (
+                  <CircularProgress size={20} />
+                ) : (
+                  <SearchIcon />
+                )
+              }
             >
-              {discoveringCameras ? 'Buscando...' : 'Buscar cámaras en la red'}
+              {discoveringCameras ? "Buscando..." : "Buscar cámaras en la red"}
             </Button>
           </Box>
-          
+
           {discoveredCameras.length > 0 ? (
             <Box>
               <Typography variant="subtitle1" gutterBottom>
@@ -917,10 +1000,10 @@ const CameraManager = () => {
                   <TableBody>
                     {discoveredCameras.map((camera, index) => (
                       <TableRow key={index}>
-                        <TableCell>{camera.name || 'Cámara ONVIF'}</TableCell>
+                        <TableCell>{camera.name || "Cámara ONVIF"}</TableCell>
                         <TableCell>{camera.ipAddress}</TableCell>
-                        <TableCell>{camera.manufacturer || '-'}</TableCell>
-                        <TableCell>{camera.model || '-'}</TableCell>
+                        <TableCell>{camera.manufacturer || "-"}</TableCell>
+                        <TableCell>{camera.model || "-"}</TableCell>
                         <TableCell>
                           <Button
                             size="small"
@@ -937,16 +1020,17 @@ const CameraManager = () => {
               </TableContainer>
             </Box>
           ) : discoveringCameras ? (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
+            <Box sx={{ textAlign: "center", py: 4 }}>
               <CircularProgress />
               <Typography sx={{ mt: 2 }}>
                 Buscando cámaras en la red...
               </Typography>
             </Box>
           ) : (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
+            <Box sx={{ textAlign: "center", py: 4 }}>
               <Typography color="text.secondary">
-                Haga clic en "Buscar cámaras en la red" para descubrir cámaras ONVIF disponibles.
+                Haga clic en "Buscar cámaras en la red" para descubrir cámaras
+                ONVIF disponibles.
               </Typography>
             </Box>
           )}

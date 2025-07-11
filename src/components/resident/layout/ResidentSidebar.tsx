@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { 
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
   ChevronLeft,
   Home,
   DollarSign,
@@ -15,10 +15,10 @@ import {
   ClipboardList,
   Users,
   Car,
-  PawPrint
-} from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+  PawPrint,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface ResidentSidebarProps {
   collapsed: boolean;
@@ -27,62 +27,82 @@ interface ResidentSidebarProps {
 
 const menuItems = [
   {
-    title: 'Dashboard',
+    title: "Dashboard",
     icon: Home,
-    href: '/dashboard',
-    description: 'Panel principal'
+    href: "/dashboard",
+    description: "Panel principal",
   },
   {
-    title: 'Finanzas',
+    title: "Finanzas",
     icon: DollarSign,
-    href: '/(auth)/dashboard/finances',
-    description: 'Estado de cuenta y pagos',
+    href: "/(auth)/dashboard/finances",
+    description: "Estado de cuenta y pagos",
     submenu: [
-      { title: 'Estado de Cuenta', href: '/(auth)/dashboard/finances/account', icon: FileText },
-      { title: 'Pagos', href: '/(auth)/dashboard/finances/payments', icon: DollarSign }
-    ]
+      {
+        title: "Estado de Cuenta",
+        href: "/(auth)/dashboard/finances/account",
+        icon: FileText,
+      },
+      {
+        title: "Pagos",
+        href: "/(auth)/dashboard/finances/payments",
+        icon: DollarSign,
+      },
+    ],
   },
   {
-    title: 'PQR',
+    title: "PQR",
     icon: MessageSquare,
-    href: '/(auth)/dashboard/pqr',
-    description: 'Peticiones, quejas y reclamos'
+    href: "/(auth)/dashboard/pqr",
+    description: "Peticiones, quejas y reclamos",
   },
   {
-    title: 'Reservas',
+    title: "Reservas",
     icon: Calendar,
-    href: '/(auth)/dashboard/services/reservations',
-    description: 'Reserva de áreas comunes'
+    href: "/(auth)/dashboard/services/reservations",
+    description: "Reserva de áreas comunes",
   },
   {
-    title: 'Comunicados',
+    title: "Comunicados",
     icon: Bell,
-    href: '/(auth)/dashboard/communications',
-    description: 'Comunicados y noticias'
+    href: "/(auth)/dashboard/communications",
+    description: "Comunicados y noticias",
   },
   {
-    title: 'Familia',
+    title: "Familia",
     icon: Users,
-    href: '/(auth)/dashboard/family',
-    description: 'Gestión familiar',
+    href: "/(auth)/dashboard/family",
+    description: "Gestión familiar",
     submenu: [
-      { title: 'Miembros', href: '/(auth)/dashboard/family/members', icon: Users },
-      { title: 'Vehículos', href: '/(auth)/dashboard/family/vehicles', icon: Car },
-      { title: 'Mascotas', href: '/(auth)/dashboard/family/pets', icon: PawPrint }
-    ]
+      {
+        title: "Miembros",
+        href: "/(auth)/dashboard/family/members",
+        icon: Users,
+      },
+      {
+        title: "Vehículos",
+        href: "/(auth)/dashboard/family/vehicles",
+        icon: Car,
+      },
+      {
+        title: "Mascotas",
+        href: "/(auth)/dashboard/family/pets",
+        icon: PawPrint,
+      },
+    ],
   },
   {
-    title: 'Documentos',
+    title: "Documentos",
     icon: ClipboardList,
-    href: '/(auth)/dashboard/documents',
-    description: 'Documentos importantes'
+    href: "/(auth)/dashboard/documents",
+    description: "Documentos importantes",
   },
   {
-    title: 'Configuración',
+    title: "Configuración",
     icon: Settings,
-    href: '/(auth)/dashboard/settings',
-    description: 'Configuración de cuenta'
-  }
+    href: "/(auth)/dashboard/settings",
+    description: "Configuración de cuenta",
+  },
 ];
 
 export function ResidentSidebar({ collapsed, onToggle }: ResidentSidebarProps) {
@@ -91,25 +111,27 @@ export function ResidentSidebar({ collapsed, onToggle }: ResidentSidebarProps) {
 
   const toggleExpanded = (title: string) => {
     if (collapsed) return;
-    setExpandedItems(prev => 
-      prev.includes(title) 
-        ? prev.filter(item => item !== title)
-        : [...prev, title]
+    setExpandedItems((prev) =>
+      prev.includes(title)
+        ? prev.filter((item) => item !== title)
+        : [...prev, title],
     );
   };
 
   const isActive = (href: string) => {
-    if (href === '/dashboard') {
-      return pathname === '/dashboard';
+    if (href === "/dashboard") {
+      return pathname === "/dashboard";
     }
     return pathname.startsWith(href);
   };
 
   return (
-    <div className={cn(
-      "fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 transition-all duration-300 z-40",
-      collapsed ? "w-16" : "w-64"
-    )}>
+    <div
+      className={cn(
+        "fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 transition-all duration-300 z-40",
+        collapsed ? "w-16" : "w-64",
+      )}
+    >
       {/* Toggle Button */}
       <div className="flex items-center justify-end p-4 border-b border-gray-200">
         <Button
@@ -118,10 +140,12 @@ export function ResidentSidebar({ collapsed, onToggle }: ResidentSidebarProps) {
           onClick={onToggle}
           className="h-8 w-8 p-0"
         >
-          <ChevronLeft className={cn(
-            "h-4 w-4 transition-transform",
-            collapsed && "rotate-180"
-          )} />
+          <ChevronLeft
+            className={cn(
+              "h-4 w-4 transition-transform",
+              collapsed && "rotate-180",
+            )}
+          />
         </Button>
       </div>
 
@@ -139,11 +163,11 @@ export function ResidentSidebar({ collapsed, onToggle }: ResidentSidebarProps) {
               <div
                 className={cn(
                   "flex items-center rounded-lg transition-colors cursor-pointer",
-                  itemIsActive 
-                    ? "bg-green-50 text-green-700" 
-                    : "text-gray-700 hover:bg-gray-100"
+                  itemIsActive
+                    ? "bg-green-50 text-green-700"
+                    : "text-gray-700 hover:bg-gray-100",
                 )}
-                onClick={() => hasSubmenu ? toggleExpanded(item.title) : null}
+                onClick={() => (hasSubmenu ? toggleExpanded(item.title) : null)}
               >
                 {hasSubmenu ? (
                   <div className="flex items-center w-full p-2">
@@ -153,15 +177,20 @@ export function ResidentSidebar({ collapsed, onToggle }: ResidentSidebarProps) {
                         <span className="ml-3 text-sm font-medium flex-1">
                           {item.title}
                         </span>
-                        <ChevronLeft className={cn(
-                          "h-4 w-4 transition-transform",
-                          isExpanded && "rotate-90"
-                        )} />
+                        <ChevronLeft
+                          className={cn(
+                            "h-4 w-4 transition-transform",
+                            isExpanded && "rotate-90",
+                          )}
+                        />
                       </>
                     )}
                   </div>
                 ) : (
-                  <Link href={item.href} className="flex items-center w-full p-2">
+                  <Link
+                    href={item.href}
+                    className="flex items-center w-full p-2"
+                  >
                     <Icon className="h-5 w-5 flex-shrink-0" />
                     {!collapsed && (
                       <span className="ml-3 text-sm font-medium">
@@ -178,7 +207,7 @@ export function ResidentSidebar({ collapsed, onToggle }: ResidentSidebarProps) {
                   {item.submenu!.map((subItem) => {
                     const SubIcon = subItem.icon;
                     const subIsActive = isActive(subItem.href);
-                    
+
                     return (
                       <Link
                         key={subItem.href}
@@ -187,7 +216,7 @@ export function ResidentSidebar({ collapsed, onToggle }: ResidentSidebarProps) {
                           "flex items-center p-2 rounded-lg text-sm transition-colors",
                           subIsActive
                             ? "bg-green-50 text-green-700"
-                            : "text-gray-600 hover:bg-gray-100"
+                            : "text-gray-600 hover:bg-gray-100",
                         )}
                       >
                         <SubIcon className="h-4 w-4 flex-shrink-0" />

@@ -1,7 +1,7 @@
-import React from 'react';
-import { Menu, Bell, Settings, User } from 'lucide-react';
-import Button from '@/components/common/Button';
-import Dropdown from '@/components/common/Dropdown';
+import React from "react";
+import { Menu, Bell, Settings, User } from "lucide-react";
+import Button from "@/components/common/Button";
+import Dropdown from "@/components/common/Dropdown";
 
 interface DashboardHeaderProps {
   onMenuClick: () => void;
@@ -10,22 +10,22 @@ interface DashboardHeaderProps {
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onMenuClick }) => {
   const userMenuItems = [
     {
-      key: 'profile',
-      label: 'Perfil',
+      key: "profile",
+      label: "Perfil",
       icon: <User size={16} />,
-      onClick: () => console.log('Profile clicked')
+      onClick: () => console.log("Profile clicked"),
     },
     {
-      key: 'settings',
-      label: 'Configuración',
+      key: "settings",
+      label: "Configuración",
       icon: <Settings size={16} />,
-      onClick: () => console.log('Settings clicked')
+      onClick: () => console.log("Settings clicked"),
     },
     {
-      key: 'logout',
-      label: 'Cerrar Sesión',
-      onClick: () => console.log('Logout clicked')
-    }
+      key: "logout",
+      label: "Cerrar Sesión",
+      onClick: () => console.log("Logout clicked"),
+    },
   ];
 
   return (
@@ -39,9 +39,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onMenuClick }) => {
           >
             <Menu className="w-6 h-6" />
           </button>
-          <h1 className="ml-4 text-xl font-semibold text-gray-800">
-            Armonía
-          </h1>
+          <h1 className="ml-4 text-xl font-semibold text-gray-800">Armonía</h1>
         </div>
 
         {/* Right section */}
@@ -50,7 +48,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onMenuClick }) => {
             variant="outline"
             size="sm"
             icon={<Bell />}
-            onClick={() => console.log('Notifications clicked')}
+            onClick={() => console.log("Notifications clicked")}
           >
             Notificaciones
           </Button>

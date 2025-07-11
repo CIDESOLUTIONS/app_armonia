@@ -1,12 +1,12 @@
-import { User } from '@prisma/client';
+import { User } from "@prisma/client";
 
 export enum UserRole {
-  USER = 'USER',
-  ADMIN = 'ADMIN',
-  APP_ADMIN = 'APP_ADMIN',
-  COMPLEX_ADMIN = 'COMPLEX_ADMIN',
-  RESIDENT = 'RESIDENT',
-  STAFF = 'STAFF'
+  USER = "USER",
+  ADMIN = "ADMIN",
+  APP_ADMIN = "APP_ADMIN",
+  COMPLEX_ADMIN = "COMPLEX_ADMIN",
+  RESIDENT = "RESIDENT",
+  STAFF = "STAFF",
 }
 
 export class AuthorizationService {
@@ -16,8 +16,8 @@ export class AuthorizationService {
    * @param allowedRoles Roles permitidos
    */
   static checkRoleAccess(
-    user: Pick<User, 'role'>, 
-    allowedRoles: UserRole[]
+    user: Pick<User, "role">,
+    allowedRoles: UserRole[],
   ): boolean {
     return allowedRoles.includes(user.role as UserRole);
   }
@@ -28,8 +28,8 @@ export class AuthorizationService {
    * @param resourceComplexId ID del conjunto del recurso
    */
   static canAccessComplex(
-    user: Pick<User, 'role' | 'complexId'>, 
-    resourceComplexId: number
+    user: Pick<User, "role" | "complexId">,
+    resourceComplexId: number,
   ): boolean {
     // Administradores de la aplicación pueden acceder a todo
     if (user.role === UserRole.APP_ADMIN) return true;
@@ -50,9 +50,9 @@ export class AuthorizationService {
    * @param resourceComplexId ID del conjunto del recurso
    */
   static canPerformAction(
-    user: Pick<User, 'role' | 'complexId'>,
+    user: Pick<User, "role" | "complexId">,
     action: string,
-    resourceComplexId: number
+    resourceComplexId: number,
   ): boolean {
     // Verificar primero el acceso al conjunto
     if (!this.canAccessComplex(user, resourceComplexId)) {
@@ -60,32 +60,22 @@ export class AuthorizationService {
     }
 
     // Definir permisos basados en roles y acciones
-    const rolePermissions: {[key in UserRole]: string[]} = {
-      [UserRole.APP_ADMIN]: ['ALL'],
+    const rolePermissions: { [key in UserRole]: string[] } = {
+      [UserRole.APP_ADMIN]: ["ALL"],
       [UserRole.COMPLEX_ADMIN]: [
-        'CREATE_PQR', 
-        'UPDATE_PQR', 
-        'VIEW_PQR', 
-        'MANAGE_PQR'
+        "CREATE_PQR",
+        "UPDATE_PQR",
+        "VIEW_PQR",
+        "MANAGE_PQR",
       ],
-      [UserRole.STAFF]: [
-        'VIEW_PQR', 
-        'UPDATE_PQR'
-      ],
-      [UserRole.RESIDENT]: [
-        'CREATE_PQR', 
-        'VIEW_OWN_PQR'
-      ],
-      [UserRole.USER]: [
-        'CREATE_PQR', 
-        'VIEW_OWN_PQR'
-      ],
-      [UserRole.ADMIN]: ['ALL']
+      [UserRole.STAFF]: ["VIEW_PQR", "UPDATE_PQR"],
+      [UserRole.RESIDENT]: ["CREATE_PQR", "VIEW_OWN_PQR"],
+      [UserRole.USER]: ["CREATE_PQR", "VIEW_OWN_PQR"],
+      [UserRole.ADMIN]: ["ALL"],
     };
 
     const userPermissions = rolePermissions[user.role as UserRole] || [];
-    
-    return userPermissions.includes('ALL') || 
-           userPermissions.includes(action);
+
+    return userPermissions.includes("ALL") || userPermissions.includes(action);
   }
 }

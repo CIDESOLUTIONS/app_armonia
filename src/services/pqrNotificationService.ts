@@ -1,16 +1,16 @@
 /**
  * Servicio para la gestión de notificaciones del sistema PQR
- * 
+ *
  * Este servicio maneja todas las notificaciones relacionadas con PQRs,
  * incluyendo cambios de estado, recordatorios y encuestas de satisfacción.
  */
 
-import { PrismaClient } from '@prisma/client';
-import { getSchemaFromRequest } from '@/lib/prisma';
-import { sendEmail } from '@/lib/communications/email-service';
-import { sendPushNotification } from '@/lib/communications/push-notification-service';
-import { sendSMS } from '@/lib/communications/sms-service';
-import { PQRStatus, PQRNotificationTemplate } from '@/constants/pqr-constants';
+import { PrismaClient } from "@prisma/client";
+import { getSchemaFromRequest } from "@/lib/prisma";
+import { sendEmail } from "@/lib/communications/email-service";
+import { sendPushNotification } from "@/lib/communications/push-notification-service";
+import { sendSMS } from "@/lib/communications/sms-service";
+import { PQRStatus, PQRNotificationTemplate } from "@/constants/pqr-constants";
 
 /**
  * Clase que implementa el servicio de notificaciones para PQRs
@@ -18,42 +18,51 @@ import { PQRStatus, PQRNotificationTemplate } from '@/constants/pqr-constants';
 export class PQRNotificationService {
   private prisma: PrismaClient;
   private schema: string;
-  private notificationTemplates: Record<string, { subject: string, content: string }>;
+  private notificationTemplates: Record<
+    string,
+    { subject: string; content: string }
+  >;
 
   /**
    * Constructor del servicio
    * @param schema Esquema de base de datos a utilizar
    */
-  constructor(schema: string = 'public') {
+  constructor(schema: string = "public") {
     this.schema = schema;
     this.prisma = getSchemaFromRequest(schema);
-    
+
     // Inicializar plantillas de notificación predeterminadas
     this.notificationTemplates = {
-      'STATUS_CHANGE_ASSIGNED': {
-        subject: 'PQR {{ticketNumber}} asignado',
-        content: '<p>Hola {{recipientName}},</p><p>El PQR <strong>{{ticketNumber}}: {{title}}</strong> ha sido asignado.</p>'
+      STATUS_CHANGE_ASSIGNED: {
+        subject: "PQR {{ticketNumber}} asignado",
+        content:
+          "<p>Hola {{recipientName}},</p><p>El PQR <strong>{{ticketNumber}}: {{title}}</strong> ha sido asignado.</p>",
       },
-      'STATUS_CHANGE_IN_PROGRESS': {
-        subject: 'PQR {{ticketNumber}} en progreso',
-        content: '<p>Hola {{recipientName}},</p><p>El PQR <strong>{{ticketNumber}}: {{title}}</strong> está siendo atendido.</p>'
+      STATUS_CHANGE_IN_PROGRESS: {
+        subject: "PQR {{ticketNumber}} en progreso",
+        content:
+          "<p>Hola {{recipientName}},</p><p>El PQR <strong>{{ticketNumber}}: {{title}}</strong> está siendo atendido.</p>",
       },
-      'STATUS_CHANGE_RESOLVED': {
-        subject: 'PQR {{ticketNumber}} resuelto',
-        content: '<p>Hola {{recipientName}},</p><p>El PQR <strong>{{ticketNumber}}: {{title}}</strong> ha sido resuelto.</p>'
+      STATUS_CHANGE_RESOLVED: {
+        subject: "PQR {{ticketNumber}} resuelto",
+        content:
+          "<p>Hola {{recipientName}},</p><p>El PQR <strong>{{ticketNumber}}: {{title}}</strong> ha sido resuelto.</p>",
       },
-      'STATUS_CHANGE_CLOSED': {
-        subject: 'PQR {{ticketNumber}} cerrado',
-        content: '<p>Hola {{recipientName}},</p><p>El PQR <strong>{{ticketNumber}}: {{title}}</strong> ha sido cerrado.</p>'
+      STATUS_CHANGE_CLOSED: {
+        subject: "PQR {{ticketNumber}} cerrado",
+        content:
+          "<p>Hola {{recipientName}},</p><p>El PQR <strong>{{ticketNumber}}: {{title}}</strong> ha sido cerrado.</p>",
       },
-      'STATUS_CHANGE_REOPENED': {
-        subject: 'PQR {{ticketNumber}} reabierto',
-        content: '<p>Hola {{recipientName}},</p><p>El PQR <strong>{{ticketNumber}}: {{title}}</strong> ha sido reabierto.</p>'
+      STATUS_CHANGE_REOPENED: {
+        subject: "PQR {{ticketNumber}} reabierto",
+        content:
+          "<p>Hola {{recipientName}},</p><p>El PQR <strong>{{ticketNumber}}: {{title}}</strong> ha sido reabierto.</p>",
       },
-      'DEFAULT': {
-        subject: 'Actualización de PQR {{ticketNumber}}',
-        content: '<p>Hola {{recipientName}},</p><p>El PQR <strong>{{ticketNumber}}: {{title}}</strong> ha sido actualizado.</p>'
-      }
+      DEFAULT: {
+        subject: "Actualización de PQR {{ticketNumber}}",
+        content:
+          "<p>Hola {{recipientName}},</p><p>El PQR <strong>{{ticketNumber}}: {{title}}</strong> ha sido actualizado.</p>",
+      },
     };
   }
 
@@ -71,7 +80,7 @@ export class PQRNotificationService {
     newStatus: string,
     previousStatus?: string,
     changedById?: number,
-    comment?: string
+    comment?: string,
   ): Promise<boolean> {
     try {
       // Verificar si las notificaciones automáticas están habilitadas
@@ -90,7 +99,7 @@ export class PQRNotificationService {
 
       // Obtener información del PQR
       const pqr = await this.prisma.pQR.findUnique({
-        where: { id: pqrId }
+        where: { id: pqrId },
       });
 
       if (!pqr) {
@@ -99,28 +108,33 @@ export class PQRNotificationService {
 
       // Obtener información del usuario que reportó
       const reporter = await this.prisma.user.findUnique({
-        where: { id: pqr.userId }
+        where: { id: pqr.userId },
       });
 
       // Obtener información del usuario asignado (si existe)
       let assignee = null;
       if (pqr.assignedToId) {
         assignee = await this.prisma.user.findUnique({
-          where: { id: pqr.assignedToId }
+          where: { id: pqr.assignedToId },
         });
       }
 
       // Obtener plantilla de notificación
-      const template = await this.getNotificationTemplate(newStatus, previousStatus);
+      const template = await this.getNotificationTemplate(
+        newStatus,
+        previousStatus,
+      );
 
       // Preparar datos para la plantilla
       const templateData = {
         ticketNumber: pqr.ticketNumber,
         title: pqr.title,
         status: newStatus,
-        previousStatus: previousStatus || 'NUEVO',
-        dueDate: pqr.dueDate ? new Date(pqr.dueDate).toLocaleDateString() : 'No definida',
-        comment: comment || ''
+        previousStatus: previousStatus || "NUEVO",
+        dueDate: pqr.dueDate
+          ? new Date(pqr.dueDate).toLocaleDateString()
+          : "No definida",
+        comment: comment || "",
       };
 
       // Enviar notificación al usuario que reportó
@@ -128,14 +142,14 @@ export class PQRNotificationService {
         // Personalizar para el usuario que reportó
         const reporterData = {
           ...templateData,
-          recipientName: reporter.name
+          recipientName: reporter.name,
         };
 
         // Enviar email
         await sendEmail({
           to: reporter.email,
           subject: this.replaceTemplateVars(template.subject, reporterData),
-          html: this.replaceTemplateVars(template.content, reporterData)
+          html: this.replaceTemplateVars(template.content, reporterData),
         });
 
         // Enviar notificación push
@@ -145,8 +159,8 @@ export class PQRNotificationService {
           body: this.replaceTemplateVars(template.content, reporterData),
           data: {
             pqrId: pqr.id.toString(),
-            status: newStatus
-          }
+            status: newStatus,
+          },
         });
 
         // Registrar notificación
@@ -154,11 +168,11 @@ export class PQRNotificationService {
           data: {
             pqrId,
             userId: reporter.id,
-            type: 'STATUS_CHANGE',
-            title: `Cambio de estado: ${previousStatus || 'NUEVO'} → ${newStatus}`,
-            content: comment || '',
-            sentAt: new Date()
-          }
+            type: "STATUS_CHANGE",
+            title: `Cambio de estado: ${previousStatus || "NUEVO"} → ${newStatus}`,
+            content: comment || "",
+            sentAt: new Date(),
+          },
         });
       }
 
@@ -167,14 +181,14 @@ export class PQRNotificationService {
         // Personalizar para el usuario asignado
         const assigneeData = {
           ...templateData,
-          recipientName: assignee.name
+          recipientName: assignee.name,
         };
 
         // Enviar email
         await sendEmail({
           to: assignee.email,
           subject: this.replaceTemplateVars(template.subject, assigneeData),
-          html: this.replaceTemplateVars(template.content, assigneeData)
+          html: this.replaceTemplateVars(template.content, assigneeData),
         });
 
         // Enviar notificación push
@@ -184,8 +198,8 @@ export class PQRNotificationService {
           body: this.replaceTemplateVars(template.content, assigneeData),
           data: {
             pqrId: pqr.id.toString(),
-            status: newStatus
-          }
+            status: newStatus,
+          },
         });
 
         // Registrar notificación
@@ -193,17 +207,17 @@ export class PQRNotificationService {
           data: {
             pqrId,
             userId: assignee.id,
-            type: 'STATUS_CHANGE',
-            title: `Cambio de estado: ${previousStatus || 'NUEVO'} → ${newStatus}`,
-            content: comment || '',
-            sentAt: new Date()
-          }
+            type: "STATUS_CHANGE",
+            title: `Cambio de estado: ${previousStatus || "NUEVO"} → ${newStatus}`,
+            content: comment || "",
+            sentAt: new Date(),
+          },
         });
       }
 
       return true;
     } catch (error) {
-      console.error('Error al enviar notificación de cambio de estado:', error);
+      console.error("Error al enviar notificación de cambio de estado:", error);
       return false;
     }
   }
@@ -222,13 +236,13 @@ export class PQRNotificationService {
       const pqrs = await this.prisma.pQR.findMany({
         where: {
           status: {
-            in: [PQRStatus.OPEN, PQRStatus.ASSIGNED, PQRStatus.IN_PROGRESS]
+            in: [PQRStatus.OPEN, PQRStatus.ASSIGNED, PQRStatus.IN_PROGRESS],
           },
           dueDate: {
             gte: now,
-            lte: tomorrow
-          }
-        }
+            lte: tomorrow,
+          },
+        },
       });
 
       let reminderCount = 0;
@@ -237,14 +251,14 @@ export class PQRNotificationService {
       for (const pqr of pqrs) {
         // Obtener información del usuario que reportó
         const reporter = await this.prisma.user.findUnique({
-          where: { id: pqr.userId }
+          where: { id: pqr.userId },
         });
 
         // Obtener información del usuario asignado (si existe)
         let assignee = null;
         if (pqr.assignedToId) {
           assignee = await this.prisma.user.findUnique({
-            where: { id: pqr.assignedToId }
+            where: { id: pqr.assignedToId },
           });
         }
 
@@ -253,8 +267,12 @@ export class PQRNotificationService {
           ticketNumber: pqr.ticketNumber,
           title: pqr.title,
           status: pqr.status,
-          dueDate: pqr.dueDate ? new Date(pqr.dueDate).toLocaleDateString() : 'No definida',
-          hoursRemaining: Math.round((pqr.dueDate.getTime() - now.getTime()) / 3600000)
+          dueDate: pqr.dueDate
+            ? new Date(pqr.dueDate).toLocaleDateString()
+            : "No definida",
+          hoursRemaining: Math.round(
+            (pqr.dueDate.getTime() - now.getTime()) / 3600000,
+          ),
         };
 
         // Enviar recordatorio al usuario asignado (si existe)
@@ -262,7 +280,7 @@ export class PQRNotificationService {
           // Personalizar para el usuario asignado
           const assigneeData = {
             ...templateData,
-            recipientName: assignee.name
+            recipientName: assignee.name,
           };
 
           // Enviar email
@@ -273,7 +291,7 @@ export class PQRNotificationService {
               <p>Hola ${assignee.name},</p>
               <p>El PQR <strong>${pqr.ticketNumber}: ${pqr.title}</strong> vence en <strong>${templateData.hoursRemaining} horas</strong>.</p>
               <p>Por favor, toma las acciones necesarias para resolverlo antes de la fecha límite.</p>
-            `
+            `,
           });
 
           // Enviar notificación push
@@ -283,8 +301,8 @@ export class PQRNotificationService {
             body: `El PQR vence en ${templateData.hoursRemaining} horas. Por favor, toma las acciones necesarias.`,
             data: {
               pqrId: pqr.id.toString(),
-              status: pqr.status
-            }
+              status: pqr.status,
+            },
           });
 
           // Registrar notificación
@@ -292,11 +310,11 @@ export class PQRNotificationService {
             data: {
               pqrId: pqr.id,
               userId: assignee.id,
-              type: 'DUE_DATE_REMINDER',
+              type: "DUE_DATE_REMINDER",
               title: `Recordatorio de vencimiento: ${templateData.hoursRemaining} horas restantes`,
               content: `El PQR ${pqr.ticketNumber} vence el ${templateData.dueDate}`,
-              sentAt: new Date()
-            }
+              sentAt: new Date(),
+            },
           });
 
           reminderCount++;
@@ -305,7 +323,7 @@ export class PQRNotificationService {
 
       return reminderCount;
     } catch (error) {
-      console.error('Error al enviar recordatorios de vencimiento:', error);
+      console.error("Error al enviar recordatorios de vencimiento:", error);
       return 0;
     }
   }
@@ -319,7 +337,7 @@ export class PQRNotificationService {
     try {
       // Obtener información del PQR
       const pqr = await this.prisma.pQR.findUnique({
-        where: { id: pqrId }
+        where: { id: pqrId },
       });
 
       if (!pqr || pqr.status !== PQRStatus.RESOLVED) {
@@ -342,7 +360,7 @@ export class PQRNotificationService {
 
       // Obtener información del usuario que reportó
       const reporter = await this.prisma.user.findUnique({
-        where: { id: pqr.userId }
+        where: { id: pqr.userId },
       });
 
       if (!reporter) {
@@ -362,7 +380,7 @@ export class PQRNotificationService {
           <p>Nos gustaría conocer tu opinión sobre la atención recibida. Por favor, completa la siguiente encuesta de satisfacción:</p>
           <p><a href="${surveyUrl}" style="padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Completar encuesta</a></p>
           <p>Tu opinión es muy importante para nosotros y nos ayuda a mejorar nuestro servicio.</p>
-        `
+        `,
       });
 
       // Enviar notificación push
@@ -373,8 +391,8 @@ export class PQRNotificationService {
         data: {
           pqrId: pqr.id.toString(),
           status: pqr.status,
-          surveyUrl
-        }
+          surveyUrl,
+        },
       });
 
       // Registrar notificación
@@ -382,16 +400,16 @@ export class PQRNotificationService {
         data: {
           pqrId: pqr.id,
           userId: reporter.id,
-          type: 'SATISFACTION_SURVEY',
+          type: "SATISFACTION_SURVEY",
           title: `Encuesta de satisfacción: PQR ${pqr.ticketNumber}`,
           content: `Por favor, completa la encuesta de satisfacción para el PQR resuelto.`,
-          sentAt: new Date()
-        }
+          sentAt: new Date(),
+        },
       });
 
       return true;
     } catch (error) {
-      console.error('Error al enviar encuesta de satisfacción:', error);
+      console.error("Error al enviar encuesta de satisfacción:", error);
       return false;
     }
   }
@@ -402,13 +420,16 @@ export class PQRNotificationService {
    * @param previousStatus Estado anterior (opcional)
    * @returns Plantilla de notificación
    */
-  private async getNotificationTemplate(newStatus: string, previousStatus?: string) {
+  private async getNotificationTemplate(
+    newStatus: string,
+    previousStatus?: string,
+  ) {
     try {
       // Intentar obtener plantilla personalizada
-      const templateName = previousStatus 
+      const templateName = previousStatus
         ? `status_change_${previousStatus}_to_${newStatus}`
         : `status_change_to_${newStatus}`;
-      
+
       const customTemplate = await this.prisma.notificationTemplate.findFirst({
         where: {
           schemaName: this.schema,
@@ -419,36 +440,39 @@ export class PQRNotificationService {
       if (customTemplate) {
         return {
           subject: customTemplate.subject,
-          content: customTemplate.content
+          content: customTemplate.content,
         };
       }
 
       // Usar plantilla predeterminada según el estado
-      let templateKey = 'DEFAULT';
-      
+      let templateKey = "DEFAULT";
+
       switch (newStatus) {
         case PQRStatus.ASSIGNED:
-          templateKey = 'STATUS_CHANGE_ASSIGNED';
+          templateKey = "STATUS_CHANGE_ASSIGNED";
           break;
         case PQRStatus.IN_PROGRESS:
-          templateKey = 'STATUS_CHANGE_IN_PROGRESS';
+          templateKey = "STATUS_CHANGE_IN_PROGRESS";
           break;
         case PQRStatus.RESOLVED:
-          templateKey = 'STATUS_CHANGE_RESOLVED';
+          templateKey = "STATUS_CHANGE_RESOLVED";
           break;
         case PQRStatus.CLOSED:
-          templateKey = 'STATUS_CHANGE_CLOSED';
+          templateKey = "STATUS_CHANGE_CLOSED";
           break;
         case PQRStatus.REOPENED:
-          templateKey = 'STATUS_CHANGE_REOPENED';
+          templateKey = "STATUS_CHANGE_REOPENED";
           break;
       }
-      
+
       // Devolver la plantilla correspondiente o la predeterminada
-      return this.notificationTemplates[templateKey] || this.notificationTemplates['DEFAULT'];
+      return (
+        this.notificationTemplates[templateKey] ||
+        this.notificationTemplates["DEFAULT"]
+      );
     } catch (error) {
-      console.error('Error al obtener plantilla de notificación:', error);
-      return this.notificationTemplates['DEFAULT'];
+      console.error("Error al obtener plantilla de notificación:", error);
+      return this.notificationTemplates["DEFAULT"];
     }
   }
 
@@ -458,23 +482,26 @@ export class PQRNotificationService {
    * @param data Datos para reemplazar
    * @returns Texto con variables reemplazadas
    */
-  private replaceTemplateVars(template: string, data: Record<string, any>): string {
-    if (!template) return '';
-    
+  private replaceTemplateVars(
+    template: string,
+    data: Record<string, any>,
+  ): string {
+    if (!template) return "";
+
     let result = template;
-    
+
     // Reemplazar variables simples {{variable}}
     for (const [key, value] of Object.entries(data)) {
-      const regex = new RegExp(`{{${key}}}`, 'g');
-      result = result.replace(regex, value?.toString() || '');
+      const regex = new RegExp(`{{${key}}}`, "g");
+      result = result.replace(regex, value?.toString() || "");
     }
-    
+
     // Procesar condicionales {{#if variable}}...{{/if}}
     const conditionalRegex = /{{#if ([^}]+)}}([\s\S]*?){{\/if}}/g;
     result = result.replace(conditionalRegex, (match, condition, content) => {
-      return data[condition] ? content : '';
+      return data[condition] ? content : "";
     });
-    
+
     return result;
   }
 

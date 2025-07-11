@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useAuthStore } from '@/store/authStore';
-import AdminHeader from '@/components/admin/layout/AdminHeader';
-import AdminSidebar from '@/components/admin/layout/AdminSidebar';
-import { AdminDashboardContent } from '@/components/admin/dashboard/AdminDashboardContent';
-import { Loader2 } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useAuthStore } from "@/store/authStore";
+import AdminHeader from "@/components/admin/layout/AdminHeader";
+import AdminSidebar from "@/components/admin/layout/AdminSidebar";
+import { AdminDashboardContent } from "@/components/admin/dashboard/AdminDashboardContent";
+import { Loader2 } from "lucide-react";
 
 export default function AdminDashboard() {
   const { user, loading, logout } = useAuthStore();
@@ -19,12 +19,16 @@ export default function AdminDashboard() {
     );
   }
 
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || user.role !== "ADMIN") {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Acceso Denegado</h1>
-          <p className="text-gray-600">No tienes permisos para acceder a esta página.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Acceso Denegado
+          </h1>
+          <p className="text-gray-600">
+            No tienes permisos para acceder a esta página.
+          </p>
         </div>
       </div>
     );
@@ -33,23 +37,25 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header específico del dashboard */}
-      <AdminHeader 
+      <AdminHeader
         adminName={user?.name || "Administrador"}
         complexName="Conjunto Residencial Armonía"
         onLogout={logout}
       />
-      
+
       <div className="flex">
         {/* Sidebar */}
-        <AdminSidebar 
+        <AdminSidebar
           collapsed={sidebarCollapsed}
           onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
-        
+
         {/* Main Content */}
-        <main className={`flex-1 transition-all duration-300 ${
-          sidebarCollapsed ? 'ml-16' : 'ml-64'
-        }`}>
+        <main
+          className={`flex-1 transition-all duration-300 ${
+            sidebarCollapsed ? "ml-16" : "ml-64"
+          }`}
+        >
           <div className="p-6">
             <AdminDashboardContent />
           </div>
