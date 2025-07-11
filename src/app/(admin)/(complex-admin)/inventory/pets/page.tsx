@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, PlusCircle, Edit, Trash2 } from 'lucide-react';
@@ -39,13 +39,7 @@ export default function PetsPage() {
     isActive: true,
   });
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchPets();
-    }
-  }, [authLoading, user]);
-
-  const fetchPets = async () => {
+  const fetchPets = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getPets();
@@ -60,7 +54,13 @@ export default function PetsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchPets();
+    }
+  }, [authLoading, user, fetchPets]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;

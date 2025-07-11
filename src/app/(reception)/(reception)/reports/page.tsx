@@ -1,6 +1,4 @@
-"use client";
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -61,6 +59,14 @@ export default function ReportsPage() {
     }
   };
 
+  const fetchData = useCallback(() => {
+    // Simular carga de datos
+    setTimeout(() => {
+      setReportData(mockReportData);
+      setIsLoading(false);
+    }, 1000);
+  }, [mockReportData]);
+
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login?portal=reception');
@@ -72,12 +78,8 @@ export default function ReportsPage() {
       return;
     }
 
-    // Simular carga de datos
-    setTimeout(() => {
-      setReportData(mockReportData);
-      setIsLoading(false);
-    }, 1000);
-  }, [user, loading, router]);
+    fetchData();
+  }, [user, loading, router, fetchData]);
 
   const generateReport = () => {
     // Simular generación de reporte

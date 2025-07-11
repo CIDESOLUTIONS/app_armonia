@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, PlusCircle, Edit, Trash2 } from 'lucide-react';
@@ -40,13 +40,7 @@ export default function CommonAssetsPage() {
     isActive: true,
   });
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchCommonAssets();
-    }
-  }, [authLoading, user]);
-
-  const fetchCommonAssets = async () => {
+  const fetchCommonAssets = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getCommonAssets();
@@ -61,7 +55,13 @@ export default function CommonAssetsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchCommonAssets();
+    }
+  }, [authLoading, user, fetchCommonAssets]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;

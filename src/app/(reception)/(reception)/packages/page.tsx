@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { Card, CardContent } from '@/components/ui/card';
@@ -17,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Package, Mail, Search, Camera, Clock, AlertCircle, CheckCircle, PlusCircle, X, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import Image from 'next/image';
 
 interface PackageItem {
   id: string;
@@ -62,7 +61,7 @@ export default function ReceptionPackagesPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Datos de ejemplo para desarrollo y pruebas
-  const mockPackages: PackageItem[] = [
+  const mockPackages: PackageItem[] = useMemo(() => [
     {
       id: "pkg1",
       type: 'package',
@@ -117,40 +116,40 @@ export default function ReceptionPackagesPage() {
       status: 'returned',
       notes: "Devuelto al remitente después de 3 días sin reclamar"
     }
-  ];
+  ], []);
+
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      _setError(null);
+      
+      // En un entorno real, esto sería una llamada a la API
+      // const response = await fetch('/api/packages');
+      // const result = await response.json();
+      // if (!response.ok) throw new Error(result.message || 'Error al cargar datos');
+      // setPackages(result.packages);
+      
+      // Simulamos un retraso en la carga de datos
+      setTimeout(() => {
+        setPackages(mockPackages);
+        setLoading(false);
+      }, 1000);
+      
+    } catch (err: any) {
+      console.error("[ReceptionPackages] Error:", err);
+      _setError(err.message || 'Error al cargar datos de paquetes');
+      setLoading(false);
+    }
+  }, [mockPackages, _setError, setPackages, setLoading]);
 
   useEffect(() => {
-    if (!isLoggedIn || !token || !schemaName) {
-      router.push('/login');
+    if (!isLoggedIn || !_token || !schemaName) {
+      _router.push('/login');
       return;
     }
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // En un entorno real, esto sería una llamada a la API
-        // // Variable response eliminada por lint
-        // const _result = await response.json();
-        // if (!response.ok) throw new Error(result.message || 'Error al cargar datos');
-        // setPackages(result.packages);
-        
-        // Simulamos un retraso en la carga de datos
-        setTimeout(() => {
-          setPackages(mockPackages);
-          setLoading(false);
-        }, 1000);
-        
-      } catch (err) {
-        console.error("[ReceptionPackages] Error:", err);
-        setError(err.message || 'Error al cargar datos de paquetes');
-        setLoading(false);
-      }
-    };
-
     fetchData();
-  }, [isLoggedIn, token, schemaName, router]);
+  }, [isLoggedIn, _token, schemaName, _router, fetchData]);
 
   // Función para formatear fechas
   const formatDate = (dateString: string | undefined) => {
@@ -772,10 +771,12 @@ export default function ReceptionPackagesPage() {
               </div>
               {newPackageForm.photo && (
                 <div className="mt-2 flex items-center bg-gray-50 p-2 rounded-md">
-                  <img 
+                  <Image 
                     src={URL.createObjectURL(newPackageForm.photo)} 
                     alt="Preview" 
-                    className="h-10 w-10 rounded-md object-cover mr-3"
+                    width={40}
+                    height={40}
+                    className="rounded-md object-cover mr-3"
                   />
                   <span className="text-sm truncate flex-grow">{newPackageForm.photo.name}</span>
                   <Button 

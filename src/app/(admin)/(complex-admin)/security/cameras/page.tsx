@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, PlusCircle, Edit, Trash2, Video } from 'lucide-react';
@@ -42,13 +42,7 @@ export default function CamerasPage() {
     isActive: true,
   });
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchCameras();
-    }
-  }, [authLoading, user]);
-
-  const fetchCameras = async () => {
+  const fetchCameras = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getCameras();
@@ -63,7 +57,13 @@ export default function CamerasPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchCameras();
+    }
+  }, [authLoading, user, fetchCameras]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;

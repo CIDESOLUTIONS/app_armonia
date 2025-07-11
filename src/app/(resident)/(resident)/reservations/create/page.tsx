@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2 } from 'lucide-react';
@@ -43,16 +43,10 @@ export default function CreateReservationPage() {
   });
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchAmenities();
-    }
-  }, [authLoading, user]);
-
-  const fetchAmenities = async () => {
+  const fetchAmenities = useCallback(async () => {
     try {
       const data = await getAmenities();
-      setAmenities(data.filter(amenity => amenity.isActive));
+      setAmenities(data.filter((amenity: Amenity) => amenity.isActive));
     } catch (error) {
       console.error('Error fetching amenities:', error);
       toast({
@@ -61,7 +55,13 @@ export default function CreateReservationPage() {
         variant: 'destructive',
       });
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchAmenities();
+    }
+  }, [authLoading, user, fetchAmenities]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;

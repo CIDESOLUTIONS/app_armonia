@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2 } from 'lucide-react';
@@ -43,17 +43,11 @@ export default function EditAssemblyPage() {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!authLoading && user && assemblyId) {
-      fetchAssembly();
-    }
-  }, [authLoading, user, assemblyId]);
-
-  const fetchAssembly = async () => {
+  const fetchAssembly = useCallback(async () => {
     setLoading(true);
     try {
       const response = await getAssemblies(); // Fetch all to find by ID for now
-      const assembly = response.data.find(a => a.id === assemblyId);
+      const assembly = response.data.find((a: Assembly) => a.id === assemblyId);
       if (assembly) {
         setFormData({
           title: assembly.title,
@@ -83,7 +77,13 @@ export default function EditAssemblyPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [assemblyId, router, toast]);
+
+  useEffect(() => {
+    if (!authLoading && user && assemblyId) {
+      fetchAssembly();
+    }
+  }, [authLoading, user, assemblyId, fetchAssembly]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;

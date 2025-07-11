@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, Edit, Trash2, User, Calendar, Info, CheckCircle, XCircle } from 'lucide-react';
@@ -36,18 +36,12 @@ export default function ViewProjectPage() {
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!authLoading && user && projectId) {
-      fetchProject();
-    }
-  }, [authLoading, user, projectId]);
-
-  const fetchProject = async () => {
+  const fetchProject = useCallback(async () => {
     setLoading(true);
     try {
       // For simplicity, fetching all and filtering. In a real app, you'd have a getProjectById endpoint.
       const data = await getProjects(); 
-      const foundProject = data.find(p => p.id === projectId);
+      const foundProject = data.find((p: Project) => p.id === projectId);
       if (foundProject) {
         setProject(foundProject);
       } else {
@@ -69,7 +63,13 @@ export default function ViewProjectPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectId, router, toast]);
+
+  useEffect(() => {
+    if (!authLoading && user && projectId) {
+      fetchProject();
+    }
+  }, [authLoading, user, projectId, fetchProject]);
 
   const handleDeleteProject = async () => {
     if (confirm('¿Estás seguro de que quieres eliminar este proyecto?')) {

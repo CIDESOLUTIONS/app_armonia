@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Edit } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
@@ -48,18 +48,12 @@ export default function ViewResidentReservationPage() {
   const [reservation, setReservation] = useState<Reservation | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!authLoading && user && reservationId) {
-      fetchReservation();
-    }
-  }, [authLoading, user, reservationId]);
-
-  const fetchReservation = async () => {
+  const fetchReservation = useCallback(async () => {
     setLoading(true);
     try {
       // For simplicity, fetching all and filtering. In a real app, you'd have a getReservationById endpoint.
       const data = await getReservations(); 
-      const foundReservation = data.find(r => r.id === reservationId);
+      const foundReservation = data.find((r: Reservation) => r.id === reservationId);
       if (foundReservation) {
         setReservation(foundReservation);
       } else {
@@ -81,7 +75,13 @@ export default function ViewResidentReservationPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [reservationId, router, toast]);
+
+  useEffect(() => {
+    if (!authLoading && user && reservationId) {
+      fetchReservation();
+    }
+  }, [authLoading, user, reservationId, fetchReservation]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-CO', {

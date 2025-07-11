@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, Edit, Trash2, CheckCircle, XCircle, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -41,13 +41,7 @@ export default function ReservationsPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchReservations();
-    }
-  }, [authLoading, user]);
-
-  const fetchReservations = async () => {
+  const fetchReservations = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getReservations();
@@ -62,7 +56,13 @@ export default function ReservationsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchReservations();
+    }
+  }, [authLoading, user, fetchReservations]);
 
   const handleUpdateStatus = async (id: number, status: 'APPROVED' | 'REJECTED') => {
     try {

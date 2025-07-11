@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, PlusCircle, Edit, Trash2, Calendar as CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -41,13 +41,7 @@ export default function CommunityEventsPage() {
     isPublic: true,
   });
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchEvents();
-    }
-  }, [authLoading, user]);
-
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getCommunityEvents();
@@ -62,7 +56,13 @@ export default function CommunityEventsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchEvents();
+    }
+  }, [authLoading, user, fetchEvents]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;

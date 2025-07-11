@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Label } from '@/components/ui/label';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -53,13 +53,7 @@ export default function ViewPQRPage() {
   const [selectedStatus, setSelectedStatus] = useState<PQR['status'] | ''>('');
   const [selectedAssignee, setSelectedAssignee] = useState<string | number>(''); // Assuming assignee ID or name
 
-  useEffect(() => {
-    if (!authLoading && user && pqrId) {
-      fetchPQR();
-    }
-  }, [authLoading, user, pqrId]);
-
-  const fetchPQR = async () => {
+  const fetchPQR = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getPQRById(pqrId as number);
@@ -77,7 +71,13 @@ export default function ViewPQRPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [pqrId, router, toast]);
+
+  useEffect(() => {
+    if (!authLoading && user && pqrId) {
+      fetchPQR();
+    }
+  }, [authLoading, user, pqrId, fetchPQR]);
 
   const handleAddComment = async () => {
     if (!pqrId || !newComment.trim()) return;

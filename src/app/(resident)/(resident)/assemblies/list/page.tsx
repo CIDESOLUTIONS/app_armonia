@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, Eye, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -29,13 +29,7 @@ export default function ResidentAssembliesPage() {
   const [assemblies, setAssemblies] = useState<Assembly[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchAssemblies();
-    }
-  }, [authLoading, user]);
-
-  const fetchAssemblies = async () => {
+  const fetchAssemblies = useCallback(async () => {
     setLoading(true);
     try {
       const response = await getAssemblies(); // Fetch all assemblies for the complex
@@ -50,7 +44,13 @@ export default function ResidentAssembliesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchAssemblies();
+    }
+  }, [authLoading, user, fetchAssemblies]);
 
   if (authLoading || loading) {
     return (

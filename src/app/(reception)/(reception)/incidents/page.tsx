@@ -82,7 +82,7 @@ export default function ReceptionIncidentsPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Datos de ejemplo para desarrollo y pruebas
-  const mockIncidents: Incident[] = [
+  const mockIncidents: Incident[] = useMemo(() => [
     {
       id: "inc1",
       title: "Intento de ingreso no autorizado",
@@ -255,40 +255,40 @@ export default function ReceptionIncidentsPage() {
         }
       ]
     }
-  ];
+  ], []);
+
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      _setError(null);
+      
+      // En un entorno real, esto sería una llamada a la API
+      // const response = await fetch('/api/incidents');
+      // const result = await response.json();
+      // if (!response.ok) throw new Error(result.message || 'Error al cargar datos');
+      // setIncidents(result.incidents);
+      
+      // Simulamos un retraso en la carga de datos
+      setTimeout(() => {
+        setIncidents(mockIncidents);
+        setLoading(false);
+      }, 1000);
+      
+    } catch (err: any) {
+      console.error("[ReceptionIncidents] Error:", err);
+      _setError(err.message || 'Error al cargar datos de incidentes');
+      setLoading(false);
+    }
+  }, [mockIncidents, _setError, setIncidents, setLoading]);
 
   useEffect(() => {
     if (!isLoggedIn || !token || !schemaName) {
-      router.push('/login');
+      _router.push('/login');
       return;
     }
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // En un entorno real, esto sería una llamada a la API
-        // // Variable response eliminada por lint
-        // const _result = await response.json();
-        // if (!response.ok) throw new Error(result.message || 'Error al cargar datos');
-        // setIncidents(result.incidents);
-        
-        // Simulamos un retraso en la carga de datos
-        setTimeout(() => {
-          setIncidents(mockIncidents);
-          setLoading(false);
-        }, 1000);
-        
-      } catch (err) {
-        console.error("[ReceptionIncidents] Error:", err);
-        setError(err.message || 'Error al cargar datos de incidentes');
-        setLoading(false);
-      }
-    };
-
     fetchData();
-  }, [isLoggedIn, token, schemaName, router]);
+  }, [isLoggedIn, token, schemaName, _router, fetchData]);
 
   // Función para formatear fechas
   const formatDate = (dateString: string | undefined) => {

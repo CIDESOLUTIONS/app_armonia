@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { Filter, Search, Loader2, PlusCircle, Eye, Edit, Trash2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -37,13 +37,7 @@ export default function ProjectListPage() {
     search: '',
   });
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchProjects();
-    }
-  }, [authLoading, user, filters]);
-
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getProjects(filters);
@@ -58,7 +52,13 @@ export default function ProjectListPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchProjects();
+    }
+  }, [authLoading, user, fetchProjects]);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

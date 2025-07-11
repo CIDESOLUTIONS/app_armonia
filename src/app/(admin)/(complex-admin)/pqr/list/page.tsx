@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { Filter, Search, Loader2, PlusCircle, Eye, Edit, Trash2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -38,13 +38,7 @@ export default function PQRListPage() {
     search: '',
   });
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchPQRs();
-    }
-  }, [authLoading, user, filters]);
-
-  const fetchPQRs = async () => {
+  const fetchPQRs = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getPQRs(filters);
@@ -59,7 +53,13 @@ export default function PQRListPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchPQRs();
+    }
+  }, [authLoading, user, fetchPQRs]);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

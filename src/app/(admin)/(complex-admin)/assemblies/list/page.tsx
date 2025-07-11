@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import AdminHeader from '@/components/admin/layout/AdminHeader';
 import AdminSidebar from '@/components/admin/layout/AdminSidebar';
@@ -31,13 +31,7 @@ export default function AssembliesPage() {
   const [assemblies, setAssemblies] = useState<Assembly[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchAssemblies();
-    }
-  }, [authLoading, user]);
-
-  const fetchAssemblies = async () => {
+  const fetchAssemblies = useCallback(async () => {
     setLoading(true);
     try {
       const response = await getAssemblies();
@@ -52,7 +46,13 @@ export default function AssembliesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchAssemblies();
+    }
+  }, [authLoading, user, fetchAssemblies]);
 
   const handleDeleteAssembly = async (id: number) => {
     if (confirm('¿Estás seguro de que quieres eliminar esta asamblea?')) {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { Loader2, Calendar, MapPin, FileText, Users, CheckCircle, XCircle, ThumbsUp, ThumbsDown } from 'lucide-react';
@@ -37,18 +37,12 @@ export default function ViewResidentAssemblyPage() {
   const [assembly, setAssembly] = useState<Assembly | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!authLoading && user && assemblyId) {
-      fetchAssembly();
-    }
-  }, [authLoading, user, assemblyId]);
-
-  const fetchAssembly = async () => {
+  const fetchAssembly = useCallback(async () => {
     setLoading(true);
     try {
       // For simplicity, fetching all and filtering. In a real app, you'd have a getAssemblyById endpoint.
       const response = await getAssemblies(); 
-      const foundAssembly = response.data.find(a => a.id === assemblyId);
+      const foundAssembly = response.data.find((a: Assembly) => a.id === assemblyId);
       if (foundAssembly) {
         // Add mock voting data for demonstration
         setAssembly({
@@ -80,7 +74,13 @@ export default function ViewResidentAssemblyPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [assemblyId, router, toast]);
+
+  useEffect(() => {
+    if (!authLoading && user && assemblyId) {
+      fetchAssembly();
+    }
+  }, [authLoading, user, assemblyId, fetchAssembly]);
 
   const handleVote = async (optionId: number) => {
     if (!assembly || !user) return;
