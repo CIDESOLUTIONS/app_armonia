@@ -66,7 +66,6 @@ export default function ReceptionVisitorsPage() {
   const [loading, setLoading] = useState(true);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [error, _setError] = useState<string | null>(null);
-  const [_searchTerm, _setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<
     "active" | "departed" | "all"
   >("active");

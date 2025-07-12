@@ -18,6 +18,49 @@ interface ApiResponse<T> {
   };
 }
 
+// --- New Types ---
+interface User {
+  id: number;
+  email: string;
+  role: string;
+  schemaName?: string;
+  // Add other user properties as needed
+}
+
+interface AuthResponse {
+  user: User;
+  token: string;
+}
+
+interface PQR {
+  id: number;
+  // Add other PQR properties as needed
+}
+
+interface Resident {
+  id: number;
+  // Add other Resident properties as needed
+}
+
+interface Assembly {
+  id: number;
+  // Add other Assembly properties as needed
+}
+
+interface Payment {
+  id: number;
+  // Add other Payment properties as needed
+}
+
+interface Package {
+  id: number;
+  // Add other Package properties as needed
+}
+
+type ListResponse<T> = T[]; // For endpoints returning an array of items
+
+// --- End New Types ---
+
 class ApiClient {
   private baseURL: string;
   private timeout: number;
@@ -94,22 +137,22 @@ class ApiClient {
   // Métodos HTTP
   async get<T>(
     endpoint: string,
-    params?: Record<string, any>,
+    params?: Record<string, string | number | boolean>,
   ): Promise<ApiResponse<T>> {
     const url = params
-      ? `${endpoint}?${new URLSearchParams(params)}`
+      ? `${endpoint}?${new URLSearchParams(params as Record<string, string>)}`
       : endpoint;
     return this.request<T>(url, { method: "GET" });
   }
 
-  async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async post<T, U = any>(endpoint: string, data?: U): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: "POST",
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
-  async put<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async put<T, U = any>(endpoint: string, data?: U): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: "PUT",
       body: data ? JSON.stringify(data) : undefined,
@@ -123,7 +166,10 @@ class ApiClient {
   // Métodos específicos para módulos
   auth = {
     login: (email: string, password: string, complexId?: number) =>
-      this.post<{ user: any; token: string }>("/auth/login", {
+      this.post<
+        AuthResponse,
+        { email: string; password: string; complexId?: number }
+      >("/auth/login", {
         email,
         password,
         complexId,
@@ -131,52 +177,62 @@ class ApiClient {
 
     logout: () => this.post<void>("/auth/logout"),
 
-    verifySession: () => this.get<{ user: any }>("/verify-session"),
+    verifySession: () => this.get<AuthResponse>("/verify-session"),
   };
 
   pqr = {
     list: (params?: { page?: number; limit?: number; status?: string }) =>
-      this.get<any[]>("/pqr", params),
+      this.get<ListResponse<PQR>>("/pqr", params),
 
-    create: (pqrData: any) => this.post<any>("/pqr", pqrData),
+    create: (pqrData: Omit<PQR, "id">) =>
+      this.post<PQR, Omit<PQR, "id">>("/pqr", pqrData),
 
-    getById: (id: number) => this.get<any>(`/pqr/${id}`),
+    getById: (id: number) => this.get<PQR>(`/pqr/${id}`),
 
-    update: (id: number, updates: any) => this.put<any>(`/pqr/${id}`, updates),
+    update: (id: number, updates: Partial<PQR>) =>
+      this.put<PQR, Partial<PQR>>(`/pqr/${id}`, updates),
 
     delete: (id: number) => this.delete<void>(`/pqr/${id}`),
   };
 
   residents = {
     list: (params?: { page?: number; limit?: number; search?: string }) =>
-      this.get<any[]>("/inventory/residents", params),
+      this.get<ListResponse<Resident>>("/inventory/residents", params),
 
-    create: (residentData: any) =>
-      this.post<any>("/inventory/residents", residentData),
+    create: (residentData: Omit<Resident, "id">) =>
+      this.post<Resident, Omit<Resident, "id">>(
+        "/inventory/residents",
+        residentData,
+      ),
   };
 
   assemblies = {
     list: (params?: { page?: number; limit?: number; status?: string }) =>
-      this.get<any[]>("/assemblies", params),
+      this.get<ListResponse<Assembly>>("/assemblies", params),
 
-    create: (assemblyData: any) => this.post<any>("/assemblies", assemblyData),
+    create: (assemblyData: Omit<Assembly, "id">) =>
+      this.post<Assembly, Omit<Assembly, "id">>("/assemblies", assemblyData),
   };
 
   payments = {
     list: (params?: { page?: number; limit?: number; status?: string }) =>
-      this.get<any[]>("/payments", params),
+      this.get<ListResponse<Payment>>("/payments", params),
 
-    create: (paymentData: any) => this.post<any>("/payments", paymentData),
+    create: (paymentData: Omit<Payment, "id">) =>
+      this.post<Payment, Omit<Payment, "id">>("/payments", paymentData),
 
-    getById: (id: number) => this.get<any>(`/payments/${id}`),
+    getById: (id: number) => this.get<Payment>(`/payments/${id}`),
   };
 
   packages = {
     list: (params?: { page?: number; limit?: number; status?: string }) =>
-      this.get<any[]>("/correspondence/packages", params),
+      this.get<ListResponse<Package>>("/correspondence/packages", params),
 
-    create: (packageData: any) =>
-      this.post<any>("/correspondence/packages", packageData),
+    create: (packageData: Omit<Package, "id">) =>
+      this.post<Package, Omit<Package, "id">>(
+        "/correspondence/packages",
+        packageData,
+      ),
   };
 }
 

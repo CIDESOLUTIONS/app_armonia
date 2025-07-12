@@ -38,11 +38,7 @@ import {
 } from "lucide-react";
 import NotificationCenterThemed from "@/components/communications/NotificationCenterThemed";
 // import { useRealTimeCommunication } from '@/lib/communications/real-time-context';
-import {
-  translate,
-  Language,
-  ThemeMode,
-} from "@/lib/communications/theme-config";
+import { Language, ThemeMode, } from "@/lib/communications/theme-config";
 
 interface Visitor {
   id: string;

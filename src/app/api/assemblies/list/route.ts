@@ -1,19 +1,28 @@
 // src/app/api/assemblies/list/route.ts
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-// Variable JWT_SECRET eliminada por lint
+interface AssemblyItem {
+  id: number;
+  title: string;
+  description?: string;
+  scheduledDate: string;
+  location: string;
+  type: string;
+  agenda: string;
+  status: string;
+  complexId: number;
+  createdBy: number;
+}
 
-export async function GET(_req: unknown) {
-  const _token = req.headers.get("Authorization")?.replace("Bearer ", "");
+export async function GET(req: NextRequest) {
+  const token = req.headers.get("Authorization")?.replace("Bearer ", "");
   if (!token) {
     return NextResponse.json({ message: "No token provided" }, { status: 401 });
   }
 
   try {
-    // Variable decoded eliminada por lint complexId: number; schemaName: string; role: string };
+    const decoded = jwt.decode(token) as { complexId: number; schemaName: string; role: string };
     console.log("[API Assemblies List] Token decodificado:", decoded);
 
-    const _schemaName = decoded.schemaName.toLowerCase();
+    const schemaName = decoded.schemaName.toLowerCase();
     await prisma.$disconnect();
     await prisma.$connect();
     prisma.setTenantSchema(schemaName);
@@ -21,11 +30,11 @@ export async function GET(_req: unknown) {
     const assemblies = (await prisma.$queryRawUnsafe(
       `SELECT * FROM "${schemaName}"."Assembly" WHERE "complexId" = $1 ORDER BY "createdAt" DESC`,
       decoded.complexId,
-    )) as any[];
+    )) as AssemblyItem[];
 
     console.log("[API Assemblies List] Asambleas encontradas:", assemblies);
     return NextResponse.json({ assemblies }, { status: 200 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("[API Assemblies List] Error detallado:", error);
     if (error instanceof jwt.JsonWebTokenError) {
       return NextResponse.json({ message: "Token inválido" }, { status: 401 });

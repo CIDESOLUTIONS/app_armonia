@@ -3,19 +3,19 @@ import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
 // Variable JWT_SECRET eliminada por lint
 
-export async function GET(_req: unknown) {
-  const _token = req.headers.get("Authorization")?.replace("Bearer ", "");
+export async function GET(req: NextRequest) {
+  const token = req.headers.get("Authorization")?.replace("Bearer ", "");
   if (!token)
     return NextResponse.json({ message: "No token provided" }, { status: 401 });
 
   try {
-    // Variable decoded eliminada por lint complexId: number; schemaName?: string };
-    const _schemaName = decoded.schemaName || `schema_${decoded.complexId}`;
+    const decoded = jwt.decode(token) as { complexId: number; schemaName?: string };
+    const schemaName = decoded.schemaName || `schema_${decoded.complexId}`;
     const prisma = getPrisma(schemaName);
     console.log("[API Attendance GET] Usando schema:", schemaName);
 
-    // Variable url eliminada por lint
-    // Variable assemblyId eliminada por lint
+    const url = new URL(req.url);
+    const assemblyId = url.searchParams.get("assemblyId");
     if (!assemblyId)
       return NextResponse.json({ message: "ID requerido" }, { status: 400 });
 

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, Bell, Send } from "lucide-react";
+import { Loader2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

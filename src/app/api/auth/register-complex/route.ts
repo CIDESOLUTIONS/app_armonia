@@ -112,7 +112,7 @@ export async function POST(req: Request) {
         city: validatedData.city || null,
         state: validatedData.state || null,
         country: validatedData.country || "Colombia",
-        propertyTypes: validatedData.propertyTypes as any,
+        propertyTypes: validatedData.propertyTypes,
         planType: planCode.toUpperCase() as "BASIC" | "STANDARD" | "PREMIUM",
         planStartDate: new Date(),
         planEndDate:

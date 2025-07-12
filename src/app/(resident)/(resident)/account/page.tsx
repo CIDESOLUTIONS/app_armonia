@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 
 export default function AccountPage() {
-  const { user } = useAuthStore();
+  const { } = useAuthStore();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

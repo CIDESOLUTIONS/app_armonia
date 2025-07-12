@@ -108,8 +108,8 @@ export default function ReceptionIncidentsPage() {
   interface NewIncidentForm {
     title: string;
     description: string;
-    category: Incident['category'];
-    priority: Incident['priority'];
+    category: Incident["category"];
+    priority: Incident["priority"];
     location: string;
     reportedBy: string;
     attachments: File[];
@@ -126,7 +126,7 @@ export default function ReceptionIncidentsPage() {
   });
   interface UpdateForm {
     content: string;
-    status: Incident['status'];
+    status: Incident["status"];
     attachments: File[];
   }
 
@@ -1382,7 +1382,7 @@ export default function ReceptionIncidentsPage() {
                 <div className="mt-2 space-y-2">
                   {newIncidentForm.attachments.map((file, index) => (
                     <div
-                      key={index}
+                      key={_index}
                       className="bg-gray-50 border rounded-md px-3 py-2 flex items-center justify-between"
                     >
                       <div className="flex items-center">

@@ -6,7 +6,6 @@ import {
   Loader2,
   PlusCircle,
   Eye,
-  Calendar as CalendarIcon,
   DollarSign,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";

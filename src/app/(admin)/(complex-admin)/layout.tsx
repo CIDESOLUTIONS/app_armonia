@@ -7,8 +7,7 @@ export const metadata: Metadata = {
   description: "Portal de administración para complejos residenciales",
 };
 
-import { Toaster } from "@/components/ui/toaster";
-import { ThemeProvider } from "next-themes";
+
 
 export default function AdminLayout({
   children,

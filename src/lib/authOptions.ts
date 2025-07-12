@@ -13,7 +13,7 @@ const prisma = new PrismaClient();
 // Función para validar y sanitizar el schemaName
 const getValidSchemaName = (schemaName: string | undefined): string | null => {
   if (!schemaName) return "armonia"; // Devuelve el schema por defecto si no se proporciona
-  
+
   // Sanitización básica: solo permitir caracteres alfanuméricos y guiones bajos
   const sanitizedSchema = schemaName.replace(/[^a-zA-Z0-9_]/g, "");
 
@@ -21,7 +21,9 @@ const getValidSchemaName = (schemaName: string | undefined): string | null => {
     return sanitizedSchema;
   }
 
-  ServerLogger.warn(`Intento de acceso con schemaName inválido o no autorizado: ${schemaName}`);
+  ServerLogger.warn(
+    `Intento de acceso con schemaName inválido o no autorizado: ${schemaName}`,
+  );
   return null;
 };
 
@@ -51,7 +53,10 @@ export const authOptions: NextAuthOptions = {
 
         try {
           if (validSchema !== "armonia") {
-            const databaseUrl = process.env.DATABASE_URL?.replace("armonia", validSchema);
+            const databaseUrl = process.env.DATABASE_URL?.replace(
+              "armonia",
+              validSchema,
+            );
             targetPrisma = new PrismaClient({
               datasources: {
                 db: {
@@ -67,7 +72,7 @@ export const authOptions: NextAuthOptions = {
 
           if (!user) {
             ServerLogger.warn(
-              `Intento de login fallido: Usuario no encontrado para ${email} en esquema ${validSchema}`
+              `Intento de login fallido: Usuario no encontrado para ${email} en esquema ${validSchema}`,
             );
             return null;
           }
@@ -76,7 +81,7 @@ export const authOptions: NextAuthOptions = {
 
           if (!passwordMatch) {
             ServerLogger.warn(
-              `Intento de login fallido: Contraseña incorrecta para ${email} en esquema ${validSchema}`
+              `Intento de login fallido: Contraseña incorrecta para ${email} en esquema ${validSchema}`,
             );
             return null;
           }
@@ -92,7 +97,7 @@ export const authOptions: NextAuthOptions = {
         } catch (error) {
           ServerLogger.error(
             `Error en la autorización para el esquema ${validSchema}:`,
-            error
+            error,
           );
           return null;
         } finally {

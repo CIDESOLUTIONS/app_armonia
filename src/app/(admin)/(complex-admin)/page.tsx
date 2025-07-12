@@ -23,7 +23,7 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-gray-50">
       <AdminHeader
         adminName={user.name || "Administrador"}
-        complexName="Conjunto Residencial Armonía" 
+        complexName="Conjunto Residencial Armonía"
         onLogout={logout}
       />
 

@@ -3,7 +3,7 @@
  * Proporciona funcionalidades para envío de correos electrónicos
  */
 
-import nodemailer from "nodemailer";
+import nodemailer, { Transporter, SendMailOptions } from "nodemailer";
 import { ServerLogger } from "../logging/server-logger";
 
 const logger = ServerLogger;
@@ -13,8 +13,35 @@ interface EmailOptions {
   subject: string;
   text?: string;
   html?: string;
-  attachments?: any[];
+  attachments?: (
+    | string
+    | { filename: string; path: string; contentType?: string }
+  )[];
   from?: string;
+}
+
+interface SendEmailResult {
+  success: boolean;
+  messageId?: string;
+  response?: string;
+  error?: string;
+}
+
+interface PQR {
+  id: number;
+  title: string;
+  status: string;
+  lastComment?: string;
+  // Add other PQR properties as needed from schema.prisma
+}
+
+interface Assembly {
+  id: number;
+  title: string;
+  date: Date;
+  location: string;
+  agenda: string;
+  // Add other Assembly properties as needed from schema.prisma
 }
 
 /**
@@ -22,10 +49,12 @@ interface EmailOptions {
  * @param config - Configuración personalizada (opcional)
  * @returns Transporte configurado
  */
-function createTransport(config: any = {}) {
+function createTransport(
+  config: nodemailer.TransportOptions = {},
+): Transporter {
   try {
     // Configuración por defecto para desarrollo
-    const defaultConfig = {
+    const defaultConfig: nodemailer.TransportOptions = {
       host: process.env.EMAIL_HOST || "smtp.example.com",
       port: parseInt(process.env.EMAIL_PORT || "587", 10),
       secure: process.env.EMAIL_SECURE === "true",
@@ -39,8 +68,13 @@ function createTransport(config: any = {}) {
     const finalConfig = { ...defaultConfig, ...config };
 
     return nodemailer.createTransport(finalConfig);
-  } catch (error: any) {
-    logger.error(`Error al crear transporte de email: ${error.message}`);
+  } catch (error: unknown) {
+    // Use unknown for caught errors
+    if (error instanceof Error) {
+      logger.error(`Error al crear transporte de email: ${error.message}`);
+    } else {
+      logger.error(`Error al crear transporte de email: ${String(error)}`);
+    }
     throw error;
   }
 }
@@ -58,8 +92,8 @@ function createTransport(config: any = {}) {
  */
 export async function sendEmail(
   options: EmailOptions,
-  config: any = {},
-): Promise<any> {
+  config: nodemailer.TransportOptions = {},
+): Promise<SendEmailResult> {
   try {
     if (!options.to) {
       throw new Error("El destinatario (to) es obligatorio");
@@ -75,7 +109,7 @@ export async function sendEmail(
 
     const transport = createTransport(config);
 
-    const mailOptions = {
+    const mailOptions: SendMailOptions = {
       from:
         options.from || process.env.EMAIL_FROM || "notificaciones@armonia.com",
       to: options.to,
@@ -96,11 +130,19 @@ export async function sendEmail(
       messageId: result.messageId,
       response: result.response,
     };
-  } catch (error: any) {
-    logger.error(`Error al enviar email: ${error.message}`);
+  } catch (error: unknown) {
+    // Use unknown for caught errors
+    if (error instanceof Error) {
+      logger.error(`Error al enviar email: ${error.message}`);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+    logger.error(`Error al enviar email: ${String(error)}`);
     return {
       success: false,
-      error: error.message,
+      error: String(error),
     };
   }
 }
@@ -117,7 +159,7 @@ export async function sendWelcomeEmail(user: {
   email: string;
   name: string;
   schemaName: string;
-}): Promise<any> {
+}): Promise<SendEmailResult> {
   try {
     if (!user || !user.email || !user.name) {
       throw new Error("Datos de usuario incompletos");
@@ -141,11 +183,19 @@ export async function sendWelcomeEmail(user: {
       text,
       html,
     });
-  } catch (error: any) {
-    logger.error(`Error al enviar email de bienvenida: ${error.message}`);
+  } catch (error: unknown) {
+    // Use unknown for caught errors
+    if (error instanceof Error) {
+      logger.error(`Error al enviar email de bienvenida: ${error.message}`);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+    logger.error(`Error al enviar email de bienvenida: ${String(error)}`);
     return {
       success: false,
-      error: error.message,
+      error: String(error),
     };
   }
 }
@@ -163,7 +213,7 @@ export async function sendPasswordResetEmail(
   user: { email: string; name?: string },
   resetToken: string,
   schemaName: string,
-): Promise<any> {
+): Promise<SendEmailResult> {
   try {
     if (!user || !user.email || !resetToken) {
       throw new Error("Datos incompletos para email de restablecimiento");
@@ -193,11 +243,21 @@ export async function sendPasswordResetEmail(
       text,
       html,
     });
-  } catch (error: any) {
-    logger.error(`Error al enviar email de restablecimiento: ${error.message}`);
+  } catch (error: unknown) {
+    // Use unknown for caught errors
+    if (error instanceof Error) {
+      logger.error(
+        `Error al enviar email de restablecimiento: ${error.message}`,
+      );
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+    logger.error(`Error al enviar email de restablecimiento: ${String(error)}`);
     return {
       success: false,
-      error: error.message,
+      error: String(error),
     };
   }
 }
@@ -210,10 +270,10 @@ export async function sendPasswordResetEmail(
  * @returns Resultado del envío
  */
 export async function sendPQRUpdateNotification(
-  pqr: any,
+  pqr: PQR,
   user: { email: string; name?: string },
   schemaName: string,
-): Promise<any> {
+): Promise<SendEmailResult> {
   try {
     if (!pqr || !user || !user.email) {
       throw new Error("Datos incompletos para notificación de PQR");
@@ -241,11 +301,19 @@ export async function sendPQRUpdateNotification(
       text,
       html,
     });
-  } catch (error: any) {
-    logger.error(`Error al enviar notificación de PQR: ${error.message}`);
+  } catch (error: unknown) {
+    // Use unknown for caught errors
+    if (error instanceof Error) {
+      logger.error(`Error al enviar notificación de PQR: ${error.message}`);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+    logger.error(`Error al enviar notificación de PQR: ${String(error)}`);
     return {
       success: false,
-      error: error.message,
+      error: String(error),
     };
   }
 }
@@ -258,10 +326,10 @@ export async function sendPQRUpdateNotification(
  * @returns Resultado del envío
  */
 export async function sendAssemblyInvitation(
-  assembly: any,
+  assembly: Assembly,
   user: { email: string; name?: string },
   schemaName: string,
-): Promise<any> {
+): Promise<SendEmailResult> {
   try {
     if (!assembly || !user || !user.email) {
       throw new Error("Datos incompletos para invitación a asamblea");
@@ -305,11 +373,19 @@ export async function sendAssemblyInvitation(
       text,
       html,
     });
-  } catch (error: any) {
-    logger.error(`Error al enviar invitación a asamblea: ${error.message}`);
+  } catch (error: unknown) {
+    // Use unknown for caught errors
+    if (error instanceof Error) {
+      logger.error(`Error al enviar invitación a asamblea: ${error.message}`);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+    logger.error(`Error al enviar invitación a asamblea: ${String(error)}`);
     return {
       success: false,
-      error: error.message,
+      error: String(error),
     };
   }
 }
@@ -322,8 +398,11 @@ export async function sendAssemblyInvitation(
  */
 export async function sendEmailWithAttachments(
   options: EmailOptions,
-  attachments: string[],
-): Promise<any> {
+  attachments: (
+    | string
+    | { filename: string; path: string; contentType?: string }
+  )[],
+): Promise<SendEmailResult> {
   try {
     if (!options || !options.to || !options.subject) {
       throw new Error("Opciones de correo incompletas");
@@ -341,24 +420,35 @@ export async function sendEmailWithAttachments(
       ...options,
       attachments: attachments.map((attachment) => {
         // Si es un objeto completo de adjunto, lo usamos directamente
-        if (typeof attachment === "object" && attachment.filename) {
+        if (
+          typeof attachment === "object" &&
+          (attachment as { filename: string }).filename
+        ) {
           return attachment;
         }
 
         // Si es una ruta de archivo, creamos el objeto de adjunto
         return {
-          filename: attachment.split("/").pop(),
-          path: attachment,
+          filename: (attachment as string).split("/").pop() || "attachment",
+          path: attachment as string,
         };
       }),
     };
 
     return await sendEmail(emailOptions);
-  } catch (error: any) {
-    logger.error(`Error al enviar email con adjuntos: ${error.message}`);
+  } catch (error: unknown) {
+    // Use unknown for caught errors
+    if (error instanceof Error) {
+      logger.error(`Error al enviar email con adjuntos: ${error.message}`);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+    logger.error(`Error al enviar email con adjuntos: ${String(error)}`);
     return {
       success: false,
-      error: error.message,
+      error: String(error),
     };
   }
 }

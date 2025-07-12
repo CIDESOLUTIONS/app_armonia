@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, PlusCircle, Edit, Trash2, FileText } from "lucide-react";
+import { Loader2, PlusCircle, Edit, Trash2 } from "lucide-react";
 import {
   Table,
   TableBody,

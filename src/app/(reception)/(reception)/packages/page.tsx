@@ -69,7 +69,6 @@ export default function ReceptionPackagesPage() {
   const [loading, setLoading] = useState(true);
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [error, _setError] = useState<string | null>(null);
-  const [_searchTerm, _setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<
     "pending" | "delivered" | "returned" | "all"
   >("pending");
