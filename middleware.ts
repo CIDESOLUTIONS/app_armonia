@@ -59,14 +59,20 @@ export async function middleware(request: NextRequest) {
 
       try {
         // Verificar el token
-        const secretKey = new TextEncoder().encode(
-          process.env.JWT_SECRET || "default_secret",
-        );
+        const jwtSecret = process.env.JWT_SECRET;
+        if (!jwtSecret || jwtSecret === "default_secret") {
+          console.error("CRITICAL SECURITY WARNING: JWT_SECRET is not set or is using the default value. This is highly insecure.");
+          // Optionally, you might want to redirect or throw an error here in production
+        }
+        const secretKey = new TextEncoder().encode(jwtSecret || "default_secret");
         const jwtVerification = await jwtVerify(token, secretKey);
 
         // Registrar información del usuario autenticado (opcional)
         if (jwtVerification.payload.email) {
           console.log(`Usuario autenticado: ${jwtVerification.payload.email}`);
+          if (jwtVerification.payload.schemaName) {
+            console.log(`Schema del conjunto: ${jwtVerification.payload.schemaName}`);
+          }
         }
 
         // Token válido, continuar

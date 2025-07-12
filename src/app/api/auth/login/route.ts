@@ -1,110 +1,89 @@
-// src/app/api/auth/login/route.ts
-import { NextResponse } from "next/server";
-import { getPrisma } from "@/lib/prisma";
-import { generateToken } from "@/lib/auth";
-import { withValidation } from "@/lib/validation";
-import {
-  LoginSchema,
-  type LoginRequest,
-} from "@/validators/auth/login.validator";
-import * as bcrypt from "bcrypt";
+import { NextResponse } from 'next/server';
+import { serialize } from 'cookie';
+import { sign } from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
+import { z } from 'zod';
+import prisma from '@/lib/prisma'; // Asume que tienes una instancia de Prisma
 
-async function loginHandler(validatedData: LoginRequest, req: Request) {
+const JWT_SECRET = process.env.JWT_SECRET || 'default_secret';
+
+// Esquema de validación con Zod
+const loginSchema = z.object({
+  email: z.string().email('Formato de email inválido'),
+  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
+  schemaName: z.string().optional(), // Opcional para usuarios globales
+});
+
+export async function POST(request: Request) {
   try {
-    const { email, password, complexId, schemaName } = validatedData;
-    console.log(
-      `[LOGIN] Intento de login para: ${email} en complejo: ${complexId || schemaName}`,
-    );
+    const body = await request.json();
+    const { email, password, schemaName } = loginSchema.parse(body);
 
-    const prisma = getPrisma();
+    let complexId: number | null = null;
+    let resolvedSchemaName: string | null = null;
 
-    // Construir la consulta con filtro multi-tenant
-    const whereClause: any = {
-      email: email,
-      active: true,
-    };
-
-    // Si se proporciona complexId, usarlo directamente
-    if (complexId) {
-      whereClause.complexId = complexId;
-    } else if (schemaName) {
-      // Si se proporciona schemaName, primero buscar el complex
-      const complex = await prisma.residentialComplex.findUnique({
+    if (schemaName) {
+      const residentialComplex = await prisma.residentialComplex.findUnique({
         where: { schemaName: schemaName },
       });
 
-      if (!complex) {
-        console.log(`[LOGIN] Complejo no encontrado: ${schemaName}`);
-        return NextResponse.json(
-          { message: "Complejo residencial no encontrado" },
-          { status: 404 },
-        );
+      if (!residentialComplex) {
+        return NextResponse.json({ message: 'Conjunto residencial no encontrado' }, { status: 404 });
       }
-
-      whereClause.complexId = complex.id;
+      complexId = residentialComplex.id;
+      resolvedSchemaName = residentialComplex.schemaName;
     }
-    // Si no se proporciona complexId ni schemaName, buscar usuario sin filtro de complejo
 
-    const user = await prisma.user.findFirst({
-      where: whereClause,
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+        ...(complexId !== null && { complexId: complexId }), // Filtrar por complexId si se proporciona
+      },
     });
 
-    console.log(`[LOGIN] Usuario encontrado:`, !!user);
-
-    if (!user) {
-      console.log(`[LOGIN] Usuario no encontrado: ${email}`);
-      return NextResponse.json(
-        { message: "Credenciales inválidas" },
-        { status: 401 },
-      );
+    if (!user || !bcrypt.compareSync(password, user.password)) {
+      return NextResponse.json({ message: 'Credenciales inválidas' }, { status: 401 });
     }
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    console.log(`[LOGIN] Contraseña válida:`, passwordMatch);
-
-    if (!passwordMatch) {
-      console.log(`[LOGIN] Contraseña incorrecta para: ${email}`);
-      return NextResponse.json(
-        { message: "Credenciales inválidas" },
-        { status: 401 },
-      );
+    // Si el usuario tiene un complexId pero no se proporcionó schemaName, o no coincide
+    if (user.complexId && !schemaName) {
+      // Esto podría indicar un intento de login global para un usuario de complejo
+      return NextResponse.json({ message: 'Por favor, especifique el conjunto residencial' }, { status: 400 });
+    }
+    if (user.complexId && complexId !== user.complexId) {
+        return NextResponse.json({ message: 'El usuario no pertenece a este conjunto residencial' }, { status: 403 });
     }
 
-    console.log(`[LOGIN] Login exitoso para: ${email}, rol: ${user.role}`);
-
-    const payload = {
-      id: user.id,
+    // Generar token JWT
+    const tokenPayload = {
+      userId: user.id,
       email: user.email,
       role: user.role,
-      name: user.name,
-      complexId: user.complexId,
-      isGlobalAdmin: user.role === "ADMIN",
-      isReception: user.role === "RECEPTION",
-      isComplexAdmin: user.role === "COMPLEX_ADMIN",
-      isResident: user.role === "RESIDENT",
+      ...(resolvedSchemaName && { schemaName: resolvedSchemaName }), // Incluir schemaName si aplica
     };
 
-    const token = await generateToken(payload);
+    const token = sign(tokenPayload, JWT_SECRET, { expiresIn: '1h' });
 
-    console.log(`[LOGIN] Token generado para: ${email}`);
-
-    const response = NextResponse.json({ user: payload });
-    response.cookies.set("token", token, {
+    const serialized = serialize('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24, // 1 day
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 1, // 1 hour
+      path: '/',
     });
-    return response;
+
+    return NextResponse.json({
+      message: 'Login exitoso',
+      user: { id: user.id, email: user.email, role: user.role, schemaName: resolvedSchemaName },
+    }, {
+      status: 200,
+      headers: { 'Set-Cookie': serialized },
+    });
   } catch (error) {
-    ServerLogger.error("[LOGIN] Error en API:", error);
-    return NextResponse.json(
-      { message: "Error interno del servidor" },
-      { status: 500 },
-    );
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ message: 'Error de validación', errors: error.errors }, { status: 400 });
+    }
+    console.error('Error en login:', error);
+    return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
   }
 }
-
-// Exportar el handler con validación
-export const POST = withValidation(LoginSchema, loginHandler);
