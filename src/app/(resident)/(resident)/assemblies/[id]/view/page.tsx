@@ -1,14 +1,24 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import { useAuthStore } from '@/store/authStore';
-import { Loader2, Calendar, MapPin, FileText, Users, CheckCircle, XCircle, ThumbsUp, ThumbsDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/components/ui/use-toast';
-import { getAssemblies } from '@/services/assemblyService';
+import React, { useState, useEffect, useCallback } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
+import {
+  Loader2,
+  Calendar,
+  MapPin,
+  FileText,
+  Users,
+  CheckCircle,
+  XCircle,
+  ThumbsUp,
+  ThumbsDown,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/use-toast";
+import { getAssemblies } from "@/services/assemblyService";
 
 interface Assembly {
   id: number;
@@ -16,9 +26,9 @@ interface Assembly {
   description?: string;
   scheduledDate: string;
   location: string;
-  type: 'ORDINARY' | 'EXTRAORDINARY';
+  type: "ORDINARY" | "EXTRAORDINARY";
   agenda: string;
-  status: 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  status: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
   complexId: number;
   createdBy: number;
   // Mock voting data
@@ -41,36 +51,38 @@ export default function ViewResidentAssemblyPage() {
     setLoading(true);
     try {
       // For simplicity, fetching all and filtering. In a real app, you'd have a getAssemblyById endpoint.
-      const response = await getAssemblies(); 
-      const foundAssembly = response.data.find((a: Assembly) => a.id === assemblyId);
+      const response = await getAssemblies();
+      const foundAssembly = response.data.find(
+        (a: Assembly) => a.id === assemblyId,
+      );
       if (foundAssembly) {
         // Add mock voting data for demonstration
         setAssembly({
           ...foundAssembly,
-          votingActive: foundAssembly.status === 'IN_PROGRESS',
+          votingActive: foundAssembly.status === "IN_PROGRESS",
           votingOptions: [
-            { id: 1, text: 'A favor', votes: 0 },
-            { id: 2, text: 'En contra', votes: 0 },
-            { id: 3, text: 'Abstención', votes: 0 },
+            { id: 1, text: "A favor", votes: 0 },
+            { id: 2, text: "En contra", votes: 0 },
+            { id: 3, text: "Abstención", votes: 0 },
           ],
           userVote: null, // Simulate no vote initially
         });
       } else {
         toast({
-          title: 'Error',
-          description: 'Asamblea no encontrada.',
-          variant: 'destructive',
+          title: "Error",
+          description: "Asamblea no encontrada.",
+          variant: "destructive",
         });
-        router.push('/resident/assemblies');
+        router.push("/resident/assemblies");
       }
     } catch (error) {
-      console.error('Error fetching assembly:', error);
+      console.error("Error fetching assembly:", error);
       toast({
-        title: 'Error',
-        description: 'No se pudo cargar la asamblea.',
-        variant: 'destructive',
+        title: "Error",
+        description: "No se pudo cargar la asamblea.",
+        variant: "destructive",
       });
-      router.push('/resident/assemblies');
+      router.push("/resident/assemblies");
     } finally {
       setLoading(false);
     }
@@ -87,26 +99,28 @@ export default function ViewResidentAssemblyPage() {
     setLoading(true);
     try {
       // Placeholder for API call to register vote
-      console.log(`User ${user.id} voted for option ${optionId} in assembly ${assembly.id}`);
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      console.log(
+        `User ${user.id} voted for option ${optionId} in assembly ${assembly.id}`,
+      );
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
 
-      setAssembly(prev => {
+      setAssembly((prev) => {
         if (!prev) return null;
-        const updatedOptions = prev.votingOptions?.map(opt => 
-          opt.id === optionId ? { ...opt, votes: opt.votes + 1 } : opt
+        const updatedOptions = prev.votingOptions?.map((opt) =>
+          opt.id === optionId ? { ...opt, votes: opt.votes + 1 } : opt,
         );
         return { ...prev, votingOptions: updatedOptions, userVote: optionId };
       });
       toast({
-        title: 'Éxito',
-        description: 'Voto registrado correctamente (simulado).',
+        title: "Éxito",
+        description: "Voto registrado correctamente (simulado).",
       });
     } catch (error) {
-      console.error('Error registering vote:', error);
+      console.error("Error registering vote:", error);
       toast({
-        title: 'Error',
-        description: 'Error al registrar el voto.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Error al registrar el voto.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -132,7 +146,9 @@ export default function ViewResidentAssemblyPage() {
   return (
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Detalles de la Asamblea: {assembly.title}</h1>
+        <h1 className="text-3xl font-bold text-gray-900">
+          Detalles de la Asamblea: {assembly.title}
+        </h1>
       </div>
 
       <Card className="mb-6">
@@ -140,12 +156,31 @@ export default function ViewResidentAssemblyPage() {
           <CardTitle>Información de la Asamblea</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <p><strong>Descripción:</strong> {assembly.description || 'No hay descripción disponible.'}</p>
-          <p><strong>Fecha:</strong> {new Date(assembly.scheduledDate).toLocaleDateString()}</p>
-          <p><strong>Hora:</strong> {new Date(assembly.scheduledDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-          <p><strong>Ubicación:</strong> {assembly.location}</p>
-          <p><strong>Tipo:</strong> {assembly.type === 'ORDINARY' ? 'Ordinaria' : 'Extraordinaria'}</p>
-          <p><strong>Estado:</strong> <Badge>{assembly.status}</Badge></p>
+          <p>
+            <strong>Descripción:</strong>{" "}
+            {assembly.description || "No hay descripción disponible."}
+          </p>
+          <p>
+            <strong>Fecha:</strong>{" "}
+            {new Date(assembly.scheduledDate).toLocaleDateString()}
+          </p>
+          <p>
+            <strong>Hora:</strong>{" "}
+            {new Date(assembly.scheduledDate).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </p>
+          <p>
+            <strong>Ubicación:</strong> {assembly.location}
+          </p>
+          <p>
+            <strong>Tipo:</strong>{" "}
+            {assembly.type === "ORDINARY" ? "Ordinaria" : "Extraordinaria"}
+          </p>
+          <p>
+            <strong>Estado:</strong> <Badge>{assembly.status}</Badge>
+          </p>
           <div>
             <h3 className="font-semibold mt-4 mb-2">Agenda:</h3>
             <div className="whitespace-pre-wrap border p-4 rounded-md bg-gray-50">
@@ -164,14 +199,16 @@ export default function ViewResidentAssemblyPage() {
           </CardHeader>
           <CardContent>
             {assembly.userVote ? (
-              <p className="text-green-600 font-semibold">¡Ya has votado en esta asamblea!</p>
+              <p className="text-green-600 font-semibold">
+                ¡Ya has votado en esta asamblea!
+              </p>
             ) : (
               <div className="space-y-3">
                 <p className="text-gray-700">Selecciona tu opción:</p>
-                {assembly.votingOptions.map(option => (
-                  <Button 
-                    key={option.id} 
-                    variant="outline" 
+                {assembly.votingOptions.map((option) => (
+                  <Button
+                    key={option.id}
+                    variant="outline"
                     className="w-full justify-start"
                     onClick={() => handleVote(option.id)}
                     disabled={loading}
@@ -184,8 +221,10 @@ export default function ViewResidentAssemblyPage() {
             {assembly.userVote && (
               <div className="mt-4">
                 <h4 className="font-semibold mb-2">Resultados Parciales:</h4>
-                {assembly.votingOptions.map(option => (
-                  <p key={option.id} className="text-sm">{option.text}: {option.votes} votos</p>
+                {assembly.votingOptions.map((option) => (
+                  <p key={option.id} className="text-sm">
+                    {option.text}: {option.votes} votos
+                  </p>
                 ))}
               </div>
             )}
@@ -201,8 +240,13 @@ export default function ViewResidentAssemblyPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-600">Las actas y documentos relacionados con esta asamblea se publicarán aquí.</p>
-          <Button variant="outline" className="mt-4">Ver Documentos</Button>
+          <p className="text-gray-600">
+            Las actas y documentos relacionados con esta asamblea se publicarán
+            aquí.
+          </p>
+          <Button variant="outline" className="mt-4">
+            Ver Documentos
+          </Button>
         </CardContent>
       </Card>
     </div>

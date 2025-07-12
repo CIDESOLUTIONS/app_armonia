@@ -1,16 +1,23 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { useAuthStore } from '@/store/authStore';
-import AdminHeader from '@/components/admin/layout/AdminHeader';
-import AdminSidebar from '@/components/admin/layout/AdminSidebar';
-import { Loader2, PlusCircle, Edit, Trash2, Eye } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import Link from 'next/link';
-import { getAssemblies, deleteAssembly } from '@/services/assemblyService';
-import { useToast } from '@/components/ui/use-toast';
+import { useState, useEffect, useCallback } from "react";
+import { useAuthStore } from "@/store/authStore";
+import AdminHeader from "@/components/admin/layout/AdminHeader";
+import AdminSidebar from "@/components/admin/layout/AdminSidebar";
+import { Loader2, PlusCircle, Edit, Trash2, Eye } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import Link from "next/link";
+import { getAssemblies, deleteAssembly } from "@/services/assemblyService";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Assembly {
   id: number;
@@ -18,9 +25,9 @@ interface Assembly {
   description?: string;
   scheduledDate: string;
   location: string;
-  type: 'ORDINARY' | 'EXTRAORDINARY';
+  type: "ORDINARY" | "EXTRAORDINARY";
   agenda: string;
-  status: 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  status: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
   complexId: number;
   createdBy: number;
 }
@@ -37,11 +44,11 @@ export default function AssembliesPage() {
       const response = await getAssemblies();
       setAssemblies(response.data);
     } catch (error) {
-      console.error('Error fetching assemblies:', error);
+      console.error("Error fetching assemblies:", error);
       toast({
-        title: 'Error',
-        description: 'No se pudieron cargar las asambleas.',
-        variant: 'destructive',
+        title: "Error",
+        description: "No se pudieron cargar las asambleas.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -55,20 +62,20 @@ export default function AssembliesPage() {
   }, [authLoading, user, fetchAssemblies]);
 
   const handleDeleteAssembly = async (id: number) => {
-    if (confirm('¿Estás seguro de que quieres eliminar esta asamblea?')) {
+    if (confirm("¿Estás seguro de que quieres eliminar esta asamblea?")) {
       try {
         await deleteAssembly(id);
         toast({
-          title: 'Éxito',
-          description: 'Asamblea eliminada correctamente.',
+          title: "Éxito",
+          description: "Asamblea eliminada correctamente.",
         });
         fetchAssemblies();
       } catch (error) {
-        console.error('Error deleting assembly:', error);
+        console.error("Error deleting assembly:", error);
         toast({
-          title: 'Error',
-          description: 'Error al eliminar la asamblea.',
-          variant: 'destructive',
+          title: "Error",
+          description: "Error al eliminar la asamblea.",
+          variant: "destructive",
         });
       }
     }
@@ -82,12 +89,16 @@ export default function AssembliesPage() {
     );
   }
 
-  if (!user || (user.role !== 'ADMIN' && user.role !== 'COMPLEX_ADMIN')) {
+  if (!user || (user.role !== "ADMIN" && user.role !== "COMPLEX_ADMIN")) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Acceso Denegado</h1>
-          <p className="text-gray-600">No tienes permisos para acceder a esta página.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Acceso Denegado
+          </h1>
+          <p className="text-gray-600">
+            No tienes permisos para acceder a esta página.
+          </p>
         </div>
       </div>
     );
@@ -95,22 +106,24 @@ export default function AssembliesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdminHeader 
+      <AdminHeader
         adminName={user?.name || "Administrador"}
         complexName="Conjunto Residencial Armonía"
         onLogout={user?.logout}
       />
-      
+
       <div className="flex">
-        <AdminSidebar 
+        <AdminSidebar
           collapsed={false} // Asumiendo que el sidebar no está colapsado por defecto en esta vista
           onToggle={() => {}} // No hay toggle en esta vista
         />
-        
+
         <main className={`flex-1 transition-all duration-300 ml-64 mt-16 p-6`}>
           <div className="max-w-7xl mx-auto">
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-3xl font-bold text-gray-900">Gestión de Asambleas</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Gestión de Asambleas
+              </h1>
               <Link href="/admin/assemblies/create">
                 <Button>
                   <PlusCircle className="mr-2 h-4 w-4" /> Nueva Asamblea
@@ -135,11 +148,27 @@ export default function AssembliesPage() {
                     assemblies.map((assembly) => (
                       <TableRow key={assembly.id}>
                         <TableCell>{assembly.title}</TableCell>
-                        <TableCell>{new Date(assembly.scheduledDate).toLocaleDateString()}</TableCell>
-                        <TableCell>{assembly.location}</TableCell>
-                        <TableCell>{assembly.type === 'ORDINARY' ? 'Ordinaria' : 'Extraordinaria'}</TableCell>
                         <TableCell>
-                          <Badge variant={assembly.status === 'PLANNED' ? 'secondary' : assembly.status === 'COMPLETED' ? 'default' : 'outline'}>
+                          {new Date(
+                            assembly.scheduledDate,
+                          ).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>{assembly.location}</TableCell>
+                        <TableCell>
+                          {assembly.type === "ORDINARY"
+                            ? "Ordinaria"
+                            : "Extraordinaria"}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              assembly.status === "PLANNED"
+                                ? "secondary"
+                                : assembly.status === "COMPLETED"
+                                  ? "default"
+                                  : "outline"
+                            }
+                          >
                             {assembly.status}
                           </Badge>
                         </TableCell>
@@ -154,7 +183,11 @@ export default function AssembliesPage() {
                               <Edit className="h-4 w-4" />
                             </Button>
                           </Link>
-                          <Button variant="ghost" size="sm" onClick={() => handleDeleteAssembly(assembly.id)}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteAssembly(assembly.id)}
+                          >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </TableCell>

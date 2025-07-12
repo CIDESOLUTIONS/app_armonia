@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { accessPassService } from '@/services/accessPassService';
-import { validateCsrfToken } from '@/lib/security/csrf-protection';
-import { sanitizeData } from '@/lib/security/xss-protection';
-import { logAuditAction } from '@/lib/security/audit-trail';
+import { NextRequest, NextResponse } from "next/server";
+import { accessPassService } from "@/services/accessPassService";
+import { validateCsrfToken } from "@/lib/security/csrf-protection";
+import { sanitizeData } from "@/lib/security/xss-protection";
+import { logAuditAction } from "@/lib/security/audit-trail";
 
 /**
  * GET /api/visitors/access-pass
@@ -12,13 +12,13 @@ export async function GET(request: NextRequest) {
   try {
     // Extraer parámetros de consulta
     const searchParams = request.nextUrl.searchParams;
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
-    const status = searchParams.get('status') || undefined;
-    const passType = searchParams.get('passType') || undefined;
-    const search = searchParams.get('search') || undefined;
-    const startDate = searchParams.get('startDate') || undefined;
-    const endDate = searchParams.get('endDate') || undefined;
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
+    const status = searchParams.get("status") || undefined;
+    const passType = searchParams.get("passType") || undefined;
+    const search = searchParams.get("search") || undefined;
+    const startDate = searchParams.get("startDate") || undefined;
+    const endDate = searchParams.get("endDate") || undefined;
 
     // Obtener pases de acceso
     const result = await accessPassService.getAllAccessPasses({
@@ -28,15 +28,15 @@ export async function GET(request: NextRequest) {
       passType,
       search,
       startDate,
-      endDate
+      endDate,
     });
 
     return NextResponse.json(result);
   } catch (error: any) {
-    console.error('Error al obtener pases de acceso:', error);
+    console.error("Error al obtener pases de acceso:", error);
     return NextResponse.json(
-      { error: 'Error al obtener pases de acceso', message: error.message },
-      { status: 500 }
+      { error: "Error al obtener pases de acceso", message: error.message },
+      { status: 500 },
     );
   }
 }
@@ -51,8 +51,8 @@ export async function POST(request: NextRequest) {
     const csrfValidation = await validateCsrfToken(request);
     if (!csrfValidation.valid) {
       return NextResponse.json(
-        { error: 'Token CSRF inválido' },
-        { status: 403 }
+        { error: "Token CSRF inválido" },
+        { status: 403 },
       );
     }
 
@@ -70,32 +70,33 @@ export async function POST(request: NextRequest) {
       passType: requestData.passType,
       createdBy: requestData.createdBy,
       preRegisterId: requestData.preRegisterId,
-      notes: sanitizeInput(requestData.notes)
+      notes: sanitizeInput(requestData.notes),
     };
 
     // Generar pase de acceso
-    const accessPass = await accessPassService.generateAccessPass(sanitizedData);
+    const accessPass =
+      await accessPassService.generateAccessPass(sanitizedData);
 
     // Registrar evento de auditoría
     await logAuditEvent({
       userId: sanitizedData.createdBy,
-      entityType: 'ACCESS_PASS',
+      entityType: "ACCESS_PASS",
       entityId: accessPass.id.toString(),
-      action: 'ACCESS_PASS_CREATED',
+      action: "ACCESS_PASS_CREATED",
       details: JSON.stringify({
         visitorName: accessPass.visitorName,
         documentNumber: accessPass.documentNumber,
         passType: accessPass.passType,
-        validUntil: accessPass.validUntil
-      })
+        validUntil: accessPass.validUntil,
+      }),
     });
 
     return NextResponse.json(accessPass, { status: 201 });
   } catch (error: any) {
-    console.error('Error al generar pase de acceso:', error);
+    console.error("Error al generar pase de acceso:", error);
     return NextResponse.json(
-      { error: 'Error al generar pase de acceso', message: error.message },
-      { status: 400 }
+      { error: "Error al generar pase de acceso", message: error.message },
+      { status: 400 },
     );
   }
 }

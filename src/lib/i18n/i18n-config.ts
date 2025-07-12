@@ -7,14 +7,14 @@
  * @module i18n-config
  */
 
-import type { Config } from 'next-i18next';
+import type { Config } from "next-i18next";
 
 interface LanguageConfig {
   code: string;
   name: string;
   localName: string;
   countryCode: string;
-  direction: 'ltr' | 'rtl';
+  direction: "ltr" | "rtl";
   dateFormat: string;
   timeFormat: string;
   isDefault: boolean;
@@ -25,23 +25,23 @@ interface LanguageConfig {
  */
 export const SUPPORTED_LANGUAGES: Record<string, LanguageConfig> = {
   es: {
-    code: 'es',
-    name: 'Español',
-    localName: 'Español',
-    countryCode: 'ES',
-    direction: 'ltr',
-    dateFormat: 'DD/MM/YYYY',
-    timeFormat: 'HH:mm',
+    code: "es",
+    name: "Español",
+    localName: "Español",
+    countryCode: "ES",
+    direction: "ltr",
+    dateFormat: "DD/MM/YYYY",
+    timeFormat: "HH:mm",
     isDefault: true,
   },
   en: {
-    code: 'en',
-    name: 'English',
-    localName: 'English',
-    countryCode: 'US',
-    direction: 'ltr',
-    dateFormat: 'MM/DD/YYYY',
-    timeFormat: 'hh:mm a',
+    code: "en",
+    name: "English",
+    localName: "English",
+    countryCode: "US",
+    direction: "ltr",
+    dateFormat: "MM/DD/YYYY",
+    timeFormat: "hh:mm a",
     isDefault: false,
   },
 };
@@ -54,9 +54,8 @@ export const LANGUAGE_CODES = Object.keys(SUPPORTED_LANGUAGES);
 /**
  * Idioma predeterminado de la aplicación
  */
-export const DEFAULT_LANGUAGE = LANGUAGE_CODES.find(
-  (code) => SUPPORTED_LANGUAGES[code].isDefault
-) || 'es';
+export const DEFAULT_LANGUAGE =
+  LANGUAGE_CODES.find((code) => SUPPORTED_LANGUAGES[code].isDefault) || "es";
 
 /**
  * Configuración para next-i18next
@@ -69,35 +68,35 @@ export const i18nConfig: Config = {
 
   // Configuración de namespaces para organizar las traducciones
   ns: [
-    'common',       // Textos comunes en toda la aplicación
-    'auth',         // Autenticación y gestión de usuarios
-    'dashboard',    // Panel principal
-    'admin',        // Administración
-    'pqr',          // Sistema PQR
-    'assembly',     // Módulo de asambleas
-    'payments',     // Pagos y facturación
-    'biometrics',   // Accesos biométricos
-    'notifications', // Notificaciones
-    'landing'      // Landing page
+    "common", // Textos comunes en toda la aplicación
+    "auth", // Autenticación y gestión de usuarios
+    "dashboard", // Panel principal
+    "admin", // Administración
+    "pqr", // Sistema PQR
+    "assembly", // Módulo de asambleas
+    "payments", // Pagos y facturación
+    "biometrics", // Accesos biométricos
+    "notifications", // Notificaciones
+    "landing", // Landing page
   ],
-  defaultNS: 'common',
+  defaultNS: "common",
 
   // Opciones para detección de idioma en navegador
   detection: {
-    order: ['cookie', 'localStorage', 'navigator', 'path', 'htmlTag'],
-    lookupCookie: 'ARMONIA_LANGUAGE',
-    lookupLocalStorage: 'ARMONIA_LANGUAGE',
-    caches: ['cookie', 'localStorage'],
+    order: ["cookie", "localStorage", "navigator", "path", "htmlTag"],
+    lookupCookie: "ARMONIA_LANGUAGE",
+    lookupLocalStorage: "ARMONIA_LANGUAGE",
+    caches: ["cookie", "localStorage"],
   },
 
   // Configuración para React
   react: {
     useSuspense: false,
-    bindI18n: 'languageChanged loaded',
-    bindI18nStore: 'added removed',
-    transEmptyNodeValue: '',
+    bindI18n: "languageChanged loaded",
+    bindI18nStore: "added removed",
+    transEmptyNodeValue: "",
     transSupportBasicHtmlNodes: true,
-    transKeepBasicHtmlNodesFor: ['br', 'strong', 'i', 'p', 'span'],
+    transKeepBasicHtmlNodesFor: ["br", "strong", "i", "p", "span"],
     skipInitialProps: false,
   },
 };
@@ -142,17 +141,21 @@ export function getAllLanguages(): LanguageConfig[] {
  * @param {string} langCode - Código de idioma
  * @returns {string} Fecha formateada
  */
-export function formatDate(date: Date, langCode: string = DEFAULT_LANGUAGE): string {
-  const language = SUPPORTED_LANGUAGES[langCode] || SUPPORTED_LANGUAGES[DEFAULT_LANGUAGE];
+export function formatDate(
+  date: Date,
+  langCode: string = DEFAULT_LANGUAGE,
+): string {
+  const language =
+    SUPPORTED_LANGUAGES[langCode] || SUPPORTED_LANGUAGES[DEFAULT_LANGUAGE];
   const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
   };
 
   return new Intl.DateTimeFormat(
     `${language.code}-${language.countryCode}`,
-    options
+    options,
   ).format(date);
 }
 
@@ -162,17 +165,21 @@ export function formatDate(date: Date, langCode: string = DEFAULT_LANGUAGE): str
  * @param {string} langCode - Código de idioma
  * @returns {string} Hora formateada
  */
-export function formatTime(date: Date, langCode: string = DEFAULT_LANGUAGE): string {
-  const language = SUPPORTED_LANGUAGES[langCode] || SUPPORTED_LANGUAGES[DEFAULT_LANGUAGE];
+export function formatTime(
+  date: Date,
+  langCode: string = DEFAULT_LANGUAGE,
+): string {
+  const language =
+    SUPPORTED_LANGUAGES[langCode] || SUPPORTED_LANGUAGES[DEFAULT_LANGUAGE];
   const options: Intl.DateTimeFormatOptions = {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: language.timeFormat.includes('a'),
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: language.timeFormat.includes("a"),
   };
 
   return new Intl.DateTimeFormat(
     `${language.code}-${language.countryCode}`,
-    options
+    options,
   ).format(date);
 }
 
@@ -186,13 +193,14 @@ export function formatTime(date: Date, langCode: string = DEFAULT_LANGUAGE): str
 export function formatNumber(
   num: number,
   options: Intl.NumberFormatOptions = {},
-  langCode: string = DEFAULT_LANGUAGE
+  langCode: string = DEFAULT_LANGUAGE,
 ): string {
-  const language = SUPPORTED_LANGUAGES[langCode] || SUPPORTED_LANGUAGES[DEFAULT_LANGUAGE];
+  const language =
+    SUPPORTED_LANGUAGES[langCode] || SUPPORTED_LANGUAGES[DEFAULT_LANGUAGE];
 
   return new Intl.NumberFormat(
     `${language.code}-${language.countryCode}`,
-    options
+    options,
   ).format(num);
 }
 
@@ -205,12 +213,13 @@ export function formatNumber(
  */
 export function formatCurrency(
   amount: number,
-  currencyCode = 'COP',
-  langCode = DEFAULT_LANGUAGE
+  currencyCode = "COP",
+  langCode = DEFAULT_LANGUAGE,
 ): string {
-  const language = SUPPORTED_LANGUAGES[langCode] || SUPPORTED_LANGUAGES[DEFAULT_LANGUAGE];
+  const language =
+    SUPPORTED_LANGUAGES[langCode] || SUPPORTED_LANGUAGES[DEFAULT_LANGUAGE];
   const options: Intl.NumberFormatOptions = {
-    style: 'currency',
+    style: "currency",
     currency: currencyCode,
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
@@ -218,6 +227,6 @@ export function formatCurrency(
 
   return new Intl.NumberFormat(
     `${language.code}-${language.countryCode}`,
-    options
+    options,
   ).format(amount);
 }

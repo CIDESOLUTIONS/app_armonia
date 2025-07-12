@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
-import * as reservationService from '@/services/reservationService';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { ServerLogger } from '@/lib/logging/server-logger';
-import { validateRequest } from '@/lib/validation';
-import { 
+import { NextRequest, NextResponse } from "next/server";
+import * as reservationService from "@/services/reservationService";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { ServerLogger } from "@/lib/logging/server-logger";
+import { validateRequest } from "@/lib/validation";
+import {
   GetNotificationsSchema,
-  type GetNotificationsRequest
-} from '@/validators/notifications/notification.validator';
+  type GetNotificationsRequest,
+} from "@/validators/notifications/notification.validator";
 
 /**
  * GET /api/notifications
@@ -18,17 +18,14 @@ export async function GET(req: NextRequest) {
     // Verificar autenticación
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json(
-        { error: 'No autorizado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
     // Obtener parámetros de consulta
     const searchParams = req.nextUrl.searchParams;
     const queryParams = {
-      isRead: searchParams.get('isRead'),
-      type: searchParams.get('type')
+      isRead: searchParams.get("isRead"),
+      type: searchParams.get("type"),
     };
 
     // Validar parámetros
@@ -42,15 +39,15 @@ export async function GET(req: NextRequest) {
     // Obtener notificaciones del usuario
     const notifications = await reservationService.getUserNotifications(
       session.user.id,
-      validatedParams
+      validatedParams,
     );
 
     return NextResponse.json(notifications);
   } catch (error) {
-    serverLogger.error('Error al obtener notificaciones', { error });
+    serverLogger.error("Error al obtener notificaciones", { error });
     return NextResponse.json(
-      { error: 'Error al obtener notificaciones' },
-      { status: 500 }
+      { error: "Error al obtener notificaciones" },
+      { status: 500 },
     );
   }
 }

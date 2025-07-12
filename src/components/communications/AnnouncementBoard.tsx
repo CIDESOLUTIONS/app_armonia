@@ -1,24 +1,38 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Megaphone, CheckCircle, AlertCircle, ChevronDown, ChevronUp, Clock } from 'lucide-react';
-import { formatDistanceToNow, format } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { useRealTimeCommunication } from '@/lib/communications/real-time-context';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useToast } from '@/components/ui/use-toast';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Megaphone,
+  CheckCircle,
+  AlertCircle,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+} from "lucide-react";
+import { formatDistanceToNow, format } from "date-fns";
+import { es } from "date-fns/locale";
+import { useRealTimeCommunication } from "@/lib/communications/real-time-context";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useToast } from "@/components/ui/use-toast";
 
 // Tipos para los anuncios
 export interface Announcement {
   id: string;
   title: string;
   content: string;
-  type: 'general' | 'important' | 'emergency';
+  type: "general" | "important" | "emergency";
   createdAt: Date;
   expiresAt?: Date;
   createdBy: {
@@ -41,311 +55,365 @@ export interface Announcement {
 }
 
 interface AnnouncementBoardProps {
-  language?: 'Español' | 'English';
+  language?: "Español" | "English";
   userId: number;
   userRole: string;
   isAdmin?: boolean;
 }
 
-export default function AnnouncementBoard({ 
-  language = 'Español', 
-  userId, 
+export default function AnnouncementBoard({
+  language = "Español",
+  userId,
   userRole,
-  isAdmin = false 
+  isAdmin = false,
 }: AnnouncementBoardProps) {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [expandedAnnouncement, setExpandedAnnouncement] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'all' | 'unread' | 'important'>('all');
+  const [expandedAnnouncement, setExpandedAnnouncement] = useState<
+    string | null
+  >(null);
+  const [activeTab, setActiveTab] = useState<"all" | "unread" | "important">(
+    "all",
+  );
   const [loading, setLoading] = useState(true);
-  
+
   const { subscribeToEvent, socket } = useRealTimeCommunication();
   const { toast } = useToast();
-  
+
   // Cargar anuncios
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/communications/announcements');
+        const response = await fetch("/api/communications/announcements");
         if (response.ok) {
           const data = await response.json();
           setAnnouncements(data);
         } else {
           toast({
-            title: language === 'Español' ? 'Error' : 'Error',
-            description: language === 'Español' 
-              ? 'No se pudieron cargar los anuncios' 
-              : 'Could not load announcements',
-            variant: 'destructive'
+            title: language === "Español" ? "Error" : "Error",
+            description:
+              language === "Español"
+                ? "No se pudieron cargar los anuncios"
+                : "Could not load announcements",
+            variant: "destructive",
           });
         }
       } catch (error) {
-        console.error('Error al cargar anuncios:', error);
+        console.error("Error al cargar anuncios:", error);
         toast({
-          title: language === 'Español' ? 'Error' : 'Error',
-          description: language === 'Español' 
-            ? 'No se pudieron cargar los anuncios' 
-            : 'Could not load announcements',
-          variant: 'destructive'
+          title: language === "Español" ? "Error" : "Error",
+          description:
+            language === "Español"
+              ? "No se pudieron cargar los anuncios"
+              : "Could not load announcements",
+          variant: "destructive",
         });
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchAnnouncements();
-    
+
     // Suscribirse a nuevos anuncios
     const handleNewAnnouncement = (announcement: Announcement) => {
-      setAnnouncements(prev => [announcement, ...prev]);
-      
+      setAnnouncements((prev) => [announcement, ...prev]);
+
       toast({
-        title: language === 'Español' ? 'Nuevo anuncio' : 'New announcement',
+        title: language === "Español" ? "Nuevo anuncio" : "New announcement",
         description: announcement.title,
-        variant: announcement.type === 'emergency' ? 'destructive' : 
-                 announcement.type === 'important' ? 'warning' : 'default'
+        variant:
+          announcement.type === "emergency"
+            ? "destructive"
+            : announcement.type === "important"
+              ? "warning"
+              : "default",
       });
     };
-    
-    subscribeToEvent('new_announcement', handleNewAnnouncement);
-    
+
+    subscribeToEvent("new_announcement", handleNewAnnouncement);
+
     return () => {
       // Limpiar suscripción
       if (socket) {
-        socket.off('new_announcement', handleNewAnnouncement);
+        socket.off("new_announcement", handleNewAnnouncement);
       }
     };
   }, [subscribeToEvent, socket, toast, language]);
-  
+
   // Formatear fecha relativa
   const formatRelativeTime = (date: Date) => {
     return formatDistanceToNow(new Date(date), {
       addSuffix: true,
-      locale: language === 'Español' ? es : undefined
+      locale: language === "Español" ? es : undefined,
     });
   };
-  
+
   // Formatear fecha completa
   const formatFullDate = (date: Date) => {
-    return format(new Date(date), 'PPpp', {
-      locale: language === 'Español' ? es : undefined
+    return format(new Date(date), "PPpp", {
+      locale: language === "Español" ? es : undefined,
     });
   };
-  
+
   // Verificar si un anuncio ha sido leído por el usuario actual
   const isAnnouncementRead = (announcement: Announcement) => {
-    return announcement.isRead || announcement.readBy.some(reader => reader.userId === userId);
+    return (
+      announcement.isRead ||
+      announcement.readBy.some((reader) => reader.userId === userId)
+    );
   };
-  
+
   // Marcar anuncio como leído
   const markAsRead = async (announcementId: string) => {
     try {
-      const response = await fetch(`/api/communications/announcements/${announcementId}/read`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
+      const response = await fetch(
+        `/api/communications/announcements/${announcementId}/read`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
       if (response.ok) {
-        setAnnouncements(prev => 
-          prev.map(a => 
-            a.id === announcementId 
-              ? { 
-                  ...a, 
+        setAnnouncements((prev) =>
+          prev.map((a) =>
+            a.id === announcementId
+              ? {
+                  ...a,
                   isRead: true,
-                  readBy: [...a.readBy, { userId, readAt: new Date() }] 
-                } 
-              : a
-          )
+                  readBy: [...a.readBy, { userId, readAt: new Date() }],
+                }
+              : a,
+          ),
         );
       } else {
         toast({
-          title: language === 'Español' ? 'Error' : 'Error',
-          description: language === 'Español' 
-            ? 'No se pudo marcar el anuncio como leído' 
-            : 'Could not mark announcement as read',
-          variant: 'destructive'
+          title: language === "Español" ? "Error" : "Error",
+          description:
+            language === "Español"
+              ? "No se pudo marcar el anuncio como leído"
+              : "Could not mark announcement as read",
+          variant: "destructive",
         });
       }
     } catch (error) {
-      console.error('Error al marcar anuncio como leído:', error);
+      console.error("Error al marcar anuncio como leído:", error);
       toast({
-        title: language === 'Español' ? 'Error' : 'Error',
-        description: language === 'Español' 
-          ? 'No se pudo marcar el anuncio como leído' 
-          : 'Could not mark announcement as read',
-        variant: 'destructive'
+        title: language === "Español" ? "Error" : "Error",
+        description:
+          language === "Español"
+            ? "No se pudo marcar el anuncio como leído"
+            : "Could not mark announcement as read",
+        variant: "destructive",
       });
     }
   };
-  
+
   // Confirmar lectura de anuncio
   const confirmReading = async (announcementId: string) => {
     try {
-      const response = await fetch(`/api/communications/announcements/${announcementId}/confirm`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
+      const response = await fetch(
+        `/api/communications/announcements/${announcementId}/confirm`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
       if (response.ok) {
-        setAnnouncements(prev => 
-          prev.map(a => 
-            a.id === announcementId 
-              ? { 
-                  ...a, 
+        setAnnouncements((prev) =>
+          prev.map((a) =>
+            a.id === announcementId
+              ? {
+                  ...a,
                   isRead: true,
-                  readBy: [...a.readBy, { userId, readAt: new Date() }] 
-                } 
-              : a
-          )
+                  readBy: [...a.readBy, { userId, readAt: new Date() }],
+                }
+              : a,
+          ),
         );
-        
+
         toast({
-          title: language === 'Español' ? 'Confirmado' : 'Confirmed',
-          description: language === 'Español' 
-            ? 'Lectura confirmada correctamente' 
-            : 'Reading confirmed successfully',
-          variant: 'success'
+          title: language === "Español" ? "Confirmado" : "Confirmed",
+          description:
+            language === "Español"
+              ? "Lectura confirmada correctamente"
+              : "Reading confirmed successfully",
+          variant: "success",
         });
       } else {
         toast({
-          title: language === 'Español' ? 'Error' : 'Error',
-          description: language === 'Español' 
-            ? 'No se pudo confirmar la lectura' 
-            : 'Could not confirm reading',
-          variant: 'destructive'
+          title: language === "Español" ? "Error" : "Error",
+          description:
+            language === "Español"
+              ? "No se pudo confirmar la lectura"
+              : "Could not confirm reading",
+          variant: "destructive",
         });
       }
     } catch (error) {
-      console.error('Error al confirmar lectura:', error);
+      console.error("Error al confirmar lectura:", error);
       toast({
-        title: language === 'Español' ? 'Error' : 'Error',
-        description: language === 'Español' 
-          ? 'No se pudo confirmar la lectura' 
-          : 'Could not confirm reading',
-        variant: 'destructive'
+        title: language === "Español" ? "Error" : "Error",
+        description:
+          language === "Español"
+            ? "No se pudo confirmar la lectura"
+            : "Could not confirm reading",
+        variant: "destructive",
       });
     }
   };
-  
+
   // Manejar clic en anuncio
   const handleAnnouncementClick = (announcement: Announcement) => {
     // Expandir/colapsar detalles
     setExpandedAnnouncement(
-      expandedAnnouncement === announcement.id ? null : announcement.id
+      expandedAnnouncement === announcement.id ? null : announcement.id,
     );
-    
+
     // Marcar como leído si no lo está
     if (!isAnnouncementRead(announcement)) {
       markAsRead(announcement.id);
     }
   };
-  
+
   // Filtrar anuncios según la pestaña activa
-  const filteredAnnouncements = announcements.filter(announcement => {
-    if (activeTab === 'unread') {
+  const filteredAnnouncements = announcements.filter((announcement) => {
+    if (activeTab === "unread") {
       return !isAnnouncementRead(announcement);
-    } else if (activeTab === 'important') {
-      return announcement.type === 'important' || announcement.type === 'emergency';
+    } else if (activeTab === "important") {
+      return (
+        announcement.type === "important" || announcement.type === "emergency"
+      );
     }
     return true;
   });
-  
+
   // Contar anuncios no leídos
-  const unreadCount = announcements.filter(a => !isAnnouncementRead(a)).length;
-  
-  // Contar anuncios importantes
-  const importantCount = announcements.filter(a => 
-    (a.type === 'important' || a.type === 'emergency')
+  const unreadCount = announcements.filter(
+    (a) => !isAnnouncementRead(a),
   ).length;
-  
+
+  // Contar anuncios importantes
+  const importantCount = announcements.filter(
+    (a) => a.type === "important" || a.type === "emergency",
+  ).length;
+
   // Obtener color según tipo de anuncio
-  const getAnnouncementColor = (type: Announcement['type']) => {
+  const getAnnouncementColor = (type: Announcement["type"]) => {
     switch (type) {
-      case 'general': return 'bg-blue-500';
-      case 'important': return 'bg-yellow-500';
-      case 'emergency': return 'bg-red-500';
-      default: return 'bg-gray-500';
+      case "general":
+        return "bg-blue-500";
+      case "important":
+        return "bg-yellow-500";
+      case "emergency":
+        return "bg-red-500";
+      default:
+        return "bg-gray-500";
     }
   };
-  
+
   // Obtener icono según tipo de anuncio
-  const getAnnouncementIcon = (type: Announcement['type']) => {
+  const getAnnouncementIcon = (type: Announcement["type"]) => {
     switch (type) {
-      case 'general': return <Megaphone className="h-5 w-5" />;
-      case 'important': return <AlertCircle className="h-5 w-5" />;
-      case 'emergency': return <AlertCircle className="h-5 w-5 text-red-500" />;
-      default: return <Megaphone className="h-5 w-5" />;
+      case "general":
+        return <Megaphone className="h-5 w-5" />;
+      case "important":
+        return <AlertCircle className="h-5 w-5" />;
+      case "emergency":
+        return <AlertCircle className="h-5 w-5 text-red-500" />;
+      default:
+        return <Megaphone className="h-5 w-5" />;
     }
   };
-  
+
   // Verificar si un anuncio está expirado
   const isExpired = (announcement: Announcement) => {
     if (!announcement.expiresAt) return false;
     return new Date(announcement.expiresAt) < new Date();
   };
-  
+
   // Crear nuevo anuncio
   const handleCreateAnnouncement = () => {
     // Implementar navegación a la página de creación de anuncios
-    window.location.href = '/admin/communications/announcements/create';
+    window.location.href = "/admin/communications/announcements/create";
   };
-  
+
   return (
     <Card className="w-full">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <CardTitle className="text-xl flex items-center gap-2">
             <Megaphone className="h-5 w-5" />
-            {language === 'Español' ? 'Tablón de Anuncios' : 'Announcement Board'}
+            {language === "Español"
+              ? "Tablón de Anuncios"
+              : "Announcement Board"}
           </CardTitle>
-          
+
           {isAdmin && (
-            <Button variant="outline" size="sm" onClick={handleCreateAnnouncement}>
-              {language === 'Español' ? 'Crear Anuncio' : 'Create Announcement'}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCreateAnnouncement}
+            >
+              {language === "Español" ? "Crear Anuncio" : "Create Announcement"}
             </Button>
           )}
         </div>
         <CardDescription>
-          {language === 'Español' 
-            ? 'Comunicados oficiales e información importante de la administración' 
-            : 'Official communications and important information from management'}
+          {language === "Español"
+            ? "Comunicados oficiales e información importante de la administración"
+            : "Official communications and important information from management"}
         </CardDescription>
-        
+
         <TabsList className="grid grid-cols-3 mt-2">
-          <TabsTrigger 
-            value="all" 
-            onClick={() => setActiveTab('all')}
-            className={activeTab === 'all' ? 'data-[state=active]:bg-indigo-600 data-[state=active]:text-white' : ''}
+          <TabsTrigger
+            value="all"
+            onClick={() => setActiveTab("all")}
+            className={
+              activeTab === "all"
+                ? "data-[state=active]:bg-indigo-600 data-[state=active]:text-white"
+                : ""
+            }
           >
-            {language === 'Español' ? 'Todos' : 'All'}
+            {language === "Español" ? "Todos" : "All"}
           </TabsTrigger>
-          <TabsTrigger 
-            value="unread" 
-            onClick={() => setActiveTab('unread')}
-            className={activeTab === 'unread' ? 'data-[state=active]:bg-indigo-600 data-[state=active]:text-white' : ''}
+          <TabsTrigger
+            value="unread"
+            onClick={() => setActiveTab("unread")}
+            className={
+              activeTab === "unread"
+                ? "data-[state=active]:bg-indigo-600 data-[state=active]:text-white"
+                : ""
+            }
           >
-            {language === 'Español' ? 'No leídos' : 'Unread'}
+            {language === "Español" ? "No leídos" : "Unread"}
             {unreadCount > 0 && (
               <Badge className="ml-2 bg-red-500">{unreadCount}</Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger 
-            value="important" 
-            onClick={() => setActiveTab('important')}
-            className={activeTab === 'important' ? 'data-[state=active]:bg-indigo-600 data-[state=active]:text-white' : ''}
+          <TabsTrigger
+            value="important"
+            onClick={() => setActiveTab("important")}
+            className={
+              activeTab === "important"
+                ? "data-[state=active]:bg-indigo-600 data-[state=active]:text-white"
+                : ""
+            }
           >
-            {language === 'Español' ? 'Importantes' : 'Important'}
+            {language === "Español" ? "Importantes" : "Important"}
             {importantCount > 0 && (
               <Badge className="ml-2 bg-yellow-500">{importantCount}</Badge>
             )}
           </TabsTrigger>
         </TabsList>
       </CardHeader>
-      
+
       <CardContent className="p-0">
         <ScrollArea className="h-[400px]">
           {loading ? (
@@ -356,11 +424,17 @@ export default function AnnouncementBoard({
             <div className="flex flex-col items-center justify-center h-40 p-4 text-gray-500">
               <Megaphone className="h-10 w-10 mb-2 text-gray-400" />
               <p>
-                {activeTab === 'unread'
-                  ? language === 'Español' ? 'No hay anuncios sin leer' : 'No unread announcements'
-                  : activeTab === 'important'
-                  ? language === 'Español' ? 'No hay anuncios importantes' : 'No important announcements'
-                  : language === 'Español' ? 'No hay anuncios' : 'No announcements'}
+                {activeTab === "unread"
+                  ? language === "Español"
+                    ? "No hay anuncios sin leer"
+                    : "No unread announcements"
+                  : activeTab === "important"
+                    ? language === "Español"
+                      ? "No hay anuncios importantes"
+                      : "No important announcements"
+                    : language === "Español"
+                      ? "No hay anuncios"
+                      : "No announcements"}
               </p>
             </div>
           ) : (
@@ -368,15 +442,17 @@ export default function AnnouncementBoard({
               {filteredAnnouncements.map((announcement) => {
                 const isRead = isAnnouncementRead(announcement);
                 const isExpanded = expandedAnnouncement === announcement.id;
-                
+
                 return (
-                  <div 
+                  <div
                     key={announcement.id}
-                    className={`border-b last:border-b-0 p-4 cursor-pointer hover:bg-gray-50 ${!isRead ? 'bg-blue-50' : ''} ${isExpired(announcement) ? 'opacity-70' : ''}`}
+                    className={`border-b last:border-b-0 p-4 cursor-pointer hover:bg-gray-50 ${!isRead ? "bg-blue-50" : ""} ${isExpired(announcement) ? "opacity-70" : ""}`}
                     onClick={() => handleAnnouncementClick(announcement)}
                   >
                     <div className="flex items-start">
-                      <div className={`h-2 w-2 mt-1.5 rounded-full mr-2 ${getAnnouncementColor(announcement.type)}`} />
+                      <div
+                        className={`h-2 w-2 mt-1.5 rounded-full mr-2 ${getAnnouncementColor(announcement.type)}`}
+                      />
                       <div className="flex-1">
                         <div className="flex justify-between items-start">
                           <div className="flex items-center gap-2">
@@ -385,7 +461,9 @@ export default function AnnouncementBoard({
                               {announcement.title}
                               {announcement.requiresConfirmation && !isRead && (
                                 <Badge className="ml-2 bg-red-500">
-                                  {language === 'Español' ? 'Requiere confirmación' : 'Confirmation required'}
+                                  {language === "Español"
+                                    ? "Requiere confirmación"
+                                    : "Confirmation required"}
                                 </Badge>
                               )}
                             </h4>
@@ -394,67 +472,84 @@ export default function AnnouncementBoard({
                             {formatRelativeTime(announcement.createdAt)}
                           </span>
                         </div>
-                        
+
                         <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
                           <Avatar className="h-5 w-5">
                             {announcement.createdBy.avatar && (
-                              <AvatarImage src={announcement.createdBy.avatar} />
+                              <AvatarImage
+                                src={announcement.createdBy.avatar}
+                              />
                             )}
                             <AvatarFallback className="text-[10px]">
-                              {announcement.createdBy.name.substring(0, 2).toUpperCase()}
+                              {announcement.createdBy.name
+                                .substring(0, 2)
+                                .toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           <span>{announcement.createdBy.name}</span>
-                          
+
                           {announcement.expiresAt && (
                             <div className="flex items-center gap-1 ml-2">
                               <Clock className="h-3 w-3" />
                               <span>
                                 {isExpired(announcement)
-                                  ? language === 'Español' ? 'Expirado' : 'Expired'
-                                  : language === 'Español' ? 'Expira ' : 'Expires '}
-                                {!isExpired(announcement) && formatRelativeTime(announcement.expiresAt)}
+                                  ? language === "Español"
+                                    ? "Expirado"
+                                    : "Expired"
+                                  : language === "Español"
+                                    ? "Expira "
+                                    : "Expires "}
+                                {!isExpired(announcement) &&
+                                  formatRelativeTime(announcement.expiresAt)}
                               </span>
                             </div>
                           )}
                         </div>
-                        
-                        <div className={`mt-2 text-sm ${isExpanded ? '' : 'line-clamp-2'}`}>
+
+                        <div
+                          className={`mt-2 text-sm ${isExpanded ? "" : "line-clamp-2"}`}
+                        >
                           {announcement.content}
                         </div>
-                        
-                        {isExpanded && announcement.attachments && announcement.attachments.length > 0 && (
-                          <div className="mt-3 space-y-2">
-                            <h5 className="text-sm font-medium">
-                              {language === 'Español' ? 'Archivos adjuntos:' : 'Attachments:'}
-                            </h5>
-                            <div className="flex flex-wrap gap-2">
-                              {announcement.attachments.map(attachment => (
-                                <a 
-                                  key={attachment.id}
-                                  href={attachment.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="flex items-center gap-1 text-xs bg-gray-100 hover:bg-gray-200 rounded px-2 py-1"
-                                  onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                                >
-                                  <span>{attachment.name}</span>
-                                </a>
-                              ))}
+
+                        {isExpanded &&
+                          announcement.attachments &&
+                          announcement.attachments.length > 0 && (
+                            <div className="mt-3 space-y-2">
+                              <h5 className="text-sm font-medium">
+                                {language === "Español"
+                                  ? "Archivos adjuntos:"
+                                  : "Attachments:"}
+                              </h5>
+                              <div className="flex flex-wrap gap-2">
+                                {announcement.attachments.map((attachment) => (
+                                  <a
+                                    key={attachment.id}
+                                    href={attachment.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-1 text-xs bg-gray-100 hover:bg-gray-200 rounded px-2 py-1"
+                                    onClick={(e: React.MouseEvent) =>
+                                      e.stopPropagation()
+                                    }
+                                  >
+                                    <span>{attachment.name}</span>
+                                  </a>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        )}
-                        
+                          )}
+
                         <div className="flex justify-between items-center mt-2">
                           <div className="flex items-center gap-2">
                             {isRead ? (
                               <div className="flex items-center text-xs text-green-600">
                                 <CheckCircle className="h-3 w-3 mr-1" />
-                                {language === 'Español' ? 'Leído' : 'Read'}
+                                {language === "Español" ? "Leído" : "Read"}
                               </div>
                             ) : announcement.requiresConfirmation ? (
-                              <Button 
-                                variant="outline" 
+                              <Button
+                                variant="outline"
                                 size="sm"
                                 className="h-7 text-xs"
                                 onClick={(e: React.MouseEvent) => {
@@ -462,11 +557,13 @@ export default function AnnouncementBoard({
                                   confirmReading(announcement.id);
                                 }}
                               >
-                                {language === 'Español' ? 'Confirmar lectura' : 'Confirm reading'}
+                                {language === "Español"
+                                  ? "Confirmar lectura"
+                                  : "Confirm reading"}
                               </Button>
                             ) : null}
                           </div>
-                          
+
                           <div className="flex items-center">
                             {isExpanded ? (
                               <ChevronUp className="h-4 w-4 text-gray-400" />
@@ -475,10 +572,12 @@ export default function AnnouncementBoard({
                             )}
                           </div>
                         </div>
-                        
+
                         {isExpanded && (
                           <div className="mt-3 text-xs text-gray-500">
-                            {language === 'Español' ? 'Publicado el ' : 'Published on '} 
+                            {language === "Español"
+                              ? "Publicado el "
+                              : "Published on "}
                             {formatFullDate(announcement.createdAt)}
                           </div>
                         )}

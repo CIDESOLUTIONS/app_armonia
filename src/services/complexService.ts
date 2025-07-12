@@ -1,4 +1,4 @@
-import { fetchApi } from '@/lib/api';
+import { fetchApi } from "@/lib/api";
 
 interface ComplexInfo {
   id: number;
@@ -30,23 +30,26 @@ interface UpdateComplexInfoData {
 
 export async function getComplexInfo(): Promise<ComplexInfo> {
   try {
-    const response = await fetchApi('/api/inventory/complex-setup');
+    const response = await fetchApi("/api/inventory/complex-setup");
     return response;
   } catch (error) {
-    console.error('Error fetching complex info:', error);
+    console.error("Error fetching complex info:", error);
     throw error;
   }
 }
 
-export async function updateComplexInfo(id: number, data: UpdateComplexInfoData): Promise<ComplexInfo> {
+export async function updateComplexInfo(
+  id: number,
+  data: UpdateComplexInfoData,
+): Promise<ComplexInfo> {
   try {
-    const response = await fetchApi('/api/inventory/complex-setup', {
-      method: 'PUT',
+    const response = await fetchApi("/api/inventory/complex-setup", {
+      method: "PUT",
       body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
-    console.error('Error updating complex info:', error);
+    console.error("Error updating complex info:", error);
     throw error;
   }
 }

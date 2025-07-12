@@ -1,13 +1,17 @@
 /**
  * Servicio para la asignación inteligente y priorización de solicitudes PQR
- * 
+ *
  * Este servicio implementa la lógica para categorizar, priorizar y asignar
  * automáticamente las solicitudes PQR según reglas configurables.
  */
 
-import { getPrisma } from '@/lib/prisma';
-import { getSchemaFromRequest } from '@/lib/prisma';
-import { PQRCategory, PQRPriority, PQRStatus } from '@/lib/constants/pqr-constants';
+import { getPrisma } from "@/lib/prisma";
+import { getSchemaFromRequest } from "@/lib/prisma";
+import {
+  PQRCategory,
+  PQRPriority,
+  PQRStatus,
+} from "@/lib/constants/pqr-constants";
 
 // Interfaz para datos de entrada de PQR
 export interface PQRInputData {
@@ -55,33 +59,43 @@ export class PQRAssignmentService {
     try {
       // 1. Categorizar la solicitud
       const categorization = await this.categorize(pqrData);
-      
+
       // 2. Determinar la prioridad
-      const prioritization = await this.prioritize(pqrData, categorization.category);
-      
+      const prioritization = await this.prioritize(
+        pqrData,
+        categorization.category,
+      );
+
       // 3. Asignar a equipo o persona responsable
-      const assignment = await this.assign(pqrData, categorization.category, prioritization.priority);
-      
+      const assignment = await this.assign(
+        pqrData,
+        categorization.category,
+        prioritization.priority,
+      );
+
       // 4. Calcular fecha límite según SLA
-      const dueDate = await this.calculateDueDate(categorization.category, prioritization.priority);
-      
+      const dueDate = await this.calculateDueDate(
+        categorization.category,
+        prioritization.priority,
+      );
+
       // 5. Generar etiquetas para clasificación
       const tags = await this.generateTags(pqrData, categorization.category);
-      
+
       // Combinar resultados
       return {
         ...categorization,
         ...prioritization,
         ...assignment,
         dueDate,
-        tags
+        tags,
       };
     } catch (error) {
-      console.error('Error en procesamiento de PQR:', error);
+      console.error("Error en procesamiento de PQR:", error);
       // En caso de error, devolver valores predeterminados
       return {
         category: pqrData.category || PQRCategory.OTHER,
-        priority: pqrData.priority || PQRPriority.MEDIUM
+        priority: pqrData.priority || PQRPriority.MEDIUM,
       };
     }
   }
@@ -89,7 +103,9 @@ export class PQRAssignmentService {
   /**
    * Categoriza automáticamente un PQR basado en su contenido
    */
-  private async categorize(pqrData: PQRInputData): Promise<{ category: PQRCategory, subcategory?: string }> {
+  private async categorize(
+    pqrData: PQRInputData,
+  ): Promise<{ category: PQRCategory; subcategory?: string }> {
     // Si ya viene con categoría, respetarla
     if (pqrData.category) {
       return { category: pqrData.category };
@@ -107,66 +123,108 @@ export class PQRAssignmentService {
       // Obtener reglas de categorización
       const rules = await this.prisma.pQRAssignmentRule.findMany({
         where: { isActive: true },
-        orderBy: { priority: 'asc' },
+        orderBy: { priority: "asc" },
       });
 
       // Texto combinado para análisis
-      const combinedText = `${pqrData.title} ${pqrData.description}`.toLowerCase();
+      const combinedText =
+        `${pqrData.title} ${pqrData.description}`.toLowerCase();
 
       // Aplicar reglas basadas en palabras clave
       for (const rule of rules) {
         if (rule.keywords && rule.keywords.length > 0) {
           // Verificar si alguna palabra clave está en el texto
-          const matchesKeyword = rule.keywords.some(keyword => 
-            combinedText.includes(keyword.toLowerCase())
+          const matchesKeyword = rule.keywords.some((keyword) =>
+            combinedText.includes(keyword.toLowerCase()),
           );
-          
+
           if (matchesKeyword && rule.categories && rule.categories.length > 0) {
-            return { 
+            return {
               category: rule.categories[0] as PQRCategory,
-              subcategory: this.determineSubcategory(combinedText, rule.categories[0] as PQRCategory)
+              subcategory: this.determineSubcategory(
+                combinedText,
+                rule.categories[0] as PQRCategory,
+              ),
             };
           }
         }
       }
 
       // Análisis básico de texto si no hay coincidencia con reglas
-      if (combinedText.match(/manten|repar|arregl|da[ñn]|fuga|goter|luz|bombill|ascensor/i)) {
-        return { 
+      if (
+        combinedText.match(
+          /manten|repar|arregl|da[ñn]|fuga|goter|luz|bombill|ascensor/i,
+        )
+      ) {
+        return {
           category: PQRCategory.MAINTENANCE,
-          subcategory: this.determineSubcategory(combinedText, PQRCategory.MAINTENANCE)
+          subcategory: this.determineSubcategory(
+            combinedText,
+            PQRCategory.MAINTENANCE,
+          ),
         };
-      } else if (combinedText.match(/segur|vigilan|robo|alarm|cctv|c[aá]mara|intru|sospech/i)) {
-        return { 
+      } else if (
+        combinedText.match(
+          /segur|vigilan|robo|alarm|cctv|c[aá]mara|intru|sospech/i,
+        )
+      ) {
+        return {
           category: PQRCategory.SECURITY,
-          subcategory: this.determineSubcategory(combinedText, PQRCategory.SECURITY)
+          subcategory: this.determineSubcategory(
+            combinedText,
+            PQRCategory.SECURITY,
+          ),
         };
-      } else if (combinedText.match(/admin|documento|certific|paz y salvo|contrato|reglamento/i)) {
-        return { 
+      } else if (
+        combinedText.match(
+          /admin|documento|certific|paz y salvo|contrato|reglamento/i,
+        )
+      ) {
+        return {
           category: PQRCategory.ADMINISTRATION,
-          subcategory: this.determineSubcategory(combinedText, PQRCategory.ADMINISTRATION)
+          subcategory: this.determineSubcategory(
+            combinedText,
+            PQRCategory.ADMINISTRATION,
+          ),
         };
-      } else if (combinedText.match(/pag|cuota|factur|cobr|recib|mora|descuent|financ/i)) {
-        return { 
+      } else if (
+        combinedText.match(/pag|cuota|factur|cobr|recib|mora|descuent|financ/i)
+      ) {
+        return {
           category: PQRCategory.PAYMENTS,
-          subcategory: this.determineSubcategory(combinedText, PQRCategory.PAYMENTS)
+          subcategory: this.determineSubcategory(
+            combinedText,
+            PQRCategory.PAYMENTS,
+          ),
         };
-      } else if (combinedText.match(/comun|vecin|ruido|fiesta|mascot|basura|conviven/i)) {
-        return { 
+      } else if (
+        combinedText.match(/comun|vecin|ruido|fiesta|mascot|basura|conviven/i)
+      ) {
+        return {
           category: PQRCategory.NEIGHBORS,
-          subcategory: this.determineSubcategory(combinedText, PQRCategory.NEIGHBORS)
+          subcategory: this.determineSubcategory(
+            combinedText,
+            PQRCategory.NEIGHBORS,
+          ),
         };
-      } else if (combinedText.match(/servicio|agua|luz|gas|internet|tv|ascensor|gimnasio|piscina/i)) {
-        return { 
+      } else if (
+        combinedText.match(
+          /servicio|agua|luz|gas|internet|tv|ascensor|gimnasio|piscina/i,
+        )
+      ) {
+        return {
           category: PQRCategory.SERVICES,
-          subcategory: this.determineSubcategory(combinedText, PQRCategory.SERVICES)
+          subcategory: this.determineSubcategory(
+            combinedText,
+            PQRCategory.SERVICES,
+          ),
         };
       }
 
       // Categoría por defecto si no hay coincidencias
       return { category: PQRCategory.OTHER };
     } catch (error) {
-      console.error('Error en categorización de PQR:', error);
+      console.error("Error en categorización de PQR:", error);
       return { category: PQRCategory.OTHER };
     }
   }
@@ -174,40 +232,48 @@ export class PQRAssignmentService {
   /**
    * Determina subcategorías basadas en el texto y la categoría principal
    */
-  private determineSubcategory(text: string, category: PQRCategory): string | undefined {
+  private determineSubcategory(
+    text: string,
+    category: PQRCategory,
+  ): string | undefined {
     // Subcategorías para mantenimiento
     if (category === PQRCategory.MAINTENANCE) {
-      if (text.match(/agua|fuga|goter|humed|inunda|tuberi|ba[ñn]o/i)) return 'Plomería';
-      if (text.match(/luz|el[eé]ctric|bombill|enchufe|corto|apag[oó]n/i)) return 'Eléctrico';
-      if (text.match(/ascensor|elevador/i)) return 'Ascensores';
-      if (text.match(/puerta|cerradura|llave|chapa/i)) return 'Cerrajería';
-      if (text.match(/pared|muro|grieta|fisura|pintura/i)) return 'Estructural';
+      if (text.match(/agua|fuga|goter|humed|inunda|tuberi|ba[ñn]o/i))
+        return "Plomería";
+      if (text.match(/luz|el[eé]ctric|bombill|enchufe|corto|apag[oó]n/i))
+        return "Eléctrico";
+      if (text.match(/ascensor|elevador/i)) return "Ascensores";
+      if (text.match(/puerta|cerradura|llave|chapa/i)) return "Cerrajería";
+      if (text.match(/pared|muro|grieta|fisura|pintura/i)) return "Estructural";
     }
-    
+
     // Subcategorías para seguridad
     else if (category === PQRCategory.SECURITY) {
-      if (text.match(/c[aá]mara|cctv|video/i)) return 'Videovigilancia';
-      if (text.match(/alarm|sensor/i)) return 'Alarmas';
-      if (text.match(/robo|hurto|intrusi[oó]n/i)) return 'Incidentes';
-      if (text.match(/vigilan|guardia|portero/i)) return 'Personal';
+      if (text.match(/c[aá]mara|cctv|video/i)) return "Videovigilancia";
+      if (text.match(/alarm|sensor/i)) return "Alarmas";
+      if (text.match(/robo|hurto|intrusi[oó]n/i)) return "Incidentes";
+      if (text.match(/vigilan|guardia|portero/i)) return "Personal";
     }
-    
+
     // Subcategorías para servicios
     else if (category === PQRCategory.SERVICES) {
-      if (text.match(/internet|wifi|red/i)) return 'Internet';
-      if (text.match(/gimnasio|gym/i)) return 'Gimnasio';
-      if (text.match(/piscina|alberca|jacuzzi/i)) return 'Piscina';
-      if (text.match(/sal[oó]n|evento|fiesta/i)) return 'Salón comunal';
-      if (text.match(/parque|juego|infantil/i)) return 'Zonas infantiles';
+      if (text.match(/internet|wifi|red/i)) return "Internet";
+      if (text.match(/gimnasio|gym/i)) return "Gimnasio";
+      if (text.match(/piscina|alberca|jacuzzi/i)) return "Piscina";
+      if (text.match(/sal[oó]n|evento|fiesta/i)) return "Salón comunal";
+      if (text.match(/parque|juego|infantil/i)) return "Zonas infantiles";
     }
-    
+
     return undefined;
   }
 
   /**
    * Determina la prioridad de un PQR
    */
-  private async prioritize(pqrData: PQRInputData, category: PQRCategory): Promise<{ priority: PQRPriority }> {
+  private async prioritize(
+    pqrData: PQRInputData,
+    category: PQRCategory,
+  ): Promise<{ priority: PQRPriority }> {
     // Si ya viene con prioridad, respetarla
     if (pqrData.priority) {
       return { priority: pqrData.priority };
@@ -220,20 +286,21 @@ export class PQRAssignmentService {
           isActive: true,
           categories: { has: category },
         },
-        orderBy: { priority: 'asc' },
+        orderBy: { priority: "asc" },
       });
 
       // Texto combinado para análisis
-      const combinedText = `${pqrData.title} ${pqrData.description}`.toLowerCase();
+      const combinedText =
+        `${pqrData.title} ${pqrData.description}`.toLowerCase();
 
       // Aplicar reglas basadas en palabras clave para prioridad
       for (const rule of rules) {
         if (rule.keywords && rule.keywords.length > 0 && rule.setPriority) {
           // Verificar si alguna palabra clave está en el texto
-          const matchesKeyword = rule.keywords.some(keyword => 
-            combinedText.includes(keyword.toLowerCase())
+          const matchesKeyword = rule.keywords.some((keyword) =>
+            combinedText.includes(keyword.toLowerCase()),
           );
-          
+
           if (matchesKeyword) {
             return { priority: rule.setPriority as PQRPriority };
           }
@@ -242,26 +309,51 @@ export class PQRAssignmentService {
 
       // Palabras clave para prioridades
       const urgentKeywords = [
-        'urgente', 'emergencia', 'inmediato', 'grave', 'peligro',
-        'fuga', 'incendio', 'inundación', 'corto circuito', 'seguridad'
+        "urgente",
+        "emergencia",
+        "inmediato",
+        "grave",
+        "peligro",
+        "fuga",
+        "incendio",
+        "inundación",
+        "corto circuito",
+        "seguridad",
       ];
-      
+
       const highKeywords = [
-        'importante', 'pronto', 'rápido', 'afecta', 'impide',
-        'no funciona', 'dañado', 'roto', 'bloqueado'
+        "importante",
+        "pronto",
+        "rápido",
+        "afecta",
+        "impide",
+        "no funciona",
+        "dañado",
+        "roto",
+        "bloqueado",
       ];
-      
+
       const lowKeywords = [
-        'sugerencia', 'cuando pueda', 'mejora', 'idea', 'propuesta',
-        'considerar', 'evaluar', 'futuro'
+        "sugerencia",
+        "cuando pueda",
+        "mejora",
+        "idea",
+        "propuesta",
+        "considerar",
+        "evaluar",
+        "futuro",
       ];
 
       // Verificar coincidencias con palabras clave de prioridad
-      if (urgentKeywords.some(keyword => combinedText.includes(keyword))) {
+      if (urgentKeywords.some((keyword) => combinedText.includes(keyword))) {
         return { priority: PQRPriority.CRITICAL };
-      } else if (highKeywords.some(keyword => combinedText.includes(keyword))) {
+      } else if (
+        highKeywords.some((keyword) => combinedText.includes(keyword))
+      ) {
         return { priority: PQRPriority.HIGH };
-      } else if (lowKeywords.some(keyword => combinedText.includes(keyword))) {
+      } else if (
+        lowKeywords.some((keyword) => combinedText.includes(keyword))
+      ) {
         return { priority: PQRPriority.LOW };
       }
 
@@ -275,7 +367,7 @@ export class PQRAssignmentService {
           return { priority: PQRPriority.MEDIUM };
       }
     } catch (error) {
-      console.error('Error en priorización de PQR:', error);
+      console.error("Error en priorización de PQR:", error);
       return { priority: PQRPriority.MEDIUM };
     }
   }
@@ -284,14 +376,14 @@ export class PQRAssignmentService {
    * Asigna un PQR a un equipo o persona responsable
    */
   private async assign(
-    pqrData: PQRInputData, 
-    category: PQRCategory, 
-    priority: PQRPriority
-  ): Promise<{ 
-    assignedToId?: number, 
-    assignedToName?: string, 
-    assignedToRole?: string,
-    assignedTeamId?: number 
+    pqrData: PQRInputData,
+    category: PQRCategory,
+    priority: PQRPriority,
+  ): Promise<{
+    assignedToId?: number;
+    assignedToName?: string;
+    assignedToRole?: string;
+    assignedTeamId?: number;
   }> {
     try {
       // Verificar si la asignación automática está habilitada
@@ -308,38 +400,38 @@ export class PQRAssignmentService {
           categories: { has: category },
           priorities: { has: priority },
         },
-        orderBy: { priority: 'asc' },
+        orderBy: { priority: "asc" },
       });
 
       // Si hay reglas específicas, aplicar la primera que coincida
       if (rules && rules.length > 0) {
         const rule = rules[0];
-        
+
         // Si la regla asigna a un equipo
         if (rule.assignToTeamId) {
           const team = await this.prisma.pQRTeam.findUnique({
             where: { id: rule.assignToTeamId, isActive: true },
           });
-          
+
           if (team) {
             // Asignar al equipo
             return {
-              assignedTeamId: team.id
+              assignedTeamId: team.id,
             };
           }
         }
-        
+
         // Si la regla asigna a un usuario específico
         if (rule.assignToUserId) {
           const user = await this.prisma.user.findUnique({
             where: { id: rule.assignToUserId },
           });
-          
+
           if (user) {
             return {
               assignedToId: user.id,
-              assignedToName: user.name || 'Usuario ' + user.id,
-              assignedToRole: user.role
+              assignedToName: user.name || "Usuario " + user.id,
+              assignedToRole: user.role,
             };
           }
         }
@@ -357,14 +449,14 @@ export class PQRAssignmentService {
         // Seleccionar equipo con menos carga o por rotación
         // Para este ejemplo, simplemente tomamos el primero
         return {
-          assignedTeamId: teams[0].id
+          assignedTeamId: teams[0].id,
         };
       }
 
       // Si no hay equipos específicos, buscar administradores
       const admins = await this.prisma.user.findMany({
         where: {
-          role: 'COMPLEX_ADMIN',
+          role: "COMPLEX_ADMIN",
           complexId: pqrData.complexId,
           active: true,
         },
@@ -375,15 +467,15 @@ export class PQRAssignmentService {
         // Para este ejemplo, simplemente tomamos el primero
         return {
           assignedToId: admins[0].id,
-          assignedToName: admins[0].name || 'Administrador ' + admins[0].id,
-          assignedToRole: admins[0].role
+          assignedToName: admins[0].name || "Administrador " + admins[0].id,
+          assignedToRole: admins[0].role,
         };
       }
 
       // Si no se pudo asignar, devolver vacío
       return {};
     } catch (error) {
-      console.error('Error en asignación de PQR:', error);
+      console.error("Error en asignación de PQR:", error);
       return {};
     }
   }
@@ -391,26 +483,24 @@ export class PQRAssignmentService {
   /**
    * Calcula la fecha límite según SLA y prioridad
    */
-  private async calculateDueDate(category: PQRCategory, priority: PQRPriority): Promise<Date | undefined> {
+  private async calculateDueDate(
+    category: PQRCategory,
+    priority: PQRPriority,
+  ): Promise<Date | undefined> {
     try {
       // Buscar SLA específico para esta categoría y prioridad
       const sla = await this.prisma.pQRSLA.findFirst({
         where: {
           isActive: true,
-          OR: [
-            { category },
-            { category: null },
-          ],
-          AND: [
-            { OR: [{ priority }, { priority: null }] },
-          ],
+          OR: [{ category }, { category: null }],
+          AND: [{ OR: [{ priority }, { priority: null }] }],
         },
       });
 
       if (sla) {
         const now = new Date();
         const resolutionTime = sla.resolutionTime || 0; // Tiempo en minutos
-        
+
         // Si solo aplica en horario laboral, calcular considerando días hábiles
         if (sla.businessHoursOnly) {
           // Implementación simplificada: solo añadir tiempo en minutos
@@ -437,7 +527,7 @@ export class PQRAssignmentService {
           return new Date(now.getTime() + 5 * 24 * 60 * 60000); // 5 días
       }
     } catch (error) {
-      console.error('Error al calcular fecha límite:', error);
+      console.error("Error al calcular fecha límite:", error);
       return undefined;
     }
   }
@@ -445,51 +535,61 @@ export class PQRAssignmentService {
   /**
    * Genera etiquetas para clasificación adicional
    */
-  private async generateTags(pqrData: PQRInputData, category: PQRCategory): Promise<string[] | undefined> {
+  private async generateTags(
+    pqrData: PQRInputData,
+    category: PQRCategory,
+  ): Promise<string[] | undefined> {
     try {
       const tags = [];
-      const combinedText = `${pqrData.title} ${pqrData.description}`.toLowerCase();
-      
+      const combinedText =
+        `${pqrData.title} ${pqrData.description}`.toLowerCase();
+
       // Añadir etiqueta de categoría
       tags.push(category);
-      
+
       // Añadir etiquetas basadas en palabras clave
       if (combinedText.match(/urgent|emergencia|inmediato|grave|peligro/i)) {
-        tags.push('urgente');
+        tags.push("urgente");
       }
-      
+
       if (combinedText.match(/reincidente|repetido|nuevamente|otra vez/i)) {
-        tags.push('reincidente');
+        tags.push("reincidente");
       }
-      
+
       if (combinedText.match(/garantía|reciente|nuevo|instalación/i)) {
-        tags.push('garantía');
+        tags.push("garantía");
       }
-      
+
       // Añadir etiquetas específicas por categoría
       switch (category) {
         case PQRCategory.MAINTENANCE:
-          if (combinedText.match(/agua|fuga|goter|humed|inunda|tuberi|ba[ñn]o/i)) {
-            tags.push('plomería');
+          if (
+            combinedText.match(/agua|fuga|goter|humed|inunda|tuberi|ba[ñn]o/i)
+          ) {
+            tags.push("plomería");
           }
-          if (combinedText.match(/luz|el[eé]ctric|bombill|enchufe|corto|apag[oó]n/i)) {
-            tags.push('eléctrico');
+          if (
+            combinedText.match(
+              /luz|el[eé]ctric|bombill|enchufe|corto|apag[oó]n/i,
+            )
+          ) {
+            tags.push("eléctrico");
           }
           break;
-          
+
         case PQRCategory.SECURITY:
           if (combinedText.match(/c[aá]mara|cctv|video/i)) {
-            tags.push('videovigilancia');
+            tags.push("videovigilancia");
           }
           if (combinedText.match(/robo|hurto|intrusi[oó]n/i)) {
-            tags.push('incidente');
+            tags.push("incidente");
           }
           break;
       }
-      
+
       return tags.length > 0 ? tags : undefined;
     } catch (error) {
-      console.error('Error al generar etiquetas:', error);
+      console.error("Error al generar etiquetas:", error);
       return undefined;
     }
   }

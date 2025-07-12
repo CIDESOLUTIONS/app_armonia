@@ -1,8 +1,13 @@
 // src/components/ui/pagination/pagination.tsx
 "use client";
 
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 
 interface PaginationProps {
   currentPage: number;
@@ -15,7 +20,7 @@ export function Pagination({
   currentPage,
   totalPages,
   onPageChange,
-  maxButtons = 5
+  maxButtons = 5,
 }: PaginationProps) {
   // No mostrar paginación si solo hay una página
   if (totalPages <= 1) {
@@ -25,18 +30,18 @@ export function Pagination({
   // Calcular el rango de páginas a mostrar
   let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxButtons - 1);
-  
+
   // Ajustar si estamos muy cerca del final
   if (endPage - startPage + 1 < maxButtons && startPage > 1) {
     startPage = Math.max(1, endPage - maxButtons + 1);
   }
-  
+
   // Crear array de páginas a mostrar
   const pages = Array.from(
     { length: endPage - startPage + 1 },
-    (_, i) => startPage + i
+    (_, i) => startPage + i,
   );
-  
+
   return (
     <div className="flex justify-center items-center gap-1">
       {/* Botones para ir al inicio */}
@@ -64,9 +69,9 @@ export function Pagination({
           </Button>
         </>
       )}
-      
+
       {/* Números de página */}
-      {pages.map(page => (
+      {pages.map((page) => (
         <Button
           key={page}
           variant={page === currentPage ? "default" : "outline"}
@@ -77,7 +82,7 @@ export function Pagination({
           {page}
         </Button>
       ))}
-      
+
       {/* Botones para ir al final */}
       {endPage < totalPages && (
         <>

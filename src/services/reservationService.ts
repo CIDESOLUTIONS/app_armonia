@@ -1,4 +1,4 @@
-import { fetchApi } from '@/lib/api';
+import { fetchApi } from "@/lib/api";
 
 interface Reservation {
   id: number;
@@ -12,7 +12,7 @@ interface Reservation {
   description?: string;
   startDateTime: string;
   endDateTime: string;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED' | 'COMPLETED';
+  status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "COMPLETED";
   attendees: number;
   requiresPayment: boolean;
   paymentAmount?: number;
@@ -48,7 +48,7 @@ interface UpdateReservationData {
   description?: string;
   startDateTime?: string;
   endDateTime?: string;
-  status?: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED' | 'COMPLETED';
+  status?: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "COMPLETED";
   attendees?: number;
   requiresPayment?: boolean;
   paymentAmount?: number;
@@ -62,48 +62,53 @@ interface UpdateReservationData {
 
 export async function getReservations(): Promise<Reservation[]> {
   try {
-    const response = await fetchApi('/api/services/reservations');
+    const response = await fetchApi("/api/services/reservations");
     return response;
   } catch (error) {
-    console.error('Error fetching reservations:', error);
+    console.error("Error fetching reservations:", error);
     throw error;
   }
 }
 
-export async function createReservation(data: CreateReservationData): Promise<Reservation> {
+export async function createReservation(
+  data: CreateReservationData,
+): Promise<Reservation> {
   try {
-    const response = await fetchApi('/api/services/reservations', {
-      method: 'POST',
+    const response = await fetchApi("/api/services/reservations", {
+      method: "POST",
       body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
-    console.error('Error creating reservation:', error);
+    console.error("Error creating reservation:", error);
     throw error;
   }
 }
 
-export async function updateReservationStatus(id: number, status: 'APPROVED' | 'REJECTED'): Promise<Reservation> {
+export async function updateReservationStatus(
+  id: number,
+  status: "APPROVED" | "REJECTED",
+): Promise<Reservation> {
   try {
-    const response = await fetchApi('/api/services/reservations', {
-      method: 'PUT',
+    const response = await fetchApi("/api/services/reservations", {
+      method: "PUT",
       body: JSON.stringify({ id, status }),
     });
     return response;
   } catch (error) {
-    console.error('Error updating reservation status:', error);
+    console.error("Error updating reservation status:", error);
     throw error;
   }
 }
 
 export async function deleteReservation(id: number): Promise<void> {
   try {
-    await fetchApi('/api/services/reservations', {
-      method: 'DELETE',
+    await fetchApi("/api/services/reservations", {
+      method: "DELETE",
       body: JSON.stringify({ id }),
     });
   } catch (error) {
-    console.error('Error deleting reservation:', error);
+    console.error("Error deleting reservation:", error);
     throw error;
   }
 }

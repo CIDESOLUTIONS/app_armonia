@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useAuthStore } from '@/store/authStore';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { X, Save, Clock, Users, DollarSign } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useAuthStore } from "@/store/authStore";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { X, Save, Clock, Users, DollarSign } from "lucide-react";
 
 interface ServiceFormProps {
   initialData: unknown;
@@ -204,7 +204,10 @@ export default function ServiceForm({
             >
               <X className="w-4 h-4 mr-2" /> Cancelar
             </Button>
-            <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 flex items-center">
+            <Button
+              type="submit"
+              className="bg-indigo-600 hover:bg-indigo-700 flex items-center"
+            >
               <Save className="w-4 h-4 mr-2" /> Guardar
             </Button>
           </div>

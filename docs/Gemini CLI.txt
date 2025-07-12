@@ -312,6 +312,7 @@ prompt ajustado
 Estás ubicado en el directorio raíz del proyecto Armonía, una aplicación web y móvil con especificaciones técnicas detalladas en la carpeta docs; tu tarea es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto para generar un resumen técnico, funcional y de estilo, identificar diferencias y proponer un plan sistemático para alinear el desarrollo con los requisitos. Evalúa qué funcionalidades deben ajustarse (desde la landing page hasta todos los flujos), qué prácticas deben corregirse según estándares modernos de calidad y si es necesario desarrollar nuevo código, verifica primero en el historial de la carpeta .git para rescatar posibles descartes; si no existe, desarrolla desde cero siguiendo el estilo actual. Incluye la reorganización de la estructura del proyecto si mejora la eficiencia, migración de .js a .ts, eliminación de dependencias o funciones innecesarias y optimización del código. Posteriormente, define y ejecuta pruebas individuales y E2E, y deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado con todas las tareas necesarias y mantenlo en memoria como guía principal hasta la ejecución completa.
 
 Nueva iteración
+<<<<<<< HEAD
 Interacciones solo en español. Compórtese como un experto en desarrollo y auditoria de aplicaciones web y móvil aplicando las últimas y mejores practicas de desarrollo. Estás ubicado en el directorio raíz del proyecto Armonía, una aplicación web y móvil con especificaciones técnicas detalladas en la carpeta docs; tu tarea es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto para generar un resumen técnico, funcional y de estilo, identificar diferencias y proponer un plan sistemático para alinear el desarrollo con los requisitos. Evalúa qué funcionalidades deben ajustarse desde la landing page pasando a todos los portales (Administrador del conjunto residencial, Residentes, Recepción/Vigilancia y la consola de administración de la aplicación) y sus funciones, qué prácticas deben corregirse según estándares modernos de calidad y si es necesario desarrollar nuevo código, verifica primero en el historial de la carpeta .git para rescatar posibles descartes; si no existe, desarrolla desde cero siguiendo el estilo actual. Incluye la reorganización de la estructura del proyecto si mejora la eficiencia, migración, eliminación de dependencias o funciones innecesarias y optimización del código. Posteriormente, define y ejecuta pruebas individuales y E2E, y deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado con todas las tareas necesarias y mantenlo en memoria como guía principal hasta la ejecución completa.
 
 
@@ -408,3 +409,64 @@ Interacciones solo en español. Compórtese como un experto en desarrollo y audi
            * Build de Producción: Generar una build de producción y solucionar cualquier error que surja.
            * Optimización de Rendimiento: Analizar el rendimiento de la aplicación con Lighthouse y aplicar optimizaciones.
 
+=======
+Interacciones solo en español. Compórtese como un experto en desarrollo y auditoria de aplicaciones web y móvil aplicando las últimas y mejores practicas de desarrollo. Estás ubicado en el directorio raíz del proyecto Armonía, una aplicación web y móvil con especificaciones técnicas detalladas en la carpeta docs; tu tarea es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto para generar un resumen técnico, funcional y de estilo, identificar diferencias y proponer un plan sistemático para alinear el desarrollo con los requisitos, si es necesario. Evalúa qué funcionalidades faltan o deben ajustarse desde la landing page y pasando a todos los portales (Administrador del conjunto residencial, Residentes, Recepción/Vigilancia y la consola de administración de la aplicación) y sus funciones, qué prácticas deben corregirse según estándares modernos de calidad y si es necesario desarrollar nuevo código desde cero siguiendo el estilo actual. Incluye la verificación y ajuste a la estructura del proyecto si mejora la eficiencia, migración, eliminación de dependencias o funciones innecesarias y optimización del código. Posteriormente, crea de ser necesario y ejecuta pruebas individuales y E2E, y deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado con todas las tareas necesarias y mantenlo en memoria como guía principal hasta la ejecución completa.
+
+
+ 
+Resumen General y Análisis Inicial
+   1. Resumen Técnico:
+       * Stack Tecnológico: El package.json confirma que el proyecto utiliza las tecnologías clave especificadas: Next.js (^15.3.5), React (^19.1.0), Prisma (^6.5.0), TypeScript, y Tailwind CSS. Las dependencias para autenticación (next-auth), validación (zod), y pruebas E2E (@playwright/test) están presentes, lo cual se alinea con las especificaciones.
+       * Calidad de Código: Se han configurado herramientas como ESLint, lo que indica una intención de mantener la calidad del código.
+       * Pruebas: ¡Alerta Crítica! El script de test en package.json está deshabilitado ("echo \"Jest tests temporarily disabled...\""). Aunque existen dependencias de Jest, esto significa que las pruebas unitarias y de integración no se están ejecutando, lo cual es un riesgo significativo y una desviación mayor de las especificaciones que exigen una estrategia de pruebas robusta.
+
+
+   2. Resumen Funcional (Basado en Especificaciones):
+       * El proyecto está diseñado para ser una plataforma multi-tenant con cuatro portales principales: Público/Landing Page, Administrador de Conjunto, Residente y Recepción/Vigilancia, además de una consola de Administración de la Aplicación.
+       * Las funcionalidades son extensas y complejas, abarcando desde gestión de inventario y finanzas hasta asambleas virtuales y comunicaciones integradas.
+       * El modelo de negocio Freemium (Básico, Estándar, Premium) debe estar integrado en la lógica de la aplicación.
+
+   3. Análisis de Estilo y Estructura (Basado en Especificaciones):
+       * Las especificaciones son muy claras en cuanto a las convenciones de nombrado (PascalCase para componentes, camelCase para funciones) y la estructura de directorios, que debe estar organizada por portales (ej. src/app/(admin), src/app/(resident)).
+       * Se requiere un sistema de diseño basado en Shadcn/UI y un enfoque en la reutilización de componentes y la accesibilidad (WCAG 2.1 AA).
+
+
+  Principales Desviaciones y Riesgos Identificados
+
+   1. Ausencia de Pruebas Unitarias/Integración: La desactivación de Jest es el problema más urgente. Sin esta red de seguridad, la refactorización y el nuevo desarrollo son arriesgados y propensos a errores.
+   2. Brecha Funcional Desconocida: Es necesario realizar una auditoría de código para determinar qué porcentaje de las funcionalidades especificadas está realmente implementado y funcionando correctamente.
+   3. Alineación de la Estructura: Se debe verificar si la estructura de archivos actual sigue el patrón de portales definido en las especificaciones, ya que esto es clave para la mantenibilidad del proyecto.
+
+  Plan de Trabajo Propuesto
+
+  Para abordar esto de manera sistemática, he creado un plan de trabajo detallado. Lo guardaré en mi memoria para que guíe todas nuestras interacciones futuras hasta completar el proyecto.
+
+
+  Plan de Trabajo: Auditoría y Alineación del Proyecto Armonía
+
+  Fase 1: Análisis Profundo y Preparación del Entorno
+   1. Auditoría de Código y Funcionalidades: Revisar cada módulo funcional (Inventario, Asambleas, Finanzas, PQR, etc.) comparando el código existente con las Especificaciones_Tecnicas_Armonia_Ver.15.txt. Documentar las desviaciones y funcionalidades faltantes. Verificar la correcta implementación de la arquitectura multi-tenant.
+   2. Análisis del Historial de Git: Buscar en el historial de .git código relevante que pudo haber sido descartado accidentalmente, especialmente para funcionalidades faltantes.
+   3. Configuración del Entorno de Desarrollo: Asegurar que todas las dependencias estén instaladas y sean compatibles. Configurar y ejecutar las herramientas de calidad de código (ESLint, Prettier) para obtener un informe del estado actual.
+
+  Fase 2: Refactorización y Alineación del Código
+   1. Reorganización de la Estructura de Archivos: Reestructurar el directorio src/app para reflejar los portales definidos (admin, resident, reception, public).
+   2. Migración a TypeScript: Identificar todos los archivos .js y .jsx y planificar su migración a .ts y .tsx.
+   3. Optimización y Limpieza: Eliminar código muerto, dependencias no utilizadas y funcionalidades redundantes. Refactorizar componentes grandes y complejos para mejorar la mantenibilidad. Asegurar que todo el código nuevo y existente siga las convenciones de nombrado y estilo definidas.
+
+  Fase 3: Desarrollo y Completitud de Funcionalidades
+   1. Ajuste de Funcionalidades Existentes: Modificar las funcionalidades actuales para que se ajusten 100% a las especificaciones.
+   2. Desarrollo de Funcionalidades Faltantes: Implementar las funcionalidades que no existen actualmente, comenzando por las más críticas para el flujo de la aplicación.
+
+  Fase 4: Pruebas y Aseguramiento de la Calidad
+   1. Pruebas Unitarias y de Integración: Desarrollar y/o completar las pruebas unitarias y de integración para todos los módulos.
+   2. Pruebas End-to-End (E2E): Crear y ejecutar scripts de Playwright para simular los flujos de usuario completos en todos los portales.
+   3. Pruebas de Rendimiento y Seguridad: Realizar pruebas de carga para asegurar la escalabilidad y analizar la seguridad para identificar y corregir vulnerabilidades.
+
+
+  Fase 5: Despliegue y Documentación
+   1. Preparación para Producción: Configurar los pipelines de CI/CD en GitHub Actions para el despliegue automatizado. Asegurar que la aplicación se construya (build) correctamente sin errores.
+   2. Documentación Final: Actualizar la documentación técnica para que refleje el estado final del proyecto.
+
+ 
+>>>>>>> 690f629f990451f9981d66ac5ff702180e8401a7

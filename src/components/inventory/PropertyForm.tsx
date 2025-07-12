@@ -1,7 +1,7 @@
-import React, { useState, ChangeEvent } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, ChangeEvent } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface PropertyFormData {
   id?: number;
@@ -26,27 +26,31 @@ interface PropertyFormProps {
 /**
  * Formulario para crear o editar propiedades
  */
-export const PropertyForm: React.FC<PropertyFormProps> = ({ 
+export const PropertyForm: React.FC<PropertyFormProps> = ({
   initialData,
   onSubmit,
-  onCancel
+  onCancel,
 }) => {
-  const [property, setProperty] = useState<PropertyFormData>(initialData || {
-    unitNumber: '',
-    type: 'APARTMENT',
-    block: '',
-    zone: '',
-    area: '',
-    bathrooms: '',
-    bedrooms: '',
-    parking: '',
-    floor: '',
-    status: 'AVAILABLE'
-  });
+  const [property, setProperty] = useState<PropertyFormData>(
+    initialData || {
+      unitNumber: "",
+      type: "APARTMENT",
+      block: "",
+      zone: "",
+      area: "",
+      bathrooms: "",
+      bedrooms: "",
+      parking: "",
+      floor: "",
+      status: "AVAILABLE",
+    },
+  );
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
-    setProperty(prev => ({ ...prev, [name]: value }));
+    setProperty((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -57,7 +61,9 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{property.id ? 'Editar Propiedad' : 'Nueva Propiedad'}</CardTitle>
+        <CardTitle>
+          {property.id ? "Editar Propiedad" : "Nueva Propiedad"}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -201,7 +207,7 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
               Cancelar
             </Button>
             <Button type="submit">
-              {property.id ? 'Actualizar' : 'Crear'} Propiedad
+              {property.id ? "Actualizar" : "Crear"} Propiedad
             </Button>
           </div>
         </form>

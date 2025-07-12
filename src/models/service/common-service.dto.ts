@@ -11,6 +11,7 @@ export interface CreateCommonServiceDTO {
   maxAdvanceReservation: number;
 }
 
-export interface UpdateCommonServiceDTO extends Partial<CreateCommonServiceDTO> {
+export interface UpdateCommonServiceDTO
+  extends Partial<CreateCommonServiceDTO> {
   isEnabled?: boolean;
 }

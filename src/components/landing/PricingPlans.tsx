@@ -1,20 +1,20 @@
-import React from 'react';
-import { useTranslation } from 'next-i18next';
-import { Plans } from '@/components/landing/Plans'; // Assuming Plans component is already there
-import { FadeIn } from '@/components/animations/FadeIn';
+import React from "react";
+import { useTranslation } from "next-i18next";
+import { Plans } from "@/components/landing/Plans"; // Assuming Plans component is already there
+import { FadeIn } from "@/components/animations/FadeIn";
 
 export function PricingPlans() {
-  const { t } = useTranslation('landing');
+  const { t } = useTranslation("landing");
 
   return (
     <FadeIn delay={0.4}>
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold text-gray-800 mb-4">
-            {t('pricing.title')}
+            {t("pricing.title")}
           </h2>
           <p className="text-xl text-gray-600 mb-12">
-            {t('pricing.description')}
+            {t("pricing.description")}
           </p>
           <Plans />
         </div>

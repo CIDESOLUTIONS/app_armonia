@@ -1,4 +1,4 @@
-import { fetchApi } from '@/lib/api';
+import { fetchApi } from "@/lib/api";
 
 interface FinancialSummary {
   currentAccountBalance: number;
@@ -24,30 +24,30 @@ interface PendingFee {
 
 export async function getResidentFinancialSummary(): Promise<FinancialSummary> {
   try {
-    const response = await fetchApi('/api/resident-financial');
+    const response = await fetchApi("/api/resident-financial");
     return response.summary;
   } catch (error) {
-    console.error('Error fetching resident financial summary:', error);
+    console.error("Error fetching resident financial summary:", error);
     throw error;
   }
 }
 
 export async function getResidentPayments(): Promise<Payment[]> {
   try {
-    const response = await fetchApi('/api/resident-financial');
+    const response = await fetchApi("/api/resident-financial");
     return response.payments;
   } catch (error) {
-    console.error('Error fetching resident payments:', error);
+    console.error("Error fetching resident payments:", error);
     throw error;
   }
 }
 
 export async function getResidentPendingFees(): Promise<PendingFee[]> {
   try {
-    const response = await fetchApi('/api/resident-financial');
+    const response = await fetchApi("/api/resident-financial");
     return response.pendingFees;
   } catch (error) {
-    console.error('Error fetching resident pending fees:', error);
+    console.error("Error fetching resident pending fees:", error);
     throw error;
   }
 }

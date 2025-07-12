@@ -1,16 +1,31 @@
 "use client";
 
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Clock, User, Home, CheckCircle, XCircle, SendHorizontal, ArrowLeft, AlertTriangle } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue,  } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Clock,
+  User,
+  Home,
+  CheckCircle,
+  XCircle,
+  SendHorizontal,
+  ArrowLeft,
+  AlertTriangle,
+} from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
-import type { PQR, PQRStatus } from './PQRList';
+import type { PQR, PQRStatus } from "./PQRList";
 
 interface Comment {
   id: number;
@@ -39,47 +54,47 @@ export default function PQRDetail({
   onAssign,
   onAddComment,
   users,
-  language
+  language,
 }: PQRDetailProps) {
-  const [newComment, setNewComment] = useState('');
+  const [newComment, setNewComment] = useState("");
   const [isInternalComment, setIsInternalComment] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(pqr.assignedTo || '');
+  const [selectedUser, setSelectedUser] = useState(pqr.assignedTo || "");
 
   // Helper functions to render badges with appropriate colors
   const renderStatusBadge = (status: PQRStatus) => {
-    let bgColor = '';
-    let textColor = '';
-    let label = '';
+    let bgColor = "";
+    let textColor = "";
+    let label = "";
 
     switch (status) {
-      case 'NEW':
-        bgColor = 'bg-blue-100';
-        textColor = 'text-blue-800';
-        label = language === 'Español' ? 'Nuevo' : 'New';
+      case "NEW":
+        bgColor = "bg-blue-100";
+        textColor = "text-blue-800";
+        label = language === "Español" ? "Nuevo" : "New";
         break;
-      case 'IN_PROGRESS':
-        bgColor = 'bg-yellow-100';
-        textColor = 'text-yellow-800';
-        label = language === 'Español' ? 'En Progreso' : 'In Progress';
+      case "IN_PROGRESS":
+        bgColor = "bg-yellow-100";
+        textColor = "text-yellow-800";
+        label = language === "Español" ? "En Progreso" : "In Progress";
         break;
-      case 'RESOLVED':
-        bgColor = 'bg-green-100';
-        textColor = 'text-green-800';
-        label = language === 'Español' ? 'Resuelto' : 'Resolved';
+      case "RESOLVED":
+        bgColor = "bg-green-100";
+        textColor = "text-green-800";
+        label = language === "Español" ? "Resuelto" : "Resolved";
         break;
-      case 'CLOSED':
-        bgColor = 'bg-gray-100';
-        textColor = 'text-gray-800';
-        label = language === 'Español' ? 'Cerrado' : 'Closed';
+      case "CLOSED":
+        bgColor = "bg-gray-100";
+        textColor = "text-gray-800";
+        label = language === "Español" ? "Cerrado" : "Closed";
         break;
-      case 'CANCELLED':
-        bgColor = 'bg-red-100';
-        textColor = 'text-red-800';
-        label = language === 'Español' ? 'Cancelado' : 'Cancelled';
+      case "CANCELLED":
+        bgColor = "bg-red-100";
+        textColor = "text-red-800";
+        label = language === "Español" ? "Cancelado" : "Cancelled";
         break;
       default:
-        bgColor = 'bg-gray-100';
-        textColor = 'text-gray-800';
+        bgColor = "bg-gray-100";
+        textColor = "text-gray-800";
         label = status;
     }
 
@@ -87,34 +102,34 @@ export default function PQRDetail({
   };
 
   const renderPriorityBadge = (priority: string) => {
-    let bgColor = '';
-    let textColor = '';
-    let label = '';
+    let bgColor = "";
+    let textColor = "";
+    let label = "";
 
     switch (priority) {
-      case 'LOW':
-        bgColor = 'bg-green-100';
-        textColor = 'text-green-800';
-        label = language === 'Español' ? 'Baja' : 'Low';
+      case "LOW":
+        bgColor = "bg-green-100";
+        textColor = "text-green-800";
+        label = language === "Español" ? "Baja" : "Low";
         break;
-      case 'MEDIUM':
-        bgColor = 'bg-blue-100';
-        textColor = 'text-blue-800';
-        label = language === 'Español' ? 'Media' : 'Medium';
+      case "MEDIUM":
+        bgColor = "bg-blue-100";
+        textColor = "text-blue-800";
+        label = language === "Español" ? "Media" : "Medium";
         break;
-      case 'HIGH':
-        bgColor = 'bg-orange-100';
-        textColor = 'text-orange-800';
-        label = language === 'Español' ? 'Alta' : 'High';
+      case "HIGH":
+        bgColor = "bg-orange-100";
+        textColor = "text-orange-800";
+        label = language === "Español" ? "Alta" : "High";
         break;
-      case 'URGENT':
-        bgColor = 'bg-red-100';
-        textColor = 'text-red-800';
-        label = language === 'Español' ? 'Urgente' : 'Urgent';
+      case "URGENT":
+        bgColor = "bg-red-100";
+        textColor = "text-red-800";
+        label = language === "Español" ? "Urgente" : "Urgent";
         break;
       default:
-        bgColor = 'bg-gray-100';
-        textColor = 'text-gray-800';
+        bgColor = "bg-gray-100";
+        textColor = "text-gray-800";
         label = priority;
     }
 
@@ -122,29 +137,29 @@ export default function PQRDetail({
   };
 
   const renderTypeBadge = (type: string) => {
-    let bgColor = '';
-    let textColor = '';
-    let label = '';
+    let bgColor = "";
+    let textColor = "";
+    let label = "";
 
     switch (type) {
-      case 'PETITION':
-        bgColor = 'bg-indigo-100';
-        textColor = 'text-indigo-800';
-        label = language === 'Español' ? 'Petición' : 'Petition';
+      case "PETITION":
+        bgColor = "bg-indigo-100";
+        textColor = "text-indigo-800";
+        label = language === "Español" ? "Petición" : "Petition";
         break;
-      case 'COMPLAINT':
-        bgColor = 'bg-purple-100';
-        textColor = 'text-purple-800';
-        label = language === 'Español' ? 'Queja' : 'Complaint';
+      case "COMPLAINT":
+        bgColor = "bg-purple-100";
+        textColor = "text-purple-800";
+        label = language === "Español" ? "Queja" : "Complaint";
         break;
-      case 'CLAIM':
-        bgColor = 'bg-pink-100';
-        textColor = 'text-pink-800';
-        label = language === 'Español' ? 'Reclamo' : 'Claim';
+      case "CLAIM":
+        bgColor = "bg-pink-100";
+        textColor = "text-pink-800";
+        label = language === "Español" ? "Reclamo" : "Claim";
         break;
       default:
-        bgColor = 'bg-gray-100';
-        textColor = 'text-gray-800';
+        bgColor = "bg-gray-100";
+        textColor = "text-gray-800";
         label = type;
     }
 
@@ -166,7 +181,7 @@ export default function PQRDetail({
   const handleAddComment = () => {
     if (newComment.trim()) {
       onAddComment(newComment, isInternalComment);
-      setNewComment('');
+      setNewComment("");
     }
   };
 
@@ -175,43 +190,51 @@ export default function PQRDetail({
       <div className="flex items-center justify-between">
         <Button variant="outline" onClick={onBack} className="mb-4">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          {language === 'Español' ? 'Volver' : 'Back'}
+          {language === "Español" ? "Volver" : "Back"}
         </Button>
 
         <div className="space-x-2">
-          {pqr.status !== 'CLOSED' && pqr.status !== 'CANCELLED' && (
+          {pqr.status !== "CLOSED" && pqr.status !== "CANCELLED" && (
             <>
               <Button
                 variant="outline"
                 className="border-yellow-500 text-yellow-600 hover:bg-yellow-50"
-                onClick={() => handleStatusChange(pqr.status === 'NEW' ? 'IN_PROGRESS' : 'NEW')}
+                onClick={() =>
+                  handleStatusChange(
+                    pqr.status === "NEW" ? "IN_PROGRESS" : "NEW",
+                  )
+                }
               >
-                {pqr.status === 'NEW'
-                  ? language === 'Español' ? 'Iniciar' : 'Start'
-                  : language === 'Español' ? 'Marcar como nuevo' : 'Mark as new'}
+                {pqr.status === "NEW"
+                  ? language === "Español"
+                    ? "Iniciar"
+                    : "Start"
+                  : language === "Español"
+                    ? "Marcar como nuevo"
+                    : "Mark as new"}
               </Button>
               <Button
                 variant="outline"
                 className="border-green-500 text-green-600 hover:bg-green-50"
-                onClick={() => handleStatusChange('RESOLVED')}
+                onClick={() => handleStatusChange("RESOLVED")}
               >
                 <CheckCircle className="mr-2 h-4 w-4" />
-                {language === 'Español' ? 'Resolver' : 'Resolve'}
+                {language === "Español" ? "Resolver" : "Resolve"}
               </Button>
               <Button
                 variant="outline"
                 className="border-gray-500 text-gray-600 hover:bg-gray-50"
-                onClick={() => handleStatusChange('CLOSED')}
+                onClick={() => handleStatusChange("CLOSED")}
               >
-                {language === 'Español' ? 'Cerrar' : 'Close'}
+                {language === "Español" ? "Cerrar" : "Close"}
               </Button>
               <Button
                 variant="outline"
                 className="border-red-500 text-red-600 hover:bg-red-50"
-                onClick={() => handleStatusChange('CANCELLED')}
+                onClick={() => handleStatusChange("CANCELLED")}
               >
                 <XCircle className="mr-2 h-4 w-4" />
-                {language === 'Español' ? 'Cancelar' : 'Cancel'}
+                {language === "Español" ? "Cancelar" : "Cancel"}
               </Button>
             </>
           )}
@@ -257,7 +280,7 @@ export default function PQRDetail({
           {/* Assignment Section */}
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-2">
-              {language === 'Español' ? 'Asignación' : 'Assignment'}
+              {language === "Español" ? "Asignación" : "Assignment"}
             </h3>
             <div className="flex items-center">
               <Select
@@ -265,13 +288,21 @@ export default function PQRDetail({
                 onValueChange={handleAssignmentChange}
               >
                 <SelectTrigger className="w-full max-w-xs">
-                  <SelectValue placeholder={language === 'Español' ? 'Seleccionar responsable' : 'Select assignee'} />
+                  <SelectValue
+                    placeholder={
+                      language === "Español"
+                        ? "Seleccionar responsable"
+                        : "Select assignee"
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="">
-                    {language === 'Español' ? '-- Sin asignar --' : '-- Unassigned --'}
+                    {language === "Español"
+                      ? "-- Sin asignar --"
+                      : "-- Unassigned --"}
                   </SelectItem>
-                  {users.map(user => (
+                  {users.map((user) => (
                     <SelectItem key={user.id} value={user.name}>
                       {user.name}
                     </SelectItem>
@@ -281,15 +312,15 @@ export default function PQRDetail({
               <span className="ml-2">
                 {pqr.assignedTo ? (
                   <span className="text-green-600">
-                    {language === 'Español' 
-                      ? `Asignado a ${pqr.assignedTo}` 
+                    {language === "Español"
+                      ? `Asignado a ${pqr.assignedTo}`
                       : `Assigned to ${pqr.assignedTo}`}
                   </span>
                 ) : (
                   <span className="text-gray-500 italic">
-                    {language === 'Español' 
-                      ? 'Esta solicitud no está asignada' 
-                      : 'This request is not assigned'}
+                    {language === "Español"
+                      ? "Esta solicitud no está asignada"
+                      : "This request is not assigned"}
                   </span>
                 )}
               </span>
@@ -299,24 +330,24 @@ export default function PQRDetail({
           {/* Comments Section */}
           <div>
             <h3 className="text-lg font-semibold mb-4">
-              {language === 'Español' ? 'Comentarios' : 'Comments'}
+              {language === "Español" ? "Comentarios" : "Comments"}
             </h3>
-            
+
             <div className="space-y-4 mb-6">
               {comments.length === 0 ? (
                 <p className="text-gray-500 italic">
-                  {language === 'Español' 
-                    ? 'No hay comentarios aún' 
-                    : 'No comments yet'}
+                  {language === "Español"
+                    ? "No hay comentarios aún"
+                    : "No comments yet"}
                 </p>
               ) : (
-                comments.map(comment => (
-                  <div 
-                    key={comment.id} 
+                comments.map((comment) => (
+                  <div
+                    key={comment.id}
                     className={`p-4 rounded-lg ${
-                      comment.isInternal 
-                        ? 'bg-yellow-50 border border-yellow-200'
-                        : 'bg-blue-50 border border-blue-200'
+                      comment.isInternal
+                        ? "bg-yellow-50 border border-yellow-200"
+                        : "bg-blue-50 border border-blue-200"
                     }`}
                   >
                     <div className="flex justify-between items-start mb-2">
@@ -328,7 +359,7 @@ export default function PQRDetail({
                         </span>
                         {comment.isInternal && (
                           <Badge className="ml-2 bg-yellow-100 text-yellow-800">
-                            {language === 'Español' ? 'Interno' : 'Internal'}
+                            {language === "Español" ? "Interno" : "Internal"}
                           </Badge>
                         )}
                       </div>
@@ -338,21 +369,25 @@ export default function PQRDetail({
                 ))
               )}
             </div>
-            
+
             {/* Add Comment Form */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="newComment">
-                  {language === 'Español' ? 'Agregar comentario' : 'Add comment'}
+                  {language === "Español"
+                    ? "Agregar comentario"
+                    : "Add comment"}
                 </Label>
                 <div className="flex items-center space-x-2">
-                  <Switch 
+                  <Switch
                     id="internalComment"
                     checked={isInternalComment}
                     onCheckedChange={setIsInternalComment}
                   />
                   <Label htmlFor="internalComment" className="cursor-pointer">
-                    {language === 'Español' ? 'Comentario interno' : 'Internal comment'}
+                    {language === "Español"
+                      ? "Comentario interno"
+                      : "Internal comment"}
                   </Label>
                   {isInternalComment && (
                     <AlertTriangle className="h-4 w-4 text-yellow-500" />
@@ -362,10 +397,14 @@ export default function PQRDetail({
               <Textarea
                 id="newComment"
                 value={newComment}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewComment(e.target.value)}
-                placeholder={language === 'Español' 
-                  ? 'Escribe tu comentario aquí...' 
-                  : 'Write your comment here...'}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setNewComment(e.target.value)
+                }
+                placeholder={
+                  language === "Español"
+                    ? "Escribe tu comentario aquí..."
+                    : "Write your comment here..."
+                }
                 className="min-h-[100px]"
               />
               <div className="flex justify-end">
@@ -375,7 +414,7 @@ export default function PQRDetail({
                   disabled={!newComment.trim()}
                 >
                   <SendHorizontal className="mr-2 h-4 w-4" />
-                  {language === 'Español' ? 'Enviar' : 'Send'}
+                  {language === "Español" ? "Enviar" : "Send"}
                 </Button>
               </div>
             </div>

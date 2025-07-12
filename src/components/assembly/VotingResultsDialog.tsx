@@ -1,5 +1,4 @@
- 
-import React from 'react';
+import React from "react";
 import {
   Box,
   Button,
@@ -17,53 +16,60 @@ import {
   TableHead,
   TableRow,
   Typography,
-  useTheme
-} from '@mui/material';
+  useTheme,
+} from "@mui/material";
 import {
   CheckCircle as CheckIcon,
   Cancel as CancelIcon,
-  PieChart as ChartIcon
-} from '@mui/icons-material';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+  PieChart as ChartIcon,
+} from "@mui/icons-material";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+} from "recharts";
 
 // Componente para mostrar los resultados de una votación
 const VotingResultsDialog = ({ open, onClose, voting }) => {
   const theme = useTheme();
-  
+
   // Si no hay votación seleccionada, no mostrar nada
   if (!voting) {
     return null;
   }
-  
+
   // Preparar datos para el gráfico
   const prepareChartData = () => {
     if (!voting.result) return [];
-    
+
     // Asegurarse de que voting.result sea un objeto con las opciones de voto
-    return Object.entries(voting.result).map(([option, data]: [string, any]) => ({
-      name: option,
-      value: data.coefficient,
-      count: data.count
-    }));
+    return Object.entries(voting.result).map(
+      ([option, data]: [string, any]) => ({
+        name: option,
+        value: data.coefficient,
+        count: data.count,
+      }),
+    );
   };
-  
+
   // Colores para el gráfico
   const COLORS = [
     theme.palette.primary.main,
     theme.palette.error.main,
     theme.palette.warning.main,
     theme.palette.success.main,
-    theme.palette.info.main
+    theme.palette.info.main,
   ];
-  
+
   // Datos para el gráfico
   const chartData = prepareChartData();
-  
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>
-        Resultados de Votación: {voting.title}
-      </DialogTitle>
+      <DialogTitle>Resultados de Votación: {voting.title}</DialogTitle>
       <DialogContent>
         <Grid container spacing={3}>
           {/* Información general */}
@@ -78,15 +84,20 @@ const VotingResultsDialog = ({ open, onClose, voting }) => {
                     <strong>Punto de agenda:</strong> {voting.agendaPoint}
                   </Typography>
                   <Typography variant="body2">
-                    <strong>Tipo de votación:</strong> {
-                      voting.type === 'SIMPLE_MAJORITY' ? 'Mayoría simple' :
-                      voting.type === 'QUALIFIED_MAJORITY' ? 'Mayoría calificada' :
-                      voting.type === 'UNANIMOUS' ? 'Unanimidad' : 'Basado en coeficientes'
-                    }
+                    <strong>Tipo de votación:</strong>{" "}
+                    {voting.type === "SIMPLE_MAJORITY"
+                      ? "Mayoría simple"
+                      : voting.type === "QUALIFIED_MAJORITY"
+                        ? "Mayoría calificada"
+                        : voting.type === "UNANIMOUS"
+                          ? "Unanimidad"
+                          : "Basado en coeficientes"}
                   </Typography>
-                  {(voting.type === 'QUALIFIED_MAJORITY' || voting.type === 'COEFFICIENT_BASED') && (
+                  {(voting.type === "QUALIFIED_MAJORITY" ||
+                    voting.type === "COEFFICIENT_BASED") && (
                     <Typography variant="body2">
-                      <strong>Porcentaje requerido:</strong> {voting.requiredPercentage}%
+                      <strong>Porcentaje requerido:</strong>{" "}
+                      {voting.requiredPercentage}%
                     </Typography>
                   )}
                 </Grid>
@@ -95,22 +106,48 @@ const VotingResultsDialog = ({ open, onClose, voting }) => {
                     <strong>Total de votos:</strong> {voting.totalVotes}
                   </Typography>
                   <Typography variant="body2">
-                    <strong>Coeficiente total votado:</strong> {voting.totalCoefficientVoted}%
+                    <strong>Coeficiente total votado:</strong>{" "}
+                    {voting.totalCoefficientVoted}%
                   </Typography>
-                  <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ display: "flex", alignItems: "center", mt: 1 }}
+                  >
                     <strong>Resultado:</strong>
-                    <Box sx={{ display: 'inline-flex', alignItems: 'center', ml: 1 }}>
+                    <Box
+                      sx={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        ml: 1,
+                      }}
+                    >
                       {voting.isApproved ? (
                         <>
-                          <CheckIcon color="success" fontSize="small" sx={{ mr: 0.5 }} />
-                          <Typography variant="body2" color="success.main" fontWeight="bold">
+                          <CheckIcon
+                            color="success"
+                            fontSize="small"
+                            sx={{ mr: 0.5 }}
+                          />
+                          <Typography
+                            variant="body2"
+                            color="success.main"
+                            fontWeight="bold"
+                          >
                             Aprobado
                           </Typography>
                         </>
                       ) : (
                         <>
-                          <CancelIcon color="error" fontSize="small" sx={{ mr: 0.5 }} />
-                          <Typography variant="body2" color="error.main" fontWeight="bold">
+                          <CancelIcon
+                            color="error"
+                            fontSize="small"
+                            sx={{ mr: 0.5 }}
+                          />
+                          <Typography
+                            variant="body2"
+                            color="error.main"
+                            fontWeight="bold"
+                          >
                             Rechazado
                           </Typography>
                         </>
@@ -121,17 +158,28 @@ const VotingResultsDialog = ({ open, onClose, voting }) => {
               </Grid>
             </Paper>
           </Grid>
-          
+
           {/* Gráfico de resultados */}
           <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 2, height: 300, display: 'flex', flexDirection: 'column' }}>
-              <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+            <Paper
+              sx={{
+                p: 2,
+                height: 300,
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <Typography
+                variant="subtitle1"
+                gutterBottom
+                sx={{ display: "flex", alignItems: "center" }}
+              >
                 <ChartIcon sx={{ mr: 1 }} />
                 Distribución de Votos
               </Typography>
-              
+
               {chartData.length > 0 ? (
-                <Box sx={{ flexGrow: 1, width: '100%' }}>
+                <Box sx={{ flexGrow: 1, width: "100%" }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -143,19 +191,37 @@ const VotingResultsDialog = ({ open, onClose, voting }) => {
                         fill="#8884d8"
                         dataKey="value"
                         nameKey="name"
-                        label={({ name, percent }: { name: string, percent: number }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+                        label={({
+                          name,
+                          percent,
+                        }: {
+                          name: string;
+                          percent: number;
+                        }) => `${name}: ${(percent * 100).toFixed(1)}%`}
                       >
                         {chartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={COLORS[index % COLORS.length]}
+                          />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value: number) => `${value.toFixed(2)}%`} />
+                      <Tooltip
+                        formatter={(value: number) => `${value.toFixed(2)}%`}
+                      />
                       <Legend />
                     </PieChart>
                   </ResponsiveContainer>
                 </Box>
               ) : (
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexGrow: 1,
+                  }}
+                >
                   <Typography variant="body2" color="text.secondary">
                     No hay datos disponibles
                   </Typography>
@@ -163,14 +229,14 @@ const VotingResultsDialog = ({ open, onClose, voting }) => {
               )}
             </Paper>
           </Grid>
-          
+
           {/* Tabla de resultados */}
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 2, height: 300 }}>
               <Typography variant="subtitle1" gutterBottom>
                 Detalle de Resultados
               </Typography>
-              
+
               <TableContainer sx={{ maxHeight: 220 }}>
                 <Table size="small">
                   <TableHead>
@@ -190,7 +256,8 @@ const VotingResultsDialog = ({ open, onClose, voting }) => {
                           </TableCell>
                           <TableCell align="right">{row.count}</TableCell>
                           <TableCell align="right">
-                            {((row.count / voting.totalVotes) * 100).toFixed(2)}%
+                            {((row.count / voting.totalVotes) * 100).toFixed(2)}
+                            %
                           </TableCell>
                           <TableCell align="right">
                             {row.value.toFixed(2)}%

@@ -1,6 +1,6 @@
-import { getPrisma } from '@/lib/prisma';
-import { ServerLogger } from '@/lib/logging/server-logger';
-import { PrismaClient } from '@prisma/client';
+import { getPrisma } from "@/lib/prisma";
+import { ServerLogger } from "@/lib/logging/server-logger";
+import { PrismaClient } from "@prisma/client";
 
 export class PaymentService {
   private prisma: PrismaClient;
@@ -16,14 +16,19 @@ export class PaymentService {
       const where: any = {};
       if (filters.status) where.status = filters.status;
       if (filters.paymentMethod) where.paymentMethod = filters.paymentMethod;
-      if (filters.startDate) where.paymentDate = { gte: new Date(filters.startDate) };
-      if (filters.endDate) where.paymentDate = { ...where.paymentDate, lte: new Date(filters.endDate) };
+      if (filters.startDate)
+        where.paymentDate = { gte: new Date(filters.startDate) };
+      if (filters.endDate)
+        where.paymentDate = {
+          ...where.paymentDate,
+          lte: new Date(filters.endDate),
+        };
 
       const orderBy: any = {};
       if (filters.sortField) {
-        orderBy[filters.sortField] = filters.sortDirection || 'desc';
+        orderBy[filters.sortField] = filters.sortDirection || "desc";
       } else {
-        orderBy.paymentDate = 'desc';
+        orderBy.paymentDate = "desc";
       }
 
       const payments = await this.prisma.payment.findMany({
@@ -40,14 +45,17 @@ export class PaymentService {
         orderBy,
       });
 
-      return payments.map(payment => ({
+      return payments.map((payment) => ({
         ...payment,
-        feeType: payment.fee?.type || 'N/A',
+        feeType: payment.fee?.type || "N/A",
         feeDueDate: payment.fee?.dueDate || null,
-        unitNumber: payment.fee?.unit?.unitNumber || 'N/A',
+        unitNumber: payment.fee?.unit?.unitNumber || "N/A",
       }));
     } catch (error) {
-      ServerLogger.error(`[PaymentService] Error al obtener pagos para ${this.schemaName}:`, error);
+      ServerLogger.error(
+        `[PaymentService] Error al obtener pagos para ${this.schemaName}:`,
+        error,
+      );
       throw error;
     }
   }
@@ -68,7 +76,10 @@ export class PaymentService {
       });
       return payment;
     } catch (error) {
-      ServerLogger.error(`[PaymentService] Error al obtener pago ${id} para ${this.schemaName}:`, error);
+      ServerLogger.error(
+        `[PaymentService] Error al obtener pago ${id} para ${this.schemaName}:`,
+        error,
+      );
       throw error;
     }
   }
@@ -79,10 +90,15 @@ export class PaymentService {
         where: { id },
         data: { ...data, updatedAt: new Date() },
       });
-      ServerLogger.info(`[PaymentService] Pago ${id} actualizado para ${this.schemaName}`);
+      ServerLogger.info(
+        `[PaymentService] Pago ${id} actualizado para ${this.schemaName}`,
+      );
       return updatedPayment;
     } catch (error) {
-      ServerLogger.error(`[PaymentService] Error al actualizar pago ${id} para ${this.schemaName}:`, error);
+      ServerLogger.error(
+        `[PaymentService] Error al actualizar pago ${id} para ${this.schemaName}:`,
+        error,
+      );
       throw error;
     }
   }
@@ -90,9 +106,14 @@ export class PaymentService {
   async deletePayment(id: number): Promise<void> {
     try {
       await this.prisma.payment.delete({ where: { id } });
-      ServerLogger.info(`[PaymentService] Pago ${id} eliminado para ${this.schemaName}`);
+      ServerLogger.info(
+        `[PaymentService] Pago ${id} eliminado para ${this.schemaName}`,
+      );
     } catch (error) {
-      ServerLogger.error(`[PaymentService] Error al eliminar pago ${id} para ${this.schemaName}:`, error);
+      ServerLogger.error(
+        `[PaymentService] Error al eliminar pago ${id} para ${this.schemaName}:`,
+        error,
+      );
       throw error;
     }
   }

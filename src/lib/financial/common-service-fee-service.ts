@@ -1,40 +1,54 @@
-'use client';
+"use client";
 
 export class CommonServiceFeeService {
   // Generar cuotas de servicios comunes para un mes específico
   static async generateCommonServiceFees(
     complexId: number,
     year: number,
-    month: number
+    month: number,
   ) {
     try {
       // Variable response eliminada por lint
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Error generando cuotas de servicios comunes');
+        throw new Error(
+          error.message || "Error generando cuotas de servicios comunes",
+        );
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Error en CommonServiceFeeService.generateCommonServiceFees:', error);
+      console.error(
+        "Error en CommonServiceFeeService.generateCommonServiceFees:",
+        error,
+      );
       throw error;
     }
   }
 
   // Obtener cuotas de servicios comunes por conjunto, año y mes
-  static async getCommonServiceFees(complexId: number, year: number, month: number) {
+  static async getCommonServiceFees(
+    complexId: number,
+    year: number,
+    month: number,
+  ) {
     try {
       // Variable response eliminada por lint
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Error obteniendo cuotas de servicios comunes');
+        throw new Error(
+          error.message || "Error obteniendo cuotas de servicios comunes",
+        );
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Error en CommonServiceFeeService.getCommonServiceFees:', error);
+      console.error(
+        "Error en CommonServiceFeeService.getCommonServiceFees:",
+        error,
+      );
       throw error;
     }
   }
@@ -46,12 +60,17 @@ export class CommonServiceFeeService {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Error obteniendo historial de cuotas');
+        throw new Error(
+          error.message || "Error obteniendo historial de cuotas",
+        );
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Error en CommonServiceFeeService.getCommonServiceFeeHistory:', error);
+      console.error(
+        "Error en CommonServiceFeeService.getCommonServiceFeeHistory:",
+        error,
+      );
       throw error;
     }
   }
@@ -63,29 +82,41 @@ export class CommonServiceFeeService {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Error anulando cuota de servicios comunes');
+        throw new Error(
+          error.message || "Error anulando cuota de servicios comunes",
+        );
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Error en CommonServiceFeeService.cancelCommonServiceFee:', error);
+      console.error(
+        "Error en CommonServiceFeeService.cancelCommonServiceFee:",
+        error,
+      );
       throw error;
     }
   }
 
   // Actualizar el monto de una cuota de servicios comunes
-  static async updateCommonServiceFeeAmount(feeId: number, newAmount: number, reason: string) {
+  static async updateCommonServiceFeeAmount(
+    feeId: number,
+    newAmount: number,
+    reason: string,
+  ) {
     try {
       // Variable response eliminada por lint
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Error actualizando monto de cuota');
+        throw new Error(error.message || "Error actualizando monto de cuota");
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Error en CommonServiceFeeService.updateCommonServiceFeeAmount:', error);
+      console.error(
+        "Error en CommonServiceFeeService.updateCommonServiceFeeAmount:",
+        error,
+      );
       throw error;
     }
   }
@@ -97,12 +128,15 @@ export class CommonServiceFeeService {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Error generando recibos');
+        throw new Error(error.message || "Error generando recibos");
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Error en CommonServiceFeeService.generateReceipts:', error);
+      console.error(
+        "Error en CommonServiceFeeService.generateReceipts:",
+        error,
+      );
       throw error;
     }
   }

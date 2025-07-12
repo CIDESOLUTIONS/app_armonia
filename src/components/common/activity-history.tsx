@@ -1,6 +1,13 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface ActivityHistoryProps {
   activities: Array<{
@@ -17,11 +24,11 @@ interface ActivityHistoryProps {
 
 export function ActivityHistory({ activities }: ActivityHistoryProps) {
   const formatAction = (action: string) => {
-    const actionMap: {[key: string]: string} = {
-      'CREATE': 'Creación',
-      'UPDATE': 'Actualización',
-      'STATUS_CHANGE': 'Cambio de Estado',
-      'DELETE': 'Eliminación'
+    const actionMap: { [key: string]: string } = {
+      CREATE: "Creación",
+      UPDATE: "Actualización",
+      STATUS_CHANGE: "Cambio de Estado",
+      DELETE: "Eliminación",
     };
     return actionMap[action] || action;
   };
@@ -54,15 +61,9 @@ export function ActivityHistory({ activities }: ActivityHistoryProps) {
                   <TableCell>
                     {new Date(activity.createdAt).toLocaleString()}
                   </TableCell>
-                  <TableCell>
-                    {activity.user.name}
-                  </TableCell>
-                  <TableCell>
-                    {formatAction(activity.action)}
-                  </TableCell>
-                  <TableCell>
-                    {activity.details || 'Sin detalles'}
-                  </TableCell>
+                  <TableCell>{activity.user.name}</TableCell>
+                  <TableCell>{formatAction(activity.action)}</TableCell>
+                  <TableCell>{activity.details || "Sin detalles"}</TableCell>
                 </TableRow>
               ))
             )}

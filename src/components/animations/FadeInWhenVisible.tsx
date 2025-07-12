@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from 'framer-motion';
-import { FC, ReactNode } from 'react';
+import { motion } from "framer-motion";
+import { FC, ReactNode } from "react";
 
 interface FadeInWhenVisibleProps {
   children: ReactNode;
@@ -9,7 +9,11 @@ interface FadeInWhenVisibleProps {
   duration?: number;
 }
 
-const FadeInWhenVisible: FC<FadeInWhenVisibleProps> = ({ children, delay = 0, duration = 0.5 }) => {
+const FadeInWhenVisible: FC<FadeInWhenVisibleProps> = ({
+  children,
+  delay = 0,
+  duration = 0.5,
+}) => {
   return (
     <motion.div
       initial="hidden"

@@ -1,9 +1,12 @@
 // src/app/api/inventory/services/[id]/route.ts
-import { NextResponse } from 'next/server';
-import { getPrisma } from '@/lib/prisma';
-import { verifyToken } from '@/lib/auth';
+import { NextResponse } from "next/server";
+import { getPrisma } from "@/lib/prisma";
+import { verifyToken } from "@/lib/auth";
 
-export async function GET(_req:unknown, { params }: { params: { id: string } }) {
+export async function GET(
+  _req: unknown,
+  { params }: { params: { id: string } },
+) {
   try {
     const serviceId = parseInt(params.id);
     const _token = req.headers.get("Authorization")?.replace("Bearer ", "");
@@ -16,14 +19,18 @@ export async function GET(_req:unknown, { params }: { params: { id: string } }) 
     const _schemaName = searchParams.get("schemaName");
 
     if (!schemaName) {
-      return NextResponse.json({ message: "Schema name es requerido" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Schema name es requerido" },
+        { status: 400 },
+      );
     }
 
     const prisma = getPrisma(schemaName);
 
     try {
       // Obtenemos el servicio específico
-      const service = await prisma.$queryRawUnsafe(`
+      const service = await prisma.$queryRawUnsafe(
+        `
         SELECT 
           id, 
           name, 
@@ -37,10 +44,15 @@ export async function GET(_req:unknown, { params }: { params: { id: string } }) 
           "daysAvailable"
         FROM "${schemaName}"."Service"
         WHERE id = $1
-      `, serviceId);
+      `,
+        serviceId,
+      );
 
       if (!service || !Array.isArray(service) || service.length === 0) {
-        return NextResponse.json({ message: "Servicio no encontrado" }, { status: 404 });
+        return NextResponse.json(
+          { message: "Servicio no encontrado" },
+          { status: 404 },
+        );
       }
 
       return NextResponse.json({ service: service[0] });
@@ -50,31 +62,35 @@ export async function GET(_req:unknown, { params }: { params: { id: string } }) 
       const mockService = {
         id: serviceId,
         name: "Servicio de demostración",
-        description: "Este es un servicio generado automáticamente para pruebas.",
+        description:
+          "Este es un servicio generado automáticamente para pruebas.",
         capacity: 20,
         startTime: "09:00",
         endTime: "18:00",
         status: "active",
         cost: 0,
         rules: "Reglas de demostración",
-        daysAvailable: "Lunes a Viernes"
+        daysAvailable: "Lunes a Viernes",
       };
-      
-      return NextResponse.json({ 
+
+      return NextResponse.json({
         service: mockService,
-        demo: true
+        demo: true,
       });
     }
   } catch (error) {
     console.error("Error en API service GET:", error);
     return NextResponse.json(
       { message: "Error al obtener el servicio" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-export async function PUT(_req:unknown, { params }: { params: { id: string } }) {
+export async function PUT(
+  _req: unknown,
+  { params }: { params: { id: string } },
+) {
   try {
     const serviceId = parseInt(params.id);
     const _token = req.headers.get("Authorization")?.replace("Bearer ", "");
@@ -87,14 +103,18 @@ export async function PUT(_req:unknown, { params }: { params: { id: string } }) 
     const { schemaName, complexId, ...serviceData } = data;
 
     if (!schemaName || !complexId) {
-      return NextResponse.json({ message: "Datos incompletos" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Datos incompletos" },
+        { status: 400 },
+      );
     }
 
     const prisma = getPrisma(schemaName);
 
     try {
       // Actualizamos el servicio
-      await prisma.$queryRawUnsafe(`
+      await prisma.$queryRawUnsafe(
+        `
         UPDATE "${schemaName}"."Service"
         SET 
           name = $1, 
@@ -108,23 +128,24 @@ export async function PUT(_req:unknown, { params }: { params: { id: string } }) 
           "daysAvailable" = $9,
           "updatedAt" = $10
         WHERE id = $11 AND "complexId" = $12
-      `, 
+      `,
         serviceData.name,
-        serviceData.description || '',
+        serviceData.description || "",
         serviceData.capacity || 0,
-        serviceData.startTime || '08:00',
-        serviceData.endTime || '18:00',
+        serviceData.startTime || "08:00",
+        serviceData.endTime || "18:00",
         serviceData.cost || 0,
-        serviceData.status || 'active',
-        serviceData.rules || '',
-        serviceData.daysAvailable || 'Lunes a Domingo',
+        serviceData.status || "active",
+        serviceData.rules || "",
+        serviceData.daysAvailable || "Lunes a Domingo",
         new Date(),
         serviceId,
-        complexId
+        complexId,
       );
 
       // Obtenemos el servicio actualizado
-      const updatedService = await prisma.$queryRawUnsafe(`
+      const updatedService = await prisma.$queryRawUnsafe(
+        `
         SELECT 
           id, 
           name, 
@@ -138,40 +159,45 @@ export async function PUT(_req:unknown, { params }: { params: { id: string } }) 
           "daysAvailable"
         FROM "${schemaName}"."Service"
         WHERE id = $1
-      `, serviceId);
+      `,
+        serviceId,
+      );
 
-      return NextResponse.json({ 
-        message: "Servicio actualizado exitosamente", 
-        service: updatedService[0]
+      return NextResponse.json({
+        message: "Servicio actualizado exitosamente",
+        service: updatedService[0],
       });
     } catch (dbError) {
       console.error("Error al actualizar servicio:", dbError);
       // Si hay error, simulamos una respuesta exitosa
-      return NextResponse.json({ 
-        message: "Servicio actualizado en modo de demostración", 
+      return NextResponse.json({
+        message: "Servicio actualizado en modo de demostración",
         service: {
           id: serviceId,
           ...serviceData,
-          demo: true
-        }
+          demo: true,
+        },
       });
     }
   } catch (error) {
     console.error("Error en PUT service:", error);
     // Simulamos una respuesta exitosa para modo de demostración
     const serviceData = await req.json();
-    return NextResponse.json({ 
-      message: "Servicio actualizado en modo de demostración", 
+    return NextResponse.json({
+      message: "Servicio actualizado en modo de demostración",
       service: {
         id: parseInt(params.id),
         ...serviceData,
-        demo: true
-      }
+        demo: true,
+      },
     });
   }
 }
 
-export async function DELETE(_req:unknown, { params }: { params: { id: string } }) {
+export async function DELETE(
+  _req: unknown,
+  { params }: { params: { id: string } },
+) {
   try {
     const serviceId = parseInt(params.id);
     const _token = req.headers.get("Authorization")?.replace("Bearer ", "");
@@ -185,34 +211,41 @@ export async function DELETE(_req:unknown, { params }: { params: { id: string } 
     const _complexId = parseInt(searchParams.get("complexId") || "0");
 
     if (!schemaName || !complexId) {
-      return NextResponse.json({ message: "Datos incompletos" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Datos incompletos" },
+        { status: 400 },
+      );
     }
 
     const prisma = getPrisma(schemaName);
 
     try {
       // Eliminamos el servicio
-      await prisma.$queryRawUnsafe(`
+      await prisma.$queryRawUnsafe(
+        `
         DELETE FROM "${schemaName}"."Service"
         WHERE id = $1 AND "complexId" = $2
-      `, serviceId, complexId);
+      `,
+        serviceId,
+        complexId,
+      );
 
-      return NextResponse.json({ 
-        message: "Servicio eliminado exitosamente" 
+      return NextResponse.json({
+        message: "Servicio eliminado exitosamente",
       });
     } catch (dbError) {
       console.error("Error al eliminar servicio:", dbError);
       // Si hay error, simulamos una respuesta exitosa
-      return NextResponse.json({ 
+      return NextResponse.json({
         message: "Servicio eliminado en modo de demostración",
-        demo: true
+        demo: true,
       });
     }
   } catch (error) {
     console.error("Error en DELETE service:", error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: "Servicio eliminado en modo de demostración",
-      demo: true
+      demo: true,
     });
   }
 }

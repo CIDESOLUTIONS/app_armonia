@@ -1,9 +1,9 @@
 // src/hooks/useFreemiumPlan.ts
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { apiClient } from '@/lib/api-client';
-import { PlanType } from '@prisma/client';
+import { useState, useEffect, useCallback } from "react";
+import { apiClient } from "@/lib/api-client";
+import { PlanType } from "@prisma/client";
 
 interface PlanStatus {
   complex: {
@@ -64,12 +64,15 @@ export function useFreemiumPlan() {
       setLoading(true);
       setError(null);
 
-      const response = await apiClient.get('/plans/status');
+      const response = await apiClient.get("/plans/status");
       setPlanStatus(response);
-
     } catch (err) {
-      console.error('Error cargando estado del plan:', err);
-      setError(err instanceof Error ? err.message : 'Error cargando información del plan');
+      console.error("Error cargando estado del plan:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Error cargando información del plan",
+      );
     } finally {
       setLoading(false);
     }
@@ -79,79 +82,95 @@ export function useFreemiumPlan() {
     try {
       setError(null);
 
-      const response = await apiClient.get('/plans/upgrade');
+      const response = await apiClient.get("/plans/upgrade");
       setAvailablePlans(response.availablePlans || []);
-
     } catch (err) {
-      console.error('Error cargando planes disponibles:', err);
-      setError(err instanceof Error ? err.message : 'Error cargando planes disponibles');
+      console.error("Error cargando planes disponibles:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Error cargando planes disponibles",
+      );
     }
   }, []);
 
-  const upgradePlan = useCallback(async (
-    targetPlan: PlanType,
-    billingData?: {
-      billingEmail?: string;
-      billingName?: string;
-      billingAddress?: string;
-      billingCity?: string;
-      billingCountry?: string;
-    }
-  ) => {
-    try {
-      setLoading(true);
-      setError(null);
+  const upgradePlan = useCallback(
+    async (
+      targetPlan: PlanType,
+      billingData?: {
+        billingEmail?: string;
+        billingName?: string;
+        billingAddress?: string;
+        billingCity?: string;
+        billingCountry?: string;
+      },
+    ) => {
+      try {
+        setLoading(true);
+        setError(null);
 
-      const response = await apiClient.post('/plans/upgrade', {
-        targetPlan,
-        ...billingData
-      });
+        const response = await apiClient.post("/plans/upgrade", {
+          targetPlan,
+          ...billingData,
+        });
 
-      if (response.success) {
-        // Recargar estado del plan después del upgrade
-        await loadPlanStatus();
-        return response;
+        if (response.success) {
+          // Recargar estado del plan después del upgrade
+          await loadPlanStatus();
+          return response;
+        }
+
+        throw new Error(response.message || "Error en el upgrade");
+      } catch (err) {
+        console.error("Error en upgrade de plan:", err);
+        setError(
+          err instanceof Error ? err.message : "Error actualizando plan",
+        );
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [loadPlanStatus],
+  );
+
+  const hasFeatureAccess = useCallback(
+    (feature: string): boolean => {
+      if (!planStatus) return false;
+
+      // Durante trial, permitir acceso a funcionalidades estándar
+      if (planStatus.trial.isActive) {
+        return true; // O verificar contra lista de features estándar
       }
 
-      throw new Error(response.message || 'Error en el upgrade');
+      return planStatus.currentPlan.features.includes(feature);
+    },
+    [planStatus],
+  );
 
-    } catch (err) {
-      console.error('Error en upgrade de plan:', err);
-      setError(err instanceof Error ? err.message : 'Error actualizando plan');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [loadPlanStatus]);
+  const isUpgradeRequired = useCallback(
+    (feature: string): boolean => {
+      return !hasFeatureAccess(feature);
+    },
+    [hasFeatureAccess],
+  );
 
-  const hasFeatureAccess = useCallback((feature: string): boolean => {
-    if (!planStatus) return false;
-    
-    // Durante trial, permitir acceso a funcionalidades estándar
-    if (planStatus.trial.isActive) {
-      return true; // O verificar contra lista de features estándar
-    }
+  const getUpgradeMessage = useCallback(
+    (feature: string): string => {
+      if (!planStatus) return "Plan no disponible";
 
-    return planStatus.currentPlan.features.includes(feature);
-  }, [planStatus]);
+      if (planStatus.upgrade.missingFeaturesStandard.includes(feature)) {
+        return "Esta funcionalidad está disponible en el Plan Estándar";
+      }
 
-  const isUpgradeRequired = useCallback((feature: string): boolean => {
-    return !hasFeatureAccess(feature);
-  }, [hasFeatureAccess]);
+      if (planStatus.upgrade.missingFeaturesPremium.includes(feature)) {
+        return "Esta funcionalidad está disponible en el Plan Premium";
+      }
 
-  const getUpgradeMessage = useCallback((feature: string): string => {
-    if (!planStatus) return 'Plan no disponible';
-
-    if (planStatus.upgrade.missingFeaturesStandard.includes(feature)) {
-      return 'Esta funcionalidad está disponible en el Plan Estándar';
-    }
-
-    if (planStatus.upgrade.missingFeaturesPremium.includes(feature)) {
-      return 'Esta funcionalidad está disponible en el Plan Premium';
-    }
-
-    return 'Funcionalidad disponible en su plan actual';
-  }, [planStatus]);
+      return "Funcionalidad disponible en su plan actual";
+    },
+    [planStatus],
+  );
 
   // Cargar datos al montar el componente
   useEffect(() => {
@@ -171,8 +190,8 @@ export function useFreemiumPlan() {
     isUpgradeRequired,
     getUpgradeMessage,
     isTrialActive: planStatus?.trial.isActive || false,
-    currentPlan: planStatus?.currentPlan.type || 'BASIC',
-    unitsWithinLimit: planStatus?.validation.unitsWithinLimit || true
+    currentPlan: planStatus?.currentPlan.type || "BASIC",
+    unitsWithinLimit: planStatus?.validation.unitsWithinLimit || true,
   };
 }
 

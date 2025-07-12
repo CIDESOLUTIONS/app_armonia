@@ -1,11 +1,16 @@
 // src/components/inventory/ResidentForm.tsx
 "use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface Resident {
   id?: number;
@@ -14,7 +19,7 @@ interface Resident {
   dni: string;
   birthDate: string;
   whatsapp: string;
-  residentType: 'permanente' | 'temporal';
+  residentType: "permanente" | "temporal";
   startDate: string;
   endDate?: string;
   status: string;
@@ -38,24 +43,31 @@ interface ResidentFormProps {
   properties: Property[];
 }
 
-export function ResidentForm({ resident, onSave, onCancel, properties }: ResidentFormProps) {
+export function ResidentForm({
+  resident,
+  onSave,
+  onCancel,
+  properties,
+}: ResidentFormProps) {
   const [_formData, _setFormData] = useState<Resident>(
     resident || {
-      name: '',
-      email: '',
-      dni: '',
-      birthDate: '',
-      whatsapp: '',
-      residentType: 'permanente',
-      startDate: new Date().toISOString().split('T')[0],
-      status: 'activo',
-      propertyNumber: '',
-    }
+      name: "",
+      email: "",
+      dni: "",
+      birthDate: "",
+      whatsapp: "",
+      residentType: "permanente",
+      startDate: new Date().toISOString().split("T")[0],
+      status: "activo",
+      propertyNumber: "",
+    },
   );
   const [loading, setLoading] = useState(false);
-  const [error, _setError] = useState('');
+  const [error, _setError] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -63,27 +75,31 @@ export function ResidentForm({ resident, onSave, onCancel, properties }: Residen
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       await onSave(formData);
     } catch (err) {
-      console.error('Error al guardar residente:', err);
-      setError(err instanceof Error ? err.message : 'Error al guardar residente');
+      console.error("Error al guardar residente:", err);
+      setError(
+        err instanceof Error ? err.message : "Error al guardar residente",
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const isTemporary = formData.residentType === 'temporal';
+  const isTemporary = formData.residentType === "temporal";
 
   return (
     <Dialog open={true} onOpenChange={() => onCancel()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{resident ? 'Editar Residente' : 'Nuevo Residente'}</DialogTitle>
+          <DialogTitle>
+            {resident ? "Editar Residente" : "Nuevo Residente"}
+          </DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div>
             <Label htmlFor="name">Nombre Completo</Label>
@@ -96,7 +112,7 @@ export function ResidentForm({ resident, onSave, onCancel, properties }: Residen
               disabled={loading}
             />
           </div>
-          
+
           <div>
             <Label htmlFor="dni">DNI/Identificación</Label>
             <Input
@@ -108,7 +124,7 @@ export function ResidentForm({ resident, onSave, onCancel, properties }: Residen
               disabled={loading}
             />
           </div>
-          
+
           <div>
             <Label htmlFor="email">Email</Label>
             <Input
@@ -121,7 +137,7 @@ export function ResidentForm({ resident, onSave, onCancel, properties }: Residen
               disabled={loading}
             />
           </div>
-          
+
           <div>
             <Label htmlFor="whatsapp">WhatsApp</Label>
             <Input
@@ -132,7 +148,7 @@ export function ResidentForm({ resident, onSave, onCancel, properties }: Residen
               disabled={loading}
             />
           </div>
-          
+
           <div>
             <Label htmlFor="birthDate">Fecha de Nacimiento</Label>
             <Input
@@ -145,7 +161,7 @@ export function ResidentForm({ resident, onSave, onCancel, properties }: Residen
               disabled={loading}
             />
           </div>
-          
+
           <div>
             <Label htmlFor="propertyNumber">Propiedad</Label>
             <select
@@ -165,7 +181,7 @@ export function ResidentForm({ resident, onSave, onCancel, properties }: Residen
               ))}
             </select>
           </div>
-          
+
           <div>
             <Label htmlFor="residentType">Tipo de Residente</Label>
             <select
@@ -181,7 +197,7 @@ export function ResidentForm({ resident, onSave, onCancel, properties }: Residen
               <option value="temporal">Temporal</option>
             </select>
           </div>
-          
+
           <div>
             <Label htmlFor="startDate">Fecha de Inicio</Label>
             <Input
@@ -194,7 +210,7 @@ export function ResidentForm({ resident, onSave, onCancel, properties }: Residen
               disabled={loading}
             />
           </div>
-          
+
           {isTemporary && (
             <div>
               <Label htmlFor="endDate">Fecha de Finalización</Label>
@@ -202,14 +218,14 @@ export function ResidentForm({ resident, onSave, onCancel, properties }: Residen
                 id="endDate"
                 name="endDate"
                 type="date"
-                value={formData.endDate || ''}
+                value={formData.endDate || ""}
                 onChange={handleChange}
                 required={isTemporary}
                 disabled={loading}
               />
             </div>
           )}
-          
+
           <div>
             <Label htmlFor="status">Estado</Label>
             <select
@@ -225,13 +241,13 @@ export function ResidentForm({ resident, onSave, onCancel, properties }: Residen
               <option value="inactivo">Inactivo</option>
             </select>
           </div>
-          
+
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
               {error}
             </div>
           )}
-          
+
           <div className="flex justify-end space-x-4 pt-4">
             <Button
               type="button"
@@ -246,7 +262,7 @@ export function ResidentForm({ resident, onSave, onCancel, properties }: Residen
               className="bg-indigo-600 hover:bg-indigo-700 text-white"
               disabled={loading}
             >
-              {loading ? 'Guardando...' : 'Guardar'}
+              {loading ? "Guardando..." : "Guardar"}
             </Button>
           </div>
         </form>

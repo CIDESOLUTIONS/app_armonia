@@ -1,10 +1,10 @@
 // src/components/inventory/ComplexDataForm.tsx
 "use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface ComplexFormData {
   name: string;
@@ -25,50 +25,57 @@ interface ComplexDataFormProps {
   onCancel: () => void;
 }
 
-export function ComplexDataForm({ initialData, onSave, onCancel }: ComplexDataFormProps) {
+export function ComplexDataForm({
+  initialData,
+  onSave,
+  onCancel,
+}: ComplexDataFormProps) {
   const [_formData, _setFormData] = useState<ComplexFormData>({
-    name: initialData?.name || '',
-    address: initialData?.address || '',
-    city: initialData?.city || '',
-    state: initialData?.state || '',
-    country: initialData?.country || '',
-    adminName: initialData?.adminName || '',
-    adminEmail: initialData?.adminEmail || '',
-    adminPhone: initialData?.adminPhone || '',
-    adminDNI: initialData?.adminDNI || '',
-    adminAddress: initialData?.adminAddress || '',
+    name: initialData?.name || "",
+    address: initialData?.address || "",
+    city: initialData?.city || "",
+    state: initialData?.state || "",
+    country: initialData?.country || "",
+    adminName: initialData?.adminName || "",
+    adminEmail: initialData?.adminEmail || "",
+    adminPhone: initialData?.adminPhone || "",
+    adminDNI: initialData?.adminDNI || "",
+    adminAddress: initialData?.adminAddress || "",
   });
   const [loading, setLoading] = useState(false);
-  const [error, _setError] = useState('');
+  const [error, _setError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       await onSave(formData);
     } catch (err) {
-      console.error('Error al guardar:', err);
-      setError(err instanceof Error ? err.message : 'Error al guardar datos');
+      console.error("Error al guardar:", err);
+      setError(err instanceof Error ? err.message : "Error al guardar datos");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow"
+    >
       <h2 className="text-xl font-bold mb-6">Datos del Conjunto</h2>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <h3 className="text-lg font-semibold mb-4">Información General</h3>
-          
+
           <div className="mb-4">
             <Label htmlFor="name">Nombre del Conjunto</Label>
             <Input
@@ -80,7 +87,7 @@ export function ComplexDataForm({ initialData, onSave, onCancel }: ComplexDataFo
               disabled={loading}
             />
           </div>
-          
+
           <div className="mb-4">
             <Label htmlFor="address">Dirección</Label>
             <Input
@@ -92,7 +99,7 @@ export function ComplexDataForm({ initialData, onSave, onCancel }: ComplexDataFo
               disabled={loading}
             />
           </div>
-          
+
           <div className="mb-4">
             <Label htmlFor="city">Ciudad</Label>
             <Input
@@ -104,7 +111,7 @@ export function ComplexDataForm({ initialData, onSave, onCancel }: ComplexDataFo
               disabled={loading}
             />
           </div>
-          
+
           <div className="mb-4">
             <Label htmlFor="state">Estado/Provincia</Label>
             <Input
@@ -116,7 +123,7 @@ export function ComplexDataForm({ initialData, onSave, onCancel }: ComplexDataFo
               disabled={loading}
             />
           </div>
-          
+
           <div className="mb-4">
             <Label htmlFor="country">País</Label>
             <Input
@@ -129,10 +136,12 @@ export function ComplexDataForm({ initialData, onSave, onCancel }: ComplexDataFo
             />
           </div>
         </div>
-        
+
         <div>
-          <h3 className="text-lg font-semibold mb-4">Información del Administrador</h3>
-          
+          <h3 className="text-lg font-semibold mb-4">
+            Información del Administrador
+          </h3>
+
           <div className="mb-4">
             <Label htmlFor="adminName">Nombre</Label>
             <Input
@@ -144,7 +153,7 @@ export function ComplexDataForm({ initialData, onSave, onCancel }: ComplexDataFo
               disabled={loading}
             />
           </div>
-          
+
           <div className="mb-4">
             <Label htmlFor="adminDNI">DNI/Identificación</Label>
             <Input
@@ -156,7 +165,7 @@ export function ComplexDataForm({ initialData, onSave, onCancel }: ComplexDataFo
               disabled={loading}
             />
           </div>
-          
+
           <div className="mb-4">
             <Label htmlFor="adminEmail">Email</Label>
             <Input
@@ -169,7 +178,7 @@ export function ComplexDataForm({ initialData, onSave, onCancel }: ComplexDataFo
               disabled={loading}
             />
           </div>
-          
+
           <div className="mb-4">
             <Label htmlFor="adminPhone">Teléfono</Label>
             <Input
@@ -181,7 +190,7 @@ export function ComplexDataForm({ initialData, onSave, onCancel }: ComplexDataFo
               disabled={loading}
             />
           </div>
-          
+
           <div className="mb-4">
             <Label htmlFor="adminAddress">Dirección</Label>
             <Input
@@ -195,13 +204,13 @@ export function ComplexDataForm({ initialData, onSave, onCancel }: ComplexDataFo
           </div>
         </div>
       </div>
-      
+
       {error && (
         <div className="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
           {error}
         </div>
       )}
-      
+
       <div className="mt-6 flex justify-end space-x-4">
         <Button
           type="button"
@@ -216,7 +225,7 @@ export function ComplexDataForm({ initialData, onSave, onCancel }: ComplexDataFo
           className="bg-indigo-600 hover:bg-indigo-700 text-white"
           disabled={loading}
         >
-          {loading ? 'Guardando...' : 'Guardar Cambios'}
+          {loading ? "Guardando..." : "Guardar Cambios"}
         </Button>
       </div>
     </form>

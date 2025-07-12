@@ -1,5 +1,4 @@
- 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Button,
   Dialog,
@@ -16,76 +15,98 @@ import {
   RadioGroup,
   Select,
   TextField,
-  Typography
-} from '@mui/material';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+  Typography,
+} from "@mui/material";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 
 // Esquema de validación
 const schema = yup.object({
-  agendaPoint: yup.number().required('Seleccione un punto de la agenda'),
-  title: yup.string().required('El título es obligatorio').max(100, 'Máximo 100 caracteres'),
-  description: yup.string().max(500, 'Máximo 500 caracteres'),
-  type: yup.string().required('Seleccione un tipo de votación'),
-  options: yup.array().of(yup.string()).min(2, 'Debe haber al menos 2 opciones'),
-  requiredPercentage: yup.number().when('type', {
-    is: (val) => val === 'QUALIFIED_MAJORITY' || val === 'COEFFICIENT_BASED',
-    then: yup.number().required('Porcentaje requerido').min(1, 'Mínimo 1%').max(100, 'Máximo 100%')
+  agendaPoint: yup.number().required("Seleccione un punto de la agenda"),
+  title: yup
+    .string()
+    .required("El título es obligatorio")
+    .max(100, "Máximo 100 caracteres"),
+  description: yup.string().max(500, "Máximo 500 caracteres"),
+  type: yup.string().required("Seleccione un tipo de votación"),
+  options: yup
+    .array()
+    .of(yup.string())
+    .min(2, "Debe haber al menos 2 opciones"),
+  requiredPercentage: yup.number().when("type", {
+    is: (val) => val === "QUALIFIED_MAJORITY" || val === "COEFFICIENT_BASED",
+    then: yup
+      .number()
+      .required("Porcentaje requerido")
+      .min(1, "Mínimo 1%")
+      .max(100, "Máximo 100%"),
   }),
-  baseForPercentage: yup.string().when('type', {
-    is: (val) => val === 'QUALIFIED_MAJORITY',
-    then: yup.string().required('Seleccione la base para el cálculo')
-  })
+  baseForPercentage: yup.string().when("type", {
+    is: (val) => val === "QUALIFIED_MAJORITY",
+    then: yup.string().required("Seleccione la base para el cálculo"),
+  }),
 });
 
 // Tipos de votación
 const votingTypes = [
-  { value: 'SIMPLE_MAJORITY', label: 'Mayoría simple (>50% de los votos)' },
-  { value: 'QUALIFIED_MAJORITY', label: 'Mayoría calificada (% configurable del total)' },
-  { value: 'UNANIMOUS', label: 'Unanimidad (todos los votos a favor)' },
-  { value: 'COEFFICIENT_BASED', label: 'Basado en coeficientes (% configurable)' }
+  { value: "SIMPLE_MAJORITY", label: "Mayoría simple (>50% de los votos)" },
+  {
+    value: "QUALIFIED_MAJORITY",
+    label: "Mayoría calificada (% configurable del total)",
+  },
+  { value: "UNANIMOUS", label: "Unanimidad (todos los votos a favor)" },
+  {
+    value: "COEFFICIENT_BASED",
+    label: "Basado en coeficientes (% configurable)",
+  },
 ];
 
 // Bases para cálculo de porcentaje
 const percentageBases = [
-  { value: 'ATTENDEES', label: 'Asistentes presentes' },
-  { value: 'TOTAL_COEFFICIENTS', label: 'Coeficientes totales del conjunto' }
+  { value: "ATTENDEES", label: "Asistentes presentes" },
+  { value: "TOTAL_COEFFICIENTS", label: "Coeficientes totales del conjunto" },
 ];
 
 // Componente para crear una nueva votación
 const CreateVotingDialog = ({ open, onClose, onSubmit, agendaPoints }) => {
-  const [optionType, setOptionType] = useState('simple');
-  
+  const [optionType, setOptionType] = useState("simple");
+
   // Configuración del formulario
-  const { control, handleSubmit, watch, formState: { errors }, reset } = useForm({
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors },
+    reset,
+  } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      agendaPoint: '',
-      title: '',
-      description: '',
-      type: 'SIMPLE_MAJORITY',
-      options: ['Sí', 'No', 'Abstención'],
+      agendaPoint: "",
+      title: "",
+      description: "",
+      type: "SIMPLE_MAJORITY",
+      options: ["Sí", "No", "Abstención"],
       requiredPercentage: 70,
-      baseForPercentage: 'ATTENDEES'
-    }
+      baseForPercentage: "ATTENDEES",
+    },
   });
-  
+
   // Observar cambios en tipo de votación
-  const watchType = watch('type');
-  
+  const watchType = watch("type");
+
   // Manejar cierre del diálogo
   const handleClose = () => {
     reset();
     onClose();
   };
-  
+
   // Manejar envío del formulario
   const handleFormSubmit = (data) => {
     onSubmit(data);
     reset();
   };
-  
+
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle>Nueva Votación</DialogTitle>
@@ -100,10 +121,7 @@ const CreateVotingDialog = ({ open, onClose, onSubmit, agendaPoints }) => {
                   name="agendaPoint"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      {...field}
-                      label="Punto de la agenda"
-                    >
+                    <Select {...field} label="Punto de la agenda">
                       {agendaPoints?.map((point: any, index: number) => (
                         <MenuItem key={index} value={index + 1}>
                           {index + 1}. {point.topic}
@@ -113,11 +131,13 @@ const CreateVotingDialog = ({ open, onClose, onSubmit, agendaPoints }) => {
                   )}
                 />
                 {errors.agendaPoint && (
-                  <FormHelperText error>{errors.agendaPoint.message}</FormHelperText>
+                  <FormHelperText error>
+                    {errors.agendaPoint.message}
+                  </FormHelperText>
                 )}
               </FormControl>
             </Grid>
-            
+
             {/* Tipo de votación */}
             <Grid item xs={12} md={6}>
               <FormControl fullWidth error={!!errors.type}>
@@ -126,10 +146,7 @@ const CreateVotingDialog = ({ open, onClose, onSubmit, agendaPoints }) => {
                   name="type"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      {...field}
-                      label="Tipo de votación"
-                    >
+                    <Select {...field} label="Tipo de votación">
                       {votingTypes.map((type) => (
                         <MenuItem key={type.value} value={type.value}>
                           {type.label}
@@ -143,7 +160,7 @@ const CreateVotingDialog = ({ open, onClose, onSubmit, agendaPoints }) => {
                 )}
               </FormControl>
             </Grid>
-            
+
             {/* Título */}
             <Grid item xs={12}>
               <Controller
@@ -160,7 +177,7 @@ const CreateVotingDialog = ({ open, onClose, onSubmit, agendaPoints }) => {
                 )}
               />
             </Grid>
-            
+
             {/* Descripción */}
             <Grid item xs={12}>
               <Controller
@@ -179,9 +196,10 @@ const CreateVotingDialog = ({ open, onClose, onSubmit, agendaPoints }) => {
                 )}
               />
             </Grid>
-            
+
             {/* Configuración adicional para tipos específicos */}
-            {(watchType === 'QUALIFIED_MAJORITY' || watchType === 'COEFFICIENT_BASED') && (
+            {(watchType === "QUALIFIED_MAJORITY" ||
+              watchType === "COEFFICIENT_BASED") && (
               <>
                 <Grid item xs={12} md={6}>
                   <Controller
@@ -200,8 +218,8 @@ const CreateVotingDialog = ({ open, onClose, onSubmit, agendaPoints }) => {
                     )}
                   />
                 </Grid>
-                
-                {watchType === 'QUALIFIED_MAJORITY' && (
+
+                {watchType === "QUALIFIED_MAJORITY" && (
                   <Grid item xs={12} md={6}>
                     <FormControl fullWidth error={!!errors.baseForPercentage}>
                       <InputLabel>Base para cálculo</InputLabel>
@@ -209,10 +227,7 @@ const CreateVotingDialog = ({ open, onClose, onSubmit, agendaPoints }) => {
                         name="baseForPercentage"
                         control={control}
                         render={({ field }) => (
-                          <Select
-                            {...field}
-                            label="Base para cálculo"
-                          >
+                          <Select {...field} label="Base para cálculo">
                             {percentageBases.map((base) => (
                               <MenuItem key={base.value} value={base.value}>
                                 {base.label}
@@ -222,40 +237,42 @@ const CreateVotingDialog = ({ open, onClose, onSubmit, agendaPoints }) => {
                         )}
                       />
                       {errors.baseForPercentage && (
-                        <FormHelperText error>{errors.baseForPercentage.message}</FormHelperText>
+                        <FormHelperText error>
+                          {errors.baseForPercentage.message}
+                        </FormHelperText>
                       )}
                     </FormControl>
                   </Grid>
                 )}
               </>
             )}
-            
+
             {/* Opciones de votación */}
             <Grid item xs={12}>
               <Typography variant="subtitle2" gutterBottom>
                 Opciones de votación
               </Typography>
-              
+
               <FormControl component="fieldset">
                 <RadioGroup
                   value={optionType}
                   onChange={(e) => setOptionType(e.target.value)}
                   row
                 >
-                  <FormControlLabel 
-                    value="simple" 
-                    control={<Radio />} 
-                    label="Sí/No/Abstención" 
+                  <FormControlLabel
+                    value="simple"
+                    control={<Radio />}
+                    label="Sí/No/Abstención"
                   />
-                  <FormControlLabel 
-                    value="custom" 
-                    control={<Radio />} 
-                    label="Opciones personalizadas" 
+                  <FormControlLabel
+                    value="custom"
+                    control={<Radio />}
+                    label="Opciones personalizadas"
                   />
                 </RadioGroup>
               </FormControl>
-              
-              {optionType === 'simple' ? (
+
+              {optionType === "simple" ? (
                 <Typography variant="body2" color="text.secondary">
                   Se utilizarán las opciones estándar: Sí, No, Abstención
                 </Typography>
@@ -265,14 +282,21 @@ const CreateVotingDialog = ({ open, onClose, onSubmit, agendaPoints }) => {
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      value={field.value.join('\n')}
-                      onChange={(e) => field.onChange(e.target.value.split('\n').filter(Boolean))}
+                      value={field.value.join("\n")}
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value.split("\n").filter(Boolean),
+                        )
+                      }
                       label="Opciones (una por línea)"
                       fullWidth
                       multiline
                       rows={4}
                       error={!!errors.options}
-                      helperText={errors.options?.message || "Ingrese cada opción en una línea separada"}
+                      helperText={
+                        errors.options?.message ||
+                        "Ingrese cada opción en una línea separada"
+                      }
                       sx={{ mt: 2 }}
                     />
                   )}

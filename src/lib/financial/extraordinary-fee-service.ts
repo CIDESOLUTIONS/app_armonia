@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 export class ExtraordinaryFeeService {
   // Crear una nueva cuota extraordinaria
@@ -6,19 +6,22 @@ export class ExtraordinaryFeeService {
     complexId: number,
     amount: number,
     description: string,
-    dueDate: Date
+    dueDate: Date,
   ) {
     try {
       // Variable response eliminada por lint
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Error creando cuota extraordinaria');
+        throw new Error(error.message || "Error creando cuota extraordinaria");
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Error en ExtraordinaryFeeService.createExtraordinaryFee:', error);
+      console.error(
+        "Error en ExtraordinaryFeeService.createExtraordinaryFee:",
+        error,
+      );
       throw error;
     }
   }
@@ -30,12 +33,17 @@ export class ExtraordinaryFeeService {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Error obteniendo cuotas extraordinarias');
+        throw new Error(
+          error.message || "Error obteniendo cuotas extraordinarias",
+        );
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Error en ExtraordinaryFeeService.getExtraordinaryFees:', error);
+      console.error(
+        "Error en ExtraordinaryFeeService.getExtraordinaryFees:",
+        error,
+      );
       throw error;
     }
   }
@@ -47,12 +55,15 @@ export class ExtraordinaryFeeService {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Error anulando cuota extraordinaria');
+        throw new Error(error.message || "Error anulando cuota extraordinaria");
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Error en ExtraordinaryFeeService.cancelExtraordinaryFee:', error);
+      console.error(
+        "Error en ExtraordinaryFeeService.cancelExtraordinaryFee:",
+        error,
+      );
       throw error;
     }
   }
@@ -64,12 +75,17 @@ export class ExtraordinaryFeeService {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Error obteniendo detalle de cuota extraordinaria');
+        throw new Error(
+          error.message || "Error obteniendo detalle de cuota extraordinaria",
+        );
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Error en ExtraordinaryFeeService.getExtraordinaryFeeDetail:', error);
+      console.error(
+        "Error en ExtraordinaryFeeService.getExtraordinaryFeeDetail:",
+        error,
+      );
       throw error;
     }
   }

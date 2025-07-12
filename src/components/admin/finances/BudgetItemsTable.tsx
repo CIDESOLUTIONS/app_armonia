@@ -1,16 +1,23 @@
 "use client";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Trash2 } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Trash2 } from "lucide-react";
 
 interface BudgetItem {
   id?: number;
   category: string;
   description: string;
   amount: number;
-  type: 'INCOME' | 'EXPENSE';
+  type: "INCOME" | "EXPENSE";
 }
 
 interface BudgetItemsTableProps {
@@ -21,17 +28,19 @@ interface BudgetItemsTableProps {
   readOnly?: boolean;
 }
 
-export default function BudgetItemsTable({ 
-  items, 
-  onRemove, 
-  currencySymbol, 
+export default function BudgetItemsTable({
+  items,
+  onRemove,
+  currencySymbol,
   language,
-  readOnly = false
+  readOnly = false,
 }: BudgetItemsTableProps) {
   if (items.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
-        {language === 'Español' ? 'No hay ítems en este presupuesto' : 'No items in this budget'}
+        {language === "Español"
+          ? "No hay ítems en este presupuesto"
+          : "No items in this budget"}
       </div>
     );
   }
@@ -40,12 +49,20 @@ export default function BudgetItemsTable({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>{language === 'Español' ? 'Categoría' : 'Category'}</TableHead>
-          <TableHead>{language === 'Español' ? 'Descripción' : 'Description'}</TableHead>
-          <TableHead>{language === 'Español' ? 'Tipo' : 'Type'}</TableHead>
-          <TableHead className="text-right">{language === 'Español' ? 'Monto' : 'Amount'}</TableHead>
+          <TableHead>
+            {language === "Español" ? "Categoría" : "Category"}
+          </TableHead>
+          <TableHead>
+            {language === "Español" ? "Descripción" : "Description"}
+          </TableHead>
+          <TableHead>{language === "Español" ? "Tipo" : "Type"}</TableHead>
+          <TableHead className="text-right">
+            {language === "Español" ? "Monto" : "Amount"}
+          </TableHead>
           {!readOnly && (
-            <TableHead className="text-right">{language === 'Español' ? 'Acciones' : 'Actions'}</TableHead>
+            <TableHead className="text-right">
+              {language === "Español" ? "Acciones" : "Actions"}
+            </TableHead>
           )}
         </TableRow>
       </TableHeader>
@@ -55,19 +72,32 @@ export default function BudgetItemsTable({
             <TableCell className="font-medium">{item.category}</TableCell>
             <TableCell>{item.description}</TableCell>
             <TableCell>
-              <Badge className={item.type === 'INCOME' 
-                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' 
-                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}>
-                {item.type === 'INCOME'
-                  ? (language === 'Español' ? 'Ingreso' : 'Income')
-                  : (language === 'Español' ? 'Gasto' : 'Expense')}
+              <Badge
+                className={
+                  item.type === "INCOME"
+                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                    : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                }
+              >
+                {item.type === "INCOME"
+                  ? language === "Español"
+                    ? "Ingreso"
+                    : "Income"
+                  : language === "Español"
+                    ? "Gasto"
+                    : "Expense"}
               </Badge>
             </TableCell>
             <TableCell className="text-right">
-              <span className={item.type === 'INCOME' 
-                ? 'text-green-600 dark:text-green-400' 
-                : 'text-red-600 dark:text-red-400'}>
-                {currencySymbol}{item.amount.toLocaleString()}
+              <span
+                className={
+                  item.type === "INCOME"
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-red-600 dark:text-red-400"
+                }
+              >
+                {currencySymbol}
+                {item.amount.toLocaleString()}
               </span>
             </TableCell>
             {!readOnly && (

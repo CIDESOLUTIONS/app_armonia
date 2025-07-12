@@ -1,39 +1,69 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  CardDescription
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { useToast } from '@/components/ui/use-toast';
-import { 
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
+import {
   UserPlus as PersonAddIcon,
   Camera as CameraIcon,
-  Loader2
-} from 'lucide-react';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { intercomService } from '../../lib/services/intercom-service';
-import Image from 'next/image';
+  Loader2,
+} from "lucide-react";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { intercomService } from "../../lib/services/intercom-service";
+import Image from "next/image";
 
 // Esquema de validación
-const schema = yup.object({
-  name: yup.string().required('El nombre es obligatorio'),
-  identification: yup.string().required('La identificación es obligatoria'),
-  phone: yup.string().matches(/^\+?[0-9]{10,15}$/, 'Formato de teléfono inválido').optional().nullable().transform(value => value === '' ? undefined : value),
-  typeId: yup.number().required('El tipo de visitante es obligatorio').min(1, 'Seleccione un tipo'),
-  unitId: yup.number().required('La unidad a visitar es obligatoria').min(1, 'Seleccione una unidad'),
-  purpose: yup.string().required('El propósito de la visita es obligatorio'),
-  company: yup.string().optional().nullable().transform(value => value === '' ? undefined : value)
-}).required();
+const schema = yup
+  .object({
+    name: yup.string().required("El nombre es obligatorio"),
+    identification: yup.string().required("La identificación es obligatoria"),
+    phone: yup
+      .string()
+      .matches(/^\+?[0-9]{10,15}$/, "Formato de teléfono inválido")
+      .optional()
+      .nullable()
+      .transform((value) => (value === "" ? undefined : value)),
+    typeId: yup
+      .number()
+      .required("El tipo de visitante es obligatorio")
+      .min(1, "Seleccione un tipo"),
+    unitId: yup
+      .number()
+      .required("La unidad a visitar es obligatoria")
+      .min(1, "Seleccione una unidad"),
+    purpose: yup.string().required("El propósito de la visita es obligatorio"),
+    company: yup
+      .string()
+      .optional()
+      .nullable()
+      .transform((value) => (value === "" ? undefined : value)),
+  })
+  .required();
 
 // Interfaz para tipos de visitantes
 interface VisitorType {
@@ -60,36 +90,41 @@ const VisitorRegistration: React.FC = () => {
   const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
 
   // Configuración del formulario
-  const { control, handleSubmit, reset, formState: { errors } } = useForm({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      name: '',
-      identification: '',
-      phone: '',
+      name: "",
+      identification: "",
+      phone: "",
       typeId: 0,
       unitId: 0,
-      purpose: '',
-      company: ''
-    }
+      purpose: "",
+      company: "",
+    },
   });
 
   // Cargar datos iniciales
   const fetchData = useCallback(async () => {
     try {
       // En un caso real, estos datos vendrían de la API
-      const typesResponse = await fetch('/api/intercom/visitor-types');
+      const typesResponse = await fetch("/api/intercom/visitor-types");
       const typesData = await typesResponse.json();
       setVisitorTypes(typesData);
 
-      const unitsResponse = await fetch('/api/intercom/units');
+      const unitsResponse = await fetch("/api/intercom/units");
       const unitsData = await unitsResponse.json();
       setUnits(unitsData);
     } catch (error) {
-      console.error('Error al cargar datos:', error);
+      console.error("Error al cargar datos:", error);
       toast({
-        title: 'Error',
-        description: 'Error al cargar datos iniciales',
-        variant: 'destructive'
+        title: "Error",
+        description: "Error al cargar datos iniciales",
+        variant: "destructive",
       });
     }
   }, [toast]);
@@ -112,20 +147,20 @@ const VisitorRegistration: React.FC = () => {
 
       // Mostrar notificación de éxito
       toast({
-        title: 'Éxito',
-        description: 'Visita registrada correctamente',
-        variant: 'default'
+        title: "Éxito",
+        description: "Visita registrada correctamente",
+        variant: "default",
       });
 
       // Resetear formulario
       reset();
       setPhotoUrl(null);
     } catch (error) {
-      console.error('Error al registrar visita:', error);
+      console.error("Error al registrar visita:", error);
       toast({
-        title: 'Error',
-        description: 'Error al registrar la visita',
-        variant: 'destructive'
+        title: "Error",
+        description: "Error al registrar la visita",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -138,14 +173,14 @@ const VisitorRegistration: React.FC = () => {
     try {
       // En un entorno real, aquí se integraría con la cámara
       // Por ahora simulamos una URL de foto
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setPhotoUrl('https://via.placeholder.com/150');
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      setPhotoUrl("https://via.placeholder.com/150");
     } catch (error) {
-      console.error('Error al tomar foto:', error);
+      console.error("Error al tomar foto:", error);
       toast({
-        title: 'Error',
-        description: 'Error al tomar la foto',
-        variant: 'destructive'
+        title: "Error",
+        description: "Error al tomar la foto",
+        variant: "destructive",
       });
     } finally {
       setTakingPhoto(false);
@@ -159,7 +194,9 @@ const VisitorRegistration: React.FC = () => {
           <PersonAddIcon className="mr-2 h-5 w-5" />
           Registro de Visitantes
         </CardTitle>
-        <CardDescription>Registre el ingreso de nuevos visitantes al conjunto.</CardDescription>
+        <CardDescription>
+          Registre el ingreso de nuevos visitantes al conjunto.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
@@ -179,7 +216,9 @@ const VisitorRegistration: React.FC = () => {
                 )}
               />
               {errors.name && (
-                <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.name.message}
+                </p>
               )}
             </div>
 
@@ -197,7 +236,9 @@ const VisitorRegistration: React.FC = () => {
                 )}
               />
               {errors.identification && (
-                <p className="text-red-500 text-sm mt-1">{errors.identification.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.identification.message}
+                </p>
               )}
             </div>
 
@@ -215,7 +256,9 @@ const VisitorRegistration: React.FC = () => {
                 )}
               />
               {errors.phone && (
-                <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.phone.message}
+                </p>
               )}
             </div>
 
@@ -249,7 +292,9 @@ const VisitorRegistration: React.FC = () => {
                       <SelectValue placeholder="Seleccione un tipo" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="0" disabled>Seleccione un tipo</SelectItem>
+                      <SelectItem value="0" disabled>
+                        Seleccione un tipo
+                      </SelectItem>
                       {visitorTypes.map((type) => (
                         <SelectItem key={type.id} value={String(type.id)}>
                           {type.name}
@@ -260,7 +305,9 @@ const VisitorRegistration: React.FC = () => {
                 )}
               />
               {errors.typeId && (
-                <p className="text-red-500 text-sm mt-1">{errors.typeId.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.typeId.message}
+                </p>
               )}
             </div>
 
@@ -279,10 +326,14 @@ const VisitorRegistration: React.FC = () => {
                       <SelectValue placeholder="Seleccione una unidad" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="0" disabled>Seleccione una unidad</SelectItem>
+                      <SelectItem value="0" disabled>
+                        Seleccione una unidad
+                      </SelectItem>
                       {units.map((unit) => (
                         <SelectItem key={unit.id} value={String(unit.id)}>
-                          {unit.tower ? `${unit.tower} - ${unit.number}` : unit.number}
+                          {unit.tower
+                            ? `${unit.tower} - ${unit.number}`
+                            : unit.number}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -290,7 +341,9 @@ const VisitorRegistration: React.FC = () => {
                 )}
               />
               {errors.unitId && (
-                <p className="text-red-500 text-sm mt-1">{errors.unitId.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.unitId.message}
+                </p>
               )}
             </div>
 
@@ -310,7 +363,9 @@ const VisitorRegistration: React.FC = () => {
                 )}
               />
               {errors.purpose && (
-                <p className="text-red-500 text-sm mt-1">{errors.purpose.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.purpose.message}
+                </p>
               )}
             </div>
 
@@ -329,13 +384,13 @@ const VisitorRegistration: React.FC = () => {
                   ) : (
                     <CameraIcon className="mr-2 h-4 w-4" />
                   )}
-                  {takingPhoto ? 'Tomando foto...' : 'Tomar foto'}
+                  {takingPhoto ? "Tomando foto..." : "Tomar foto"}
                 </Button>
                 {photoUrl && (
                   <div className="relative w-24 h-24 rounded-md overflow-hidden">
-                    <Image 
-                      src={photoUrl} 
-                      alt="Foto del visitante" 
+                    <Image
+                      src={photoUrl}
+                      alt="Foto del visitante"
                       layout="fill"
                       objectFit="cover"
                     />
@@ -357,14 +412,11 @@ const VisitorRegistration: React.FC = () => {
               >
                 Cancelar
               </Button>
-              <Button
-                type="submit"
-                disabled={loading}
-              >
+              <Button type="submit" disabled={loading}>
                 {loading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
-                  'Registrar Visita'
+                  "Registrar Visita"
                 )}
               </Button>
             </DialogFooter>

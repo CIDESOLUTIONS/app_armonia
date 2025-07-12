@@ -4,8 +4,13 @@
  * Reemplaza consultas $queryRawUnsafe por operaciones type-safe
  */
 
-import { getPrisma } from '@/lib/prisma';
-import { PropertyCreateSchema, PetCreateSchema, VehicleCreateSchema, ResidentUpdateSchema } from '@/lib/schemas/inventory-schemas';
+import { getPrisma } from "@/lib/prisma";
+import {
+  PropertyCreateSchema,
+  PetCreateSchema,
+  VehicleCreateSchema,
+  ResidentUpdateSchema,
+} from "@/lib/schemas/inventory-schemas";
 
 // Interfaces de respuesta
 export interface PropertyWithDetails {
@@ -64,31 +69,30 @@ export interface VehicleWithDetails {
  * Servicio refactorizado de inventario
  */
 export class InventoryServiceRefactored {
-  
   /**
    * PROPIEDADES
    */
-  
+
   // Obtener todas las propiedades de un complejo con detalles
   async getProperties(complexId: number): Promise<PropertyWithDetails[]> {
     const prisma = getPrisma();
-    
+
     try {
       const properties = await prisma.property.findMany({
         where: { complexId },
         include: {
           owner: {
-            select: { id: true, name: true, email: true }
+            select: { id: true, name: true, email: true },
           },
           residents: {
             select: { id: true },
-            where: { status: 'ACTIVE' }
-          }
+            where: { status: "ACTIVE" },
+          },
         },
-        orderBy: { unitNumber: 'asc' }
+        orderBy: { unitNumber: "asc" },
       });
 
-      return properties.map(property => ({
+      return properties.map((property) => ({
         id: property.id,
         complexId: property.complexId,
         unitNumber: property.unitNumber,
@@ -102,19 +106,18 @@ export class InventoryServiceRefactored {
         ownerEmail: property.owner?.email || undefined,
         totalResidents: property.residents.length,
         createdAt: property.createdAt,
-        updatedAt: property.updatedAt
+        updatedAt: property.updatedAt,
       }));
-
     } catch (error) {
-      console.error('[INVENTORY SERVICE] Error obteniendo propiedades:', error);
-      throw new Error('Error obteniendo propiedades');
+      console.error("[INVENTORY SERVICE] Error obteniendo propiedades:", error);
+      throw new Error("Error obteniendo propiedades");
     }
   }
 
   // Crear nueva propiedad
   async createProperty(data: z.infer<typeof PropertyCreateSchema>) {
     const prisma = getPrisma();
-    
+
     try {
       const property = await prisma.property.create({
         data: {
@@ -125,57 +128,61 @@ export class InventoryServiceRefactored {
           area: data.area,
           block: data.block,
           zone: data.zone,
-          ownerId: data.ownerId
+          ownerId: data.ownerId,
         },
         include: {
           owner: {
-            select: { id: true, name: true, email: true }
-          }
-        }
+            select: { id: true, name: true, email: true },
+          },
+        },
       });
 
       return property;
-
     } catch (error) {
-      console.error('[INVENTORY SERVICE] Error creando propiedad:', error);
-      throw new Error('Error creando propiedad');
+      console.error("[INVENTORY SERVICE] Error creando propiedad:", error);
+      throw new Error("Error creando propiedad");
     }
   }
 
   // Actualizar propiedad
-  async updateProperty(id: number, data: Partial<z.infer<typeof PropertyCreateSchema>>) {
+  async updateProperty(
+    id: number,
+    data: Partial<z.infer<typeof PropertyCreateSchema>>,
+  ) {
     const prisma = getPrisma();
-    
+
     try {
       const property = await prisma.property.update({
         where: { id },
         data,
         include: {
           owner: {
-            select: { id: true, name: true, email: true }
-          }
-        }
+            select: { id: true, name: true, email: true },
+          },
+        },
       });
 
       return property;
-
     } catch (error) {
-      console.error('[INVENTORY SERVICE] Error actualizando propiedad:', error);
-      throw new Error('Error actualizando propiedad');
+      console.error("[INVENTORY SERVICE] Error actualizando propiedad:", error);
+      throw new Error("Error actualizando propiedad");
     }
   }
 
   /**
    * MASCOTAS
    */
-  
+
   // Obtener mascotas de un complejo con filtros
-  async getPets(complexId: number, propertyId?: number): Promise<PetWithDetails[]> {
+  async getPets(
+    complexId: number,
+    propertyId?: number,
+  ): Promise<PetWithDetails[]> {
     const prisma = getPrisma();
-    
+
     try {
       const whereClause: any = {
-        property: { complexId }
+        property: { complexId },
       };
 
       if (propertyId) {
@@ -186,16 +193,16 @@ export class InventoryServiceRefactored {
         where: whereClause,
         include: {
           property: {
-            select: { id: true, unitNumber: true }
+            select: { id: true, unitNumber: true },
           },
           resident: {
-            select: { id: true, name: true }
-          }
+            select: { id: true, name: true },
+          },
         },
-        orderBy: { name: 'asc' }
+        orderBy: { name: "asc" },
       });
 
-      return pets.map(pet => ({
+      return pets.map((pet) => ({
         id: pet.id,
         name: pet.name,
         type: pet.type,
@@ -210,19 +217,18 @@ export class InventoryServiceRefactored {
         residentId: pet.residentId,
         unitNumber: pet.property.unitNumber,
         residentName: pet.resident.name,
-        createdAt: pet.createdAt
+        createdAt: pet.createdAt,
       }));
-
     } catch (error) {
-      console.error('[INVENTORY SERVICE] Error obteniendo mascotas:', error);
-      throw new Error('Error obteniendo mascotas');
+      console.error("[INVENTORY SERVICE] Error obteniendo mascotas:", error);
+      throw new Error("Error obteniendo mascotas");
     }
   }
 
   // Crear nueva mascota
   async createPet(data: z.infer<typeof PetCreateSchema>) {
     const prisma = getPrisma();
-    
+
     try {
       const pet = await prisma.pet.create({
         data: {
@@ -235,38 +241,42 @@ export class InventoryServiceRefactored {
           propertyId: data.propertyId,
           residentId: data.residentId,
           vaccinated: data.vaccinated,
-          vaccineExpiryDate: data.vaccineExpiryDate ? new Date(data.vaccineExpiryDate) : null,
-          notes: data.notes
+          vaccineExpiryDate: data.vaccineExpiryDate
+            ? new Date(data.vaccineExpiryDate)
+            : null,
+          notes: data.notes,
         },
         include: {
           property: {
-            select: { unitNumber: true }
+            select: { unitNumber: true },
           },
           resident: {
-            select: { name: true }
-          }
-        }
+            select: { name: true },
+          },
+        },
       });
 
       return pet;
-
     } catch (error) {
-      console.error('[INVENTORY SERVICE] Error creando mascota:', error);
-      throw new Error('Error creando mascota');
+      console.error("[INVENTORY SERVICE] Error creando mascota:", error);
+      throw new Error("Error creando mascota");
     }
   }
 
   /**
    * VEHÍCULOS
    */
-  
+
   // Obtener vehículos de un complejo
-  async getVehicles(complexId: number, propertyId?: number): Promise<VehicleWithDetails[]> {
+  async getVehicles(
+    complexId: number,
+    propertyId?: number,
+  ): Promise<VehicleWithDetails[]> {
     const prisma = getPrisma();
-    
+
     try {
       const whereClause: any = {
-        property: { complexId }
+        property: { complexId },
       };
 
       if (propertyId) {
@@ -277,16 +287,16 @@ export class InventoryServiceRefactored {
         where: whereClause,
         include: {
           property: {
-            select: { id: true, unitNumber: true }
+            select: { id: true, unitNumber: true },
           },
           resident: {
-            select: { id: true, name: true }
-          }
+            select: { id: true, name: true },
+          },
         },
-        orderBy: { licensePlate: 'asc' }
+        orderBy: { licensePlate: "asc" },
       });
 
-      return vehicles.map(vehicle => ({
+      return vehicles.map((vehicle) => ({
         id: vehicle.id,
         licensePlate: vehicle.licensePlate,
         brand: vehicle.brand,
@@ -300,19 +310,18 @@ export class InventoryServiceRefactored {
         residentId: vehicle.residentId,
         unitNumber: vehicle.property.unitNumber,
         residentName: vehicle.resident.name,
-        createdAt: vehicle.createdAt
+        createdAt: vehicle.createdAt,
       }));
-
     } catch (error) {
-      console.error('[INVENTORY SERVICE] Error obteniendo vehículos:', error);
-      throw new Error('Error obteniendo vehículos');
+      console.error("[INVENTORY SERVICE] Error obteniendo vehículos:", error);
+      throw new Error("Error obteniendo vehículos");
     }
   }
 
   // Crear nuevo vehículo
   async createVehicle(data: z.infer<typeof VehicleCreateSchema>) {
     const prisma = getPrisma();
-    
+
     try {
       const vehicle = await prisma.vehicle.create({
         data: {
@@ -325,37 +334,36 @@ export class InventoryServiceRefactored {
           parkingSpot: data.parkingSpot,
           notes: data.notes,
           propertyId: data.propertyId,
-          residentId: data.residentId
+          residentId: data.residentId,
         },
         include: {
           property: {
-            select: { unitNumber: true }
+            select: { unitNumber: true },
           },
           resident: {
-            select: { name: true }
-          }
-        }
+            select: { name: true },
+          },
+        },
       });
 
       return vehicle;
-
     } catch (error) {
-      console.error('[INVENTORY SERVICE] Error creando vehículo:', error);
-      throw new Error('Error creando vehículo');
+      console.error("[INVENTORY SERVICE] Error creando vehículo:", error);
+      throw new Error("Error creando vehículo");
     }
   }
 
   /**
    * RESIDENTES
    */
-  
+
   // Obtener residentes de un complejo
   async getResidents(complexId: number, propertyId?: number) {
     const prisma = getPrisma();
-    
+
     try {
       const whereClause: any = {
-        property: { complexId }
+        property: { complexId },
       };
 
       if (propertyId) {
@@ -366,84 +374,81 @@ export class InventoryServiceRefactored {
         where: whereClause,
         include: {
           property: {
-            select: { id: true, unitNumber: true, type: true }
+            select: { id: true, unitNumber: true, type: true },
           },
           pets: {
-            select: { id: true, name: true, type: true }
+            select: { id: true, name: true, type: true },
           },
           vehicles: {
-            select: { id: true, licensePlate: true, brand: true, model: true }
-          }
+            select: { id: true, licensePlate: true, brand: true, model: true },
+          },
         },
-        orderBy: { name: 'asc' }
+        orderBy: { name: "asc" },
       });
 
       return residents;
-
     } catch (error) {
-      console.error('[INVENTORY SERVICE] Error obteniendo residentes:', error);
-      throw new Error('Error obteniendo residentes');
+      console.error("[INVENTORY SERVICE] Error obteniendo residentes:", error);
+      throw new Error("Error obteniendo residentes");
     }
   }
 
   // Actualizar residente
   async updateResident(id: number, data: z.infer<typeof ResidentUpdateSchema>) {
     const prisma = getPrisma();
-    
+
     try {
       const resident = await prisma.resident.update({
         where: { id },
         data,
         include: {
           property: {
-            select: { unitNumber: true }
-          }
-        }
+            select: { unitNumber: true },
+          },
+        },
       });
 
       return resident;
-
     } catch (error) {
-      console.error('[INVENTORY SERVICE] Error actualizando residente:', error);
-      throw new Error('Error actualizando residente');
+      console.error("[INVENTORY SERVICE] Error actualizando residente:", error);
+      throw new Error("Error actualizando residente");
     }
   }
 
   /**
    * SERVICIOS COMUNES
    */
-  
+
   // Obtener servicios de un complejo
   async getServices(complexId: number) {
     const prisma = getPrisma();
-    
+
     try {
       const services = await prisma.commonService.findMany({
         where: { complexId },
         include: {
           _count: {
-            select: { reservations: true }
-          }
+            select: { reservations: true },
+          },
         },
-        orderBy: { name: 'asc' }
+        orderBy: { name: "asc" },
       });
 
       return services;
-
     } catch (error) {
-      console.error('[INVENTORY SERVICE] Error obteniendo servicios:', error);
-      throw new Error('Error obteniendo servicios');
+      console.error("[INVENTORY SERVICE] Error obteniendo servicios:", error);
+      throw new Error("Error obteniendo servicios");
     }
   }
 
   /**
    * ESTADÍSTICAS GENERALES
    */
-  
+
   // Obtener estadísticas de inventario del complejo
   async getInventoryStats(complexId: number) {
     const prisma = getPrisma();
-    
+
     try {
       const [
         totalProperties,
@@ -451,50 +456,62 @@ export class InventoryServiceRefactored {
         totalResidents,
         totalPets,
         totalVehicles,
-        totalServices
+        totalServices,
       ] = await Promise.all([
         prisma.property.count({ where: { complexId } }),
-        prisma.property.count({ where: { complexId, status: 'OCCUPIED' } }),
-        prisma.resident.count({ 
-          where: { 
+        prisma.property.count({ where: { complexId, status: "OCCUPIED" } }),
+        prisma.resident.count({
+          where: {
             property: { complexId },
-            status: 'ACTIVE'
-          } 
+            status: "ACTIVE",
+          },
         }),
         prisma.pet.count({ where: { property: { complexId } } }),
         prisma.vehicle.count({ where: { property: { complexId } } }),
-        prisma.commonService.count({ where: { complexId } })
+        prisma.commonService.count({ where: { complexId } }),
       ]);
 
-      const occupancyRate = totalProperties > 0 ? (occupiedProperties / totalProperties) * 100 : 0;
+      const occupancyRate =
+        totalProperties > 0 ? (occupiedProperties / totalProperties) * 100 : 0;
 
       return {
         properties: {
           total: totalProperties,
           occupied: occupiedProperties,
           available: totalProperties - occupiedProperties,
-          occupancyRate: Math.round(occupancyRate * 100) / 100
+          occupancyRate: Math.round(occupancyRate * 100) / 100,
         },
         residents: {
           total: totalResidents,
-          averagePerProperty: totalProperties > 0 ? Math.round((totalResidents / totalProperties) * 100) / 100 : 0
+          averagePerProperty:
+            totalProperties > 0
+              ? Math.round((totalResidents / totalProperties) * 100) / 100
+              : 0,
         },
         pets: {
           total: totalPets,
-          averagePerProperty: totalProperties > 0 ? Math.round((totalPets / totalProperties) * 100) / 100 : 0
+          averagePerProperty:
+            totalProperties > 0
+              ? Math.round((totalPets / totalProperties) * 100) / 100
+              : 0,
         },
         vehicles: {
           total: totalVehicles,
-          averagePerProperty: totalProperties > 0 ? Math.round((totalVehicles / totalProperties) * 100) / 100 : 0
+          averagePerProperty:
+            totalProperties > 0
+              ? Math.round((totalVehicles / totalProperties) * 100) / 100
+              : 0,
         },
         services: {
-          total: totalServices
-        }
+          total: totalServices,
+        },
       };
-
     } catch (error) {
-      console.error('[INVENTORY SERVICE] Error obteniendo estadísticas:', error);
-      throw new Error('Error obteniendo estadísticas de inventario');
+      console.error(
+        "[INVENTORY SERVICE] Error obteniendo estadísticas:",
+        error,
+      );
+      throw new Error("Error obteniendo estadísticas de inventario");
     }
   }
 }

@@ -1,4 +1,4 @@
-import { fetchApi } from '@/lib/api';
+import { fetchApi } from "@/lib/api";
 
 interface ResidentDashboardStats {
   totalResidentsInProperty: number;
@@ -21,10 +21,10 @@ export async function getResidentDashboardStats(): Promise<{
   monthlyExpensesTrend: MonthlyExpenseData[];
 }> {
   try {
-    const response = await fetchApi('/api/resident-dashboard/stats');
+    const response = await fetchApi("/api/resident-dashboard/stats");
     return response;
   } catch (error) {
-    console.error('Error fetching resident dashboard stats:', error);
+    console.error("Error fetching resident dashboard stats:", error);
     throw error;
   }
 }

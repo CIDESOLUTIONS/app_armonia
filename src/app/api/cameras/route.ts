@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getPrisma } from '@/lib/prisma';
-import { validateRequest } from '@/lib/validation';
-import { verifyAuth } from '@/lib/auth';
-import { ServerLogger } from '@/lib/logging/server-logger';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getPrisma } from "@/lib/prisma";
+import { validateRequest } from "@/lib/validation";
+import { verifyAuth } from "@/lib/auth";
+import { ServerLogger } from "@/lib/logging/server-logger";
+import { z } from "zod";
 
 // Esquema de validación para creación de cámara
 const cameraCreateSchema = z.object({
@@ -29,38 +29,41 @@ export async function GET(req: NextRequest) {
     // Verificar autenticación
     const { auth, payload } = await verifyAuth(req);
     if (!auth || !payload) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
     if (!payload.complexId) {
-      return NextResponse.json({ error: 'Usuario sin complejo asociado' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Usuario sin complejo asociado" },
+        { status: 400 },
+      );
     }
 
     // Obtener parámetros
     const searchParams = req.nextUrl.searchParams;
-    const includeInactive = searchParams.get('includeInactive') === 'true';
-    
+    const includeInactive = searchParams.get("includeInactive") === "true";
+
     // Inicializar Prisma
     const prisma = getPrisma();
-    
+
     // Obtener cámaras con filtro multi-tenant
     const cameras = await prisma.camera.findMany({
       where: {
         complexId: payload.complexId,
-        ...(includeInactive ? {} : { isActive: true })
+        ...(includeInactive ? {} : { isActive: true }),
       },
       orderBy: {
-        name: 'asc'
-      }
+        name: "asc",
+      },
     });
-    
+
     // Devolver respuesta
     return NextResponse.json(cameras);
   } catch (error) {
-    ServerLogger.error('Error en GET /api/cameras:', error);
+    ServerLogger.error("Error en GET /api/cameras:", error);
     return NextResponse.json(
-      { error: 'Error al obtener cámaras' },
-      { status: 500 }
+      { error: "Error al obtener cámaras" },
+      { status: 500 },
     );
   }
 }
@@ -74,64 +77,69 @@ export async function POST(req: NextRequest) {
     // Verificar autenticación
     const { auth, payload } = await verifyAuth(req);
     if (!auth || !payload) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
-    
+
     // Verificar rol de administrador
-    if (payload.role !== 'ADMIN') {
+    if (payload.role !== "ADMIN") {
       return NextResponse.json(
-        { error: 'Se requiere rol de administrador' },
-        { status: 403 }
+        { error: "Se requiere rol de administrador" },
+        { status: 403 },
       );
     }
 
     if (!payload.complexId) {
-      return NextResponse.json({ error: 'Usuario sin complejo asociado' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Usuario sin complejo asociado" },
+        { status: 400 },
+      );
     }
-    
+
     // Obtener datos de la solicitud
     const data = await req.json();
-    
+
     // Validar datos
     const validationResult = cameraCreateSchema.safeParse(data);
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'Datos inválidos', details: validationResult.error.format() },
-        { status: 400 }
+        { error: "Datos inválidos", details: validationResult.error.format() },
+        { status: 400 },
       );
     }
-    
+
     // Inicializar Prisma
     const prisma = getPrisma();
-    
+
     // Crear cámara con filtro multi-tenant
     const camera = await prisma.camera.create({
       data: {
         ...validationResult.data,
         complexId: payload.complexId,
-        createdById: payload.id
-      }
+        createdById: payload.id,
+      },
     });
-    
+
     // Registrar acción
     await prisma.activityLog.create({
       data: {
-        action: 'CREATE',
-        entityType: 'CAMERA',
+        action: "CREATE",
+        entityType: "CAMERA",
         entityId: camera.id.toString(),
         userId: payload.id,
         complexId: payload.complexId,
-        details: `Cámara ${camera.name} creada`
-      }
+        details: `Cámara ${camera.name} creada`,
+      },
     });
-    
+
     // Devolver respuesta
     return NextResponse.json(camera, { status: 201 });
   } catch (error) {
-    ServerLogger.error('Error en POST /api/cameras:', error);
+    ServerLogger.error("Error en POST /api/cameras:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Error al crear cámara' },
-      { status: 500 }
+      {
+        error: error instanceof Error ? error.message : "Error al crear cámara",
+      },
+      { status: 500 },
     );
   }
 }
@@ -145,51 +153,54 @@ export async function POST_discover(req: NextRequest) {
     // Verificar autenticación
     const { auth, payload } = await verifyAuth(req);
     if (!auth || !payload) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
-    
+
     // Verificar rol de administrador
-    if (payload.role !== 'ADMIN') {
+    if (payload.role !== "ADMIN") {
       return NextResponse.json(
-        { error: 'Se requiere rol de administrador' },
-        { status: 403 }
+        { error: "Se requiere rol de administrador" },
+        { status: 403 },
       );
     }
 
     if (!payload.complexId) {
-      return NextResponse.json({ error: 'Usuario sin complejo asociado' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Usuario sin complejo asociado" },
+        { status: 400 },
+      );
     }
-    
+
     // Inicializar Prisma
     const prisma = getPrisma();
-    
+
     // Aquí iría la lógica de descubrimiento de cámaras
     // Por ahora devolvemos un mock
     const discoveredCameras = [
       {
-        ipAddress: '192.168.1.100',
+        ipAddress: "192.168.1.100",
         port: 554,
-        brand: 'Hikvision',
-        model: 'DS-2CD2032-I'
+        brand: "Hikvision",
+        model: "DS-2CD2032-I",
       },
       {
-        ipAddress: '192.168.1.101',
+        ipAddress: "192.168.1.101",
         port: 554,
-        brand: 'Dahua',
-        model: 'IPC-HDW4631C-A'
-      }
+        brand: "Dahua",
+        model: "IPC-HDW4631C-A",
+      },
     ];
-    
+
     // Devolver respuesta
     return NextResponse.json({
       success: true,
-      cameras: discoveredCameras
+      cameras: discoveredCameras,
     });
   } catch (error) {
-    ServerLogger.error('Error en POST /api/cameras/discover:', error);
+    ServerLogger.error("Error en POST /api/cameras/discover:", error);
     return NextResponse.json(
-      { error: 'Error al descubrir cámaras' },
-      { status: 500 }
+      { error: "Error al descubrir cámaras" },
+      { status: 500 },
     );
   }
 }

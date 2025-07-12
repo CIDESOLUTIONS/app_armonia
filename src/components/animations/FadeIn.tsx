@@ -2,9 +2,9 @@
 
 "use client";
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
+import React from "react";
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
 
 interface FadeInProps {
   children: React.ReactNode;
@@ -15,7 +15,7 @@ interface FadeInProps {
 export const FadeIn = ({ children, className, delay = 0 }: FadeInProps) => {
   const { ref, inView } = useInView({
     triggerOnce: true, // La animación solo se ejecuta una vez
-    threshold: 0.1,    // Se activa cuando el 10% del elemento es visible
+    threshold: 0.1, // Se activa cuando el 10% del elemento es visible
   });
 
   const variants = {
@@ -29,7 +29,7 @@ export const FadeIn = ({ children, className, delay = 0 }: FadeInProps) => {
       className={className}
       variants={variants}
       initial="hidden"
-      animate={inView ? 'visible' : 'hidden'}
+      animate={inView ? "visible" : "hidden"}
       transition={{ duration: 0.5, delay }}
     >
       {children}

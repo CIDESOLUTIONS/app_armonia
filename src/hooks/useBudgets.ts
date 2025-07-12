@@ -1,6 +1,6 @@
 // frontend/src/hooks/useBudgets.ts
-import { useState, useCallback } from 'react';
-import { toast } from 'react-hot-toast';
+import { useState, useCallback } from "react";
+import { toast } from "react-hot-toast";
 
 interface BudgetCategory {
   id?: string;
@@ -13,7 +13,7 @@ interface Budget {
   year: number;
   description: string;
   totalAmount: number;
-  status: 'DRAFT' | 'APPROVED' | 'ACTIVE';
+  status: "DRAFT" | "APPROVED" | "ACTIVE";
   categories: BudgetCategory[];
 }
 
@@ -32,89 +32,93 @@ export const useBudgets = () => {
     setError(null);
     try {
       const queryParams = new URLSearchParams();
-      if (filters?.year) queryParams.append('year', filters.year.toString());
-      if (filters?.status) queryParams.append('status', filters.status);
+      if (filters?.year) queryParams.append("year", filters.year.toString());
+      if (filters?.status) queryParams.append("status", filters.status);
 
       const _response = await fetch(`/api/financial/budgets?${queryParams}`);
-      if (!response.ok) throw new Error('Error al obtener presupuestos');
+      if (!response.ok) throw new Error("Error al obtener presupuestos");
 
       const _data = await response.json();
       setBudgets(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido');
-      toast.error('Error al cargar presupuestos');
+      setError(err instanceof Error ? err.message : "Error desconocido");
+      toast.error("Error al cargar presupuestos");
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const createBudget = useCallback(async (budgetData: Omit<Budget, 'id'>) => {
+  const createBudget = useCallback(async (budgetData: Omit<Budget, "id">) => {
     setLoading(true);
     try {
-      const _response = await fetch('/api/financial/budgets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const _response = await fetch("/api/financial/budgets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(budgetData),
       });
 
-      if (!response.ok) throw new Error('Error al crear presupuesto');
+      if (!response.ok) throw new Error("Error al crear presupuesto");
 
       const newBudget = await response.json();
-      setBudgets(prev => [...prev, newBudget]);
-      toast.success('Presupuesto creado exitosamente');
+      setBudgets((prev) => [...prev, newBudget]);
+      toast.success("Presupuesto creado exitosamente");
       return newBudget;
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Error desconocido';
+      const message = err instanceof Error ? err.message : "Error desconocido";
       setError(message);
-      toast.error('Error al crear presupuesto');
+      toast.error("Error al crear presupuesto");
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const updateBudget = useCallback(async (id: string, updates: Partial<Budget>) => {
-    setLoading(true);
-    try {
-      const _response = await fetch(`/api/financial/budgets/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates),
-      });
+  const updateBudget = useCallback(
+    async (id: string, updates: Partial<Budget>) => {
+      setLoading(true);
+      try {
+        const _response = await fetch(`/api/financial/budgets/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updates),
+        });
 
-      if (!response.ok) throw new Error('Error al actualizar presupuesto');
+        if (!response.ok) throw new Error("Error al actualizar presupuesto");
 
-      const updatedBudget = await response.json();
-      setBudgets(prev => 
-        prev.map(budget => budget.id === id ? updatedBudget : budget)
-      );
-      toast.success('Presupuesto actualizado exitosamente');
-      return updatedBudget;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Error desconocido';
-      setError(message);
-      toast.error('Error al actualizar presupuesto');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+        const updatedBudget = await response.json();
+        setBudgets((prev) =>
+          prev.map((budget) => (budget.id === id ? updatedBudget : budget)),
+        );
+        toast.success("Presupuesto actualizado exitosamente");
+        return updatedBudget;
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Error desconocido";
+        setError(message);
+        toast.error("Error al actualizar presupuesto");
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
   const deleteBudget = useCallback(async (id: string) => {
     setLoading(true);
     try {
       const _response = await fetch(`/api/financial/budgets/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
-      if (!response.ok) throw new Error('Error al eliminar presupuesto');
+      if (!response.ok) throw new Error("Error al eliminar presupuesto");
 
-      setBudgets(prev => prev.filter(budget => budget.id !== id));
-      toast.success('Presupuesto eliminado exitosamente');
+      setBudgets((prev) => prev.filter((budget) => budget.id !== id));
+      toast.success("Presupuesto eliminado exitosamente");
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Error desconocido';
+      const message = err instanceof Error ? err.message : "Error desconocido";
       setError(message);
-      toast.error('Error al eliminar presupuesto');
+      toast.error("Error al eliminar presupuesto");
       throw err;
     } finally {
       setLoading(false);
@@ -125,14 +129,14 @@ export const useBudgets = () => {
     setLoading(true);
     try {
       const _response = await fetch(`/api/financial/budgets/${id}`);
-      if (!response.ok) throw new Error('Error al obtener presupuesto');
+      if (!response.ok) throw new Error("Error al obtener presupuesto");
 
       const budget = await response.json();
       return budget;
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Error desconocido';
+      const message = err instanceof Error ? err.message : "Error desconocido";
       setError(message);
-      toast.error('Error al obtener presupuesto');
+      toast.error("Error al obtener presupuesto");
       throw err;
     } finally {
       setLoading(false);

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Building2,
   Users,
@@ -16,12 +16,16 @@ import {
   CheckCircle,
   Clock,
   BarChart3,
-  BellRing // Added BellRing icon
-} from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import Link from 'next/link';
-import { getDashboardStats, getRecentActivity, getUpcomingEvents } from '@/services/dashboardService'; // Added getUpcomingEvents
-import { DashboardCharts } from '@/components/admin/dashboard/DashboardCharts';
+  BellRing, // Added BellRing icon
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import {
+  getDashboardStats,
+  getRecentActivity,
+  getUpcomingEvents,
+} from "@/services/dashboardService"; // Added getUpcomingEvents
+import { DashboardCharts } from "@/components/admin/dashboard/DashboardCharts";
 
 interface DashboardStats {
   totalProperties: number;
@@ -40,21 +44,21 @@ interface DashboardStats {
 
 interface RecentActivity {
   id: string;
-  type: 'payment' | 'pqr' | 'assembly' | 'incident';
+  type: "payment" | "pqr" | "assembly" | "incident";
   title: string;
   description: string;
   timestamp: string;
-  status: 'success' | 'warning' | 'error' | 'info';
+  status: "success" | "warning" | "error" | "info";
 }
 
 // New interface for UpcomingEvent
 interface UpcomingEvent {
   id: string;
-  type: 'assembly' | 'fee';
+  type: "assembly" | "fee";
   title: string;
   description: string;
   date: string;
-  status: 'upcoming' | 'overdue';
+  status: "upcoming" | "overdue";
 }
 
 export function AdminDashboardContent() {
@@ -69,64 +73,82 @@ export function AdminDashboardContent() {
 
   const fetchDashboardData = async () => {
     try {
-      const [fetchedStats, fetchedActivity, fetchedUpcomingEvents] = await Promise.all([ // Modified to fetch upcoming events
-        getDashboardStats(),
-        getRecentActivity(),
-        getUpcomingEvents(), // Fetch upcoming events
-      ]);
+      const [fetchedStats, fetchedActivity, fetchedUpcomingEvents] =
+        await Promise.all([
+          // Modified to fetch upcoming events
+          getDashboardStats(),
+          getRecentActivity(),
+          getUpcomingEvents(), // Fetch upcoming events
+        ]);
 
       setStats(fetchedStats);
       setRecentActivity(fetchedActivity);
       setUpcomingEvents(fetchedUpcomingEvents); // Set upcoming events state
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      console.error("Error fetching dashboard data:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0
+    return new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      minimumFractionDigits: 0,
     }).format(amount);
   };
 
   const getActivityIcon = (type: string) => {
     switch (type) {
-      case 'payment': return <DollarSign className="h-4 w-4" />;
-      case 'pqr': return <MessageSquare className="h-4 w-4" />;
-      case 'assembly': return <Calendar className="h-4 w-4" />;
-      case 'incident': return <AlertCircle className="h-4 w-4" />;
-      default: return <Activity className="h-4 w-4" />;
+      case "payment":
+        return <DollarSign className="h-4 w-4" />;
+      case "pqr":
+        return <MessageSquare className="h-4 w-4" />;
+      case "assembly":
+        return <Calendar className="h-4 w-4" />;
+      case "incident":
+        return <AlertCircle className="h-4 w-4" />;
+      default:
+        return <Activity className="h-4 w-4" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'success': return 'bg-green-100 text-green-800';
-      case 'warning': return 'bg-yellow-100 text-yellow-800';
-      case 'error': return 'bg-red-100 text-red-800';
-      case 'info': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "success":
+        return "bg-green-100 text-green-800";
+      case "warning":
+        return "bg-yellow-100 text-yellow-800";
+      case "error":
+        return "bg-red-100 text-red-800";
+      case "info":
+        return "bg-blue-100 text-blue-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   // New helper functions for upcoming events
   const getEventIcon = (type: string) => {
     switch (type) {
-      case 'assembly': return <Calendar className="h-4 w-4 text-blue-600" />;
-      case 'fee': return <DollarSign className="h-4 w-4 text-green-600" />;
-      default: return <BellRing className="h-4 w-4 text-gray-600" />;
+      case "assembly":
+        return <Calendar className="h-4 w-4 text-blue-600" />;
+      case "fee":
+        return <DollarSign className="h-4 w-4 text-green-600" />;
+      default:
+        return <BellRing className="h-4 w-4 text-gray-600" />;
     }
   };
 
   const getEventBadge = (status: string) => {
     switch (status) {
-      case 'upcoming': return <Badge variant="outline">Próxima</Badge>;
-      case 'overdue': return <Badge variant="destructive">Vencida</Badge>;
-      default: return <Badge variant="secondary">Info</Badge>;
+      case "upcoming":
+        return <Badge variant="outline">Próxima</Badge>;
+      case "overdue":
+        return <Badge variant="destructive">Vencida</Badge>;
+      default:
+        return <Badge variant="secondary">Info</Badge>;
     }
   };
 
@@ -152,8 +174,12 @@ export function AdminDashboardContent() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard Administrador</h1>
-          <p className="text-gray-600 mt-1">Panel de control y métricas principales</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Dashboard Administrador
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Panel de control y métricas principales
+          </p>
         </div>
         <div className="flex space-x-3">
           <Button variant="outline" size="sm">
@@ -172,7 +198,9 @@ export function AdminDashboardContent() {
         {/* Total Inmuebles */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Inmuebles</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Inmuebles
+            </CardTitle>
             <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -186,7 +214,9 @@ export function AdminDashboardContent() {
         {/* Total Residentes */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Residentes</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Residentes
+            </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -200,11 +230,15 @@ export function AdminDashboardContent() {
         {/* Estado de Cartera */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pagos Pendientes</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Pagos Pendientes
+            </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{stats.pendingPayments}</div>
+            <div className="text-2xl font-bold text-red-600">
+              {stats.pendingPayments}
+            </div>
             <p className="text-xs text-muted-foreground">
               Cuotas por cobrar este mes
             </p>
@@ -214,7 +248,9 @@ export function AdminDashboardContent() {
         {/* Ingresos Totales */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ingresos del Mes</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Ingresos del Mes
+            </CardTitle>
             <TrendingUp className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
@@ -230,14 +266,16 @@ export function AdminDashboardContent() {
         {/* Ejecución Presupuesto */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ejecución Presupuesto</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Ejecución Presupuesto
+            </CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.budgetExecution}%</div>
             <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-              <div 
-                className="bg-blue-600 h-2 rounded-full" 
+              <div
+                className="bg-blue-600 h-2 rounded-full"
                 style={{ width: `${stats.budgetExecution}%` }}
               ></div>
             </div>
@@ -247,7 +285,9 @@ export function AdminDashboardContent() {
         {/* Proyectos Activos */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Proyectos Activos</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Proyectos Activos
+            </CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -261,7 +301,9 @@ export function AdminDashboardContent() {
         {/* Uso Servicios Comunes */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Uso Áreas Comunes</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Uso Áreas Comunes
+            </CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -280,11 +322,15 @@ export function AdminDashboardContent() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center space-x-2">
-              <div className="text-lg font-bold text-yellow-600">{stats.pendingPQRs}</div>
+              <div className="text-lg font-bold text-yellow-600">
+                {stats.pendingPQRs}
+              </div>
               <span className="text-sm text-gray-500">pendientes</span>
             </div>
             <div className="flex items-center space-x-2 mt-1">
-              <div className="text-lg font-bold text-green-600">{stats.resolvedPQRs}</div>
+              <div className="text-lg font-bold text-green-600">
+                {stats.resolvedPQRs}
+              </div>
               <span className="text-sm text-gray-500">resueltas</span>
             </div>
           </CardContent>
@@ -293,7 +339,9 @@ export function AdminDashboardContent() {
         {/* Próximas Asambleas */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Próximas Asambleas</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Próximas Asambleas
+            </CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -307,7 +355,10 @@ export function AdminDashboardContent() {
 
       {/* Charts Section */}
       {stats.revenueTrend && stats.commonAreaUsageTrend && (
-        <DashboardCharts revenueTrend={stats.revenueTrend} commonAreaUsageTrend={stats.commonAreaUsageTrend} />
+        <DashboardCharts
+          revenueTrend={stats.revenueTrend}
+          commonAreaUsageTrend={stats.commonAreaUsageTrend}
+        />
       )}
 
       {/* Recent Activity & Quick Actions */}
@@ -323,15 +374,24 @@ export function AdminDashboardContent() {
           <CardContent>
             <div className="space-y-4">
               {recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50">
-                  <div className={`p-2 rounded-full ${getStatusColor(activity.status)}`}>
+                <div
+                  key={activity.id}
+                  className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50"
+                >
+                  <div
+                    className={`p-2 rounded-full ${getStatusColor(activity.status)}`}
+                  >
                     {getActivityIcon(activity.type)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">{activity.title}</p>
-                    <p className="text-sm text-gray-500">{activity.description}</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {activity.title}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {activity.description}
+                    </p>
                     <p className="text-xs text-gray-400 mt-1">
-                      {new Date(activity.timestamp).toLocaleString('es-CO')}
+                      {new Date(activity.timestamp).toLocaleString("es-CO")}
                     </p>
                   </div>
                 </div>
@@ -354,31 +414,51 @@ export function AdminDashboardContent() {
           </CardHeader>
           <CardContent className="space-y-3">
             <Link href="/admin/assemblies/create">
-              <Button variant="outline" size="sm" className="w-full justify-start">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start"
+              >
                 <Calendar className="h-4 w-4 mr-2" />
                 Nueva Asamblea
               </Button>
             </Link>
             <Link href="/admin/finances/fees/create">
-              <Button variant="outline" size="sm" className="w-full justify-start">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start"
+              >
                 <DollarSign className="h-4 w-4 mr-2" />
                 Generar Cuotas
               </Button>
             </Link>
             <Link href="/admin/communications/create">
-              <Button variant="outline" size="sm" className="w-full justify-start">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start"
+              >
                 <MessageSquare className="h-4 w-4 mr-2" />
                 Nuevo Anuncio
               </Button>
             </Link>
             <Link href="/admin/inventory/residents/create">
-              <Button variant="outline" size="sm" className="w-full justify-start">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start"
+              >
                 <Users className="h-4 w-4 mr-2" />
                 Registrar Residente
               </Button>
             </Link>
             <Link href="/admin/reports">
-              <Button variant="outline" size="sm" className="w-full justify-start">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start"
+              >
                 <BarChart3 className="h-4 w-4 mr-2" />
                 Generar Reporte
               </Button>
@@ -399,21 +479,34 @@ export function AdminDashboardContent() {
           <div className="space-y-3">
             {upcomingEvents.length > 0 ? (
               upcomingEvents.map((event) => (
-                <div key={event.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div
+                  key={event.id}
+                  className="flex items-center justify-between p-3 border rounded-lg"
+                >
                   <div className="flex items-center space-x-3">
                     <div className="p-2 rounded-full">
                       {getEventIcon(event.type)}
                     </div>
                     <div>
                       <p className="font-medium">{event.title}</p>
-                      <p className="text-sm text-gray-500">{new Date(event.date).toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                      <p className="text-sm text-gray-500">
+                        {new Date(event.date).toLocaleDateString("es-CO", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
                     </div>
                   </div>
                   {getEventBadge(event.status)}
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-center">No hay próximos eventos.</p>
+              <p className="text-gray-500 text-center">
+                No hay próximos eventos.
+              </p>
             )}
           </div>
         </CardContent>

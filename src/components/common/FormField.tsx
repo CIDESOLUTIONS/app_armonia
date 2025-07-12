@@ -1,6 +1,6 @@
-import React from 'react';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import React from "react";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -18,7 +18,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   id,
   name,
   error,
-  type = 'text',
+  type = "text",
   placeholder,
   value,
   onChange,
@@ -34,7 +34,9 @@ export const FormField: React.FC<FormFieldProps> = ({
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className={error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}
+        className={
+          error ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""
+        }
         {...props}
       />
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}

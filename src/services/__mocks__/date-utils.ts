@@ -7,8 +7,8 @@
 const originalDateNow = Date.now;
 
 // Asegurar que Date.now siempre sea una función
-if (typeof Date.now !== 'function') {
-  Date.now = function(): number {
+if (typeof Date.now !== "function") {
+  Date.now = function (): number {
     return new Date().getTime();
   };
 }

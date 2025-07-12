@@ -1,11 +1,11 @@
-import React from 'react';
+import React from "react";
 import Image from "next/image";
-import { useTranslation } from 'next-i18next';
-import { Check } from 'lucide-react';
-import { FadeIn } from '@/components/animations/FadeIn';
+import { useTranslation } from "next-i18next";
+import { Check } from "lucide-react";
+import { FadeIn } from "@/components/animations/FadeIn";
 
 export function MainFeatures() {
-  const { t } = useTranslation('landing');
+  const { t } = useTranslation("landing");
 
   return (
     <FadeIn delay={0.4}>
@@ -15,27 +15,27 @@ export function MainFeatures() {
           <div className="flex flex-col lg:flex-row items-center mb-20">
             <div className="lg:w-1/2 mb-8 lg:mb-0 lg:pr-12">
               <h3 className="text-3xl font-bold text-gray-800 mb-4">
-                {t('features.inventory.title')}
+                {t("features.inventory.title")}
               </h3>
               <p className="text-lg text-gray-600 mb-6">
-                {t('features.inventory.description')}
+                {t("features.inventory.description")}
               </p>
               <ul className="space-y-3 text-gray-700">
                 <li className="flex items-center">
                   <Check className="text-green-500 mr-2" size={20} />
-                  {t('features.inventory.feature1')}
+                  {t("features.inventory.feature1")}
                 </li>
                 <li className="flex items-center">
                   <Check className="text-green-500 mr-2" size={20} />
-                  {t('features.inventory.feature2')}
+                  {t("features.inventory.feature2")}
                 </li>
                 <li className="flex items-center">
                   <Check className="text-green-500 mr-2" size={20} />
-                  {t('features.inventory.feature3')}
+                  {t("features.inventory.feature3")}
                 </li>
                 <li className="flex items-center">
                   <Check className="text-green-500 mr-2" size={20} />
-                  {t('features.inventory.feature4')}
+                  {t("features.inventory.feature4")}
                 </li>
               </ul>
             </div>
@@ -54,27 +54,27 @@ export function MainFeatures() {
           <div className="flex flex-col lg:flex-row-reverse items-center mb-20">
             <div className="lg:w-1/2 mb-8 lg:mb-0 lg:pl-12">
               <h3 className="text-3xl font-bold text-gray-800 mb-4">
-                {t('features.assemblies.title')}
+                {t("features.assemblies.title")}
               </h3>
               <p className="text-lg text-gray-600 mb-6">
-                {t('features.assemblies.description')}
+                {t("features.assemblies.description")}
               </p>
               <ul className="space-y-3 text-gray-700">
                 <li className="flex items-center">
                   <Check className="text-green-500 mr-2" size={20} />
-                  {t('features.assemblies.feature1')}
+                  {t("features.assemblies.feature1")}
                 </li>
                 <li className="flex items-center">
                   <Check className="text-green-500 mr-2" size={20} />
-                  {t('features.assemblies.feature2')}
+                  {t("features.assemblies.feature2")}
                 </li>
                 <li className="flex items-center">
                   <Check className="text-green-500 mr-2" size={20} />
-                  {t('features.assemblies.feature3')}
+                  {t("features.assemblies.feature3")}
                 </li>
                 <li className="flex items-center">
                   <Check className="text-green-500 mr-2" size={20} />
-                  {t('features.assemblies.feature4')}
+                  {t("features.assemblies.feature4")}
                 </li>
               </ul>
             </div>
@@ -93,27 +93,27 @@ export function MainFeatures() {
           <div className="flex flex-col lg:flex-row items-center">
             <div className="lg:w-1/2 mb-8 lg:mb-0 lg:pr-12">
               <h3 className="text-3xl font-bold text-gray-800 mb-4">
-                {t('features.financial.title')}
+                {t("features.financial.title")}
               </h3>
               <p className="text-lg text-gray-600 mb-6">
-                {t('features.financial.description')}
+                {t("features.financial.description")}
               </p>
               <ul className="space-y-3 text-gray-700">
                 <li className="flex items-center">
                   <Check className="text-green-500 mr-2" size={20} />
-                  {t('features.financial.feature1')}
+                  {t("features.financial.feature1")}
                 </li>
                 <li className="flex items-center">
                   <Check className="text-green-500 mr-2" size={20} />
-                  {t('features.financial.feature2')}
+                  {t("features.financial.feature2")}
                 </li>
                 <li className="flex items-center">
                   <Check className="text-green-500 mr-2" size={20} />
-                  {t('features.financial.feature3')}
+                  {t("features.financial.feature3")}
                 </li>
                 <li className="flex items-center">
                   <Check className="text-green-500 mr-2" size={20} />
-                  {t('features.financial.feature4')}
+                  {t("features.financial.feature4")}
                 </li>
               </ul>
             </div>

@@ -1,10 +1,17 @@
-'use client';
-import { useState } from 'react';
-import { useAuthStore } from '@/store/authStore';
-import AdminHeader from '@/components/admin/layout/AdminHeader';
-import AdminSidebar from '@/components/admin/layout/AdminSidebar';
-import { Loader2 } from 'lucide-react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+"use client";
+import { useState } from "react";
+import { useAuthStore } from "@/store/authStore";
+import AdminHeader from "@/components/admin/layout/AdminHeader";
+import AdminSidebar from "@/components/admin/layout/AdminSidebar";
+import { Loader2 } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export default function FinancesPage() {
   const { user, loading, logout } = useAuthStore();
@@ -17,19 +24,19 @@ export default function FinancesPage() {
     pagosRecientes: [
       {
         id: 1,
-        concepto: 'Cuota de administración - Apt 301',
+        concepto: "Cuota de administración - Apt 301",
         monto: 450000,
-        fecha: '2025-07-03',
-        estado: 'Pagado'
+        fecha: "2025-07-03",
+        estado: "Pagado",
       },
       {
         id: 2,
-        concepto: 'Servicios públicos - Junio',
+        concepto: "Servicios públicos - Junio",
         monto: 2800000,
-        fecha: '2025-07-02',
-        estado: 'Pendiente'
-      }
-    ]
+        fecha: "2025-07-02",
+        estado: "Pendiente",
+      },
+    ],
   });
 
   if (loading) {
@@ -42,15 +49,17 @@ export default function FinancesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdminHeader 
-        user={user} 
+      <AdminHeader
+        user={user}
         onLogout={logout}
         sidebarCollapsed={sidebarCollapsed}
         setSidebarCollapsed={setSidebarCollapsed}
       />
       <div className="flex">
         <AdminSidebar collapsed={sidebarCollapsed} />
-        <main className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
+        <main
+          className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? "ml-16" : "ml-64"}`}
+        >
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-bold">Gestión Financiera</h1>
@@ -62,25 +71,33 @@ export default function FinancesPage() {
             {/* Métricas principales */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
               <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-sm font-medium text-gray-500">Total Ingresos</h3>
+                <h3 className="text-sm font-medium text-gray-500">
+                  Total Ingresos
+                </h3>
                 <p className="text-2xl font-bold text-green-600">
                   ${finances.totalIngresos.toLocaleString()}
                 </p>
               </div>
               <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-sm font-medium text-gray-500">Total Egresos</h3>
+                <h3 className="text-sm font-medium text-gray-500">
+                  Total Egresos
+                </h3>
                 <p className="text-2xl font-bold text-red-600">
                   ${finances.totalEgresos.toLocaleString()}
                 </p>
               </div>
               <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-sm font-medium text-gray-500">Saldo Actual</h3>
+                <h3 className="text-sm font-medium text-gray-500">
+                  Saldo Actual
+                </h3>
                 <p className="text-2xl font-bold text-blue-600">
                   ${finances.saldoActual.toLocaleString()}
                 </p>
               </div>
               <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-sm font-medium text-gray-500">Cuotas Pendientes</h3>
+                <h3 className="text-sm font-medium text-gray-500">
+                  Cuotas Pendientes
+                </h3>
                 <p className="text-2xl font-bold text-orange-600">
                   {finances.cuotasPendientes}
                 </p>
@@ -90,30 +107,42 @@ export default function FinancesPage() {
             {/* Tabla de movimientos recientes */}
             <div className="bg-white rounded-lg shadow">
               <div className="p-6">
-                <h2 className="text-lg font-semibold mb-4">Movimientos Recientes</h2>
+                <h2 className="text-lg font-semibold mb-4">
+                  Movimientos Recientes
+                </h2>
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="text-left py-2">Concepto</TableHead>
+                        <TableHead className="text-left py-2">
+                          Concepto
+                        </TableHead>
                         <TableHead className="text-left py-2">Monto</TableHead>
                         <TableHead className="text-left py-2">Fecha</TableHead>
                         <TableHead className="text-left py-2">Estado</TableHead>
-                        <TableHead className="text-left py-2">Acciones</TableHead>
+                        <TableHead className="text-left py-2">
+                          Acciones
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {finances.pagosRecientes.map((pago) => (
                         <TableRow key={pago.id} className="border-b">
-                          <TableCell className="py-3">{pago.concepto}</TableCell>
-                          <TableCell className="py-3">${pago.monto.toLocaleString()}</TableCell>
+                          <TableCell className="py-3">
+                            {pago.concepto}
+                          </TableCell>
+                          <TableCell className="py-3">
+                            ${pago.monto.toLocaleString()}
+                          </TableCell>
                           <TableCell className="py-3">{pago.fecha}</TableCell>
                           <TableCell className="py-3">
-                            <span className={`px-2 py-1 rounded-full text-xs ${
-                              pago.estado === 'Pagado' 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-orange-100 text-orange-800'
-                            }`}>
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs ${
+                                pago.estado === "Pagado"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-orange-100 text-orange-800"
+                              }`}
+                            >
                               {pago.estado}
                             </span>
                           </TableCell>

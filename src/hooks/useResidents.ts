@@ -1,8 +1,8 @@
 // src/hooks/useResidents.ts
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { apiClient } from '@/lib/api-client';
+import { useState, useEffect, useCallback } from "react";
+import { apiClient } from "@/lib/api-client";
 
 interface Resident {
   id: number;
@@ -12,7 +12,7 @@ interface Resident {
   propertyUnit: string;
   documentType: string;
   documentNumber: string;
-  status: 'ACTIVE' | 'INACTIVE' | 'PENDING';
+  status: "ACTIVE" | "INACTIVE" | "PENDING";
   createdAt: string;
   updatedAt: string;
 }
@@ -47,7 +47,7 @@ export function useResidents({
   limit = 10,
   search,
   status,
-  autoLoad = true
+  autoLoad = true,
 }: UseResidentsParams = {}): UseResidentsReturn {
   const [residents, setResidents] = useState<Resident[]>([]);
   const [loading, setLoading] = useState(false);
@@ -59,79 +59,104 @@ export function useResidents({
     totalPages: number;
   } | null>(null);
 
-  const loadResidents = useCallback(async (currentPage: number = page) => {
-    try {
-      setLoading(true);
-      setError(null);
+  const loadResidents = useCallback(
+    async (currentPage: number = page) => {
+      try {
+        setLoading(true);
+        setError(null);
 
-      const params: any = {
-        page: currentPage,
-        limit,
-      };
+        const params: any = {
+          page: currentPage,
+          limit,
+        };
 
-      if (search) params.search = search;
-      if (status) params.status = status;
+        if (search) params.search = search;
+        if (status) params.status = status;
 
-      const response = await apiClient.residents.list(params);
-      
-      setResidents(response.data);
-      setPagination(response.pagination || null);
-    } catch (err) {
-      console.error('Error loading residents:', err);
-      setError(err instanceof Error ? err.message : 'Error cargando residentes');
-    } finally {
-      setLoading(false);
-    }
-  }, [page, limit, search, status]);
+        const response = await apiClient.residents.list(params);
 
-  const refresh = useCallback(() => loadResidents(pagination?.page || 1), [loadResidents, pagination]);
+        setResidents(response.data);
+        setPagination(response.pagination || null);
+      } catch (err) {
+        console.error("Error loading residents:", err);
+        setError(
+          err instanceof Error ? err.message : "Error cargando residentes",
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [page, limit, search, status],
+  );
 
-  const loadPage = useCallback(async (newPage: number) => {
-    await loadResidents(newPage);
-  }, [loadResidents]);
+  const refresh = useCallback(
+    () => loadResidents(pagination?.page || 1),
+    [loadResidents, pagination],
+  );
 
-  const createResident = useCallback(async (residentData: Partial<Resident>): Promise<Resident> => {
-    try {
-      setError(null);
-      const response = await apiClient.residents.create(residentData);
-      
-      await refresh();
-      
-      return response.data;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error creando residente';
-      setError(errorMessage);
-      throw err;
-    }
-  }, [refresh]);
+  const loadPage = useCallback(
+    async (newPage: number) => {
+      await loadResidents(newPage);
+    },
+    [loadResidents],
+  );
 
-  const updateResident = useCallback(async (id: number, updates: Partial<Resident>): Promise<Resident> => {
-    try {
-      setError(null);
-      const response = await apiClient.put<Resident>(`/inventory/residents/${id}`, updates);
-      
-      setResidents(prevResidents => 
-        prevResidents.map(resident => 
-          resident.id === id ? { ...resident, ...response.data } : resident
-        )
-      );
-      
-      return response.data;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error actualizando residente';
-      setError(errorMessage);
-      throw err;
-    }
-  }, []);
+  const createResident = useCallback(
+    async (residentData: Partial<Resident>): Promise<Resident> => {
+      try {
+        setError(null);
+        const response = await apiClient.residents.create(residentData);
+
+        await refresh();
+
+        return response.data;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Error creando residente";
+        setError(errorMessage);
+        throw err;
+      }
+    },
+    [refresh],
+  );
+
+  const updateResident = useCallback(
+    async (id: number, updates: Partial<Resident>): Promise<Resident> => {
+      try {
+        setError(null);
+        const response = await apiClient.put<Resident>(
+          `/inventory/residents/${id}`,
+          updates,
+        );
+
+        setResidents((prevResidents) =>
+          prevResidents.map((resident) =>
+            resident.id === id ? { ...resident, ...response.data } : resident,
+          ),
+        );
+
+        return response.data;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Error actualizando residente";
+        setError(errorMessage);
+        throw err;
+      }
+    },
+    [],
+  );
 
   const deleteResident = useCallback(async (id: number): Promise<void> => {
     try {
       setError(null);
       await apiClient.delete(`/inventory/residents/${id}`);
-      
-      setResidents(prevResidents => prevResidents.filter(resident => resident.id !== id));
+
+      setResidents((prevResidents) =>
+        prevResidents.filter((resident) => resident.id !== id),
+      );
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error eliminando residente';
+      const errorMessage =
+        err instanceof Error ? err.message : "Error eliminando residente";
       setError(errorMessage);
       throw err;
     }

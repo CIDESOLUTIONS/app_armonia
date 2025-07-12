@@ -1,22 +1,22 @@
 "use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { 
-  Home, 
-  Users, 
-  Package, 
-  AlertTriangle, 
-  Camera, 
-  FileText, 
-  Settings, 
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Home,
+  Users,
+  Package,
+  AlertTriangle,
+  Camera,
+  FileText,
+  Settings,
   LogOut,
   ChevronLeft,
-  ChevronRight
-} from 'lucide-react';
+  ChevronRight,
+} from "lucide-react";
 
 interface SidebarItem {
   title: string;
@@ -27,41 +27,41 @@ interface SidebarItem {
 
 const sidebarItems: SidebarItem[] = [
   {
-    title: 'Dashboard',
-    href: '/reception-dashboard',
+    title: "Dashboard",
+    href: "/reception-dashboard",
     icon: Home,
-    description: 'Panel principal de recepción'
+    description: "Panel principal de recepción",
   },
   {
-    title: 'Visitantes',
-    href: '/visitors',
+    title: "Visitantes",
+    href: "/visitors",
     icon: Users,
-    description: 'Registro y control de visitantes'
+    description: "Registro y control de visitantes",
   },
   {
-    title: 'Paquetería',
-    href: '/packages',
+    title: "Paquetería",
+    href: "/packages",
     icon: Package,
-    description: 'Gestión de paquetes y correspondencia'
+    description: "Gestión de paquetes y correspondencia",
   },
   {
-    title: 'Incidentes',
-    href: '/incidents',
+    title: "Incidentes",
+    href: "/incidents",
     icon: AlertTriangle,
-    description: 'Registro de incidentes y novedades'
+    description: "Registro de incidentes y novedades",
   },
   {
-    title: 'Vigilancia',
-    href: '/surveillance',
+    title: "Vigilancia",
+    href: "/surveillance",
     icon: Camera,
-    description: 'Monitoreo y cámaras de seguridad'
+    description: "Monitoreo y cámaras de seguridad",
   },
   {
-    title: 'Reportes',
-    href: '/reports',
+    title: "Reportes",
+    href: "/reports",
     icon: FileText,
-    description: 'Reportes y estadísticas'
-  }
+    description: "Reportes y estadísticas",
+  },
 ];
 
 interface ReceptionSidebarProps {
@@ -73,16 +73,20 @@ export default function ReceptionSidebar({ className }: ReceptionSidebarProps) {
   const pathname = usePathname();
 
   return (
-    <div className={cn(
-      "flex flex-col h-full bg-white border-r border-gray-200 transition-all duration-300",
-      collapsed ? "w-16" : "w-64",
-      className
-    )}>
+    <div
+      className={cn(
+        "flex flex-col h-full bg-white border-r border-gray-200 transition-all duration-300",
+        collapsed ? "w-16" : "w-64",
+        className,
+      )}
+    >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         {!collapsed && (
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Portal Recepción</h2>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Portal Recepción
+            </h2>
             <p className="text-sm text-gray-500">Control de accesos</p>
           </div>
         )}
@@ -105,7 +109,7 @@ export default function ReceptionSidebar({ className }: ReceptionSidebarProps) {
         {sidebarItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
-          
+
           return (
             <Link key={item.href} href={item.href}>
               <Button
@@ -113,14 +117,17 @@ export default function ReceptionSidebar({ className }: ReceptionSidebarProps) {
                 className={cn(
                   "w-full justify-start h-auto p-3",
                   collapsed && "px-2",
-                  isActive && "bg-orange-100 text-orange-700 hover:bg-orange-200"
+                  isActive &&
+                    "bg-orange-100 text-orange-700 hover:bg-orange-200",
                 )}
               >
                 <Icon className={cn("h-5 w-5", !collapsed && "mr-3")} />
                 {!collapsed && (
                   <div className="text-left">
                     <div className="font-medium">{item.title}</div>
-                    <div className="text-xs text-gray-500 mt-1">{item.description}</div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {item.description}
+                    </div>
                   </div>
                 )}
               </Button>
@@ -135,11 +142,11 @@ export default function ReceptionSidebar({ className }: ReceptionSidebarProps) {
           variant="ghost"
           className={cn(
             "w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50",
-            collapsed && "px-2"
+            collapsed && "px-2",
           )}
           onClick={() => {
             // Implementar logout
-            window.location.href = '/portal-selector';
+            window.location.href = "/portal-selector";
           }}
         >
           <LogOut className={cn("h-5 w-5", !collapsed && "mr-3")} />
@@ -149,4 +156,3 @@ export default function ReceptionSidebar({ className }: ReceptionSidebarProps) {
     </div>
   );
 }
-
