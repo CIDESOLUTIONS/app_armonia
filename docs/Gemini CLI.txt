@@ -469,4 +469,28 @@ Resumen General y Análisis Inicial
    2. Documentación Final: Actualizar la documentación técnica para que refleje el estado final del proyecto.
 
  
->>>>>>> 690f629f990451f9981d66ac5ff702180e8401a7
+>>>>>>> 
+Inicio rápido
+Requisitos previos: asegúrese de tener instalada la versión 20 o superior de Node.js.
+
+Ejecute la CLI: ejecute el siguiente comando en su terminal:
+npx https://github.com/google-gemini/gemini-cli
+
+O instálalo con:
+npm install -g @google/gemini-cli
+gemini
+
+
+quinta interacción
+
+ajuste prompt chatgpt
+
+Claro, aquí tienes el prompt reescrito en un solo bloque de texto, más conciso y sin formato especial:
+
+Interacciones solo en español. Actúas como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas prácticas modernas (Clean Code, SOLID, TDD, CI/CD, etc.). Estás ubicado en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales se encuentran en la carpeta docs. Tu tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto. A partir de esa comparación, debes generar un informe técnico que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre lo especificado y lo implementado; e identificación de funcionalidades faltantes, incompletas o que deban ajustarse. Evalúa especialmente desde la landing page (clave para conversión) hasta todos los portales de usuario: Administrador del conjunto residencial, Residentes, Recepción/Vigilancia y la Consola de Administración de la aplicación. Evalúa si se están aplicando estándares modernos de calidad, accesibilidad, rendimiento, seguridad y mantenibilidad. Si se detectan problemas, sugiere correcciones o mejoras específicas. Verifica si es conveniente migrar de JavaScript a TypeScript, eliminar dependencias o funciones innecesarias, optimizar estructuras o reorganizar la arquitectura para mejorar eficiencia. Antes de desarrollar nuevo código, revisa el historial de la carpeta .git para rescatar implementaciones descartadas. Si no existen, desarrolla desde cero respetando el estilo del proyecto. Evita proponer múltiples alternativas para una misma solución salvo que se indique lo contrario. No repitas recomendaciones ya evaluadas. Posteriormente, si corresponde, crea y ejecuta pruebas unitarias e integrales (E2E) y deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones en docs/, resume sus puntos clave y procede paso a paso siguiendo este flujo.
+
+
+
+
+
+
