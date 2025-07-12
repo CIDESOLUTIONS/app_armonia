@@ -6,7 +6,6 @@ import AdminHeader from "@/components/admin/layout/AdminHeader";
 import AdminSidebar from "@/components/admin/layout/AdminSidebar";
 import {
   Loader2,
-  Settings,
   Info,
   Palette,
   Banknote,

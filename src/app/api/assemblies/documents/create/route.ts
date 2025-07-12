@@ -113,7 +113,13 @@ export async function POST(_req: unknown) {
       { message: "Acta generada", documentId: result[0].id },
       { status: 201 },
     );
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { message: "Error al generar acta", error: error.message },
+        { status: 500 },
+      );
+    }
     return NextResponse.json(
       { message: "Error al generar acta", error: String(error) },
       { status: 500 },

@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     const validatedParams = validation.data;
     const prisma = getPrisma();
 
-    const where: any = { complexId: payload.complexId };
+    const where: { complexId: number; status?: string } = { complexId: payload.complexId };
     if (validatedParams.status) where.status = validatedParams.status;
 
     const offset = (validatedParams.page - 1) * validatedParams.limit;

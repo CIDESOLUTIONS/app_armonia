@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, PlusCircle, Edit, Trash2, Video } from "lucide-react";
+import { Loader2, PlusCircle, Edit, Trash2 } from "lucide-react";
 import {
   Table,
   TableBody,

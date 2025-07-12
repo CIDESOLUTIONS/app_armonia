@@ -4,8 +4,8 @@ import { getPrisma } from "@/lib/prisma";
 const prisma = getPrisma();
 // Variable JWT_SECRET eliminada por lint
 
-export async function DELETE(_req: unknown) {
-  const _token = req.headers.get("Authorization")?.replace("Bearer ", "");
+export async function DELETE(req: NextRequest) {
+  const token = req.headers.get("Authorization")?.replace("Bearer ", "");
   if (!token)
     return NextResponse.json({ message: "No token provided" }, { status: 401 });
 

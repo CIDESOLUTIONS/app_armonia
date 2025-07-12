@@ -47,7 +47,9 @@ export async function DELETE(req: Request) {
 
     const now = new Date();
     const assemblyEnd = new Date(assembly.date);
-    assembly.agenda.forEach((item: any) => {
+    interface AgendaItem { time: string; } // Define the interface for agenda items
+
+    assembly.agenda.forEach((item: AgendaItem) => {
       const [hours, minutes, seconds] = item.time.split(":").map(Number);
       assemblyEnd.setHours(assemblyEnd.getHours() + hours);
       assemblyEnd.setMinutes(assemblyEnd.getMinutes() + minutes);

@@ -21,11 +21,7 @@ import {
   Settings,
   LogOut,
   DollarSign,
-  TrendingUp,
-  TrendingDown,
   Clock,
-  CheckCircle,
-  AlertCircle,
   Loader2,
 } from "lucide-react";
 import Link from "next/link";

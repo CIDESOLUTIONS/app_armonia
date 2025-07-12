@@ -12,8 +12,8 @@ const intlMiddleware = createIntlMiddleware({
 
 export default async function middleware(req: NextRequest) {
   const publicPathnameRegex = RegExp(
-    `^(/(${locales.join("|")}))?(${publicPages.join("|")})/?,
-    "i"
+    `^(/(${locales.join("|")}))?(${publicPages.join("|")})/?`,
+    "i",
   );
   const isPublicPage = publicPathnameRegex.test(req.nextUrl.pathname);
 

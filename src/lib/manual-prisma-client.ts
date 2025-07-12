@@ -43,13 +43,13 @@ export class ManualPrismaClient extends BasePrismaClient {
     }
     this.tenantSchema = schema;
     this.$disconnect().then(() => {
-      // @ts-ignore
+      // @ts-expect-error: _engineConfig is a private property of PrismaClient and is not officially exposed, but is necessary for dynamic schema switching.
       this._engineConfig.datasources = {
         db: {
           url: `${databaseUrl.split("?")[0]}?schema=${schema}`,
         },
       };
-      // @ts-ignore
+      // @ts-expect-error: _engineConfig is a private property of PrismaClient and is not officially exposed, but is necessary for dynamic schema switching.
       this.$connect();
     });
   }

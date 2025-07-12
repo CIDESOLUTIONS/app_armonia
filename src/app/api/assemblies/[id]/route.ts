@@ -5,7 +5,6 @@ import { z } from "zod";
 import { ServerLogger } from "@/lib/logging/server-logger";
 import {
   UpdateAssemblySchema,
-  DeleteAssemblySchema,
 } from "@/validators/assemblies/assemblies.validator";
 
 export async function PUT(

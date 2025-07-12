@@ -27,9 +27,6 @@ export default function AuthLayout({
   const { toast } = useToast();
 
   const [isLoading, setIsLoading] = useState(true);
-  const [language, _setLanguage] = useState("Español");
-  const [_theme, _setTheme] = useState("Claro");
-  const [_currency, _setCurrency] = useState("Pesos");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
 
   useEffect(() => {

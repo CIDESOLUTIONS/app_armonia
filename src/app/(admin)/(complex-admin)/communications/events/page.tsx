@@ -125,23 +125,23 @@ export default function CommunityEventsPage() {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const _handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (currentEvent) {
-        await updateCommunityEvent(currentEvent.id, formData);
+      if (_currentEvent) {
+        await updateCommunityEvent(_currentEvent.id, _formData);
         toast({
           title: "Éxito",
           description: "Evento comunitario actualizado correctamente.",
         });
       } else {
-        await createCommunityEvent(formData);
+        await createCommunityEvent(_formData);
         toast({
           title: "Éxito",
           description: "Evento comunitario creado correctamente.",
         });
       }
-      setIsModalOpen(false);
+      _setIsModalOpen(false);
       fetchEvents();
     } catch (error) {
       console.error("Error saving community event:", error);

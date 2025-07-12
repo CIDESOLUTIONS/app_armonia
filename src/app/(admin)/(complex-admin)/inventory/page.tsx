@@ -11,8 +11,6 @@ import {
   Car,
   PawPrint,
   Plus,
-  Search,
-  Filter,
   Home,
   Settings,
 } from "lucide-react";

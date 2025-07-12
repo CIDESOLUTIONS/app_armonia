@@ -35,7 +35,13 @@ export async function GET(_req: unknown) {
       },
       status: 200,
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { message: "Error al descargar", error: error.message },
+        { status: 500 },
+      );
+    }
     return NextResponse.json(
       { message: "Error al descargar", error: String(error) },
       { status: 500 },
