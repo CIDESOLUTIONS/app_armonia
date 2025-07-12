@@ -4,15 +4,10 @@
  */
 
 // Importar enums y constantes desde nuestros mocks centralizados
-import { PQRCategory, PQRStatus, PQRPriority, PQRType } from './pqr-constants';
+import { PQRCategory, PQRStatus, PQRPriority, PQRType } from "./pqr-constants";
 
 // Exportar enums para que sean accesibles como si vinieran de @prisma/client
-export {
-  PQRCategory,
-  PQRStatus,
-  PQRPriority,
-  PQRType
-};
+export { PQRCategory, PQRStatus, PQRPriority, PQRType };
 
 // Mock básico de PrismaClient
 export class PrismaClient {
@@ -39,16 +34,16 @@ export class PrismaClient {
     findMany: jest.fn().mockResolvedValue([]),
     create: jest.fn().mockResolvedValue({}),
     update: jest.fn().mockResolvedValue({}),
-    delete: jest.fn().mockResolvedValue({})
+    delete: jest.fn().mockResolvedValue({}),
   };
 
   user = {
     findUnique: jest.fn().mockResolvedValue(null),
-    findMany: jest.fn().mockResolvedValue([])
+    findMany: jest.fn().mockResolvedValue([]),
   };
 
   pQRNotification = {
-    create: jest.fn().mockResolvedValue({})
+    create: jest.fn().mockResolvedValue({}),
   };
 }
 

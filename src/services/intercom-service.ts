@@ -1,14 +1,19 @@
 /**
  * Servicio de Citofonía Virtual
- * 
+ *
  * Este servicio implementa la funcionalidad de citofonía virtual con integraciones
  * a WhatsApp y Telegram para notificaciones de visitantes y control de accesos.
  */
 
-import { PrismaClient } from '@prisma/client';
-import { prisma } from '../prisma';
-import { ActivityLogger } from '../logging/activity-logger';
-import { NotificationChannel, NotificationStatus, ResponseType, VisitStatus } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
+import { prisma } from "../prisma";
+import { ActivityLogger } from "../logging/activity-logger";
+import {
+  NotificationChannel,
+  NotificationStatus,
+  ResponseType,
+  VisitStatus,
+} from "@prisma/client";
 export class IntercomService {
   private prisma: PrismaClient;
   private logger: ActivityLogger;
@@ -20,7 +25,7 @@ export class IntercomService {
     this.prisma = prisma;
     this.logger = new ActivityLogger();
     this.initializeAdapters();
-    
+
     // Iniciar procesamiento de cola cada 5 segundos
     setInterval(() => this.processMessageQueue(), 5000);
   }
@@ -32,46 +37,58 @@ export class IntercomService {
     try {
       // Obtener configuración de la base de datos
       const settings = await this.prisma.intercomSettings.findFirst();
-      
+
       if (!settings) {
-        console.error('No se encontró configuración para el servicio de citofonía');
+        console.error(
+          "No se encontró configuración para el servicio de citofonía",
+        );
         return;
       }
-      
+
       // Inicializar adaptador de WhatsApp si está habilitado
       if (settings.whatsappEnabled && settings.whatsappConfig) {
         const config = settings.whatsappConfig as any;
-        this.adapters.set(NotificationChannel.WHATSAPP, new WhatsAppAdapter(config));
+        this.adapters.set(
+          NotificationChannel.WHATSAPP,
+          new WhatsAppAdapter(config),
+        );
       }
-      
+
       // Inicializar adaptador de Telegram si está habilitado
       if (settings.telegramEnabled && settings.telegramBotToken) {
         const config = { botToken: settings.telegramBotToken };
-        this.adapters.set(NotificationChannel.TELEGRAM, new TelegramAdapter(config));
+        this.adapters.set(
+          NotificationChannel.TELEGRAM,
+          new TelegramAdapter(config),
+        );
       }
-      
-      console.log('Adaptadores de mensajería inicializados correctamente');
+
+      console.log("Adaptadores de mensajería inicializados correctamente");
     } catch (error) {
-      console.error('Error al inicializar adaptadores:', error);
+      console.error("Error al inicializar adaptadores:", error);
     }
   }
 
   /**
    * Registra una nueva visita en el sistema
    */
-  async registerVisit(visitorData: any, unitId: number, purpose: string): Promise<any> {
+  async registerVisit(
+    visitorData: any,
+    unitId: number,
+    purpose: string,
+  ): Promise<any> {
     const { name, identification, phone, typeId } = visitorData;
-    
+
     try {
       // Transacción para asegurar consistencia
       return await this.prisma.$transaction(async (tx) => {
         // Buscar si el visitante ya existe
         let visitor = await tx.visitor.findFirst({
           where: {
-            identification: identification
-          }
+            identification: identification,
+          },
         });
-        
+
         // Si no existe, crearlo
         if (!visitor) {
           visitor = await tx.visitor.create({
@@ -80,36 +97,36 @@ export class IntercomService {
               identification,
               phone,
               typeId,
-              isFrequent: false
-            }
+              isFrequent: false,
+            },
           });
         }
-        
+
         // Crear la visita
         const visit = await tx.visit.create({
           data: {
             visitorId: visitor.id,
             unitId,
             purpose,
-            status: VisitStatus.PENDING
-          }
+            status: VisitStatus.PENDING,
+          },
         });
-        
+
         // Registrar actividad
         await this.logger.logActivity({
-          module: 'intercom',
-          action: 'register_visit',
+          module: "intercom",
+          action: "register_visit",
           entityId: visit.id,
-          details: { visitor: visitor.name, unit: unitId, purpose }
+          details: { visitor: visitor.name, unit: unitId, purpose },
         });
-        
+
         // Notificar a los residentes
         await this.notifyResidents(visit.id, tx);
-        
+
         return visit;
       });
     } catch (error) {
-      console.error('Error al registrar visita:', error);
+      console.error("Error al registrar visita:", error);
       throw error;
     }
   }
@@ -119,59 +136,63 @@ export class IntercomService {
    */
   async notifyResidents(visitId: string, prismaClient?: any): Promise<void> {
     const tx = prismaClient || this.prisma;
-    
+
     try {
       // Obtener información de la visita
       const visit = await tx.visit.findUnique({
         where: { id: visitId },
         include: {
           visitor: {
-            include: { type: true }
+            include: { type: true },
           },
-          unit: true
-        }
+          unit: true,
+        },
       });
-      
+
       if (!visit) {
         throw new Error(`Visita con ID ${visitId} no encontrada`);
       }
-      
+
       // Obtener residentes de la unidad
       const unit = await tx.unit.findUnique({
-        where: { id: visit.unitId }
+        where: { id: visit.unitId },
       });
-      
+
       if (!unit || !unit.residents || unit.residents.length === 0) {
-        console.warn(`No se encontraron residentes para la unidad ${visit.unitId}`);
+        console.warn(
+          `No se encontraron residentes para la unidad ${visit.unitId}`,
+        );
         return;
       }
-      
+
       // Obtener preferencias de citofonía de los residentes
       for (const residentId of unit.residents) {
         const preferences = await tx.userIntercomPreference.findUnique({
-          where: { userId: residentId }
+          where: { userId: residentId },
         });
-        
+
         // Si no hay preferencias o el tipo de visitante está en la lista de auto-aprobación
         if (!preferences) continue;
-        
+
         // Verificar si el tipo de visitante requiere notificación
-        if (!preferences.notifyAllVisitors && 
-            preferences.allowedVisitorTypes.includes(visit.visitor.typeId)) {
+        if (
+          !preferences.notifyAllVisitors &&
+          preferences.allowedVisitorTypes.includes(visit.visitor.typeId)
+        ) {
           continue;
         }
-        
+
         // Verificar si estamos en horas de silencio
         if (this.isQuietHours(preferences)) {
           continue;
         }
-        
+
         // Verificar si el tipo de visitante tiene aprobación automática
         if (preferences.autoApproveTypes.includes(visit.visitor.typeId)) {
           await this.approveVisit(visitId, residentId);
           continue;
         }
-        
+
         // Enviar notificaciones según preferencias
         if (preferences.whatsappEnabled && preferences.whatsappNumber) {
           await this.queueNotification({
@@ -181,10 +202,10 @@ export class IntercomService {
             to: preferences.whatsappNumber,
             visitor: visit.visitor,
             unit: visit.unit,
-            purpose: visit.purpose
+            purpose: visit.purpose,
           });
         }
-        
+
         if (preferences.telegramEnabled && preferences.telegramChatId) {
           await this.queueNotification({
             visitId,
@@ -193,19 +214,18 @@ export class IntercomService {
             to: preferences.telegramChatId,
             visitor: visit.visitor,
             unit: visit.unit,
-            purpose: visit.purpose
+            purpose: visit.purpose,
           });
         }
       }
-      
+
       // Actualizar estado de la visita
       await tx.visit.update({
         where: { id: visitId },
-        data: { status: VisitStatus.NOTIFIED }
+        data: { status: VisitStatus.NOTIFIED },
       });
-      
     } catch (error) {
-      console.error('Error al notificar residentes:', error);
+      console.error("Error al notificar residentes:", error);
       throw error;
     }
   }
@@ -217,18 +237,22 @@ export class IntercomService {
     if (!preferences.quietHoursStart || !preferences.quietHoursEnd) {
       return false;
     }
-    
+
     const now = new Date();
     const currentHour = now.getHours();
     const currentMinute = now.getMinutes();
-    
-    const [startHour, startMinute] = preferences.quietHoursStart.split(':').map(Number);
-    const [endHour, endMinute] = preferences.quietHoursEnd.split(':').map(Number);
-    
+
+    const [startHour, startMinute] = preferences.quietHoursStart
+      .split(":")
+      .map(Number);
+    const [endHour, endMinute] = preferences.quietHoursEnd
+      .split(":")
+      .map(Number);
+
     const currentTime = currentHour * 60 + currentMinute;
     const startTime = startHour * 60 + startMinute;
     const endTime = endHour * 60 + endMinute;
-    
+
     // Manejar caso donde el período cruza la medianoche
     if (startTime > endTime) {
       return currentTime >= startTime || currentTime < endTime;
@@ -243,15 +267,17 @@ export class IntercomService {
   private async queueNotification(data: any): Promise<void> {
     try {
       // Crear registro de notificación en la base de datos
-      const notification = await this.prisma.virtualIntercomNotification.create({
-        data: {
-          visitId: data.visitId,
-          userId: data.userId,
-          channel: data.channel,
-          status: NotificationStatus.PENDING
-        }
-      });
-      
+      const notification = await this.prisma.virtualIntercomNotification.create(
+        {
+          data: {
+            visitId: data.visitId,
+            userId: data.userId,
+            channel: data.channel,
+            status: NotificationStatus.PENDING,
+          },
+        },
+      );
+
       // Agregar a la cola de mensajes
       this.messageQueue.push({
         notificationId: notification.id,
@@ -259,18 +285,18 @@ export class IntercomService {
         channel: data.channel,
         visitor: data.visitor,
         unit: data.unit,
-        purpose: data.purpose
+        purpose: data.purpose,
       });
-      
+
       // Registrar actividad
       await this.logger.logActivity({
-        module: 'intercom',
-        action: 'queue_notification',
+        module: "intercom",
+        action: "queue_notification",
         entityId: notification.id,
-        details: { channel: data.channel, userId: data.userId }
+        details: { channel: data.channel, userId: data.userId },
       });
     } catch (error) {
-      console.error('Error al encolar notificación:', error);
+      console.error("Error al encolar notificación:", error);
     }
   }
 
@@ -281,65 +307,79 @@ export class IntercomService {
     if (this.isProcessingQueue || this.messageQueue.length === 0) {
       return;
     }
-    
+
     this.isProcessingQueue = true;
-    
+
     try {
       // Obtener plantillas de mensajes
       const settings = await this.prisma.intercomSettings.findFirst();
-      const templates = settings?.messageTemplates as any || {};
-      
+      const templates = (settings?.messageTemplates as any) || {};
+
       // Procesar mensajes en cola
       while (this.messageQueue.length > 0) {
         const message = this.messageQueue.shift();
-        
+
         // Obtener adaptador para el canal
         const adapter = this.adapters.get(message.channel);
         if (!adapter) {
-          console.error(`No hay adaptador configurado para el canal ${message.channel}`);
+          console.error(
+            `No hay adaptador configurado para el canal ${message.channel}`,
+          );
           continue;
         }
-        
+
         // Preparar mensaje según el canal
         const messageText = this.prepareMessage(message, templates);
-        
+
         // Preparar opciones según el canal
         const options: any = {};
-        
+
         if (message.channel === NotificationChannel.TELEGRAM) {
           options.buttons = [
-            { text: '✅ Aprobar', payload: `approve_${message.notificationId}` },
-            { text: '❌ Rechazar', payload: `reject_${message.notificationId}` }
+            {
+              text: "✅ Aprobar",
+              payload: `approve_${message.notificationId}`,
+            },
+            {
+              text: "❌ Rechazar",
+              payload: `reject_${message.notificationId}`,
+            },
           ];
         }
-        
+
         if (message.visitor.photo) {
           options.mediaUrl = message.visitor.photo;
         }
-        
+
         // Enviar mensaje
-        const result = await adapter.sendMessage(message.to, messageText, options);
-        
+        const result = await adapter.sendMessage(
+          message.to,
+          messageText,
+          options,
+        );
+
         // Actualizar estado de la notificación
         await this.prisma.virtualIntercomNotification.update({
           where: { id: message.notificationId },
           data: {
-            status: result.success ? NotificationStatus.SENT : NotificationStatus.FAILED,
+            status: result.success
+              ? NotificationStatus.SENT
+              : NotificationStatus.FAILED,
             messageId: result.messageId,
-            errorMessage: result.error
-          }
+            errorMessage: result.error,
+          },
         });
-        
+
         // Registrar actividad
         await this.logger.logActivity({
-          module: 'intercom',
-          action: result.success ? 'notification_sent' : 'notification_failed',
+          module: "intercom",
+          action: result.success ? "notification_sent" : "notification_failed",
           entityId: message.notificationId,
-          details: { channel: message.channel, success: result.success }
+          details: { channel: message.channel, success: result.success },
         });
       }
     } catch (error) {
-      console.error('Error al procesar cola de mensajes:', error);
+      console.error("Error al procesar cola de mensajes:", error);
     } finally {
       this.isProcessingQueue = false;
     }
@@ -351,11 +391,12 @@ export class IntercomService {
   private prepareMessage(data: any, templates: any): string {
     const { visitor, unit, purpose } = data;
     const channel = data.channel;
-    
+
     // Obtener plantilla según el canal
-    let template = templates[channel]?.visitor_notification || 
-                  '¡Hola! Tienes un visitante: {{visitor.name}} para {{unit.number}}. Motivo: {{purpose}}';
-    
+    const template =
+      templates[channel]?.visitor_notification ||
+      "¡Hola! Tienes un visitante: {{visitor.name}} para {{unit.number}}. Motivo: {{purpose}}";
+
     // Reemplazar variables en la plantilla
     return template
       .replace(/{{visitor\.name}}/g, visitor.name)
@@ -367,46 +408,64 @@ export class IntercomService {
   /**
    * Procesa un webhook recibido de un proveedor de mensajería
    */
-  async processWebhook(channel: NotificationChannel, payload: any, signature?: string): Promise<any> {
+  async processWebhook(
+    channel: NotificationChannel,
+    payload: any,
+    signature?: string,
+  ): Promise<any> {
     try {
       // Obtener adaptador para el canal
       const adapter = this.adapters.get(channel);
       if (!adapter) {
-        throw new Error(`No hay adaptador configurado para el canal ${channel}`);
+        throw new Error(
+          `No hay adaptador configurado para el canal ${channel}`,
+        );
       }
-      
+
       // Verificar autenticidad del webhook
       if (!adapter.verifyWebhook(payload, signature)) {
-        throw new Error('Verificación de webhook fallida');
+        throw new Error("Verificación de webhook fallida");
       }
-      
+
       // Parsear respuesta
       const event = adapter.parseResponse(payload);
-      
+
       // Procesar según el tipo de evento
-      if (event.type === 'button' && event.buttonPayload) {
+      if (event.type === "button" && event.buttonPayload) {
         // Es una respuesta de botón (Telegram)
-        const [action, notificationId] = event.buttonPayload.split('_');
-        
-        if (action === 'approve') {
+        const [action, notificationId] = event.buttonPayload.split("_");
+
+        if (action === "approve") {
           await this.processApproval(notificationId);
-        } else if (action === 'reject') {
+        } else if (action === "reject") {
           await this.processRejection(notificationId);
         }
-      } else if (event.type === 'text') {
+      } else if (event.type === "text") {
         // Es un mensaje de texto (WhatsApp o Telegram)
         // Buscar notificación pendiente para este remitente
-        const notification = await this.findPendingNotification(channel, event.from);
-        
+        const notification = await this.findPendingNotification(
+          channel,
+          event.from,
+        );
+
         if (notification) {
           // Procesar respuesta según el texto
           const text = event.text.toLowerCase().trim();
-          
-          if (text.includes('si') || text.includes('sí') || text.includes('aprobar') || 
-              text.includes('aceptar') || text === '1') {
+
+          if (
+            text.includes("si") ||
+            text.includes("sí") ||
+            text.includes("aprobar") ||
+            text.includes("aceptar") ||
+            text === "1"
+          ) {
             await this.processApproval(notification.id);
-          } else if (text.includes('no') || text.includes('rechazar') || 
-                    text.includes('denegar') || text === '2') {
+          } else if (
+            text.includes("no") ||
+            text.includes("rechazar") ||
+            text.includes("denegar") ||
+            text === "2"
+          ) {
             await this.processRejection(notification.id);
           } else {
             // Respuesta no reconocida, guardar como personalizada
@@ -414,10 +473,10 @@ export class IntercomService {
           }
         }
       }
-      
+
       return { success: true };
     } catch (error) {
-      console.error('Error al procesar webhook:', error);
+      console.error("Error al procesar webhook:", error);
       return { success: false, error: error.message };
     }
   }
@@ -425,37 +484,48 @@ export class IntercomService {
   /**
    * Busca una notificación pendiente para un remitente
    */
-  private async findPendingNotification(channel: NotificationChannel, from: string): Promise<any> {
+  private async findPendingNotification(
+    channel: NotificationChannel,
+    from: string,
+  ): Promise<any> {
     try {
       // Buscar usuario por número de WhatsApp o chat ID de Telegram
-      const userPreference = await this.prisma.userIntercomPreference.findFirst({
-        where: channel === NotificationChannel.WHATSAPP
-          ? { whatsappNumber: from }
-          : { telegramChatId: from }
-      });
-      
+      const userPreference = await this.prisma.userIntercomPreference.findFirst(
+        {
+          where:
+            channel === NotificationChannel.WHATSAPP
+              ? { whatsappNumber: from }
+              : { telegramChatId: from },
+        },
+      );
+
       if (!userPreference) return null;
-      
+
       // Buscar notificación pendiente para este usuario
-      const notification = await this.prisma.virtualIntercomNotification.findFirst({
-        where: {
-          userId: userPreference.userId,
-          channel,
-          status: {
-            in: [NotificationStatus.SENT, NotificationStatus.DELIVERED, NotificationStatus.READ]
-          }
-        },
-        orderBy: {
-          sentAt: 'desc'
-        },
-        include: {
-          visit: true
-        }
-      });
-      
+      const notification =
+        await this.prisma.virtualIntercomNotification.findFirst({
+          where: {
+            userId: userPreference.userId,
+            channel,
+            status: {
+              in: [
+                NotificationStatus.SENT,
+                NotificationStatus.DELIVERED,
+                NotificationStatus.READ,
+              ],
+            },
+          },
+          orderBy: {
+            sentAt: "desc",
+          },
+          include: {
+            visit: true,
+          },
+        });
+
       return notification;
     } catch (error) {
-      console.error('Error al buscar notificación pendiente:', error);
+      console.error("Error al buscar notificación pendiente:", error);
       return null;
     }
   }
@@ -466,31 +536,31 @@ export class IntercomService {
   private async processApproval(notificationId: string): Promise<void> {
     try {
       // Obtener notificación
-      const notification = await this.prisma.virtualIntercomNotification.findUnique({
-        where: { id: notificationId },
-        include: { visit: true }
-      });
-      
+      const notification =
+        await this.prisma.virtualIntercomNotification.findUnique({
+          where: { id: notificationId },
+          include: { visit: true },
+        });
+
       if (!notification) {
         throw new Error(`Notificación con ID ${notificationId} no encontrada`);
       }
-      
+
       // Actualizar notificación
       await this.prisma.virtualIntercomNotification.update({
         where: { id: notificationId },
         data: {
           status: NotificationStatus.RESPONDED,
           respondedAt: new Date(),
-          response: 'Aprobado',
-          responseType: ResponseType.APPROVE
-        }
+          response: "Aprobado",
+          responseType: ResponseType.APPROVE,
+        },
       });
-      
+
       // Aprobar visita
       await this.approveVisit(notification.visitId, notification.userId);
-      
     } catch (error) {
-      console.error('Error al procesar aprobación:', error);
+      console.error("Error al procesar aprobación:", error);
     }
   }
 
@@ -500,38 +570,41 @@ export class IntercomService {
   private async processRejection(notificationId: string): Promise<void> {
     try {
       // Obtener notificación
-      const notification = await this.prisma.virtualIntercomNotification.findUnique({
-        where: { id: notificationId },
-        include: { visit: true }
-      });
-      
+      const notification =
+        await this.prisma.virtualIntercomNotification.findUnique({
+          where: { id: notificationId },
+          include: { visit: true },
+        });
+
       if (!notification) {
         throw new Error(`Notificación con ID ${notificationId} no encontrada`);
       }
-      
+
       // Actualizar notificación
       await this.prisma.virtualIntercomNotification.update({
         where: { id: notificationId },
         data: {
           status: NotificationStatus.RESPONDED,
           respondedAt: new Date(),
-          response: 'Rechazado',
-          responseType: ResponseType.REJECT
-        }
+          response: "Rechazado",
+          responseType: ResponseType.REJECT,
+        },
       });
-      
+
       // Rechazar visita
       await this.rejectVisit(notification.visitId, notification.userId);
-      
     } catch (error) {
-      console.error('Error al procesar rechazo:', error);
+      console.error("Error al procesar rechazo:", error);
     }
   }
 
   /**
    * Procesa una respuesta personalizada
    */
-  private async processCustomResponse(notificationId: string, response: string): Promise<void> {
+  private async processCustomResponse(
+    notificationId: string,
+    response: string,
+  ): Promise<void> {
     try {
       // Actualizar notificación
       await this.prisma.virtualIntercomNotification.update({
@@ -540,20 +613,19 @@ export class IntercomService {
           status: NotificationStatus.RESPONDED,
           respondedAt: new Date(),
           response,
-          responseType: ResponseType.CUSTOM
-        }
+          responseType: ResponseType.CUSTOM,
+        },
       });
-      
+
       // Registrar actividad
       await this.logger.logActivity({
-        module: 'intercom',
-        action: 'custom_response',
+        module: "intercom",
+        action: "custom_response",
         entityId: notificationId,
-        details: { response }
+        details: { response },
       });
-      
     } catch (error) {
-      console.error('Error al procesar respuesta personalizada:', error);
+      console.error("Error al procesar respuesta personalizada:", error);
     }
   }
 
@@ -567,20 +639,19 @@ export class IntercomService {
         where: { id: visitId },
         data: {
           status: VisitStatus.APPROVED,
-          authorizedBy: userId
-        }
+          authorizedBy: userId,
+        },
       });
-      
+
       // Registrar actividad
       await this.logger.logActivity({
-        module: 'intercom',
-        action: 'approve_visit',
+        module: "intercom",
+        action: "approve_visit",
         entityId: visitId,
-        details: { userId }
+        details: { userId },
       });
-      
     } catch (error) {
-      console.error('Error al aprobar visita:', error);
+      console.error("Error al aprobar visita:", error);
       throw error;
     }
   }
@@ -595,20 +666,19 @@ export class IntercomService {
         where: { id: visitId },
         data: {
           status: VisitStatus.REJECTED,
-          authorizedBy: userId
-        }
+          authorizedBy: userId,
+        },
       });
-      
+
       // Registrar actividad
       await this.logger.logActivity({
-        module: 'intercom',
-        action: 'reject_visit',
+        module: "intercom",
+        action: "reject_visit",
         entityId: visitId,
-        details: { userId }
+        details: { userId },
       });
-      
     } catch (error) {
-      console.error('Error al rechazar visita:', error);
+      console.error("Error al rechazar visita:", error);
       throw error;
     }
   }
@@ -620,36 +690,35 @@ export class IntercomService {
     try {
       // Verificar que la visita esté aprobada
       const visit = await this.prisma.visit.findUnique({
-        where: { id: visitId }
+        where: { id: visitId },
       });
-      
+
       if (!visit) {
         throw new Error(`Visita con ID ${visitId} no encontrada`);
       }
-      
+
       if (visit.status !== VisitStatus.APPROVED) {
         throw new Error(`La visita con ID ${visitId} no está aprobada`);
       }
-      
+
       // Actualizar estado de la visita
       await this.prisma.visit.update({
         where: { id: visitId },
         data: {
           status: VisitStatus.IN_PROGRESS,
-          entryTime: new Date()
-        }
+          entryTime: new Date(),
+        },
       });
-      
+
       // Registrar actividad
       await this.logger.logActivity({
-        module: 'intercom',
-        action: 'register_entry',
+        module: "intercom",
+        action: "register_entry",
         entityId: visitId,
-        details: {}
+        details: {},
       });
-      
     } catch (error) {
-      console.error('Error al registrar entrada:', error);
+      console.error("Error al registrar entrada:", error);
       throw error;
     }
   }
@@ -661,36 +730,35 @@ export class IntercomService {
     try {
       // Verificar que la visita esté en progreso
       const visit = await this.prisma.visit.findUnique({
-        where: { id: visitId }
+        where: { id: visitId },
       });
-      
+
       if (!visit) {
         throw new Error(`Visita con ID ${visitId} no encontrada`);
       }
-      
+
       if (visit.status !== VisitStatus.IN_PROGRESS) {
         throw new Error(`La visita con ID ${visitId} no está en progreso`);
       }
-      
+
       // Actualizar estado de la visita
       await this.prisma.visit.update({
         where: { id: visitId },
         data: {
           status: VisitStatus.COMPLETED,
-          exitTime: new Date()
-        }
+          exitTime: new Date(),
+        },
       });
-      
+
       // Registrar actividad
       await this.logger.logActivity({
-        module: 'intercom',
-        action: 'register_exit',
+        module: "intercom",
+        action: "register_exit",
         entityId: visitId,
-        details: {}
+        details: {},
       });
-      
     } catch (error) {
-      console.error('Error al registrar salida:', error);
+      console.error("Error al registrar salida:", error);
       throw error;
     }
   }
@@ -700,57 +768,57 @@ export class IntercomService {
    */
   async getVisitHistory(unitId: number, options: any = {}): Promise<any[]> {
     const { status, startDate, endDate, page = 1, pageSize = 10 } = options;
-    
+
     try {
       // Construir filtros
       const where: any = { unitId };
-      
+
       if (status) {
         where.status = status;
       }
-      
+
       if (startDate || endDate) {
         where.createdAt = {};
-        
+
         if (startDate) {
           where.createdAt.gte = new Date(startDate);
         }
-        
+
         if (endDate) {
           where.createdAt.lte = new Date(endDate);
         }
       }
-      
+
       // Obtener visitas
       const visits = await this.prisma.visit.findMany({
         where,
         include: {
           visitor: {
-            include: { type: true }
+            include: { type: true },
           },
-          notifications: true
+          notifications: true,
         },
         orderBy: {
-          createdAt: 'desc'
+          createdAt: "desc",
         },
         skip: (page - 1) * pageSize,
-        take: pageSize
+        take: pageSize,
       });
-      
+
       // Obtener total de registros para paginación
       const total = await this.prisma.visit.count({ where });
-      
+
       return {
         data: visits,
         pagination: {
           page,
           pageSize,
           total,
-          totalPages: Math.ceil(total / pageSize)
-        }
+          totalPages: Math.ceil(total / pageSize),
+        },
       };
     } catch (error) {
-      console.error('Error al obtener historial de visitas:', error);
+      console.error("Error al obtener historial de visitas:", error);
       throw error;
     }
   }
@@ -762,26 +830,26 @@ export class IntercomService {
     try {
       // Verificar si ya existen preferencias
       const existing = await this.prisma.userIntercomPreference.findUnique({
-        where: { userId }
+        where: { userId },
       });
-      
+
       if (existing) {
         // Actualizar preferencias existentes
         return await this.prisma.userIntercomPreference.update({
           where: { userId },
-          data: preferences
+          data: preferences,
         });
       } else {
         // Crear nuevas preferencias
         return await this.prisma.userIntercomPreference.create({
           data: {
             userId,
-            ...preferences
-          }
+            ...preferences,
+          },
         });
       }
     } catch (error) {
-      console.error('Error al actualizar preferencias de usuario:', error);
+      console.error("Error al actualizar preferencias de usuario:", error);
       throw error;
     }
   }
@@ -793,31 +861,31 @@ export class IntercomService {
     try {
       // Obtener configuración actual
       const current = await this.prisma.intercomSettings.findFirst();
-      
+
       if (current) {
         // Actualizar configuración existente
         const updated = await this.prisma.intercomSettings.update({
           where: { id: current.id },
-          data: settings
+          data: settings,
         });
-        
+
         // Reinicializar adaptadores
         await this.initializeAdapters();
-        
+
         return updated;
       } else {
         // Crear nueva configuración
         const created = await this.prisma.intercomSettings.create({
-          data: settings
+          data: settings,
         });
-        
+
         // Reinicializar adaptadores
         await this.initializeAdapters();
-        
+
         return created;
       }
     } catch (error) {
-      console.error('Error al actualizar configuración:', error);
+      console.error("Error al actualizar configuración:", error);
       throw error;
     }
   }
@@ -827,93 +895,101 @@ export class IntercomService {
    */
   async getStatistics(options: any = {}): Promise<any> {
     const { startDate, endDate } = options;
-    
+
     try {
       // Construir filtros de fecha
       const dateFilter: any = {};
-      
+
       if (startDate) {
         dateFilter.gte = new Date(startDate);
       }
-      
+
       if (endDate) {
         dateFilter.lte = new Date(endDate);
       }
-      
+
       // Estadísticas de visitas
       const visitStats = await this.prisma.$transaction([
         // Total de visitas
         this.prisma.visit.count({
-          where: dateFilter.gte || dateFilter.lte ? { createdAt: dateFilter } : {}
+          where:
+            dateFilter.gte || dateFilter.lte ? { createdAt: dateFilter } : {},
         }),
-        
+
         // Visitas por estado
         this.prisma.visit.groupBy({
-          by: ['status'],
+          by: ["status"],
           _count: true,
-          where: dateFilter.gte || dateFilter.lte ? { createdAt: dateFilter } : {}
+          where:
+            dateFilter.gte || dateFilter.lte ? { createdAt: dateFilter } : {},
         }),
-        
+
         // Tiempo promedio de respuesta (en segundos)
         this.prisma.virtualIntercomNotification.aggregate({
           _avg: {
-            retries: true
+            retries: true,
           },
           where: {
             status: NotificationStatus.RESPONDED,
-            sentAt: dateFilter.gte || dateFilter.lte ? dateFilter : {}
-          }
-        })
+            sentAt: dateFilter.gte || dateFilter.lte ? dateFilter : {},
+          },
+        }),
       ]);
-      
+
       // Estadísticas de notificaciones
       const notificationStats = await this.prisma.$transaction([
         // Notificaciones por canal
         this.prisma.virtualIntercomNotification.groupBy({
-          by: ['channel'],
+          by: ["channel"],
           _count: true,
-          where: dateFilter.gte || dateFilter.lte ? { sentAt: dateFilter } : {}
+          where: dateFilter.gte || dateFilter.lte ? { sentAt: dateFilter } : {},
         }),
-        
+
         // Notificaciones por estado
         this.prisma.virtualIntercomNotification.groupBy({
-          by: ['status'],
+          by: ["status"],
           _count: true,
-          where: dateFilter.gte || dateFilter.lte ? { sentAt: dateFilter } : {}
-        })
+          where: dateFilter.gte || dateFilter.lte ? { sentAt: dateFilter } : {},
+        }),
       ]);
-      
+
       // Formatear resultados
       const visitByStatus = visitStats[1].reduce((acc: any, item: any) => {
         acc[item.status] = item._count;
         return acc;
       }, {});
-      
-      const notificationByChannel = notificationStats[0].reduce((acc: any, item: any) => {
-        acc[item.channel] = item._count;
-        return acc;
-      }, {});
-      
-      const notificationByStatus = notificationStats[1].reduce((acc: any, item: any) => {
-        acc[item.status] = item._count;
-        return acc;
-      }, {});
-      
+
+      const notificationByChannel = notificationStats[0].reduce(
+        (acc: any, item: any) => {
+          acc[item.channel] = item._count;
+          return acc;
+        },
+        {},
+      );
+
+      const notificationByStatus = notificationStats[1].reduce(
+        (acc: any, item: any) => {
+          acc[item.status] = item._count;
+          return acc;
+        },
+        {},
+      );
+
       return {
         visits: {
           total: visitStats[0],
-          byStatus: visitByStatus
+          byStatus: visitByStatus,
         },
         notifications: {
           byChannel: notificationByChannel,
-          byStatus: notificationByStatus
+          byStatus: notificationByStatus,
         },
         performance: {
-          avgRetries: visitStats[2]._avg.retries || 0
-        }
+          avgRetries: visitStats[2]._avg.retries || 0,
+        },
       };
     } catch (error) {
-      console.error('Error al obtener estadísticas:', error);
+      console.error("Error al obtener estadísticas:", error);
       throw error;
     }
   }
@@ -921,4 +997,3 @@ export class IntercomService {
 
 // Exportar la clase del servicio
 // La instancia se creará en el archivo de prueba para permitir el mocking adecuado
-

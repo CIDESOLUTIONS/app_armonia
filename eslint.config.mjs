@@ -8,142 +8,98 @@ import pluginPrettier from "eslint-plugin-prettier";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  { files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"] },
-  
-  // Configuración específica para archivos Jest
+  // 1. Configuraciones globales y de ignorados
   {
-    files: ["**/*.config.js", "**/jest.*.js", "**/__mocks__/**/*.js", "jest.mocks.js", "jest.setup.js", "**/*.test.ts", "**/*.test.tsx"],
-    languageOptions: {
-      globals: {
-        ...globals.jest,
-        ...globals.node,
-        jest: "readonly",
-        global: "readonly",
-        beforeEach: "readonly",
-        afterEach: "readonly",
-        describe: "readonly",
-        it: "readonly",
-        expect: "readonly"
-      }
-    },
-    rules: {
-      "@typescript-eslint/no-require-imports": "off",
-      "no-undef": "off", 
-      "@typescript-eslint/no-unused-vars": "off" 
-    }
-  },
-  { 
     ignores: [
-      // Archivos de configuración
+      "node_modules/**",
+      ".next/**",
+      "dist/**",
+      "dist-jest/**",
+      "venv/**",
+      "build/**",
+      "coverage/**",
       "tailwind.config.ts",
       "jest.config.ts",
       "next.config.mjs",
       "babel.config.cjs",
       "postcss.config.mjs",
-      
-      // Scripts de utilidad
       "scripts/**",
       "prisma/seed.ts",
-      "seedUsers.js",
-      "analyze-project.js",
-      "createTestUsers.js",
-      "recreateUsers.js",
-      
-      // Archivos de configuración Jest
-      "jest.mocks.js",
-      "jest.setup.js",
-      
-      // Archivos generados
-      "node_modules/**",
-      ".next/**",
-      "dist/**",
-      "build/**",
-      "coverage/**",
-      
-      // Archivos de prueba
-      "**/__mocks__/**",
-      "**/mocks/**",
-      "**/__tests__/fileMock.js",
-      "jest/**",
-      
-      // Archivos webpack generados
       "**/*.webpack.js",
-      "**/*webpack*.js",
-      
-      // Archivos de declaración de tipos con any
-      "**/types/declarations.d.ts"
-    ] 
+      "**/types/declarations.d.ts",
+    ],
   },
+
+  // 2. Configuración base de JavaScript
+  pluginJs.configs.recommended,
+
+  // Configuración para archivos CommonJS
   {
+    files: ["**/*.js", "**/*.cjs"],
     languageOptions: {
       globals: {
-        ...globals.browser,
-        ...globals.node, 
-      },
-      parser: tseslint.parser,
-      parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
-        ecmaVersion: "latest",
-        sourceType: "module",
+        ...globals.node,
       },
     },
+  },
+
+  // 3. Configuraciones recomendadas de TypeScript
+  ...tseslint.configs.recommended,
+
+  // 4. Configuración para React, Next.js y Prettier
+  {
+    files: ["**/*.{ts,tsx}"],
     plugins: {
-      js: pluginJs,
-      "@typescript-eslint": tseslint,
       react: pluginReact,
       "react-hooks": pluginReactHooks,
       "@next/next": nextPlugin,
+      prettier: pluginPrettier,
+    },
+    languageOptions: {
+      parserOptions: {
+        ecmaFeatures: { jsx: true },
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
     },
     rules: {
-      // Reglas de ESLint base
-      ...pluginJs.configs.recommended.rules,
-      "no-undef": "error",
-      "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-
-      // Reglas de TypeScript ESLint
-      ...tseslint.configs.recommended.rules,
-      "@typescript-eslint/naming-convention": [
-        "error",
-        {
-          selector: "variableLike",
-          format: ["camelCase", "PascalCase", "UPPER_CASE"],
-          leadingUnderscore: "allow",
-        },
-        {
-          selector: "function",
-          format: ["camelCase", "PascalCase"],
-        },
-        {
-          selector: "typeLike",
-          format: ["PascalCase"],
-        },
-        {
-          selector: "enumMember",
-          format: ["PascalCase", "UPPER_CASE"],
-        },
-      ],
-
-      // Reglas de React
       ...pluginReact.configs.recommended.rules,
-      "react/react-in-jsx-scope": "off",
-      "react/jsx-uses-react": "off",
-      "react/no-unescaped-entities": "off",
-      "react/prop-types": "error", // Habilitado
-
-      // Reglas de React Hooks
       ...pluginReactHooks.configs.recommended.rules,
-
-      // Reglas de Next.js
       ...nextPlugin.configs.recommended.rules,
       ...nextPlugin.configs["core-web-vitals"].rules,
-      // Reglas de Prettier
       "prettier/prettier": "error",
+      "react/react-in-jsx-scope": "off",
+      "react/jsx-uses-react": "off",
+      "react/prop-types": "off",
+      "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+      "@typescript-eslint/naming-convention": [
+        "warn",
+        { selector: "variableLike", format: ["camelCase", "PascalCase", "UPPER_CASE"], leadingUnderscore: "allow" },
+        { selector: "function", format: ["camelCase", "PascalCase"] },
+        { selector: "typeLike", format: ["PascalCase"] },
+        { selector: "enumMember", format: ["PascalCase", "UPPER_CASE"] },
+      ],
     },
   },
-  pluginPrettier.configs.recommended,,
+
+  // 5. Configuración específica para archivos Jest
+  {
+    files: ["**/*.test.ts", "**/*.test.tsx", "**/jest.*.js", "**/__mocks__/**"],
+    languageOptions: {
+      globals: {
+        ...globals.jest,
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "no-undef": "off",
+      "@typescript-eslint/no-require-imports": "off",
+    },
   },
+  
+  // 6. Configuración para desactivar reglas específicas en ciertos archivos
   {
     files: ["src/lib/constants/*.ts"],
     rules: {

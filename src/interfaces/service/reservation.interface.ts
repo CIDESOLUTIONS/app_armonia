@@ -1,12 +1,12 @@
 // src/interfaces/service/reservation.interface.ts
-import { Document } from 'mongoose';
+import { Document } from "mongoose";
 
 export interface IReservation extends Document {
   service: string;
   user: string;
   startTime: Date;
   endTime: Date;
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  status: "pending" | "confirmed" | "cancelled" | "completed";
   attendees: number;
   notes?: string;
   residentialComplex: string;
@@ -40,44 +40,44 @@ export interface IReservationService {
   createReservation(
     data: CreateReservationDTO,
     userId: string,
-    complexId: string
+    complexId: string,
   ): Promise<IReservation>;
 
   getReservation(
     id: string,
     userId: string,
-    complexId: string
+    complexId: string,
   ): Promise<IReservation>;
 
   updateReservation(
     id: string,
     data: UpdateReservationDTO,
     userId: string,
-    complexId: string
+    complexId: string,
   ): Promise<IReservation>;
 
   cancelReservation(
     id: string,
     userId: string,
-    complexId: string
+    complexId: string,
   ): Promise<IReservation>;
 
   getUserReservations(
     userId: string,
     complexId: string,
-    status?: string[]
+    status?: string[],
   ): Promise<IReservation[]>;
 
   getServiceReservations(
     serviceId: string,
     complexId: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): Promise<IReservation[]>;
 
   getAvailableTimeSlots(
     serviceId: string,
     date: Date,
-    complexId: string
+    complexId: string,
   ): Promise<TimeSlot[]>;
 }

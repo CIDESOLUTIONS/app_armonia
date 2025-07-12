@@ -23,13 +23,13 @@ const authMiddleware = withAuth(
     pages: {
       signIn: "/login",
     },
-  }
+  },
 );
 
 export default function middleware(req: NextRequest) {
   const publicPathnameRegex = RegExp(
     `^(/(${locales.join("|")}))?(${publicPages.join("|")})/?$`,
-    "i"
+    "i",
   );
   const isPublicPage = publicPathnameRegex.test(req.nextUrl.pathname);
 
@@ -41,5 +41,5 @@ export default function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next|.*\..*).*)'],
+  matcher: ["/((?!api|_next|.*\..*).*)"],
 };

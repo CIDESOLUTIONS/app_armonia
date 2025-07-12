@@ -1,7 +1,7 @@
 // src/components/ui/data-table.tsx
-import React from 'react';
-import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React from "react";
+import { motion } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface DataTableProps<T> {
   data: T[];
@@ -46,7 +46,11 @@ export function DataTable<T>({
                 <td colSpan={columns.length} className="px-6 py-4 text-center">
                   <motion.div
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
                     className="inline-block w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full"
                   />
                 </td>
@@ -76,7 +80,7 @@ export function DataTable<T>({
           </tbody>
         </table>
       </div>
-      
+
       <div className="flex items-center justify-between mt-4">
         <span className="text-sm text-gray-700 dark:text-gray-300">
           Página {currentPage} de {totalPages}

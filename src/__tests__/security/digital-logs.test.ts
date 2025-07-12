@@ -1,59 +1,59 @@
 // src/__tests__/security/digital-logs.test.ts
-import { useDigitalLogs, DigitalLog } from '@/hooks/useDigitalLogs';
-import { renderHook, act } from '@testing-library/react';
+import { useDigitalLogs, DigitalLog } from "@/hooks/useDigitalLogs";
+import { renderHook, act } from "@testing-library/react";
 
 // Mock de API client
-jest.mock('@/lib/api-client', () => ({
+jest.mock("@/lib/api-client", () => ({
   apiClient: {
     post: jest.fn(),
     get: jest.fn(),
     put: jest.fn(),
-    delete: jest.fn()
-  }
+    delete: jest.fn(),
+  },
 }));
 
-const mockApiClient = require('@/lib/api-client').apiClient;
+import { apiClient as mockApiClient } from "@/lib/api-client";
 
-describe('useDigitalLogs Hook', () => {
+describe("useDigitalLogs Hook", () => {
   const mockLog: DigitalLog = {
     id: 1,
     complexId: 1,
-    shiftDate: '2025-06-14T00:00:00.000Z',
-    shiftStart: '2025-06-14T06:00:00.000Z',
-    shiftEnd: '2025-06-14T14:00:00.000Z',
+    shiftDate: "2025-06-14T00:00:00.000Z",
+    shiftStart: "2025-06-14T06:00:00.000Z",
+    shiftEnd: "2025-06-14T14:00:00.000Z",
     guardOnDuty: 1,
-    logType: 'GENERAL',
-    priority: 'NORMAL',
-    title: 'Turno nocturno sin novedades',
-    description: 'Turno transcurrió con normalidad, sin incidentes reportados.',
-    status: 'OPEN',
+    logType: "GENERAL",
+    priority: "NORMAL",
+    title: "Turno nocturno sin novedades",
+    description: "Turno transcurrió con normalidad, sin incidentes reportados.",
+    status: "OPEN",
     requiresFollowUp: false,
-    category: 'OTHER',
+    category: "OTHER",
     supervisorReview: false,
-    createdAt: '2025-06-14T06:00:00.000Z',
-    updatedAt: '2025-06-14T06:00:00.000Z',
+    createdAt: "2025-06-14T06:00:00.000Z",
+    updatedAt: "2025-06-14T06:00:00.000Z",
     guard: {
       id: 1,
-      name: 'Juan Pérez',
-      email: 'juan.perez@example.com'
+      name: "Juan Pérez",
+      email: "juan.perez@example.com",
     },
     creator: {
       id: 1,
-      name: 'Juan Pérez',
-      email: 'juan.perez@example.com'
-    }
+      name: "Juan Pérez",
+      email: "juan.perez@example.com",
+    },
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('createLog', () => {
-    it('should create a new digital log successfully', async () => {
+  describe("createLog", () => {
+    it("should create a new digital log successfully", async () => {
       const mockResponse = {
         success: true,
         digitalLog: mockLog,
-        message: 'Minuta digital creada exitosamente'
+        message: "Minuta digital creada exitosamente",
       };
 
       mockApiClient.post.mockResolvedValue(mockResponse);
@@ -61,14 +61,15 @@ describe('useDigitalLogs Hook', () => {
       const { result } = renderHook(() => useDigitalLogs());
 
       const createData = {
-        shiftDate: '2025-06-14T00:00:00.000Z',
-        shiftStart: '2025-06-14T06:00:00.000Z',
-        title: 'Turno nocturno sin novedades',
-        description: 'Turno transcurrió con normalidad, sin incidentes reportados.',
-        logType: 'GENERAL' as const,
-        priority: 'NORMAL' as const,
-        category: 'OTHER' as const,
-        requiresFollowUp: false
+        shiftDate: "2025-06-14T00:00:00.000Z",
+        shiftStart: "2025-06-14T06:00:00.000Z",
+        title: "Turno nocturno sin novedades",
+        description:
+          "Turno transcurrió con normalidad, sin incidentes reportados.",
+        logType: "GENERAL" as const,
+        priority: "NORMAL" as const,
+        category: "OTHER" as const,
+        requiresFollowUp: false,
       };
 
       await act(async () => {
@@ -76,14 +77,17 @@ describe('useDigitalLogs Hook', () => {
         expect(success).toBe(true);
       });
 
-      expect(mockApiClient.post).toHaveBeenCalledWith('/security/digital-logs', createData);
+      expect(mockApiClient.post).toHaveBeenCalledWith(
+        "/security/digital-logs",
+        createData,
+      );
       expect(result.current.digitalLogs).toContain(mockLog);
     });
 
-    it('should handle creation errors', async () => {
+    it("should handle creation errors", async () => {
       const mockError = {
         success: false,
-        message: 'Error creando minuta'
+        message: "Error creando minuta",
       };
 
       mockApiClient.post.mockResolvedValue(mockError);
@@ -91,14 +95,14 @@ describe('useDigitalLogs Hook', () => {
       const { result } = renderHook(() => useDigitalLogs());
 
       const createData = {
-        shiftDate: '2025-06-14T00:00:00.000Z',
-        shiftStart: '2025-06-14T06:00:00.000Z',
-        title: 'Test',
-        description: 'Test description',
-        logType: 'GENERAL' as const,
-        priority: 'NORMAL' as const,
-        category: 'OTHER' as const,
-        requiresFollowUp: false
+        shiftDate: "2025-06-14T00:00:00.000Z",
+        shiftStart: "2025-06-14T06:00:00.000Z",
+        title: "Test",
+        description: "Test description",
+        logType: "GENERAL" as const,
+        priority: "NORMAL" as const,
+        category: "OTHER" as const,
+        requiresFollowUp: false,
       };
 
       await act(async () => {
@@ -106,17 +110,17 @@ describe('useDigitalLogs Hook', () => {
         expect(success).toBe(false);
       });
 
-      expect(result.current.error).toBe('Error creando minuta');
+      expect(result.current.error).toBe("Error creando minuta");
     });
   });
 
-  describe('updateLog', () => {
-    it('should update a digital log successfully', async () => {
-      const updatedLog = { ...mockLog, status: 'RESOLVED' as const };
+  describe("updateLog", () => {
+    it("should update a digital log successfully", async () => {
+      const updatedLog = { ...mockLog, status: "RESOLVED" as const };
       const mockResponse = {
         success: true,
         digitalLog: updatedLog,
-        message: 'Minuta actualizada exitosamente'
+        message: "Minuta actualizada exitosamente",
       };
 
       mockApiClient.put.mockResolvedValue(mockResponse);
@@ -129,17 +133,22 @@ describe('useDigitalLogs Hook', () => {
       });
 
       await act(async () => {
-        const success = await result.current.updateLog(1, { status: 'RESOLVED' });
+        const success = await result.current.updateLog(1, {
+          status: "RESOLVED",
+        });
         expect(success).toBe(true);
       });
 
-      expect(mockApiClient.put).toHaveBeenCalledWith('/security/digital-logs/1', { status: 'RESOLVED' });
+      expect(mockApiClient.put).toHaveBeenCalledWith(
+        "/security/digital-logs/1",
+        { status: "RESOLVED" },
+      );
     });
 
-    it('should handle update errors', async () => {
+    it("should handle update errors", async () => {
       const mockError = {
         success: false,
-        message: 'Error actualizando minuta'
+        message: "Error actualizando minuta",
       };
 
       mockApiClient.put.mockResolvedValue(mockError);
@@ -147,19 +156,21 @@ describe('useDigitalLogs Hook', () => {
       const { result } = renderHook(() => useDigitalLogs());
 
       await act(async () => {
-        const success = await result.current.updateLog(1, { status: 'RESOLVED' });
+        const success = await result.current.updateLog(1, {
+          status: "RESOLVED",
+        });
         expect(success).toBe(false);
       });
 
-      expect(result.current.error).toBe('Error actualizando minuta');
+      expect(result.current.error).toBe("Error actualizando minuta");
     });
   });
 
-  describe('deleteLog', () => {
-    it('should delete a digital log successfully', async () => {
+  describe("deleteLog", () => {
+    it("should delete a digital log successfully", async () => {
       const mockResponse = {
         success: true,
-        message: 'Minuta eliminada exitosamente'
+        message: "Minuta eliminada exitosamente",
       };
 
       mockApiClient.delete.mockResolvedValue(mockResponse);
@@ -171,12 +182,14 @@ describe('useDigitalLogs Hook', () => {
         expect(success).toBe(true);
       });
 
-      expect(mockApiClient.delete).toHaveBeenCalledWith('/security/digital-logs/1');
+      expect(mockApiClient.delete).toHaveBeenCalledWith(
+        "/security/digital-logs/1",
+      );
     });
   });
 
-  describe('searchLogs', () => {
-    it('should search logs with filters', async () => {
+  describe("searchLogs", () => {
+    it("should search logs with filters", async () => {
       const mockResponse = {
         success: true,
         digitalLogs: [mockLog],
@@ -186,8 +199,8 @@ describe('useDigitalLogs Hook', () => {
           total: 1,
           totalPages: 1,
           hasNext: false,
-          hasPrevious: false
-        }
+          hasPrevious: false,
+        },
       };
 
       mockApiClient.get.mockResolvedValue(mockResponse);
@@ -195,10 +208,10 @@ describe('useDigitalLogs Hook', () => {
       const { result } = renderHook(() => useDigitalLogs());
 
       const filters = {
-        startDate: '2025-06-01',
-        endDate: '2025-06-30',
-        logType: 'GENERAL',
-        priority: 'NORMAL'
+        startDate: "2025-06-01",
+        endDate: "2025-06-30",
+        logType: "GENERAL",
+        priority: "NORMAL",
       };
 
       await act(async () => {
@@ -206,16 +219,16 @@ describe('useDigitalLogs Hook', () => {
       });
 
       expect(mockApiClient.get).toHaveBeenCalledWith(
-        expect.stringContaining('/security/digital-logs?')
+        expect.stringContaining("/security/digital-logs?"),
       );
       expect(result.current.digitalLogs).toEqual([mockLog]);
       expect(result.current.pagination).toEqual(mockResponse.pagination);
     });
 
-    it('should handle search errors', async () => {
+    it("should handle search errors", async () => {
       const mockError = {
         success: false,
-        message: 'Error buscando minutas'
+        message: "Error buscando minutas",
       };
 
       mockApiClient.get.mockResolvedValue(mockError);
@@ -226,15 +239,15 @@ describe('useDigitalLogs Hook', () => {
         await result.current.searchLogs({});
       });
 
-      expect(result.current.error).toBe('Error buscando minutas');
+      expect(result.current.error).toBe("Error buscando minutas");
     });
   });
 
-  describe('getLog', () => {
-    it('should get a specific log by ID', async () => {
+  describe("getLog", () => {
+    it("should get a specific log by ID", async () => {
       const mockResponse = {
         success: true,
-        digitalLog: mockLog
+        digitalLog: mockLog,
       };
 
       mockApiClient.get.mockResolvedValue(mockResponse);
@@ -246,13 +259,15 @@ describe('useDigitalLogs Hook', () => {
         expect(log).toEqual(mockLog);
       });
 
-      expect(mockApiClient.get).toHaveBeenCalledWith('/security/digital-logs/1');
+      expect(mockApiClient.get).toHaveBeenCalledWith(
+        "/security/digital-logs/1",
+      );
     });
 
-    it('should return null on error', async () => {
+    it("should return null on error", async () => {
       const mockError = {
         success: false,
-        message: 'Minuta no encontrada'
+        message: "Minuta no encontrada",
       };
 
       mockApiClient.get.mockResolvedValue(mockError);
@@ -264,23 +279,23 @@ describe('useDigitalLogs Hook', () => {
         expect(log).toBeNull();
       });
 
-      expect(result.current.error).toBe('Minuta no encontrada');
+      expect(result.current.error).toBe("Minuta no encontrada");
     });
   });
 
-  describe('reviewLog', () => {
-    it('should review a log as supervisor', async () => {
-      const reviewedLog = { 
-        ...mockLog, 
-        supervisorReview: true, 
-        status: 'IN_REVIEW' as const,
-        reviewNotes: 'Revisado por supervisor'
+  describe("reviewLog", () => {
+    it("should review a log as supervisor", async () => {
+      const reviewedLog = {
+        ...mockLog,
+        supervisorReview: true,
+        status: "IN_REVIEW" as const,
+        reviewNotes: "Revisado por supervisor",
       };
-      
+
       const mockResponse = {
         success: true,
         digitalLog: reviewedLog,
-        message: 'Minuta actualizada exitosamente'
+        message: "Minuta actualizada exitosamente",
       };
 
       mockApiClient.put.mockResolvedValue(mockResponse);
@@ -288,24 +303,51 @@ describe('useDigitalLogs Hook', () => {
       const { result } = renderHook(() => useDigitalLogs());
 
       await act(async () => {
-        const success = await result.current.reviewLog(1, 'Revisado por supervisor');
+        const success = await result.current.reviewLog(
+          1,
+          "Revisado por supervisor",
+        );
         expect(success).toBe(true);
       });
 
-      expect(mockApiClient.put).toHaveBeenCalledWith('/security/digital-logs/1', {
-        supervisorReview: true,
-        reviewNotes: 'Revisado por supervisor',
-        status: 'IN_REVIEW'
-      });
+      expect(mockApiClient.put).toHaveBeenCalledWith(
+        "/security/digital-logs/1",
+        {
+          supervisorReview: true,
+          reviewNotes: "Revisado por supervisor",
+          status: "IN_REVIEW",
+        },
+      );
     });
   });
 
-  describe('getLogStats', () => {
-    it('should calculate statistics from loaded logs', async () => {
+  describe("getLogStats", () => {
+    it("should calculate statistics from loaded logs", async () => {
       const mockLogs = [
-        { ...mockLog, id: 1, status: 'OPEN', priority: 'NORMAL', category: 'OTHER', requiresFollowUp: false },
-        { ...mockLog, id: 2, status: 'RESOLVED', priority: 'HIGH', category: 'INCIDENT', requiresFollowUp: true },
-        { ...mockLog, id: 3, status: 'IN_REVIEW', priority: 'URGENT', category: 'EMERGENCY', requiresFollowUp: false }
+        {
+          ...mockLog,
+          id: 1,
+          status: "OPEN",
+          priority: "NORMAL",
+          category: "OTHER",
+          requiresFollowUp: false,
+        },
+        {
+          ...mockLog,
+          id: 2,
+          status: "RESOLVED",
+          priority: "HIGH",
+          category: "INCIDENT",
+          requiresFollowUp: true,
+        },
+        {
+          ...mockLog,
+          id: 3,
+          status: "IN_REVIEW",
+          priority: "URGENT",
+          category: "EMERGENCY",
+          requiresFollowUp: false,
+        },
       ];
 
       const { result } = renderHook(() => useDigitalLogs());
@@ -317,33 +359,33 @@ describe('useDigitalLogs Hook', () => {
 
       await act(async () => {
         const stats = await result.current.getLogStats();
-        
+
         expect(stats).toEqual({
           total: 3,
           byStatus: {
-            'OPEN': 1,
-            'RESOLVED': 1,
-            'IN_REVIEW': 1
+            OPEN: 1,
+            RESOLVED: 1,
+            IN_REVIEW: 1,
           },
           byPriority: {
-            'NORMAL': 1,
-            'HIGH': 1,
-            'URGENT': 1
+            NORMAL: 1,
+            HIGH: 1,
+            URGENT: 1,
           },
           byCategory: {
-            'OTHER': 1,
-            'INCIDENT': 1,
-            'EMERGENCY': 1
+            OTHER: 1,
+            INCIDENT: 1,
+            EMERGENCY: 1,
           },
           pending: 2, // OPEN + IN_REVIEW
-          requiresFollowUp: 1
+          requiresFollowUp: 1,
         });
       });
     });
   });
 
-  describe('State Management', () => {
-    it('should manage selectedLog state', () => {
+  describe("State Management", () => {
+    it("should manage selectedLog state", () => {
       const { result } = renderHook(() => useDigitalLogs());
 
       act(() => {
@@ -359,15 +401,15 @@ describe('useDigitalLogs Hook', () => {
       expect(result.current.selectedLog).toBeNull();
     });
 
-    it('should clear errors', () => {
+    it("should clear errors", () => {
       const { result } = renderHook(() => useDigitalLogs());
 
       // Simular error
       act(() => {
-        (result.current as any).error = 'Test error';
+        (result.current as any).error = "Test error";
       });
 
-      expect(result.current.error).toBe('Test error');
+      expect(result.current.error).toBe("Test error");
 
       act(() => {
         result.current.clearError();
@@ -376,29 +418,32 @@ describe('useDigitalLogs Hook', () => {
       expect(result.current.error).toBeNull();
     });
 
-    it('should manage loading state during operations', async () => {
+    it("should manage loading state during operations", async () => {
       const mockResponse = {
         success: true,
-        digitalLog: mockLog
+        digitalLog: mockLog,
       };
 
       // Simular delay en la respuesta
-      mockApiClient.post.mockImplementation(() => 
-        new Promise(resolve => setTimeout(() => resolve(mockResponse), 100))
+      mockApiClient.post.mockImplementation(
+        () =>
+          new Promise((resolve) =>
+            setTimeout(() => resolve(mockResponse), 100),
+          ),
       );
 
       const { result } = renderHook(() => useDigitalLogs());
 
       const createPromise = act(async () => {
         await result.current.createLog({
-          shiftDate: '2025-06-14T00:00:00.000Z',
-          shiftStart: '2025-06-14T06:00:00.000Z',
-          title: 'Test',
-          description: 'Test description',
-          logType: 'GENERAL',
-          priority: 'NORMAL',
-          category: 'OTHER',
-          requiresFollowUp: false
+          shiftDate: "2025-06-14T00:00:00.000Z",
+          shiftStart: "2025-06-14T06:00:00.000Z",
+          title: "Test",
+          description: "Test description",
+          logType: "GENERAL",
+          priority: "NORMAL",
+          category: "OTHER",
+          requiresFollowUp: false,
         });
       });
 
@@ -412,30 +457,30 @@ describe('useDigitalLogs Hook', () => {
     });
   });
 
-  describe('Edge Cases', () => {
-    it('should handle network errors gracefully', async () => {
-      mockApiClient.post.mockRejectedValue(new Error('Network error'));
+  describe("Edge Cases", () => {
+    it("should handle network errors gracefully", async () => {
+      mockApiClient.post.mockRejectedValue(new Error("Network error"));
 
       const { result } = renderHook(() => useDigitalLogs());
 
       await act(async () => {
         const success = await result.current.createLog({
-          shiftDate: '2025-06-14T00:00:00.000Z',
-          shiftStart: '2025-06-14T06:00:00.000Z',
-          title: 'Test',
-          description: 'Test description',
-          logType: 'GENERAL',
-          priority: 'NORMAL',
-          category: 'OTHER',
-          requiresFollowUp: false
+          shiftDate: "2025-06-14T00:00:00.000Z",
+          shiftStart: "2025-06-14T06:00:00.000Z",
+          title: "Test",
+          description: "Test description",
+          logType: "GENERAL",
+          priority: "NORMAL",
+          category: "OTHER",
+          requiresFollowUp: false,
         });
         expect(success).toBe(false);
       });
 
-      expect(result.current.error).toBe('Network error');
+      expect(result.current.error).toBe("Network error");
     });
 
-    it('should handle invalid responses', async () => {
+    it("should handle invalid responses", async () => {
       mockApiClient.get.mockResolvedValue(null);
 
       const { result } = renderHook(() => useDigitalLogs());
@@ -444,14 +489,14 @@ describe('useDigitalLogs Hook', () => {
         await result.current.searchLogs({});
       });
 
-      expect(result.current.error).toBe('Error buscando minutas');
+      expect(result.current.error).toBe("Error buscando minutas");
     });
 
-    it('should update selected log when updating same log', async () => {
-      const updatedLog = { ...mockLog, status: 'RESOLVED' as const };
+    it("should update selected log when updating same log", async () => {
+      const updatedLog = { ...mockLog, status: "RESOLVED" as const };
       const mockResponse = {
         success: true,
-        digitalLog: updatedLog
+        digitalLog: updatedLog,
       };
 
       mockApiClient.put.mockResolvedValue(mockResponse);
@@ -464,10 +509,10 @@ describe('useDigitalLogs Hook', () => {
       });
 
       await act(async () => {
-        await result.current.updateLog(1, { status: 'RESOLVED' });
+        await result.current.updateLog(1, { status: "RESOLVED" });
       });
 
-      expect(result.current.selectedLog?.status).toBe('RESOLVED');
+      expect(result.current.selectedLog?.status).toBe("RESOLVED");
     });
   });
 });

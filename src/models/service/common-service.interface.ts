@@ -1,5 +1,5 @@
 // src/interfaces/service/common-service.interface.ts
-import { Document } from 'mongoose';
+import { Document } from "mongoose";
 
 export interface ISchedule {
   dayOfWeek: number;

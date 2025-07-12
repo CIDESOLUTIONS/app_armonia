@@ -1,5 +1,5 @@
 // src/hooks/use-passive-event.ts
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 interface PassiveEventOptions {
   passive?: boolean;
@@ -10,7 +10,7 @@ export function usePassiveEvent(
   element: HTMLElement | null | Window,
   eventName: string,
   handler: EventListener,
-  options: PassiveEventOptions = { passive: true }
+  options: PassiveEventOptions = { passive: true },
 ) {
   useEffect(() => {
     if (!element) return;

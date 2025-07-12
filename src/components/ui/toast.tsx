@@ -1,9 +1,9 @@
 // src/components/ui/toast.tsx
-import { AnimatePresence, motion } from 'framer-motion';
-import { XCircle, CheckCircle, Info } from 'lucide-react';
+import { AnimatePresence, motion } from "framer-motion";
+import { XCircle, CheckCircle, Info } from "lucide-react";
 
 interface ToastProps {
-  variant: 'success' | 'error' | 'info';
+  variant: "success" | "error" | "info";
   title?: string;
   description: string;
   onClose: () => void;
@@ -13,13 +13,13 @@ export function Toast({ variant, title, description, onClose }: ToastProps) {
   const icons = {
     success: <CheckCircle className="w-5 h-5 text-white" />,
     error: <XCircle className="w-5 h-5 text-white" />,
-    info: <Info className="w-5 h-5 text-white" />
+    info: <Info className="w-5 h-5 text-white" />,
   };
 
   const bgColors = {
-    success: 'bg-green-500',
-    error: 'bg-red-500',
-    info: 'bg-blue-500'
+    success: "bg-green-500",
+    error: "bg-red-500",
+    info: "bg-blue-500",
   };
 
   return (

@@ -1,7 +1,7 @@
 // frontend/src/app/api/financial/payments/summary/route.ts
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { pool } from '@/lib/db';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { pool } from "@/lib/db";
 
 // GET /api/financial/payments/summary
 export async function GET(_req: unknown) {
@@ -11,7 +11,7 @@ export async function GET(_req: unknown) {
       const summary = {
         totalCollected: 0,
         monthlyPayments: 0,
-        pendingPayments: 0
+        pendingPayments: 0,
       };
 
       // Total recaudado
@@ -45,10 +45,10 @@ export async function GET(_req: unknown) {
       client.release();
     }
   } catch (error) {
-    console.error('Error fetching payment summary:', error);
+    console.error("Error fetching payment summary:", error);
     return NextResponse.json(
-      { error: 'Error al obtener resumen de pagos' },
-      { status: 500 }
+      { error: "Error al obtener resumen de pagos" },
+      { status: 500 },
     );
   }
 }

@@ -4,9 +4,9 @@ export interface IPayment extends Document {
   fee: string;
   amount: number;
   paymentDate: Date;
-  paymentMethod: 'cash' | 'transfer' | 'card' | 'check';
+  paymentMethod: "cash" | "transfer" | "card" | "check";
   transactionId?: string;
-  status: 'pending' | 'confirmed' | 'rejected';
+  status: "pending" | "confirmed" | "rejected";
   notes?: string;
   paidBy: string;
   receivedBy: string;
@@ -17,7 +17,7 @@ export interface IPayment extends Document {
 export interface CreatePaymentDTO {
   fee: string;
   amount: number;
-  paymentMethod: 'cash' | 'transfer' | 'card' | 'check';
+  paymentMethod: "cash" | "transfer" | "card" | "check";
   transactionId?: string;
   notes?: string;
 }

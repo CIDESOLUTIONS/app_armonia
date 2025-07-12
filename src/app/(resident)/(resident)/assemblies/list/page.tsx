@@ -1,14 +1,21 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { useAuthStore } from '@/store/authStore';
-import { Loader2, Eye, CheckCircle, XCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import Link from 'next/link';
-import { useToast } from '@/components/ui/use-toast';
-import { getAssemblies } from '@/services/assemblyService';
+import { useState, useEffect, useCallback } from "react";
+import { useAuthStore } from "@/store/authStore";
+import { Loader2, Eye, CheckCircle, XCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import Link from "next/link";
+import { useToast } from "@/components/ui/use-toast";
+import { getAssemblies } from "@/services/assemblyService";
 
 interface Assembly {
   id: number;
@@ -16,9 +23,9 @@ interface Assembly {
   description?: string;
   scheduledDate: string;
   location: string;
-  type: 'ORDINARY' | 'EXTRAORDINARY';
+  type: "ORDINARY" | "EXTRAORDINARY";
   agenda: string;
-  status: 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  status: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
   complexId: number;
   createdBy: number;
 }
@@ -35,11 +42,11 @@ export default function ResidentAssembliesPage() {
       const response = await getAssemblies(); // Fetch all assemblies for the complex
       setAssemblies(response.data);
     } catch (error) {
-      console.error('Error fetching assemblies:', error);
+      console.error("Error fetching assemblies:", error);
       toast({
-        title: 'Error',
-        description: 'No se pudieron cargar las asambleas.',
-        variant: 'destructive',
+        title: "Error",
+        description: "No se pudieron cargar las asambleas.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -66,8 +73,10 @@ export default function ResidentAssembliesPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Asambleas del Conjunto</h1>
-      
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        Asambleas del Conjunto
+      </h1>
+
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <Table>
           <TableHeader>
@@ -85,11 +94,25 @@ export default function ResidentAssembliesPage() {
               assemblies.map((assembly) => (
                 <TableRow key={assembly.id}>
                   <TableCell>{assembly.title}</TableCell>
-                  <TableCell>{new Date(assembly.scheduledDate).toLocaleDateString()}</TableCell>
-                  <TableCell>{assembly.location}</TableCell>
-                  <TableCell>{assembly.type === 'ORDINARY' ? 'Ordinaria' : 'Extraordinaria'}</TableCell>
                   <TableCell>
-                    <Badge variant={assembly.status === 'PLANNED' ? 'secondary' : assembly.status === 'COMPLETED' ? 'default' : 'outline'}>
+                    {new Date(assembly.scheduledDate).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>{assembly.location}</TableCell>
+                  <TableCell>
+                    {assembly.type === "ORDINARY"
+                      ? "Ordinaria"
+                      : "Extraordinaria"}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        assembly.status === "PLANNED"
+                          ? "secondary"
+                          : assembly.status === "COMPLETED"
+                            ? "default"
+                            : "outline"
+                      }
+                    >
                       {assembly.status}
                     </Badge>
                   </TableCell>
@@ -100,7 +123,7 @@ export default function ResidentAssembliesPage() {
                       </Button>
                     </Link>
                     {/* Add buttons for voting if assembly is in progress */}
-                    {assembly.status === 'IN_PROGRESS' && (
+                    {assembly.status === "IN_PROGRESS" && (
                       <Button variant="ghost" size="sm" className="ml-2">
                         <CheckCircle className="h-4 w-4 text-green-600" /> Votar
                       </Button>

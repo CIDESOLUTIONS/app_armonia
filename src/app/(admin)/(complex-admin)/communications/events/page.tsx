@@ -1,17 +1,41 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useAuthStore } from '@/store/authStore';
-import { Loader2, PlusCircle, Edit, Trash2, Calendar as CalendarIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/components/ui/use-toast';
-import { getCommunityEvents, createCommunityEvent, updateCommunityEvent, deleteCommunityEvent } from '@/services/communityEventService';
+import React, { useState, useEffect, useCallback } from "react";
+import { useAuthStore } from "@/store/authStore";
+import {
+  Loader2,
+  PlusCircle,
+  Edit,
+  Trash2,
+  Calendar as CalendarIcon,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  getCommunityEvents,
+  createCommunityEvent,
+  updateCommunityEvent,
+  deleteCommunityEvent,
+} from "@/services/communityEventService";
 
 interface CommunityEvent {
   id: number;
@@ -33,11 +57,11 @@ export default function CommunityEventsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEvent, setCurrentEvent] = useState<CommunityEvent | null>(null);
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    startDateTime: '',
-    endDateTime: '',
-    location: '',
+    title: "",
+    description: "",
+    startDateTime: "",
+    endDateTime: "",
+    location: "",
     isPublic: true,
   });
 
@@ -47,11 +71,11 @@ export default function CommunityEventsPage() {
       const data = await getCommunityEvents();
       setEvents(data);
     } catch (error) {
-      console.error('Error fetching community events:', error);
+      console.error("Error fetching community events:", error);
       toast({
-        title: 'Error',
-        description: 'No se pudieron cargar los eventos comunitarios.',
-        variant: 'destructive',
+        title: "Error",
+        description: "No se pudieron cargar los eventos comunitarios.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -64,22 +88,25 @@ export default function CommunityEventsPage() {
     }
   }, [authLoading, user, fetchEvents]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value, type } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+      [name]:
+        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
   };
 
   const handleAddEvent = () => {
     setCurrentEvent(null);
     setFormData({
-      title: '',
-      description: '',
+      title: "",
+      description: "",
       startDateTime: new Date().toISOString().slice(0, 16),
       endDateTime: new Date().toISOString().slice(0, 16),
-      location: '',
+      location: "",
       isPublic: true,
     });
     setIsModalOpen(true);
@@ -89,7 +116,7 @@ export default function CommunityEventsPage() {
     setCurrentEvent(event);
     setFormData({
       title: event.title,
-      description: event.description || '',
+      description: event.description || "",
       startDateTime: new Date(event.startDateTime).toISOString().slice(0, 16),
       endDateTime: new Date(event.endDateTime).toISOString().slice(0, 16),
       location: event.location,
@@ -104,43 +131,45 @@ export default function CommunityEventsPage() {
       if (currentEvent) {
         await updateCommunityEvent(currentEvent.id, formData);
         toast({
-          title: 'Éxito',
-          description: 'Evento comunitario actualizado correctamente.',
+          title: "Éxito",
+          description: "Evento comunitario actualizado correctamente.",
         });
       } else {
         await createCommunityEvent(formData);
         toast({
-          title: 'Éxito',
-          description: 'Evento comunitario creado correctamente.',
+          title: "Éxito",
+          description: "Evento comunitario creado correctamente.",
         });
       }
       setIsModalOpen(false);
       fetchEvents();
     } catch (error) {
-      console.error('Error saving community event:', error);
+      console.error("Error saving community event:", error);
       toast({
-        title: 'Error',
-        description: 'Error al guardar el evento comunitario.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Error al guardar el evento comunitario.",
+        variant: "destructive",
       });
     }
   };
 
   const handleDeleteEvent = async (id: number) => {
-    if (confirm('¿Estás seguro de que quieres eliminar este evento comunitario?')) {
+    if (
+      confirm("¿Estás seguro de que quieres eliminar este evento comunitario?")
+    ) {
       try {
         await deleteCommunityEvent(id);
         toast({
-          title: 'Éxito',
-          description: 'Evento comunitario eliminado correctamente.',
+          title: "Éxito",
+          description: "Evento comunitario eliminado correctamente.",
         });
         fetchEvents();
       } catch (error) {
-        console.error('Error deleting community event:', error);
+        console.error("Error deleting community event:", error);
         toast({
-          title: 'Error',
-          description: 'Error al eliminar el evento comunitario.',
-          variant: 'destructive',
+          title: "Error",
+          description: "Error al eliminar el evento comunitario.",
+          variant: "destructive",
         });
       }
     }
@@ -154,12 +183,16 @@ export default function CommunityEventsPage() {
     );
   }
 
-  if (!user || (user.role !== 'ADMIN' && user.role !== 'COMPLEX_ADMIN')) {
+  if (!user || (user.role !== "ADMIN" && user.role !== "COMPLEX_ADMIN")) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Acceso Denegado</h1>
-          <p className="text-gray-600">No tienes permisos para acceder a esta página.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Acceso Denegado
+          </h1>
+          <p className="text-gray-600">
+            No tienes permisos para acceder a esta página.
+          </p>
         </div>
       </div>
     );
@@ -167,8 +200,10 @@ export default function CommunityEventsPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Gestión de Eventos Comunitarios</h1>
-      
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        Gestión de Eventos Comunitarios
+      </h1>
+
       <div className="flex justify-end mb-4">
         <Button onClick={handleAddEvent}>
           <PlusCircle className="mr-2 h-4 w-4" /> Crear Evento
@@ -194,17 +229,34 @@ export default function CommunityEventsPage() {
                 <TableRow key={event.id}>
                   <TableCell>{event.title}</TableCell>
                   <TableCell>{event.description}</TableCell>
-                  <TableCell>{new Date(event.startDateTime).toLocaleString()}</TableCell>
-                  <TableCell>{new Date(event.endDateTime).toLocaleString()}</TableCell>
+                  <TableCell>
+                    {new Date(event.startDateTime).toLocaleString()}
+                  </TableCell>
+                  <TableCell>
+                    {new Date(event.endDateTime).toLocaleString()}
+                  </TableCell>
                   <TableCell>{event.location}</TableCell>
                   <TableCell>
-                    {event.isPublic ? <Badge variant="default">Sí</Badge> : <Badge variant="destructive">No</Badge>}
+                    {event.isPublic ? (
+                      <Badge variant="default">Sí</Badge>
+                    ) : (
+                      <Badge variant="destructive">No</Badge>
+                    )}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" onClick={() => handleEditEvent(event)} className="mr-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEditEvent(event)}
+                      className="mr-2"
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDeleteEvent(event.id)}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteEvent(event.id)}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </TableCell>

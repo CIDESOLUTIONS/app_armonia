@@ -1,10 +1,17 @@
 "use client";
 
-import { Clock, Edit, Trash2, Users, DollarSign, Info } from 'lucide-react';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Clock, Edit, Trash2, Users, DollarSign, Info } from "lucide-react";
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface Service {
   id: number;
@@ -24,14 +31,20 @@ interface ServiceListProps {
   onDelete: (id: number) => void;
 }
 
-export default function ServiceList({ services, onEdit, onDelete }: ServiceListProps) {
+export default function ServiceList({
+  services,
+  onEdit,
+  onDelete,
+}: ServiceListProps) {
   if (!services.length) {
     return (
       <Card className="mb-8">
         <CardContent className="pt-6">
           <div className="text-center py-8">
             <Info className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-medium mb-2">No hay servicios registrados</h3>
+            <h3 className="text-lg font-medium mb-2">
+              No hay servicios registrados
+            </h3>
             <p className="text-gray-500">
               Agregue servicios para que los residentes puedan utilizarlos.
             </p>
@@ -80,7 +93,9 @@ export default function ServiceList({ services, onEdit, onDelete }: ServiceListP
                 <div className="flex items-center">
                   <DollarSign className="w-4 h-4 mr-1 text-gray-500" />
                   <span>
-                    {service.cost ? `$${service.cost.toLocaleString()}` : "Gratuito"}
+                    {service.cost
+                      ? `$${service.cost.toLocaleString()}`
+                      : "Gratuito"}
                   </span>
                 </div>
               </TableCell>
@@ -90,15 +105,15 @@ export default function ServiceList({ services, onEdit, onDelete }: ServiceListP
                     service.status === "active"
                       ? "bg-green-500"
                       : service.status === "inactive"
-                      ? "bg-red-500"
-                      : "bg-yellow-500"
+                        ? "bg-red-500"
+                        : "bg-yellow-500"
                   }
                 >
                   {service.status === "active"
                     ? "Activo"
                     : service.status === "inactive"
-                    ? "Inactivo"
-                    : "Mantenimiento"}
+                      ? "Inactivo"
+                      : "Mantenimiento"}
                 </Badge>
               </TableCell>
               <TableCell className="text-right">

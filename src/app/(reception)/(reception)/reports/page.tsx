@@ -1,14 +1,35 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/authStore';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { FileText, Download, Calendar, Users, Package, AlertTriangle, BarChart3, TrendingUp } from 'lucide-react';
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  FileText,
+  Download,
+  Calendar,
+  Users,
+  Package,
+  AlertTriangle,
+  BarChart3,
+  TrendingUp,
+} from "lucide-react";
 
 interface ReportData {
   visitors: {
@@ -34,30 +55,33 @@ export default function ReportsPage() {
   const { user, loading } = useAuthStore();
   const router = useRouter();
   const [reportData, setReportData] = useState<ReportData | null>(null);
-  const [selectedPeriod, setSelectedPeriod] = useState('thisMonth');
-  const [selectedReport, setSelectedReport] = useState('summary');
+  const [selectedPeriod, setSelectedPeriod] = useState("thisMonth");
+  const [selectedReport, setSelectedReport] = useState("summary");
   const [isLoading, setIsLoading] = useState(true);
 
   // Datos de ejemplo para desarrollo
-  const mockReportData: ReportData = useMemo(() => ({
-    visitors: {
-      total: 1247,
-      today: 23,
-      thisWeek: 156,
-      thisMonth: 487
-    },
-    packages: {
-      received: 89,
-      delivered: 76,
-      pending: 13
-    },
-    incidents: {
-      total: 34,
-      resolved: 28,
-      pending: 6,
-      critical: 2
-    }
-  }), []);
+  const mockReportData: ReportData = useMemo(
+    () => ({
+      visitors: {
+        total: 1247,
+        today: 23,
+        thisWeek: 156,
+        thisMonth: 487,
+      },
+      packages: {
+        received: 89,
+        delivered: 76,
+        pending: 13,
+      },
+      incidents: {
+        total: 34,
+        resolved: 28,
+        pending: 6,
+        critical: 2,
+      },
+    }),
+    [],
+  );
 
   const fetchData = useCallback(() => {
     // Simular carga de datos
@@ -69,12 +93,12 @@ export default function ReportsPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/login?portal=reception');
+      router.push("/login?portal=reception");
       return;
     }
 
-    if (user && user.role !== 'reception' && user.role !== 'admin') {
-      router.push('/unauthorized');
+    if (user && user.role !== "reception" && user.role !== "admin") {
+      router.push("/unauthorized");
       return;
     }
 
@@ -83,7 +107,9 @@ export default function ReportsPage() {
 
   const generateReport = () => {
     // Simular generación de reporte
-    alert(`Generando reporte: ${selectedReport} para el período: ${selectedPeriod}`);
+    alert(
+      `Generando reporte: ${selectedReport} para el período: ${selectedPeriod}`,
+    );
   };
 
   if (loading || isLoading) {
@@ -121,7 +147,9 @@ export default function ReportsPage() {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Reportes y Estadísticas</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Reportes y Estadísticas
+          </h1>
           <p className="text-gray-600 mt-2">
             Análisis y reportes de actividades de recepción
           </p>
@@ -149,9 +177,15 @@ export default function ReportsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="summary">Resumen General</SelectItem>
-                  <SelectItem value="visitors">Reporte de Visitantes</SelectItem>
-                  <SelectItem value="packages">Reporte de Paquetería</SelectItem>
-                  <SelectItem value="incidents">Reporte de Incidentes</SelectItem>
+                  <SelectItem value="visitors">
+                    Reporte de Visitantes
+                  </SelectItem>
+                  <SelectItem value="packages">
+                    Reporte de Paquetería
+                  </SelectItem>
+                  <SelectItem value="incidents">
+                    Reporte de Incidentes
+                  </SelectItem>
                   <SelectItem value="security">Reporte de Seguridad</SelectItem>
                 </SelectContent>
               </Select>
@@ -188,46 +222,60 @@ export default function ReportsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Visitantes Hoy</p>
-                <p className="text-2xl font-bold text-blue-600">{reportData.visitors.today}</p>
-                <p className="text-xs text-gray-500">Total: {reportData.visitors.total}</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {reportData.visitors.today}
+                </p>
+                <p className="text-xs text-gray-500">
+                  Total: {reportData.visitors.total}
+                </p>
               </div>
               <Users className="h-8 w-8 text-blue-600" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Paquetes Pendientes</p>
-                <p className="text-2xl font-bold text-orange-600">{reportData.packages.pending}</p>
-                <p className="text-xs text-gray-500">Entregados: {reportData.packages.delivered}</p>
+                <p className="text-2xl font-bold text-orange-600">
+                  {reportData.packages.pending}
+                </p>
+                <p className="text-xs text-gray-500">
+                  Entregados: {reportData.packages.delivered}
+                </p>
               </div>
               <Package className="h-8 w-8 text-orange-600" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Incidentes Activos</p>
-                <p className="text-2xl font-bold text-red-600">{reportData.incidents.pending}</p>
-                <p className="text-xs text-gray-500">Críticos: {reportData.incidents.critical}</p>
+                <p className="text-2xl font-bold text-red-600">
+                  {reportData.incidents.pending}
+                </p>
+                <p className="text-xs text-gray-500">
+                  Críticos: {reportData.incidents.critical}
+                </p>
               </div>
               <AlertTriangle className="h-8 w-8 text-red-600" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Visitantes Semana</p>
-                <p className="text-2xl font-bold text-green-600">{reportData.visitors.thisWeek}</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {reportData.visitors.thisWeek}
+                </p>
                 <p className="text-xs text-green-600 flex items-center">
                   <TrendingUp className="h-3 w-3 mr-1" />
                   +12% vs anterior
@@ -250,19 +298,27 @@ export default function ReportsPage() {
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Hoy</span>
-                <span className="font-semibold">{reportData.visitors.today}</span>
+                <span className="font-semibold">
+                  {reportData.visitors.today}
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Esta Semana</span>
-                <span className="font-semibold">{reportData.visitors.thisWeek}</span>
+                <span className="font-semibold">
+                  {reportData.visitors.thisWeek}
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Este Mes</span>
-                <span className="font-semibold">{reportData.visitors.thisMonth}</span>
+                <span className="font-semibold">
+                  {reportData.visitors.thisMonth}
+                </span>
               </div>
               <div className="flex justify-between items-center border-t pt-3">
                 <span className="text-sm font-medium">Total Histórico</span>
-                <span className="font-bold text-lg">{reportData.visitors.total}</span>
+                <span className="font-bold text-lg">
+                  {reportData.visitors.total}
+                </span>
               </div>
             </div>
           </CardContent>
@@ -271,26 +327,39 @@ export default function ReportsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Estado de Paquetería</CardTitle>
-            <CardDescription>Gestión de paquetes y correspondencia</CardDescription>
+            <CardDescription>
+              Gestión de paquetes y correspondencia
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Recibidos</span>
-                <span className="font-semibold text-blue-600">{reportData.packages.received}</span>
+                <span className="font-semibold text-blue-600">
+                  {reportData.packages.received}
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Entregados</span>
-                <span className="font-semibold text-green-600">{reportData.packages.delivered}</span>
+                <span className="font-semibold text-green-600">
+                  {reportData.packages.delivered}
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Pendientes</span>
-                <span className="font-semibold text-orange-600">{reportData.packages.pending}</span>
+                <span className="font-semibold text-orange-600">
+                  {reportData.packages.pending}
+                </span>
               </div>
               <div className="flex justify-between items-center border-t pt-3">
                 <span className="text-sm font-medium">Eficiencia</span>
                 <span className="font-bold text-lg text-green-600">
-                  {Math.round((reportData.packages.delivered / reportData.packages.received) * 100)}%
+                  {Math.round(
+                    (reportData.packages.delivered /
+                      reportData.packages.received) *
+                      100,
+                  )}
+                  %
                 </span>
               </div>
             </div>
@@ -300,4 +369,3 @@ export default function ReportsPage() {
     </div>
   );
 }
-

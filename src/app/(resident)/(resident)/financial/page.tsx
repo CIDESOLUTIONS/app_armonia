@@ -1,14 +1,25 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useAuthStore } from '@/store/authStore';
-import { Loader2, CreditCard, History, DollarSign } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import Link from 'next/link';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { getResidentFinancialSummary, getResidentPayments, getResidentPendingFees } from '@/services/residentFinancialService';
+import { useState, useEffect } from "react";
+import { useAuthStore } from "@/store/authStore";
+import { Loader2, CreditCard, History, DollarSign } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  getResidentFinancialSummary,
+  getResidentPayments,
+  getResidentPendingFees,
+} from "@/services/residentFinancialService";
 
 interface FinancialSummary {
   currentAccountBalance: number;
@@ -56,7 +67,7 @@ export default function ResidentFinancialPage() {
       setPayments(fetchedPayments);
       setPendingFees(fetchedPendingFees);
     } catch (error) {
-      console.error('Error fetching resident financial data:', error);
+      console.error("Error fetching resident financial data:", error);
       // Handle error, e.g., show a toast
     } finally {
       setLoading(false);
@@ -64,10 +75,10 @@ export default function ResidentFinancialPage() {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0
+    return new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      minimumFractionDigits: 0,
     }).format(amount);
   };
 
@@ -85,36 +96,50 @@ export default function ResidentFinancialPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Mi Gestión Financiera</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        Mi Gestión Financiera
+      </h1>
 
       {/* Financial Summary */}
       {summary && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Saldo Actual</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Saldo Actual
+              </CardTitle>
               <CreditCard className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(summary.currentAccountBalance)}</div>
+              <div className="text-2xl font-bold">
+                {formatCurrency(summary.currentAccountBalance)}
+              </div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Pagado este Año</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Pagado este Año
+              </CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(summary.totalPaidThisYear)}</div>
+              <div className="text-2xl font-bold">
+                {formatCurrency(summary.totalPaidThisYear)}
+              </div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Cuotas Pendientes</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Cuotas Pendientes
+              </CardTitle>
               <History className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(summary.totalPendingFees)}</div>
+              <div className="text-2xl font-bold">
+                {formatCurrency(summary.totalPendingFees)}
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -131,17 +156,28 @@ export default function ResidentFinancialPage() {
           {pendingFees.length > 0 ? (
             <div className="space-y-3">
               {pendingFees.map((fee) => (
-                <div key={fee.id} className="flex items-center justify-between p-3 border rounded-lg bg-red-50">
+                <div
+                  key={fee.id}
+                  className="flex items-center justify-between p-3 border rounded-lg bg-red-50"
+                >
                   <div>
-                    <p className="font-medium">{fee.billNumber} - {fee.billingPeriod}</p>
-                    <p className="text-sm text-gray-600">Vence: {new Date(fee.dueDate).toLocaleDateString()}</p>
+                    <p className="font-medium">
+                      {fee.billNumber} - {fee.billingPeriod}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Vence: {new Date(fee.dueDate).toLocaleDateString()}
+                    </p>
                   </div>
-                  <Badge variant="destructive">{formatCurrency(fee.totalAmount)}</Badge>
+                  <Badge variant="destructive">
+                    {formatCurrency(fee.totalAmount)}
+                  </Badge>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-center">No tienes cuotas pendientes.</p>
+            <p className="text-gray-500 text-center">
+              No tienes cuotas pendientes.
+            </p>
           )}
         </CardContent>
       </Card>
@@ -159,20 +195,38 @@ export default function ResidentFinancialPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Concepto</TableHead>
-                    <TableHead className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Monto</TableHead>
-                    <TableHead className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha</TableHead>
-                    <TableHead className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Estado</TableHead>
+                    <TableHead className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Concepto
+                    </TableHead>
+                    <TableHead className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Monto
+                    </TableHead>
+                    <TableHead className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Fecha
+                    </TableHead>
+                    <TableHead className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Estado
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {payments.map((payment) => (
                     <TableRow key={payment.id}>
-                      <TableCell className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{payment.billNumber}</TableCell>
-                      <TableCell className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{formatCurrency(payment.amount)}</TableCell>
-                      <TableCell className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{new Date(payment.paidAt).toLocaleDateString()}</TableCell>
                       <TableCell className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                        <Badge variant={payment.status === 'PAID' ? 'default' : 'secondary'}>
+                        {payment.billNumber}
+                      </TableCell>
+                      <TableCell className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        {formatCurrency(payment.amount)}
+                      </TableCell>
+                      <TableCell className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        {new Date(payment.paidAt).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <Badge
+                          variant={
+                            payment.status === "PAID" ? "default" : "secondary"
+                          }
+                        >
                           {payment.status}
                         </Badge>
                       </TableCell>
@@ -182,7 +236,9 @@ export default function ResidentFinancialPage() {
               </Table>
             </div>
           ) : (
-            <p className="text-gray-500 text-center">No hay historial de pagos.</p>
+            <p className="text-gray-500 text-center">
+              No hay historial de pagos.
+            </p>
           )}
         </CardContent>
       </Card>

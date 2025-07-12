@@ -1,11 +1,11 @@
 /**
  * Mock del servicio para asignación de PQRs
- * 
+ *
  * Este archivo proporciona un mock completo del servicio de asignación de PQRs
  * para ser utilizado en pruebas unitarias y de integración.
  */
 
-import { PQRCategory, PQRPriority } from '../lib/constants/pqr-constants';
+import { PQRCategory, PQRPriority } from "../lib/constants/pqr-constants";
 
 /**
  * Servicio mock para la asignación de PQRs
@@ -19,10 +19,15 @@ class PQRAssignmentServiceMock {
    * @param priority Prioridad del PQR
    * @returns Información de la asignación
    */
-  async assignPQR(pqrId: number, category: string, subcategory: string | null, priority: string) {
+  async assignPQR(
+    pqrId: number,
+    category: string,
+    subcategory: string | null,
+    priority: string,
+  ) {
     // Simular tiempo de procesamiento
-    await new Promise(resolve => setTimeout(resolve, 10));
-    
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
     // Determinar fecha de vencimiento basada en la prioridad
     const dueDate = new Date();
     switch (priority) {
@@ -41,10 +46,10 @@ class PQRAssignmentServiceMock {
       default:
         dueDate.setDate(dueDate.getDate() + 5); // 5 días por defecto
     }
-    
+
     // Determinar equipo asignado basado en la categoría
     let assignedTeamId = 1; // Equipo general por defecto
-    
+
     if (category === PQRCategory.MAINTENANCE) {
       assignedTeamId = 2; // Equipo de mantenimiento
     } else if (category === PQRCategory.SECURITY) {
@@ -52,7 +57,7 @@ class PQRAssignmentServiceMock {
     } else if (category === PQRCategory.SERVICES) {
       assignedTeamId = 4; // Equipo de servicios
     }
-    
+
     // Retornar resultado de la asignación
     return {
       pqrId,
@@ -61,10 +66,10 @@ class PQRAssignmentServiceMock {
       priority,
       assignedTeamId,
       dueDate,
-      assignedAt: new Date()
+      assignedAt: new Date(),
     };
   }
-  
+
   /**
    * Encuentra un especialista adecuado para un PQR basado en criterios específicos
    * @param category Categoría del PQR
@@ -72,19 +77,23 @@ class PQRAssignmentServiceMock {
    * @param priority Prioridad del PQR
    * @returns Información del especialista asignado
    */
-  async findSpecialist(category: string, specialization: string, priority: string) {
+  async findSpecialist(
+    category: string,
+    specialization: string,
+    priority: string,
+  ) {
     // Simular tiempo de procesamiento
-    await new Promise(resolve => setTimeout(resolve, 10));
-    
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
     // Determinar especialista basado en los criterios
     let specialistId = 1;
     let specialistName = "Técnico General";
-    
+
     if (category === PQRCategory.MAINTENANCE) {
-      if (specialization === 'Plomería') {
+      if (specialization === "Plomería") {
         specialistId = 2;
         specialistName = "Juan Pérez - Plomero";
-      } else if (specialization === 'Electricidad') {
+      } else if (specialization === "Electricidad") {
         specialistId = 3;
         specialistName = "Carlos Rodríguez - Electricista";
       }
@@ -92,11 +101,13 @@ class PQRAssignmentServiceMock {
       specialistId = 4;
       specialistName = "Ana Gómez - Seguridad";
     }
-    
+
     // Ajustar disponibilidad basada en prioridad
-    const availability = priority === PQRPriority.CRITICAL || priority === PQRPriority.HIGH ? 
-      'Inmediata' : 'Programada';
-    
+    const availability =
+      priority === PQRPriority.CRITICAL || priority === PQRPriority.HIGH
+        ? "Inmediata"
+        : "Programada";
+
     // Retornar información del especialista
     return {
       specialistId,
@@ -104,10 +115,10 @@ class PQRAssignmentServiceMock {
       category,
       specialization,
       availability,
-      assignmentPriority: priority
+      assignmentPriority: priority,
     };
   }
-  
+
   /**
    * Reasigna un PQR a otro equipo o especialista
    * @param pqrId ID del PQR a reasignar
@@ -117,35 +128,55 @@ class PQRAssignmentServiceMock {
    */
   async reassignPQR(pqrId: number, newTeamId: number, reason: string) {
     // Simular tiempo de procesamiento
-    await new Promise(resolve => setTimeout(resolve, 10));
-    
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
     // Retornar resultado de la reasignación
     return {
       pqrId,
       previousTeamId: 1, // Valor simulado
       newTeamId,
       reason,
-      reassignedAt: new Date()
+      reassignedAt: new Date(),
     };
   }
-  
+
   /**
    * Calcula la carga de trabajo actual de los equipos
    * @returns Información de carga de trabajo por equipo
    */
   async getTeamWorkload() {
     // Simular tiempo de procesamiento
-    await new Promise(resolve => setTimeout(resolve, 10));
-    
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
     // Retornar carga de trabajo simulada
     return [
-      { teamId: 1, teamName: "Equipo General", assignedPQRs: 5, completedToday: 2 },
-      { teamId: 2, teamName: "Equipo Mantenimiento", assignedPQRs: 8, completedToday: 3 },
-      { teamId: 3, teamName: "Equipo Seguridad", assignedPQRs: 3, completedToday: 1 },
-      { teamId: 4, teamName: "Equipo Servicios", assignedPQRs: 4, completedToday: 2 }
+      {
+        teamId: 1,
+        teamName: "Equipo General",
+        assignedPQRs: 5,
+        completedToday: 2,
+      },
+      {
+        teamId: 2,
+        teamName: "Equipo Mantenimiento",
+        assignedPQRs: 8,
+        completedToday: 3,
+      },
+      {
+        teamId: 3,
+        teamName: "Equipo Seguridad",
+        assignedPQRs: 3,
+        completedToday: 1,
+      },
+      {
+        teamId: 4,
+        teamName: "Equipo Servicios",
+        assignedPQRs: 4,
+        completedToday: 2,
+      },
     ];
   }
-  
+
   /**
    * Verifica si un PQR requiere escalamiento basado en su estado actual
    * @param pqrId ID del PQR a verificar
@@ -153,19 +184,30 @@ class PQRAssignmentServiceMock {
    * @param daysOpen Días que lleva abierto el PQR
    * @returns Información sobre si requiere escalamiento
    */
-  async checkEscalationNeeded(pqrId: number, currentStatus: string, daysOpen: number) {
+  async checkEscalationNeeded(
+    pqrId: number,
+    currentStatus: string,
+    daysOpen: number,
+  ) {
     // Simular tiempo de procesamiento
-    await new Promise(resolve => setTimeout(resolve, 10));
-    
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
     // Determinar si requiere escalamiento
-    const needsEscalation = daysOpen > 5 && currentStatus !== 'RESOLVED' && currentStatus !== 'CLOSED';
-    
+    const needsEscalation =
+      daysOpen > 5 &&
+      currentStatus !== "RESOLVED" &&
+      currentStatus !== "CLOSED";
+
     // Retornar resultado
     return {
       pqrId,
       needsEscalation,
-      recommendedAction: needsEscalation ? 'ESCALATE_TO_MANAGER' : 'CONTINUE_NORMAL',
-      reason: needsEscalation ? `PQR abierto por ${daysOpen} días sin resolver` : 'Dentro de parámetros normales'
+      recommendedAction: needsEscalation
+        ? "ESCALATE_TO_MANAGER"
+        : "CONTINUE_NORMAL",
+      reason: needsEscalation
+        ? `PQR abierto por ${daysOpen} días sin resolver`
+        : "Dentro de parámetros normales",
     };
   }
 }

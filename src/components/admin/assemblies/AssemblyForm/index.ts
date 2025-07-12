@@ -1,2 +1,2 @@
-export { default } from './AssemblyForm';
-export type { AssemblyFormProps } from './AssemblyForm';
+export { default } from "./AssemblyForm";
+export type { AssemblyFormProps } from "./AssemblyForm";

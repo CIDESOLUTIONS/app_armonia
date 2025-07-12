@@ -1,8 +1,7 @@
+import { PrismaClient } from "@prisma/client";
+import { ServerLogger } from "@/lib/logging/server-logger";
 
-import { PrismaClient } from '@prisma/client';
-import { ServerLogger } from '@/lib/logging/server-logger';
-
-const logger = new ServerLogger('FinancialService');
+const logger = new ServerLogger("FinancialService");
 
 export class FinancialService {
   private prisma: PrismaClient;

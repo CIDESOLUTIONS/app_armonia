@@ -1,10 +1,14 @@
 // src/validators/service/common-service.validator.ts
-import Joi from 'joi';
+import Joi from "joi";
 
 const scheduleSchema = Joi.object({
   dayOfWeek: Joi.number().min(0).max(6).required(),
-  startTime: Joi.string().pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).required(),
-  endTime: Joi.string().pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).required()
+  startTime: Joi.string()
+    .pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+    .required(),
+  endTime: Joi.string()
+    .pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+    .required(),
 });
 
 export const createServiceSchema = Joi.object({
@@ -16,7 +20,7 @@ export const createServiceSchema = Joi.object({
   reservationRequired: Joi.boolean(),
   maxReservationDuration: Joi.number().min(30).required(),
   minAdvanceReservation: Joi.number().min(0).required(),
-  maxAdvanceReservation: Joi.number().min(1).required()
+  maxAdvanceReservation: Joi.number().min(1).required(),
 });
 
 export const updateServiceSchema = Joi.object({
@@ -29,5 +33,5 @@ export const updateServiceSchema = Joi.object({
   maxReservationDuration: Joi.number().min(30),
   minAdvanceReservation: Joi.number().min(0),
   maxAdvanceReservation: Joi.number().min(1),
-  isEnabled: Joi.boolean()
+  isEnabled: Joi.boolean(),
 }).min(1);

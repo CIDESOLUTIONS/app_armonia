@@ -1,5 +1,5 @@
 // src/components/ui/section-card.tsx
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 interface SectionCardProps {
   title: string;
@@ -7,7 +7,11 @@ interface SectionCardProps {
   className?: string;
 }
 
-export function SectionCard({ title, children, className = '' }: SectionCardProps) {
+export function SectionCard({
+  title,
+  children,
+  className = "",
+}: SectionCardProps) {
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}

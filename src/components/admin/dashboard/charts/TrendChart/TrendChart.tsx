@@ -1,5 +1,13 @@
-import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import React from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 interface TrendChartProps {
   data: Array<{
@@ -17,13 +25,13 @@ const TrendChart: React.FC<TrendChartProps> = ({
   data,
   title,
   yAxisLabel,
-  className = ''
+  className = "",
 }) => {
   return (
-    <div className={`bg-white p-6 rounded-lg border border-gray-200 ${className}`}>
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">
-        {title}
-      </h3>
+    <div
+      className={`bg-white p-6 rounded-lg border border-gray-200 ${className}`}
+    >
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
@@ -36,19 +44,19 @@ const TrendChart: React.FC<TrendChartProps> = ({
             }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-            <XAxis 
-              dataKey="name" 
+            <XAxis dataKey="name" stroke="#6B7280" fontSize={12} />
+            <YAxis
               stroke="#6B7280"
               fontSize={12}
-            />
-            <YAxis 
-              stroke="#6B7280"
-              fontSize={12}
-              label={yAxisLabel ? { 
-                value: yAxisLabel, 
-                angle: -90, 
-                position: 'insideLeft' 
-              } : undefined}
+              label={
+                yAxisLabel
+                  ? {
+                      value: yAxisLabel,
+                      angle: -90,
+                      position: "insideLeft",
+                    }
+                  : undefined
+              }
             />
             <Tooltip />
             <Bar dataKey="value" fill="#3B82F6" radius={[4, 4, 0, 0]} />

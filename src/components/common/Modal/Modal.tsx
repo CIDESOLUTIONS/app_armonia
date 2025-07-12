@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -6,7 +6,7 @@ interface ModalProps {
   title?: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
   closeOnOverlayClick?: boolean;
   className?: string;
 }
@@ -17,35 +17,35 @@ const Modal: React.FC<ModalProps> = ({
   title,
   children,
   footer,
-  size = 'md',
+  size = "md",
   closeOnOverlayClick = true,
-  className = ''
+  className = "",
 }) => {
   // Manejar la tecla Escape
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         onClose();
       }
     };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden";
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
     };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
   const sizeClasses = {
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg'
+    sm: "max-w-sm",
+    md: "max-w-md",
+    lg: "max-w-lg",
   };
 
   return (
@@ -82,9 +82,7 @@ const Modal: React.FC<ModalProps> = ({
           )}
 
           {/* Content */}
-          <div className="px-6 py-4">
-            {children}
-          </div>
+          <div className="px-6 py-4">{children}</div>
 
           {/* Footer */}
           {footer && (

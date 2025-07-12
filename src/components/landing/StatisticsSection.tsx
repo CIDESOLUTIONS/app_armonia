@@ -1,9 +1,9 @@
-import React from 'react';
-import { useTranslation } from 'next-i18next';
-import { FadeIn } from '@/components/animations/FadeIn';
+import React from "react";
+import { useTranslation } from "next-i18next";
+import { FadeIn } from "@/components/animations/FadeIn";
 
 export function StatisticsSection() {
-  const { t } = useTranslation('landing');
+  const { t } = useTranslation("landing");
 
   return (
     <FadeIn delay={0.2}>
@@ -14,28 +14,32 @@ export function StatisticsSection() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="p-6 bg-white rounded-lg shadow-md">
-              <div className="text-5xl font-bold text-indigo-600 mb-2">+500</div>
+              <div className="text-5xl font-bold text-indigo-600 mb-2">
+                +500
+              </div>
               <p className="text-gray-700">
-                {t('statistics.complexesManaged')}
+                {t("statistics.complexesManaged")}
               </p>
             </div>
             <div className="p-6 bg-white rounded-lg shadow-md">
-              <div className="text-5xl font-bold text-indigo-600 mb-2">+10,000</div>
+              <div className="text-5xl font-bold text-indigo-600 mb-2">
+                +10,000
+              </div>
               <p className="text-gray-700">
-                {t('statistics.satisfiedResidents')}
+                {t("statistics.satisfiedResidents")}
               </p>
             </div>
             <div className="p-6 bg-white rounded-lg shadow-md">
               <div className="text-5xl font-bold text-indigo-600 mb-2">98%</div>
               <p className="text-gray-700">
-                {t('statistics.userSatisfaction')}
+                {t("statistics.userSatisfaction")}
               </p>
             </div>
             <div className="p-6 bg-white rounded-lg shadow-md">
-              <div className="text-5xl font-bold text-indigo-600 mb-2">-30%</div>
-              <p className="text-gray-700">
-                {t('statistics.timeReduction')}
-              </p>
+              <div className="text-5xl font-bold text-indigo-600 mb-2">
+                -30%
+              </div>
+              <p className="text-gray-700">{t("statistics.timeReduction")}</p>
             </div>
           </div>
         </div>

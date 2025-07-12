@@ -14,7 +14,9 @@ interface TwilioMock {
   video: {
     rooms: {
       create: jest.Mock<Promise<{ sid: string }>>;
-      list: jest.Mock<Promise<{ sid: string; uniqueName: string; status: string; }[]>>;
+      list: jest.Mock<
+        Promise<{ sid: string; uniqueName: string; status: string }[]>
+      >;
     };
   };
 }
@@ -22,20 +24,20 @@ interface TwilioMock {
 // Constructor mock de Twilio
 const twilioMock = jest.fn<() => TwilioMock, []>().mockImplementation(() => ({
   messages: {
-    create: jest.fn().mockResolvedValue({ sid: 'test-message-id' })
+    create: jest.fn().mockResolvedValue({ sid: "test-message-id" }),
   },
   calls: {
-    create: jest.fn().mockResolvedValue({ sid: 'test-call-id' })
+    create: jest.fn().mockResolvedValue({ sid: "test-call-id" }),
   },
   video: {
     rooms: {
-      create: jest.fn().mockResolvedValue({ sid: 'test-room-id' }),
+      create: jest.fn().mockResolvedValue({ sid: "test-room-id" }),
       list: jest.fn().mockResolvedValue([
-        { sid: 'room-1', uniqueName: 'test-room-1', status: 'in-progress' },
-        { sid: 'room-2', uniqueName: 'test-room-2', status: 'completed' }
-      ])
-    }
-  }
+        { sid: "room-1", uniqueName: "test-room-1", status: "in-progress" },
+        { sid: "room-2", uniqueName: "test-room-2", status: "completed" },
+      ]),
+    },
+  },
 }));
 
 // Exportar el mock usando ES Modules

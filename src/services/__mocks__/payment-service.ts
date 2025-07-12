@@ -7,7 +7,7 @@ class PaymentService {
   private schema: string;
   public prisma: any; // Mock Prisma client
 
-  constructor(schema: string = 'public') {
+  constructor(schema: string = "public") {
     this.schema = schema;
     this.prisma = {
       payment: {
@@ -16,11 +16,11 @@ class PaymentService {
           receiptId: 1,
           userId: 1,
           amount: 150000,
-          paymentMethod: 'CREDIT_CARD',
-          transactionId: 'txn_123456',
-          status: 'COMPLETED',
+          paymentMethod: "CREDIT_CARD",
+          transactionId: "txn_123456",
+          status: "COMPLETED",
           createdAt: new Date(),
-          completedAt: new Date()
+          completedAt: new Date(),
         }),
         findMany: jest.fn().mockResolvedValue([
           {
@@ -28,49 +28,49 @@ class PaymentService {
             receiptId: 1,
             userId: 1,
             amount: 150000,
-            paymentMethod: 'CREDIT_CARD',
-            transactionId: 'txn_123456',
-            status: 'COMPLETED',
+            paymentMethod: "CREDIT_CARD",
+            transactionId: "txn_123456",
+            status: "COMPLETED",
             createdAt: new Date(),
-            completedAt: new Date()
-          }
+            completedAt: new Date(),
+          },
         ]),
         create: jest.fn().mockResolvedValue({
           id: 2,
           receiptId: 2,
           userId: 2,
           amount: 150000,
-          paymentMethod: 'BANK_TRANSFER',
-          transactionId: 'txn_654321',
-          status: 'PENDING',
+          paymentMethod: "BANK_TRANSFER",
+          transactionId: "txn_654321",
+          status: "PENDING",
           createdAt: new Date(),
-          completedAt: null
+          completedAt: null,
         }),
         update: jest.fn().mockResolvedValue({
           id: 2,
           receiptId: 2,
           userId: 2,
           amount: 150000,
-          paymentMethod: 'BANK_TRANSFER',
-          transactionId: 'txn_654321',
-          status: 'COMPLETED',
+          paymentMethod: "BANK_TRANSFER",
+          transactionId: "txn_654321",
+          status: "COMPLETED",
           createdAt: new Date(),
-          completedAt: new Date()
-        })
+          completedAt: new Date(),
+        }),
       },
       receipt: {
         update: jest.fn().mockResolvedValue({
           id: 2,
-          receiptNumber: 'REC-002',
+          receiptNumber: "REC-002",
           userId: 2,
           amount: 150000,
-          concept: 'Cuota de administración',
-          status: 'PAID',
-          pdfUrl: '/receipts/REC-002.pdf',
+          concept: "Cuota de administración",
+          status: "PAID",
+          pdfUrl: "/receipts/REC-002.pdf",
           createdAt: new Date(),
-          paidAt: new Date()
-        })
-      }
+          paidAt: new Date(),
+        }),
+      },
     };
   }
 
@@ -83,43 +83,43 @@ class PaymentService {
     try {
       // Simular búsqueda de transacción
       const transaction = await this.prisma.payment.findUnique({
-        where: { id: transactionId }
+        where: { id: transactionId },
       });
 
       if (!transaction) {
-        throw new Error('Transacción no encontrada');
+        throw new Error("Transacción no encontrada");
       }
 
-      if (transaction.status !== 'PENDING') {
-        throw new Error('La transacción no está pendiente');
+      if (transaction.status !== "PENDING") {
+        throw new Error("La transacción no está pendiente");
       }
 
       // Simular procesamiento exitoso
       const updatedTransaction = await this.prisma.payment.update({
         where: { id: transactionId },
         data: {
-          status: 'COMPLETED',
-          completedAt: new Date()
-        }
+          status: "COMPLETED",
+          completedAt: new Date(),
+        },
       });
 
       // Actualizar recibo asociado
       await this.prisma.receipt.update({
         where: { id: transaction.receiptId },
         data: {
-          status: 'PAID',
-          paidAt: new Date()
-        }
+          status: "PAID",
+          paidAt: new Date(),
+        },
       });
 
       return {
         success: true,
-        transaction: updatedTransaction
+        transaction: updatedTransaction,
       };
     } catch (error: any) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -134,23 +134,23 @@ class PaymentService {
     try {
       // Validar firma
       if (!this.validateSignature(webhookData, signature)) {
-        throw new Error('Firma inválida');
+        throw new Error("Firma inválida");
       }
 
       // Procesar según el tipo de evento
-      if (webhookData.event === 'payment.success') {
+      if (webhookData.event === "payment.success") {
         const transactionId = webhookData.data.transactionId;
         return await this.processTransaction(transactionId);
       }
 
       return {
         success: true,
-        message: 'Webhook procesado correctamente'
+        message: "Webhook procesado correctamente",
       };
     } catch (error: any) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -172,7 +172,14 @@ class PaymentService {
    * @param options - Opciones de filtrado y paginación
    * @returns Resultado paginado
    */
-  async getTransactions(options: { page?: number; limit?: number; userId?: number; status?: string } = {}): Promise<any> {
+  async getTransactions(
+    options: {
+      page?: number;
+      limit?: number;
+      userId?: number;
+      status?: string;
+    } = {},
+  ): Promise<any> {
     const { page = 1, limit = 10, userId, status } = options;
     const skip = (page - 1) * limit;
 
@@ -184,7 +191,7 @@ class PaymentService {
       where,
       skip,
       take: limit,
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: "desc" },
     });
 
     return {
@@ -192,8 +199,8 @@ class PaymentService {
       pagination: {
         page,
         limit,
-        total: transactions.length // En un caso real, se haría un count
-      }
+        total: transactions.length, // En un caso real, se haría un count
+      },
     };
   }
 }

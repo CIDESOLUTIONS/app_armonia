@@ -1,8 +1,8 @@
-import { prisma } from '@/lib/prisma';
-import nodemailer from 'nodemailer';
+import { prisma } from "@/lib/prisma";
+import nodemailer from "nodemailer";
 
 export interface NotificationData {
-  type: 'EMAIL' | 'SMS' | 'IN_APP';
+  type: "EMAIL" | "SMS" | "IN_APP";
   recipient: string;
   subject: string;
   body: string;
@@ -13,12 +13,12 @@ export interface NotificationData {
 export class NotificationService {
   private static transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: process.env.SMTP_SECURE === 'true',
+    port: parseInt(process.env.SMTP_PORT || "587"),
+    secure: process.env.SMTP_SECURE === "true",
     auth: {
       user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS
-    }
+      pass: process.env.SMTP_PASS,
+    },
   });
 
   /**
@@ -31,19 +31,19 @@ export class NotificationService {
         from: process.env.EMAIL_FROM,
         to: data.recipient,
         subject: data.subject,
-        html: data.body
+        html: data.body,
       });
 
       return this.saveNotification({
         ...data,
-        status: 'SENT',
-        messageId: info.messageId
+        status: "SENT",
+        messageId: info.messageId,
       });
     } catch (error) {
-      console.error('Error enviando correo:', error);
+      console.error("Error enviando correo:", error);
       return this.saveNotification({
         ...data,
-        status: 'FAILED'
+        status: "FAILED",
       });
     }
   }
@@ -52,10 +52,12 @@ export class NotificationService {
    * Guardar registro de notificación
    * @param notificationData Datos de la notificación
    */
-  static async saveNotification(notificationData: NotificationData & {
-    status: 'SENT' | 'FAILED';
-    messageId?: string;
-  }) {
+  static async saveNotification(
+    notificationData: NotificationData & {
+      status: "SENT" | "FAILED";
+      messageId?: string;
+    },
+  ) {
     return prisma.notification.create({
       data: {
         type: notificationData.type,
@@ -65,8 +67,8 @@ export class NotificationService {
         entityType: notificationData.entityType,
         entityId: notificationData.entityId,
         status: notificationData.status,
-        messageId: notificationData.messageId
-      }
+        messageId: notificationData.messageId,
+      },
     });
   }
 
@@ -79,14 +81,14 @@ export class NotificationService {
     const admins = await prisma.user.findMany({
       where: {
         complexId: pqr.complexId,
-        role: 'COMPLEX_ADMIN'
-      }
+        role: "COMPLEX_ADMIN",
+      },
     });
 
     // Enviar notificación a cada administrador
     for (const admin of admins) {
       await this.sendEmail({
-        type: 'EMAIL',
+        type: "EMAIL",
         recipient: admin.email,
         subject: `Nueva PQR: ${pqr.title}`,
         body: `
@@ -99,8 +101,8 @@ export class NotificationService {
           </ul>
           <p>Por favor, revise y gestione esta solicitud.</p>
         `,
-        entityType: 'PQR',
-        entityId: pqr.id
+        entityType: "PQR",
+        entityId: pqr.id,
       });
     }
   }
@@ -113,12 +115,12 @@ export class NotificationService {
   static async notifyPQRStatusChange(pqr: unknown, oldStatus: string) {
     // Obtener usuario que creó la PQR
     const creator = await prisma.user.findUnique({
-      where: { id: pqr.userId }
+      where: { id: pqr.userId },
     });
 
     if (creator) {
       await this.sendEmail({
-        type: 'EMAIL',
+        type: "EMAIL",
         recipient: creator.email,
         subject: `Actualización de PQR: ${pqr.title}`,
         body: `
@@ -131,8 +133,8 @@ export class NotificationService {
           </ul>
           <p>Puede consultar más detalles en el portal de su conjunto residencial.</p>
         `,
-        entityType: 'PQR',
-        entityId: pqr.id
+        entityType: "PQR",
+        entityId: pqr.id,
       });
     }
   }
