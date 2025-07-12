@@ -313,3 +313,98 @@ Estás ubicado en el directorio raíz del proyecto Armonía, una aplicación web
 
 Nueva iteración
 Interacciones solo en español. Compórtese como un experto en desarrollo y auditoria de aplicaciones web y móvil aplicando las últimas y mejores practicas de desarrollo. Estás ubicado en el directorio raíz del proyecto Armonía, una aplicación web y móvil con especificaciones técnicas detalladas en la carpeta docs; tu tarea es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto para generar un resumen técnico, funcional y de estilo, identificar diferencias y proponer un plan sistemático para alinear el desarrollo con los requisitos. Evalúa qué funcionalidades deben ajustarse desde la landing page pasando a todos los portales (Administrador del conjunto residencial, Residentes, Recepción/Vigilancia y la consola de administración de la aplicación) y sus funciones, qué prácticas deben corregirse según estándares modernos de calidad y si es necesario desarrollar nuevo código, verifica primero en el historial de la carpeta .git para rescatar posibles descartes; si no existe, desarrolla desde cero siguiendo el estilo actual. Incluye la reorganización de la estructura del proyecto si mejora la eficiencia, migración, eliminación de dependencias o funciones innecesarias y optimización del código. Posteriormente, define y ejecuta pruebas individuales y E2E, y deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado con todas las tareas necesarias y mantenlo en memoria como guía principal hasta la ejecución completa.
+
+
+ Resumen de Auditoría Inicial
+
+
+   1. Análisis Técnico:
+       * Stack Tecnológico: El proyecto utiliza correctamente el stack principal especificado: Next.js, React, TypeScript, Prisma y Tailwind
+         CSS. Las versiones de las dependencias en package.json están actualizadas y son coherentes con las especificaciones.
+       * Arquitectura: La estructura de directorios sigue las convenciones del App Router de Next.js (ej. src/app/(admin),
+         src/app/(resident)), lo cual es positivo. Sin embargo, se observan inconsistencias como múltiples directorios services (uno en la
+         raíz de src, otro dentro de lib) y la presencia de archivos de respaldo (route_old.ts, route-original-backup.ts), lo que sugiere un
+         proceso de refactorización en curso o desordenado.
+       * Base de Datos: Se utiliza Prisma como ORM, alineado con los requisitos. La configuración para un entorno multi-tenant deberá ser
+         verificada en la lógica de negocio.
+
+
+   2. Análisis Funcional:
+       * Cobertura: El proyecto contiene una gran cantidad de archivos que parecen corresponder a las funcionalidades descritas en las
+         especificaciones (gestión de inventario, asambleas, PQR, finanzas, etc.).
+       * Brechas: Es imposible determinar la completitud y correctitud de cada funcionalidad sin una revisión de código más profunda. El plan
+         de acción abordará la auditoría detallada de cada módulo contra las especificaciones.
+       * Código Muerto/Duplicado: La presencia de archivos de prueba, mocks y backups en múltiples ubicaciones (__tests__, jest/,
+         services/__mocks__) indica la necesidad de una limpieza y estandarización.
+
+
+   3. Análisis de Estilo y Calidad:
+       * Convenciones: A primera vista, el nombrado de archivos y componentes (PascalCase para .tsx) parece seguir las directrices. Se
+         requiere una revisión con ESLint y Prettier para asegurar la consistencia total.
+       * Pruebas: Existen archivos de pruebas unitarias (Jest) y E2E (Playwright). La cobertura y efectividad de estas pruebas deben ser
+         evaluadas. Hay una buena base, pero probablemente necesite expansión.
+       * Manejo de Estado: Se ha incorporado zustand, una opción moderna y eficiente que se alinea con el objetivo de evaluar y mejorar el
+         manejo del estado de la aplicación.
+
+
+  Plan de Trabajo: Auditoría y Refactorización del Proyecto Armonía
+
+  He estructurado el trabajo en fases para abordar sistemáticamente todos los puntos. Este será mi plan guía durante nuestra interacción.
+
+  Fase 1: Análisis y Diagnóstico (Completada)
+
+
+   * [X] Revisar docs/Especificaciones_Tecnicas_Armonia_Ver.15.txt
+   * [X] Analizar package.json para entender dependencias y scripts.
+   * [X] Inspeccionar la estructura del directorio src.
+
+  Fase 2: Plan de Acción Detallado
+
+
+   1. Reorganización Estructural y Migración a TypeScript:
+       * Objetivo: Mejorar la mantenibilidad y escalabilidad del proyecto.
+       * Tareas:
+           * Migrar archivos .js a .ts en src/, components/, y otras carpetas clave. Priorizaré los archivos de lógica de negocio y
+             componentes complejos.
+           * Revisar y reorganizar la estructura de carpetas en src/app para seguir las convenciones de Next.js App Router.
+           * Mover la lógica de negocio de los componentes a services/ o lib/ según corresponda.
+           * Evaluar la necesidad de pages/ y migrar a app/ si es posible.
+
+
+   2. Refactorización y Optimización de Código:
+       * Objetivo: Alinear el código con las especificaciones y mejorar la calidad.
+       * Tareas:
+           * Landing Page: Comparar src/app/public/landing/page.tsx (o similar) con las especificaciones y ajustar diseño, contenido y
+             funcionalidades.
+           * Flujos de Autenticación: Revisar y refactorizar el código en src/app/auth y src/middleware.ts para asegurar que cumple con los
+             flujos de registro, inicio de sesión y protección de rutas especificados.
+           * Módulos Principales (Admin, Residente, etc.): Auditar cada módulo (app-admin, resident, etc.) contra las especificaciones.
+             Identificar y corregir desviaciones en la funcionalidad.
+           * Componentes: Refactorizar componentes para que sean más reutilizables y sigan un estilo consistente.
+           * Manejo de Estado: Evaluar el uso de context/ y proponer zustand o redux si la complejidad lo justifica.
+           * Eliminación de Código Muerto: Identificar y eliminar componentes, funciones y dependencias no utilizadas.
+
+
+   3. Calidad de Código y Consistencia:
+       * Objetivo: Asegurar un código limpio, consistente y fácil de mantener.
+       * Tareas:
+           * Linting y Formateo: Configurar y aplicar reglas de ESLint y Prettier de forma estricta en todo el proyecto.
+           * Convenciones de Nomenclatura: Asegurar que los archivos, variables y funciones sigan un estándar consistente.
+           * Comentarios y Documentación: Añadir JSDoc a funciones y componentes complejos.
+
+
+   4. Pruebas:
+       * Objetivo: Garantizar la estabilidad y el correcto funcionamiento de la aplicación.
+       * Tareas:
+           * Pruebas Unitarias: Desarrollar pruebas unitarias con Jest/RTL para componentes y funciones críticas.
+           * Pruebas E2E: Revisar y actualizar las pruebas existentes en e2e/ con Playwright. Crear nuevas pruebas para los flujos de usuario
+             principales.
+
+
+   5. Preparación para Producción:
+       * Objetivo: Dejar la aplicación lista para un despliegue exitoso.
+       * Tareas:
+           * Variables de Entorno: Asegurar que la configuración en .env y sus variantes es correcta para cada entorno.
+           * Build de Producción: Generar una build de producción y solucionar cualquier error que surja.
+           * Optimización de Rendimiento: Analizar el rendimiento de la aplicación con Lighthouse y aplicar optimizaciones.
+
