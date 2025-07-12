@@ -52,14 +52,17 @@ Objetivos del Proyecto
 * Ofrecer una escalabilidad técnica para soportar desde pequeños conjuntos hasta grandes urbanizaciones.
 
 Arquitectura del Sistema
-Stack Tecnológico
-* Frontend: Next.js 15.3.3 o superior, React 19.1 o superior, TypeScript, Tailwind CSS, Shadcn/UI
+Stack Tecnológico (emplear las ultimas versiones estables)
+* Frontend: Next.js 15.x.x, React 19.x, TypeScript, Tailwind CSS, Shadcn/UI
 * Backend : Next.js, API Routes, Serverless Functions
 * Base de Datos: PostgreSQL 17.5 o superior, con enfoque multi -tenant basado en esquemas
-* ORM: Prisma 6.5.0 o superior
+* ORM: Prisma 6.5.x o superior
 * Autenticación: JWT (JSON Web Tokens), bcrypt para el hash de contraseñas
 * Almacenamiento: PostgreSQL
 * Validación: Zod para validación de datos
+* axios: si se requiere.
+* socket.io: Requerido para funcionalidades en tiempo real.
+* twilio: para comunicaciones.
 * Gráficos y Visualización: Recharts para gráficos y estadísticas
 * Generación de PDFs: pdfkit para reportes exportables
 * CI/CD: GitHub Actions, Vercel o similares
@@ -198,6 +201,7 @@ KPIs personalizados
 * Gráfico de gastos mensuales
 * Próximos vencimientos
 * Uso de servicios comunes
+y las que considere aporten información valiosa
  
 * PQRs de los residentes de su propiedad (todos, resuelto y pendientes)
 * Consulta de estado de cuenta
@@ -218,6 +222,7 @@ KPIs personalizados con vista rápida de información crítica:
 * Alertas pendientes
 * Estado de cámaras
 * Cantidad de novedades del turno anterior en la "minuta digital".
+y las que considere aporten información valiosa
 
 PQRs asignados a recepción/y vigilancia
 Registro de visitantes y proveedores
@@ -373,35 +378,6 @@ Escalabilidad
 Conclusión
 El proyecto Armonía tiene un enfoque en usabilidad, rendimiento y escalabilidad. La plataforma está diseñada para satisfacer las necesidades de diversos tipos de conjuntos residenciales, desde pequeñas comunidades hasta grandes urbanizaciones, ofreciendo una solución integral para la gestión eficiente de todos los aspectos relacionados con la administración de propiedades horizontales.
 
+Usar las mejores y modernas prácticas de desarrollo y seguridad de código.
 
 
-Ejemplo: 
-Convenciones de Codificación Nombrado
-- Archivos: PascalCase para componentes React (.tsx), camelCase para utilidades (.ts)
-- Funciones: camelCase (ej. getUserData)
-- Componentes React : PascalCase (ej. UserProfile)
-- Variables: camelCase (ej. userData)
-- Constantes: UPPER_SNAKE_CASE (ej. API_BASE_URL)
-- Interfaces/Types: PascalCase con prefijo I para interfaces (ej. IUserData)
-- Endpoints API: kebab -case (ej. /api/user -profile)
-
-Estructura de portales (Ejemplo) 
-src/app/ 
-??? (admin)/          # Portal de administración 
-??? (resident)/       # Portal de residentes
-??? (reception)/      # Portal de recepción ?   
-??? page.tsx      # Dashboard principal ?   
-??? visitors/     # Gestión de visitantes ?   
-??? packages/     # Control de correspondencia ?   
-??? incidents/    # Registro de incidentes ?   
-??? dashboard/    # Componentes del dashboard 
-??? (public)/         # Páginas públicas 
-       ??? (auth)/           # Solo autenticación y gestión dueño de la aplicación
-
-Ejemplo de Estilo de Código
-- Usar TypeScript con tipos estrictos
-- Preferir funciones arrow para componentes
-- Usar React Hooks para gestión de estado
-- Documentar funciones y componentes complejos
-- Mantener componentes pequeños y con responsabilidad única
-- Usar Prettier y ESLint para formateo y calidad de código. Fin de especificaciones.
