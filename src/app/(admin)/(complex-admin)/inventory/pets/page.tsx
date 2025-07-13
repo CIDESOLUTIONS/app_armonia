@@ -24,6 +24,17 @@ import {
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   getPets,
   createPet,
   updatePet,
@@ -56,6 +67,8 @@ export default function PetsPage() {
     propertyId: 0,
     isActive: true,
   });
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [petToDelete, setPetToDelete] = useState<number | null>(null);
 
   const fetchPets = useCallback(async () => {
     setLoading(true);
@@ -152,23 +165,30 @@ export default function PetsPage() {
     }
   };
 
-  const handleDeletePet = async (id: number) => {
-    if (confirm("¿Estás seguro de que quieres eliminar esta mascota?")) {
-      try {
-        await deletePet(id);
-        toast({
-          title: "Éxito",
-          description: "Mascota eliminada correctamente.",
-        });
-        fetchPets();
-      } catch (error) {
-        console.error("Error deleting pet:", error);
-        toast({
-          title: "Error",
-          description: "Error al eliminar la mascota.",
-          variant: "destructive",
-        });
-      }
+  const handleDeletePet = (id: number) => {
+    setPetToDelete(id);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeletePet = async () => {
+    if (petToDelete === null) return;
+    try {
+      await deletePet(petToDelete);
+      toast({
+        title: "Éxito",
+        description: "Mascota eliminada correctamente.",
+      });
+      fetchPets();
+    } catch (error) {
+      console.error("Error deleting pet:", error);
+      toast({
+        title: "Error",
+        description: "Error al eliminar la mascota.",
+        variant: "destructive",
+      });
+    } finally {
+      setShowDeleteDialog(false);
+      setPetToDelete(null);
     }
   };
 
@@ -267,9 +287,7 @@ export default function PetsPage() {
           </DialogHeader>
           <form onSubmit={handleSubmit} className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Nombre
-              </Label>
+              <Label htmlFor="name">Nombre</Label>
               <Input
                 id="name"
                 name="name"
@@ -280,9 +298,7 @@ export default function PetsPage() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="species" className="text-right">
-                Especie
-              </Label>
+              <Label htmlFor="species">Especie</Label>
               <Input
                 id="species"
                 name="species"
@@ -293,9 +309,7 @@ export default function PetsPage() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="breed" className="text-right">
-                Raza
-              </Label>
+              <Label htmlFor="breed">Raza</Label>
               <Input
                 id="breed"
                 name="breed"
@@ -306,9 +320,7 @@ export default function PetsPage() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="ownerName" className="text-right">
-                Nombre Propietario
-              </Label>
+              <Label htmlFor="ownerName">Nombre Propietario</Label>
               <Input
                 id="ownerName"
                 name="ownerName"
@@ -319,9 +331,7 @@ export default function PetsPage() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="propertyId" className="text-right">
-                ID Propiedad
-              </Label>
+              <Label htmlFor="propertyId">ID Propiedad</Label>
               <Input
                 id="propertyId"
                 name="propertyId"
@@ -350,6 +360,23 @@ export default function PetsPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Eliminación</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Estás seguro de que quieres eliminar esta mascota? Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeletePet}>
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

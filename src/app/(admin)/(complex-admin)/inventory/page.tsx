@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
-import AdminHeader from "@/components/admin/layout/AdminHeader";
-import AdminSidebar from "@/components/admin/layout/AdminSidebar";
+import { getDashboardStats } from "@/services/dashboardService";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   Loader2,
   Building2,
@@ -14,9 +15,6 @@ import {
   Home,
   Settings,
 } from "lucide-react";
-import { getDashboardStats } from "@/services/dashboardService";
-import Link from "next/link";
-import { useTranslations } from "next-intl";
 
 interface DashboardStats {
   totalProperties: number;
@@ -28,7 +26,6 @@ interface DashboardStats {
 export default function InventoryPage() {
   const t = useTranslations("admin.inventory");
   const { user, loading: authLoading, logout } = useAuthStore();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loadingStats, setLoadingStats] = useState(true);
 
@@ -148,70 +145,49 @@ export default function InventoryPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <AdminHeader
-        adminName={user?.name || t("header.defaultAdminName")}
-        complexName={t("header.complexName")}
-        onLogout={logout}
-      />
+    <div className="max-w-7xl mx-auto">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
+        <p className="text-gray-600 mt-2">{t("description")}</p>
+      </div>
 
-      <div className="flex">
-        <AdminSidebar
-          collapsed={sidebarCollapsed}
-          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-        />
-
-        <main
-          className={`flex-1 transition-all duration-300 ${
-            sidebarCollapsed ? "ml-16" : "ml-64"
-          } mt-16 p-6`}
-        >
-          <div className="max-w-7xl mx-auto">
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
-              <p className="text-gray-600 mt-2">{t("description")}</p>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              {statCards.map((card, index) => (
-                <div key={index} className="bg-white rounded-lg shadow p-6">
-                  <div className="flex items-center">
-                    <card.icon className={`h-8 w-8 ${card.color}`} />
-                    <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">
-                        {card.title}
-                      </p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {card.value}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {quickAccessCards.map((card, index) => (
-                <Link
-                  key={index}
-                  href={card.href}
-                  className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <card.icon className={`h-8 w-8 ${card.color}`} />
-                    <Plus className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    {card.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm">{card.description}</p>
-                </Link>
-              ))}
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {statCards.map((card, index) => (
+          <div key={index} className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <card.icon className={`h-8 w-8 ${card.color}`} />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">
+                  {card.title}
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {card.value}
+                </p>
+              </div>
             </div>
           </div>
-        </main>
+        ))}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {quickAccessCards.map((card, index) => (
+          <Link
+            key={index}
+            href={card.href}
+            className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <card.icon className={`h-8 w-8 ${card.color}`} />
+              <Plus className="h-5 w-5 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              {card.title}
+            </h3>
+            <p className="text-gray-600 text-sm">{card.description}</p>
+          </Link>
+        ))}
       </div>
     </div>
   );

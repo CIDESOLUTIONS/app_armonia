@@ -1,23 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPrisma } from "@/lib/prisma";
+import { getTenantPrismaClient } from "@/lib/prisma";
 import { authMiddleware } from "@/lib/auth";
 import { z } from "zod";
 import { ServerLogger } from "@/lib/logging/server-logger";
 
-const AmenityUpdateSchema = z
+const AmenitySchema = z
   .object({
-    name: z.string().min(1, "El nombre es requerido.").optional(),
+    name: z.string().min(1, "El nombre es requerido."),
     description: z.string().optional(),
-    location: z.string().min(1, "La ubicación es requerida.").optional(),
+    location: z.string().min(1, "La ubicación es requerida."),
     capacity: z
       .number()
       .int()
-      .min(0, "La capacidad debe ser un número positivo.")
-      .optional(),
-    requiresApproval: z.boolean().optional(),
-    hasFee: z.boolean().optional(),
+      .min(0, "La capacidad debe ser un número positivo."),
+    requiresApproval: z.boolean().default(false),
+    hasFee: z.boolean().default(false),
     feeAmount: z.number().optional(),
-    isActive: z.boolean().optional(),
+    isActive: z.boolean().default(true),
   })
   .refine(
     (data) =>
@@ -29,10 +28,7 @@ const AmenityUpdateSchema = z
     },
   );
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const authResult = await authMiddleware(request, [
       "ADMIN",
@@ -43,18 +39,22 @@ export async function PUT(
     }
     const { payload } = authResult;
 
-    const id = parseInt(params.id);
-    const updateData = await request.json();
-    const validatedData = AmenityUpdateSchema.parse(updateData);
+    const amenityId = parseInt(params.id);
+    if (isNaN(amenityId)) {
+      return NextResponse.json({ message: "ID de amenidad inválido" }, { status: 400 });
+    }
 
-    const tenantPrisma = getPrisma(payload.schemaName);
+    const body = await request.json();
+    const validatedData = AmenitySchema.partial().parse(body);
+
+    const tenantPrisma = getTenantPrismaClient(payload.schemaName);
     const updatedAmenity = await tenantPrisma.commonArea.update({
-      where: { id },
+      where: { id: amenityId, complexId: payload.complexId },
       data: validatedData,
     });
 
     ServerLogger.info(
-      `Amenidad actualizada: ${updatedAmenity.name} en complejo ${payload.complexId}`,
+      `Amenidad ${amenityId} actualizada para el complejo ${payload.complexId}`,
     );
     return NextResponse.json(updatedAmenity, { status: 200 });
   } catch (error) {
@@ -64,18 +64,12 @@ export async function PUT(
         { status: 400 },
       );
     }
-    ServerLogger.error("Error al actualizar amenidad:", error);
-    return NextResponse.json(
-      { message: "Error al actualizar amenidad" },
-      { status: 500 },
-    );
+    ServerLogger.error(`Error al actualizar amenidad ${params.id}:`, error);
+    return NextResponse.json({ message: "Error interno" }, { status: 500 });
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const authResult = await authMiddleware(request, [
       "ADMIN",
@@ -86,23 +80,22 @@ export async function DELETE(
     }
     const { payload } = authResult;
 
-    const id = parseInt(params.id);
+    const amenityId = parseInt(params.id);
+    if (isNaN(amenityId)) {
+      return NextResponse.json({ message: "ID de amenidad inválido" }, { status: 400 });
+    }
 
-    const tenantPrisma = getPrisma(payload.schemaName);
-    await tenantPrisma.commonArea.delete({ where: { id } });
+    const tenantPrisma = getTenantPrismaClient(payload.schemaName);
+    await tenantPrisma.commonArea.delete({
+      where: { id: amenityId, complexId: payload.complexId },
+    });
 
     ServerLogger.info(
-      `Amenidad eliminada: ID ${id} en complejo ${payload.complexId}`,
+      `Amenidad ${amenityId} eliminada para el complejo ${payload.complexId}`,
     );
-    return NextResponse.json(
-      { message: "Amenidad eliminada exitosamente" },
-      { status: 200 },
-    );
+    return NextResponse.json({ message: "Amenidad eliminada exitosamente" }, { status: 200 });
   } catch (error) {
-    ServerLogger.error("Error al eliminar amenidad:", error);
-    return NextResponse.json(
-      { message: "Error al eliminar amenidad" },
-      { status: 500 },
-    );
+    ServerLogger.error(`Error al eliminar amenidad ${params.id}:`, error);
+    return NextResponse.json({ message: "Error interno" }, { status: 500 });
   }
 }
