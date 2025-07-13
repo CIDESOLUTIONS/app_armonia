@@ -1,30 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPrisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { getTenantPrismaClient } from "@/lib/prisma";
 import { ServerLogger } from "@/lib/logging/server-logger";
-import { startOfMonth, endOfMonth, subMonths } from "date-fns";
+import { startOfMonth, endOfMonth, subMonths, format, addDays } from "date-fns";
 
 export async function GET(_req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const schemaName = _req.headers.get("X-Tenant-Schema");
 
-    if (!session || !session.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
-    const userId = session.user.id;
-    const complexId = session.user.complexId;
-    const schemaName = session.user.schemaName;
-
-    if (!userId || !complexId || !schemaName) {
+    if (!schemaName) {
       return NextResponse.json(
-        { message: "User, Complex ID or schema name not found in session" },
+        { message: "Tenant schema not found in request headers." },
         { status: 400 },
       );
     }
 
-    const tenantPrisma = getPrisma(schemaName);
+    const tenantPrisma = getTenantPrismaClient(schemaName);
+
+    const userId = _req.headers.get("X-User-Id"); // Asumiendo que el userId también viene en un header
+    if (!userId) {
+      return NextResponse.json(
+        { message: "User ID not found in request headers." },
+        { status: 400 },
+      );
+    }
 
     // Get user's property ID
     const userProperty = await tenantPrisma.resident.findFirst({
@@ -134,15 +132,20 @@ export async function GET(_req: NextRequest) {
     };
 
     // Monthly expenses trend (placeholder for now)
-    const monthlyExpensesTrend = [];
-    for (let i = 5; i >= 0; i--) {
-      // Last 6 months
-      const month = subMonths(new Date(), i);
-      monthlyExpensesTrend.push({
-        month: format(month, "MMM yyyy"),
-        value: Math.floor(Math.random() * 1000000), // Simulated data
-      });
-    }
+    const monthlyExpensesData = await tenantPrisma.expense.groupBy({
+      by: ["createdAt"],
+      _sum: { amount: true },
+      where: {
+        userId: parseInt(userId as string),
+        createdAt: { gte: subMonths(new Date(), 5) }, // Last 6 months
+      },
+      orderBy: { createdAt: "asc" },
+    });
+
+    const monthlyExpensesTrend = monthlyExpensesData.map((item: any) => ({
+      month: format(new Date(item.createdAt), "MMM yyyy"),
+      value: item._sum.amount || 0,
+    }));
 
     ServerLogger.info(
       `Dashboard de residente para usuario ${userId} en complejo ${complexId} obtenido.`,

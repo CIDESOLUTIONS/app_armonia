@@ -1,28 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
-import { getPrisma } from "@/lib/prisma";
+
+import { getTenantPrismaClient } from "@/lib/prisma";
 import { ServerLogger } from "@/lib/logging/server-logger";
 
 export async function GET(_req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const schemaName = _req.headers.get("X-Tenant-Schema");
 
-    if (!session || !session.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
-    const complexId = session.user.complexId;
-    const schemaName = session.user.schemaName;
-
-    if (!complexId || !schemaName) {
+    if (!schemaName) {
       return NextResponse.json(
-        { message: "Complex ID or schema name not found in session" },
+        { message: "Tenant schema not found in request headers." },
         { status: 400 },
       );
     }
 
-    const tenantPrisma = getPrisma(schemaName);
+    const tenantPrisma = getTenantPrismaClient(schemaName);
 
     const today = new Date();
     const oneMonthLater = new Date();

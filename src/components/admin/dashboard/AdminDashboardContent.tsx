@@ -30,6 +30,8 @@ import { DashboardCharts } from "@/components/admin/dashboard/DashboardCharts";
 interface DashboardStats {
   totalProperties: number;
   totalResidents: number;
+  totalVehicles: number;
+  totalPets: number;
   pendingPayments: number;
   totalRevenue: number;
   upcomingAssemblies: number;

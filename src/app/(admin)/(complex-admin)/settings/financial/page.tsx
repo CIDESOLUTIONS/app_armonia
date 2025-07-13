@@ -8,18 +8,36 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
+import { getFinancialSettings, updateFinancialSettings } from "@/services/financialSettingsService";
 
 export default function FinancialSettingsPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    bankName: "",
-    accountNumber: "",
-    accountType: "",
-    nit: "",
-    paymentMethods: "",
-  });
-  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState<Partial<FinancialSettings>>({});
+  const [loadingData, setLoadingData] = useState(true);
+
+  const fetchFinancialSettings = useCallback(async () => {
+    setLoadingData(true);
+    try {
+      const data = await getFinancialSettings();
+      setFormData(data);
+    } catch (error) {
+      console.error("Error fetching financial settings:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo cargar la configuración financiera.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingData(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchFinancialSettings();
+    }
+  }, [authLoading, user, fetchFinancialSettings]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -35,15 +53,12 @@ export default function FinancialSettingsPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      // Placeholder for API call to save financial settings
-      console.log("Saving financial settings:", formData);
-      await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate API call
-
+      await updateFinancialSettings(formData as FinancialSettings);
       toast({
         title: "Éxito",
-        description:
-          "Configuración financiera guardada correctamente (simulado).",
+        description: "Configuración financiera guardada correctamente.",
       });
+      fetchFinancialSettings(); // Re-fetch para asegurar que los datos estén actualizados
     } catch (error) {
       console.error("Error saving financial settings:", error);
       toast({
@@ -56,7 +71,7 @@ export default function FinancialSettingsPage() {
     }
   };
 
-  if (authLoading) {
+  if (authLoading || loadingData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -95,7 +110,7 @@ export default function FinancialSettingsPage() {
             <Input
               id="bankName"
               name="bankName"
-              value={formData.bankName}
+              value={formData.bankName || ""}
               onChange={handleInputChange}
             />
           </div>
@@ -104,7 +119,7 @@ export default function FinancialSettingsPage() {
             <Input
               id="accountNumber"
               name="accountNumber"
-              value={formData.accountNumber}
+              value={formData.accountNumber || ""}
               onChange={handleInputChange}
             />
           </div>
@@ -113,7 +128,7 @@ export default function FinancialSettingsPage() {
             <Input
               id="accountType"
               name="accountType"
-              value={formData.accountType}
+              value={formData.accountType || ""}
               onChange={handleInputChange}
             />
           </div>
@@ -122,7 +137,7 @@ export default function FinancialSettingsPage() {
             <Input
               id="nit"
               name="nit"
-              value={formData.nit}
+              value={formData.nit || ""}
               onChange={handleInputChange}
             />
           </div>
@@ -133,7 +148,7 @@ export default function FinancialSettingsPage() {
             <Textarea
               id="paymentMethods"
               name="paymentMethods"
-              value={formData.paymentMethods}
+              value={formData.paymentMethods || ""}
               onChange={handleInputChange}
               rows={3}
             />

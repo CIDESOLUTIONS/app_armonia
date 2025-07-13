@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPrisma } from "@/lib/prisma";
+import { getTenantPrismaClient } from "@/lib/prisma";
 import { withValidation, validateRequest } from "@/lib/validation";
 import { verifyAuth } from "@/lib/auth";
 import {
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     if (!validation.success) return validation.response;
 
     const validatedParams = validation.data;
-    const prisma = getPrisma();
+    const prisma = getTenantPrismaClient(payload.schemaName);
 
     const where: { complexId: number; status?: string } = {
       complexId: payload.complexId,
@@ -102,7 +102,7 @@ async function createAssemblyHandler(
       );
     }
 
-    const prisma = getPrisma();
+    const prisma = getTenantPrismaClient(payload.schemaName);
 
     const assembly = await prisma.assembly.create({
       data: {

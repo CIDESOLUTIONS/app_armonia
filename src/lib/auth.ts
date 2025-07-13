@@ -20,7 +20,10 @@ export interface JWTPayload {
 
 // Obtener secreto JWT
 export function getJwtSecret() {
-  const secretKey = process.env.JWT_SECRET || "default_secret";
+  const secretKey = process.env.JWT_SECRET;
+  if (!secretKey) {
+    throw new Error("JWT_SECRET is not defined in environment variables.");
+  }
   return new TextEncoder().encode(secretKey);
 }
 
@@ -114,8 +117,8 @@ export async function verifyPasswordResetToken(
   token: string,
 ): Promise<JWTPayload | null> {
   try {
-    const publicKey = getJwtPublicKey();
-    const { payload } = await jwtVerify(token, publicKey);
+    const secretKey = getJwtSecret();
+    const { payload } = await jwtVerify(token, secretKey);
 
     if (payload.type !== "password-reset") {
       ServerLogger.warn(

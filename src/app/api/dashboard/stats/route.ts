@@ -33,6 +33,8 @@ export async function GET(req: Request) {
         SELECT
           (SELECT COUNT(*) FROM "Property")::int AS "totalProperties",
           (SELECT COUNT(*) FROM "Resident")::int AS "totalResidents",
+          (SELECT COUNT(*) FROM "Vehicle")::int AS "totalVehicles",
+          (SELECT COUNT(*) FROM "Pet")::int AS "totalPets",
           (SELECT COUNT(*) FROM "PQR" WHERE status IN ('OPEN', 'IN_PROGRESS'))::int AS "pendingPQRs",
           (SELECT COUNT(*) FROM "PQR" WHERE status IN ('RESOLVED', 'CLOSED'))::int AS "resolvedPQRs", -- Added resolvedPQRs
           (SELECT SUM(amount) FROM "Payment" WHERE status = 'COMPLETED' AND "createdAt" >= ${startOfCurrentMonth})::float AS "totalRevenue",

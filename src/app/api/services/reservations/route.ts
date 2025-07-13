@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPrisma } from "@/lib/prisma";
+import { getTenantPrismaClient } from "@/lib/prisma";
 import { authMiddleware } from "@/lib/auth";
 import { z } from "zod";
 import { ServerLogger } from "@/lib/logging/server-logger";
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     }
     const { payload } = authResult;
 
-    const tenantPrisma = getPrisma(payload.schemaName);
+    const tenantPrisma = getTenantPrismaClient(payload.schemaName);
     const where: { complexId: number; userId?: number } = {
       complexId: payload.complexId,
     };
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = ReservationSchema.parse(body);
 
-    const tenantPrisma = getPrisma(payload.schemaName);
+    const tenantPrisma = getTenantPrismaClient(payload.schemaName);
     const newReservation = await tenantPrisma.reservation.create({
       data: validatedData,
     });
@@ -141,7 +141,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const tenantPrisma = getPrisma(payload.schemaName);
+    const tenantPrisma = getTenantPrismaClient(payload.schemaName);
     const updatedReservation = await tenantPrisma.reservation.update({
       where: { id: parseInt(id) },
       data: validatedData,
@@ -186,7 +186,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const tenantPrisma = getPrisma(payload.schemaName);
+    const tenantPrisma = getTenantPrismaClient(payload.schemaName);
     await tenantPrisma.reservation.delete({ where: { id: parseInt(id) } });
 
     ServerLogger.info(

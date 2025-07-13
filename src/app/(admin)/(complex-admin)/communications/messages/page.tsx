@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { sendMessage } from "@/services/messageService";
 
 export default function MessagesPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -28,15 +29,11 @@ export default function MessagesPage() {
 
     setLoading(true);
     try {
-      // Placeholder for actual API call to send message
-      // In a real implementation, this would call an API endpoint
-      // that integrates with Twilio (WhatsApp/SMS) or Telegram API.
-      console.log(`Sending message to ${recipient}: ${messageContent}`);
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+      await sendMessage({ recipient, messageContent });
 
       toast({
         title: "Éxito",
-        description: "Mensaje enviado correctamente (simulado).",
+        description: "Mensaje enviado correctamente.",
       });
       setMessageContent("");
       setRecipient("");

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
-import { getAssemblies } from "@/services/assemblyService";
+import { getAssemblyById } from "@/services/assemblyService";
 
 interface Assembly {
   id: number;
@@ -40,11 +40,7 @@ export default function ViewResidentAssemblyPage() {
   const fetchAssembly = useCallback(async () => {
     setLoading(true);
     try {
-      // For simplicity, fetching all and filtering. In a real app, you'd have a getAssemblyById endpoint.
-      const response = await getAssemblies();
-      const foundAssembly = response.data.find(
-        (a: Assembly) => a.id === assemblyId,
-      );
+      const foundAssembly = await getAssemblyById(assemblyId as number);
       if (foundAssembly) {
         // Add mock voting data for demonstration
         setAssembly({
