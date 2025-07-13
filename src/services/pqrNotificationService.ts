@@ -5,8 +5,7 @@
  * incluyendo cambios de estado, recordatorios y encuestas de satisfacción.
  */
 
-import { PrismaClient } from "@prisma/client";
-import { getSchemaFromRequest } from "@/lib/prisma";
+import { getTenantPrismaClient } from "@/lib/prisma";
 import { sendEmail } from "@/lib/communications/email-service";
 import { sendPushNotification } from "@/lib/communications/push-notification-service";
 import { sendSMS } from "@/lib/communications/sms-service";
@@ -27,9 +26,9 @@ export class PQRNotificationService {
    * Constructor del servicio
    * @param schema Esquema de base de datos a utilizar
    */
-  constructor(schema: string = "public") {
+  constructor(schema: string) {
     this.schema = schema;
-    this.prisma = getSchemaFromRequest(schema);
+    this.prisma = getTenantPrismaClient(schema);
 
     // Inicializar plantillas de notificación predeterminadas
     this.notificationTemplates = {

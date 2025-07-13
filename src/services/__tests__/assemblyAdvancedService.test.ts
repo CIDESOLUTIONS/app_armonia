@@ -1,8 +1,8 @@
 import { describe, it, expect, jest, beforeEach } from "@jest/globals";
 import AssemblyAdvancedService from "../../services/assembly-advanced-service";
 import { WebSocketService } from "../../communications/websocket-service";
-import { ActivityLogger } from "../../lib/logging/activity-logger";
-import { getPrisma } from "@/lib/prisma";
+import { ActivityLogger } from "@/lib/logging/activity-logger";
+import { getTenantPrismaClient, getPublicPrismaClient } from "@/lib/prisma";
 
 // Mock de dependencias
 jest.mock("@prisma/client", () => {
@@ -45,6 +45,44 @@ jest.mock("@prisma/client", () => {
   };
 });
 
+jest.mock("@/lib/prisma", () => ({
+  getTenantPrismaClient: jest.fn(() => ({
+    assembly: {
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+    assemblyAttendee: {
+      findFirst: jest.fn(),
+      findMany: jest.fn(),
+      create: jest.fn(),
+    },
+    voting: {
+      findUnique: jest.fn(),
+      findMany: jest.fn(),
+      count: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+    vote: {
+      findFirst: jest.fn(),
+      findMany: jest.fn(),
+      create: jest.fn(),
+    },
+    assemblyMinutes: {
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+    digitalSignature: {
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+  })),
+  getPublicPrismaClient: jest.fn(() => ({ /* mock if needed */ })),
+}));
+
 jest.mock("../../communications/websocket-service");
 jest.mock("../../logging/activity-logger");
 jest.mock("../../communications/integrations/assembly-notifications", () => ({
@@ -60,14 +98,14 @@ describe("AssemblyAdvancedService", () => {
   let service;
   let prisma;
   let wsService;
+  const mockSchemaName = "test_schema";
 
   beforeEach(() => {
-    // Limpiar todos los mocks
     jest.clearAllMocks();
 
     // Instanciar el servicio y obtener las dependencias mockeadas
-    service = new AssemblyAdvancedService();
-    prisma = getPrisma();
+    service = new AssemblyAdvancedService(mockSchemaName);
+    prisma = getTenantPrismaClient(mockSchemaName);
     wsService = new WebSocketService();
   });
 

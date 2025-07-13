@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
+import { useTranslations } from "next-intl";
 import { Plans } from "@/components/landing/Plans"; // Assuming Plans component is already there
 import { FadeIn } from "@/components/animations/FadeIn";
 

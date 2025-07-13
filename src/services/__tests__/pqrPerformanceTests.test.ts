@@ -6,7 +6,7 @@
  */
 
 import { performance } from "perf_hooks";
-import { PrismaClient } from "@prisma/client";
+import { getTenantPrismaClient, getPublicPrismaClient } from "@/lib/prisma";
 import { PQRStatus } from "@/constants/pqr-constants";
 import { PQRAssignmentService } from "../pqrAssignmentService";
 import { PQRNotificationService } from "../pqrNotificationService";
@@ -30,44 +30,70 @@ const TEST_CONFIG = {
 };
 
 // Mock de PrismaClient para pruebas de rendimiento
-jest.mock("@prisma/client", () => {
-  const mockPrismaClient = {
-    $queryRaw: jest.fn().mockImplementation(() => Promise.resolve([])),
-    pQR: {
-      findUnique: jest.fn().mockImplementation(() => Promise.resolve({})),
-      findMany: jest.fn().mockImplementation(() => Promise.resolve([])),
-      create: jest.fn().mockImplementation((data) =>
-        Promise.resolve({
-          id: Math.floor(Math.random() * 1000),
-          ...data.data,
-        }),
+const mockPrismaClient = {
+  $queryRaw: jest.fn().mockImplementation(() => Promise.resolve([])),
+  pQR: {
+    findUnique: jest.fn().mockImplementation(() => Promise.resolve({})),
+    findMany: jest.fn().mockImplementation(() => Promise.resolve([])),
+    create: jest.fn().mockImplementation((data) =>
+      Promise.resolve({
+        id: Math.floor(Math.random() * 1000),
+        ...data.data,
+      }),
+    ),
+    update: jest
+      .fn()
+      .mockImplementation((data) =>
+        Promise.resolve({ id: data.where.id, ...data.data }),
       ),
-      update: jest
-        .fn()
-        .mockImplementation((data) =>
-          Promise.resolve({ id: data.where.id, ...data.data }),
-        ),
-      count: jest.fn().mockImplementation(() => Promise.resolve(0)),
-      groupBy: jest.fn().mockImplementation(() => Promise.resolve([])),
-    },
-    pQRStatusHistory: {
-      create: jest.fn().mockImplementation(() => Promise.resolve({})),
-      findMany: jest.fn().mockImplementation(() => Promise.resolve([])),
-    },
-    pQRNotification: {
-      create: jest.fn().mockImplementation(() => Promise.resolve({})),
-      findMany: jest.fn().mockImplementation(() => Promise.resolve([])),
-    },
-    user: {
-      findUnique: jest.fn().mockImplementation(() => Promise.resolve({})),
-      findMany: jest.fn().mockImplementation(() => Promise.resolve([])),
-    },
-  };
+    count: jest.fn().mockImplementation(() => Promise.resolve(0)),
+    groupBy: jest.fn().mockImplementation(() => Promise.resolve([])),
+  },
+  pQRStatusHistory: {
+    create: jest.fn().mockImplementation(() => Promise.resolve({})),
+    findMany: jest.fn().mockImplementation(() => Promise.resolve([])),
+  },
+  pQRNotification: {
+    create: jest.fn().mockImplementation(() => Promise.resolve({})),
+    findMany: jest.fn().mockImplementation(() => Promise.resolve([])),
+  },
+  user: {
+    findUnique: jest.fn().mockImplementation(() => Promise.resolve({})),
+    findMany: jest.fn().mockImplementation(() => Promise.resolve([])),
+  },
+};
 
-  return {
-    PrismaClient: jest.fn(() => mockPrismaClient),
-  };
-});
+jest.mock("@/lib/prisma", () => ({
+  getTenantPrismaClient: jest.fn(() => mockPrismaClient),
+  getPublicPrismaClient: jest.fn(() => ({ /* mock if needed */ })),
+  // Exportar enums para que estén disponibles en las pruebas
+  PQRCategory: {
+    MAINTENANCE: "MAINTENANCE",
+    SECURITY: "SECURITY",
+    ADMINISTRATION: "ADMINISTRATION",
+    PAYMENTS: "PAYMENTS",
+    NEIGHBORS: "NEIGHBORS",
+    SERVICES: "SERVICES",
+    OTHER: "OTHER",
+  },
+  PQRPriority: {
+    LOW: "LOW",
+    MEDIUM: "MEDIUM",
+    HIGH: "HIGH",
+    CRITICAL: "CRITICAL",
+  },
+  PQRStatus: {
+    OPEN: "OPEN",
+    CATEGORIZED: "CATEGORIZED",
+    ASSIGNED: "ASSIGNED",
+    IN_PROGRESS: "IN_PROGRESS",
+    WAITING: "WAITING",
+    RESOLVED: "RESOLVED",
+    CLOSED: "CLOSED",
+    REOPENED: "REOPENED",
+    CANCELLED: "CANCELLED",
+  },
+}));
 
 // Mock de servicios de comunicación
 jest.mock("@/lib/communications/email-service", () => ({
@@ -85,21 +111,22 @@ describe("PQR System Performance Tests", () => {
   let notificationService: PQRNotificationService;
   let metricsService: PQRMetricsService;
   let prisma: any;
+  const mockSchemaName = "test_schema";
 
   beforeEach(() => {
     // Limpiar todos los mocks
     jest.clearAllMocks();
 
     // Crear instancias de los servicios con schema de prueba
-    assignmentService = new PQRAssignmentService("test_schema");
-    notificationService = new PQRNotificationService("test_schema");
-    metricsService = new PQRMetricsService("test_schema");
+    assignmentService = new PQRAssignmentService(mockSchemaName);
+    notificationService = new PQRNotificationService(mockSchemaName);
+    metricsService = new PQRMetricsService(mockSchemaName);
 
     // Obtener la instancia de prisma para configurar mocks
-    prisma = (assignmentService as any).prisma;
+    prisma = getTenantPrismaClient(mockSchemaName);
 
     // Configurar mocks comunes
-    prisma.$queryRaw.mockResolvedValue([
+    mockPrismaClient.$queryRaw.mockResolvedValue([
       {
         autoCategorizeEnabled: true,
         autoAssignEnabled: true,

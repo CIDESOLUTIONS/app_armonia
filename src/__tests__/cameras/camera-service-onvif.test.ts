@@ -1,20 +1,23 @@
-// src/__tests__/cameras/camera-service-onvif.test.ts
 import {
   CameraServiceONVIF,
   CameraDevice,
-} from "@/lib/services/camera-service-onvif";
+} from "@/services/camera-service-onvif";
+import { getTenantPrismaClient, getPublicPrismaClient } from "@/lib/prisma";
 
 // Mock de Prisma
+const mockPrismaClient = {
+  camera: {
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  },
+};
+
 jest.mock("@/lib/prisma", () => ({
-  getPrisma: jest.fn(() => ({
-    camera: {
-      findUnique: jest.fn(),
-      findMany: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-    },
-  })),
+  getTenantPrismaClient: jest.fn(() => mockPrismaClient),
+  getPublicPrismaClient: jest.fn(() => ({ /* mock if needed */ })),
 }));
 
 // Mock de encryption
@@ -25,10 +28,11 @@ jest.mock("@/lib/security/encryption", () => ({
 
 describe("CameraServiceONVIF", () => {
   let service: CameraServiceONVIF;
+  const mockSchemaName = "test_schema";
 
   beforeEach(() => {
-    service = CameraServiceONVIF.getInstance();
     jest.clearAllMocks();
+    service = new CameraServiceONVIF(mockSchemaName);
 
     // Mock environment for development
     process.env.NODE_ENV = "development";

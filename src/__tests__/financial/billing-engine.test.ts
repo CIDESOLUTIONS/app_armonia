@@ -1,51 +1,55 @@
-// src/__tests__/financial/billing-engine.test.ts
 import { BillingEngine } from "@/lib/financial/billing-engine";
 import { FreemiumService } from "@/lib/freemium-service";
+import { getTenantPrismaClient, getPublicPrismaClient } from "@/lib/prisma";
 
 // Mock de Prisma
+const mockPrismaClient = {
+  residentialComplex: {
+    findUnique: jest.fn(),
+  },
+  property: {
+    findMany: jest.fn(),
+  },
+  fee: {
+    findMany: jest.fn(),
+  },
+  bill: {
+    create: jest.fn(),
+    findUnique: jest.fn(),
+    update: jest.fn(),
+  },
+  payment: {
+    create: jest.fn(),
+  },
+  $transaction: jest.fn((callback) =>
+    callback({
+      bill: {
+        create: jest.fn(),
+        update: jest.fn(),
+      },
+      payment: {
+        create: jest.fn(),
+      },
+    }),
+  ),
+};
+
 jest.mock("@/lib/prisma", () => ({
-  getPrisma: jest.fn(() => ({
-    residentialComplex: {
-      findUnique: jest.fn(),
-    },
-    property: {
-      findMany: jest.fn(),
-    },
-    fee: {
-      findMany: jest.fn(),
-    },
-    bill: {
-      create: jest.fn(),
-      findUnique: jest.fn(),
-      update: jest.fn(),
-    },
-    payment: {
-      create: jest.fn(),
-    },
-    $transaction: jest.fn((callback) =>
-      callback({
-        bill: {
-          create: jest.fn(),
-          update: jest.fn(),
-        },
-        payment: {
-          create: jest.fn(),
-        },
-      }),
-    ),
-  })),
+  getTenantPrismaClient: jest.fn(() => mockPrismaClient),
+  getPublicPrismaClient: jest.fn(() => ({ /* mock if needed */ })),
 }));
 
 describe("BillingEngine", () => {
+  let billingEngineService: BillingEngine;
+  const mockSchemaName = "test_schema";
+
   beforeEach(() => {
     jest.clearAllMocks();
+    billingEngineService = new BillingEngine(mockSchemaName);
   });
 
   describe("generateBillsForPeriod", () => {
     it("should generate bills for all active properties", async () => {
-      const { getPrisma } = await import("@/lib/prisma");
-      const mockPrisma = getPrisma();
-
       // Mock data
       const mockComplex = {
         id: 1,
@@ -88,9 +92,9 @@ describe("BillingEngine", () => {
       ];
 
       // Setup mocks
-      mockPrisma.residentialComplex.findUnique.mockResolvedValue(mockComplex);
-      mockPrisma.property.findMany.mockResolvedValue(mockProperties);
-      mockPrisma.fee.findMany.mockResolvedValue(mockFees);
+      mockPrismaClient.residentialComplex.findUnique.mockResolvedValue(mockComplex);
+      mockPrismaClient.property.findMany.mockResolvedValue(mockProperties);
+      mockPrismaClient.fee.findMany.mockResolvedValue(mockFees);
 
       // Mock FreemiumService
       jest.spyOn(FreemiumService, "hasFeatureAccess").mockReturnValue(true);
@@ -103,7 +107,7 @@ describe("BillingEngine", () => {
       };
 
       // Execute
-      const bills = await BillingEngine.generateBillsForPeriod(1, period);
+      const bills = await billingEngineService.generateBillsForPeriod(1, period);
 
       // Assertions
       expect(bills).toHaveLength(2);
@@ -130,23 +134,20 @@ describe("BillingEngine", () => {
         totalAmount: 180000, // 100000 + (1000 * 80)
       });
 
-      expect(mockPrisma.residentialComplex.findUnique).toHaveBeenCalledWith({
+      expect(mockPrismaClient.residentialComplex.findUnique).toHaveBeenCalledWith({
         where: { id: 1 },
         select: { planType: true, isTrialActive: true },
       });
     });
 
     it("should throw error for complexes without billing access", async () => {
-      const { getPrisma } = await import("@/lib/prisma");
-      const mockPrisma = getPrisma();
-
       const mockComplex = {
         id: 1,
         planType: "BASIC",
         isTrialActive: false,
       };
 
-      mockPrisma.residentialComplex.findUnique.mockResolvedValue(mockComplex);
+      mockPrismaClient.residentialComplex.findUnique.mockResolvedValue(mockComplex);
       jest.spyOn(FreemiumService, "hasFeatureAccess").mockReturnValue(false);
 
       const period = {
@@ -157,7 +158,7 @@ describe("BillingEngine", () => {
       };
 
       await expect(
-        BillingEngine.generateBillsForPeriod(1, period),
+        billingEngineService.generateBillsForPeriod(1, period),
       ).rejects.toThrow("Funcionalidad no disponible en su plan actual");
     });
   });
@@ -183,9 +184,6 @@ describe("BillingEngine", () => {
 
   describe("processPayment", () => {
     it("should process full payment correctly", async () => {
-      const { getPrisma } = await import("@/lib/prisma");
-      const mockPrisma = getPrisma();
-
       const mockBill = {
         id: 1,
         totalAmount: 100000,
@@ -193,9 +191,9 @@ describe("BillingEngine", () => {
         billItems: [],
       };
 
-      mockPrisma.bill.findUnique.mockResolvedValue(mockBill);
+      mockPrismaClient.bill.findUnique.mockResolvedValue(mockBill);
 
-      const result = await BillingEngine.processPayment(
+      const result = await billingEngineService.processPayment(
         1,
         100000,
         "BANK_TRANSFER",
@@ -203,13 +201,10 @@ describe("BillingEngine", () => {
       );
 
       expect(result).toBe(true); // Full payment
-      expect(mockPrisma.$transaction).toHaveBeenCalled();
+      expect(mockPrismaClient.$transaction).toHaveBeenCalled();
     });
 
     it("should process partial payment correctly", async () => {
-      const { getPrisma } = await import("@/lib/prisma");
-      const mockPrisma = getPrisma();
-
       const mockBill = {
         id: 1,
         totalAmount: 100000,
@@ -217,9 +212,9 @@ describe("BillingEngine", () => {
         billItems: [],
       };
 
-      mockPrisma.bill.findUnique.mockResolvedValue(mockBill);
+      mockPrismaClient.bill.findUnique.mockResolvedValue(mockBill);
 
-      const result = await BillingEngine.processPayment(
+      const result = await billingEngineService.processPayment(
         1,
         50000,
         "CREDIT_CARD",
@@ -229,9 +224,6 @@ describe("BillingEngine", () => {
     });
 
     it("should throw error for already paid bills", async () => {
-      const { getPrisma } = await import("@/lib/prisma");
-      const mockPrisma = getPrisma();
-
       const mockBill = {
         id: 1,
         totalAmount: 100000,
@@ -239,10 +231,10 @@ describe("BillingEngine", () => {
         billItems: [],
       };
 
-      mockPrisma.bill.findUnique.mockResolvedValue(mockBill);
+      mockPrismaClient.bill.findUnique.mockResolvedValue(mockBill);
 
       await expect(
-        BillingEngine.processPayment(1, 100000, "CASH"),
+        billingEngineService.processPayment(1, 100000, "CASH"),
       ).rejects.toThrow("Factura ya está pagada");
     });
   });

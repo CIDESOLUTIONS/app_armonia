@@ -18,7 +18,8 @@ const config: Config = {
   },
   transformIgnorePatterns: ["/node_modules/(?!lucide-react|jose)/"],
   testMatch: ["**/?(*.)+(spec|test).[tj]s?(x)"],
-  testPathIgnorePatterns: ["/e2e/"],
+  testPathIgnorePatterns: ["/e2e/", "/dist-jest/"],
+  modulePathIgnorePatterns: ["<rootDir>/dist-jest/"],
   collectCoverageFrom: [
     "src/**/*.{js,jsx,ts,tsx}",
     "!src/**/*.d.ts",

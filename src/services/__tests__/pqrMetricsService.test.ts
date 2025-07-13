@@ -4,116 +4,49 @@
 
 import { PQRMetricsService } from "../pqrMetricsService";
 import {
-  PrismaClient,
   PQRCategory,
   PQRPriority,
   PQRStatus,
-} from "@prisma/client";
-import { getPrisma } from "@/lib/prisma";
+} from "@/constants/pqr-constants";
+import { getTenantPrismaClient, getPublicPrismaClient } from "@/lib/prisma";
 
 // Mock de PrismaClient
-jest.mock("@prisma/client", () => {
-  const mockPrismaClient = {
-    $queryRaw: jest.fn(),
-    pQR: {
-      findUnique: jest.fn(),
-      findMany: jest.fn(),
-      count: jest.fn(),
-      groupBy: jest.fn(),
-    },
-    pQRStatusHistory: {
-      findMany: jest.fn(),
-    },
-    user: {
-      findUnique: jest.fn(),
-      findMany: jest.fn(),
-    },
-  };
-
-  return {
-    PrismaClient: jest.fn(() => mockPrismaClient),
-    PQRCategory: {
-      MAINTENANCE: "MAINTENANCE",
-      SECURITY: "SECURITY",
-      ADMINISTRATIVE: "ADMINISTRATIVE",
-      FINANCIAL: "FINANCIAL",
-      COMMUNITY: "COMMUNITY",
-      SERVICES: "SERVICES",
-      SUGGESTION: "SUGGESTION",
-      COMPLAINT: "COMPLAINT",
-      OTHER: "OTHER",
-    },
-    PQRPriority: {
-      LOW: "LOW",
-      MEDIUM: "MEDIUM",
-      HIGH: "HIGH",
-      URGENT: "URGENT",
-    },
-    PQRStatus: {
-      OPEN: "OPEN",
-      CATEGORIZED: "CATEGORIZED",
-      ASSIGNED: "ASSIGNED",
-      IN_PROGRESS: "IN_PROGRESS",
-      WAITING: "WAITING",
-      RESOLVED: "RESOLVED",
-      CLOSED: "CLOSED",
-      REOPENED: "REOPENED",
-      CANCELLED: "CANCELLED",
-    },
-  };
-});
+const mockPrismaClient = {
+  $queryRaw: jest.fn(),
+  pQR: {
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+    count: jest.fn(),
+    groupBy: jest.fn(),
+  },
+  pQRStatusHistory: {
+    findMany: jest.fn(),
+  },
+  user: {
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+  },
+};
 
 jest.mock("@/lib/prisma", () => ({
-  getPrisma: jest.fn(() => ({
-    pQR: {
-      findUnique: jest.fn(),
-      findMany: jest.fn(),
-      count: jest.fn(),
-      groupBy: jest.fn(),
-    },
-    pQRStatusHistory: {
-      findMany: jest.fn(),
-    },
-    user: {
-      findUnique: jest.fn(),
-      findMany: jest.fn(),
-    },
-    $queryRaw: jest.fn(),
-  })),
-  getSchemaFromRequest: jest.fn(() => ({
-    pQR: {
-      findUnique: jest.fn(),
-      findMany: jest.fn(),
-      count: jest.fn(),
-      groupBy: jest.fn(),
-    },
-    pQRStatusHistory: {
-      findMany: jest.fn(),
-    },
-    user: {
-      findUnique: jest.fn(),
-      findMany: jest.fn(),
-    },
-    pQRSettings: {
-      findFirst: jest.fn(),
-    },
-    $queryRaw: jest.fn(),
-  })),
+  getTenantPrismaClient: jest.fn(() => mockPrismaClient),
+  getPublicPrismaClient: jest.fn(() => ({ /* mock if needed */ })),
 }));
 
 describe("PQRMetricsService", () => {
   let service: PQRMetricsService;
   let prisma: any;
+  const mockSchemaName = "test_schema";
 
   beforeEach(() => {
     // Limpiar todos los mocks
     jest.clearAllMocks();
 
     // Crear instancia del servicio con schema de prueba
-    service = new PQRMetricsService("test_schema");
+    service = new PQRMetricsService(mockSchemaName);
 
     // Obtener la instancia de prisma para configurar mocks
-    prisma = getPrisma();
+    prisma = getTenantPrismaClient(mockSchemaName);
   });
 
   describe("getSummaryMetrics", () => {

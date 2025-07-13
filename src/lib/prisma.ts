@@ -1,71 +1,74 @@
-/**
- * configuracion de Prisma Client
- * Este archivo proporciona la configuración y instancia global de Prisma
- * para el proyecto Armonía.
- */
-
 import { PrismaClient } from "@prisma/client";
+import { sign, verify } from "jsonwebtoken";
+
+const JWT_SECRET = process.env.JWT_SECRET || "default_secret";
+
+// 1. Instancia de Prisma para el esquema público (armonia)
+const publicPrisma = new PrismaClient();
+
+// 2. Caché para las instancias de Prisma de los tenants
+const tenantPrismaInstances: Record<string, PrismaClient> = {};
 
 /**
- * Obtiene una instancia de PrismaClient global
- * @returns Instancia de PrismaClient
+ * Obtiene una instancia de PrismaClient conectada al esquema de un tenant específico.
+ * Crea y cachea una nueva instancia si no existe para el tenant solicitado.
+ *
+ * @param schemaName El nombre del esquema del tenant (ej. "tenant_cj0001").
+ * @returns Una instancia de PrismaClient configurada para el tenant.
  */
-function createPrismaClient(): PrismaClient {
-  return new PrismaClient();
-}
+export function getTenantPrismaClient(schemaName: string): PrismaClient {
+  if (!schemaName) {
+    throw new Error("Schema name is required to get a tenant Prisma client.");
+  }
 
-// Instancia global de Prisma
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-};
+  if (tenantPrismaInstances[schemaName]) {
+    return tenantPrismaInstances[schemaName];
+  }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
+  const databaseUrl = `${process.env.DATABASE_URL}?schema=${schemaName}`;
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
-
-/**
- * Obtiene una instancia de PrismaClient configurada para el esquema especificado
- * @param schema Esquema de base de datos a utilizar
- * @returns Instancia de PrismaClient
- */
-export function getSchemaFromRequest(schema: string = "public"): PrismaClient {
-  // Para entornos de producción, creamos una nueva instancia con el esquema especificado
-  // En desarrollo/pruebas, la instancia global puede ser mockeada o manejada de otra forma
-  if (process.env.NODE_ENV === "production") {
-    return new PrismaClient({
-      datasources: {
-        db: {
-          url: `${process.env.DATABASE_URL}?schema=${schema}`,
-        },
+  const newTenantPrisma = new PrismaClient({
+    datasources: {
+      db: {
+        url: databaseUrl,
       },
-    });
-  } else {
-    // En desarrollo, podemos usar la instancia global o una mockeada
-    // Asegúrate de que tu configuración de pruebas maneje esto adecuadamente
-    return prisma; // O una instancia mockeada si estás en un entorno de prueba
-  }
+    },
+  });
+
+  tenantPrismaInstances[schemaName] = newTenantPrisma;
+  return newTenantPrisma;
 }
 
 /**
- * Obtiene el esquema de base de datos a partir de un objeto de solicitud
- * @param req Objeto de solicitud (NextRequest)
- * @returns Esquema de base de datos o null si no se encuentra
+ * Devuelve la instancia de Prisma para el esquema público.
+ *
+ * @returns La instancia de PrismaClient para el esquema 'armonia'.
  */
-export function getSchemaFromReq(req: any): string | null {
-  // Asumimos que el schema viene en una cabecera 'X-Tenant-Schema'
-  const schemaName = req.headers.get("x-tenant-schema");
-  if (schemaName) {
-    return schemaName;
-  }
-  // Si no se encuentra en la cabecera, se podría buscar en el subdominio, etc.
-  // Por ahora, devolvemos null si no se encuentra
-  return null;
+export function getPublicPrismaClient(): PrismaClient {
+  return publicPrisma;
 }
 
 /**
- * Obtiene una instancia de PrismaClient global
- * @returns Instancia de PrismaClient
+ * Extrae el schemaName del token JWT de una solicitud.
+ * @param req Objeto de la solicitud (Request).
+ * @returns El schemaName o null si no se encuentra o el token es inválido.
  */
-export function getPrisma(): PrismaClient {
-  return prisma;
+export function getTenantSchemaFromToken(req: Request): string | null {
+  const tokenCookie = req.headers.get("cookie")?.split('; ').find(c => c.startsWith('token='));
+  if (!tokenCookie) {
+    return null;
+  }
+
+  const token = tokenCookie.split('=')[1];
+  if (!token) {
+    return null;
+  }
+
+  try {
+    const decoded = verify(token, JWT_SECRET) as { schemaName?: string };
+    return decoded.schemaName || null;
+  } catch (error) {
+    console.error("Invalid JWT:", error);
+    return null;
+  }
 }
