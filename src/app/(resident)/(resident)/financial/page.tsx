@@ -14,10 +14,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 import {
   getResidentFinancialSummary,
   getResidentPayments,
   getResidentPendingFees,
+  initiatePayment,
 } from "@/services/residentFinancialService";
 
 interface FinancialSummary {
@@ -44,10 +47,12 @@ interface PendingFee {
 
 export default function ResidentFinancialPage() {
   const { user, loading: authLoading } = useAuthStore();
+  const { toast } = useToast();
   const [summary, setSummary] = useState<FinancialSummary | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [pendingFees, setPendingFees] = useState<PendingFee[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isPaying, setIsPaying] = useState(false);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -67,9 +72,30 @@ export default function ResidentFinancialPage() {
       setPendingFees(fetchedPendingFees);
     } catch (error) {
       console.error("Error fetching resident financial data:", error);
-      // Handle error, e.g., show a toast
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los datos financieros.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePayFee = async (feeId: number) => {
+    setIsPaying(true);
+    try {
+      const paymentUrl = await initiatePayment(feeId);
+      window.location.href = paymentUrl; // Redirect to payment gateway
+    } catch (error) {
+      console.error("Error initiating payment:", error);
+      toast({
+        title: "Error",
+        description: "Error al iniciar el pago. Intente de nuevo.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsPaying(false);
     }
   };
 
@@ -167,9 +193,21 @@ export default function ResidentFinancialPage() {
                       Vence: {new Date(fee.dueDate).toLocaleDateString()}
                     </p>
                   </div>
-                  <Badge variant="destructive">
-                    {formatCurrency(fee.totalAmount)}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="destructive">
+                      {formatCurrency(fee.totalAmount)}
+                    </Badge>
+                    <Button
+                      size="sm"
+                      onClick={() => handlePayFee(fee.id)}
+                      disabled={isPaying}
+                    >
+                      {isPaying ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : null}{" "}
+                      Pagar
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

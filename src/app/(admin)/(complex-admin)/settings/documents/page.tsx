@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Trash2, Loader2, Upload, FileText } from "lucide-react";
 import {
@@ -13,75 +13,78 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { documentSchema, DocumentFormValues } from "@/validators/document-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { getDocuments, uploadDocument, deleteDocument } from "@/services/documentService";
 
 interface Document {
   id: number;
-  name: string;
+  title: string;
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+  uploadDate: string;
   url: string;
-  uploadedAt: string;
 }
 
 export default function DocumentsSettingsPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
-  const [documents, setDocuments] = useState<Document[]>([
-    // Mock data
-    {
-      id: 1,
-      name: "Certificado de Existencia y Representación Legal",
-      url: "/docs/cert_legal.pdf",
-      uploadedAt: "2024-01-15",
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const form = useForm<DocumentFormValues>({
+    resolver: zodResolver(documentSchema),
+    defaultValues: {
+      name: "",
+      file: undefined,
     },
-    {
-      id: 2,
-      name: "Reglamento de Propiedad Horizontal",
-      url: "/docs/reglamento.pdf",
-      uploadedAt: "2023-11-01",
-    },
-  ]);
-  const [newDocumentFile, setNewDocumentFile] = useState<File | null>(null);
-  const [newDocumentName, setNewDocumentName] = useState("");
-  const [loading, setLoading] = useState(false);
+  });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setNewDocumentFile(e.target.files[0]);
-    }
-  };
+  const { handleSubmit, control, reset, formState: { isSubmitting } } = form;
 
-  const handleUploadDocument = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newDocumentFile || !newDocumentName.trim()) {
-      toast({
-        title: "Error",
-        description:
-          "Por favor, seleccione un archivo y escriba un nombre para el documento.",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const fetchDocuments = useCallback(async () => {
     setLoading(true);
     try {
-      // Placeholder for API call to upload document
-      console.log("Uploading document:", newDocumentName, newDocumentFile.name);
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
+      const data = await getDocuments();
+      setDocuments(data);
+    } catch (error) {
+      console.error("Error fetching documents:", error);
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los documentos.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
 
-      const newDoc: Document = {
-        id: documents.length + 1,
-        name: newDocumentName,
-        url: "/docs/" + newDocumentFile.name, // Mock URL
-        uploadedAt: new Date().toISOString().split("T")[0],
-      };
-      setDocuments((prev) => [...prev, newDoc]);
-      setNewDocumentFile(null);
-      setNewDocumentName("");
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchDocuments();
+    }
+  }, [authLoading, user, fetchDocuments]);
+
+  const handleUploadDocument = async (data: DocumentFormValues) => {
+    try {
+      await uploadDocument(data.name, data.file);
       toast({
         title: "Éxito",
-        description: "Documento subido correctamente (simulado).",
+        description: "Documento subido correctamente.",
       });
+      reset(); // Clear form after successful upload
+      fetchDocuments();
     } catch (error) {
       console.error("Error uploading document:", error);
       toast({
@@ -89,8 +92,6 @@ export default function DocumentsSettingsPage() {
         description: "Error al subir el documento.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -98,15 +99,12 @@ export default function DocumentsSettingsPage() {
     if (confirm("¿Estás seguro de que quieres eliminar este documento?")) {
       setLoading(true);
       try {
-        // Placeholder for API call to delete document
-        console.log("Deleting document with ID:", id);
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-
-        setDocuments((prev) => prev.filter((doc) => doc.id !== id));
+        await deleteDocument(id);
         toast({
           title: "Éxito",
-          description: "Documento eliminado correctamente (simulado).",
+          description: "Documento eliminado correctamente.",
         });
+        fetchDocuments();
       } catch (error) {
         console.error("Error deleting document:", error);
         toast({
@@ -120,7 +118,7 @@ export default function DocumentsSettingsPage() {
     }
   };
 
-  if (authLoading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -151,39 +149,50 @@ export default function DocumentsSettingsPage() {
 
       <div className="bg-white shadow-md rounded-lg p-6 mb-8">
         <h2 className="text-xl font-semibold mb-4">Subir Nuevo Documento</h2>
-        <form
-          onSubmit={handleUploadDocument}
-          className="grid gap-4 md:grid-cols-2"
-        >
-          <div className="grid gap-2">
-            <Label htmlFor="documentName">Nombre del Documento</Label>
-            <Input
-              id="documentName"
-              value={newDocumentName}
-              onChange={(e) => setNewDocumentName(e.target.value)}
-              required
+        <Form {...form}>
+          <form onSubmit={handleSubmit(handleUploadDocument)} className="grid gap-4 md:grid-cols-2">
+            <FormField
+              control={control}
+              name="name"
+              render={({ field }) => (
+                <FormItem className="grid gap-2">
+                  <FormLabel>Nombre del Documento</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="documentFile">Archivo</Label>
-            <Input
-              id="documentFile"
-              type="file"
-              onChange={handleFileChange}
-              required
+            <FormField
+              control={control}
+              name="file"
+              render={({ field: { value, onChange, ...fieldProps } }) => (
+                <FormItem className="grid gap-2">
+                  <FormLabel>Archivo</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...fieldProps}
+                      type="file"
+                      onChange={(event) => onChange(event.target.files && event.target.files[0])}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="md:col-span-2 flex justify-end">
-            <Button type="submit" disabled={loading}>
-              {loading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Upload className="mr-2 h-4 w-4" />
-              )}{" "}
-              Subir Documento
-            </Button>
-          </div>
-        </form>
+            <div className="md:col-span-2 flex justify-end">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="mr-2 h-4 w-4" />
+                )}{" "}
+                Subir Documento
+              </Button>
+            </div>
+          </form>
+        </Form>
       </div>
 
       <div className="bg-white shadow-md rounded-lg p-6">
@@ -192,7 +201,10 @@ export default function DocumentsSettingsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nombre</TableHead>
+                <TableHead>Título</TableHead>
+                <TableHead>Nombre de Archivo</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Tamaño</TableHead>
                 <TableHead>Fecha de Subida</TableHead>
                 <TableHead></TableHead>
               </TableRow>
@@ -208,10 +220,15 @@ export default function DocumentsSettingsPage() {
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:underline flex items-center"
                       >
-                        <FileText className="mr-2 h-4 w-4" /> {doc.name}
+                        <FileText className="mr-2 h-4 w-4" /> {doc.title}
                       </a>
                     </TableCell>
-                    <TableCell>{doc.uploadedAt}</TableCell>
+                    <TableCell>{doc.fileName}</TableCell>
+                    <TableCell>{doc.fileType}</TableCell>
+                    <TableCell>{(doc.fileSize / 1024).toFixed(2)} KB</TableCell>
+                    <TableCell>
+                      {new Date(doc.uploadDate).toLocaleDateString()}
+                    </TableCell>
                     <TableCell className="text-right">
                       <Button
                         variant="ghost"
@@ -225,7 +242,7 @@ export default function DocumentsSettingsPage() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center py-5">
+                  <TableCell colSpan={6} className="text-center py-5">
                     No hay documentos registrados.
                   </TableCell>
                 </TableRow>

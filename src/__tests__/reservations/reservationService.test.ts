@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
 import { getPrisma } from "@/lib/prisma";
 import { PrismaClient, ReservationStatus } from "@prisma/client";
-import reservationService from "../reservationService";
+import { getReservations, createReservation, updateReservationStatus, deleteReservation, getCommonAreaById, checkAvailability, createCommonArea, cancelReservation, getUserNotifications } from "../reservationService";
 
 // Mock PrismaClient and ReservationStatus
 jest.mock("@prisma/client", () => {
@@ -68,7 +68,7 @@ describe("ReservationService", () => {
 
       prisma.commonArea.findMany.mockResolvedValue(mockAreas);
 
-      const result = await reservationService.getCommonAreas();
+      const result = await getReservations();
 
       expect(prisma.commonArea.findMany).toHaveBeenCalledWith({
         where: {},
@@ -94,7 +94,7 @@ describe("ReservationService", () => {
 
       prisma.commonArea.findMany.mockResolvedValue(mockAreas);
 
-      const result = await reservationService.getCommonAreas({
+      const result = await getReservations({
         active: true,
         requiresApproval: true,
       });
@@ -130,7 +130,7 @@ describe("ReservationService", () => {
 
       prisma.commonArea.findUnique.mockResolvedValue(mockArea);
 
-      const result = await reservationService.getCommonAreaById(1);
+      const result = await getCommonAreaById(1);
 
       expect(prisma.commonArea.findUnique).toHaveBeenCalledWith({
         where: { id: 1 },
@@ -163,7 +163,7 @@ describe("ReservationService", () => {
 
       prisma.commonArea.create.mockResolvedValue(mockCreatedArea);
 
-      const result = await reservationService.createCommonArea(mockAreaData);
+      const result = await createCommonArea(mockAreaData);
 
       expect(prisma.commonArea.create).toHaveBeenCalledWith({
         data: mockAreaData,
@@ -201,7 +201,7 @@ describe("ReservationService", () => {
       const startDate = new Date("2025-06-01T00:00:00Z");
       const endDate = new Date("2025-06-02T00:00:00Z");
 
-      const result = await reservationService.checkAvailability(
+      const result = await checkAvailability(
         1,
         startDate,
         endDate,
@@ -221,7 +221,7 @@ describe("ReservationService", () => {
       const endDate = new Date("2025-06-02T00:00:00Z");
 
       await expect(
-        reservationService.checkAvailability(999, startDate, endDate),
+        checkAvailability(999, startDate, endDate),
       ).rejects.toThrow("Área común no encontrada");
     });
   });

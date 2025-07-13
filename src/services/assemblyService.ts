@@ -39,6 +39,11 @@ interface UpdateAssemblyData {
   status?: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
 }
 
+interface VotingResult {
+  voting: any; // Replace with actual Voting interface
+  results: { [key: string]: { count: number; coefficient: number } };
+}
+
 export async function getAssemblyById(id: number): Promise<Assembly> {
   try {
     const response = await fetchApi(`/api/assemblies/${id}`);
@@ -103,6 +108,38 @@ export async function deleteAssembly(id: number): Promise<void> {
     });
   } catch (error) {
     console.error("Error deleting assembly:", error);
+    throw error;
+  }
+}
+
+export async function registerVote(
+  assemblyId: number,
+  votingId: number,
+  optionValue: string,
+): Promise<any> {
+  try {
+    const response = await fetchApi(`/api/assemblies/${assemblyId}/vote`, {
+      method: "POST",
+      body: JSON.stringify({ votingId, optionValue }),
+    });
+    return response;
+  } catch (error) {
+    console.error(`Error registering vote for assembly ${assemblyId}:`, error);
+    throw error;
+  }
+}
+
+export async function getVotingResults(
+  assemblyId: number,
+  votingId: number,
+): Promise<VotingResult> {
+  try {
+    const response = await fetchApi(
+      `/api/assemblies/${assemblyId}/voting-results?votingId=${votingId}`,
+    );
+    return response;
+  } catch (error) {
+    console.error(`Error fetching voting results for assembly ${assemblyId}:`, error);
     throw error;
   }
 }

@@ -90,8 +90,8 @@ describe("CameraServiceONVIF", () => {
 
   describe("Camera Connection", () => {
     beforeEach(async () => {
-      const { getPrisma } = await import("@/lib/prisma");
-      const mockPrisma = getPrisma();
+      const { getTenantPrismaClient } = await import("@/lib/prisma");
+      const mockPrisma = getTenantPrismaClient(mockSchemaName);
 
       mockPrisma.camera.findUnique.mockResolvedValue({
         id: 1,
@@ -109,8 +109,8 @@ describe("CameraServiceONVIF", () => {
 
       expect(connected).toBe(true);
 
-      const { getPrisma } = await import("@/lib/prisma");
-      const mockPrisma = getPrisma();
+      const { getTenantPrismaClient } = await import("@/lib/prisma");
+      const mockPrisma = getTenantPrismaClient(mockSchemaName);
       expect(mockPrisma.camera.update).toHaveBeenCalledWith({
         where: { id: 1 },
         data: {
@@ -121,8 +121,8 @@ describe("CameraServiceONVIF", () => {
     });
 
     it("should handle connection failure", async () => {
-      const { getPrisma } = await import("@/lib/prisma");
-      const mockPrisma = getPrisma();
+      const { getTenantPrismaClient } = await import("@/lib/prisma");
+      const mockPrisma = getTenantPrismaClient(mockSchemaName);
 
       mockPrisma.camera.findUnique.mockResolvedValue(null);
 
@@ -184,8 +184,8 @@ describe("CameraServiceONVIF", () => {
   describe("PTZ Control", () => {
     beforeEach(async () => {
       // Mock PTZ camera
-      const { getPrisma } = await import("@/lib/prisma");
-      const mockPrisma = getPrisma();
+      const { getTenantPrismaClient } = await import("@/lib/prisma");
+      const mockPrisma = getTenantPrismaClient(mockSchemaName);
 
       mockPrisma.camera.findUnique.mockResolvedValue({
         id: 2,
@@ -219,8 +219,8 @@ describe("CameraServiceONVIF", () => {
     });
 
     it("should fail on non-PTZ camera", async () => {
-      const { getPrisma } = await import("@/lib/prisma");
-      const mockPrisma = getPrisma();
+      const { getTenantPrismaClient } = await import("@/lib/prisma");
+      const mockPrisma = getTenantPrismaClient(mockSchemaName);
 
       mockPrisma.camera.findUnique.mockResolvedValue({
         id: 1,
@@ -239,8 +239,8 @@ describe("CameraServiceONVIF", () => {
 
   describe("Camera Registration", () => {
     it("should register new camera", async () => {
-      const { getPrisma } = await import("@/lib/prisma");
-      const mockPrisma = getPrisma();
+      const { getTenantPrismaClient } = await import("@/lib/prisma");
+      const mockPrisma = getTenantPrismaClient(mockSchemaName);
 
       mockPrisma.camera.create.mockResolvedValue({
         id: 5,
@@ -289,8 +289,8 @@ describe("CameraServiceONVIF", () => {
     });
 
     it("should update camera configuration", async () => {
-      const { getPrisma } = await import("@/lib/prisma");
-      const mockPrisma = getPrisma();
+      const { getTenantPrismaClient } = await import("@/lib/prisma");
+      const mockPrisma = getTenantPrismaClient(mockSchemaName);
 
       mockPrisma.camera.update.mockResolvedValue({ id: 1 });
 
@@ -310,8 +310,8 @@ describe("CameraServiceONVIF", () => {
     });
 
     it("should delete camera", async () => {
-      const { getPrisma } = await import("@/lib/prisma");
-      const mockPrisma = getPrisma();
+      const { getTenantPrismaClient } = await import("@/lib/prisma");
+      const mockPrisma = getTenantPrismaClient(mockSchemaName);
 
       mockPrisma.camera.delete.mockResolvedValue({ id: 1 });
 
@@ -330,8 +330,8 @@ describe("CameraServiceONVIF", () => {
 
   describe("Status Monitoring", () => {
     beforeEach(async () => {
-      const { getPrisma } = await import("@/lib/prisma");
-      const mockPrisma = getPrisma();
+      const { getTenantPrismaClient } = await import("@/lib/prisma");
+      const mockPrisma = getTenantPrismaClient(mockSchemaName);
 
       // Mock cameras for complex
       mockPrisma.camera.findMany.mockResolvedValue([
@@ -354,8 +354,8 @@ describe("CameraServiceONVIF", () => {
     });
 
     it("should check cameras status", async () => {
-      const { getPrisma } = await import("@/lib/prisma");
-      const mockPrisma = getPrisma();
+      const { getTenantPrismaClient } = await import("@/lib/prisma");
+      const mockPrisma = getTenantPrismaClient(mockSchemaName);
 
       // Mock individual camera lookups
       mockPrisma.camera.findUnique
@@ -388,8 +388,8 @@ describe("CameraServiceONVIF", () => {
 
   describe("Error Handling", () => {
     it("should handle database errors gracefully", async () => {
-      const { getPrisma } = await import("@/lib/prisma");
-      const mockPrisma = getPrisma();
+      const { getTenantPrismaClient } = await import("@/lib/prisma");
+      const mockPrisma = getTenantPrismaClient(mockSchemaName);
 
       mockPrisma.camera.findUnique.mockRejectedValue(
         new Error("Database connection failed"),
@@ -400,8 +400,8 @@ describe("CameraServiceONVIF", () => {
     });
 
     it("should handle invalid camera IDs", async () => {
-      const { getPrisma } = await import("@/lib/prisma");
-      const mockPrisma = getPrisma();
+      const { getTenantPrismaClient } = await import("@/lib/prisma");
+      const mockPrisma = getTenantPrismaClient(mockSchemaName);
 
       mockPrisma.camera.findUnique.mockResolvedValue(null);
 
@@ -430,8 +430,8 @@ describe("CameraServiceONVIF", () => {
           hasAudio: false,
           hasPTZ: false,
           hasPresets: false,
-          hasEvents: false,
-          hasRecording: false,
+          hasEvents: true,
+          hasRecording: true,
           supportedProfiles: [],
           supportedResolutions: [],
         },
@@ -444,9 +444,9 @@ describe("CameraServiceONVIF", () => {
     });
 
     it("should decrypt passwords when reading", async () => {
-      const { getPrisma } = await import("@/lib/prisma");
+      const { getTenantPrismaClient } = await import("@/lib/prisma");
       const { decryptData } = await import("@/lib/security/encryption");
-      const mockPrisma = getPrisma();
+      const mockPrisma = getTenantPrismaClient(mockSchemaName);
 
       mockPrisma.camera.findUnique.mockResolvedValue({
         id: 1,

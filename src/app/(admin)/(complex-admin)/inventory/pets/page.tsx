@@ -21,7 +21,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import {
   AlertDialog,
@@ -40,6 +39,18 @@ import {
   updatePet,
   deletePet,
 } from "@/services/petService";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { petSchema, PetFormValues } from "@/validators/pet-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Pet {
   id: number;
@@ -59,16 +70,20 @@ export default function PetsPage() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPet, setCurrentPet] = useState<Pet | null>(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    species: "",
-    breed: "",
-    ownerName: "",
-    propertyId: 0,
-    isActive: true,
+
+  const form = useForm<PetFormValues>({
+    resolver: zodResolver(petSchema),
+    defaultValues: {
+      name: "",
+      species: "",
+      breed: "",
+      ownerName: "",
+      propertyId: 0,
+      isActive: true,
+    },
   });
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [petToDelete, setPetToDelete] = useState<number | null>(null);
+
+  const { handleSubmit, control, reset, formState: { isSubmitting } } = form;
 
   const fetchPets = useCallback(async () => {
     setLoading(true);
@@ -93,27 +108,9 @@ export default function PetsPage() {
     }
   }, [authLoading, user, fetchPets]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "number" ? parseInt(value) : value,
-    }));
-  };
-
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: checked,
-    }));
-  };
-
   const handleAddPet = () => {
     setCurrentPet(null);
-    setFormData({
+    reset({
       name: "",
       species: "",
       breed: "",
@@ -126,7 +123,7 @@ export default function PetsPage() {
 
   const handleEditPet = (pet: Pet) => {
     setCurrentPet(pet);
-    setFormData({
+    reset({
       name: pet.name,
       species: pet.species,
       breed: pet.breed,
@@ -137,17 +134,16 @@ export default function PetsPage() {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: PetFormValues) => {
     try {
       if (currentPet) {
-        await updatePet(currentPet.id, formData);
+        await updatePet(currentPet.id, data);
         toast({
           title: "Éxito",
           description: "Mascota actualizada correctamente.",
         });
       } else {
-        await createPet(formData);
+        await createPet(data);
         toast({
           title: "Éxito",
           description: "Mascota creada correctamente.",
@@ -164,6 +160,9 @@ export default function PetsPage() {
       });
     }
   };
+
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [petToDelete, setPetToDelete] = useState<number | null>(null);
 
   const handleDeletePet = (id: number) => {
     setPetToDelete(id);
@@ -285,79 +284,106 @@ export default function PetsPage() {
               {currentPet ? "Editar Mascota" : "Añadir Nueva Mascota"}
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name">Nombre</Label>
-              <Input
-                id="name"
+          <Form {...form}>
+            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
+              <FormField
+                control={control}
                 name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Nombre</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="species">Especie</Label>
-              <Input
-                id="species"
+              <FormField
+                control={control}
                 name="species"
-                value={formData.species}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Especie</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="breed">Raza</Label>
-              <Input
-                id="breed"
+              <FormField
+                control={control}
                 name="breed"
-                value={formData.breed}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Raza</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="ownerName">Nombre Propietario</Label>
-              <Input
-                id="ownerName"
+              <FormField
+                control={control}
                 name="ownerName"
-                value={formData.ownerName}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Nombre Propietario</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="propertyId">ID Propiedad</Label>
-              <Input
-                id="propertyId"
+              <FormField
+                control={control}
                 name="propertyId"
-                type="number"
-                value={formData.propertyId}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">ID Propiedad</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        className="col-span-3"
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Input
-                id="isActive"
+              <FormField
+                control={control}
                 name="isActive"
-                type="checkbox"
-                checked={formData.isActive}
-                onChange={handleCheckboxChange}
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Activa</FormLabel>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <Label htmlFor="isActive">Activa</Label>
-            </div>
-            <DialogFooter>
-              <Button type="submit">
-                {currentPet ? "Guardar Cambios" : "Añadir Mascota"}
-              </Button>
-            </DialogFooter>
-          </form>
+              <DialogFooter>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : null}{" "}
+                  {currentPet ? "Guardar Cambios" : "Añadir Mascota"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 

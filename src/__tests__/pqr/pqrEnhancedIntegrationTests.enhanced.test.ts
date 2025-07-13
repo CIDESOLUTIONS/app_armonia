@@ -12,7 +12,7 @@ import {
   PQRPriority,
 } from "@prisma/client";
 import { PQRAssignmentService } from "../pqrAssignmentService";
-import { PQRNotificationService } from "../pqrNotificationService";
+import { PQRNotificationService } from "@/services/pqrNotificationService";
 import { PQRMetricsService } from "../pqrMetricsService";
 import { sendEmail } from "@/lib/communications/email-service";
 import { sendPushNotification } from "@/lib/communications/push-notification-service";

@@ -13,7 +13,7 @@ import {
   PQRStatus,
 } from "@prisma/client";
 import { PQRAssignmentService } from "../pqrAssignmentService";
-import { PQRNotificationService } from "../pqrNotificationService";
+import { PQRNotificationService } from "@/services/pqrNotificationService";
 import { PQRMetricsService } from "../pqrMetricsService";
 import { ActivityLogger } from "@/lib/logging/activity-logger";
 

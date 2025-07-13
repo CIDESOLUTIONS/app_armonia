@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,43 +19,41 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { createPQR } from "@/services/pqrService";
+import { pqrSchema, PqrFormValues } from "@/validators/pqr-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 export default function CreatePQRPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
   const router = useRouter();
 
-  const [formData, setFormData] = useState({
-    subject: "",
-    description: "",
-    category: "",
-    priority: "MEDIUM",
-    reportedById: user?.id || 0, // Default to current user's ID
+  const form = useForm<PqrFormValues>({
+    resolver: zodResolver(pqrSchema),
+    defaultValues: {
+      subject: "",
+      description: "",
+      category: "",
+      priority: "MEDIUM",
+      reportedById: user?.id || 0,
+    },
   });
-  const [loading, setLoading] = useState(false);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const {
+    handleSubmit,
+    control,
+    formState: { isSubmitting },
+  } = form;
 
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const onSubmit = async (data: PqrFormValues) => {
     try {
-      await createPQR(formData);
+      await createPQR(data);
       toast({
         title: "Éxito",
         description: "PQR creada correctamente.",
@@ -66,8 +66,6 @@ export default function CreatePQRPage() {
         description: "Error al crear la PQR.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -102,64 +100,85 @@ export default function CreatePQRPage() {
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Crear Nueva PQR</h1>
-
-      <form onSubmit={handleSubmit} className="grid gap-6 md:grid-cols-2">
-        <div className="grid gap-2">
-          <Label htmlFor="subject">Asunto</Label>
-          <Input
-            id="subject"
+      <Form {...form}>
+        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-6 md:grid-cols-2">
+          <FormField
+            control={control}
             name="subject"
-            value={formData.subject}
-            onChange={handleInputChange}
-            required
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Asunto</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ej: Fuga de agua en el baño" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="category">Categoría</Label>
-          <Input
-            id="category"
+          <FormField
+            control={control}
             name="category"
-            value={formData.category}
-            onChange={handleInputChange}
-            required
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Categoría</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ej: Mantenimiento" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="priority">Prioridad</Label>
-          <Select
+          <FormField
+            control={control}
             name="priority"
-            value={formData.priority}
-            onValueChange={(value) => handleSelectChange("priority", value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Seleccionar prioridad" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="LOW">Baja</SelectItem>
-              <SelectItem value="MEDIUM">Media</SelectItem>
-              <SelectItem value="HIGH">Alta</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="grid gap-2 col-span-full">
-          <Label htmlFor="description">Descripción</Label>
-          <Textarea
-            id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleInputChange}
-            rows={5}
-            required
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Prioridad</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar prioridad" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="LOW">Baja</SelectItem>
+                    <SelectItem value="MEDIUM">Media</SelectItem>
+                    <SelectItem value="HIGH">Alta</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-
-        <div className="col-span-full flex justify-end">
-          <Button type="submit" disabled={loading}>
-            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}{" "}
-            Crear PQR
-          </Button>
-        </div>
-      </form>
+          <div className="col-span-full">
+            <FormField
+              control={control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Descripción</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Describe el problema en detalle..."
+                      rows={5}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="col-span-full flex justify-end">
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}{" "}
+              Crear PQR
+            </Button>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }

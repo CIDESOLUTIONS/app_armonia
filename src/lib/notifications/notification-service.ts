@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import nodemailer from "nodemailer";
+import { sendSMSMessage } from "@/lib/communications/sms-service";
 
 export interface NotificationData {
   type: "EMAIL" | "SMS" | "IN_APP";
-  recipient: string;
-  subject: string;
+  recipient: string; // Email or Phone Number
+  subject?: string; // For Email
   body: string;
   entityType: string;
   entityId: number;
@@ -26,6 +27,9 @@ export class NotificationService {
    * @param data Datos de la notificación
    */
   static async sendEmail(data: NotificationData) {
+    if (data.type !== "EMAIL") {
+      throw new Error("Tipo de notificación incorrecto para sendEmail.");
+    }
     try {
       const info = await this.transporter.sendMail({
         from: process.env.EMAIL_FROM,
@@ -49,6 +53,38 @@ export class NotificationService {
   }
 
   /**
+   * Enviar notificación por SMS
+   * @param data Datos de la notificación
+   */
+  static async sendSMS(data: NotificationData) {
+    if (data.type !== "SMS") {
+      throw new Error("Tipo de notificación incorrecto para sendSMS.");
+    }
+    try {
+      const result = await sendSMSMessage({
+        to: data.recipient,
+        message: data.body,
+      });
+
+      if (result.success) {
+        return this.saveNotification({
+          ...data,
+          status: "SENT",
+          messageId: result.messageId,
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error("Error enviando SMS:", error);
+      return this.saveNotification({
+        ...data,
+        status: "FAILED",
+      });
+    }
+  }
+
+  /**
    * Guardar registro de notificación
    * @param notificationData Datos de la notificación
    */
@@ -62,7 +98,7 @@ export class NotificationService {
       data: {
         type: notificationData.type,
         recipient: notificationData.recipient,
-        subject: notificationData.subject,
+        subject: notificationData.subject, // Subject is optional for SMS
         body: notificationData.body,
         entityType: notificationData.entityType,
         entityId: notificationData.entityId,
@@ -76,7 +112,7 @@ export class NotificationService {
    * Notificar creación de PQR
    * @param pqr Datos de la PQR
    */
-  static async notifyPQRCreation(pqr: unknown) {
+  static async notifyPQRCreation(pqr: any) {
     // Obtener administradores del conjunto
     const admins = await prisma.user.findMany({
       where: {
@@ -87,6 +123,7 @@ export class NotificationService {
 
     // Enviar notificación a cada administrador
     for (const admin of admins) {
+      // Enviar por Email
       await this.sendEmail({
         type: "EMAIL",
         recipient: admin.email,
@@ -104,6 +141,17 @@ export class NotificationService {
         entityType: "PQR",
         entityId: pqr.id,
       });
+
+      // Opcional: Enviar por SMS si el administrador tiene un número de teléfono
+      if (admin.phone) {
+        await this.sendSMS({
+          type: "SMS",
+          recipient: admin.phone,
+          body: `Nueva PQR: ${pqr.title} - ${pqr.description.substring(0, 50)}...`,
+          entityType: "PQR",
+          entityId: pqr.id,
+        });
+      }
     }
   }
 
@@ -112,13 +160,14 @@ export class NotificationService {
    * @param pqr Datos de la PQR
    * @param oldStatus Estado anterior
    */
-  static async notifyPQRStatusChange(pqr: unknown, oldStatus: string) {
+  static async notifyPQRStatusChange(pqr: any, oldStatus: string) {
     // Obtener usuario que creó la PQR
     const creator = await prisma.user.findUnique({
       where: { id: pqr.userId },
     });
 
     if (creator) {
+      // Enviar por Email
       await this.sendEmail({
         type: "EMAIL",
         recipient: creator.email,
@@ -136,6 +185,17 @@ export class NotificationService {
         entityType: "PQR",
         entityId: pqr.id,
       });
+
+      // Opcional: Enviar por SMS si el creador tiene un número de teléfono
+      if (creator.phone) {
+        await this.sendSMS({
+          type: "SMS",
+          recipient: creator.phone,
+          body: `PQR ${pqr.title} actualizada a: ${pqr.status}.`,
+          entityType: "PQR",
+          entityId: pqr.id,
+        });
+      }
     }
   }
 }

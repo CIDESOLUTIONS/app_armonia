@@ -21,7 +21,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import {
   AlertDialog,
@@ -40,6 +39,18 @@ import {
   updateAmenity,
   deleteAmenity,
 } from "@/services/amenityService";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { amenitySchema, AmenityFormValues } from "@/validators/amenity-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Amenity {
   id: number;
@@ -59,20 +70,24 @@ export default function AmenitiesPage() {
   const [amenities, setAmenities] = useState<Amenity[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentAmenity, setCurrentAmenity] =
-    useState<Amenity | null>(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    location: "",
-    capacity: 0,
-    requiresApproval: false,
-    hasFee: false,
-    feeAmount: 0,
-    isActive: true,
+  const [currentAmenity, setCurrentAmenity] = useState<Amenity | null>(null);
+
+  const form = useForm<AmenityFormValues>({
+    resolver: zodResolver(amenitySchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      location: "",
+      capacity: 0,
+      requiresApproval: false,
+      hasFee: false,
+      feeAmount: 0,
+      isActive: true,
+    },
   });
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [amenityToDelete, setAmenityToDelete] = useState<number | null>(null);
+
+  const { handleSubmit, control, reset, watch, formState: { isSubmitting } } = form;
+  const hasFee = watch("hasFee");
 
   const fetchAmenities = useCallback(async () => {
     setLoading(true);
@@ -97,29 +112,9 @@ export default function AmenitiesPage() {
     }
   }, [authLoading, user, fetchAmenities]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
-  ) => {
-    const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "number" ? parseFloat(value) : value,
-    }));
-  };
-
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: checked,
-    }));
-  };
-
   const handleAddAmenity = () => {
     setCurrentAmenity(null);
-    setFormData({
+    reset({
       name: "",
       description: "",
       location: "",
@@ -134,7 +129,7 @@ export default function AmenitiesPage() {
 
   const handleEditAmenity = (amenity: Amenity) => {
     setCurrentAmenity(amenity);
-    setFormData({
+    reset({
       name: amenity.name,
       description: amenity.description || "",
       location: amenity.location,
@@ -147,17 +142,16 @@ export default function AmenitiesPage() {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: AmenityFormValues) => {
     try {
       if (currentAmenity) {
-        await updateAmenity(currentAmenity.id, formData);
+        await updateAmenity(currentAmenity.id, data);
         toast({
           title: "Éxito",
           description: "Amenidad actualizada correctamente.",
         });
       } else {
-        await createAmenity(formData);
+        await createAmenity(data);
         toast({
           title: "Éxito",
           description: "Amenidad creada correctamente.",
@@ -174,6 +168,9 @@ export default function AmenitiesPage() {
       });
     }
   };
+
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [amenityToDelete, setAmenityToDelete] = useState<number | null>(null);
 
   const handleDeleteAmenity = (id: number) => {
     setAmenityToDelete(id);
@@ -311,101 +308,149 @@ export default function AmenitiesPage() {
               {currentAmenity ? "Editar Amenidad" : "Añadir Nueva Amenidad"}
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name">Nombre</Label>
-              <Input
-                id="name"
+          <Form {...form}>
+            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
+              <FormField
+                control={control}
                 name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Nombre</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description">Descripción</Label>
-              <Input
-                id="description"
+              <FormField
+                control={control}
                 name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                className="col-span-3"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Descripción</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="location">Ubicación</Label>
-              <Input
-                id="location"
+              <FormField
+                control={control}
                 name="location"
-                value={formData.location}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Ubicación</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="capacity">Capacidad</Label>
-              <Input
-                id="capacity"
+              <FormField
+                control={control}
                 name="capacity"
-                type="number"
-                value={formData.capacity}
-                onChange={handleInputChange}
-                className="col-span-3"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Capacidad</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        className="col-span-3"
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Input
-                id="requiresApproval"
+              <FormField
+                control={control}
                 name="requiresApproval"
-                type="checkbox"
-                checked={formData.requiresApproval}
-                onChange={handleCheckboxChange}
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Requiere Aprobación</FormLabel>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <Label htmlFor="requiresApproval">Requiere Aprobación</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Input
-                id="hasFee"
+              <FormField
+                control={control}
                 name="hasFee"
-                type="checkbox"
-                checked={formData.hasFee}
-                onChange={handleCheckboxChange}
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Tiene Costo</FormLabel>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <Label htmlFor="hasFee">Tiene Costo</Label>
-            </div>
-            {formData.hasFee && (
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="feeAmount" className="text-right">
-                  Costo
-                </Label>
-                <Input
-                  id="feeAmount"
+              {hasFee && (
+                <FormField
+                  control={control}
                   name="feeAmount"
-                  type="number"
-                  value={formData.feeAmount}
-                  onChange={handleInputChange}
-                  className="col-span-3"
+                  render={({ field }) => (
+                    <FormItem className="grid grid-cols-4 items-center gap-4">
+                      <FormLabel className="text-right">Costo</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          className="col-span-3"
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage className="col-span-full text-right" />
+                    </FormItem>
+                  )}
                 />
-              </div>
-            )}
-            <div className="flex items-center space-x-2">
-              <Input
-                id="isActive"
+              )}
+              <FormField
+                control={control}
                 name="isActive"
-                type="checkbox"
-                checked={formData.isActive}
-                onChange={handleCheckboxChange}
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Activa</FormLabel>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <Label htmlFor="isActive">Activa</Label>
-            </div>
-            <DialogFooter>
-              <Button type="submit">
-                {currentAmenity ? "Guardar Cambios" : "Añadir Amenidad"}
-              </Button>
-            </DialogFooter>
-          </form>
+              <DialogFooter>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : null}{" "}
+                  {currentAmenity ? "Guardar Cambios" : "Añadir Amenidad"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 

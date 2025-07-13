@@ -2,7 +2,7 @@
  * Pruebas unitarias para el servicio de métricas de PQR
  */
 
-import { PQRMetricsService } from "../pqrMetricsService";
+import { PQRMetricsService } from "@/services/pqrMetricsService";
 import { PQRCategory, PQRPriority, PQRStatus } from "@/constants/pqr-constants";
 import { getTenantPrismaClient, getPublicPrismaClient } from "@/lib/prisma";
 

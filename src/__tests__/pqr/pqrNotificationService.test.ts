@@ -2,7 +2,7 @@
  * Pruebas unitarias para el servicio de notificaciones de PQR
  */
 
-import { PQRNotificationService } from "../pqrNotificationService";
+import { PQRNotificationService } from "@/services/pqrNotificationService";
 import { PQRStatus, PQRNotificationTemplate } from "@/constants/pqr-constants";
 import { sendEmail } from "@/lib/communications/email-service";
 import { sendPushNotification } from "@/lib/communications/push-notification-service";

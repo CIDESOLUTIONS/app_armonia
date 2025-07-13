@@ -1,6 +1,7 @@
 // src/__tests__/inventory/inventory-service-refactored.test.ts
 import { InventoryServiceRefactored } from "@/lib/services/inventory-service-refactored";
 import { PrismaClient } from "@prisma/client";
+import { getPrisma } from "@/lib/prisma"; // Moved to top level
 
 // Mock de Prisma
 jest.mock("@/lib/prisma", () => ({
@@ -39,8 +40,7 @@ describe("InventoryServiceRefactored", () => {
 
   beforeEach(() => {
     service = new InventoryServiceRefactored();
-    import { getPrisma } from "@/lib/prisma";
-    mockPrisma = getPrisma();
+    mockPrisma = getPrisma(); // Call the already imported function
     jest.clearAllMocks();
   });
 

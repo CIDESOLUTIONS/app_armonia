@@ -21,7 +21,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import {
   AlertDialog,
@@ -40,6 +39,18 @@ import {
   updateVehicle,
   deleteVehicle,
 } from "@/services/vehicleService";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { vehicleSchema, VehicleFormValues } from "@/validators/vehicle-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Vehicle {
   id: number;
@@ -61,18 +72,22 @@ export default function VehiclesPage() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentVehicle, setCurrentVehicle] = useState<Vehicle | null>(null);
-  const [formData, setFormData] = useState({
-    licensePlate: "",
-    brand: "",
-    model: "",
-    color: "",
-    ownerName: "",
-    propertyId: 0,
-    parkingSpace: "",
-    isActive: true,
+
+  const form = useForm<VehicleFormValues>({
+    resolver: zodResolver(vehicleSchema),
+    defaultValues: {
+      licensePlate: "",
+      brand: "",
+      model: "",
+      color: "",
+      ownerName: "",
+      propertyId: 0,
+      parkingSpace: "",
+      isActive: true,
+    },
   });
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [vehicleToDelete, setVehicleToDelete] = useState<number | null>(null);
+
+  const { handleSubmit, control, reset, formState: { isSubmitting } } = form;
 
   const fetchVehicles = useCallback(async () => {
     setLoading(true);
@@ -97,27 +112,9 @@ export default function VehiclesPage() {
     }
   }, [authLoading, user, fetchVehicles]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "number" ? parseInt(value) : value,
-    }));
-  };
-
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: checked,
-    }));
-  };
-
   const handleAddVehicle = () => {
     setCurrentVehicle(null);
-    setFormData({
+    reset({
       licensePlate: "",
       brand: "",
       model: "",
@@ -132,7 +129,7 @@ export default function VehiclesPage() {
 
   const handleEditVehicle = (vehicle: Vehicle) => {
     setCurrentVehicle(vehicle);
-    setFormData({
+    reset({
       licensePlate: vehicle.licensePlate,
       brand: vehicle.brand,
       model: vehicle.model,
@@ -145,17 +142,16 @@ export default function VehiclesPage() {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: VehicleFormValues) => {
     try {
       if (currentVehicle) {
-        await updateVehicle(currentVehicle.id, formData);
+        await updateVehicle(currentVehicle.id, data);
         toast({
           title: "Éxito",
           description: "Vehículo actualizado correctamente.",
         });
       } else {
-        await createVehicle(formData);
+        await createVehicle(data);
         toast({
           title: "Éxito",
           description: "Vehículo creado correctamente.",
@@ -172,6 +168,9 @@ export default function VehiclesPage() {
       });
     }
   };
+
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [vehicleToDelete, setVehicleToDelete] = useState<number | null>(null);
 
   const handleDeleteVehicle = (id: number) => {
     setVehicleToDelete(id);
@@ -297,100 +296,132 @@ export default function VehiclesPage() {
               {currentVehicle ? "Editar Vehículo" : "Añadir Nuevo Vehículo"}
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="licensePlate">Placa</Label>
-              <Input
-                id="licensePlate"
+          <Form {...form}>
+            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
+              <FormField
+                control={control}
                 name="licensePlate"
-                value={formData.licensePlate}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Placa</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="brand">Marca</Label>
-              <Input
-                id="brand"
+              <FormField
+                control={control}
                 name="brand"
-                value={formData.brand}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Marca</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="model">Modelo</Label>
-              <Input
-                id="model"
+              <FormField
+                control={control}
                 name="model"
-                value={formData.model}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Modelo</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="color">Color</Label>
-              <Input
-                id="color"
+              <FormField
+                control={control}
                 name="color"
-                value={formData.color}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Color</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="ownerName">Nombre Propietario</Label>
-              <Input
-                id="ownerName"
+              <FormField
+                control={control}
                 name="ownerName"
-                value={formData.ownerName}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Nombre Propietario</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="propertyId">ID Propiedad</Label>
-              <Input
-                id="propertyId"
+              <FormField
+                control={control}
                 name="propertyId"
-                type="number"
-                value={formData.propertyId}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">ID Propiedad</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        className="col-span-3"
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="parkingSpace">Parqueadero</Label>
-              <Input
-                id="parkingSpace"
+              <FormField
+                control={control}
                 name="parkingSpace"
-                value={formData.parkingSpace}
-                onChange={handleInputChange}
-                className="col-span-3"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Parqueadero</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Input
-                id="isActive"
+              <FormField
+                control={control}
                 name="isActive"
-                type="checkbox"
-                checked={formData.isActive}
-                onChange={handleCheckboxChange}
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Activo</FormLabel>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <Label htmlFor="isActive">Activo</Label>
-            </div>
-            <DialogFooter>
-              <Button type="submit">
-                {currentVehicle ? "Guardar Cambios" : "Añadir Vehículo"}
-              </Button>
-            </DialogFooter>
-          </form>
+              <DialogFooter>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : null}{" "}
+                  {currentVehicle ? "Guardar Cambios" : "Añadir Vehículo"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 
@@ -413,5 +444,3 @@ export default function VehiclesPage() {
     </div>
   );
 }
-
-

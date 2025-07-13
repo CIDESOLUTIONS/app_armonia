@@ -3,11 +3,11 @@
  * Incluye funcionalidades para procesamiento de pagos con múltiples pasarelas
  */
 
-import { prisma } from "@/lib/prisma";
+import { PrismaClient } from "@prisma/client";
 import { ServerLogger } from "@/lib/logging/server-logger";
 import { ActivityLogger } from "@/lib/logging/activity-logger";
-import { NotificationService } from "@/lib/communications/notification-service";
-import { generateReceipt, sendReceiptByEmail } from "@/lib/pdf/receipt-service";
+import { NotificationService, NotificationData } from "@/lib/notifications/notification-service";
+import { generateReceipt } from "@/lib/pdf/receipt-service";
 import { encrypt, decrypt } from "@/lib/security/encryption-service";
 import { TransactionStatus, DiscountType } from "@prisma/client";
 
@@ -294,10 +294,72 @@ export class PaymentGatewayFactory {
 
 // Servicio principal de pagos
 export class PaymentService {
+  private prisma: PrismaClient;
+
+  constructor(prismaClient: PrismaClient) {
+    this.prisma = prismaClient;
+  }
+
+  /**
+   * Inicia el proceso de pago para una cuota pendiente.
+   * @param feeId ID de la cuota pendiente.
+   * @param userId ID del usuario que inicia el pago.
+   * @param complexId ID del complejo residencial.
+   * @returns URL de la pasarela de pago.
+   */
+  async initiatePaymentForFee(
+    feeId: number,
+    userId: number,
+    complexId: number,
+  ): Promise<string> {
+    try {
+      const fee = await this.prisma.bill.findUnique({
+        where: { id: feeId },
+      });
+
+      if (!fee) {
+        throw new Error(`Cuota con ID ${feeId} no encontrada.`);
+      }
+
+      // Asumiendo una pasarela y método de pago por defecto para el ejemplo.
+      // En un escenario real, estos se seleccionarían dinámicamente o se configurarían.
+      const defaultGateway = await this.prisma.paymentGateway.findFirst({
+        where: { isActive: true },
+      });
+      const defaultMethod = await this.prisma.paymentMethod.findFirst({
+        where: { isActive: true },
+      });
+
+      if (!defaultGateway || !defaultMethod) {
+        throw new Error("No se encontró una pasarela o método de pago activo.");
+      }
+
+      const transaction = await this.createTransaction({
+        userId: userId,
+        invoiceId: fee.id, // Asumiendo que invoiceId mapea a Bill.id
+        amount: fee.totalAmount.toNumber(), // Convertir Decimal a number
+        currency: "COP", // Asumiendo moneda por defecto
+        description: `Pago de cuota: ${fee.billNumber} - ${fee.billingPeriod}`,
+        gatewayId: defaultGateway.id,
+        methodId: defaultMethod.id,
+        // Añadir otros campos necesarios para CreateTransactionDto
+      });
+
+      if (!transaction.paymentUrl) {
+        throw new Error("URL de pago no generada por la pasarela.");
+      }
+
+      return transaction.paymentUrl;
+    } catch (error) {
+      ServerLogger.error(`Error al iniciar el pago de la cuota ${feeId}:`, error);
+      throw new Error("No se pudo iniciar el pago de la cuota.");
+    }
+  }
+
   /**
    * Crea una nueva transacción de pago
    */
-  static async createTransaction(data: CreateTransactionDto): Promise<any> {
+  async createTransaction(data: CreateTransactionDto): Promise<any> {
     try {
       // Validar datos básicos
       if (!data.amount || data.amount <= 0) {
@@ -305,7 +367,7 @@ export class PaymentService {
       }
 
       // Obtener configuración de la pasarela
-      const gateway = await prisma.paymentGateway.findUnique({
+      const gateway = await this.prisma.paymentGateway.findUnique({
         where: { id: data.gatewayId, isActive: true },
       });
 
@@ -314,7 +376,7 @@ export class PaymentService {
       }
 
       // Obtener método de pago
-      const paymentMethod = await prisma.paymentMethod.findUnique({
+      const paymentMethod = await this.prisma.paymentMethod.findUnique({
         where: { id: data.methodId, isActive: true },
       });
 
@@ -342,7 +404,7 @@ export class PaymentService {
       }
 
       // Crear transacción en la base de datos
-      const transaction = await prisma.transaction.create({
+      const transaction = await this.prisma.transaction.create({
         data: {
           userId: data.userId,
           invoiceId: data.invoiceId,
@@ -379,8 +441,8 @@ export class PaymentService {
 
       // Inicializar adaptador con configuración
       const gatewayConfig = {
-        apiKey: await EncryptionService.decrypt(gateway.apiKey),
-        apiSecret: await EncryptionService.decrypt(gateway.apiSecret),
+        apiKey: await decrypt(gateway.apiKey),
+        apiSecret: await decrypt(gateway.apiSecret),
         merchantId: gateway.merchantId,
         accountId: gateway.accountId,
         testMode: gateway.testMode,
@@ -401,13 +463,13 @@ export class PaymentService {
       });
 
       // Actualizar transacción con datos de la pasarela
-      const updatedTransaction = await prisma.transaction.update({
+      const updatedTransaction = await this.prisma.transaction.update({
         where: { id: transaction.id },
         data: {
           gatewayReference: gatewayResponse.gatewayReference,
           paymentUrl: gatewayResponse.paymentUrl,
           gatewayResponse: gatewayResponse,
-          status: this.mapGatewayStatus(gatewayResponse.status),
+          status: PaymentService.mapGatewayStatus(gatewayResponse.status),
         },
       });
 
@@ -421,9 +483,9 @@ export class PaymentService {
   /**
    * Verifica el estado de una transacción en la pasarela
    */
-  static async verifyTransaction(transactionId: string): Promise<any> {
+  async verifyTransaction(transactionId: string): Promise<any> {
     try {
-      const transaction = await prisma.transaction.findUnique({
+      const transaction = await this.prisma.transaction.findUnique({
         where: { id: transactionId },
         include: {
           gateway: true,
@@ -450,8 +512,8 @@ export class PaymentService {
 
       // Inicializar adaptador con configuración
       const gatewayConfig = {
-        apiKey: await EncryptionService.decrypt(transaction.gateway.apiKey),
-        apiSecret: await EncryptionService.decrypt(
+        apiKey: await decrypt(transaction.gateway.apiKey),
+        apiSecret: await decrypt(
           transaction.gateway.apiSecret,
         ),
         merchantId: transaction.gateway.merchantId,
@@ -468,13 +530,13 @@ export class PaymentService {
       );
 
       // Determinar estado final
-      const finalStatus = this.mapGatewayStatus(gatewayResponse.status);
+      const finalStatus = PaymentService.mapGatewayStatus(gatewayResponse.status);
       const statusChanged = finalStatus !== transaction.status;
       const isCompleted = finalStatus === TransactionStatus.COMPLETED;
 
       // Actualizar transacción si cambió el estado
       if (statusChanged) {
-        const updatedTransaction = await prisma.transaction.update({
+        const updatedTransaction = await this.prisma.transaction.update({
           where: { id: transaction.id },
           data: {
             status: finalStatus,
@@ -487,37 +549,38 @@ export class PaymentService {
         if (isCompleted && transaction.status !== TransactionStatus.COMPLETED) {
           // Actualizar factura si existe
           if (transaction.invoiceId) {
-            await prisma.invoice.update({
+            await this.prisma.bill.update({
               where: { id: transaction.invoiceId },
               data: {
                 status: "PAID",
                 paidAt: new Date(),
-                paidAmount: transaction.amount,
+                // paidAmount: transaction.amount, // No existe en el modelo Bill
               },
             });
           }
 
           // Generar recibo
-          const receipt = await ReceiptService.generatePaymentReceipt(
+          const receipt = await generateReceipt(
             transaction.id,
           );
 
           // Actualizar transacción con recibo
-          await prisma.transaction.update({
+          await this.prisma.transaction.update({
             where: { id: transaction.id },
             data: {
-              receiptId: receipt.id,
-              receiptUrl: receipt.url,
+              // receiptId: receipt.id, // No existe en el modelo Transaction
+              // receiptUrl: receipt.url, // No existe en el modelo Transaction
             },
           });
 
           // Enviar notificación al usuario
-          await NotificationService.sendNotification({
-            userId: transaction.userId,
-            title: "Pago confirmado",
-            content: `Su pago por ${transaction.amount} ${transaction.currency} ha sido confirmado.`,
-            type: "PAYMENT",
-            actionUrl: `/payments/receipt/${receipt.id}`,
+          await NotificationService.sendEmail({
+            recipient: (await this.prisma.user.findUnique({ where: { id: transaction.userId } }))?.email || '',
+            subject: "Pago confirmado",
+            body: `Su pago por ${transaction.amount} ${transaction.currency} ha sido confirmado.`,
+            type: "EMAIL",
+            entityType: "PAYMENT",
+            entityId: transaction.id,
           });
 
           // Registrar actividad
@@ -547,14 +610,14 @@ export class PaymentService {
   /**
    * Procesa un webhook de pasarela de pago
    */
-  static async processWebhook(
+  async processWebhook(
     gatewayName: string,
     payload: any,
     signature: string,
   ): Promise<any> {
     try {
       // Obtener configuración de la pasarela
-      const gateway = await prisma.paymentGateway.findFirst({
+      const gateway = await this.prisma.paymentGateway.findFirst({
         where: {
           name: { equals: gatewayName, mode: "insensitive" },
           isActive: true,
@@ -581,7 +644,7 @@ export class PaymentService {
 
       // Extraer referencia de transacción del payload
       // Nota: Esto depende de la estructura específica del webhook de cada pasarela
-      const gatewayReference = this.extractGatewayReference(
+      const gatewayReference = PaymentService.extractGatewayReference(
         gateway.name,
         payload,
       );
@@ -592,7 +655,7 @@ export class PaymentService {
       }
 
       // Buscar transacción por referencia de pasarela
-      const transaction = await prisma.transaction.findFirst({
+      const transaction = await this.prisma.transaction.findFirst({
         where: { gatewayReference },
       });
 
@@ -603,11 +666,11 @@ export class PaymentService {
       }
 
       // Extraer estado del payload
-      const gatewayStatus = this.extractGatewayStatus(gateway.name, payload);
-      const newStatus = this.mapGatewayStatus(gatewayStatus);
+      const gatewayStatus = PaymentService.extractGatewayStatus(gateway.name, payload);
+      const newStatus = PaymentService.mapGatewayStatus(gatewayStatus);
 
       // Actualizar transacción
-      await prisma.transaction.update({
+      await this.prisma.transaction.update({
         where: { id: transaction.id },
         data: {
           status: newStatus,
@@ -632,13 +695,13 @@ export class PaymentService {
   /**
    * Reembolsa una transacción
    */
-  static async refundTransaction(
+  async refundTransaction(
     transactionId: string,
     amount?: number,
     reason?: string,
   ): Promise<any> {
     try {
-      const transaction = await prisma.transaction.findUnique({
+      const transaction = await this.prisma.transaction.findUnique({
         where: { id: transactionId },
         include: {
           gateway: true,
@@ -675,8 +738,8 @@ export class PaymentService {
 
       // Inicializar adaptador con configuración
       const gatewayConfig = {
-        apiKey: await EncryptionService.decrypt(transaction.gateway.apiKey),
-        apiSecret: await EncryptionService.decrypt(
+        apiKey: await decrypt(transaction.gateway.apiKey),
+        apiSecret: await decrypt(
           transaction.gateway.apiSecret,
         ),
         merchantId: transaction.gateway.merchantId,
@@ -694,7 +757,7 @@ export class PaymentService {
       );
 
       // Actualizar transacción
-      const updatedTransaction = await prisma.transaction.update({
+      const updatedTransaction = await this.prisma.transaction.update({
         where: { id: transaction.id },
         data: {
           status: TransactionStatus.REFUNDED,
@@ -715,22 +778,23 @@ export class PaymentService {
 
       // Si hay factura asociada, actualizar su estado
       if (transaction.invoiceId) {
-        await prisma.invoice.update({
+        await this.prisma.bill.update({
           where: { id: transaction.invoiceId },
           data: {
             status: "UNPAID",
-            paidAmount: 0,
+            // paidAmount: 0, // No existe en el modelo Bill
           },
         });
       }
 
       // Enviar notificación al usuario
-      await NotificationService.sendNotification({
-        userId: transaction.userId,
-        title: "Reembolso procesado",
-        content: `Su pago por ${refundAmount} ${transaction.currency} ha sido reembolsado.`,
-        type: "PAYMENT",
-        actionUrl: `/payments/transaction/${transaction.id}`,
+      await NotificationService.sendEmail({
+        recipient: (await this.prisma.user.findUnique({ where: { id: transaction.userId } }))?.email || '',
+        subject: "Reembolso procesado",
+        body: `Su pago por ${refundAmount} ${transaction.currency} ha sido reembolsado.`,
+        type: "EMAIL",
+        entityType: "PAYMENT",
+        entityId: transaction.id,
       });
 
       // Registrar actividad
@@ -756,7 +820,7 @@ export class PaymentService {
   /**
    * Guarda un token de pago para uso futuro
    */
-  static async savePaymentToken(data: {
+  async savePaymentToken(data: {
     userId: number;
     gatewayId: number;
     token: string;
@@ -770,11 +834,11 @@ export class PaymentService {
   }): Promise<any> {
     try {
       // Encriptar token
-      const encryptedToken = await EncryptionService.encrypt(data.token);
+      const encryptedToken = await encrypt(data.token);
 
       // Si este token será el predeterminado, quitar ese estado de otros tokens
       if (data.isDefault) {
-        await prisma.paymentToken.updateMany({
+        await this.prisma.paymentToken.updateMany({
           where: {
             userId: data.userId,
             isDefault: true,
@@ -784,7 +848,7 @@ export class PaymentService {
       }
 
       // Crear token
-      const paymentToken = await prisma.paymentToken.create({
+      const paymentToken = await this.prisma.paymentToken.create({
         data: {
           userId: data.userId,
           gatewayId: data.gatewayId,
@@ -831,9 +895,9 @@ export class PaymentService {
   /**
    * Obtiene tokens de pago de un usuario
    */
-  static async getUserPaymentTokens(userId: number): Promise<any> {
+  async getUserPaymentTokens(userId: number): Promise<any> {
     try {
-      const tokens = await prisma.paymentToken.findMany({
+      const tokens = await this.prisma.paymentToken.findMany({
         where: {
           userId,
           isActive: true,
@@ -873,13 +937,13 @@ export class PaymentService {
   /**
    * Elimina un token de pago
    */
-  static async deletePaymentToken(
+  async deletePaymentToken(
     tokenId: string,
     userId: number,
   ): Promise<any> {
     try {
       // Verificar que el token pertenece al usuario
-      const token = await prisma.paymentToken.findFirst({
+      const token = await this.prisma.paymentToken.findFirst({
         where: {
           id: tokenId,
           userId,
@@ -891,7 +955,7 @@ export class PaymentService {
       }
 
       // Desactivar token en lugar de eliminarlo
-      await prisma.paymentToken.update({
+      await this.prisma.paymentToken.update({
         where: { id: tokenId },
         data: { isActive: false },
       });
@@ -919,16 +983,16 @@ export class PaymentService {
   /**
    * Configura una pasarela de pago
    */
-  static async configureGateway(data: GatewayConfigDto): Promise<any> {
+  async configureGateway(data: GatewayConfigDto): Promise<any> {
     try {
       // Encriptar credenciales
-      const encryptedApiKey = await EncryptionService.encrypt(data.apiKey);
-      const encryptedApiSecret = await EncryptionService.encrypt(
+      const encryptedApiKey = await encrypt(data.apiKey);
+      const encryptedApiSecret = await encrypt(
         data.apiSecret,
       );
 
       // Buscar si ya existe la pasarela
-      const existingGateway = await prisma.paymentGateway.findFirst({
+      const existingGateway = await this.prisma.paymentGateway.findFirst({
         where: {
           name: { equals: data.name, mode: "insensitive" },
         },
@@ -937,7 +1001,7 @@ export class PaymentService {
       let gateway;
       if (existingGateway) {
         // Actualizar pasarela existente
-        gateway = await prisma.paymentGateway.update({
+        gateway = await this.prisma.paymentGateway.update({
           where: { id: existingGateway.id },
           data: {
             apiKey: encryptedApiKey,
@@ -958,7 +1022,7 @@ export class PaymentService {
         });
       } else {
         // Crear nueva pasarela
-        gateway = await prisma.paymentGateway.create({
+        gateway = await this.prisma.paymentGateway.create({
           data: {
             name: data.name,
             apiKey: encryptedApiKey,
@@ -1015,10 +1079,10 @@ export class PaymentService {
   /**
    * Configura un método de pago
    */
-  static async configurePaymentMethod(data: PaymentMethodDto): Promise<any> {
+  async configurePaymentMethod(data: PaymentMethodDto): Promise<any> {
     try {
       // Buscar si ya existe el método
-      const existingMethod = await prisma.paymentMethod.findFirst({
+      const existingMethod = await this.prisma.paymentMethod.findFirst({
         where: {
           code: { equals: data.code, mode: "insensitive" },
         },
@@ -1027,7 +1091,7 @@ export class PaymentService {
       let paymentMethod;
       if (existingMethod) {
         // Actualizar método existente
-        paymentMethod = await prisma.paymentMethod.update({
+        paymentMethod = await this.prisma.paymentMethod.update({
           where: { id: existingMethod.id },
           data: {
             name: data.name,
@@ -1046,7 +1110,7 @@ export class PaymentService {
         });
       } else {
         // Crear nuevo método
-        paymentMethod = await prisma.paymentMethod.create({
+        paymentMethod = await this.prisma.paymentMethod.create({
           data: {
             name: data.name,
             code: data.code,
@@ -1071,7 +1135,7 @@ export class PaymentService {
   /**
    * Obtiene transacciones de un usuario
    */
-  static async getUserTransactions(
+  async getUserTransactions(
     userId: number,
     page = 1,
     limit = 10,
@@ -1085,9 +1149,9 @@ export class PaymentService {
         ...(status && { status }),
       };
 
-      const total = await prisma.transaction.count({ where });
+      const total = await this.prisma.transaction.count({ where });
 
-      const transactions = await prisma.transaction.findMany({
+      const transactions = await this.prisma.transaction.findMany({
         where,
         include: {
           gateway: {
@@ -1129,14 +1193,14 @@ export class PaymentService {
   /**
    * Obtiene estadísticas de pagos
    */
-  static async getPaymentStats(dateFrom?: Date, dateTo?: Date): Promise<any> {
+  async getPaymentStats(dateFrom?: Date, dateTo?: Date): Promise<any> {
     try {
       const now = new Date();
       const fromDate = dateFrom || new Date(now.setMonth(now.getMonth() - 1));
       const toDate = dateTo || new Date();
 
       // Total de transacciones por estado
-      const transactionsByStatus = await prisma.transaction.groupBy({
+      const transactionsByStatus = await this.prisma.transaction.groupBy({
         by: ["status"],
         where: {
           createdAt: {
@@ -1151,7 +1215,7 @@ export class PaymentService {
       });
 
       // Transacciones por método de pago
-      const transactionsByMethod = await prisma.transaction.groupBy({
+      const transactionsByMethod = await this.prisma.transaction.groupBy({
         by: ["methodId"],
         where: {
           status: TransactionStatus.COMPLETED,
@@ -1168,7 +1232,7 @@ export class PaymentService {
 
       // Obtener nombres de métodos
       const methodIds = transactionsByMethod.map((item) => item.methodId);
-      const methods = await prisma.paymentMethod.findMany({
+      const methods = await this.prisma.paymentMethod.findMany({
         where: {
           id: { in: methodIds },
         },
@@ -1195,7 +1259,7 @@ export class PaymentService {
       }));
 
       // Transacciones por día
-      const transactionsByDay = await prisma.$queryRaw`
+      const transactionsByDay = await this.prisma.$queryRaw`
         SELECT 
           DATE_TRUNC('day', "createdAt") as day,
           COUNT(*) as count,

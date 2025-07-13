@@ -3,6 +3,7 @@ import { getTenantPrismaClient } from "@/lib/prisma";
 import { verifyAuth } from "@/lib/auth";
 import { ServerLogger } from "@/lib/logging/server-logger";
 import { z } from "zod";
+import { uploadFileToS3 } from "@/lib/storage/s3-upload";
 
 const BrandingSettingsSchema = z.object({
   primaryColor: z.string().min(1, "El color principal es requerido."),
@@ -90,11 +91,26 @@ export async function PUT(request: NextRequest) {
     let logoUrl: string | undefined;
 
     if (logoFile) {
-      // TODO: Implement file upload to a storage service (e.g., S3, GCS)
-      // For now, simulate upload and generate a placeholder URL
       const fileName = `${payload.complexId}-${Date.now()}-${logoFile.name}`;
-      logoUrl = `/uploads/${fileName}`; // Placeholder URL
-      ServerLogger.info(`Simulating logo upload for ${fileName}`);
+      const bucketName = process.env.AWS_S3_BUCKET_NAME;
+
+      if (!bucketName) {
+        ServerLogger.error("AWS_S3_BUCKET_NAME no está configurado.");
+        return NextResponse.json(
+          { message: "Error de configuración del servidor: Bucket S3 no especificado." },
+          { status: 500 },
+        );
+      }
+
+      try {
+        logoUrl = await uploadFileToS3(logoFile, fileName, bucketName);
+      } catch (uploadError: any) {
+        ServerLogger.error(`Error al cargar el logo a S3: ${uploadError.message}`);
+        return NextResponse.json(
+          { message: "Error al cargar el logo.", details: uploadError.message },
+          { status: 500 },
+        );
+      }
     }
 
     const updatedSettings = await tenantPrisma.brandingSettings.upsert({
@@ -121,3 +137,4 @@ export async function PUT(request: NextRequest) {
     );
   }
 }
+
