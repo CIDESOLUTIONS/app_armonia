@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { JWTPayload } from "@/lib/auth";
 
 interface Assembly {
   id: number;
@@ -19,7 +20,7 @@ export async function PUT(_req: unknown) {
     return NextResponse.json({ message: "No token provided" }, { status: 401 });
 
   try {
-    // Variable decoded eliminada por lint complexId: number; role: string; schemaName?: string };
+    const decoded = (await verifyToken(token)) as JWTPayload;
     console.log("[API Assemblies Update] Token decodificado:", decoded);
 
     if (decoded.role !== "COMPLEX_ADMIN") {

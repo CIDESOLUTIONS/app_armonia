@@ -11,7 +11,7 @@ interface Assembly {
   date: Date;
   endTime: Date | null;
   location: string;
-  agenda: any; // Assuming Json is any
+  agenda: unknown; // Assuming Json is any
   requiredCoefficient: number;
   currentCoefficient: number;
   quorumStatus: string;
