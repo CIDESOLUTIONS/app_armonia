@@ -8,8 +8,8 @@ async function seed() {
 
   // Limpiar datos existentes si es necesario
   console.log("Eliminando datos existentes...");
-  await prisma.$executeRaw`DELETE FROM "armonia"."User" WHERE 1=1;`;
-  await prisma.$executeRaw`DELETE FROM "armonia"."ResidentialComplex" WHERE 1=1;`;
+  await prisma.$executeRaw`DELETE FROM "User" WHERE 1=1;`;
+  await prisma.$executeRaw`DELETE FROM "ResidentialComplex" WHERE 1=1;`;
 
   // Crear un conjunto residencial de ejemplo
   console.log("Creando conjunto residencial de prueba...");

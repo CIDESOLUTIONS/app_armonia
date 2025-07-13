@@ -30,10 +30,23 @@ export const authOptions: NextAuthOptions = {
             include: { complex: true }, // Incluir la relación con ResidentialComplex
           });
 
+          const ipAddress = req.headers['x-forwarded-for']?.toString() || req.socket.remoteAddress || 'unknown';
+          const userAgent = req.headers['user-agent'] || 'unknown';
+
           if (!user) {
             ServerLogger.warn(
               `Intento de login fallido: Usuario no encontrado para ${email}`,
             );
+            await publicPrisma.loginHistory.create({
+              data: {
+                email: email,
+                timestamp: new Date(),
+                ipAddress: ipAddress,
+                userAgent: userAgent,
+                status: "FAILED",
+                reason: "User not found",
+              },
+            });
             return null;
           }
 
@@ -43,7 +56,35 @@ export const authOptions: NextAuthOptions = {
             ServerLogger.warn(
               `Intento de login fallido: Contraseña incorrecta para ${email}`,
             );
+            await publicPrisma.loginHistory.create({
+              data: {
+                email: email,
+                userId: user.id,
+                timestamp: new Date(),
+                ipAddress: ipAddress,
+                userAgent: userAgent,
+                status: "FAILED",
+                reason: "Incorrect password",
+              },
+            });
             return null;
+          }
+
+          // Registrar el inicio de sesión exitoso
+          try {
+            await publicPrisma.loginHistory.create({
+              data: {
+                userId: user.id,
+                email: email,
+                timestamp: new Date(),
+                ipAddress: ipAddress,
+                userAgent: userAgent,
+                status: "SUCCESS",
+              },
+            });
+            ServerLogger.info(`Inicio de sesión exitoso para ${email} desde ${ipAddress}`);
+          } catch (logError) {
+            ServerLogger.error(`Error al registrar el historial de login para ${email}:`, logError);
           }
 
           // Validar que el usuario pertenece al schemaName proporcionado (si aplica)
