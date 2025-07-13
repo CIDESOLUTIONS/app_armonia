@@ -21,6 +21,9 @@ import {
   ResidentUpdateSchema,
 } from "@/lib/schemas/inventory-schemas";
 
+import { InventoryService } from "@/services/inventory-service-refactored";
+import { verifyAuth } from "@/lib/auth";
+
 // Mock de next/server para simular NextResponse
 jest.mock("next/server", () => ({
   NextRequest: jest
@@ -48,34 +51,35 @@ jest.mock("@/lib/auth", () => ({
         email: "admin@test.com",
         role: "COMPLEX_ADMIN",
         complexId: 1,
+        schemaName: "test_schema", // Add schemaName to payload
       },
     }),
   ),
 }));
 
 // Mock del servicio de inventario
-jest.mock("@/lib/services/inventory-service-refactored", () => ({
-  inventoryService: {
+jest.mock("@/services/inventory-service-refactored", () => ({
+  InventoryService: jest.fn().mockImplementation(() => ({
     getPets: jest.fn(),
     createPet: jest.fn(),
     getProperties: jest.fn(),
     createProperty: jest.fn(),
-    updateProperty: jest.fn(), // Added mock for updateProperty
+    updateProperty: jest.fn(),
     getVehicles: jest.fn(),
     createVehicle: jest.fn(),
-    getResidents: jest.fn(), // Added mock for getResidents
-    updateResident: jest.fn(), // Added mock for updateResident
-    getServices: jest.fn(), // Added mock for getServices
+    getResidents: jest.fn(),
+    updateResident: jest.fn(),
+    getServices: jest.fn(),
     getInventoryStats: jest.fn(),
-  },
+  })),
 }));
 
-import { inventoryService as mockInventoryService } from "@/lib/services/inventory-service-refactored";
-import { verifyAuth } from "@/lib/auth";
-
 describe("Inventory API Integration Tests", () => {
+  let inventoryService: InventoryService;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    inventoryService = new InventoryService("test_schema"); // Instantiate with schemaName
   });
 
   describe("Pets API", () => {

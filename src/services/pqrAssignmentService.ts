@@ -5,8 +5,7 @@
  * automáticamente las solicitudes PQR según reglas configurables.
  */
 
-import { getPrisma } from "@/lib/prisma";
-import { getSchemaFromRequest } from "@/lib/prisma";
+import { getTenantPrismaClient } from "@/lib/prisma";
 import {
   PQRCategory,
   PQRPriority,
@@ -48,8 +47,8 @@ export interface AssignmentResult {
 export class PQRAssignmentService {
   private prisma: PrismaClient;
 
-  constructor() {
-    this.prisma = getPrisma();
+  constructor(schemaName: string) {
+    this.prisma = getTenantPrismaClient(schemaName);
   }
 
   /**

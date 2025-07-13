@@ -5,7 +5,7 @@
 datasource db {
   provider   = "postgresql"
   url        = env("DATABASE_URL")
-  schemas    = ["armonia", "tenant"]
+  
 }
 
 // Definición del generator
@@ -27,7 +27,7 @@ enum IncidentCategory {
   PETS           // Problemas con mascotas
   OTHER          // Otros tipos
   
-  @@schema("tenant")
+  
 }
 
 // Enumeración para prioridades de incidentes
@@ -37,7 +37,7 @@ enum IncidentPriority {
   HIGH          // Alta prioridad
   CRITICAL      // Crítica (emergencia)
   
-  @@schema("tenant")
+  
 }
 
 // Enumeración para estados de incidentes
@@ -51,7 +51,7 @@ enum IncidentStatus {
   CANCELLED     // Cancelado
   REOPENED      // Reabierto
   
-  @@schema("tenant")
+  
 }
 
 // Enumeración para tipos de notificación
@@ -62,7 +62,7 @@ enum NotificationType {
   APP           // Notificación en app
   WHATSAPP      // Mensaje de WhatsApp
   
-  @@schema("tenant")
+  
 }
 
 // Enumeración para tipos de adjuntos
@@ -73,7 +73,7 @@ enum AttachmentType {
   AUDIO         // Audio
   OTHER         // Otro tipo
   
-  @@schema("tenant")
+  
 }
 
 // Enumeración para planes freemium
@@ -164,7 +164,7 @@ model Incident {
   @@index([unitNumber])
   @@index([incidentNumber])
   
-  @@schema("tenant")
+  
 }
 
 // Modelo mejorado para actualizaciones de incidentes
@@ -184,7 +184,7 @@ model IncidentUpdate {
   @@index([incidentId])
   @@index([timestamp])
   
-  @@schema("tenant")
+  
 }
 
 // Nuevo modelo para comentarios de incidentes
@@ -204,7 +204,7 @@ model IncidentComment {
   @@index([incidentId])
   @@index([timestamp])
   
-  @@schema("tenant")
+  
 }
 
 // Nuevo modelo para historial de estados de incidentes
@@ -224,7 +224,7 @@ model IncidentStatusHistory {
   @@index([incidentId])
   @@index([changedAt])
   
-  @@schema("tenant")
+  
 }
 
 // Nuevo modelo para notificaciones de incidentes
@@ -244,7 +244,7 @@ model IncidentNotification {
   @@index([incidentId])
   @@index([sentAt])
   
-  @@schema("tenant")
+  
 }
 
 // Nuevo modelo para SLA de incidentes
@@ -263,7 +263,7 @@ model IncidentSLA {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
   
-  @@schema("tenant")
+  
 }
 
 // Nuevo modelo para plantillas de notificación de incidentes
@@ -279,7 +279,7 @@ model IncidentNotificationTemplate {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
   
-  @@schema("tenant")
+  
 }
 
 // Nuevo modelo para configuración de incidentes
@@ -295,7 +295,7 @@ model IncidentSettings {
   residentCanClose        Boolean   @default(false) // Residentes pueden cerrar sus incidentes
   updatedAt               DateTime  @updatedAt
   
-  @@schema("tenant")
+  
 }
 
 // Nuevo modelo para categorías personalizadas de incidentes
@@ -308,7 +308,7 @@ model IncidentCustomCategory {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
   
-  @@schema("tenant")
+  
 }
 
 // Nuevo modelo para reportes de incidentes
@@ -323,7 +323,7 @@ model IncidentReport {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
   
-  @@schema("tenant")
+  
 }
 
 // Nuevo modelo para equipos de atención de incidentes
@@ -337,7 +337,7 @@ model IncidentTeam {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
   
-  @@schema("tenant")
+  
 }
 
 // Modelos existentes que deben mantenerse
@@ -428,14 +428,14 @@ enum DocumentType {
   PASSPORT // Pasaporte
   OTHER   // Otro tipo de documento
   
-  @@schema("tenant")
+  
 }
 
 enum VisitorStatus {
   ACTIVE   // Visitante actualmente en las instalaciones
   DEPARTED // Visitante que ya salió
   
-  @@schema("tenant")
+  
 }
 
 enum AccessPassType {
@@ -443,7 +443,7 @@ enum AccessPassType {
   TEMPORARY  // Pase temporal con validez limitada
   RECURRENT  // Pase recurrente (ej: servicios de limpieza)
   
-  @@schema("tenant")
+  
 }
 
 enum AccessPassStatus {
@@ -452,7 +452,7 @@ enum AccessPassStatus {
   EXPIRED // Pase expirado
   REVOKED // Pase revocado por administración
   
-  @@schema("tenant")
+  
 }
 
 enum AccessAction {
@@ -460,7 +460,7 @@ enum AccessAction {
   EXIT   // Registro de salida
   DENIED // Acceso denegado
   
-  @@schema("tenant")
+  
 }
 
 // Enumeración para tipos de correspondencia
@@ -471,7 +471,7 @@ enum PackageType {
   FOOD       // Comida o delivery
   OTHER      // Otro tipo
   
-  @@schema("tenant")
+  
 }
 
 // Enumeración para estados de correspondencia
@@ -483,7 +483,7 @@ enum PackageStatus {
   RETURNED   // Devuelto al remitente
   EXPIRED    // Expirado (no reclamado)
   
-  @@schema("tenant")
+  
 }
 
 // Enumeración para prioridades
@@ -493,7 +493,7 @@ enum PackagePriority {
   HIGH       // Alta prioridad
   URGENT     // Urgente
   
-  @@schema("tenant")
+  
 }
 
 // Otros modelos existentes necesarios para mantener la integridad del esquema
@@ -530,7 +530,7 @@ model Visitor {
   @@index([destination])
   @@index([preRegisterId])
   
-  @@schema("tenant")
+  
 }
 
 model PreRegisteredVisitor {
@@ -557,7 +557,7 @@ model PreRegisteredVisitor {
   @@index([status])
   @@index([validFrom, validUntil])
   
-  @@schema("tenant")
+  
 }
 
 model AccessPass {
@@ -582,7 +582,7 @@ model AccessPass {
   @@index([validFrom, validUntil])
   @@index([preRegisterId])
   
-  @@schema("tenant")
+  
 }
 
 model AccessLog {
@@ -602,7 +602,7 @@ model AccessLog {
   @@index([visitorId])
   @@index([accessPassId])
   
-  @@schema("tenant")
+  
 }
 
 model Resident {
@@ -621,7 +621,7 @@ model Resident {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   
-  @@schema("tenant")
+  
 }
 
 model Package {
@@ -670,7 +670,7 @@ model Package {
   @@index([trackingCode])
   @@index([trackingNumber])
   
-  @@schema("tenant")
+  
 }
 
 model PackageStatusHistory {
@@ -687,7 +687,7 @@ model PackageStatusHistory {
   @@index([packageId])
   @@index([changedAt])
   
-  @@schema("tenant")
+  
 }
 
 model PackageNotification {
@@ -703,7 +703,7 @@ model PackageNotification {
   @@index([packageId])
   @@index([sentAt])
   
-  @@schema("tenant")
+  
 }
 
 model PackageNotificationTemplate {
@@ -717,7 +717,7 @@ model PackageNotificationTemplate {
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
   
-  @@schema("tenant")
+  
 }
 
 model PackageSettings {
@@ -731,7 +731,7 @@ model PackageSettings {
   allowAnyoneToReceive    Boolean   @default(false)
   updatedAt               DateTime  @updatedAt
   
-  @@schema("tenant")
+  
 }
 
 model PackageReport {
@@ -745,5 +745,5 @@ model PackageReport {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   
-  @@schema("tenant")
+  
 }

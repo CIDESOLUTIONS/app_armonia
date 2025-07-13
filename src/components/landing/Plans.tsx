@@ -1,239 +1,106 @@
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ROUTES } from "@/constants/routes";
+import { useTranslations } from "next-intl";
 
 interface PlansProps {
-  theme: string;
   currency: string;
 }
 
-export function Plans({ theme, currency }: PlansProps) {
-  const _router = useRouter();
+export function Plans({ currency }: PlansProps) {
+  const t = useTranslations("landing.pricing");
+
+  const plans = [
+    {
+      name: "basic",
+      price: t("plans.basic.price"),
+      description: t("plans.basic.description"),
+      features: t.raw("plans.basic.features"),
+      buttonText: t("plans.basic.buttonText"),
+      recommended: false,
+    },
+    {
+      name: "standard",
+      price: currency === "USD" ? "$25" : "$95,000",
+      priceSuffix: t("plans.standard.priceSuffix"),
+      description: t("plans.standard.description"),
+      features: t.raw("plans.standard.features"),
+      buttonText: t("plans.standard.buttonText"),
+      recommended: true,
+    },
+    {
+      name: "premium",
+      price: currency === "USD" ? "$50" : "$190,000",
+      priceSuffix: t("plans.premium.priceSuffix"),
+      description: t("plans.premium.description"),
+      features: t.raw("plans.premium.features"),
+      buttonText: t("plans.premium.buttonText"),
+      recommended: false,
+    },
+  ];
 
   return (
-    <section
-      id="planes"
-      className={`py-20 ${theme === "dark" ? "bg-gray-800" : "bg-indigo-50"}`}
-    >
+    <section id="planes" className="py-20 bg-indigo-50 dark:bg-gray-800">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2
-            className={`text-3xl md:text-4xl font-bold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-          >
-            Planes que se adaptan a sus necesidades
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
+            {t("title")}
           </h2>
-          <p
-            className={`text-lg ${theme === "dark" ? "text-gray-300" : "text-gray-600"} max-w-3xl mx-auto`}
-          >
-            Ofrecemos diferentes opciones para conjuntos de todos los tamaños.
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            {t("description")}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div
-            className={`${theme === "dark" ? "bg-gray-700" : "bg-white"} p-8 rounded-lg border ${theme === "dark" ? "border-gray-600" : "border-gray-200"} shadow-md hover:shadow-xl transition-all`}
-          >
-            <h3
-              className={`text-xl font-bold mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-            >
-              Plan Básico
-            </h3>
+          {plans.map((plan, index) => (
             <div
-              className={`text-4xl font-bold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+              key={index}
+              className={`p-8 rounded-lg border shadow-md hover:shadow-xl transition-all ${
+                plan.recommended
+                  ? "border-2 border-indigo-500 dark:border-indigo-400 transform scale-105"
+                  : "border-gray-200 dark:border-gray-600"
+              } bg-white dark:bg-gray-700 relative`}
             >
-              Gratuito
+              {plan.recommended && (
+                <div className="absolute top-0 right-0 bg-indigo-500 text-white px-4 py-1 text-sm font-bold rounded-bl-lg rounded-tr-lg">
+                  {t("recommended")}
+                </div>
+              )}
+              <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">
+                {t(`plans.${plan.name}.name`)}
+              </h3>
+              <div className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
+                {plan.price}
+                {plan.priceSuffix && (
+                  <span className="text-base font-normal">
+                    {plan.priceSuffix}
+                  </span>
+                )}
+              </div>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
+                {plan.description}
+              </p>
+
+              <ul className="space-y-3 mb-8">
+                {plan.features.map((feature: string, fIndex: number) => (
+                  <li key={fIndex} className="flex items-start">
+                    <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+                    <span className="text-gray-700 dark:text-gray-300">
+                      {feature}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <Link href={ROUTES.REGISTER_COMPLEX} passHref>
+                <Button
+                  className="w-full bg-indigo-600 hover:bg-indigo-700"
+                >
+                  {plan.buttonText}
+                </Button>
+              </Link>
             </div>
-            <p
-              className={`${theme === "dark" ? "text-gray-300" : "text-gray-600"} mb-6`}
-            >
-              Ideal para conjuntos pequeños de hasta 25 unidades.
-            </p>
-
-            <ul className="space-y-3 mb-8">
-              <li className="flex items-start">
-                <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                <span
-                  className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                >
-                  Gestión de propiedades y residentes
-                </span>
-              </li>
-              <li className="flex items-start">
-                <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                <span
-                  className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                >
-                  Funcionalidad básica de comunicaciones (Citofonía Virtual y
-                  Cartelera Digital)
-                </span>
-              </li>
-              <li className="flex items-start">
-                <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                <span
-                  className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                >
-                  Limitado a 1 año de históricos
-                </span>
-              </li>
-            </ul>
-
-            <Button
-              className={`w-full ${theme === "dark" ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-900 hover:bg-gray-800"}`}
-              onClick={() => router.push(ROUTES.REGISTER_COMPLEX)}
-            >
-              Registrarse Gratis
-            </Button>
-          </div>
-
-          <div
-            className={`${theme === "dark" ? "bg-gray-700" : "bg-white"} p-8 rounded-lg border-2 ${theme === "dark" ? "border-indigo-400" : "border-indigo-500"} shadow-xl relative transform scale-105`}
-          >
-            <div className="absolute top-0 right-0 bg-indigo-500 text-white px-4 py-1 text-sm font-bold rounded-bl-lg rounded-tr-lg">
-              RECOMENDADO
-            </div>
-            <h3
-              className={`text-xl font-bold mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-            >
-              Plan Estándar
-            </h3>
-            <div
-              className={`text-4xl font-bold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-            >
-              ${currency === "USD" ? "25" : "95000"}
-              <span className="text-base font-normal">/mes</span>
-            </div>
-            <p
-              className={`${theme === "dark" ? "text-gray-300" : "text-gray-600"} mb-6`}
-            >
-              Para conjuntos de hasta 40 unidades. ($USD 1/mes por unidad
-              residencial adicional)
-            </p>
-
-            <ul className="space-y-3 mb-8">
-              <li className="flex items-start">
-                <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                <span
-                  className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                >
-                  Todas las funcionalidades básicas
-                </span>
-              </li>
-              <li className="flex items-start">
-                <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                <span
-                  className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                >
-                  Gestión de asambleas y votaciones
-                </span>
-              </li>
-              <li className="flex items-start">
-                <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                <span
-                  className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                >
-                  Sistema de PQR avanzado
-                </span>
-              </li>
-              <li className="flex items-start">
-                <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                <span
-                  className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                >
-                  Históricos de hasta 3 años
-                </span>
-              </li>
-            </ul>
-
-            <Button
-              className="w-full bg-indigo-600 hover:bg-indigo-700"
-              onClick={() => router.push(ROUTES.REGISTER_COMPLEX)}
-            >
-              Elegir Plan Estándar
-            </Button>
-          </div>
-
-          <div
-            className={`${theme === "dark" ? "bg-gray-700" : "bg-white"} p-8 rounded-lg border ${theme === "dark" ? "border-gray-600" : "border-gray-200"} shadow-md hover:shadow-xl transition-all`}
-          >
-            <h3
-              className={`text-xl font-bold mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-            >
-              Plan Premium
-            </h3>
-            <div
-              className={`text-4xl font-bold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-            >
-              ${currency === "USD" ? "50" : "190000"}
-              <span className="text-base font-normal">/mes</span>
-            </div>
-            <p
-              className={`${theme === "dark" ? "text-gray-300" : "text-gray-600"} mb-6`}
-            >
-              Para conjuntos de hasta 90 unidades. ($USD 1/mes por unidad
-              residencial adicional)
-            </p>
-
-            <ul className="space-y-3 mb-8">
-              <li className="flex items-start">
-                <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                <span
-                  className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                >
-                  Todas las funcionalidades estándar
-                </span>
-              </li>
-              <li className="flex items-start">
-                <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                <span
-                  className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                >
-                  Módulo financiero avanzado con generación automática de
-                  recibos
-                </span>
-              </li>
-              <li className="flex items-start">
-                <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                <span
-                  className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                >
-                  Personalización de la plataforma con logo y colores
-                  corporativos del conjunto residencial
-                </span>
-              </li>
-              <li className="flex items-start">
-                <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                <span
-                  className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                >
-                  API para integraciones
-                </span>
-              </li>
-              <li className="flex items-start">
-                <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                <span
-                  className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                >
-                  Históricos completos hasta 5 años
-                </span>
-              </li>
-              <li className="flex items-start">
-                <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                <span
-                  className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                >
-                  Soporte prioritario
-                </span>
-              </li>
-            </ul>
-
-            <Button
-              className={`w-full ${theme === "dark" ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-900 hover:bg-gray-800"}`}
-              onClick={() => router.push(ROUTES.REGISTER_COMPLEX)}
-            >
-              Elegir Plan Premium
-            </Button>
-          </div>
+          ))}
         </div>
       </div>
     </section>

@@ -3,44 +3,38 @@
  */
 
 import { PQRNotificationService } from "../pqrNotificationService";
-import { PrismaClient } from "@prisma/client";
 import { PQRStatus, PQRNotificationTemplate } from "@/constants/pqr-constants";
 import { sendEmail } from "@/lib/communications/email-service";
 import { sendPushNotification } from "@/lib/communications/push-notification-service";
+import { getTenantPrismaClient, getPublicPrismaClient } from "@/lib/prisma";
 
 // Mock de PrismaClient
-jest.mock("@prisma/client", () => {
-  const mockPrismaClient = {
-    $queryRaw: jest.fn(),
-    pQR: {
-      findUnique: jest.fn(),
-      findMany: jest.fn(),
-      update: jest.fn(),
-    },
-    pQRNotification: {
-      create: jest.fn(),
-    },
-    user: {
-      findUnique: jest.fn(),
-      findMany: jest.fn(),
-    },
-  };
+const mockPrismaClient = {
+  $queryRaw: jest.fn(),
+  pQR: {
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+    update: jest.fn(),
+  },
+  pQRNotification: {
+    create: jest.fn(),
+  },
+  user: {
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+  },
+  notificationTemplate: {
+    findFirst: jest.fn(),
+  },
+  pQRSettings: {
+    findFirst: jest.fn(),
+  },
+};
 
-  return {
-    PrismaClient: jest.fn(() => mockPrismaClient),
-    PQRStatus: {
-      OPEN: "OPEN",
-      CATEGORIZED: "CATEGORIZED",
-      ASSIGNED: "ASSIGNED",
-      IN_PROGRESS: "IN_PROGRESS",
-      WAITING: "WAITING",
-      RESOLVED: "RESOLVED",
-      CLOSED: "CLOSED",
-      REOPENED: "REOPENED",
-      CANCELLED: "CANCELLED",
-    },
-  };
-});
+jest.mock("@/lib/prisma", () => ({
+  getTenantPrismaClient: jest.fn(() => mockPrismaClient),
+  getPublicPrismaClient: jest.fn(() => ({ /* mock if needed */ })),
+}));
 
 // Mock de servicios de comunicación
 jest.mock("@/lib/communications/email-service", () => ({
@@ -58,16 +52,17 @@ jest.mock("@/lib/communications/sms-service", () => ({
 describe("PQRNotificationService", () => {
   let service: PQRNotificationService;
   let prisma: any;
+  const mockSchemaName = "test_schema";
 
   beforeEach(() => {
     // Limpiar todos los mocks
     jest.clearAllMocks();
 
     // Crear instancia del servicio con schema de prueba
-    service = new PQRNotificationService("test_schema");
+    service = new PQRNotificationService(mockSchemaName);
 
     // Obtener la instancia de prisma para configurar mocks
-    prisma = (service as any).prisma;
+    prisma = getTenantPrismaClient(mockSchemaName);
   });
 
   describe("notifyStatusChange", () => {

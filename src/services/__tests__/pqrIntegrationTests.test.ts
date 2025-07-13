@@ -1,50 +1,82 @@
-/**
- * Pruebas de integración para los flujos principales del sistema PQR
- *
- * Estas pruebas verifican la interacción entre los diferentes servicios
- * del sistema PQR (asignación, notificaciones y métricas).
- */
-
-import {
-  PrismaClient,
-  PQRCategory,
-  PQRPriority,
-  PQRStatus,
-} from "@prisma/client";
 import { PQRAssignmentService } from "../pqrAssignmentService";
 import { PQRNotificationService } from "../pqrNotificationService";
 import { PQRMetricsService } from "../pqrMetricsService";
+import { getTenantPrismaClient, getPublicPrismaClient } from "@/lib/prisma";
+import { PrismaClient } from "@prisma/client";
 
 // Mock de PrismaClient
-jest.mock("@prisma/client", () => {
-  const mockPrismaClient = {
-    $queryRaw: jest.fn(),
-    pQR: {
-      findUnique: jest.fn(),
-      findMany: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      count: jest.fn(),
-      groupBy: jest.fn(),
-    },
-    pQRStatusHistory: {
-      create: jest.fn(),
-      findMany: jest.fn(),
-    },
-    pQRNotification: {
-      create: jest.fn(),
-      findMany: jest.fn(),
-    },
-    user: {
-      findUnique: jest.fn(),
-      findMany: jest.fn(),
-    },
-  };
+const mockPrismaClientInstance = {
+  $queryRaw: jest.fn(),
+  pQR: {
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    count: jest.fn(),
+    groupBy: jest.fn(),
+  },
+  pQRStatusHistory: {
+    create: jest.fn(),
+    findMany: jest.fn(),
+  },
+  pQRNotification: {
+    create: jest.fn(),
+    findMany: jest.fn(),
+  },
+  user: {
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+  },
+  pQRSettings: {
+    findFirst: jest.fn(),
+  },
+  pQRAssignmentRule: {
+    findMany: jest.fn(),
+  },
+  pQRTeam: {
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+  },
+  pQRSLA: {
+    findFirst: jest.fn(),
+  },
+};
 
-  return {
-    PrismaClient: jest.fn(() => mockPrismaClient),
-  };
-});
+jest.mock("@prisma/client", () => ({
+  PrismaClient: jest.fn(() => mockPrismaClientInstance),
+}));
+
+jest.mock("@/lib/prisma", () => ({
+  getTenantPrismaClient: jest.fn(() => mockPrismaClientInstance),
+  getPublicPrismaClient: jest.fn(() => ({ /* mock if needed */ })),
+  // Exportar enums para que estén disponibles en las pruebas
+  PQRCategory: {
+    MAINTENANCE: "MAINTENANCE",
+    SECURITY: "SECURITY",
+    ADMINISTRATION: "ADMINISTRATION",
+    PAYMENTS: "PAYMENTS",
+    NEIGHBORS: "NEIGHBORS",
+    SERVICES: "SERVICES",
+    OTHER: "OTHER",
+  },
+  PQRPriority: {
+    LOW: "LOW",
+    MEDIUM: "MEDIUM",
+    HIGH: "HIGH",
+    CRITICAL: "CRITICAL",
+  },
+  PQRStatus: {
+    OPEN: "OPEN",
+    CATEGORIZED: "CATEGORIZED",
+    ASSIGNED: "ASSIGNED",
+    IN_PROGRESS: "IN_PROGRESS",
+    WAITING: "WAITING",
+    RESOLVED: "RESOLVED",
+    CLOSED: "CLOSED",
+    REOPENED: "REOPENED",
+    CANCELLED: "CANCELLED",
+  },
+}));
 
 // Mock de servicios de comunicación
 jest.mock("@/lib/communications/email-service", () => ({
@@ -60,21 +92,28 @@ describe("PQR System Integration Tests", () => {
   let notificationService: PQRNotificationService;
   let metricsService: PQRMetricsService;
   let prisma: any;
+  const mockSchemaName = "test_schema";
 
   beforeEach(() => {
     // Limpiar todos los mocks
     jest.clearAllMocks();
 
-    // Crear instancias de los servicios con schema de prueba
-    assignmentService = new PQRAssignmentService("test_schema");
-    notificationService = new PQRNotificationService("test_schema");
-    metricsService = new PQRMetricsService("test_schema");
-
     // Obtener la instancia de prisma para configurar mocks
-    prisma = (assignmentService as any).prisma;
-  });
+    prisma = getTenantPrismaClient(mockSchemaName);
 
-  describe("Flujo completo de PQR", () => {
+    // Configurar mocks para pQRSettings
+    mockPrismaClientInstance.pQRSettings.findFirst.mockResolvedValue({
+      autoCategorizeEnabled: true,
+      autoAssignEnabled: true,
+      autoNotifyEnabled: true,
+      satisfactionSurveyEnabled: true,
+    });
+
+    // Crear instancias de los servicios con schema de prueba
+    assignmentService = new PQRAssignmentService(mockSchemaName);
+    notificationService = new PQRNotificationService(mockSchemaName);
+    metricsService = new PQRMetricsService(mockSchemaName);
+  });
     it("debe procesar un PQR desde creación hasta resolución", async () => {
       // 1. Datos de entrada para un nuevo PQR
       const pqrData = {

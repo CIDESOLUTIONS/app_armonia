@@ -1,8 +1,5 @@
-// C:\Users\meciz\Documents\armonia\frontend\src\app\api\dashboard\stats\route.ts
 import { NextResponse } from "next/server";
-import { getPrisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { getTenantPrismaClient } from "@/lib/prisma";
 import { ActivityLogger } from "@/lib/logging/activity-logger";
 import { startOfMonth, subMonths, format } from "date-fns";
 
@@ -10,24 +7,22 @@ const logger = new ActivityLogger();
 
 export async function GET(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const schemaName = req.headers.get("X-Tenant-Schema");
 
-    if (!session?.user?.complexId || !session?.user?.schemaName) {
+    if (!schemaName) {
       return NextResponse.json(
-        { message: "Unauthorized or session is invalid" },
-        { status: 401 },
+        { message: "Tenant schema not found in request headers." },
+        { status: 400 },
       );
     }
 
-    const { complexId, schemaName } = session.user;
-    const tenantPrisma = getPrisma(schemaName);
+    const tenantPrisma = getTenantPrismaClient(schemaName);
 
     const now = new Date();
     const twelveMonthsAgo = startOfMonth(subMonths(now, 11));
 
     const [kpis, revenueTrendData, pqrTrendData] =
       await tenantPrisma.$transaction([
-        // 1. Consulta agregada para KPIs principales
         tenantPrisma.$queryRaw`
         SELECT
           (SELECT COUNT(*) FROM "Property")::int AS "totalProperties",
@@ -36,14 +31,12 @@ export async function GET(req: Request) {
           (SELECT SUM(amount) FROM "Payment" WHERE status = 'COMPLETED' AND "createdAt" >= ${startOfMonth(now)})::float AS "totalRevenue",
           (SELECT COUNT(*) FROM "Assembly" WHERE date >= NOW())::int AS "upcomingAssemblies"
       `,
-        // 2. Consulta para tendencia de ingresos (últimos 12 meses)
         tenantPrisma.payment.groupBy({
           by: ["createdAt"],
           _sum: { amount: true },
           where: { createdAt: { gte: twelveMonthsAgo }, status: "COMPLETED" },
           orderBy: { createdAt: "asc" },
         }),
-        // 3. Consulta para tendencia de PQRs (últimos 12 meses)
         tenantPrisma.pQR.groupBy({
           by: ["createdAt"],
           _count: { _all: true },
@@ -54,14 +47,13 @@ export async function GET(req: Request) {
 
     const formattedKpis = kpis[0] || {};
 
-    // Procesamiento de datos de tendencias
-    const processTrendData = (data, valueField) => {
+    const processTrendData = (data: any[], valueField: string) => {
       const monthlyData = new Map<string, number>();
       for (let i = 0; i < 12; i++) {
         const month = format(subMonths(now, i), "MMM yyyy");
         monthlyData.set(month, 0);
       }
-      data.forEach((item) => {
+      data.forEach((item: any) => {
         const month = format(new Date(item.createdAt), "MMM yyyy");
         monthlyData.set(
           month,
@@ -80,7 +72,6 @@ export async function GET(req: Request) {
     logger.logActivity({
       module: "dashboard",
       action: "fetch_dashboard_data",
-      entityId: complexId,
       details: { message: "Dashboard data successfully fetched" },
     });
 

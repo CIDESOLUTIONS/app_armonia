@@ -1,22 +1,18 @@
 import { PrismaClient } from "@prisma/client";
+import { getPublicPrismaClient, getTenantPrismaClient } from "@/lib/prisma";
 
 describe("Prisma Client Configuration", () => {
   let MockPrismaClient: jest.Mock;
-  let getPrisma: any;
-  let getSchemaFromRequest: any;
 
   beforeEach(() => {
-    // Clear all mocks before each test
     jest.clearAllMocks();
-    jest.resetModules(); // Reset module registry to ensure fresh imports
+    jest.resetModules();
 
-    // Explicitly clear the global Prisma instance to ensure a fresh mock is used
-    (globalThis as any).prisma = undefined;
-
-    // Define the mock for PrismaClient as a constructor function
-    MockPrismaClient = jest.fn(function (this: any) {
+    // Mock the PrismaClient constructor
+    MockPrismaClient = jest.fn(function (this: any, options?: any) {
       this.$disconnect = jest.fn();
-      // Add other mocked methods/properties as needed
+      // Store options to assert against them later
+      this.options = options;
     });
 
     // Mock the @prisma/client module to export our mock class
@@ -24,53 +20,54 @@ describe("Prisma Client Configuration", () => {
       PrismaClient: MockPrismaClient,
     }));
 
-    // Dynamically import the module under test AFTER the mock is set up
-    // This is crucial to ensure src/lib/prisma.ts uses the mocked PrismaClient
-    const {
-      getPrisma: getPrismaFunc,
-      getSchemaFromRequest: getSchemaFromRequestFunc,
-    } = require("@/lib/prisma");
-    getPrisma = getPrismaFunc;
-    getSchemaFromRequest = getSchemaFromRequestFunc;
-  });
+    // Clear the cache for tenantPrismaInstances to ensure fresh instances
+    // This is a bit of a hack, but necessary for testing the caching logic
+    // In a real scenario, you might not test the internal cache directly
+    (getTenantPrismaClient as any).__clearCache__ && (getTenantPrismaClient as any).__clearCache__();
 
-  test("getPrisma should return a PrismaClient instance", () => {
-    const prismaInstance = getPrisma();
-    expect(prismaInstance).toBeInstanceOf(MockPrismaClient);
-    expect(MockPrismaClient).toHaveBeenCalledTimes(1); // Should be called once when prisma.ts is imported
-  });
-
-  test("getSchemaFromRequest should create a new PrismaClient with the specified schema in production", () => {
-    // Simular entorno de producción
-    process.env.NODE_ENV = "production";
+    // Set a dummy DATABASE_URL for testing
     process.env.DATABASE_URL = "postgresql://user:password@host:port/database";
+  });
 
-    const schemaName = "tenant_cj1234";
-    const prismaInstance = getSchemaFromRequest(schemaName);
-
-    expect(prismaInstance).toBeInstanceOf(MockPrismaClient);
-    expect(MockPrismaClient).toHaveBeenCalledTimes(2); // One for global, one for getSchemaFromRequest
-
-    const prismaClientCall = (MockPrismaClient as jest.Mock).mock.calls[1][0];
-    expect(prismaClientCall.datasources.db.url).toBe(
-      `postgresql://user:password@host:port/database?schema=${schemaName}`,
-    );
-
-    // Restore environment
-    process.env.NODE_ENV = "test";
+  afterEach(() => {
+    // Clean up environment variables
     delete process.env.DATABASE_URL;
   });
 
-  test("getSchemaFromRequest should return the global PrismaClient instance in non-production", () => {
-    // Simular entorno de no producción (test)
-    process.env.NODE_ENV = "test";
+  test("getPublicPrismaClient should return a PrismaClient instance", () => {
+    const prismaInstance = getPublicPrismaClient();
+    expect(prismaInstance).toBeInstanceOf(MockPrismaClient);
+    expect(MockPrismaClient).toHaveBeenCalledTimes(1);
+    expect(MockPrismaClient).toHaveBeenCalledWith(undefined); // No specific options for public
+  });
 
-    const schemaName = "tenant_cj5678";
-    const globalPrismaInstance = getPrisma();
-    const prismaInstance = getSchemaFromRequest(schemaName);
+  test("getTenantPrismaClient should return a new PrismaClient instance for a new schema", () => {
+    const schemaName = "tenant_cj1234";
+    const prismaInstance = getTenantPrismaClient(schemaName);
 
     expect(prismaInstance).toBeInstanceOf(MockPrismaClient);
-    expect(MockPrismaClient).toHaveBeenCalledTimes(1); // Only the global instance creation
-    expect(prismaInstance).toBe(globalPrismaInstance);
+    expect(MockPrismaClient).toHaveBeenCalledTimes(1);
+    expect(MockPrismaClient).toHaveBeenCalledWith({
+      datasources: {
+        db: {
+          url: `postgresql://user:password@host:port/database?schema=${schemaName}`,
+        },
+      },
+    });
+  });
+
+  test("getTenantPrismaClient should return the same instance for the same schema (caching)", () => {
+    const schemaName = "tenant_cj5678";
+    const prismaInstance1 = getTenantPrismaClient(schemaName);
+    const prismaInstance2 = getTenantPrismaClient(schemaName);
+
+    expect(prismaInstance1).toBe(prismaInstance2);
+    expect(MockPrismaClient).toHaveBeenCalledTimes(1); // Should only be called once for this schema
+  });
+
+  test("getTenantPrismaClient should throw error if schemaName is not provided", () => {
+    expect(() => getTenantPrismaClient("")).toThrow("Schema name is required to get a tenant Prisma client.");
+    expect(() => getTenantPrismaClient(null as any)).toThrow("Schema name is required to get a tenant Prisma client.");
+    expect(() => getTenantPrismaClient(undefined as any)).toThrow("Schema name is required to get a tenant Prisma client.");
   });
 });

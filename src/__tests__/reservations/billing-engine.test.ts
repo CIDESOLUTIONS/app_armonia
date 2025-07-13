@@ -1,43 +1,44 @@
-// src/__tests__/reservations/billing-engine.test.ts
 import { BillingEngine } from "@/lib/services/billing-engine";
 import { TransactionStatus } from "@prisma/client";
+import { getTenantPrismaClient, getPublicPrismaClient } from "@/lib/prisma";
 
 // Mock de Prisma
+const mockPrismaClient = {
+  transaction: {
+    create: jest.fn(),
+    update: jest.fn(),
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+  },
+  reservation: {
+    findUnique: jest.fn(),
+    update: jest.fn(),
+  },
+  paymentSettings: {
+    findFirst: jest.fn(),
+    create: jest.fn(),
+  },
+  paymentGateway: {
+    findUnique: jest.fn(),
+    findFirst: jest.fn(),
+  },
+  paymentMethod: {
+    findFirst: jest.fn(),
+  },
+};
+
 jest.mock("@/lib/prisma", () => ({
-  getPrisma: jest.fn(() => ({
-    transaction: {
-      create: jest.fn(),
-      update: jest.fn(),
-      findUnique: jest.fn(),
-      findMany: jest.fn(),
-    },
-    reservation: {
-      findUnique: jest.fn(),
-      update: jest.fn(),
-    },
-    paymentSettings: {
-      findFirst: jest.fn(),
-      create: jest.fn(),
-    },
-    paymentGateway: {
-      findUnique: jest.fn(),
-      findFirst: jest.fn(),
-    },
-    paymentMethod: {
-      findFirst: jest.fn(),
-    },
-  })),
+  getTenantPrismaClient: jest.fn(() => mockPrismaClient),
+  getPublicPrismaClient: jest.fn(() => ({ /* mock if needed */ })),
 }));
 
 describe("BillingEngine", () => {
   let billingEngine: BillingEngine;
-  let mockPrisma: any;
+  const mockSchemaName = "test_schema";
 
   beforeEach(() => {
-    billingEngine = new BillingEngine();
-    import { getPrisma } from "@/lib/prisma";
-    mockPrisma = getPrisma();
     jest.clearAllMocks();
+    billingEngine = new BillingEngine(mockSchemaName);
   });
 
   describe("createPayment", () => {

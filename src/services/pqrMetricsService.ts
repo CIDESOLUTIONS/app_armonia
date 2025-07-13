@@ -5,13 +5,12 @@
  * y análisis de rendimiento del sistema PQR.
  */
 
+import { getTenantPrismaClient } from "@/lib/prisma";
 import {
-  PrismaClient,
-  PQRStatus,
-  PQRPriority,
   PQRCategory,
-} from "@prisma/client";
-import { getSchemaFromRequest } from "../lib/prisma";
+  PQRPriority,
+  PQRStatus,
+} from "@/constants/pqr-constants";
 
 // Interfaces para métricas
 interface SummaryMetrics {
@@ -107,9 +106,9 @@ export class PQRMetricsService {
    * Constructor del servicio
    * @param schema Esquema de base de datos a utilizar
    */
-  constructor(schema: string = "public") {
+  constructor(schema: string) {
     this.schema = schema;
-    this.prisma = getSchemaFromRequest(schema);
+    this.prisma = getTenantPrismaClient(schema);
   }
 
   /**

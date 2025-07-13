@@ -14,7 +14,7 @@ import {
   MinutesStatus,
   SignatureStatus,
 } from "@prisma/client";
-import { getPrisma } from "@/lib/prisma";
+import { getTenantPrismaClient } from "@/lib/prisma";
 import { ServerLogger } from "../logging/server-logger";
 import { ActivityLogger } from "../logging/activity-logger";
 import { WebSocketService } from "../communications/websocket-service";
@@ -29,15 +29,21 @@ import {
 import { generatePdf } from "../pdf/pdfGenerator";
 import { DigitalSignatureService } from "./digital-signature-service";
 
-const prisma = getPrisma();
-const activityLogger = new ActivityLogger();
-const wsService = new WebSocketService();
-const signatureService = new DigitalSignatureService();
-
 /**
  * Servicio avanzado para gestión de asambleas
  */
 export class AssemblyAdvancedService {
+  private prisma: PrismaClient;
+  private activityLogger: ActivityLogger;
+  private wsService: WebSocketService;
+  private signatureService: DigitalSignatureService;
+
+  constructor(schemaName: string) {
+    this.prisma = getTenantPrismaClient(schemaName);
+    this.activityLogger = new ActivityLogger(); // Assuming ActivityLogger doesn't need schemaName in constructor
+    this.wsService = new WebSocketService(); // Assuming WebSocketService doesn't need schemaName in constructor
+    this.signatureService = new DigitalSignatureService(); // Assuming DigitalSignatureService doesn't need schemaName in constructor
+  }
   /**
    * Crea una nueva asamblea con configuración avanzada
    *

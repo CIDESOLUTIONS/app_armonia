@@ -1,10 +1,4 @@
-// src/lib/services/camera-service-onvif.ts
-/**
- * Servicio avanzado para gestión de cámaras IP con ONVIF
- * Maneja discovery, conexión, streams y control PTZ
- */
-
-import { getPrisma } from "@/lib/prisma";
+import { getTenantPrismaClient } from "@/lib/prisma";
 import { encryptData, decryptData } from "@/lib/security/encryption";
 
 // Definición de interfaces
@@ -78,11 +72,15 @@ export interface PTZPosition {
  * Servicio principal para gestión de cámaras IP
  */
 export class CameraServiceONVIF {
-  private static instance: CameraServiceONVIF;
+  private prisma: PrismaClient;
   private connectedCameras: Map<number, any> = new Map();
   private discoveryInterval: NodeJS.Timeout | null = null;
+  private schemaName: string;
 
-  private constructor() {}
+  constructor(schemaName: string) {
+    this.schemaName = schemaName;
+    this.prisma = getTenantPrismaClient(schemaName);
+  }
 
   static getInstance(): CameraServiceONVIF {
     if (!CameraServiceONVIF.instance) {
@@ -480,8 +478,7 @@ export class CameraServiceONVIF {
 
   // Métodos de base de datos
   private async getCameraById(id: number): Promise<any> {
-    const prisma = getPrisma();
-    return await prisma.camera.findUnique({
+    return await this.prisma.camera.findUnique({
       where: { id },
       include: {
         zone: true,
@@ -493,8 +490,7 @@ export class CameraServiceONVIF {
   }
 
   private async getAllCameras(complexId: number): Promise<any[]> {
-    const prisma = getPrisma();
-    return await prisma.camera.findMany({
+    return await this.prisma.camera.findMany({
       where: {
         // Asumir que hay relación con complejo via zona o directamente
         zone: {
@@ -511,8 +507,7 @@ export class CameraServiceONVIF {
     cameraId: number,
     status: string,
   ): Promise<void> {
-    const prisma = getPrisma();
-    await prisma.camera.update({
+    await this.prisma.camera.update({
       where: { id: cameraId },
       data: {
         status,
@@ -529,9 +524,7 @@ export class CameraServiceONVIF {
     complexId: number,
     zoneId?: number,
   ): Promise<number> {
-    const prisma = getPrisma();
-
-    const camera = await prisma.camera.create({
+    const camera = await this.prisma.camera.create({
       data: {
         name: cameraData.name,
         ipAddress: cameraData.ipAddress,
@@ -567,8 +560,6 @@ export class CameraServiceONVIF {
     updates: Partial<CameraDevice>,
   ): Promise<boolean> {
     try {
-      const prisma = getPrisma();
-
       const updateData: any = {};
       if (updates.name) updateData.name = updates.name;
       if (updates.ipAddress) updateData.ipAddress = updates.ipAddress;
@@ -578,7 +569,7 @@ export class CameraServiceONVIF {
       if (updates.manufacturer) updateData.manufacturer = updates.manufacturer;
       if (updates.model) updateData.model = updates.model;
 
-      await prisma.camera.update({
+      await this.prisma.camera.update({
         where: { id: cameraId },
         data: updateData,
       });
@@ -596,14 +587,12 @@ export class CameraServiceONVIF {
    */
   async deleteCamera(cameraId: number): Promise<boolean> {
     try {
-      const prisma = getPrisma();
-
       // Desconectar si está conectada
       if (this.connectedCameras.has(cameraId)) {
         this.connectedCameras.delete(cameraId);
       }
 
-      await prisma.camera.delete({
+      await this.prisma.camera.delete({
         where: { id: cameraId },
       });
 
@@ -625,8 +614,6 @@ export class CameraServiceONVIF {
     error: number;
     unknown: number;
   }> {
-    const prisma = getPrisma();
-
     const cameras = await this.getAllCameras(complexId);
 
     const stats = {
@@ -641,5 +628,3 @@ export class CameraServiceONVIF {
   }
 }
 
-// Instancia singleton
-export const cameraService = CameraServiceONVIF.getInstance();

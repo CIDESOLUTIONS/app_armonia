@@ -1,5 +1,4 @@
-// src/lib/services/billing-engine.ts
-import { getPrisma } from "@/lib/prisma";
+import { getTenantPrismaClient } from "@/lib/prisma";
 import { TransactionStatus } from "@prisma/client";
 import { z } from "zod";
 
@@ -51,7 +50,11 @@ interface ReservationPayment {
 
 // Servicio de BillingEngine para gestión de pagos
 export class BillingEngine {
-  private prisma = getPrisma();
+  private prisma: PrismaClient;
+
+  constructor(schemaName: string) {
+    this.prisma = getTenantPrismaClient(schemaName);
+  }
 
   /**
    * Crear una nueva transacción de pago
@@ -450,5 +453,4 @@ export class BillingEngine {
   }
 }
 
-// Instancia singleton del servicio
-export const billingEngine = new BillingEngine();
+
