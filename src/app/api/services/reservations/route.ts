@@ -42,7 +42,9 @@ export async function GET(request: NextRequest) {
     const { payload } = authResult;
 
     const tenantPrisma = getPrisma(payload.schemaName);
-    const where: any = { complexId: payload.complexId };
+    const where: { complexId: number; userId?: number } = {
+      complexId: payload.complexId,
+    };
 
     // Si es residente, solo mostrar sus reservas
     if (payload.role === "RESIDENT") {

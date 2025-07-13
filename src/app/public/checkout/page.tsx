@@ -4,14 +4,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/header";
-import {
-  CreditCard,
-  Check,
-  Loader2,
-  ShieldCheck,
-  AlertCircle,
-  ArrowLeft,
-} from "lucide-react";
+import { Check, ArrowLeft } from "lucide-react";
 
 // Textos para soportar múltiples idiomas
 const texts = {
@@ -101,20 +94,20 @@ export default function Checkout() {
   const [currency, setCurrency] = useState("Pesos");
   const [theme, setTheme] = useState("Claro");
   const [paymentStep, setPaymentStep] = useState("form"); // form, processing, verifying, success, error
-  const [formData, setFormData] = useState({
+  const [_formData, _setFormData] = useState({
     cardNumber: "",
     expiryDate: "",
     cvv: "",
     cardholderName: "",
   });
-  const [transactionId, setTransactionId] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [_transactionId, _setTransactionId] = useState("");
+  const [_errorMessage, setErrorMessage] = useState("");
 
   // Obtener los textos traducidos
   const t = language === "Español" ? texts.es : texts.en;
 
   // Función para verificar el estado del pago usando la API
-  const verifyPayment = async (txId: string) => {
+  const _verifyPayment = async (txId: string) => {
     try {
       // Simulación de verificación de pago
       await new Promise((resolve) => setTimeout(resolve, 1000));

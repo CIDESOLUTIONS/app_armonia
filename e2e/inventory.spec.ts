@@ -4,7 +4,7 @@
  * Estas pruebas verifican la gestión completa del inventario del conjunto:
  * información del conjunto, gestión de residentes, propiedades y servicios comunes.
  */
-import { test, expect, Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 // Datos de prueba
 const testUsers = {
   admin: {

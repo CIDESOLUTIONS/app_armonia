@@ -52,7 +52,7 @@ export async function POST(
       );
     }
 
-    const { returnUrl, methodId } = validation.data;
+    const { _returnUrl, _methodId } = validation.data;
 
     // Obtener información de la reserva
     const prisma = getPrisma();
@@ -207,7 +207,7 @@ export async function PUT(
     }
 
     // Verificar que la transacción corresponde a esta reserva
-    const metadata = transaction.metadata as any;
+    const metadata = transaction.metadata as { reservationId: number };
     if (!metadata || metadata.reservationId !== reservationId) {
       return NextResponse.json(
         {

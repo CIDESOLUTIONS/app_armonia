@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, ReactNode, FC } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ROUTES } from "@/constants/routes";
+
 import { Header } from "@/components/layout/header";
 import { Testimonials } from "@/components/landing/Testimonials";
 import { BlogSection } from "@/components/landing/BlogSection";
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 };
 
 export default function LandingPage() {
-  const router = useRouter();
+  const _router = useRouter();
   const [currency, setCurrency] = useState("Pesos");
   const [theme, setTheme] = useState("Claro");
 

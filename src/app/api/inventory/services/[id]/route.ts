@@ -99,7 +99,7 @@ export async function PUT(
     }
 
     // Variable decoded eliminada por lint
-    const _data = await req.json();
+    const data = await req.json();
     const { schemaName, complexId, ...serviceData } = data;
 
     if (!schemaName || !complexId) {
@@ -208,7 +208,7 @@ export async function DELETE(
     // Variable decoded eliminada por lint
     const { searchParams } = new URL(req.url);
     const _schemaName = searchParams.get("schemaName");
-    const _complexId = parseInt(searchParams.get("complexId") || "0");
+    const complexId = parseInt(searchParams.get("complexId") || "0");
 
     if (!schemaName || !complexId) {
       return NextResponse.json(

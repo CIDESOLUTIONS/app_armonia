@@ -1,6 +1,5 @@
 import { BillingEngine } from "@/lib/financial/billing-engine";
 import { FreemiumService } from "@/lib/freemium-service";
-import { getTenantPrismaClient, getPublicPrismaClient } from "@/lib/prisma";
 
 // Mock de Prisma
 const mockPrismaClient = {
@@ -36,7 +35,9 @@ const mockPrismaClient = {
 
 jest.mock("@/lib/prisma", () => ({
   getTenantPrismaClient: jest.fn(() => mockPrismaClient),
-  getPublicPrismaClient: jest.fn(() => ({ /* mock if needed */ })),
+  getPublicPrismaClient: jest.fn(() => ({
+    /* mock if needed */
+  })),
 }));
 
 describe("BillingEngine", () => {
@@ -92,7 +93,9 @@ describe("BillingEngine", () => {
       ];
 
       // Setup mocks
-      mockPrismaClient.residentialComplex.findUnique.mockResolvedValue(mockComplex);
+      mockPrismaClient.residentialComplex.findUnique.mockResolvedValue(
+        mockComplex,
+      );
       mockPrismaClient.property.findMany.mockResolvedValue(mockProperties);
       mockPrismaClient.fee.findMany.mockResolvedValue(mockFees);
 
@@ -107,7 +110,10 @@ describe("BillingEngine", () => {
       };
 
       // Execute
-      const bills = await billingEngineService.generateBillsForPeriod(1, period);
+      const bills = await billingEngineService.generateBillsForPeriod(
+        1,
+        period,
+      );
 
       // Assertions
       expect(bills).toHaveLength(2);
@@ -134,7 +140,9 @@ describe("BillingEngine", () => {
         totalAmount: 180000, // 100000 + (1000 * 80)
       });
 
-      expect(mockPrismaClient.residentialComplex.findUnique).toHaveBeenCalledWith({
+      expect(
+        mockPrismaClient.residentialComplex.findUnique,
+      ).toHaveBeenCalledWith({
         where: { id: 1 },
         select: { planType: true, isTrialActive: true },
       });
@@ -147,7 +155,9 @@ describe("BillingEngine", () => {
         isTrialActive: false,
       };
 
-      mockPrismaClient.residentialComplex.findUnique.mockResolvedValue(mockComplex);
+      mockPrismaClient.residentialComplex.findUnique.mockResolvedValue(
+        mockComplex,
+      );
       jest.spyOn(FreemiumService, "hasFeatureAccess").mockReturnValue(false);
 
       const period = {

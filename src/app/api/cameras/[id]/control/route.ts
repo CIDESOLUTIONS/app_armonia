@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
-import { validateRequest } from "@/lib/validation";
 import { verifyAuth } from "@/lib/auth";
 import { ServerLogger } from "@/lib/logging/server-logger";
 import { z } from "zod";
@@ -60,7 +59,7 @@ export async function POST(
       );
     }
 
-    const { action, params: actionParams } = validationResult.data;
+    const { action, params: _actionParams } = validationResult.data;
 
     // Inicializar Prisma
     const prisma = getPrisma();

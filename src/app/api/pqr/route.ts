@@ -32,7 +32,16 @@ export async function GET(request: NextRequest) {
     const { payload } = authResult;
 
     const tenantPrisma = getPrisma(payload.schemaName);
-    const where: any = { complexId: payload.complexId };
+    const where: {
+      complexId: number;
+      status?: string;
+      priority?: string;
+      OR?: (
+        | { subject: { contains: string; mode: "insensitive" } }
+        | { description: { contains: string; mode: "insensitive" } }
+      )[];
+      reportedById?: number;
+    } = { complexId: payload.complexId };
 
     const searchParams = request.nextUrl.searchParams;
     const status = searchParams.get("status");

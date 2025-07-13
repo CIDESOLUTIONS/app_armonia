@@ -1,6 +1,5 @@
 // frontend/src/app/api/financial/payments/export/route.ts
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 import { pool } from "@/lib/db";
 
 // GET /api/financial/payments/export
@@ -37,7 +36,7 @@ export async function GET(_req: unknown) {
 
     query += ` ORDER BY p.payment_date DESC`;
 
-    const _result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return NextResponse.json(result.rows);
   } catch (error) {
     console.error("Error exporting payments:", error);

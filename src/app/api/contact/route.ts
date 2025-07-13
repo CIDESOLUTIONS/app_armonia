@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
 import nodemailer from "nodemailer";
 
-const prisma = getPrisma();
+const _prisma = getPrisma();
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, phone, _complexName, units, message } = body;
+    const { name, email, phone, complexName, units, message } = body;
 
     // Validar los datos
     if (!name || !email || !complexName || !units) {

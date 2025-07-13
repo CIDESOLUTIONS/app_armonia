@@ -40,7 +40,7 @@ export async function notifyAssemblyConvocation(
     );
     // Implementación real para enviar notificaciones (email, SMS, push, etc.)
     return true;
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(
       `Error al enviar notificaciones de convocatoria: ${error.message}`,
     );
@@ -66,7 +66,7 @@ export async function notifyQuorumReached(
     );
     // Implementación real para enviar notificaciones
     return true;
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(`Error al notificar quórum alcanzado: ${error.message}`);
     return false;
   }
@@ -90,7 +90,7 @@ export async function sendAssemblyReminder(
     );
     // Implementación real para enviar recordatorios
     return true;
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(`Error al enviar recordatorios de asamblea: ${error.message}`);
     return false;
   }
@@ -116,7 +116,7 @@ export async function sendAssemblyMinutes(
     );
     // Implementación real para enviar el acta
     return true;
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(`Error al enviar acta de asamblea: ${error.message}`);
     return false;
   }

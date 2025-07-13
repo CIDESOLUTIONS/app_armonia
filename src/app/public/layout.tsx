@@ -16,9 +16,9 @@ export const metadata: Metadata = {
 };
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
-  const handleLanguageChange = (language: string) => {};
-  const handleThemeChange = (theme: string) => {};
-  const handleCurrencyChange = (currency: string) => {};
+  const handleLanguageChange = (_language: string) => {};
+  const handleThemeChange = (_theme: string) => {};
+  const handleCurrencyChange = (_currency: string) => {};
 
   return (
     <div className="public-layout">

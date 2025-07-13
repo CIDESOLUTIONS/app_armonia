@@ -105,7 +105,7 @@ export async function PUT(
     }
 
     // Preparar datos de actualización
-    const updateData: any = {
+    const updateData: Partial<typeof UpdateLogSchema._type> = {
       updatedBy: payload.userId,
     };
 

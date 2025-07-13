@@ -3,11 +3,7 @@
  */
 
 import { PQRMetricsService } from "../pqrMetricsService";
-import {
-  PQRCategory,
-  PQRPriority,
-  PQRStatus,
-} from "@/constants/pqr-constants";
+import { PQRCategory, PQRPriority, PQRStatus } from "@/constants/pqr-constants";
 import { getTenantPrismaClient, getPublicPrismaClient } from "@/lib/prisma";
 
 // Mock de PrismaClient
@@ -30,7 +26,9 @@ const mockPrismaClient = {
 
 jest.mock("@/lib/prisma", () => ({
   getTenantPrismaClient: jest.fn(() => mockPrismaClient),
-  getPublicPrismaClient: jest.fn(() => ({ /* mock if needed */ })),
+  getPublicPrismaClient: jest.fn(() => ({
+    /* mock if needed */
+  })),
 }));
 
 describe("PQRMetricsService", () => {

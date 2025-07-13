@@ -1,4 +1,3 @@
-import { PrismaClient } from "@prisma/client";
 import { getPublicPrismaClient, getTenantPrismaClient } from "@/lib/prisma";
 
 describe("Prisma Client Configuration", () => {
@@ -9,7 +8,7 @@ describe("Prisma Client Configuration", () => {
     jest.resetModules();
 
     // Mock the PrismaClient constructor
-    MockPrismaClient = jest.fn(function (this: any, options?: any) {
+    MockPrismaClient = jest.fn(function (this: unknown, options?: unknown) {
       this.$disconnect = jest.fn();
       // Store options to assert against them later
       this.options = options;
@@ -23,7 +22,13 @@ describe("Prisma Client Configuration", () => {
     // Clear the cache for tenantPrismaInstances to ensure fresh instances
     // This is a bit of a hack, but necessary for testing the caching logic
     // In a real scenario, you might not test the internal cache directly
-    (getTenantPrismaClient as any).__clearCache__ && (getTenantPrismaClient as any).__clearCache__();
+    void (
+      (getTenantPrismaClient as unknown as { __clearCache__: () => void })
+        .__clearCache__ &&
+      (
+        getTenantPrismaClient as unknown as { __clearCache__: () => void }
+      ).__clearCache__()
+    );
 
     // Set a dummy DATABASE_URL for testing
     process.env.DATABASE_URL = "postgresql://user:password@host:port/database";
@@ -66,8 +71,14 @@ describe("Prisma Client Configuration", () => {
   });
 
   test("getTenantPrismaClient should throw error if schemaName is not provided", () => {
-    expect(() => getTenantPrismaClient("")).toThrow("Schema name is required to get a tenant Prisma client.");
-    expect(() => getTenantPrismaClient(null as any)).toThrow("Schema name is required to get a tenant Prisma client.");
-    expect(() => getTenantPrismaClient(undefined as any)).toThrow("Schema name is required to get a tenant Prisma client.");
+    expect(() => getTenantPrismaClient("")).toThrow(
+      "Schema name is required to get a tenant Prisma client.",
+    );
+    expect(() => getTenantPrismaClient(null as unknown)).toThrow(
+      "Schema name is required to get a tenant Prisma client.",
+    );
+    expect(() => getTenantPrismaClient(undefined as unknown)).toThrow(
+      "Schema name is required to get a tenant Prisma client.",
+    );
   });
 });

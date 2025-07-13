@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     const { id: userId, email, schemaName } = decodedToken;
 
-    let user;
+    let user: any;
     let targetPrisma = prisma;
 
     if (schemaName) {

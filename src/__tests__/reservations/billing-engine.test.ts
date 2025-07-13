@@ -1,6 +1,5 @@
 import { BillingEngine } from "@/lib/services/billing-engine";
 import { TransactionStatus } from "@prisma/client";
-import { getTenantPrismaClient, getPublicPrismaClient } from "@/lib/prisma";
 
 // Mock de Prisma
 const mockPrismaClient = {
@@ -29,7 +28,9 @@ const mockPrismaClient = {
 
 jest.mock("@/lib/prisma", () => ({
   getTenantPrismaClient: jest.fn(() => mockPrismaClient),
-  getPublicPrismaClient: jest.fn(() => ({ /* mock if needed */ })),
+  getPublicPrismaClient: jest.fn(() => ({
+    /* mock if needed */
+  })),
 }));
 
 describe("BillingEngine", () => {
@@ -310,7 +311,7 @@ describe("BillingEngine", () => {
       const invalidConfirmation = {
         gatewayReference: "", // Empty reference
         gatewayResponse: {},
-        status: "INVALID_STATUS" as any,
+        status: "INVALID_STATUS" as TransactionStatus,
       };
 
       await expect(
@@ -392,11 +393,11 @@ describe("BillingEngine", () => {
         status: "REFUNDED",
       });
 
-      const result = await billingEngine.processRefund(
+      void (await billingEngine.processRefund(
         "txn_123",
         undefined,
         "Customer request",
-      );
+      ));
 
       expect(result).toEqual({
         refundId: "refund_123",
@@ -465,11 +466,11 @@ describe("BillingEngine", () => {
       mockPrisma.transaction.create.mockResolvedValue(refundTransaction);
       mockPrisma.transaction.update.mockResolvedValue(originalTransaction);
 
-      const result = await billingEngine.processRefund(
+      void (await billingEngine.processRefund(
         "txn_123",
         30000,
         "Partial refund requested",
-      );
+      ));
 
       expect(mockPrisma.transaction.create).toHaveBeenCalledWith({
         data: expect.objectContaining({

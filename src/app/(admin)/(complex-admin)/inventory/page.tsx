@@ -62,9 +62,7 @@ export default function InventoryPage() {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             {t("accessDenied.title")}
           </h1>
-          <p className="text-gray-600">
-            {t("accessDenied.message")}
-          </p>
+          <p className="text-gray-600">{t("accessDenied.message")}</p>
         </div>
       </div>
     );
@@ -170,12 +168,8 @@ export default function InventoryPage() {
         >
           <div className="max-w-7xl mx-auto">
             <div className="mb-6">
-              <h1 className="text-3xl font-bold text-gray-900">
-                {t("title")}
-              </h1>
-              <p className="text-gray-600 mt-2">
-                {t("description")}
-              </p>
+              <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
+              <p className="text-gray-600 mt-2">{t("description")}</p>
             </div>
 
             {/* Quick Stats */}
@@ -212,9 +206,7 @@ export default function InventoryPage() {
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
                     {card.title}
                   </h3>
-                  <p className="text-gray-600 text-sm">
-                    {card.description}
-                  </p>
+                  <p className="text-gray-600 text-sm">{card.description}</p>
                 </Link>
               ))}
             </div>

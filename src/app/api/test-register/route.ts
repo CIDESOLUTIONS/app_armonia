@@ -78,7 +78,9 @@ export async function POST(request: NextRequest) {
         propertyTypes:
           validatedData.propertyTypes.length > 0
             ? JSON.stringify(
-                validatedData.propertyTypes.filter((pt: any) => pt.enabled),
+                validatedData.propertyTypes.filter(
+                  (pt: { enabled: boolean }) => pt.enabled,
+                ),
               )
             : null,
       };

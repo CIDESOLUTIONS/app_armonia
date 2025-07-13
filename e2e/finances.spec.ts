@@ -4,7 +4,7 @@
  * Estas pruebas verifican el flujo completo de facturación y pagos:
  * creación de facturas, procesamiento de pagos y verificación de estados de cuenta.
  */
-import { test, expect, Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 // Datos de prueba
 const testUsers = {
   admin: {

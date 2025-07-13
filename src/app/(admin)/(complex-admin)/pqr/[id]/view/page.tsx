@@ -5,17 +5,7 @@ import { Label } from "@/components/ui/label";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/store/authStore";
-import {
-  Loader2,
-  Edit,
-  Trash2,
-  MessageSquare,
-  User,
-  Tag,
-  Clock,
-  CheckCircle,
-  XCircle,
-} from "lucide-react";
+import { Loader2, Edit, Trash2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

@@ -4,7 +4,7 @@
  * Estas pruebas verifican el flujo completo del sistema de minutas digitales:
  * registro por guardias, consulta por administradores y gestión de incidentes.
  */
-import { test, expect, Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 // Datos de prueba
 const testUsers = {
   admin: {

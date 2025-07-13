@@ -80,7 +80,9 @@ jest.mock("@/lib/prisma", () => ({
       update: jest.fn(),
     },
   })),
-  getPublicPrismaClient: jest.fn(() => ({ /* mock if needed */ })),
+  getPublicPrismaClient: jest.fn(() => ({
+    /* mock if needed */
+  })),
 }));
 
 jest.mock("../../communications/websocket-service");

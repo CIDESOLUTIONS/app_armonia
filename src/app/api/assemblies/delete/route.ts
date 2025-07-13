@@ -47,7 +47,9 @@ export async function DELETE(req: Request) {
 
     const now = new Date();
     const assemblyEnd = new Date(assembly.date);
-    interface AgendaItem { time: string; } // Define the interface for agenda items
+    interface AgendaItem {
+      time: string;
+    } // Define the interface for agenda items
 
     assembly.agenda.forEach((item: AgendaItem) => {
       const [hours, minutes, seconds] = item.time.split(":").map(Number);
@@ -70,7 +72,7 @@ export async function DELETE(req: Request) {
       { message: "Asamblea eliminada con éxito" },
       { status: 200 },
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[API Assemblies Delete] Error:", error);
     if (error.name === "JsonWebTokenError") {
       return NextResponse.json({ message: "Token inválido" }, { status: 401 });

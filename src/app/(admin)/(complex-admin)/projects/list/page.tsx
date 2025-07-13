@@ -2,14 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
-import {
-  Filter,
-  Loader2,
-  PlusCircle,
-  Eye,
-  Edit,
-  Trash2,
-} from "lucide-react";
+import { Filter, Loader2, PlusCircle, Eye, Edit, Trash2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -18,13 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";

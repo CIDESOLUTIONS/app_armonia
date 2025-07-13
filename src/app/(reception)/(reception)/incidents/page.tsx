@@ -85,12 +85,12 @@ interface Attachment {
 }
 
 export default function ReceptionIncidentsPage() {
-  const { isLoggedIn, token: _token, schemaName } = useAuthStore();
+  const { isLoggedIn, schemaName } = useAuthStore();
   const _router = useRouter();
   const [loading, setLoading] = useState(true);
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [error, _setError] = useState<string | null>(null);
-  const [_searchTerm, _setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<
     "reported" | "in_progress" | "resolved" | "closed" | "all"
   >("all");
@@ -896,7 +896,16 @@ export default function ReceptionIncidentsPage() {
             <div className="flex flex-wrap gap-2">
               <Select
                 value={statusFilter}
-                onValueChange={(value) => setStatusFilter(value as any)}
+                onValueChange={(value) =>
+                  setStatusFilter(
+                    value as
+                      | "reported"
+                      | "in_progress"
+                      | "resolved"
+                      | "closed"
+                      | "all",
+                  )
+                }
               >
                 <SelectTrigger className="w-full md:w-32">
                   <SelectValue placeholder="Estado" />
@@ -912,7 +921,16 @@ export default function ReceptionIncidentsPage() {
 
               <Select
                 value={categoryFilter}
-                onValueChange={(value) => setCategoryFilter(value as any)}
+                onValueChange={(value) =>
+                  setCategoryFilter(
+                    value as
+                      | "security"
+                      | "maintenance"
+                      | "emergency"
+                      | "other"
+                      | "all",
+                  )
+                }
               >
                 <SelectTrigger className="w-full md:w-36">
                   <SelectValue placeholder="Categoría" />
@@ -928,7 +946,11 @@ export default function ReceptionIncidentsPage() {
 
               <Select
                 value={priorityFilter}
-                onValueChange={(value) => setPriorityFilter(value as any)}
+                onValueChange={(value) =>
+                  setPriorityFilter(
+                    value as "low" | "medium" | "high" | "critical" | "all",
+                  )
+                }
               >
                 <SelectTrigger className="w-full md:w-32">
                   <SelectValue placeholder="Prioridad" />
@@ -1382,7 +1404,7 @@ export default function ReceptionIncidentsPage() {
                 <div className="mt-2 space-y-2">
                   {newIncidentForm.attachments.map((file, index) => (
                     <div
-                      key={_index}
+                      key={index}
                       className="bg-gray-50 border rounded-md px-3 py-2 flex items-center justify-between"
                     >
                       <div className="flex items-center">

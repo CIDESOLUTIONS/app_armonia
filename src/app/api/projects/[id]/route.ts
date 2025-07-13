@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { getPrisma } from "@/lib/prisma";
 import { withValidation, validateRequest } from "@/lib/validation";
 import {
   ProjectIdSchema,
   ProjectUpdateSchema,
-  type ProjectIdRequest,
   type ProjectUpdateRequest,
 } from "@/validators/projects/project-id.validator";
 
@@ -96,7 +94,7 @@ async function updateProjectHandler(
     }
 
     // Convertir fechas si están presentes
-    const updateData: any = { ...validatedData };
+    const updateData: Partial<ProjectUpdateRequest> = { ...validatedData };
     if (validatedData.startDate) {
       updateData.startDate = new Date(validatedData.startDate);
     }

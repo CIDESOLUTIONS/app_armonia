@@ -4,7 +4,7 @@
  * Estas pruebas verifican el flujo completo de reservas de áreas comunes:
  * consulta de disponibilidad, creación de reserva y procesamiento de pago.
  */
-import { test, expect, Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 // Datos de prueba
 const testUsers = {
   admin: {

@@ -26,7 +26,7 @@ export async function GET(
       await preRegistrationService.getPreRegistrationById(id);
 
     return NextResponse.json(preRegistration);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`Error al obtener pre-registro ${params.id}:`, error);
     return NextResponse.json(
       { error: "Error al obtener pre-registro", message: error.message },
@@ -98,7 +98,7 @@ export async function PUT(
     });
 
     return NextResponse.json(preRegistration);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`Error al actualizar pre-registro ${params.id}:`, error);
     return NextResponse.json(
       { error: "Error al actualizar pre-registro", message: error.message },
@@ -162,7 +162,7 @@ export async function POST(
       });
 
       return NextResponse.json(preRegistration);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`Error al cancelar pre-registro ${params.id}:`, error);
       return NextResponse.json(
         { error: "Error al cancelar pre-registro", message: error.message },
@@ -216,7 +216,7 @@ export async function POST(
       });
 
       return NextResponse.json(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`Error al notificar pre-registro ${params.id}:`, error);
       return NextResponse.json(
         { error: "Error al notificar pre-registro", message: error.message },

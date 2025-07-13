@@ -61,7 +61,7 @@ interface Visitor {
 }
 
 export default function ReceptionVisitorsPage() {
-  const { isLoggedIn, token: _token, schemaName } = useAuthStore();
+  const { isLoggedIn, schemaName } = useAuthStore();
   const _router = useRouter();
   const [loading, setLoading] = useState(true);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
@@ -267,7 +267,7 @@ export default function ReceptionVisitorsPage() {
       const newVisitor: Visitor = {
         id: `vis${Date.now()}`,
         name: newVisitorForm.name,
-        documentType: newVisitorForm.documentType as any,
+        documentType: newVisitorForm.documentType as Visitor["documentType"],
         documentNumber: newVisitorForm.documentNumber,
         destination: newVisitorForm.destination,
         residentName: newVisitorForm.residentName,
@@ -432,7 +432,9 @@ export default function ReceptionVisitorsPage() {
           </div>
           <Select
             value={statusFilter}
-            onValueChange={(value) => setStatusFilter(value as any)}
+            onValueChange={(value) =>
+              setStatusFilter(value as Visitor["status"] | "all")
+            }
           >
             <SelectTrigger className="w-full md:w-48">
               <SelectValue placeholder="Filtrar por estado" />

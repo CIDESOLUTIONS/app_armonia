@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
-import { withValidation, validateRequest } from "@/lib/validation";
+import { withValidation } from "@/lib/validation";
 import { verifyAuth } from "@/lib/auth";
-import { ServerLogger } from "@/lib/logging/server-logger";
 import { ActivityLogger } from "@/lib/logging/activity-logger";
+import { Prisma } from "@prisma/client/runtime/library";
 import {
   UpdateTransactionSchema,
   TransactionIdSchema,
   type UpdateTransactionRequest,
-  type TransactionIdParams,
 } from "@/validators/financial/payments.validator";
 
 const activityLogger = new ActivityLogger();
@@ -55,7 +54,7 @@ export async function GET(
     const prisma = getPrisma();
 
     // Construir filtros con multi-tenant
-    const where: any = {
+    const where: { id: string; complexId: number; userId?: number } = {
       id: transactionId,
       complexId: payload.complexId, // CRÍTICO: Filtro multi-tenant
     };
@@ -187,7 +186,7 @@ async function updateTransactionHandler(
         data: {
           status: validatedData.status,
           gatewayReference: validatedData.gatewayReference,
-          gatewayResponse: validatedData.gatewayResponse,
+          gatewayResponse: validatedData.gatewayResponse as Prisma.JsonValue,
           errorMessage: validatedData.errorMessage,
           completedAt:
             validatedData.status === "COMPLETED" ? new Date() : undefined,
@@ -317,7 +316,7 @@ export async function DELETE(
     const prisma = getPrisma();
 
     // Construir filtros con multi-tenant
-    const where: any = {
+    const where: { id: string; complexId: number; userId?: number } = {
       id: transactionId,
       complexId: payload.complexId, // CRÍTICO: Filtro multi-tenant
     };

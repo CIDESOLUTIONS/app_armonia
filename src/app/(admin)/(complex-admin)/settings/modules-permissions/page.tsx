@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, Puzzle, Users, Check, X } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";

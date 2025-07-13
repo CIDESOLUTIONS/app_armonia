@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/header";
 import { Check, ArrowLeft, AlertCircle } from "lucide-react";
-import { ROUTES } from "@/constants/routes";
+
 import { FormField } from "@/components/common/FormField";
 import {
   Select,
@@ -14,7 +14,6 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 
 // Textos para soportar múltiples idiomas
 const texts = {
@@ -472,7 +471,7 @@ export default function RegisterComplex() {
 
   // Actualizamos para conectar con el API y procesar la respuesta
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
+  const [_error, setError] = useState("");
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string>
   >({});

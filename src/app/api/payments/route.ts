@@ -2,12 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
 import { withValidation, validateRequest } from "@/lib/validation";
 import { verifyAuth } from "@/lib/auth";
-import { ServerLogger } from "@/lib/logging/server-logger";
+import { ServerLogger as _ServerLogger } from "@/lib/logging/server-logger";
 import { ActivityLogger } from "@/lib/logging/activity-logger";
 import {
   GetTransactionsSchema,
   CreateTransactionSchema,
-  type GetTransactionsRequest,
   type CreateTransactionRequest,
 } from "@/validators/financial/payments.validator";
 
@@ -71,7 +70,17 @@ export async function GET(request: NextRequest) {
     const prisma = getPrisma();
 
     // Construir consulta con filtros multi-tenant
-    const where: any = {
+    const where: {
+      complexId: number;
+      userId?: number;
+      status?: string;
+      createdAt?: { gte?: Date; lte?: Date };
+      amount?: { gte?: number; lte?: number };
+      OR?: (
+        | { description: { contains: string; mode: "insensitive" } }
+        | { gatewayReference: { contains: string; mode: "insensitive" } }
+      )[];
+    } = {
       complexId: payload.complexId, // CRÍTICO: Filtro multi-tenant
     };
 

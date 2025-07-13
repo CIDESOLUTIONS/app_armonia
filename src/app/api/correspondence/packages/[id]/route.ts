@@ -25,7 +25,7 @@ export async function GET(
     const packageData = await packageService.getPackageById(id);
 
     return NextResponse.json(packageData);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`Error al obtener paquete ${params.id}:`, error);
     return NextResponse.json(
       { error: "Error al obtener paquete", message: error.message },
@@ -105,7 +105,7 @@ export async function PUT(
     });
 
     return NextResponse.json(packageData);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`Error al actualizar paquete ${params.id}:`, error);
     return NextResponse.json(
       { error: "Error al actualizar paquete", message: error.message },
@@ -181,7 +181,7 @@ export async function POST(
       });
 
       return NextResponse.json(packageData);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`Error al cambiar estado de paquete ${params.id}:`, error);
       return NextResponse.json(
         { error: "Error al cambiar estado de paquete", message: error.message },
@@ -245,7 +245,7 @@ export async function POST(
       });
 
       return NextResponse.json(packageData);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`Error al entregar paquete ${params.id}:`, error);
       return NextResponse.json(
         { error: "Error al entregar paquete", message: error.message },
@@ -300,7 +300,7 @@ export async function POST(
       });
 
       return NextResponse.json(packageData);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`Error al devolver paquete ${params.id}:`, error);
       return NextResponse.json(
         { error: "Error al devolver paquete", message: error.message },
@@ -348,7 +348,7 @@ export async function POST(
       });
 
       return NextResponse.json(notification);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`Error al notificar paquete ${params.id}:`, error);
       return NextResponse.json(
         { error: "Error al notificar paquete", message: error.message },

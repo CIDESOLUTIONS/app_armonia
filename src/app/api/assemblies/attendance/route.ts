@@ -1,6 +1,28 @@
 // src/app/api/assemblies/attendance/route.ts
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
+
+interface AssemblyQueryResult {
+  id: number;
+  title: string;
+  description: string | null;
+  type: string;
+  status: string;
+  date: Date;
+  endTime: Date | null;
+  location: string;
+  agenda: any; // Assuming Json is any
+  requiredCoefficient: number;
+  currentCoefficient: number;
+  quorumStatus: string;
+  quorumReachedAt: Date | null;
+  realtimeChannel: string | null;
+  createdBy: number;
+  createdAt: Date;
+  updatedAt: Date;
+  complexId: number;
+}
+
 // Variable JWT_SECRET eliminada por lint
 
 export async function GET(req: NextRequest) {
@@ -9,7 +31,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: "No token provided" }, { status: 401 });
 
   try {
-    const decoded = jwt.decode(token) as { complexId: number; schemaName?: string };
+    const decoded = jwt.decode(token) as {
+      complexId: number;
+      schemaName?: string;
+    };
     const schemaName = decoded.schemaName || `schema_${decoded.complexId}`;
     const prisma = getPrisma(schemaName);
     console.log("[API Attendance GET] Usando schema:", schemaName);
@@ -23,7 +48,7 @@ export async function GET(req: NextRequest) {
       `SELECT * FROM "${schemaName}"."Assembly" WHERE id = $1 AND "complexId" = $2`,
       assemblyId,
       decoded.complexId,
-    )) as any[];
+    )) as AssemblyQueryResult[];
     if (!assemblyResult.length) {
       console.log("[API Attendance GET] Asamblea no encontrada:", {
         assemblyId,

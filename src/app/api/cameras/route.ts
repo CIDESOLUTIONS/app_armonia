@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
-import { validateRequest } from "@/lib/validation";
 import { verifyAuth } from "@/lib/auth";
 import { ServerLogger } from "@/lib/logging/server-logger";
 import { z } from "zod";
@@ -44,7 +43,7 @@ export async function GET(req: NextRequest) {
     const includeInactive = searchParams.get("includeInactive") === "true";
 
     // Inicializar Prisma
-    const prisma = getPrisma();
+    const _prisma = getPrisma();
 
     // Obtener cámaras con filtro multi-tenant
     const cameras = await prisma.camera.findMany({
@@ -108,7 +107,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Inicializar Prisma
-    const prisma = getPrisma();
+    const _prisma = getPrisma();
 
     // Crear cámara con filtro multi-tenant
     const camera = await prisma.camera.create({
@@ -172,7 +171,7 @@ export async function POST_discover(req: NextRequest) {
     }
 
     // Inicializar Prisma
-    const prisma = getPrisma();
+    const _prisma = getPrisma();
 
     // Aquí iría la lógica de descubrimiento de cámaras
     // Por ahora devolvemos un mock

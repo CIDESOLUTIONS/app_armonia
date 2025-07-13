@@ -2,12 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import * as reservationService from "@/services/reservationService";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { ServerLogger } from "@/lib/logging/server-logger";
+import { ServerLogger as _ServerLogger } from "@/lib/logging/server-logger";
 import { validateRequest, withValidation } from "@/lib/validation";
 import {
   NotificationIdSchema,
   MarkNotificationSchema,
-  type NotificationIdRequest,
   type MarkNotificationRequest,
 } from "@/validators/notifications/notification.validator";
 import prisma from "@/lib/prisma";

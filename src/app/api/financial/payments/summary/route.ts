@@ -1,6 +1,5 @@
 // frontend/src/app/api/financial/payments/summary/route.ts
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 import { pool } from "@/lib/db";
 
 // GET /api/financial/payments/summary

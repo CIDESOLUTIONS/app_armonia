@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 // Variable JWT_SECRET eliminada por lint
 
 export async function POST(_req: unknown) {
-  const _token = req.headers.get("Authorization")?.replace("Bearer ", "");
+  const token = req.headers.get("Authorization")?.replace("Bearer ", "");
   const { questionId, votes } = await req.json();
 
   if (!token || !questionId || !votes)
@@ -11,7 +11,7 @@ export async function POST(_req: unknown) {
 
   try {
     // Variable decoded eliminada por lint
-    const _schemaName = decoded.schemaName.toLowerCase();
+    const schemaName = decoded.schemaName.toLowerCase();
     prisma.setTenantSchema(schemaName);
 
     const yesVotes = votes.filter((v: unknown) => v.vote === "Sí").length;

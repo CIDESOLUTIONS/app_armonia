@@ -5,12 +5,7 @@ import { verifyAuth } from "@/lib/auth";
 import {
   GetAssembliesSchema,
   CreateAssemblySchema,
-  UpdateAssemblySchema,
-  DeleteAssemblySchema,
-  type GetAssembliesRequest,
   type CreateAssemblyRequest,
-  type UpdateAssemblyRequest,
-  type DeleteAssemblyRequest,
 } from "@/validators/assemblies/assemblies.validator";
 
 // GET: Obtener asambleas con filtros
@@ -50,7 +45,9 @@ export async function GET(request: NextRequest) {
     const validatedParams = validation.data;
     const prisma = getPrisma();
 
-    const where: { complexId: number; status?: string } = { complexId: payload.complexId };
+    const where: { complexId: number; status?: string } = {
+      complexId: payload.complexId,
+    };
     if (validatedParams.status) where.status = validatedParams.status;
 
     const offset = (validatedParams.page - 1) * validatedParams.limit;

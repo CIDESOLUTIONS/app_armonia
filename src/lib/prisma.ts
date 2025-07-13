@@ -54,12 +54,15 @@ export function getPublicPrismaClient(): PrismaClient {
  * @returns El schemaName o null si no se encuentra o el token es inválido.
  */
 export function getTenantSchemaFromToken(req: Request): string | null {
-  const tokenCookie = req.headers.get("cookie")?.split('; ').find(c => c.startsWith('token='));
+  const tokenCookie = req.headers
+    .get("cookie")
+    ?.split("; ")
+    .find((c) => c.startsWith("token="));
   if (!tokenCookie) {
     return null;
   }
 
-  const token = tokenCookie.split('=')[1];
+  const token = tokenCookie.split("=")[1];
   if (!token) {
     return null;
   }
