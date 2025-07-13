@@ -1,10 +1,8 @@
-// src/app/layout.tsx
 import type { Metadata } from "next";
 import { Providers } from "@/components/providers";
 import "./globals.css";
-
-// Eliminamos la fuente Inter para resolver el conflicto con Babel
-// const inter = Inter({ subsets: ['latin'] });
+import { NextIntlClientProvider } from "next-intl";
+import { useMessages } from "next-intl";
 
 export const metadata: Metadata = {
   title: "Armonía - Gestión de Conjuntos Residenciales",
@@ -16,10 +14,14 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const messages = useMessages();
+
   return (
     <html lang="es">
       <body className="font-sans">
-        <Providers>{children}</Providers>
+        <NextIntlClientProvider messages={messages}>
+          <Providers>{children}</Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
