@@ -60,7 +60,7 @@
     "lucide-react": "^0.475.0",
     "mathjs": "^14.5.3",
     "next": "^15.3.5",
-    "next-auth": "^4.24.11",
+    "next-auth": "^5.0.0-beta.29",
     "next-intl": "^4.3.4",
     "node-onvif": "^0.1.7",
     "node-rtsp-stream": "^0.0.9",
