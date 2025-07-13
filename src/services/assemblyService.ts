@@ -39,6 +39,16 @@ interface UpdateAssemblyData {
   status?: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
 }
 
+export async function getAssemblyById(id: number): Promise<Assembly> {
+  try {
+    const response = await fetchApi(`/api/assemblies/${id}`);
+    return response;
+  } catch (error) {
+    console.error(`Error fetching assembly ${id}:`, error);
+    throw error;
+  }
+}
+
 export async function getAssemblies(
   params?: GetAssembliesParams,
 ): Promise<{ data: Assembly[]; pagination: any }> {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPrisma } from "@/lib/prisma";
+import { getTenantPrismaClient } from "@/lib/prisma";
 import { authMiddleware } from "@/lib/auth";
 import { z } from "zod";
 import { ServerLogger } from "@/lib/logging/server-logger";
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     }
     const { payload } = authResult;
 
-    const tenantPrisma = getPrisma(payload.schemaName);
+    const tenantPrisma = getTenantPrismaClient(payload.schemaName);
     const where: {
       complexId: number;
       isActive?: boolean;
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = AnnouncementSchema.parse(body);
 
-    const tenantPrisma = getPrisma(payload.schemaName);
+    const tenantPrisma = getTenantPrismaClient(payload.schemaName);
     const newAnnouncement = await tenantPrisma.announcement.create({
       data: {
         ...validatedData,

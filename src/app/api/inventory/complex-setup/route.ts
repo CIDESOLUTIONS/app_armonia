@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPrisma } from "@/lib/prisma";
+import { getPublicPrismaClient } from "@/lib/prisma";
 import { authMiddleware } from "@/lib/auth";
 import { z } from "zod";
 import { ServerLogger } from "@/lib/logging/server-logger";
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     }
     const { payload } = authResult;
 
-    const armoniaPrisma = getPrisma("armonia");
+    const armoniaPrisma = getPublicPrismaClient();
     const complexInfo = await armoniaPrisma.residentialComplex.findUnique({
       where: { id: payload.complexId },
     });
@@ -77,7 +77,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const armoniaPrisma = getPrisma("armonia");
+    const armoniaPrisma = getPublicPrismaClient();
     const updatedComplex = await armoniaPrisma.residentialComplex.update({
       where: { id: payload.complexId },
       data: validatedData,

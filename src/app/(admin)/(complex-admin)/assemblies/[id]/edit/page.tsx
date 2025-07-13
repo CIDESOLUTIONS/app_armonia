@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { getAssemblies, updateAssembly } from "@/services/assemblyService";
+import { getAssemblyById, updateAssembly } from "@/services/assemblyService";
 
 interface Assembly {
   id: number;
@@ -52,8 +52,7 @@ export default function EditAssemblyPage() {
   const fetchAssembly = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await getAssemblies(); // Fetch all to find by ID for now
-      const assembly = response.data.find((a: Assembly) => a.id === assemblyId);
+      const assembly = await getAssemblyById(assemblyId);
       if (assembly) {
         setFormData({
           title: assembly.title,
@@ -116,7 +115,7 @@ export default function EditAssemblyPage() {
     if (!assemblyId) return;
 
     try {
-      await updateAssembly(assemblyId, formData);
+      await updateAssembly({ id: assemblyId, ...formData });
       toast({
         title: "Éxito",
         description: "Asamblea actualizada correctamente.",

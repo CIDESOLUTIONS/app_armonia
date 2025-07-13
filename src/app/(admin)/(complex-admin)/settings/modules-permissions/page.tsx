@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { getModulePermissions, updateModulePermissions } from "@/services/modulePermissionService";
 
 interface ModuleConfig {
   id: string;
@@ -18,61 +19,43 @@ interface ModuleConfig {
 export default function ModulesPermissionsPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
-  const [modules, setModules] = useState<ModuleConfig[]>([
-    // Mock data
-    {
-      id: "inventory",
-      name: "Gestión de Inventario",
-      description:
-        "Permite administrar propiedades, residentes, vehículos y mascotas.",
-      enabled: true,
-      permissions: [
-        { role: "ADMIN", canView: true, canEdit: true },
-        { role: "COMPLEX_ADMIN", canView: true, canEdit: true },
-        { role: "STAFF", canView: true, canEdit: false },
-        { role: "RESIDENT", canView: false, canEdit: false },
-      ],
-    },
-    {
-      id: "finances",
-      name: "Gestión Financiera",
-      description: "Control de ingresos, egresos, presupuestos y cuotas.",
-      enabled: true,
-      permissions: [
-        { role: "ADMIN", canView: true, canEdit: true },
-        { role: "COMPLEX_ADMIN", canView: true, canEdit: true },
-        { role: "STAFF", canView: false, canEdit: false },
-        { role: "RESIDENT", canView: true, canEdit: false },
-      ],
-    },
-    {
-      id: "assemblies",
-      name: "Gestión de Asambleas",
-      description: "Programación, votaciones y actas de asambleas.",
-      enabled: true,
-      permissions: [
-        { role: "ADMIN", canView: true, canEdit: true },
-        { role: "COMPLEX_ADMIN", canView: true, canEdit: true },
-        { role: "STAFF", canView: true, canEdit: false },
-        { role: "RESIDENT", canView: true, canEdit: false },
-      ],
-    },
-  ]);
-  const [loading, setLoading] = useState(false);
+  const [modules, setModules] = useState<ModuleConfig[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchModulePermissions = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await getModulePermissions();
+      setModules(data);
+    } catch (error) {
+      console.error("Error fetching module permissions:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo cargar la configuración de módulos y permisos.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchModulePermissions();
+    }
+  }, [authLoading, user, fetchModulePermissions]);
 
   const handleToggleModule = async (moduleId: string, enabled: boolean) => {
     setLoading(true);
     try {
-      // Placeholder for API call to update module status
-      console.log(`Module ${moduleId} toggled to ${enabled}`);
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
-
-      setModules((prev) =>
-        prev.map((mod) => (mod.id === moduleId ? { ...mod, enabled } : mod)),
+      const updatedModules = modules.map((mod) =>
+        mod.id === moduleId ? { ...mod, enabled } : mod,
       );
+      await updateModulePermissions(updatedModules);
+      setModules(updatedModules);
       toast({
         title: "Éxito",
-        description: "Configuración de módulo actualizada (simulado).",
+        description: "Configuración de módulo actualizada correctamente.",
       });
     } catch (error) {
       console.error("Error toggling module:", error);
@@ -94,25 +77,21 @@ export default function ModulesPermissionsPage() {
   ) => {
     setLoading(true);
     try {
-      // Placeholder for API call to update permissions
-      console.log(`Module ${moduleId}, role ${role}, ${type} set to ${value}`);
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
-
-      setModules((prev) =>
-        prev.map((mod) =>
-          mod.id === moduleId
-            ? {
-                ...mod,
-                permissions: mod.permissions.map((p) =>
-                  p.role === role ? { ...p, [type]: value } : p,
-                ),
-              }
-            : mod,
-        ),
+      const updatedModules = modules.map((mod) =>
+        mod.id === moduleId
+          ? {
+              ...mod,
+              permissions: mod.permissions.map((p) =>
+                p.role === role ? { ...p, [type]: value } : p,
+              ),
+            }
+          : mod,
       );
+      await updateModulePermissions(updatedModules);
+      setModules(updatedModules);
       toast({
         title: "Éxito",
-        description: "Permisos actualizados (simulado).",
+        description: "Permisos actualizados correctamente.",
       });
     } catch (error) {
       console.error("Error updating permissions:", error);
@@ -126,7 +105,7 @@ export default function ModulesPermissionsPage() {
     }
   };
 
-  if (authLoading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />

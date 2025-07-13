@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-import prisma from "@/lib/prisma"; // Asume que tienes una instancia de Prisma
+import { getPublicPrismaClient } from "@/lib/prisma";
 
 // Esquema de validación con Zod
 const registerSchema = z.object({
@@ -20,7 +20,8 @@ export async function POST(request: Request) {
     const { name, email, password, schemaName, role } =
       registerSchema.parse(body);
 
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+        const publicPrisma = getPublicPrismaClient();
+    const existingUser = await publicPrisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return NextResponse.json(
         { message: "El usuario ya existe" },
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
 
     let complexId: number | null = null;
     if (schemaName) {
-      const residentialComplex = await prisma.residentialComplex.findUnique({
+      const residentialComplex = await publicPrisma.residentialComplex.findUnique({
         where: { schemaName: schemaName },
       });
 
@@ -45,7 +46,7 @@ export async function POST(request: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await prisma.user.create({
+    const newUser = await publicPrisma.user.create({
       data: {
         name,
         email,

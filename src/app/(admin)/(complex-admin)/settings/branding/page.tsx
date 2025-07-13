@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { getBrandingSettings, updateBrandingSettings } from "@/services/brandingService";
 
 export default function BrandingSettingsPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -14,7 +15,32 @@ export default function BrandingSettingsPage() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [primaryColor, setPrimaryColor] = useState("#4f46e5"); // Default indigo-600
   const [secondaryColor, setSecondaryColor] = useState("#ffffff"); // Default white
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const fetchBrandingSettings = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await getBrandingSettings();
+      setPrimaryColor(data.primaryColor);
+      setSecondaryColor(data.secondaryColor);
+      // No se carga el logoFile directamente, solo su URL si existe
+    } catch (error) {
+      console.error("Error fetching branding settings:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo cargar la configuración de marca.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchBrandingSettings();
+    }
+  }, [authLoading, user, fetchBrandingSettings]);
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -26,18 +52,18 @@ export default function BrandingSettingsPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      // Placeholder for API call to save branding settings
-      console.log("Saving branding settings:", {
-        logoFile,
-        primaryColor,
-        secondaryColor,
-      });
-      await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate API call
+      const formData = new FormData();
+      formData.append("primaryColor", primaryColor);
+      formData.append("secondaryColor", secondaryColor);
+      if (logoFile) {
+        formData.append("logoFile", logoFile);
+      }
+
+      await updateBrandingSettings(formData);
 
       toast({
         title: "Éxito",
-        description:
-          "Configuración de marca guardada correctamente (simulado).",
+        description: "Configuración de marca guardada correctamente.",
       });
     } catch (error) {
       console.error("Error saving branding settings:", error);
@@ -51,7 +77,7 @@ export default function BrandingSettingsPage() {
     }
   };
 
-  if (authLoading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
