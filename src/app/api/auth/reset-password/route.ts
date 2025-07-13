@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 import * as bcrypt from "bcrypt";
-import { verifyPasswordResetToken } from "@/lib/auth";
+import { verifyPasswordResetToken, JWTPayload } from "@/lib/auth";
 import { ServerLogger } from "@/lib/logging/server-logger";
 
 const prisma = new PrismaClient();
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     const validatedData = ResetPasswordSchema.parse(body);
     const { token, newPassword } = validatedData;
 
-    const decodedToken = await verifyPasswordResetToken(token);
+    const decodedToken = (await verifyPasswordResetToken(token)) as JWTPayload;
 
     if (!decodedToken) {
       ServerLogger.warn(
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     const { id: userId, email, schemaName } = decodedToken;
 
-    let user: any;
+    const user: any;
     let targetPrisma = prisma;
 
     if (schemaName) {

@@ -3,7 +3,7 @@
  */
 
 import WebSocket from "ws";
-import { Server as HttpServer } from "http";
+import { Server as HttpServer, IncomingMessage } from "http";
 import { Server as HttpsServer } from "https";
 import { ServerLogger } from "../lib/logging/server-logger";
 
@@ -23,7 +23,7 @@ export function initializeWebSocketServer(
   try {
     const wss = new WebSocket.Server({ server });
 
-    wss.on("connection", (ws: WebSocket, req: any) => {
+    wss.on("connection", (ws: WebSocket, req: IncomingMessage) => {
       const clientId = req.headers["x-client-id"] || generateClientId();
       const schemaName = req.headers["x-schema-name"] || "default";
 

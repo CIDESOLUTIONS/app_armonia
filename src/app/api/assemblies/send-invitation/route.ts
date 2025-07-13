@@ -15,7 +15,7 @@ export async function POST(_req: unknown) {
 
   try {
     // Variable decoded eliminada por lint complexId: number; schemaName: string };
-    const { _assemblyId, title, date, agenda } = await req.json();
+    const { title, date, agenda } = await req.json();
     const schemaName = decoded.schemaName.toLowerCase();
 
     prisma.setTenantSchema(schemaName);

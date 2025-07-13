@@ -6,6 +6,7 @@ import {
 import {
   GET as getProperties,
   POST as postProperties,
+  PUT as putProperties,
 } from "@/app/api/inventory/properties/route";
 import {
   GET as getVehicles,
@@ -13,8 +14,12 @@ import {
 } from "@/app/api/inventory/vehicles/route";
 import { GET as getStatistics } from "@/app/api/inventory/statistics/route";
 
-import { InventoryService } from "@/services/inventory-service-refactored";
-import { verifyAuth } from "@/lib/auth";
+import {
+  PropertyCreateSchema,
+  PetCreateSchema,
+  VehicleCreateSchema,
+  ResidentUpdateSchema,
+} from "@/lib/schemas/inventory-schemas";
 
 // Mock de next/server para simular NextResponse
 jest.mock("next/server", () => ({
@@ -23,7 +28,6 @@ jest.mock("next/server", () => ({
     .mockImplementation((input, init) => new Request(input, init)),
   NextResponse: {
     json: jest.fn((data, options) => {
-      // Simulate a Response object with a json method
       return {
         status: options?.status || 200,
         json: () => Promise.resolve(data),
@@ -43,33 +47,34 @@ jest.mock("@/lib/auth", () => ({
         email: "admin@test.com",
         role: "COMPLEX_ADMIN",
         complexId: 1,
-        schemaName: "test_schema", // Add schemaName to payload
       },
     }),
   ),
 }));
 
 // Mock del servicio de inventario
-jest.mock("@/services/inventory-service-refactored", () => ({
-  InventoryService: jest.fn().mockImplementation(() => ({
+jest.mock("@/lib/services/inventory-service-refactored", () => ({
+  inventoryService: {
     getPets: jest.fn(),
     createPet: jest.fn(),
     getProperties: jest.fn(),
     createProperty: jest.fn(),
-    updateProperty: jest.fn(),
+    updateProperty: jest.fn(), // Added mock for updateProperty
     getVehicles: jest.fn(),
     createVehicle: jest.fn(),
-    getResidents: jest.fn(),
-    updateResident: jest.fn(),
-    getServices: jest.fn(),
+    getResidents: jest.fn(), // Added mock for getResidents
+    updateResident: jest.fn(), // Added mock for updateResident
+    getServices: jest.fn(), // Added mock for getServices
     getInventoryStats: jest.fn(),
-  })),
+  },
 }));
+
+const mockInventoryService =
+  require("@/lib/services/inventory-service-refactored").inventoryService;
 
 describe("Inventory API Integration Tests", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    inventoryService = new InventoryService("test_schema"); // Instantiate with schemaName
   });
 
   describe("Pets API", () => {
@@ -125,6 +130,7 @@ describe("Inventory API Integration Tests", () => {
       });
 
       it("should return 403 for access to different complex", async () => {
+        const { verifyAuth } = require("@/lib/auth");
         verifyAuth.mockResolvedValueOnce({
           auth: true,
           payload: {
@@ -182,6 +188,7 @@ describe("Inventory API Integration Tests", () => {
       });
 
       it("should return 403 for unauthorized role", async () => {
+        const { verifyAuth } = require("@/lib/auth");
         verifyAuth.mockResolvedValueOnce({
           auth: true,
           payload: {
@@ -297,6 +304,7 @@ describe("Inventory API Integration Tests", () => {
       });
 
       it("should return 403 for non-admin role", async () => {
+        const { verifyAuth } = require("@/lib/auth");
         verifyAuth.mockResolvedValueOnce({
           auth: true,
           payload: {
@@ -466,6 +474,7 @@ describe("Inventory API Integration Tests", () => {
     });
 
     it("should handle authentication errors", async () => {
+      const { verifyAuth } = require("@/lib/auth");
       verifyAuth.mockResolvedValueOnce({
         auth: false,
         payload: null,
