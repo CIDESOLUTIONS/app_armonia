@@ -9,7 +9,7 @@ export async function GET() {
     ServerLogger.info("Iniciando sesión de prueba");
 
     // Crear datos de usuario de prueba
-    const _user = {
+    const user = {
       id: 1,
       email: "Admin001@prueba.com",
       name: "Administrador de Prueba",
@@ -21,7 +21,7 @@ export async function GET() {
     };
 
     // Generar token
-    const _token = await generateToken(user);
+    const token = await generateToken(user);
 
     // Establecer cookie
     cookies().set({

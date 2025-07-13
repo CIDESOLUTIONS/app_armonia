@@ -19,7 +19,11 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const decoded = jwt.decode(token) as { complexId: number; schemaName: string; role: string };
+    const decoded = jwt.decode(token) as {
+      complexId: number;
+      schemaName: string;
+      role: string;
+    };
     console.log("[API Assemblies List] Token decodificado:", decoded);
 
     const schemaName = decoded.schemaName.toLowerCase();

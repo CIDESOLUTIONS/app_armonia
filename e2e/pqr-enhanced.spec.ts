@@ -6,7 +6,17 @@
  * los roles y escenarios principales.
  */
 
-import { test, expect, Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
+
+interface PQRData {
+  title: string;
+  description: string;
+  type: string;
+  location: string;
+  category?: string;
+  subcategory?: string;
+  priority?: string;
+}
 
 // Datos de prueba
 const testUsers = {
@@ -104,7 +114,7 @@ class PQRPage {
   }
 
   // Acciones de PQR
-  async createPQR(pqrData: any) {
+  async createPQR(pqrData: PQRData) {
     await this.gotoPQRCreate();
 
     // Llenar formulario

@@ -47,20 +47,26 @@ export async function GET(req: Request) {
 
     const formattedKpis = kpis[0] || {};
 
-    const processTrendData = (data: any[], valueField: string) => {
+    const processTrendData = (data: unknown[], valueField: string) => {
       const monthlyData = new Map<string, number>();
       for (let i = 0; i < 12; i++) {
         const month = format(subMonths(now, i), "MMM yyyy");
         monthlyData.set(month, 0);
       }
-      data.forEach((item: any) => {
-        const month = format(new Date(item.createdAt), "MMM yyyy");
-        monthlyData.set(
-          month,
-          (monthlyData.get(month) || 0) +
-            (item._sum?.[valueField] || item._count?._all || 0),
-        );
-      });
+      data.forEach(
+        (item: {
+          createdAt: string;
+          _sum?: { amount: number };
+          _count?: { _all: number };
+        }) => {
+          const month = format(new Date(item.createdAt), "MMM yyyy");
+          monthlyData.set(
+            month,
+            (monthlyData.get(month) || 0) +
+              (item._sum?.[valueField] || item._count?._all || 0),
+          );
+        },
+      );
       return Array.from(monthlyData.entries())
         .map(([month, value]) => ({ month, value }))
         .reverse();

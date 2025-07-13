@@ -3,9 +3,7 @@ import { getPrisma } from "@/lib/prisma";
 import { authMiddleware } from "@/lib/auth";
 import { z } from "zod";
 import { ServerLogger } from "@/lib/logging/server-logger";
-import {
-  UpdateAssemblySchema,
-} from "@/validators/assemblies/assemblies.validator";
+import { UpdateAssemblySchema } from "@/validators/assemblies/assemblies.validator";
 
 export async function PUT(
   request: NextRequest,

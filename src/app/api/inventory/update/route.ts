@@ -1,7 +1,6 @@
 // src/app/api/inventory/update/route.ts
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
 
 export async function GET(_req: unknown) {
   try {
@@ -14,8 +13,8 @@ export async function GET(_req: unknown) {
 
     // Obtener y validar parámetros
     const { searchParams } = new URL(req.url);
-    const _complexId = searchParams.get("complexId");
-    const _schemaName = searchParams.get("schemaName");
+    const complexId = searchParams.get("complexId");
+    const schemaName = searchParams.get("schemaName");
 
     console.log("[API Inventory/Update GET] Params:", {
       complexId,

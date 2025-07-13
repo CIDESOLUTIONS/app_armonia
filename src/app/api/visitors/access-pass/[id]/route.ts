@@ -25,7 +25,7 @@ export async function GET(
     const accessPass = await accessPassService.getAccessPassById(id);
 
     return NextResponse.json(accessPass);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`Error al obtener pase de acceso ${params.id}:`, error);
     return NextResponse.json(
       { error: "Error al obtener pase de acceso", message: error.message },
@@ -87,7 +87,7 @@ export async function POST(
       });
 
       return NextResponse.json(validationResult);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`Error al validar pase de acceso ${params.id}:`, error);
       return NextResponse.json(
         { error: "Error al validar pase de acceso", message: error.message },
@@ -149,7 +149,7 @@ export async function POST(
       });
 
       return NextResponse.json(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(
         `Error al registrar uso de pase de acceso ${params.id}:`,
         error,
@@ -214,7 +214,7 @@ export async function POST(
       });
 
       return NextResponse.json(accessPass);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`Error al revocar pase de acceso ${params.id}:`, error);
       return NextResponse.json(
         { error: "Error al revocar pase de acceso", message: error.message },

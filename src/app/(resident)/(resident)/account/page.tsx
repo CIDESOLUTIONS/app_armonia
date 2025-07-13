@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuthStore } from "@/store/authStore";
+
 import {
   Table,
   TableBody,
@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/table";
 
 export default function AccountPage() {
-  const { } = useAuthStore();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { incidentService } from "@/services/incidentService";
 import { validateCsrfToken } from "@/lib/security/csrf-protection";
-import { sanitizeData } from "@/lib/security/xss-protection";
-import { logAuditAction } from "@/lib/security/audit-trail";
 import { getServerSession } from "next-auth";
 import { withValidation, validateRequest } from "@/lib/validation";
 import {
   GetIncidentsSchema,
   CreateIncidentSchema,
-  type GetIncidentsRequest,
   type CreateIncidentRequest,
 } from "@/validators/incidents/incident.validator";
 
@@ -58,7 +55,7 @@ export async function GET(request: NextRequest) {
     const isResident = session.user.role === "RESIDENT";
 
     // Aplicar restricciones según rol
-    const finalParams: any = { ...validatedParams };
+    const finalParams: GetIncidentsRequest = { ...validatedParams };
 
     // Residentes solo ven sus propios incidentes o los públicos
     if (isResident) {
@@ -90,7 +87,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error al obtener incidentes:", error);
     return NextResponse.json(
       { error: error.message || "Error al obtener incidentes" },
@@ -169,7 +166,7 @@ async function createIncidentHandler(
     });
 
     return NextResponse.json(incident, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error al crear incidente:", error);
     return NextResponse.json(
       { error: error.message || "Error al crear incidente" },

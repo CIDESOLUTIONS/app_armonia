@@ -47,7 +47,11 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Validar que el usuario pertenece al schemaName proporcionado (si aplica)
-          if (user.complexId && schemaName && user.complex?.schemaName !== schemaName) {
+          if (
+            user.complexId &&
+            schemaName &&
+            user.complex?.schemaName !== schemaName
+          ) {
             ServerLogger.warn(
               `Intento de login fallido: Usuario ${email} no pertenece al schema ${schemaName}`,
             );
@@ -63,10 +67,7 @@ export const authOptions: NextAuthOptions = {
             schemaName: user.complex?.schemaName || null, // Usar el schemaName del complejo asociado
           };
         } catch (error) {
-          ServerLogger.error(
-            `Error en la autorización para ${email}:`,
-            error,
-          );
+          ServerLogger.error(`Error en la autorización para ${email}:`, error);
           return null;
         }
       },

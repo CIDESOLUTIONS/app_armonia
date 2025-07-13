@@ -1,16 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { visitorService } from "@/services/visitorService";
 import { validateCsrfToken } from "@/lib/security/csrf-protection";
-import { sanitizeData } from "@/lib/security/xss-protection";
-import { logAuditAction } from "@/lib/security/audit-trail";
 import { withValidation, validateRequest } from "@/lib/validation";
 import {
   GetVisitorsSchema,
   CreateVisitorSchema,
   GetVisitorStatsSchema,
-  type GetVisitorsRequest,
-  type CreateVisitorRequest,
-  type GetVisitorStatsRequest,
 } from "@/validators/visitors/visitor.validator";
 
 /**
@@ -42,7 +37,7 @@ export async function GET(request: NextRequest) {
     const result = await visitorService.getAllVisitors(validatedParams);
 
     return NextResponse.json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error al obtener visitantes:", error);
     return NextResponse.json(
       { error: "Error al obtener visitantes", message: error.message },
@@ -111,7 +106,7 @@ async function createVisitorHandler(
     });
 
     return NextResponse.json(visitor, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error al crear visitante:", error);
     return NextResponse.json(
       { error: "Error al crear visitante", message: error.message },
@@ -145,7 +140,7 @@ export async function GET_STATS(request: NextRequest) {
     const stats = await visitorService.getVisitorStats(validatedParams);
 
     return NextResponse.json(stats);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error al obtener estadísticas:", error);
     return NextResponse.json(
       { error: "Error al obtener estadísticas", message: error.message },

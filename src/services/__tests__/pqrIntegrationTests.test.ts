@@ -181,8 +181,8 @@ describe("PQR System Integration Tests", () => {
         userName: pqrData.userName,
         userRole: pqrData.userRole,
         unitId: pqrData.unitId,
-        unitNumber: pqrData.unitNumber,
-        complexId: pqrData.complexId,
+        unitNumber: "101",
+        complexId: 1,
         submittedAt: new Date(),
         dueDate: assignmentResult.dueDate,
       };

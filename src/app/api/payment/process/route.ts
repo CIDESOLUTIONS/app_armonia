@@ -99,7 +99,7 @@ export async function POST(_req: unknown) {
 
     // Si se envían datos del conjunto, lo creamos temporalmente para asociar el pago
     if (complexData) {
-      const { complexName, totalUnits, adminEmail, _adminName } = complexData;
+      const { complexName, totalUnits, adminEmail, adminName } = complexData;
 
       if (complexName && totalUnits && adminEmail && adminName) {
         try {

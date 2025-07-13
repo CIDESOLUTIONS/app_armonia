@@ -3,8 +3,8 @@ import { prisma } from "@/lib/prisma";
 // Variable JWT_SECRET eliminada por lint
 
 export async function GET(_req: unknown) {
-  const _token = req.headers.get("Authorization")?.replace("Bearer ", "");
-  const { searchParams } = new URL(req.url);
+  const token = req.headers.get("Authorization")?.replace("Bearer ", "");
+
   // Variable assemblyId eliminada por lint
 
   if (!token || !assemblyId)
@@ -12,7 +12,7 @@ export async function GET(_req: unknown) {
 
   try {
     // Variable decoded eliminada por lint
-    const _schemaName = decoded.schemaName.toLowerCase();
+    const schemaName = decoded.schemaName.toLowerCase();
     prisma.setTenantSchema(schemaName);
 
     const documents = await prisma.$queryRawUnsafe(

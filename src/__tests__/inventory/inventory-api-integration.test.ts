@@ -6,20 +6,12 @@ import {
 import {
   GET as getProperties,
   POST as postProperties,
-  PUT as putProperties,
 } from "@/app/api/inventory/properties/route";
 import {
   GET as getVehicles,
   POST as postVehicles,
 } from "@/app/api/inventory/vehicles/route";
 import { GET as getStatistics } from "@/app/api/inventory/statistics/route";
-
-import {
-  PropertyCreateSchema,
-  PetCreateSchema,
-  VehicleCreateSchema,
-  ResidentUpdateSchema,
-} from "@/lib/schemas/inventory-schemas";
 
 import { InventoryService } from "@/services/inventory-service-refactored";
 import { verifyAuth } from "@/lib/auth";
@@ -75,8 +67,6 @@ jest.mock("@/services/inventory-service-refactored", () => ({
 }));
 
 describe("Inventory API Integration Tests", () => {
-  let inventoryService: InventoryService;
-
   beforeEach(() => {
     jest.clearAllMocks();
     inventoryService = new InventoryService("test_schema"); // Instantiate with schemaName

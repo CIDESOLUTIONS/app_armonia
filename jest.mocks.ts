@@ -56,7 +56,7 @@ jest.mock("@/lib/prisma", () => ({
 }));
 
 // Configuración global para pruebas
-(global as any).mockPrismaClient = mockPrismaClient;
+global.mockPrismaClient = mockPrismaClient;
 
 // Mock para constantes PQR
 jest.mock("./src/lib/constants/pqr-constants", () => ({

@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { incidentService } from "@/services/incidentService";
 import { validateCsrfToken } from "@/lib/security/csrf-protection";
-import { sanitizeData } from "@/lib/security/xss-protection";
-import { logAuditAction } from "@/lib/security/audit-trail";
 import { getServerSession } from "next-auth";
 
 /**
@@ -45,7 +43,7 @@ export async function POST(
       session.user.role === "ADMIN" || session.user.role === "COMPLEX_ADMIN";
     const isStaff = session.user.role === "STAFF";
     const isOwner = currentIncident.reportedById === session.user.id;
-    const isAssigned = currentIncident.assignedToId === session.user.id;
+    const _isAssigned = currentIncident.assignedToId === session.user.id;
     const isPublic = currentIncident.isPublic;
 
     // Residentes solo pueden comentar en sus propios incidentes o en los públicos
@@ -101,7 +99,7 @@ export async function POST(
     });
 
     return NextResponse.json(comment, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error al crear comentario:", error);
 
     if (error.message === "Incidente no encontrado") {
@@ -156,7 +154,7 @@ export async function GET(
       session.user.role === "ADMIN" || session.user.role === "COMPLEX_ADMIN";
     const isStaff = session.user.role === "STAFF";
     const isOwner = currentIncident.reportedById === session.user.id;
-    const isAssigned = currentIncident.assignedToId === session.user.id;
+    const _isAssigned = currentIncident.assignedToId === session.user.id;
     const isPublic = currentIncident.isPublic;
 
     // Residentes solo pueden ver comentarios de sus propios incidentes o de los públicos
@@ -176,7 +174,7 @@ export async function GET(
     );
 
     return NextResponse.json(comments);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error al obtener comentarios:", error);
 
     if (error.message === "Incidente no encontrado") {

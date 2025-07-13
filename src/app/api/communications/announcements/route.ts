@@ -31,7 +31,13 @@ export async function GET(request: NextRequest) {
     const { payload } = authResult;
 
     const tenantPrisma = getPrisma(payload.schemaName);
-    const where: any = { complexId: payload.complexId };
+    const where: {
+      complexId: number;
+      isActive?: boolean;
+      targetRoles?: { has: string };
+      publishedAt?: { lte: Date };
+      OR?: ({ expiresAt: { gte: Date } } | { expiresAt: null })[];
+    } = { complexId: payload.complexId };
 
     // Si no es admin, filtrar por roles objetivo y anuncios activos
     if (!["ADMIN", "COMPLEX_ADMIN"].includes(payload.role)) {

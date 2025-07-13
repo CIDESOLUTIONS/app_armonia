@@ -6,10 +6,10 @@ import { useRouter } from "next/navigation";
 import { Header } from "@/components/layout/header";
 
 export default function ForgotPasswordPage() {
-  const _router = useRouter();
-  const [uage, _setLanguageUnused] = useState("Español");
-  const [_theme, _setTheme] = useState("Claro");
-  const [setCurrency] = useState("Dólares");
+  const router = useRouter();
+  const [_uage, _setLanguage] = useState("Español");
+  const [theme, setTheme] = useState("Claro");
+  const [_setCurrency] = useState("Dólares");
 
   const handleLoginRedirect = () => {
     router.push("/(public)/login");

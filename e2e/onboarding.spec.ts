@@ -4,7 +4,7 @@
  * Estas pruebas verifican el flujo completo de registro de un nuevo conjunto
  * residencial y la creación de su administrador principal.
  */
-import { test, expect, Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 // Datos de prueba para conjunto residencial
 const testComplex = {
   name: "Conjunto Residencial Los Robles E2E Test",

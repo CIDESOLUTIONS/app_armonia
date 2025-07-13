@@ -1,5 +1,4 @@
 import { generateToken, verifyToken } from "../src/lib/auth";
-import jwt from "jsonwebtoken"; // Importar jwt para mockearlo
 
 // Mock de las dependencias
 jest.mock("jsonwebtoken", () => ({

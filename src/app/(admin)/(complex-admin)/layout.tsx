@@ -7,8 +7,6 @@ export const metadata: Metadata = {
   description: "Portal de administración para complejos residenciales",
 };
 
-
-
 export default function AdminLayout({
   children,
 }: {

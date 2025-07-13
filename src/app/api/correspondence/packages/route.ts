@@ -5,7 +5,6 @@ import { verifyAuth } from "@/lib/auth";
 import {
   GetPackagesSchema,
   CreatePackageSchema,
-  type GetPackagesRequest,
   type CreatePackageRequest,
 } from "@/validators/correspondence/packages.validator";
 
@@ -47,7 +46,11 @@ export async function GET(request: NextRequest) {
     const validatedParams = validation.data;
     const prisma = getPrisma();
 
-    const where: any = { complexId: payload.complexId };
+    const where: {
+      complexId: number;
+      status?: string;
+      recipientUnit?: string;
+    } = { complexId: payload.complexId };
     if (validatedParams.status) where.status = validatedParams.status;
     if (validatedParams.unit) where.recipientUnit = validatedParams.unit;
 

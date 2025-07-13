@@ -176,7 +176,10 @@ export async function POST(request: NextRequest) {
       features: {
         gained:
           targetPlan !== "BASIC"
-            ? FreemiumService.getMissingFeatures(complex.planType, targetPlan)
+            ? FreemiumService.getMissingFeatures(
+                complex.planType,
+                targetPlan as "BASIC" | "STANDARD" | "PREMIUM",
+              )
             : [],
         available: newPlanFeatures.features,
       },
@@ -225,7 +228,7 @@ export async function GET(request: NextRequest) {
     // Generar información de todos los planes con costos
     const plans = Object.entries(PLAN_FEATURES).map(([planType, features]) => {
       const cost = FreemiumService.calculateMonthlyCost(
-        planType as any,
+        planType as "BASIC" | "STANDARD" | "PREMIUM",
         complex.totalUnits,
       );
       const unitsValidation = FreemiumService.validateUnitsLimit(

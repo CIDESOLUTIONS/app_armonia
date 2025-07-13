@@ -627,4 +627,3 @@ export class CameraServiceONVIF {
     return stats;
   }
 }
-

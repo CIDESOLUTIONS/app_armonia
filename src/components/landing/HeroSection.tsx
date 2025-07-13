@@ -29,7 +29,11 @@ export function HeroSection() {
                   </Button>
                 </Link>
                 <Link href={ROUTES.REGISTER_COMPLEX} passHref>
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="w-full sm:w-auto"
+                  >
                     {t("hero.registerButton")}
                   </Button>
                 </Link>

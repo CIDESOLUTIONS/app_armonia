@@ -93,9 +93,7 @@ export function Plans({ currency }: PlansProps) {
                 ))}
               </ul>
               <Link href={ROUTES.REGISTER_COMPLEX} passHref>
-                <Button
-                  className="w-full bg-indigo-600 hover:bg-indigo-700"
-                >
+                <Button className="w-full bg-indigo-600 hover:bg-indigo-700">
                   {plan.buttonText}
                 </Button>
               </Link>

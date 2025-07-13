@@ -4,7 +4,7 @@
  * Estas pruebas verifican el flujo completo de gestión de asambleas:
  * creación, configuración, votación en tiempo real y consulta de resultados.
  */
-import { test, expect, Page, Browser } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 // Datos de prueba
 const testUsers = {
   admin: {

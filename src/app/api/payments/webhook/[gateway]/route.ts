@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { PaymentService } from "@/lib/services/payment-service";
 import { ServerLogger } from "@/lib/logging/server-logger";
-import { getTenantSchema } from "@/lib/db";
 
 /**
  * Manejador de solicitudes POST para procesar webhooks de pasarelas de pago

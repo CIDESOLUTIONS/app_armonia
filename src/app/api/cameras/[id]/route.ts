@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
 import { validateRequest } from "@/lib/validation";
+import { NextRequest, NextResponse } from "next/server";
+import { getPrisma } from "@/lib/prisma";
 import { verifyAuth } from "@/lib/auth";
 import { ServerLogger } from "@/lib/logging/server-logger";
 import { z } from "zod";

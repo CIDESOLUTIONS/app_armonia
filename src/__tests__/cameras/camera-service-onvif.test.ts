@@ -2,7 +2,6 @@ import {
   CameraServiceONVIF,
   CameraDevice,
 } from "@/services/camera-service-onvif";
-import { getTenantPrismaClient, getPublicPrismaClient } from "@/lib/prisma";
 
 // Mock de Prisma
 const mockPrismaClient = {
@@ -17,7 +16,9 @@ const mockPrismaClient = {
 
 jest.mock("@/lib/prisma", () => ({
   getTenantPrismaClient: jest.fn(() => mockPrismaClient),
-  getPublicPrismaClient: jest.fn(() => ({ /* mock if needed */ })),
+  getPublicPrismaClient: jest.fn(() => ({
+    /* mock if needed */
+  })),
 }));
 
 // Mock de encryption

@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+
+interface Document {
+  fileName: string;
+}
+
 // Variable JWT_SECRET eliminada por lint
 
 export async function GET(_req: unknown) {
-  const _token = req.headers.get("Authorization")?.replace("Bearer ", "");
+  const token = req.headers.get("Authorization")?.replace("Bearer ", "");
   const { searchParams } = new URL(req.url);
   const documentId = parseInt(searchParams.get("documentId") || "");
 
@@ -12,13 +17,13 @@ export async function GET(_req: unknown) {
 
   try {
     // Variable decoded eliminada por lint
-    const _schemaName = decoded.schemaName.toLowerCase();
+    const schemaName = decoded.schemaName.toLowerCase();
     prisma.setTenantSchema(schemaName);
 
     const doc = (await prisma.$queryRawUnsafe(
       `SELECT fileName FROM "${schemaName}"."Document" WHERE id = $1`,
       documentId,
-    )) as any[];
+    )) as Document[];
     if (!doc.length)
       return NextResponse.json(
         { message: "Documento no encontrado" },

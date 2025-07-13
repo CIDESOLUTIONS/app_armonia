@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import * as reservationService from "@/services/reservationService";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { ServerLogger } from "@/lib/logging/server-logger";
+import { ServerLogger as _ServerLogger } from "@/lib/logging/server-logger";
 import { withValidation, validateRequest } from "@/lib/validation";
 import {
   GetReservationsSchema,
@@ -106,7 +106,7 @@ export async function GET(req: NextRequest) {
  */
 async function createReservationHandler(
   validatedData: CreateReservationRequest,
-  req: NextRequest,
+  _req: NextRequest,
 ) {
   try {
     // Verificar autenticación

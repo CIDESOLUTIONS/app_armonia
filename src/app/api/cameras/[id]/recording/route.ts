@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
-import { validateRequest } from "@/lib/validation";
 import { verifyAuth } from "@/lib/auth";
 import { ServerLogger } from "@/lib/logging/server-logger";
 import { z } from "zod";
@@ -120,7 +119,11 @@ export async function GET(
     }
 
     // Construir filtro para grabaciones
-    const filter: any = {
+    const filter: {
+      cameraId: number;
+      createdAt?: { gte?: Date; lte?: Date };
+      status?: "ACTIVE" | "COMPLETED" | "FAILED";
+    } = {
       cameraId: id,
     };
 

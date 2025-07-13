@@ -38,7 +38,7 @@ import {
 } from "lucide-react";
 import NotificationCenterThemed from "@/components/communications/NotificationCenterThemed";
 // import { useRealTimeCommunication } from '@/lib/communications/real-time-context';
-import { Language, ThemeMode, } from "@/lib/communications/theme-config";
+import { Language, ThemeMode } from "@/lib/communications/theme-config";
 
 interface Visitor {
   id: string;
@@ -224,7 +224,7 @@ export default function ReceptionDashboard() {
         setData(mockData);
         setLoading(false);
       }, 1000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("[ReceptionDashboard] Error:", err);
       setError(err.message || "Error al cargar datos del dashboard");
       setLoading(false);

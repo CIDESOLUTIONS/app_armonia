@@ -1,18 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { visitorService } from "@/services/visitorService";
 import { validateCsrfToken } from "@/lib/security/csrf-protection";
-import { sanitizeData } from "@/lib/security/xss-protection";
-import { logAuditAction } from "@/lib/security/audit-trail";
 import { withValidation, validateRequest } from "@/lib/validation";
 import {
   VisitorIdSchema,
   UpdateVisitorSchema,
   RegisterExitSchema,
   DeleteVisitorSchema,
-  type VisitorIdRequest,
-  type UpdateVisitorRequest,
-  type RegisterExitRequest,
-  type DeleteVisitorRequest,
 } from "@/validators/visitors/visitor-id.validator";
 
 /**
@@ -36,7 +30,7 @@ export async function GET(
     const visitor = await visitorService.getVisitorById(id);
 
     return NextResponse.json(visitor);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`Error al obtener visitante ${params.id}:`, error);
     return NextResponse.json(
       { error: "Error al obtener visitante", message: error.message },
@@ -117,7 +111,7 @@ async function updateVisitorHandler(
     });
 
     return NextResponse.json(visitor);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`Error al actualizar visitante ${params.id}:`, error);
     return NextResponse.json(
       { error: "Error al actualizar visitante", message: error.message },
@@ -178,7 +172,7 @@ async function registerExitHandler(
     });
 
     return NextResponse.json(visitor);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(
       `Error al registrar salida de visitante ${params.id}:`,
       error,
@@ -246,7 +240,7 @@ async function deleteVisitorHandler(
       success: true,
       message: "Visitante eliminado correctamente",
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`Error al eliminar visitante ${params.id}:`, error);
     return NextResponse.json(
       { error: "Error al eliminar visitante", message: error.message },

@@ -2,12 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import * as reservationService from "@/services/reservationService";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { ServerLogger } from "@/lib/logging/server-logger";
+import { ServerLogger as _ServerLogger } from "@/lib/logging/server-logger";
 import { validateRequest } from "@/lib/validation";
-import {
-  GetNotificationsSchema,
-  type GetNotificationsRequest,
-} from "@/validators/notifications/notification.validator";
+import { GetNotificationsSchema } from "@/validators/notifications/notification.validator";
 
 /**
  * GET /api/notifications

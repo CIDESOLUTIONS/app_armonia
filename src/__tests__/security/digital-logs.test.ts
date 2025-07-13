@@ -354,7 +354,8 @@ describe("useDigitalLogs Hook", () => {
 
       // Simular logs cargados
       act(() => {
-        (result.current as any).digitalLogs = mockLogs;
+        (result.current as { digitalLogs: DigitalLog[] }).digitalLogs =
+          mockLogs;
       });
 
       await act(async () => {
@@ -406,7 +407,7 @@ describe("useDigitalLogs Hook", () => {
 
       // Simular error
       act(() => {
-        (result.current as any).error = "Test error";
+        (result.current as { error: string | null }).error = "Test error";
       });
 
       expect(result.current.error).toBe("Test error");

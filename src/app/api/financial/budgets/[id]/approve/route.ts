@@ -1,7 +1,6 @@
 // C:\Users\meciz\Documents\armonia\frontend\src\app\api\financial\budgets[id]\approve\route.ts
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
 
 export async function POST(
   _req: unknown,
@@ -9,14 +8,14 @@ export async function POST(
 ) {
   try {
     const budgetId = parseInt(params.id);
-    const _token = req.headers.get("Authorization")?.replace("Bearer ", "");
+    const token = req.headers.get("Authorization")?.replace("Bearer ", "");
     if (!token) {
       return NextResponse.json({ message: "No autorizado" }, { status: 401 });
     }
 
     // Variable decoded eliminada por lint
     const { searchParams } = new URL(req.url);
-    const _schemaName = searchParams.get("schemaName");
+    const schemaName = searchParams.get("schemaName");
 
     if (!schemaName) {
       return NextResponse.json(

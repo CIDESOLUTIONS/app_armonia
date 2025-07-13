@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import * as reservationService from "@/services/reservationService";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { ServerLogger } from "@/lib/logging/server-logger";
+import { ServerLogger as _ServerLogger } from "@/lib/logging/server-logger";
 
 /**
  * GET /api/reservations/[id]

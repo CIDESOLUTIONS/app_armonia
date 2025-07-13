@@ -1,5 +1,6 @@
 // src/__tests__/inventory/inventory-service-refactored.test.ts
 import { InventoryServiceRefactored } from "@/lib/services/inventory-service-refactored";
+import { PrismaClient } from "@prisma/client";
 
 // Mock de Prisma
 jest.mock("@/lib/prisma", () => ({
@@ -34,7 +35,7 @@ jest.mock("@/lib/prisma", () => ({
 
 describe("InventoryServiceRefactored", () => {
   let service: InventoryServiceRefactored;
-  let mockPrisma: any;
+  let mockPrisma: PrismaClient;
 
   beforeEach(() => {
     service = new InventoryServiceRefactored();

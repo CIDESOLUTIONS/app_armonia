@@ -4,7 +4,6 @@ import { FinancialService } from "@/services/financialService";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { ServerLogger } from "@/lib/logging/server-logger";
-import { getSchemaFromRequest } from "@/lib/multi-tenant/schema-resolver";
 import { withValidation, validateRequest } from "@/lib/validation";
 import {
   GetReceiptsSchema,
@@ -50,7 +49,14 @@ export async function GET(req: NextRequest) {
     const financialService = new FinancialService(schema);
 
     // Construir filtros
-    const filters: any = {};
+    const filters: {
+      propertyId?: string;
+      status?: string;
+      startDate?: Date;
+      endDate?: Date;
+      page?: number;
+      limit?: number;
+    } = {};
     if (validatedParams.propertyId)
       filters.propertyId = validatedParams.propertyId;
     if (validatedParams.status) filters.status = validatedParams.status;

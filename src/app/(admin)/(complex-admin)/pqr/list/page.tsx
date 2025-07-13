@@ -2,15 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
-import {
-  Filter,
-  Search,
-  Loader2,
-  PlusCircle,
-  Eye,
-  Edit,
-  Trash2,
-} from "lucide-react";
+import { Filter, Loader2, PlusCircle, Eye, Edit, Trash2 } from "lucide-react";
 import {
   Table,
   TableBody,

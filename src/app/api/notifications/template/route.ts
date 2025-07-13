@@ -227,7 +227,15 @@ export async function GET(request: NextRequest) {
           acc[key] = template;
           return acc;
         },
-        {} as Record<string, any>,
+        {} as Record<
+          string,
+          {
+            name: string;
+            description: string;
+            requiredData: string[];
+            roles: string[];
+          }
+        >,
       );
 
     return NextResponse.json({

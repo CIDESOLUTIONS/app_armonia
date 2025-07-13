@@ -8,7 +8,7 @@
  * - Navegación completa del dashboard con menú lateral colapsable
  * - Verificación de todas las funcionalidades del menú lateral
  */
-import { test, expect, Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 // Datos de usuarios de prueba para cada portal
 const testUsers = {
   admin: {
@@ -484,7 +484,7 @@ test.describe("Navegación Completa - Landing a Dashboard", () => {
       await page.waitForTimeout(500);
 
       // Verificar que el menú se adapta o se oculta en móvil
-      const mobileMenu = page.locator(".mobile-menu, .sidebar-mobile").first();
+
       const menuToggle = page.locator(".menu-toggle, .hamburger").first();
 
       if (await menuToggle.isVisible()) {

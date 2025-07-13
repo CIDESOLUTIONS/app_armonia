@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { incidentService } from "@/services/incidentService";
 import { validateCsrfToken } from "@/lib/security/csrf-protection";
-import { sanitizeData } from "@/lib/security/xss-protection";
-import { logAuditAction } from "@/lib/security/audit-trail";
 import { getServerSession } from "next-auth";
 
 /**
@@ -38,7 +36,7 @@ export async function POST(
     }
 
     // Obtener incidente actual para verificar permisos
-    const currentIncident = await incidentService.getIncidentById(id, true);
+    const _currentIncident = await incidentService.getIncidentById(id, true);
 
     // Verificar permisos de asignación
     const isAdmin =
@@ -97,7 +95,7 @@ export async function POST(
     });
 
     return NextResponse.json(updatedIncident);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error al asignar incidente:", error);
 
     if (error.message === "Incidente no encontrado") {

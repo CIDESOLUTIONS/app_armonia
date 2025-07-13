@@ -66,7 +66,7 @@ export function initializeWebSocketServer(
                 `Tipo de mensaje no reconocido: ${parsedMessage.type}`,
               );
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           logger.error(`Error al procesar mensaje WebSocket: ${error.message}`);
         }
       });
@@ -87,7 +87,7 @@ export function initializeWebSocketServer(
 
     logger.info("Servidor WebSocket inicializado correctamente");
     return wss;
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(`Error al inicializar servidor WebSocket: ${error.message}`);
     throw error;
   }
@@ -129,7 +129,7 @@ export function sendToClient(
       logger.warn(`Conexión no disponible para cliente ${clientId}`);
       return false;
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(
       `Error al enviar mensaje a cliente ${clientId}: ${error.message}`,
     );
@@ -169,7 +169,7 @@ export function broadcastToSchema(schemaName: string, data: any): number {
       `Broadcast enviado a ${notifiedCount} clientes en schema ${schemaName}`,
     );
     return notifiedCount;
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(`Error en broadcast a schema ${schemaName}: ${error.message}`);
     return 0;
   }

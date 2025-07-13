@@ -335,7 +335,7 @@ export default function ReceptionPackagesPage() {
       // Simulamos una respuesta exitosa
       const newPackage: PackageItem = {
         id: `pkg${Date.now()}`,
-        type: newPackageForm.type as any,
+        type: newPackageForm.type as PackageItem["type"],
         trackingNumber: newPackageForm.trackingNumber || undefined,
         courier: newPackageForm.courier || undefined,
         destination: newPackageForm.destination,
@@ -609,7 +609,9 @@ export default function ReceptionPackagesPage() {
             <div className="flex gap-2">
               <Select
                 value={statusFilter}
-                onValueChange={(value) => setStatusFilter(value as any)}
+                onValueChange={(value) =>
+                  setStatusFilter(value as PackageItem["status"] | "all")
+                }
               >
                 <SelectTrigger className="w-full md:w-40">
                   <SelectValue placeholder="Estado" />
@@ -624,7 +626,9 @@ export default function ReceptionPackagesPage() {
 
               <Select
                 value={typeFilter}
-                onValueChange={(value) => setTypeFilter(value as any)}
+                onValueChange={(value) =>
+                  setTypeFilter(value as PackageItem["type"] | "all")
+                }
               >
                 <SelectTrigger className="w-full md:w-40">
                   <SelectValue placeholder="Tipo" />

@@ -37,12 +37,30 @@ import {
 import { getResidentDashboardStats } from "@/services/residentDashboardService";
 import { useAuthStore } from "@/store/authStore";
 
+interface PendingFee {
+  id: number;
+  billNumber: string;
+  totalAmount: number;
+  dueDate: string;
+  billingPeriod: string;
+}
+
+interface Reservation {
+  id: number;
+  title: string;
+  startDateTime: string;
+  endDateTime: string;
+  status: string;
+  commonArea?: { name: string };
+  userId: number;
+}
+
 interface ResidentDashboardStats {
   totalResidentsInProperty: number;
   currentAccountBalance: number;
   annualPaymentsSummary: number;
-  pendingFees: any[];
-  upcomingReservations: any[];
+  pendingFees: PendingFee[];
+  upcomingReservations: Reservation[];
   reportedPQRs: number;
   resolvedPQRs: number;
   commonAreaUsage: number;

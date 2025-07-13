@@ -3,7 +3,7 @@ import { getPrisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth"; // Asumiendo que verifyToken es adecuado para rutas de API
 import { markNotificationAsRead } from "@/lib/communications/notification-service";
 
-const prisma = getPrisma();
+const _prisma = getPrisma();
 
 /**
  * API para marcar una notificación como leída

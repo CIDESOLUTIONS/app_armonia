@@ -9,14 +9,14 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function POST(_req: unknown) {
-  const _token = req.headers.get("Authorization")?.replace("Bearer ", "");
+  const token = req.headers.get("Authorization")?.replace("Bearer ", "");
   if (!token)
     return NextResponse.json({ message: "No autorizado" }, { status: 401 });
 
   try {
     // Variable decoded eliminada por lint complexId: number; schemaName: string };
-    const { assemblyId, title, date, agenda } = await req.json();
-    const _schemaName = decoded.schemaName.toLowerCase();
+    const { _assemblyId, title, date, agenda } = await req.json();
+    const schemaName = decoded.schemaName.toLowerCase();
 
     prisma.setTenantSchema(schemaName);
     const residents = (await prisma.$queryRawUnsafe(

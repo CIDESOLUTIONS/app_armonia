@@ -29,7 +29,7 @@ const VotingSystem: React.FC<VotingSystemProps> = ({
   topic,
   onStartVoting,
   onEndVoting,
-  onVote,
+  _onVote,
 }) => {
   const [selectedVote, setSelectedVote] = useState<Vote["value"] | null>(null);
 

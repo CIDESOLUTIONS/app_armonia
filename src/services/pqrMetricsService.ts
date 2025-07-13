@@ -6,11 +6,7 @@
  */
 
 import { getTenantPrismaClient } from "@/lib/prisma";
-import {
-  PQRCategory,
-  PQRPriority,
-  PQRStatus,
-} from "@/constants/pqr-constants";
+import { PQRCategory, PQRPriority, PQRStatus } from "@/constants/pqr-constants";
 
 // Interfaces para métricas
 interface SummaryMetrics {

@@ -7,19 +7,19 @@ import { TextEncoder, TextDecoder } from "util";
 
 if (typeof global !== "undefined") {
   if (typeof global.TextEncoder === "undefined") {
-    (global as any).TextEncoder = TextEncoder;
+    global.TextEncoder = TextEncoder;
   }
   if (typeof global.TextDecoder === "undefined") {
-    (global as any).TextDecoder = TextDecoder;
+    global.TextDecoder = TextDecoder;
   }
 }
 
 // Polyfill for Request and Response in JSDOM environment
 if (typeof global !== "undefined" && !global.Request) {
-  (global as any).Request = Request;
+  global.Request = Request;
 }
 if (typeof global !== "undefined" && !global.Response) {
-  (global as any).Response = Response;
+  global.Response = Response;
 }
 
 // Mock global para PrismaClient

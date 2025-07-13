@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
-import { validateRequest } from "@/lib/validation";
 import { verifyAuth } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
@@ -17,7 +16,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const prisma = getPrisma();
+    const _prisma = getPrisma();
 
     // TODO: Implementar lógica específica del endpoint
     // CRÍTICO: Aplicar filtro multi-tenant: { complexId: payload.complexId }

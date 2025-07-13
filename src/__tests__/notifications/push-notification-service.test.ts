@@ -127,7 +127,7 @@ describe("PushNotificationService", () => {
       };
       delete invalidRequest.complexId;
 
-      const result = await service.sendNotification(invalidRequest as any);
+      const result = await service.sendNotification(invalidRequest);
 
       expect(result.success).toBe(false);
       expect(result.errors).toBeDefined();
@@ -340,7 +340,7 @@ describe("PushNotificationService", () => {
     it("should fail with invalid template type", async () => {
       await expect(
         service.sendTemplateNotification(
-          "invalid_template" as any,
+          "invalid_template",
           {},
           { complexId: 1 },
         ),

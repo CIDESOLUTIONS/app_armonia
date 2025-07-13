@@ -6,11 +6,11 @@ export async function GET(request: Request) {
     const authHeader = request.headers.get("Authorization");
     if (!authHeader) throw new Error("No autorizado");
 
-    const _token = authHeader.replace("Bearer ", "");
+    const token = authHeader.replace("Bearer ", "");
     // Variable decoded eliminada por lint
 
     prisma.setTenantSchema("public");
-    const _user = await prisma.$queryRawUnsafe(
+    const user = await prisma.$queryRawUnsafe(
       `SELECT name FROM "public"."User" WHERE id = $1 LIMIT 1`,
       decoded.id,
     );

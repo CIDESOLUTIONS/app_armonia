@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error al obtener pases de acceso:", error);
     return NextResponse.json(
       { error: "Error al obtener pases de acceso", message: error.message },
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(accessPass, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error al generar pase de acceso:", error);
     return NextResponse.json(
       { error: "Error al generar pase de acceso", message: error.message },

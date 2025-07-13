@@ -1,9 +1,20 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+
+interface Assembly {
+  id: number;
+  title: string;
+  type: string;
+  date: Date;
+  description: string | null;
+  agenda: any; // Assuming Json is any
+  complexId: number;
+}
+
 // Variable JWT_SECRET eliminada por lint
 
 export async function PUT(_req: unknown) {
-  const _token = req.headers.get("Authorization")?.replace("Bearer ", "");
+  const token = req.headers.get("Authorization")?.replace("Bearer ", "");
   if (!token)
     return NextResponse.json({ message: "No token provided" }, { status: 401 });
 
@@ -28,12 +39,12 @@ export async function PUT(_req: unknown) {
       );
     }
 
-    const _schemaName = decoded.schemaName?.toLowerCase() || "armonia";
+    const schemaName = decoded.schemaName?.toLowerCase() || "armonia";
     const assemblyResult = (await prisma.$queryRawUnsafe(
       `SELECT * FROM "${schemaName}"."Assembly" WHERE id = $1 AND "complexId" = $2`,
       id,
       decoded.complexId,
-    )) as any[];
+    )) as Assembly[];
 
     if (!assemblyResult.length) {
       return NextResponse.json(
@@ -54,7 +65,7 @@ export async function PUT(_req: unknown) {
       JSON.stringify(agenda),
       id,
       decoded.complexId,
-    )) as any[];
+    )) as Assembly[];
 
     console.log(
       "[API Assemblies Update] Asamblea actualizada:",

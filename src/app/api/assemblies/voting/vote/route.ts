@@ -7,7 +7,7 @@ const prisma = getPrisma();
 // Variable JWT_SECRET eliminada por lint
 
 export async function POST(_req: unknown) {
-  const _token = req.headers.get("Authorization")?.replace("Bearer ", "");
+  const token = req.headers.get("Authorization")?.replace("Bearer ", "");
   if (!token) {
     return NextResponse.json({ message: "No token provided" }, { status: 401 });
   }

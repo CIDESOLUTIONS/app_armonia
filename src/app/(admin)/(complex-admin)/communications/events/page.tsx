@@ -2,24 +2,9 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
-import {
-  Loader2,
-  PlusCircle,
-  Edit,
-  Trash2,
-  Calendar as CalendarIcon,
-} from "lucide-react";
+import { Loader2, PlusCircle, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+
 import {
   Table,
   TableBody,
@@ -54,9 +39,11 @@ export default function CommunityEventsPage() {
   const { toast } = useToast();
   const [events, setEvents] = useState<CommunityEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentEvent, setCurrentEvent] = useState<CommunityEvent | null>(null);
-  const [formData, setFormData] = useState({
+  const [_isModalOpen, setIsModalOpen] = useState(false);
+  const [_currentEvent, setCurrentEvent] = useState<CommunityEvent | null>(
+    null,
+  );
+  const [_formData, setFormData] = useState({
     title: "",
     description: "",
     startDateTime: "",
@@ -88,7 +75,7 @@ export default function CommunityEventsPage() {
     }
   }, [authLoading, user, fetchEvents]);
 
-  const handleInputChange = (
+  const _handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value, type } = e.target;
@@ -125,7 +112,7 @@ export default function CommunityEventsPage() {
     setIsModalOpen(true);
   };
 
-  const _handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (_currentEvent) {

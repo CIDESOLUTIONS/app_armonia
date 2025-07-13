@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { incidentService } from "@/services/incidentService";
 import { validateCsrfToken } from "@/lib/security/csrf-protection";
-import { sanitizeData } from "@/lib/security/xss-protection";
-import { logAuditAction } from "@/lib/security/audit-trail";
 import { getServerSession } from "next-auth";
 import { withValidation, validateRequest } from "@/lib/validation";
 import {
   IncidentIdSchema,
   UpdateIncidentSchema,
   CancelIncidentSchema,
-  type IncidentIdRequest,
   type UpdateIncidentRequest,
   type CancelIncidentRequest,
 } from "@/validators/incidents/incident-id.validator";
@@ -48,12 +45,12 @@ export async function GET(
     const incident = await incidentService.getIncidentById(id, includeInternal);
 
     // Verificar permisos de acceso
-    const isAdmin =
+    const _isAdmin =
       session.user.role === "ADMIN" || session.user.role === "COMPLEX_ADMIN";
-    const isStaff = session.user.role === "STAFF";
+    const _isStaff = session.user.role === "STAFF";
     const isResident = session.user.role === "RESIDENT";
     const isOwner = incident.reportedById === session.user.id;
-    const isAssigned = incident.assignedToId === session.user.id;
+    const _isAssigned = incident.assignedToId === session.user.id;
     const isPublic = incident.isPublic;
 
     // Residentes solo pueden ver sus propios incidentes o los públicos
@@ -78,7 +75,7 @@ export async function GET(
     });
 
     return NextResponse.json(incident);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error al obtener incidente:", error);
 
     if (error.message === "Incidente no encontrado") {
@@ -133,9 +130,9 @@ async function updateIncidentHandler(
     const currentIncident = await incidentService.getIncidentById(id, true);
 
     // Verificar permisos de actualización
-    const isAdmin =
+    const _isAdmin =
       session.user.role === "ADMIN" || session.user.role === "COMPLEX_ADMIN";
-    const isStaff = session.user.role === "STAFF";
+    const _isStaff = session.user.role === "STAFF";
     const isOwner = currentIncident.reportedById === session.user.id;
     const isAssigned = currentIncident.assignedToId === session.user.id;
 
@@ -237,7 +234,7 @@ async function updateIncidentHandler(
     });
 
     return NextResponse.json(updatedIncident);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error al actualizar incidente:", error);
 
     if (error.message === "Incidente no encontrado") {
@@ -292,7 +289,7 @@ async function cancelIncidentHandler(
     const currentIncident = await incidentService.getIncidentById(id, true);
 
     // Verificar permisos de cancelación
-    const isAdmin =
+    const _isAdmin =
       session.user.role === "ADMIN" || session.user.role === "COMPLEX_ADMIN";
     const isOwner = currentIncident.reportedById === session.user.id;
 
@@ -345,7 +342,7 @@ async function cancelIncidentHandler(
       message: "Incidente cancelado correctamente",
       incident: cancelledIncident,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error al cancelar incidente:", error);
 
     if (error.message === "Incidente no encontrado") {

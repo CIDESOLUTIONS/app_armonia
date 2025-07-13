@@ -33,7 +33,9 @@ const mockPrismaClient = {
 
 jest.mock("@/lib/prisma", () => ({
   getTenantPrismaClient: jest.fn(() => mockPrismaClient),
-  getPublicPrismaClient: jest.fn(() => ({ /* mock if needed */ })),
+  getPublicPrismaClient: jest.fn(() => ({
+    /* mock if needed */
+  })),
 }));
 
 // Mock de servicios de comunicación

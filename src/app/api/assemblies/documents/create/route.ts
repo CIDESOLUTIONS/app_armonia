@@ -2,10 +2,30 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { PDFDocument, StandardFonts } from "pdf-lib";
 
+interface Assembly {
+  id: number;
+  title: string;
+  description: string | null;
+  type: string;
+  status: string;
+  date: Date;
+  endTime: Date | null;
+  location: string;
+  agenda: any; // Assuming Json is any
+  requiredCoefficient: number;
+  currentCoefficient: number;
+  quorumStatus: string;
+  quorumReachedAt: Date | null;
+  realtimeChannel: string | null;
+  createdBy: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // Variable JWT_SECRET eliminada por lint
 
 export async function POST(_req: unknown) {
-  const _token = req.headers.get("Authorization")?.replace("Bearer ", "");
+  const token = req.headers.get("Authorization")?.replace("Bearer ", "");
   const { assemblyId } = await req.json();
 
   if (!token || !assemblyId)
@@ -13,13 +33,13 @@ export async function POST(_req: unknown) {
 
   try {
     // Variable decoded eliminada por lint
-    const _schemaName = decoded.schemaName.toLowerCase();
+    const schemaName = decoded.schemaName.toLowerCase();
     prisma.setTenantSchema(schemaName);
 
     const assembly = (await prisma.$queryRawUnsafe(
       `SELECT * FROM "${schemaName}"."Assembly" WHERE id = $1`,
       assemblyId,
-    )) as any[];
+    )) as Assembly[];
     const agenda = await prisma.$queryRawUnsafe(
       `SELECT * FROM "${schemaName}"."AgendaItem" WHERE "assemblyId" = $1`,
       assemblyId,
@@ -36,7 +56,7 @@ export async function POST(_req: unknown) {
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage();
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const { width, height } = page.getSize();
+    const { height } = page.getSize();
     let y = height - 50;
 
     page.drawText(`Acta de Asamblea: ${assembly[0].title}`, {
@@ -102,7 +122,7 @@ export async function POST(_req: unknown) {
       );
     }
 
-    const _result = await prisma.$queryRawUnsafe(
+    const result = await prisma.$queryRawUnsafe(
       `INSERT INTO "${schemaName}"."Document" ("assemblyId", fileName) VALUES ($1, $2) RETURNING id`,
       assemblyId,
       fileName,
