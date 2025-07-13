@@ -28,7 +28,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import {
   AlertDialog,
@@ -47,6 +46,18 @@ import {
   updateResident,
   deleteResident,
 } from "@/services/residentService";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { residentSchema, ResidentFormValues } from "@/validators/resident-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Resident {
   id: number;
@@ -66,16 +77,20 @@ export default function ResidentsPage() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentResident, setCurrentResident] = useState<Resident | null>(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    propertyId: 0,
-    role: "",
-    isActive: true,
+
+  const form = useForm<ResidentFormValues>({
+    resolver: zodResolver(residentSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      propertyId: 0,
+      role: "RESIDENT", // Default role
+      isActive: true,
+    },
   });
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [residentToDelete, setResidentToDelete] = useState<number | null>(null);
+
+  const { handleSubmit, control, reset, formState: { isSubmitting } } = form;
 
   const fetchResidents = useCallback(async () => {
     setLoading(true);
@@ -100,32 +115,14 @@ export default function ResidentsPage() {
     }
   }, [authLoading, user, fetchResidents]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "number" ? parseInt(value) : value,
-    }));
-  };
-
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: checked,
-    }));
-  };
-
   const handleAddResident = () => {
     setCurrentResident(null);
-    setFormData({
+    reset({
       name: "",
       email: "",
       phone: "",
       propertyId: 0,
-      role: "",
+      role: "RESIDENT",
       isActive: true,
     });
     setIsModalOpen(true);
@@ -133,28 +130,27 @@ export default function ResidentsPage() {
 
   const handleEditResident = (resident: Resident) => {
     setCurrentResident(resident);
-    setFormData({
+    reset({
       name: resident.name,
       email: resident.email,
       phone: resident.phone,
       propertyId: resident.propertyId,
-      role: resident.role,
+      role: resident.role as "RESIDENT" | "OWNER" | "TENANT", // Cast to valid enum type
       isActive: resident.isActive,
     });
     setIsModalOpen(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: ResidentFormValues) => {
     try {
       if (currentResident) {
-        await updateResident(currentResident.id, formData);
+        await updateResident(currentResident.id, data);
         toast({
           title: "Éxito",
           description: "Residente actualizado correctamente.",
         });
       } else {
-        await createResident(formData);
+        await createResident(data);
         toast({
           title: "Éxito",
           description: "Residente creado correctamente.",
@@ -171,6 +167,9 @@ export default function ResidentsPage() {
       });
     }
   };
+
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [residentToDelete, setResidentToDelete] = useState<number | null>(null);
 
   const handleDeleteResident = (id: number) => {
     setResidentToDelete(id);
@@ -292,100 +291,115 @@ export default function ResidentsPage() {
               {currentResident ? "Editar Residente" : "Añadir Nuevo Residente"}
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Nombre
-              </Label>
-              <Input
-                id="name"
+          <Form {...form}>
+            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
+              <FormField
+                control={control}
                 name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Nombre</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="email" className="text-right">
-                Email
-              </Label>
-              <Input
-                id="email"
+              <FormField
+                control={control}
                 name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="phone" className="text-right">
-                Teléfono
-              </Label>
-              <Input
-                id="phone"
+              <FormField
+                control={control}
                 name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
-                className="col-span-3"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Teléfono</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="propertyId" className="text-right">
-                ID Propiedad
-              </Label>
-              <Input
-                id="propertyId"
+              <FormField
+                control={control}
                 name="propertyId"
-                type="number"
-                value={formData.propertyId}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">ID Propiedad</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        className="col-span-3"
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="role" className="text-right">
-                Rol
-              </Label>
-              <Select
-                id="role"
+              <FormField
+                control={control}
                 name="role"
-                value={formData.role}
-                onValueChange={(value) =>
-                  handleInputChange({
-                    target: { name: "role", value },
-                  } as React.ChangeEvent<HTMLSelectElement>)
-                }
-              >
-                <SelectTrigger className="col-span-3 p-2 border rounded-md">
-                  <SelectValue placeholder="Seleccionar Rol" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="RESIDENT">Residente</SelectItem>
-                  <SelectItem value="OWNER">Propietario</SelectItem>
-                  <SelectItem value="TENANT">Inquilino</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Input
-                id="isActive"
-                name="isActive"
-                type="checkbox"
-                checked={formData.isActive}
-                onChange={handleCheckboxChange}
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Rol</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="col-span-3 p-2 border rounded-md">
+                          <SelectValue placeholder="Seleccionar Rol" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="RESIDENT">Residente</SelectItem>
+                        <SelectItem value="OWNER">Propietario</SelectItem>
+                        <SelectItem value="TENANT">Inquilino</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-              <Label htmlFor="isActive">Activo</Label>
-            </div>
-            <DialogFooter>
-              <Button type="submit">
-                {currentResident ? "Guardar Cambios" : "Añadir Residente"}
-              </Button>
-            </DialogFooter>
-          </form>
+              <FormField
+                control={control}
+                name="isActive"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Activo</FormLabel>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : null}{" "}
+                  {currentResident ? "Guardar Cambios" : "Añadir Residente"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 

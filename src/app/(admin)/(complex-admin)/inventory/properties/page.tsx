@@ -40,6 +40,18 @@ import {
   updateProperty,
   deleteProperty,
 } from "@/services/propertyService";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { propertySchema, PropertyFormValues } from "@/validators/property-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox"; // Assuming Shadcn Checkbox component
 
 interface Property {
   id: number;
@@ -60,16 +72,22 @@ export default function PropertiesPage() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentProperty, setCurrentProperty] = useState<Property | null>(null);
-  const [formData, setFormData] = useState({
-    unitNumber: "",
-    address: "",
-    type: "",
-    area: 0,
-    bedrooms: 0,
-    bathrooms: 0,
-    parkingSpaces: 0,
-    isActive: true,
+
+  const form = useForm<PropertyFormValues>({
+    resolver: zodResolver(propertySchema),
+    defaultValues: {
+      unitNumber: "",
+      address: "",
+      type: "",
+      area: 0,
+      bedrooms: 0,
+      bathrooms: 0,
+      parkingSpaces: 0,
+      isActive: true,
+    },
   });
+
+  const { handleSubmit, control, reset, formState: { isSubmitting } } = form;
 
   const fetchProperties = useCallback(async () => {
     setLoading(true);
@@ -94,27 +112,9 @@ export default function PropertiesPage() {
     }
   }, [authLoading, user, fetchProperties]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "number" ? parseFloat(value) : value,
-    }));
-  };
-
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: checked,
-    }));
-  };
-
   const handleAddProperty = () => {
     setCurrentProperty(null);
-    setFormData({
+    reset({
       unitNumber: "",
       address: "",
       type: "",
@@ -129,7 +129,7 @@ export default function PropertiesPage() {
 
   const handleEditProperty = (property: Property) => {
     setCurrentProperty(property);
-    setFormData({
+    reset({
       unitNumber: property.unitNumber,
       address: property.address,
       type: property.type,
@@ -142,17 +142,16 @@ export default function PropertiesPage() {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: PropertyFormValues) => {
     try {
       if (currentProperty) {
-        await updateProperty(currentProperty.id, formData);
+        await updateProperty(currentProperty.id, data);
         toast({
           title: "Éxito",
           description: "Propiedad actualizada correctamente.",
         });
       } else {
-        await createProperty(formData);
+        await createProperty(data);
         toast({
           title: "Éxito",
           description: "Propiedad creada correctamente.",
@@ -297,114 +296,147 @@ export default function PropertiesPage() {
               {currentProperty ? "Editar Propiedad" : "Añadir Nueva Propiedad"}
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="unitNumber" className="text-right">
-                Número de Unidad
-              </Label>
-              <Input
-                id="unitNumber"
+          <Form {...form}>
+            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
+              <FormField
+                control={control}
                 name="unitNumber"
-                value={formData.unitNumber}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Número de Unidad</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="address" className="text-right">
-                Dirección
-              </Label>
-              <Input
-                id="address"
+              <FormField
+                control={control}
                 name="address"
-                value={formData.address}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Dirección</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="type" className="text-right">
-                Tipo
-              </Label>
-              <Input
-                id="type"
+              <FormField
+                control={control}
                 name="type"
-                value={formData.type}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Tipo</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="area" className="text-right">
-                Área (m²)
-              </Label>
-              <Input
-                id="area"
+              <FormField
+                control={control}
                 name="area"
-                type="number"
-                value={formData.area}
-                onChange={handleInputChange}
-                className="col-span-3"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Área (m²)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        className="col-span-3"
+                        {...field}
+                        onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="bedrooms" className="text-right">
-                Habitaciones
-              </Label>
-              <Input
-                id="bedrooms"
+              <FormField
+                control={control}
                 name="bedrooms"
-                type="number"
-                value={formData.bedrooms}
-                onChange={handleInputChange}
-                className="col-span-3"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Habitaciones</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        className="col-span-3"
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="bathrooms" className="text-right">
-                Baños
-              </Label>
-              <Input
-                id="bathrooms"
+              <FormField
+                control={control}
                 name="bathrooms"
-                type="number"
-                value={formData.bathrooms}
-                onChange={handleInputChange}
-                className="col-span-3"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Baños</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        className="col-span-3"
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="parkingSpaces" className="text-right">
-                Parqueaderos
-              </Label>
-              <Input
-                id="parkingSpaces"
+              <FormField
+                control={control}
                 name="parkingSpaces"
-                type="number"
-                value={formData.parkingSpaces}
-                onChange={handleInputChange}
-                className="col-span-3"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Parqueaderos</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        className="col-span-3"
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Input
-                id="isActive"
+              <FormField
+                control={control}
                 name="isActive"
-                type="checkbox"
-                checked={formData.isActive}
-                onChange={handleCheckboxChange}
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Activa</FormLabel>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <Label htmlFor="isActive">Activa</Label>
-            </div>
-            <DialogFooter>
-              <Button type="submit">
-                {currentProperty ? "Guardar Cambios" : "Añadir Propiedad"}
-              </Button>
-            </DialogFooter>
-          </form>
+              <DialogFooter>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : null}{" "}
+                  {currentProperty ? "Guardar Cambios" : "Añadir Propiedad"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 
@@ -427,3 +459,4 @@ export default function PropertiesPage() {
     </div>
   );
 }
+

@@ -20,6 +20,34 @@ export async function getDocuments(): Promise<Document[]> {
   }
 }
 
+export async function uploadDocument(name: string, file: File): Promise<Document> {
+  try {
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("file", file);
+
+    const response = await fetchApi("/api/documents/upload", {
+      method: "POST",
+      body: formData,
+    });
+    return response;
+  } catch (error) {
+    console.error("Error uploading document:", error);
+    throw error;
+  }
+}
+
+export async function deleteDocument(id: number): Promise<void> {
+  try {
+    await fetchApi(`/api/documents/${id}`, {
+      method: "DELETE",
+    });
+  } catch (error) {
+    console.error(`Error deleting document ${id}:`, error);
+    throw error;
+  }
+}
+
 export async function downloadDocument(id: number): Promise<Blob> {
   try {
     const response = await fetchApi(`/api/documents/${id}`, { method: "GET" });

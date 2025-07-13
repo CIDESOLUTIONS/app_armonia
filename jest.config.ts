@@ -6,7 +6,6 @@ const config: Config = {
   testEnvironment: "jest-environment-jsdom",
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
-    "^@/lib/prisma$": "<rootDir>/src/lib/prisma",
     "^.+\.(css|less|scss|sass)$": "identity-obj-proxy",
     "^.+\.(jpg|jpeg|png|gif|webp|svg)$": "<rootDir>/__mocks__/fileMock.ts",
   },
@@ -16,7 +15,7 @@ const config: Config = {
       { configFile: "./babel.config.jest.js" },
     ],
   },
-  transformIgnorePatterns: ["/node_modules/(?!lucide-react|jose)/"],
+  transformIgnorePatterns: [], // Temporarily transpile all node_modules to debug syntax errors
   testMatch: ["**/?(*.)+(spec|test).[tj]s?(x)"],
   testPathIgnorePatterns: ["/e2e/", "/dist-jest/"],
   modulePathIgnorePatterns: ["<rootDir>/dist-jest/"],
@@ -34,6 +33,7 @@ const config: Config = {
       statements: 70,
     },
   },
+  modulePaths: ["<rootDir>/src"], // Add this line
 };
 
 export default config;

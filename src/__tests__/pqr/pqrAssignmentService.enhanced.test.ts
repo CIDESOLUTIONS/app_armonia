@@ -5,7 +5,7 @@
  * más complejos, escenarios límite y manejo de errores específicos.
  */
 
-import { PQRAssignmentService } from "../pqrAssignmentService";
+import { PQRAssignmentService } from "@/services/pqrAssignmentService";
 import { PrismaClient, PQRCategory, PQRPriority } from "@prisma/client";
 
 // Mock de PrismaClient

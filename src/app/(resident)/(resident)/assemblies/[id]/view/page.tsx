@@ -8,7 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
-import { getAssemblyById } from "@/services/assemblyService";
+import {
+  getAssemblyById,
+  registerVote,
+  getVotingResults,
+} from "@/services/assemblyService";
 
 interface Assembly {
   id: number;
@@ -21,10 +25,33 @@ interface Assembly {
   status: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
   complexId: number;
   createdBy: number;
-  // Mock voting data
-  votingActive?: boolean;
-  votingOptions?: { id: number; text: string; votes: number }[];
-  userVote?: number | null;
+}
+
+interface VotingOption {
+  id: number;
+  text: string;
+}
+
+interface Voting {
+  id: number;
+  assemblyId: number;
+  agendaPoint: number;
+  title: string;
+  description?: string;
+  type: string;
+  status: "PENDING" | "ACTIVE" | "CLOSED" | "CANCELLED";
+  options: string[]; // Array of option texts
+  startTime?: string;
+  endTime?: string;
+  totalVotes: number;
+  totalCoefficientVoted: number;
+  isApproved?: boolean;
+  userHasVoted?: boolean; // Custom field to track if current user has voted
+}
+
+interface VotingResult {
+  voting: Voting;
+  results: { [key: string]: { count: number; coefficient: number } };
 }
 
 export default function ViewResidentAssemblyPage() {
@@ -35,32 +62,31 @@ export default function ViewResidentAssemblyPage() {
   const assemblyId = params.id ? parseInt(params.id as string) : null;
 
   const [assembly, setAssembly] = useState<Assembly | null>(null);
+  const [currentVoting, setCurrentVoting] = useState<Voting | null>(null);
+  const [votingResults, setVotingResults] = useState<VotingResult["results"] | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isVotingLoading, setIsVotingLoading] = useState(false);
 
-  const fetchAssembly = useCallback(async () => {
+  const fetchAssemblyData = useCallback(async () => {
     setLoading(true);
     try {
-      const foundAssembly = await getAssemblyById(assemblyId as number);
-      if (foundAssembly) {
-        // Add mock voting data for demonstration
-        setAssembly({
-          ...foundAssembly,
-          votingActive: foundAssembly.status === "IN_PROGRESS",
-          votingOptions: [
-            { id: 1, text: "A favor", votes: 0 },
-            { id: 2, text: "En contra", votes: 0 },
-            { id: 3, text: "Abstención", votes: 0 },
-          ],
-          userVote: null, // Simulate no vote initially
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: "Asamblea no encontrada.",
-          variant: "destructive",
-        });
+      if (!assemblyId) {
         router.push("/resident/assemblies");
+        return;
       }
+      const fetchedAssembly = await getAssemblyById(assemblyId);
+      setAssembly(fetchedAssembly);
+
+      // Fetch active voting for this assembly
+      // In a real scenario, there might be an API to get active votings for an assembly
+      // For now, we'll assume the first voting in 'votings' array is the active one if any
+      // You might need to adjust this based on your backend API for active votings
+      const activeVoting = (fetchedAssembly as any).votings?.find((v: Voting) => v.status === "ACTIVE");
+      if (activeVoting) {
+        setCurrentVoting(activeVoting);
+        await fetchVotingResults(assemblyId, activeVoting.id);
+      }
+
     } catch (error) {
       console.error("Error fetching assembly:", error);
       toast({
@@ -74,42 +100,52 @@ export default function ViewResidentAssemblyPage() {
     }
   }, [assemblyId, router, toast]);
 
+  const fetchVotingResults = useCallback(async (asmId: number, vtgId: number) => {
+    try {
+      const results = await getVotingResults(asmId, vtgId);
+      setVotingResults(results.results);
+      // Check if user has voted
+      // This would require an API endpoint to check user's vote for a specific voting
+      // For now, simulate based on local state or add a new API call
+      // const userVote = await checkUserVote(asmId, vtgId, user.id);
+      // setCurrentVoting(prev => prev ? { ...prev, userHasVoted: !!userVote } : null);
+    } catch (error) {
+      console.error("Error fetching voting results:", error);
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los resultados de la votación.",
+        variant: "destructive",
+      });
+    }
+  }, [toast]);
+
   useEffect(() => {
     if (!authLoading && user && assemblyId) {
-      fetchAssembly();
+      fetchAssemblyData();
     }
-  }, [authLoading, user, assemblyId, fetchAssembly]);
+  }, [authLoading, user, assemblyId, fetchAssemblyData]);
 
-  const handleVote = async (optionId: number) => {
-    if (!assembly || !user) return;
-    setLoading(true);
+  const handleVote = async (optionValue: string) => {
+    if (!assemblyId || !currentVoting || !user) return;
+    setIsVotingLoading(true);
     try {
-      // Placeholder for API call to register vote
-      console.log(
-        `User ${user.id} voted for option ${optionId} in assembly ${assembly.id}`,
-      );
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-
-      setAssembly((prev) => {
-        if (!prev) return null;
-        const updatedOptions = prev.votingOptions?.map((opt) =>
-          opt.id === optionId ? { ...opt, votes: opt.votes + 1 } : opt,
-        );
-        return { ...prev, votingOptions: updatedOptions, userVote: optionId };
-      });
+      await registerVote(assemblyId, currentVoting.id, optionValue);
       toast({
         title: "Éxito",
-        description: "Voto registrado correctamente (simulado).",
+        description: "Voto registrado correctamente.",
       });
-    } catch (error) {
+      // After voting, re-fetch results and mark user as voted
+      await fetchVotingResults(assemblyId, currentVoting.id);
+      setCurrentVoting(prev => prev ? { ...prev, userHasVoted: true } : null);
+    } catch (error: any) {
       console.error("Error registering vote:", error);
       toast({
         title: "Error",
-        description: "Error al registrar el voto.",
+        description: error.message || "Error al registrar el voto.",
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setIsVotingLoading(false);
     }
   };
 
@@ -176,40 +212,45 @@ export default function ViewResidentAssemblyPage() {
         </CardContent>
       </Card>
 
-      {assembly.votingActive && assembly.votingOptions && (
+      {currentVoting && (
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Users className="mr-2 h-5 w-5" /> Participar en Votación
+              <Users className="mr-2 h-5 w-5" /> Votación: {currentVoting.title}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {assembly.userVote ? (
-              <p className="text-green-600 font-semibold">
-                ¡Ya has votado en esta asamblea!
-              </p>
-            ) : (
+            {currentVoting.status === "ACTIVE" && !currentVoting.userHasVoted ? (
               <div className="space-y-3">
-                <p className="text-gray-700">Selecciona tu opción:</p>
-                {assembly.votingOptions.map((option) => (
+                <p className="text-gray-700">{currentVoting.description || "Selecciona tu opción:"}</p>
+                {currentVoting.options.map((optionText, index) => (
                   <Button
-                    key={option.id}
+                    key={index}
                     variant="outline"
                     className="w-full justify-start"
-                    onClick={() => handleVote(option.id)}
-                    disabled={loading}
+                    onClick={() => handleVote(optionText)}
+                    disabled={isVotingLoading}
                   >
-                    {option.text}
+                    {optionText}
                   </Button>
                 ))}
               </div>
+            ) : currentVoting.userHasVoted ? (
+              <p className="text-green-600 font-semibold">
+                ¡Ya has votado en esta votación!
+              </p>
+            ) : (
+              <p className="text-gray-500">
+                La votación no está activa o ya ha finalizado.
+              </p>
             )}
-            {assembly.userVote && (
+
+            {votingResults && (
               <div className="mt-4">
                 <h4 className="font-semibold mb-2">Resultados Parciales:</h4>
-                {assembly.votingOptions.map((option) => (
-                  <p key={option.id} className="text-sm">
-                    {option.text}: {option.votes} votos
+                {Object.entries(votingResults).map(([option, data]) => (
+                  <p key={option} className="text-sm">
+                    {option}: {data.count} votos ({data.coefficient.toFixed(2)}% coeficiente)
                   </p>
                 ))}
               </div>

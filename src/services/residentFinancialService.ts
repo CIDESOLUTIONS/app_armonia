@@ -51,3 +51,19 @@ export async function getResidentPendingFees(): Promise<PendingFee[]> {
     throw error;
   }
 }
+
+export async function initiatePayment(feeId: number): Promise<string> {
+  try {
+    const response = await fetchApi("/api/payments/initiate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ feeId }),
+    });
+    return response.paymentUrl;
+  } catch (error) {
+    console.error("Error initiating payment:", error);
+    throw error;
+  }
+}

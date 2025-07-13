@@ -8,7 +8,7 @@
 import { performance } from "perf_hooks";
 import { getTenantPrismaClient, getPublicPrismaClient } from "@/lib/prisma";
 import { PQRStatus } from "@/constants/pqr-constants";
-import { PQRAssignmentService } from "../pqrAssignmentService";
+import { PQRAssignmentService } from "@/services/pqrAssignmentService";
 import { PQRNotificationService } from "../pqrNotificationService";
 import { PQRMetricsService } from "../pqrMetricsService";
 

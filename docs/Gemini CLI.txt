@@ -491,7 +491,6 @@ Interacciones solo en español. Actúas como un experto en desarrollo full stack
  Resumen Consolidado de Auditoría y Plan de Corrección
 
   I. Problemas Críticos Identificados (Requieren Atención Inmediata):
-
    
     5. Funcionalidad de Recuperación de Contraseña Incompleta:
        * Problema: La página de "olvidé mi contraseña" es un placeholder.
@@ -551,13 +550,13 @@ Interacciones solo en español. Actúas como un experto en desarrollo full stack
        * Problema: Asegurar un manejo robusto y consistente de fechas y horas en toda la aplicación.
        * Corrección: Pendiente de revisión y ajuste.
 
-  ---
-
-Plan de Ejecución de Correcciones Unificadas:
+Plan de Ejecución de Correcciones Unificadas de auditoria:
 
 Ahora que tenemos un resumen claro, procederé a implementar estas correcciones. Dada la cantidad y la interdependencia de algunas de  ellas, las abordaré en un orden lógico, priorizando las críticas y las que desbloquean otras funcionalidades.
 
-Fase de Implementación de Correcciones:
+
+Interacciones solo en español. Actúas como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas (Clean Code, SOLID, TDD, CI/CD, etc.). Estás ubicado en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales se encuentran en la carpeta docs. Tu tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto. A partir de esa comparación, debes generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre lo especificado y lo implementado; e identificación de funcionalidades faltantes, incompletas o que deban ajustarse. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. en tu última iteración de auditoria encontraste estas correcciones por realizar, valida el avance y retoma en la tarea que quedaste( no estoy seguro pero era remplazar window.confirm).
+Implementación de Correcciones de auditoria:
    1. Implementar Endpoints CRUD Faltantes (PUT/DELETE) para Inventario y Comunicaciones:
        * src/app/api/inventory/properties/[id]/route.ts (PUT, DELETE)
        * src/app/api/inventory/residents/[id]/route.ts (PUT, DELETE)
@@ -585,6 +584,29 @@ Fase de Implementación de Correcciones:
    15. Verificar la existencia y estructura de los modelos de Prisma para Payment, Expense y Fee en el esquema.
 
 
+
+
+Interacciones solo en español. Actúas como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas (Clean Code, SOLID, TDD, CI/CD, etc.). Estás ubicado en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales se encuentran en la carpeta docs. Tu tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto. A partir de esa comparación, debes generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre lo especificado y lo implementado; e identificación de funcionalidades faltantes, incompletas o que deban ajustarse. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias e integrales (E2E). Luego, revisa la calidad del código (Lint) y deja la aplicación lista para su despliegue en producción. en tu última iteración de auditoria encontraste estas correcciones por realizar, inicia en la fase uno.
+
+plan de acción para las pruebas será el siguiente:
+
+  Fase 1: Diagnóstico y Corrección de la Configuración de Jest
+   1. Revisar jest.config.ts y tsconfig.jest.json: Estos son los archivos clave para la configuración de Jest y la transpilación de TypeScript. Buscaré errores en moduleNameMapper y en las opciones de compilación.
+   2. Examinar `babel.config.ts`: Asegurarme de que Babel esté configurado correctamente para trabajar con Jest y TypeScript.
+   3. Resolver errores de `Cannot find module`: Corregir las rutas de importación o los alias en moduleNameMapper.
+
+  Fase 2: Refactorización y Creación de Pruebas Unitarias
+   1. Enfoque modular: Seleccionaré un módulo a la vez, preferiblemente uno que haya modificado recientemente (PQR, financiero, documentos, asambleas), y me aseguraré de que sus pruebas unitarias pasen.
+   2. Implementar mocking adecuado: Asegurarme de que las dependencias de los servicios se mockeen correctamente para aislar la unidad bajo prueba.
+   3. Manejar contextos de React: Para los componentes de React, asegurarme de que se rendericen dentro de los proveedores de contexto necesarios o que el contexto se mockee.
+   4. Escribir nuevas pruebas: Crear pruebas unitarias para la nueva funcionalidad que he añadido.
+   5. Refactorizar pruebas existentes: Mejorar la claridad, mantenibilidad y efectividad de las pruebas existentes. Eliminar pruebas  redundantes o irrelevantes.
+
+  Fase 3: Pruebas E2E
+   1. Examinar `playwright.config.ts`: Entender la configuración de Playwright.
+   2. Identificar pruebas E2E existentes: Revisar el directorio e2e/.
+   3. Ejecutar pruebas E2E individualmente: Intentar ejecutar una sola prueba E2E para diagnosticar problemas.
+   4. Crear/Refactorizar pruebas E2E: Escribir nuevas pruebas E2E para las nuevas características y refactorizar las existentes según sea necesario.
 
 
 

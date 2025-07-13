@@ -4,6 +4,8 @@
  * Maneja el envío de notificaciones push a dispositivos móviles y web
  */
 
+import * as admin from 'firebase-admin';
+
 interface PushNotificationPayload {
   title: string;
   body: string;
@@ -81,7 +83,8 @@ export class PushNotificationService {
       // Verificar si las credenciales de Firebase están configuradas
       if (
         !process.env.FIREBASE_PROJECT_ID ||
-        !process.env.FIREBASE_PRIVATE_KEY
+        !process.env.FIREBASE_PRIVATE_KEY ||
+        !process.env.FIREBASE_CLIENT_EMAIL
       ) {
         console.warn(
           "[PUSH] Firebase no configurado - funcionando en modo simulación",
@@ -92,16 +95,15 @@ export class PushNotificationService {
       }
 
       // En producción aquí iría la inicialización real de Firebase Admin SDK
-      // const admin = require('firebase-admin');
-      // if (!admin.apps.length) {
-      //   admin.initializeApp({
-      //     credential: admin.credential.cert({
-      //       projectId: process.env.FIREBASE_PROJECT_ID,
-      //       privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      //       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      //     }),
-      //   });
-      // }
+      if (!admin.apps.length) {
+        admin.initializeApp({
+          credential: admin.credential.cert({
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          }),
+        });
+      }
 
       this.fcmEnabled = true;
       this.isInitialized = true;
@@ -191,47 +193,49 @@ export class PushNotificationService {
     }
 
     // En producción, aquí iría el envío real con Firebase Admin SDK
-    // const admin = require('firebase-admin');
-    // const messaging = admin.messaging();
-    //
-    // const message = {
-    //   notification: {
-    //     title: request.payload.title,
-    //     body: request.payload.body,
-    //     icon: request.payload.icon,
-    //     image: request.payload.image,
-    //   },
-    //   data: request.payload.data || {},
-    //   tokens: tokens,
-    //   android: {
-    //     priority: request.options?.priority || 'normal',
-    //     ttl: request.options?.timeToLive || 3600000, // 1 hora por defecto
-    //   },
-    //   webpush: {
-    //     notification: {
-    //       icon: request.payload.icon,
-    //       badge: request.payload.badge,
-    //       actions: request.payload.actions,
-    //       requireInteraction: request.options?.requireInteraction,
-    //       silent: request.options?.silent,
-    //       tag: request.options?.tag,
-    //     },
-    //     fcmOptions: {
-    //       link: request.options?.clickAction,
-    //     },
-    //   },
-    // };
-    //
-    // const response = await messaging.sendEachForMulticast(message);
+    const messaging = admin.messaging();
 
-    // Simular respuesta exitosa para desarrollo
+    const message = {
+      notification: {
+        title: request.payload.title,
+        body: request.payload.body,
+        icon: request.payload.icon,
+        image: request.payload.image,
+      },
+      data: request.payload.data || {},
+      tokens: tokens,
+      android: {
+        priority: request.options?.priority || 'normal',
+        ttl: request.options?.timeToLive || 3600000, // 1 hora por defecto
+      },
+      webpush: {
+        notification: {
+          icon: request.payload.icon,
+          badge: request.payload.badge,
+          actions: request.payload.actions,
+          requireInteraction: request.options?.requireInteraction,
+          silent: request.options?.silent,
+          tag: request.options?.tag,
+        },
+        fcmOptions: {
+          link: request.options?.clickAction,
+        },
+      },
+    };
+
+    const response = await messaging.sendEachForMulticast(message);
+
     await this.logNotification(request, tokens, "sent");
 
     return {
       success: true,
       messageId: `fcm_${Date.now()}`,
-      successCount: tokens.length,
-      failureCount: 0,
+      successCount: response.successCount,
+      failureCount: response.failureCount,
+      errors: response.responses.filter(res => !res.success).map(res => ({
+        token: res.multicastMessageId || '', // Fallback if token not available
+        error: res.error?.message || 'Unknown error',
+      })),
     };
   }
 
@@ -409,9 +413,8 @@ export class PushNotificationService {
     }
 
     // En producción:
-    // const admin = require('firebase-admin');
-    // const messaging = admin.messaging();
-    // await messaging.subscribeToTopic(tokens, topic);
+    const messaging = admin.messaging();
+    await messaging.subscribeToTopic(tokens, topic);
 
     return true;
   }
@@ -431,9 +434,8 @@ export class PushNotificationService {
     }
 
     // En producción:
-    // const admin = require('firebase-admin');
-    // const messaging = admin.messaging();
-    // await messaging.unsubscribeFromTopic(tokens, topic);
+    const messaging = admin.messaging();
+    await messaging.unsubscribeFromTopic(tokens, topic);
 
     return true;
   }
@@ -494,7 +496,7 @@ export class PushNotificationService {
       options: {
         priority: "high",
         requireInteraction: true,
-        clickAction: `/dashboard/${type.split("_")[0]}`,
+        clickAction: `/dashboard/${type.split("_")[0]} `,
       },
     });
   }

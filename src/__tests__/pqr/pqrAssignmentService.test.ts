@@ -2,7 +2,7 @@
  * Pruebas unitarias para el servicio de asignación de PQR
  */
 
-import { PQRAssignmentService } from "../pqrAssignmentService";
+import { PQRAssignmentService } from "@/services/pqrAssignmentService";
 import { PrismaClient, PQRCategory, PQRPriority } from "@prisma/client";
 import { getPrisma } from "@/lib/prisma";
 

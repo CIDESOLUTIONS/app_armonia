@@ -2,6 +2,8 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import CommonAreaReservation from "../CommonAreaReservation";
+import { Toaster } from "@/components/ui/toaster";
+import { ToastProvider } from "@/components/ui/toast";
 
 // Mock next-auth
 jest.mock("next-auth/react", () => ({
@@ -88,12 +90,22 @@ describe("CommonAreaReservation Component", () => {
   });
 
   it("renders the component title", async () => {
-    render(<CommonAreaReservation />);
+    render(
+      <ToastProvider>
+        <CommonAreaReservation />
+        <Toaster />
+      </ToastProvider>,
+    );
     expect(screen.getByText("Reserva de Áreas Comunes")).toBeInTheDocument();
   });
 
   it("loads and displays common areas", async () => {
-    render(<CommonAreaReservation />);
+    render(
+      <ToastProvider>
+        <CommonAreaReservation />
+        <Toaster />
+      </ToastProvider>,
+    );
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
         "/api/common-areas?active=true",

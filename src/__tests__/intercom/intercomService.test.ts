@@ -8,6 +8,7 @@ import {
 } from "@jest/globals";
 import { PrismaClient } from "@prisma/client";
 import { MessageAdapter } from "../../lib/communications/message-adapters";
+import { IntercomService } from "../../lib/services/intercom-service"; // Moved to top level
 
 const mockVisitStatus = {
   PENDING: "PENDING",
@@ -82,6 +83,7 @@ jest.mock("../../lib/communications/telegram-adapter", () => ({
 }));
 
 let mockPrisma: any; // Declare mockPrisma here
+let intercomService: IntercomService; // Declare intercomService here
 
 // Mock PrismaClient globally
 jest.mock("@prisma/client", () => {
@@ -167,9 +169,8 @@ beforeEach(() => {
     id: "notification-id-123",
   });
 
-  // Dynamically import intercomService after mocks are set up
-  import { IntercomService } from "../../lib/services/intercom-service";
-  intercomService = new IntercomService(); // Instantiate the class
+  // Instantiate intercomService after mocks are set up
+  intercomService = new IntercomService();
 });
 
 afterEach(() => {
