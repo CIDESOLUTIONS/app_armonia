@@ -3,12 +3,6 @@
 import React, { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
-import { getFinancialSettings, updateFinancialSettings } from "@/services/financialSettingsService";
 
 export default function FinancialSettingsPage() {
   const { user, loading: authLoading } = useAuthStore();

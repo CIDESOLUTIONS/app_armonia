@@ -3,11 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
-import { getComplexInfo, updateComplexInfo } from "@/services/complexService";
 
 interface ComplexInfo {
   id: number;
@@ -83,6 +78,8 @@ export default function ComplexSetupPage() {
         description: "Error al guardar la información del conjunto.",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -131,13 +128,35 @@ export default function ComplexSetupPage() {
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="schemaName">Nombre del Esquema</Label>
+            <Label htmlFor="legalName">Razón Social / Nombre Legal</Label>
             <Input
-              id="schemaName"
-              name="schemaName"
-              value={formData.schemaName || ""}
+              id="legalName"
+              name="legalName"
+              value={formData.legalName || ""}
               onChange={handleInputChange}
-              disabled
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="nit">NIT / Identificación Tributaria</Label>
+            <Input
+              id="nit"
+              name="nit"
+              value={formData.nit || ""}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="registrationDate">Fecha de Registro</Label>
+            <Input
+              id="registrationDate"
+              name="registrationDate"
+              type="date"
+              value={
+                formData.registrationDate
+                  ? formData.registrationDate.split("T")[0]
+                  : ""
+              }
+              onChange={handleInputChange}
             />
           </div>
           <div className="grid gap-2">
@@ -245,3 +264,4 @@ export default function ComplexSetupPage() {
     </div>
   );
 }
+

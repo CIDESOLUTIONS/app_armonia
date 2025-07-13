@@ -16,6 +16,17 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { getPQRs, deletePQR } from "@/services/pqrService";
 
 interface PQR {
@@ -43,6 +54,8 @@ export default function PQRListPage() {
     priority: "",
     search: "",
   });
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [pqrToDelete, setPqrToDelete] = useState<number | null>(null);
 
   const fetchPQRs = useCallback(async () => {
     setLoading(true);
@@ -77,23 +90,30 @@ export default function PQRListPage() {
     }));
   };
 
-  const handleDeletePQR = async (id: number) => {
-    if (confirm("¿Estás seguro de que quieres eliminar esta PQR?")) {
-      try {
-        await deletePQR(id);
-        toast({
-          title: "Éxito",
-          description: "PQR eliminada correctamente.",
-        });
-        fetchPQRs();
-      } catch (error) {
-        console.error("Error deleting PQR:", error);
-        toast({
-          title: "Error",
-          description: "Error al eliminar la PQR.",
-          variant: "destructive",
-        });
-      }
+  const handleDeletePQR = (id: number) => {
+    setPqrToDelete(id);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeletePQR = async () => {
+    if (pqrToDelete === null) return;
+    try {
+      await deletePQR(pqrToDelete);
+      toast({
+        title: "Éxito",
+        description: "PQR eliminada correctamente.",
+      });
+      fetchPQRs();
+    } catch (error) {
+      console.error("Error deleting PQR:", error);
+      toast({
+        title: "Error",
+        description: "Error al eliminar la PQR.",
+        variant: "destructive",
+      });
+    } finally {
+      setShowDeleteDialog(false);
+      setPqrToDelete(null);
     }
   };
 
@@ -253,6 +273,23 @@ export default function PQRListPage() {
           </TableBody>
         </Table>
       </div>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Eliminación</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Estás seguro de que quieres eliminar esta PQR? Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeletePQR}>
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

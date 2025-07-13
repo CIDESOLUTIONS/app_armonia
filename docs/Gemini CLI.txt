@@ -488,6 +488,103 @@ ajuste prompt chatgpt
 Interacciones solo en español. Actúas como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas (Clean Code, SOLID, TDD, CI/CD, etc.). Estás ubicado en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales se encuentran en la carpeta docs. Tu tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto. A partir de esa comparación, debes generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre lo especificado y lo implementado; e identificación de funcionalidades faltantes, incompletas o que deban ajustarse. Evalúa especialmente desde el acceso a la landing page (clave para conversión) hasta todos los portales: Administrador del conjunto residencial, Residentes, Recepción/Vigilancia y la Consola de Administración de la aplicación. Evalúa si se están aplicando estándares modernos de calidad, accesibilidad, rendimiento, seguridad y mantenibilidad. Si se detectan problemas, sugiere correcciones o mejoras específicas. Verifica si es conveniente, eliminar dependencias o funciones innecesarias, optimizar estructuras o reorganizar la arquitectura para mejorar eficiencia. Antes de desarrollar nuevo código, es muy importante revisar el historial de la carpeta .git para rescatar implementaciones descartadas. Si no existen, desarrolla desde cero respetando el estilo del proyecto. Evita proponer múltiples alternativas para una misma solución salvo que se indique lo contrario. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones en docs/, resume sus puntos clave y procede paso a paso siguiendo este flujo.
 
 
+ Resumen Consolidado de Auditoría y Plan de Corrección
+
+  I. Problemas Críticos Identificados (Requieren Atención Inmediata):
+
+   
+    5. Funcionalidad de Recuperación de Contraseña Incompleta:
+       * Problema: La página de "olvidé mi contraseña" es un placeholder.
+       * Corrección: Pendiente de implementar el flujo completo de restablecimiento de contraseña (endpoints de API y lógica de frontend).
+   6. Endpoints CRUD Incompletos (PUT/DELETE):
+       * Problema: Varios endpoints de API (Residentes, Vehículos, Mascotas, Amenidades, Anuncios, PQR) solo tenían implementados GET y POST, a pesar de que el frontend ya llamaba a PUT y DELETE.
+       * Corrección: Pendiente de implementar los métodos PUT y DELETE en los archivos route.ts correspondientes o en archivos [id]/route.ts.
+   7. Endpoint `/api/dashboard/activity` Faltante:
+       * Problema: El dashboard del administrador llama a este endpoint, pero no existe.
+       * Corrección: Pendiente de implementar src/app/api/dashboard/activity/route.ts.
+   8. Funcionalidad de Mensajería Digital y Notificaciones (Backend):
+       * Problema: La integración real con Twilio/Telegram y la lógica de envío de notificaciones no están implementadas en el backend.
+       * Corrección: Pendiente de implementar la integración con servicios de comunicación y la lógica de envío dentro de NotificationService.
+   9. Carga de Archivos de Logotipo (Backend):
+       * Problema: La implementación de la carga de archivos en el backend para el logotipo es un placeholder.
+       * Corrección: Pendiente de implementar la integración con un servicio de almacenamiento de archivos.
+   10. Funcionalidad de Pago en Finanzas del Residente:
+       * Problema: No hay funcionalidad para realizar pagos.
+       * Corrección: Pendiente de implementar la funcionalidad de pago y la integración con pasarelas de pago.
+   11. Funcionalidad de Documentos del Residente:
+       * Problema: La página de documentos es un placeholder.
+       * Corrección: Pendiente de implementar la funcionalidad de listar y descargar documentos.
+   12. Funcionalidad de Votación en Asambleas del Residente:
+       * Problema: La votación es simulada.
+       * Corrección: Pendiente de implementar la funcionalidad de votación real en el backend y frontend.
+
+  II. Problemas de Usabilidad y Mantenibilidad (Requieren Mejora):
+
+   1. `window.confirm` para Eliminación:
+       * Problema: Uso inconsistente de window.confirm en lugar de diálogos de Shadcn/UI.
+       * Corrección: Pendiente de reemplazar en todas las páginas donde se utilice.
+   2. Validación Frontend Básica:
+       * Problema: La validación en el frontend es básica (atributos HTML).
+       * Corrección: Pendiente de mejorar con react-hook-form y zod para una mejor experiencia de usuario.
+   3. UX de Selección de `propertyId`:
+       * Problema: En formularios de Residentes, Vehículos y Mascotas, propertyId es un input numérico.
+       * Corrección: Pendiente de mejorar con un selector de propiedades más amigable.
+   4. Refactorización de Componentes de Layout:
+       * Problema: AdminHeader y AdminSidebar se renderizan en cada página, causando duplicación.
+       * Corrección: Pendiente de refactorizar a un layout superior.
+   5. `getPQRById` Ineficiente:
+       * Problema: La función getPQRById en pqrService.ts realiza una llamada ineficiente.
+       * Corrección: Pendiente de refactorizar para usar un endpoint dedicado /api/pqr/[id]/route.ts.
+   6. Página de Edición de PQR Faltante:
+       * Problema: La página src/app/(admin)/(complex-admin)/pqr/[id]/edit/page.tsx no existe.
+       * Corrección: Pendiente de implementar.
+   7. Carga Dinámica de Usuarios Asignables (PQR):
+       * Problema: La lista de usuarios a los que se puede asignar una PQR no se carga dinámicamente.
+       * Corrección: Pendiente de implementar.
+
+  III. Tareas de Verificación y Refinamiento:
+
+   1. Verificar Modelos de Prisma:
+       * Problema: Se asume la existencia y estructura de modelos de Prisma para Payment, Expense y Fee.
+       * Corrección: Pendiente de verificar en el esquema de Prisma.
+   2. Consistencia de Fechas/Horas:
+       * Problema: Asegurar un manejo robusto y consistente de fechas y horas en toda la aplicación.
+       * Corrección: Pendiente de revisión y ajuste.
+
+  ---
+
+Plan de Ejecución de Correcciones Unificadas:
+
+Ahora que tenemos un resumen claro, procederé a implementar estas correcciones. Dada la cantidad y la interdependencia de algunas de  ellas, las abordaré en un orden lógico, priorizando las críticas y las que desbloquean otras funcionalidades.
+
+Fase de Implementación de Correcciones:
+   1. Implementar Endpoints CRUD Faltantes (PUT/DELETE) para Inventario y Comunicaciones:
+       * src/app/api/inventory/properties/[id]/route.ts (PUT, DELETE)
+       * src/app/api/inventory/residents/[id]/route.ts (PUT, DELETE)
+       * src/app/api/inventory/vehicles/[id]/route.ts (PUT, DELETE)
+       * src/app/api/inventory/amenities/[id]/route.ts (PUT, DELETE)
+       * src/app/api/communications/announcements/[id]/route.ts (PUT, DELETE)
+       * src/app/api/pqr/[id]/route.ts (PUT, DELETE)
+   2. Implementar Endpoint `/api/dashboard/activity/route.ts`.
+   3. Implementar Endpoints de API para Comentarios y Asignación de PQR:
+       * src/app/api/pqr/comment/route.ts
+       * src/app/api/pqr/assign/route.ts
+   4. Implementar el flujo completo de "Recuperación y cambio de contraseña seguro".
+       * Endpoints de API para solicitar y restablecer contraseña.
+       * Páginas de frontend para estos flujos.
+   5. Refactorizar componentes de layout (AdminHeader, AdminSidebar) a un layout superior.
+   6. Mejorar la UX de selección de `propertyId` en los formularios de Residentes, Vehículos y Mascotas (selector de propiedades). Esto implicará un nuevo endpoint de API para listar propiedades.
+   7. Reemplazar `window.confirm` por diálogos de confirmación de Shadcn/UI en todas las páginas donde se utilice.
+   8. Mejorar la validación frontend en los formularios (integrar react-hook-form y zod).
+   9. Integrar Twilio/Telegram en el backend para la mensajería digital.
+   10. Implementar la lógica real de envío de notificaciones (ej. push notifications, email) dentro de NotificationService.
+   11. Implementar la integración con un servicio de almacenamiento de archivos para el logotipo en la configuración de branding.
+   12. Implementar la funcionalidad de pago en la página de finanzas del residente.
+   13. Implementar la funcionalidad de documentos en la página de documentos del residente.
+   14. Implementar la funcionalidad de votación en la página de asambleas del residente.
+   15. Verificar la existencia y estructura de los modelos de Prisma para Payment, Expense y Fee en el esquema.
+
+
 
 
 

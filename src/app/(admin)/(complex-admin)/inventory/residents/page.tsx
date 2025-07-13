@@ -31,6 +31,17 @@ import {
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   getResidents,
   createResident,
   updateResident,
@@ -63,6 +74,8 @@ export default function ResidentsPage() {
     role: "",
     isActive: true,
   });
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [residentToDelete, setResidentToDelete] = useState<number | null>(null);
 
   const fetchResidents = useCallback(async () => {
     setLoading(true);
@@ -159,23 +172,30 @@ export default function ResidentsPage() {
     }
   };
 
-  const handleDeleteResident = async (id: number) => {
-    if (confirm("¿Estás seguro de que quieres eliminar este residente?")) {
-      try {
-        await deleteResident(id);
-        toast({
-          title: "Éxito",
-          description: "Residente eliminado correctamente.",
-        });
-        fetchResidents();
-      } catch (error) {
-        console.error("Error deleting resident:", error);
-        toast({
-          title: "Error",
-          description: "Error al eliminar el residente.",
-          variant: "destructive",
-        });
-      }
+  const handleDeleteResident = (id: number) => {
+    setResidentToDelete(id);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteResident = async () => {
+    if (residentToDelete === null) return;
+    try {
+      await deleteResident(residentToDelete);
+      toast({
+        title: "Éxito",
+        description: "Residente eliminado correctamente.",
+      });
+      fetchResidents();
+    } catch (error) {
+      console.error("Error deleting resident:", error);
+      toast({
+        title: "Error",
+        description: "Error al eliminar el residente.",
+        variant: "destructive",
+      });
+    } finally {
+      setShowDeleteDialog(false);
+      setResidentToDelete(null);
     }
   };
 
@@ -368,6 +388,23 @@ export default function ResidentsPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Eliminación</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Estás seguro de que quieres eliminar este residente? Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteResident}>
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

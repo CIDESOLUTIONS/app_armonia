@@ -1,74 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
-import { PrismaClient } from "@prisma/client";
-import { sendPasswordResetEmail } from "@/lib/communications/email-service";
+import { getPublicPrismaClient } from "@/lib/prisma";
 import { generatePasswordResetToken } from "@/lib/auth";
 import { ServerLogger } from "@/lib/logging/server-logger";
+import { z } from "zod";
 
-const prisma = new PrismaClient();
-
-const ForgotPasswordSchema = z.object({
-  email: z.string().email({ message: "Correo electrónico inválido." }),
-  schemaName: z
-    .string()
-    .min(1, { message: "Nombre de esquema requerido." })
-    .optional(),
+const RequestPasswordResetSchema = z.object({
+  email: z.string().email("Formato de email inválido"),
 });
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const validatedData = ForgotPasswordSchema.parse(body);
-    const { email, schemaName } = validatedData;
+    const { email } = RequestPasswordResetSchema.parse(body);
 
-    let user;
-    if (schemaName) {
-      // Buscar usuario en el esquema específico
-      const tenantPrisma = new PrismaClient({
-        datasources: {
-          db: { url: process.env.DATABASE_URL?.replace("armonia", schemaName) },
-        },
-      });
-      user = await tenantPrisma.user.findUnique({ where: { email } });
-      await tenantPrisma.$disconnect();
-    } else {
-      // Buscar usuario en el esquema principal (para super-administradores o si no se especifica esquema)
-      user = await prisma.user.findUnique({ where: { email } });
-    }
+    const publicPrisma = getPublicPrismaClient();
+    const user = await publicPrisma.user.findUnique({ where: { email } });
 
     if (!user) {
       // No revelar si el usuario existe o no por razones de seguridad
-      ServerLogger.warn(
-        `Intento de recuperación de contraseña para email no registrado: ${email}`,
-      );
+      ServerLogger.warn(`Intento de restablecimiento de contraseña para email no registrado: ${email}`);
       return NextResponse.json(
-        {
-          message:
-            "Si su correo electrónico está registrado, recibirá un enlace para restablecer su contraseña.",
-        },
+        { message: "Si su correo electrónico está registrado, recibirá un enlace para restablecer su contraseña." },
         { status: 200 },
       );
     }
 
-    // Generar token de restablecimiento de contraseña
-    const token = await generatePasswordResetToken(user.id, email, schemaName);
+    const token = await generatePasswordResetToken(user.id, user.email, user.schemaName || undefined);
 
-    // Enviar correo electrónico
-    await sendPasswordResetEmail(
-      email,
-      user.name || "Usuario",
-      token,
-      schemaName,
-    );
+    // TODO: Implement email sending logic here
+    // This would involve using a transactional email service (e.g., SendGrid, Nodemailer)
+    ServerLogger.info(`Enlace de restablecimiento de contraseña generado para ${email}: ${token}`);
 
-    ServerLogger.info(
-      `Enlace de recuperación de contraseña enviado a: ${email}`,
-    );
     return NextResponse.json(
-      {
-        message:
-          "Si su correo electrónico está registrado, recibirá un enlace para restablecer su contraseña.",
-      },
+      { message: "Si su correo electrónico está registrado, recibirá un enlace para restablecer su contraseña." },
       { status: 200 },
     );
   } catch (error) {
@@ -78,12 +42,9 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-    ServerLogger.error(
-      "Error en la solicitud de recuperación de contraseña:",
-      error,
-    );
+    ServerLogger.error("Error al solicitar restablecimiento de contraseña:", error);
     return NextResponse.json(
-      { message: "Error interno del servidor." },
+      { message: "Error interno del servidor" },
       { status: 500 },
     );
   }

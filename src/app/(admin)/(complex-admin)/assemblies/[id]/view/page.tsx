@@ -21,19 +21,6 @@ import Link from "next/link";
 import { getAssemblyById } from "@/services/assemblyService";
 import { useToast } from "@/components/ui/use-toast";
 
-interface Assembly {
-  id: number;
-  title: string;
-  description?: string;
-  scheduledDate: string;
-  location: string;
-  type: "ORDINARY" | "EXTRAORDINARY";
-  agenda: string;
-  status: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
-  complexId: number;
-  createdBy: number;
-}
-
 export default function ViewAssemblyPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();

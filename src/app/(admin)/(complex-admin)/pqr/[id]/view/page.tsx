@@ -1,30 +1,9 @@
-"use client";
-
 import React, { useState, useEffect, useCallback } from "react";
 import { Label } from "@/components/ui/label";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2, Edit, Trash2, MessageSquare } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useToast } from "@/components/ui/use-toast";
-import {
-  getPQRById,
-  updatePQR,
-  deletePQR,
-  addPQRComment,
-  assignPQR,
-} from "@/services/pqrService";
 
 interface PQR {
   id: number;
@@ -51,6 +30,13 @@ interface PQRComment {
   createdAt: string;
 }
 
+interface AssignableUser {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+}
+
 export default function ViewPQRPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
@@ -62,7 +48,8 @@ export default function ViewPQRPage() {
   const [loading, setLoading] = useState(true);
   const [newComment, setNewComment] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<PQR["status"] | "">("");
-  const [selectedAssignee, setSelectedAssignee] = useState<string | number>(""); // Assuming assignee ID or name
+  const [selectedAssignee, setSelectedAssignee] = useState<string | number>("");
+  const [assignableUsers, setAssignableUsers] = useState<AssignableUser[]>([]);
 
   const fetchPQR = useCallback(async () => {
     setLoading(true);
@@ -84,11 +71,26 @@ export default function ViewPQRPage() {
     }
   }, [pqrId, router, toast]);
 
+  const fetchAssignableUsers = useCallback(async () => {
+    try {
+      const users = await getAssignableUsers();
+      setAssignableUsers(users);
+    } catch (error) {
+      console.error("Error fetching assignable users:", error);
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los usuarios asignables.",
+        variant: "destructive",
+      });
+    }
+  }, [toast]);
+
   useEffect(() => {
     if (!authLoading && user && pqrId) {
       fetchPQR();
+      fetchAssignableUsers();
     }
-  }, [authLoading, user, pqrId, fetchPQR]);
+  }, [authLoading, user, pqrId, fetchPQR, fetchAssignableUsers]);
 
   const handleAddComment = async () => {
     if (!pqrId || !newComment.trim()) return;
@@ -132,7 +134,7 @@ export default function ViewPQRPage() {
   const handleAssignPQR = async () => {
     if (!pqrId || !selectedAssignee) return;
     try {
-      await assignPQR(pqrId, selectedAssignee as number); // Assuming selectedAssignee is ID
+      await assignPQR(pqrId, selectedAssignee as number);
       toast({
         title: "Éxito",
         description: "PQR asignada correctamente.",
@@ -198,7 +200,7 @@ export default function ViewPQRPage() {
   }
 
   if (!pqr) {
-    return null; // Should not happen due to redirects above
+    return null;
   }
 
   return (
@@ -318,11 +320,11 @@ export default function ViewPQRPage() {
                   <SelectValue placeholder="Seleccionar responsable" />
                 </SelectTrigger>
                 <SelectContent>
-                  {/* Aquí se cargarían dinámicamente los usuarios STAFF/ADMIN/COMPLEX_ADMIN */}
-                  <SelectItem value={user?.id || ""}>
-                    {user?.name || "Yo"}
-                  </SelectItem>
-                  {/* Ejemplo: <SelectItem value="2">Juan Pérez (Mantenimiento)</SelectItem> */}
+                  {assignableUsers.map((assignee) => (
+                    <SelectItem key={assignee.id} value={assignee.id.toString()}>
+                      {assignee.name} ({assignee.role})
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <Button onClick={handleAssignPQR} className="mt-2">

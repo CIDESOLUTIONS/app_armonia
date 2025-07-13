@@ -24,6 +24,17 @@ import {
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   getVehicles,
   createVehicle,
   updateVehicle,
@@ -60,6 +71,8 @@ export default function VehiclesPage() {
     parkingSpace: "",
     isActive: true,
   });
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [vehicleToDelete, setVehicleToDelete] = useState<number | null>(null);
 
   const fetchVehicles = useCallback(async () => {
     setLoading(true);
@@ -160,23 +173,30 @@ export default function VehiclesPage() {
     }
   };
 
-  const handleDeleteVehicle = async (id: number) => {
-    if (confirm("¿Estás seguro de que quieres eliminar este vehículo?")) {
-      try {
-        await deleteVehicle(id);
-        toast({
-          title: "Éxito",
-          description: "Vehículo eliminado correctamente.",
-        });
-        fetchVehicles();
-      } catch (error) {
-        console.error("Error deleting vehicle:", error);
-        toast({
-          title: "Error",
-          description: "Error al eliminar el vehículo.",
-          variant: "destructive",
-        });
-      }
+  const handleDeleteVehicle = (id: number) => {
+    setVehicleToDelete(id);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteVehicle = async () => {
+    if (vehicleToDelete === null) return;
+    try {
+      await deleteVehicle(vehicleToDelete);
+      toast({
+        title: "Éxito",
+        description: "Vehículo eliminado correctamente.",
+      });
+      fetchVehicles();
+    } catch (error) {
+      console.error("Error deleting vehicle:", error);
+      toast({
+        title: "Error",
+        description: "Error al eliminar el vehículo.",
+        variant: "destructive",
+      });
+    } finally {
+      setShowDeleteDialog(false);
+      setVehicleToDelete(null);
     }
   };
 
@@ -279,9 +299,7 @@ export default function VehiclesPage() {
           </DialogHeader>
           <form onSubmit={handleSubmit} className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="licensePlate" className="text-right">
-                Placa
-              </Label>
+              <Label htmlFor="licensePlate">Placa</Label>
               <Input
                 id="licensePlate"
                 name="licensePlate"
@@ -292,9 +310,7 @@ export default function VehiclesPage() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="brand" className="text-right">
-                Marca
-              </Label>
+              <Label htmlFor="brand">Marca</Label>
               <Input
                 id="brand"
                 name="brand"
@@ -305,9 +321,7 @@ export default function VehiclesPage() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="model" className="text-right">
-                Modelo
-              </Label>
+              <Label htmlFor="model">Modelo</Label>
               <Input
                 id="model"
                 name="model"
@@ -318,9 +332,7 @@ export default function VehiclesPage() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="color" className="text-right">
-                Color
-              </Label>
+              <Label htmlFor="color">Color</Label>
               <Input
                 id="color"
                 name="color"
@@ -331,9 +343,7 @@ export default function VehiclesPage() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="ownerName" className="text-right">
-                Nombre Propietario
-              </Label>
+              <Label htmlFor="ownerName">Nombre Propietario</Label>
               <Input
                 id="ownerName"
                 name="ownerName"
@@ -344,9 +354,7 @@ export default function VehiclesPage() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="propertyId" className="text-right">
-                ID Propiedad
-              </Label>
+              <Label htmlFor="propertyId">ID Propiedad</Label>
               <Input
                 id="propertyId"
                 name="propertyId"
@@ -358,9 +366,7 @@ export default function VehiclesPage() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="parkingSpace" className="text-right">
-                Parqueadero
-              </Label>
+              <Label htmlFor="parkingSpace">Parqueadero</Label>
               <Input
                 id="parkingSpace"
                 name="parkingSpace"
@@ -387,6 +393,25 @@ export default function VehiclesPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Eliminación</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Estás seguro de que quieres eliminar este vehículo? Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteVehicle}>
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
+
+

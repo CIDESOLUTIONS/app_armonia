@@ -24,6 +24,17 @@ import {
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   getAmenities,
   createAmenity,
   updateAmenity,
@@ -48,7 +59,8 @@ export default function AmenitiesPage() {
   const [amenities, setAmenities] = useState<Amenity[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentAmenity, setCurrentAmenity] = useState<Amenity | null>(null);
+  const [currentAmenity, setCurrentAmenity] =
+    useState<Amenity | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -59,6 +71,8 @@ export default function AmenitiesPage() {
     feeAmount: 0,
     isActive: true,
   });
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [amenityToDelete, setAmenityToDelete] = useState<number | null>(null);
 
   const fetchAmenities = useCallback(async () => {
     setLoading(true);
@@ -161,23 +175,30 @@ export default function AmenitiesPage() {
     }
   };
 
-  const handleDeleteAmenity = async (id: number) => {
-    if (confirm("¿Estás seguro de que quieres eliminar esta amenidad?")) {
-      try {
-        await deleteAmenity(id);
-        toast({
-          title: "Éxito",
-          description: "Amenidad eliminada correctamente.",
-        });
-        fetchAmenities();
-      } catch (error) {
-        console.error("Error deleting amenity:", error);
-        toast({
-          title: "Error",
-          description: "Error al eliminar la amenidad.",
-          variant: "destructive",
-        });
-      }
+  const handleDeleteAmenity = (id: number) => {
+    setAmenityToDelete(id);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteAmenity = async () => {
+    if (amenityToDelete === null) return;
+    try {
+      await deleteAmenity(amenityToDelete);
+      toast({
+        title: "Éxito",
+        description: "Amenidad eliminada correctamente.",
+      });
+      fetchAmenities();
+    } catch (error) {
+      console.error("Error deleting amenity:", error);
+      toast({
+        title: "Error",
+        description: "Error al eliminar la amenidad.",
+        variant: "destructive",
+      });
+    } finally {
+      setShowDeleteDialog(false);
+      setAmenityToDelete(null);
     }
   };
 
@@ -292,9 +313,7 @@ export default function AmenitiesPage() {
           </DialogHeader>
           <form onSubmit={handleSubmit} className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Nombre
-              </Label>
+              <Label htmlFor="name">Nombre</Label>
               <Input
                 id="name"
                 name="name"
@@ -305,9 +324,7 @@ export default function AmenitiesPage() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-right">
-                Descripción
-              </Label>
+              <Label htmlFor="description">Descripción</Label>
               <Input
                 id="description"
                 name="description"
@@ -317,9 +334,7 @@ export default function AmenitiesPage() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="location" className="text-right">
-                Ubicación
-              </Label>
+              <Label htmlFor="location">Ubicación</Label>
               <Input
                 id="location"
                 name="location"
@@ -330,9 +345,7 @@ export default function AmenitiesPage() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="capacity" className="text-right">
-                Capacidad
-              </Label>
+              <Label htmlFor="capacity">Capacidad</Label>
               <Input
                 id="capacity"
                 name="capacity"
@@ -395,6 +408,23 @@ export default function AmenitiesPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Eliminación</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Estás seguro de que quieres eliminar esta amenidad? Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteAmenity}>
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

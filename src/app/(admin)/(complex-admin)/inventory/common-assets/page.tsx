@@ -24,6 +24,17 @@ import {
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   getCommonAssets,
   createCommonAsset,
   updateCommonAsset,
@@ -58,6 +69,8 @@ export default function CommonAssetsPage() {
     value: 0,
     isActive: true,
   });
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [commonAssetToDelete, setCommonAssetToDelete] = useState<number | null>(null);
 
   const fetchCommonAssets = useCallback(async () => {
     setLoading(true);
@@ -158,23 +171,30 @@ export default function CommonAssetsPage() {
     }
   };
 
-  const handleDeleteCommonAsset = async (id: number) => {
-    if (confirm("¿Estás seguro de que quieres eliminar este bien común?")) {
-      try {
-        await deleteCommonAsset(id);
-        toast({
-          title: "Éxito",
-          description: "Bien común eliminado correctamente.",
-        });
-        fetchCommonAssets();
-      } catch (error) {
-        console.error("Error deleting common asset:", error);
-        toast({
-          title: "Error",
-          description: "Error al eliminar el bien común.",
-          variant: "destructive",
-        });
-      }
+  const handleDeleteCommonAsset = (id: number) => {
+    setCommonAssetToDelete(id);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteCommonAsset = async () => {
+    if (commonAssetToDelete === null) return;
+    try {
+      await deleteCommonAsset(commonAssetToDelete);
+      toast({
+        title: "Éxito",
+        description: "Bien común eliminado correctamente.",
+      });
+      fetchCommonAssets();
+    } catch (error) {
+      console.error("Error deleting common asset:", error);
+      toast({
+        title: "Error",
+        description: "Error al eliminar el bien común.",
+        variant: "destructive",
+      });
+    } finally {
+      setShowDeleteDialog(false);
+      setCommonAssetToDelete(null);
     }
   };
 
@@ -281,9 +301,7 @@ export default function CommonAssetsPage() {
           </DialogHeader>
           <form onSubmit={handleSubmit} className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Nombre
-              </Label>
+              <Label htmlFor="name">Nombre</Label>
               <Input
                 id="name"
                 name="name"
@@ -294,9 +312,7 @@ export default function CommonAssetsPage() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-right">
-                Descripción
-              </Label>
+              <Label htmlFor="description">Descripción</Label>
               <Input
                 id="description"
                 name="description"
@@ -306,9 +322,7 @@ export default function CommonAssetsPage() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="location" className="text-right">
-                Ubicación
-              </Label>
+              <Label htmlFor="location">Ubicación</Label>
               <Input
                 id="location"
                 name="location"
@@ -319,9 +333,7 @@ export default function CommonAssetsPage() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="assetType" className="text-right">
-                Tipo de Activo
-              </Label>
+              <Label htmlFor="assetType">Tipo de Activo</Label>
               <Input
                 id="assetType"
                 name="assetType"
@@ -332,9 +344,7 @@ export default function CommonAssetsPage() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="purchaseDate" className="text-right">
-                Fecha de Compra
-              </Label>
+              <Label htmlFor="purchaseDate">Fecha de Compra</Label>
               <Input
                 id="purchaseDate"
                 name="purchaseDate"
@@ -345,9 +355,7 @@ export default function CommonAssetsPage() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="value" className="text-right">
-                Valor
-              </Label>
+              <Label htmlFor="value">Valor</Label>
               <Input
                 id="value"
                 name="value"
@@ -365,7 +373,7 @@ export default function CommonAssetsPage() {
                 checked={formData.isActive}
                 onChange={handleCheckboxChange}
               />
-              <Label htmlFor="isActive">Activo</Label>
+              <Label htmlFor="isActive">Activa</Label>
             </div>
             <DialogFooter>
               <Button type="submit">
@@ -375,6 +383,23 @@ export default function CommonAssetsPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Eliminación</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Estás seguro de que quieres eliminar este bien común? Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteCommonAsset}>
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

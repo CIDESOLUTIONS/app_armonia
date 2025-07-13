@@ -24,6 +24,17 @@ import {
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   getProperties,
   createProperty,
   updateProperty,
@@ -159,23 +170,33 @@ export default function PropertiesPage() {
     }
   };
 
-  const handleDeleteProperty = async (id: number) => {
-    if (confirm("¿Estás seguro de que quieres eliminar esta propiedad?")) {
-      try {
-        await deleteProperty(id);
-        toast({
-          title: "Éxito",
-          description: "Propiedad eliminada correctamente.",
-        });
-        fetchProperties();
-      } catch (error) {
-        console.error("Error deleting property:", error);
-        toast({
-          title: "Error",
-          description: "Error al eliminar la propiedad.",
-          variant: "destructive",
-        });
-      }
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [propertyToDelete, setPropertyToDelete] = useState<number | null>(null);
+
+  const handleDeleteProperty = (id: number) => {
+    setPropertyToDelete(id);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteProperty = async () => {
+    if (propertyToDelete === null) return;
+    try {
+      await deleteProperty(propertyToDelete);
+      toast({
+        title: "Éxito",
+        description: "Propiedad eliminada correctamente.",
+      });
+      fetchProperties();
+    } catch (error) {
+      console.error("Error deleting property:", error);
+      toast({
+        title: "Error",
+        description: "Error al eliminar la propiedad.",
+        variant: "destructive",
+      });
+    } finally {
+      setShowDeleteDialog(false);
+      setPropertyToDelete(null);
     }
   };
 
@@ -386,6 +407,23 @@ export default function PropertiesPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Eliminación</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Estás seguro de que quieres eliminar esta propiedad? Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteProperty}>
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
