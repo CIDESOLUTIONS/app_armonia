@@ -21,6 +21,12 @@ export async function GET(req: Request) {
     const now = new Date();
     const twelveMonthsAgo = startOfMonth(subMonths(now, 11));
 
+    const now = new Date();
+    const startOfCurrentMonth = startOfMonth(now);
+    const startOfLastMonth = startOfMonth(subMonths(now, 1));
+    const twelveMonthsAgo = startOfMonth(subMonths(now, 11));
+    const thirtyDaysFromNow = addDays(now, 30); // For upcoming assemblies
+
     const [kpis, revenueTrendData, pqrTrendData] =
       await tenantPrisma.$transaction([
         tenantPrisma.$queryRaw`
@@ -28,8 +34,11 @@ export async function GET(req: Request) {
           (SELECT COUNT(*) FROM "Property")::int AS "totalProperties",
           (SELECT COUNT(*) FROM "Resident")::int AS "totalResidents",
           (SELECT COUNT(*) FROM "PQR" WHERE status IN ('OPEN', 'IN_PROGRESS'))::int AS "pendingPQRs",
-          (SELECT SUM(amount) FROM "Payment" WHERE status = 'COMPLETED' AND "createdAt" >= ${startOfMonth(now)})::float AS "totalRevenue",
-          (SELECT COUNT(*) FROM "Assembly" WHERE date >= NOW())::int AS "upcomingAssemblies"
+          (SELECT COUNT(*) FROM "PQR" WHERE status IN ('RESOLVED', 'CLOSED'))::int AS "resolvedPQRs", -- Added resolvedPQRs
+          (SELECT SUM(amount) FROM "Payment" WHERE status = 'COMPLETED' AND "createdAt" >= ${startOfCurrentMonth})::float AS "totalRevenue",
+          (SELECT SUM(amount) FROM "Payment" WHERE status = 'COMPLETED' AND "createdAt" >= ${startOfLastMonth} AND "createdAt" < ${startOfCurrentMonth})::float AS "totalRevenueLastMonth", -- Added totalRevenueLastMonth
+          (SELECT COUNT(*) FROM "Assembly" WHERE date >= ${now} AND date <= ${thirtyDaysFromNow})::int AS "upcomingAssemblies", -- Adjusted upcomingAssemblies
+          (SELECT COUNT(*) FROM "Project" WHERE status IN ('IN_PROGRESS', 'PENDING'))::int AS "activeProjects" -- Added activeProjects
       `,
         tenantPrisma.payment.groupBy({
           by: ["createdAt"],
@@ -46,6 +55,16 @@ export async function GET(req: Request) {
       ]);
 
     const formattedKpis = kpis[0] || {};
+
+    // Calculate revenue change percentage
+    const revenueChangePercentage =
+      formattedKpis.totalRevenueLastMonth > 0
+        ? ((formattedKpis.totalRevenue - formattedKpis.totalRevenueLastMonth) /
+            formattedKpis.totalRevenueLastMonth) *
+          100
+        : formattedKpis.totalRevenue > 0
+        ? 100
+        : 0;
 
     const processTrendData = (data: unknown[], valueField: string) => {
       const monthlyData = new Map<string, number>();
@@ -75,6 +94,10 @@ export async function GET(req: Request) {
     const revenueTrend = processTrendData(revenueTrendData, "amount");
     const pqrTrend = processTrendData(pqrTrendData, "_all");
 
+    // Placeholder for commonAreaUsage and budgetExecution
+    const commonAreaUsage = 0; // To be implemented
+    const budgetExecution = 0; // To be implemented
+
     logger.logActivity({
       module: "dashboard",
       action: "fetch_dashboard_data",
@@ -83,7 +106,12 @@ export async function GET(req: Request) {
 
     return NextResponse.json(
       {
-        stats: formattedKpis,
+        stats: {
+          ...formattedKpis,
+          commonAreaUsage,
+          budgetExecution,
+          revenueChangePercentage: revenueChangePercentage.toFixed(2),
+        },
         revenueTrend,
         pqrTrend,
       },

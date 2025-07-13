@@ -38,6 +38,7 @@ interface DashboardStats {
   commonAreaUsage: number;
   budgetExecution: number;
   activeProjects: number;
+  revenueChangePercentage: number; // New field
   revenueTrend: { month: string; value: number }[];
   commonAreaUsageTrend: { month: string; value: number }[];
 }
@@ -91,10 +92,12 @@ export function AdminDashboardContent() {
     }
   };
 
+  const { currency } = useCurrencyStore();
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-CO", {
       style: "currency",
-      currency: "COP",
+      currency: currency,
       minimumFractionDigits: 0,
     }).format(amount);
   };
@@ -257,8 +260,9 @@ export function AdminDashboardContent() {
             <div className="text-2xl font-bold text-green-600">
               {formatCurrency(stats.totalRevenue)}
             </div>
-            <p className="text-xs text-muted-foreground">
-              +12% vs mes anterior
+            <p className={`text-xs ${stats.revenueChangePercentage >= 0 ? "text-green-600" : "text-red-600"}`}>
+              {stats.revenueChangePercentage >= 0 ? <TrendingUp className="inline h-3 w-3 mr-1" /> : <TrendingDown className="inline h-3 w-3 mr-1" />}
+              {stats.revenueChangePercentage}% vs mes anterior
             </p>
           </CardContent>
         </Card>
