@@ -744,3 +744,14 @@ model PackageReport {
   
   
 }
+
+model LoginHistory {
+  id        Int      @id @default(autoincrement())
+  userId    Int?     // Optional, for failed attempts by non-existent users
+  email     String?  // Email of the login attempt
+  timestamp DateTime @default(now())
+  ipAddress String?
+  userAgent String?
+  status    String   // "SUCCESS" o "FAILED"
+  reason    String?  // Reason for failed login (e.g., "User not found", "Incorrect password")
+}
