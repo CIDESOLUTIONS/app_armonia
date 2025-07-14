@@ -36,7 +36,7 @@ interface UpdateAmenityData {
 
 export async function getAmenities(): Promise<Amenity[]> {
   try {
-    const response = await fetchApi("/api/inventory/amenities");
+    const response = await fetchApi("/inventory/amenities");
     return response;
   } catch (error) {
     console.error("Error fetching amenities:", error);
@@ -46,7 +46,7 @@ export async function getAmenities(): Promise<Amenity[]> {
 
 export async function createAmenity(data: CreateAmenityData): Promise<Amenity> {
   try {
-    const response = await fetchApi("/api/inventory/amenities", {
+    const response = await fetchApi("/inventory/amenities", {
       method: "POST",
       body: JSON.stringify(data),
     });
@@ -62,9 +62,9 @@ export async function updateAmenity(
   data: UpdateAmenityData,
 ): Promise<Amenity> {
   try {
-    const response = await fetchApi("/api/inventory/amenities", {
+    const response = await fetchApi(`/inventory/amenities/${id}`, {
       method: "PUT",
-      body: JSON.stringify({ id, ...data }),
+      body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
@@ -75,7 +75,7 @@ export async function updateAmenity(
 
 export async function deleteAmenity(id: number): Promise<void> {
   try {
-    await fetchApi(`/api/services/${id}`, {
+    await fetchApi(`/inventory/amenities/${id}`, {
       method: "DELETE",
     });
   } catch (error) {

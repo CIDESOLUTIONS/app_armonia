@@ -90,7 +90,7 @@ export default function LoginPage() {
 
     if (!formData.email || !formData.password) {
       setError(
-        language === "Español"
+        _language === "Español"
           ? "Por favor, completa todos los campos."
           : "Please fill in all fields.",
       );
@@ -105,11 +105,18 @@ export default function LoginPage() {
         formData.email,
       );
 
-      await login(formData.email, formData.password);
+      // Hardcode complexId y schemaName por ahora
+      const complexId = 1; // ID de ejemplo
+      const schemaName = "tenant_cj0001"; // Nombre de esquema de ejemplo
+
+      await login(formData.email, formData.password, complexId, schemaName); // Pasar complexId y schemaName
+
+      // Redirigir después del inicio de sesión exitoso
+      router.push(portalInfo.redirectTo);
     } catch (err: unknown) {
       console.error("[LoginPage] Error de autenticación:", err);
       setError(
-        language === "Español"
+        _language === "Español"
           ? "Credenciales inválidas. Por favor, verifica tu email y contraseña."
           : "Invalid credentials. Please verify your email and password.",
       );
@@ -120,8 +127,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-md">
-        <div className="mb-4 flex">
+      <div className="mb-4 flex">
           <Button
             variant="ghost"
             onClick={() => router.push(ROUTES.PORTAL_SELECTOR)}
@@ -144,7 +150,7 @@ export default function LoginPage() {
           <div className="p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <FormField
-                label={language === "Español" ? "Email" : "Email"}
+                label={_language === "Español" ? "Email" : "Email"}
                 id="email"
                 name="email"
                 type="email"
@@ -155,14 +161,14 @@ export default function LoginPage() {
                 required
                 disabled={loading}
                 placeholder={
-                  language === "Español"
+                  _language === "Español"
                     ? "Tu correo electrónico"
                     : "Your email"
                 }
               />
 
               <FormField
-                label={language === "Español" ? "Contraseña" : "Password"}
+                label={_language === "Español" ? "Contraseña" : "Password"}
                 id="password"
                 name="password"
                 type="password"
@@ -173,7 +179,7 @@ export default function LoginPage() {
                 required
                 disabled={loading}
                 placeholder={
-                  language === "Español" ? "Tu contraseña" : "Your password"
+                  _language === "Español" ? "Tu contraseña" : "Your password"
                 }
               />
 
@@ -190,10 +196,10 @@ export default function LoginPage() {
                 disabled={loading}
               >
                 {loading
-                  ? language === "Español"
+                  ? _language === "Español"
                     ? "Iniciando sesión..."
                     : "Logging in..."
-                  : language === "Español"
+                  : _language === "Español"
                     ? "Iniciar Sesión"
                     : "Log In"}
               </Button>
@@ -205,7 +211,7 @@ export default function LoginPage() {
                   onClick={() => router.push(ROUTES.HOME)}
                   className={`${portalInfo.textColor}`}
                 >
-                  {language === "Español" ? "Volver al inicio" : "Back to home"}
+                  {_language === "Español" ? "Volver al inicio" : "Back to home"}
                 </Button>
               </div>
             </form>

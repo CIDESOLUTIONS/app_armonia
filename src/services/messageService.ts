@@ -1,13 +1,18 @@
-export async function sendMessage(data: {
+import { fetchApi } from "@/lib/api";
+
+interface MessageData {
   recipient: string;
   messageContent: string;
-}): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      console.log(
-        `Simulating message sent to ${data.recipient}: ${data.messageContent}`,
-      );
-      resolve();
-    }, 1000);
-  });
+}
+
+export async function sendMessage(data: MessageData): Promise<void> {
+  try {
+    await fetchApi("/communications/messages", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  } catch (error) {
+    console.error("Error sending message:", error);
+    throw error;
+  }
 }

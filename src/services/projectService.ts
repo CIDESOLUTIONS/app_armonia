@@ -47,7 +47,7 @@ export async function getProjects(
     if (params?.status) query.append("status", params.status);
     if (params?.search) query.append("search", params.search);
 
-    const response = await fetchApi(`/api/projects?${query.toString()}`);
+    const response = await fetchApi(`/projects?${query.toString()}`);
     return response;
   } catch (error) {
     console.error("Error fetching projects:", error);
@@ -57,7 +57,7 @@ export async function getProjects(
 
 export async function createProject(data: CreateProjectData): Promise<Project> {
   try {
-    const response = await fetchApi("/api/projects", {
+    const response = await fetchApi("/projects", {
       method: "POST",
       body: JSON.stringify(data),
     });
@@ -70,7 +70,7 @@ export async function createProject(data: CreateProjectData): Promise<Project> {
 
 export async function updateProject(data: UpdateProjectData): Promise<Project> {
   try {
-    const response = await fetchApi("/api/projects", {
+    const response = await fetchApi(`/projects/${data.id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     });
@@ -83,9 +83,8 @@ export async function updateProject(data: UpdateProjectData): Promise<Project> {
 
 export async function deleteProject(id: number): Promise<void> {
   try {
-    await fetchApi("/api/projects", {
+    await fetchApi(`/projects/${id}`, {
       method: "DELETE",
-      body: JSON.stringify({ id }),
     });
   } catch (error) {
     console.error("Error deleting project:", error);

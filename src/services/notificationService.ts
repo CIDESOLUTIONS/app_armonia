@@ -11,7 +11,7 @@ export async function sendNotification(
   data: SendNotificationData,
 ): Promise<any> {
   try {
-    const response = await fetchApi("/api/communications/notifications/send", {
+    const response = await fetchApi("/communications/notifications/send", {
       method: "POST",
       body: JSON.stringify(data),
     });
