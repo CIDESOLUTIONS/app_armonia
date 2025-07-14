@@ -610,3 +610,69 @@ plan de acción para las pruebas será el siguiente:
 
 
 
+en el chat de Vicky pro. (mañana es el primero en enviar)
+
+Interacciones solo en español. Actúas como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas (Clean Code, SOLID, TDD, CI/CD, etc.). Estás ubicado en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales se encuentran en la carpeta docs. Tu tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto. A partir de esa comparación, debes generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre lo especificado y lo implementado; e identificación de funcionalidades faltantes, incompletas o que deban ajustarse. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. en tu última iteración de auditoria encontraste estas correcciones para realizar, 
+Lista de Tareas Priorizada auditoria proyecto Armonía: 
+A continuación, se presenta el listado de tareas de desarrollo, ordenado por prioridad decreciente (P0 a P3), para completar el proyecto "Armonía"
+Prioridad P0 (Crítica - Iniciar Inmediatamente)
+1.	Corregir Configuración de TypeScript:
+	En el archivo tsconfig.json, modifica la opción "noImplicitAny": false a "noImplicitAny": true.
+	Resuelve todos los errores de tipado que surjan en el código como resultado de este cambio para garantizar un tipado estricto.
+2.	Desarrollar API para Gestión de Tenants (SAAS):
+	Crea las rutas de API en src/app/api/ necesarias para administrar los conjuntos residenciales (tenants).
+	Implementa los endpoints para:
+■	Crear un nuevo tenant (conjunto), lo que debe incluir la creación de su esquema de base de datos (tenant_cjXXXX).
+■	Listar todos los tenants existentes.
+■	Obtener los detalles de un tenant específico.
+■	Actualizar la información de un tenant.
+3.	Desarrollar Interfaz de Administración de Tenants (SAAS):
+	En el portal de Administrador de la Aplicación (src/app/(admin)/(app-admin)/), crea una nueva página para la gestión de conjuntos.
+	Implementa una tabla que liste los tenants existentes, consumiendo el endpoint del paso anterior.
+	Crea un formulario para registrar nuevos conjuntos y para editar los existentes.
+4.	Implementar Lógica de Planes y Suscripciones (SAAS):
+	Modifica el modelo de datos (prisma.schema) para asociar cada Tenant (Conjunto) con un plan (Básico, Estándar, Premium).
+	Crea un servicio de backend que verifique el plan de un tenant y aplique las limitaciones correspondientes (ej. número máximo de propiedades, acceso a funcionalidades).
+	Integra esta lógica en el middleware.ts para restringir el acceso a funcionalidades premium si el tenant no tiene el plan adecuado.
+Prioridad P1 (Alta)
+5.	Finalizar Integración de Citofonía Virtual:
+	Desarrolla el servicio de backend en src/lib/communications/ que contenga la lógica para enviar notificaciones a través de WhatsApp (Twilio) y/o Telegram.
+	Integra este servicio en el portal de Recepción/Vigilancia para que, desde la interfaz, se pueda activar la citofonía para un visitante registrado.
+6.	Finalizar Integración de Cámaras IP:
+	Implementa un servicio en el backend (src/services/cameraService.ts) que utilice node-onvif para descubrir y obtener el stream de cámaras IP.
+	En el portal de Seguridad (/security/cameras/page.tsx), crea los componentes de React necesarios para mostrar el stream de video de las cámaras configuradas.
+7.	Crear Pruebas Unitarias (Jest):
+	Desarrolla pruebas unitarias para todos los servicios críticos de la carpeta src/services/, enfocándote en la lógica de negocio de finanzas, asambleas y seguridad.
+	Asegura una cobertura de pruebas de al menos el 80% para estos servicios críticos.
+8.	Crear Pruebas End-to-End (Playwright):
+	Desarrolla scripts de prueba E2E que simulen los flujos de usuario más importantes:
+■	Registro de un nuevo conjunto.
+■	Login de un administrador y creación de una propiedad.
+■	Login de un residente y pago de una cuota de administración.
+■	Login de un vigilante y registro de un visitante.
+9.	Configurar Pipeline de CI/CD:
+	Edita los archivos de GitHub Actions (.github/workflows/) para crear un pipeline que se ejecute en cada push a la rama principal.
+	El pipeline debe ejecutar: linting, pruebas unitarias y pruebas E2E. El build del proyecto debe fallar si alguna de estas etapas no se completa con éxito.
+10.	Auditoría y Hardening de Seguridad:
+	Revisa todas las API Routes en src/app/api/ y asegúrate de que cada una valide los datos de entrada (payload) usando los esquemas de Zod correspondientes.
+	Verifica que todas las operaciones de base de datos que reciben parámetros del cliente estén protegidas contra inyecciones SQL (Prisma ayuda, pero la validación es clave).
+Prioridad P2 (Media)
+11.	Implementar Minuta Digital:
+	Crea el modelo de datos en prisma.schema para la "Minuta Digital", que debe incluir campos como timestamp, author, novedad, etc.
+	Desarrolla la API y los componentes del frontend en el portal de Recepción para registrar y consultar las novedades del día.
+12.	Implementar Blog Funcional:
+	Crea un modelo en prisma.schema para las entradas del Blog (Post).
+	Desarrolla las API Routes para obtener la lista de posts y un post individual por su slug.
+	Crea las páginas dinámicas en src/app/blog/[slug]/page.tsx para mostrar el contenido de cada post.
+13.	Implementar Firma Digital de Actas:
+	Integra la librería pdf-lib en el backend para permitir la adición de una imagen (firma) a un documento PDF (acta de asamblea) existente.
+	Crea la interfaz en el portal de Administrador para subir una imagen de firma y aplicarla a un acta generada.
+Prioridad P3 (Baja)
+14.	Unificar Librerías de Generación de PDF:
+	Evalúa jspdf y pdf-lib. Selecciona una como la librería estándar para la generación de PDFs en todo el proyecto.
+	Refactoriza el código existente para usar únicamente la librería seleccionada, eliminando la otra de las dependencias en package.json.
+15.	Implementar Directorio de Residentes:
+	Crea un componente en el portal de Residente que muestre una lista de los residentes del conjunto.
+	Añade una opción en la configuración del conjunto (Portal de Administrador) para habilitar o deshabilitar la visibilidad de este directorio, considerando la privacidad de los datos.
+
+
