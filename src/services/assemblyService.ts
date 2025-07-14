@@ -139,7 +139,10 @@ export async function getVotingResults(
     );
     return response;
   } catch (error) {
-    console.error(`Error fetching voting results for assembly ${assemblyId}:`, error);
+    console.error(
+      `Error fetching voting results for assembly ${assemblyId}:`,
+      error,
+    );
     throw error;
   }
 }

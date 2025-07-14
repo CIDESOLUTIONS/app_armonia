@@ -19,7 +19,9 @@ export async function getProfileInfo(): Promise<UserProfile> {
   }
 }
 
-export async function updateProfileInfo(data: Partial<UserProfile>): Promise<UserProfile> {
+export async function updateProfileInfo(
+  data: Partial<UserProfile>,
+): Promise<UserProfile> {
   try {
     const response = await fetchApi("/api/profile", {
       method: "PUT",

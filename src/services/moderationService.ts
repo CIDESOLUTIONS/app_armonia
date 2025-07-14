@@ -1,4 +1,3 @@
-
 import { prisma } from "@/lib/prisma";
 
 export async function getReportedListings() {
@@ -30,7 +29,10 @@ export async function getReportedListings() {
   }
 }
 
-export async function resolveReport(reportId: number, action: "APPROVE" | "REJECT") {
+export async function resolveReport(
+  reportId: number,
+  action: "APPROVE" | "REJECT",
+) {
   try {
     if (action === "REJECT") {
       // Si se rechaza el reporte, se elimina el reporte y el anuncio permanece

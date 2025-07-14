@@ -18,7 +18,9 @@ export async function getModulePermissions(): Promise<ModulePermission[]> {
   }
 }
 
-export async function updateModulePermissions(data: ModulePermission[]): Promise<ModulePermission[]> {
+export async function updateModulePermissions(
+  data: ModulePermission[],
+): Promise<ModulePermission[]> {
   try {
     const response = await fetchApi("/api/settings/modules-permissions", {
       method: "PUT",

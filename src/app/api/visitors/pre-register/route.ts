@@ -7,7 +7,10 @@ export async function POST(req: NextRequest) {
     const data = await req.json();
 
     // Generar un código de acceso único
-    const accessCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+    const accessCode = Math.random()
+      .toString(36)
+      .substring(2, 10)
+      .toUpperCase();
 
     // Crear el registro del visitante pre-registrado
     const newVisitor = await prisma.preRegisteredVisitor.create({

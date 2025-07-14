@@ -6,7 +6,10 @@ import { Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { getModulePermissions, updateModulePermissions } from "@/services/modulePermissionService";
+import {
+  getModulePermissions,
+  updateModulePermissions,
+} from "@/services/modulePermissionService";
 
 interface ModuleConfig {
   id: string;
@@ -31,7 +34,8 @@ export default function ModulesPermissionsPage() {
       console.error("Error fetching module permissions:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar la configuración de módulos y permisos.",
+        description:
+          "No se pudo cargar la configuración de módulos y permisos.",
         variant: "destructive",
       });
     } finally {

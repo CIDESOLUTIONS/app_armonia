@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAuth } from "@/lib/auth";
 import { getTenantPrismaClient } from "@/lib/prisma";
@@ -61,7 +60,8 @@ export async function GET(
     }
 
     // Calcular resultados
-    const results: { [key: string]: { count: number; coefficient: number } } = {};
+    const results: { [key: string]: { count: number; coefficient: number } } =
+      {};
     const options = voting.options as string[]; // Asumiendo que options es un array de strings
 
     options.forEach((option) => {

@@ -153,9 +153,7 @@ export default function AssembliesPage() {
                 <TableRow key={assembly.id}>
                   <TableCell>{assembly.title}</TableCell>
                   <TableCell>
-                    {new Date(
-                      assembly.scheduledDate,
-                    ).toLocaleDateString()}
+                    {new Date(assembly.scheduledDate).toLocaleDateString()}
                   </TableCell>
                   <TableCell>{assembly.location}</TableCell>
                   <TableCell>
@@ -213,7 +211,8 @@ export default function AssembliesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Eliminación</AlertDialogTitle>
             <AlertDialogDescription>
-              ¿Estás seguro de que quieres eliminar esta asamblea? Esta acción no se puede deshacer.
+              ¿Estás seguro de que quieres eliminar esta asamblea? Esta acción
+              no se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -227,4 +226,3 @@ export default function AssembliesPage() {
     </div>
   );
 }
-

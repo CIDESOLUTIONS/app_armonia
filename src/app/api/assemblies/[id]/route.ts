@@ -5,7 +5,10 @@ import { ServerLogger } from "@/lib/logging/server-logger";
 import { z } from "zod";
 import { UpdateAssemblySchema } from "@/validators/assemblies/assemblies.validator";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
     const { auth, payload } = await verifyAuth(request);
     if (!auth || !payload) {
@@ -28,7 +31,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
     const assemblyId = parseInt(params.id);
     if (isNaN(assemblyId)) {
-      return NextResponse.json({ message: "ID de asamblea inválido" }, { status: 400 });
+      return NextResponse.json(
+        { message: "ID de asamblea inválido" },
+        { status: 400 },
+      );
     }
 
     const tenantPrisma = getTenantPrismaClient(payload.schemaName);
@@ -37,7 +43,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     });
 
     if (!assembly) {
-      return NextResponse.json({ message: "Asamblea no encontrada" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Asamblea no encontrada" },
+        { status: 404 },
+      );
     }
 
     ServerLogger.info(
@@ -50,7 +59,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
     const { auth, payload } = await verifyAuth(request);
     if (!auth || !payload) {
@@ -73,7 +85,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     const assemblyId = parseInt(params.id);
     if (isNaN(assemblyId)) {
-      return NextResponse.json({ message: "ID de asamblea inválido" }, { status: 400 });
+      return NextResponse.json(
+        { message: "ID de asamblea inválido" },
+        { status: 400 },
+      );
     }
 
     const body = await request.json();
@@ -101,7 +116,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
     const { auth, payload } = await verifyAuth(request);
     if (!auth || !payload) {
@@ -124,7 +142,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     const assemblyId = parseInt(params.id);
     if (isNaN(assemblyId)) {
-      return NextResponse.json({ message: "ID de asamblea inválido" }, { status: 400 });
+      return NextResponse.json(
+        { message: "ID de asamblea inválido" },
+        { status: 400 },
+      );
     }
 
     const tenantPrisma = getTenantPrismaClient(payload.schemaName);
@@ -135,7 +156,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     ServerLogger.info(
       `Asamblea ${assemblyId} eliminada para el complejo ${payload.complexId}`,
     );
-    return NextResponse.json({ message: "Asamblea eliminada exitosamente" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Asamblea eliminada exitosamente" },
+      { status: 200 },
+    );
   } catch (error) {
     ServerLogger.error(`Error al eliminar asamblea ${params.id}:`, error);
     return NextResponse.json({ message: "Error interno" }, { status: 500 });

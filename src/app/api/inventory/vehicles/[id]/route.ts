@@ -15,7 +15,10 @@ const VehicleSchema = z.object({
   isActive: z.boolean().default(true),
 });
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
     const authResult = await authMiddleware(request, [
       "ADMIN",
@@ -28,7 +31,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     const vehicleId = parseInt(params.id);
     if (isNaN(vehicleId)) {
-      return NextResponse.json({ message: "ID de vehículo inválido" }, { status: 400 });
+      return NextResponse.json(
+        { message: "ID de vehículo inválido" },
+        { status: 400 },
+      );
     }
 
     const body = await request.json();
@@ -56,7 +62,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
     const authResult = await authMiddleware(request, [
       "ADMIN",
@@ -69,7 +78,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     const vehicleId = parseInt(params.id);
     if (isNaN(vehicleId)) {
-      return NextResponse.json({ message: "ID de vehículo inválido" }, { status: 400 });
+      return NextResponse.json(
+        { message: "ID de vehículo inválido" },
+        { status: 400 },
+      );
     }
 
     const tenantPrisma = getTenantPrismaClient(payload.schemaName);
@@ -80,7 +92,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     ServerLogger.info(
       `Vehículo ${vehicleId} eliminado para el complejo ${payload.complexId}`,
     );
-    return NextResponse.json({ message: "Vehículo eliminado exitosamente" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Vehículo eliminado exitosamente" },
+      { status: 200 },
+    );
   } catch (error) {
     ServerLogger.error(`Error al eliminar vehículo ${params.id}:`, error);
     return NextResponse.json({ message: "Error interno" }, { status: 500 });

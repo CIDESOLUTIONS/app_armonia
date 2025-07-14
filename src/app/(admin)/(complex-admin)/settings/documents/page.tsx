@@ -16,7 +16,10 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { documentSchema, DocumentFormValues } from "@/validators/document-schema";
+import {
+  documentSchema,
+  DocumentFormValues,
+} from "@/validators/document-schema";
 import {
   Form,
   FormControl,
@@ -25,7 +28,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { getDocuments, uploadDocument, deleteDocument } from "@/services/documentService";
+import {
+  getDocuments,
+  uploadDocument,
+  deleteDocument,
+} from "@/services/documentService";
 
 interface Document {
   id: number;
@@ -51,7 +58,12 @@ export default function DocumentsSettingsPage() {
     },
   });
 
-  const { handleSubmit, control, reset, formState: { isSubmitting } } = form;
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { isSubmitting },
+  } = form;
 
   const fetchDocuments = useCallback(async () => {
     setLoading(true);
@@ -150,7 +162,10 @@ export default function DocumentsSettingsPage() {
       <div className="bg-white shadow-md rounded-lg p-6 mb-8">
         <h2 className="text-xl font-semibold mb-4">Subir Nuevo Documento</h2>
         <Form {...form}>
-          <form onSubmit={handleSubmit(handleUploadDocument)} className="grid gap-4 md:grid-cols-2">
+          <form
+            onSubmit={handleSubmit(handleUploadDocument)}
+            className="grid gap-4 md:grid-cols-2"
+          >
             <FormField
               control={control}
               name="name"
@@ -174,7 +189,9 @@ export default function DocumentsSettingsPage() {
                     <Input
                       {...fieldProps}
                       type="file"
-                      onChange={(event) => onChange(event.target.files && event.target.files[0])}
+                      onChange={(event) =>
+                        onChange(event.target.files && event.target.files[0])
+                      }
                     />
                   </FormControl>
                   <FormMessage />

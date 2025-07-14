@@ -41,7 +41,8 @@ export async function GET(request: NextRequest) {
       where: { status: "PENDING" }, // Asumiendo un estado para cuotas pendientes
     });
 
-    const saldoActual = (totalIngresos._sum.amount || 0) - (totalEgresos._sum.amount || 0);
+    const saldoActual =
+      (totalIngresos._sum.amount || 0) - (totalEgresos._sum.amount || 0);
 
     ServerLogger.info(
       `Resumen financiero obtenido para el complejo ${payload.complexId}`,

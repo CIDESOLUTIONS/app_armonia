@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from "react";
@@ -25,7 +24,9 @@ import { useAuthStore } from "@/store/authStore";
 
 const formSchema = z.object({
   title: z.string().min(5, "El título debe tener al menos 5 caracteres."),
-  description: z.string().min(20, "La descripción debe tener al menos 20 caracteres."),
+  description: z
+    .string()
+    .min(20, "La descripción debe tener al menos 20 caracteres."),
   price: z.preprocess(
     (val) => Number(val),
     z.number().positive("El precio debe ser un número positivo."),
@@ -53,7 +54,10 @@ export default function CreateListingPage() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!user?.id) {
-      toast({ title: "Error", description: "Debes iniciar sesión para publicar un anuncio." });
+      toast({
+        title: "Error",
+        description: "Debes iniciar sesión para publicar un anuncio.",
+      });
       return;
     }
 
@@ -83,7 +87,9 @@ export default function CreateListingPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Publicar Nuevo Anuncio</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        Publicar Nuevo Anuncio
+      </h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
@@ -106,7 +112,11 @@ export default function CreateListingPage() {
               <FormItem>
                 <FormLabel>Descripción</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Describe tu producto o servicio" {...field} rows={5} />
+                  <Textarea
+                    placeholder="Describe tu producto o servicio"
+                    {...field}
+                    rows={5}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -132,7 +142,10 @@ export default function CreateListingPage() {
               <FormItem>
                 <FormLabel>Categoría</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ej: Electrónica, Servicios, Hogar" {...field} />
+                  <Input
+                    placeholder="Ej: Electrónica, Servicios, Hogar"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

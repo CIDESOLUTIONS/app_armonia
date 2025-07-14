@@ -60,7 +60,10 @@ export default function LoginForm() {
           Iniciar Sesión
         </h2>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 space-y-6">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="mt-8 space-y-6"
+          >
             <FormField
               control={form.control}
               name="email"

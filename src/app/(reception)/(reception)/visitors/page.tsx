@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -84,7 +90,9 @@ export default function ReceptionVisitorsPage() {
   const _router = useRouter();
   const [loading, setLoading] = useState(true);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
-  const [preRegisteredVisitors, setPreRegisteredVisitors] = useState<PreRegisteredVisitor[]>([]);
+  const [preRegisteredVisitors, setPreRegisteredVisitors] = useState<
+    PreRegisteredVisitor[]
+  >([]);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<
     "active" | "departed" | "all"
@@ -160,7 +168,6 @@ export default function ReceptionVisitorsPage() {
 
       const preRegistered = await getPreRegisteredVisitors();
       setPreRegisteredVisitors(preRegistered);
-
     } catch (err: any) {
       console.error("[ReceptionVisitors] Error:", err);
       setError(err.message || "Error al cargar datos de visitantes");
@@ -445,7 +452,9 @@ export default function ReceptionVisitorsPage() {
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Visitantes Pre-registrados</CardTitle>
-          <CardDescription>Visitantes que han sido pre-autorizados por los residentes.</CardDescription>
+          <CardDescription>
+            Visitantes que han sido pre-autorizados por los residentes.
+          </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           {preRegisteredVisitors.length > 0 ? (
@@ -465,7 +474,9 @@ export default function ReceptionVisitorsPage() {
               <TableBody>
                 {preRegisteredVisitors.map((visitor) => (
                   <TableRow key={visitor.id}>
-                    <TableCell className="font-medium">{visitor.name}</TableCell>
+                    <TableCell className="font-medium">
+                      {visitor.name}
+                    </TableCell>
                     <TableCell>{visitor.documentNumber}</TableCell>
                     <TableCell>{visitor.resident.name}</TableCell>
                     <TableCell>{visitor.resident.unit}</TableCell>
@@ -485,8 +496,12 @@ export default function ReceptionVisitorsPage() {
           ) : (
             <div className="text-center py-8 text-gray-500">
               <IdCard className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-lg font-medium mb-2">No hay visitantes pre-registrados</h3>
-              <p>Los residentes pueden pre-registrar visitantes desde su portal.</p>
+              <h3 className="text-lg font-medium mb-2">
+                No hay visitantes pre-registrados
+              </h3>
+              <p>
+                Los residentes pueden pre-registrar visitantes desde su portal.
+              </p>
             </div>
           )}
         </CardContent>
@@ -798,4 +813,3 @@ export default function ReceptionVisitorsPage() {
     </div>
   );
 }
-

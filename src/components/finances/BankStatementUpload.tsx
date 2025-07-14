@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from "react";
@@ -22,7 +21,10 @@ export function BankStatementUpload() {
 
   const handleSubmit = async () => {
     if (!file) {
-      toast({ title: "Error", description: "Por favor, selecciona un archivo." });
+      toast({
+        title: "Error",
+        description: "Por favor, selecciona un archivo.",
+      });
       return;
     }
 
@@ -42,7 +44,10 @@ export function BankStatementUpload() {
 
       const data = await response.json();
       setSuggestions(data);
-      toast({ title: "Éxito", description: "Archivo procesado. Revisa las sugerencias." });
+      toast({
+        title: "Éxito",
+        description: "Archivo procesado. Revisa las sugerencias.",
+      });
     } catch (error) {
       toast({ title: "Error", description: "No se pudo subir el archivo." });
     } finally {

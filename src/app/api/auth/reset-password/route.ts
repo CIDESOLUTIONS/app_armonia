@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
@@ -8,7 +7,9 @@ export async function POST(req: NextRequest) {
     const { token, password } = await req.json();
 
     if (!token || !password) {
-      return new NextResponse("Token y contraseña son requeridos", { status: 400 });
+      return new NextResponse("Token y contraseña son requeridos", {
+        status: 400,
+      });
     }
 
     const hashedToken = Buffer.from(token).toString("base64");
@@ -35,7 +36,10 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ message: "Contraseña actualizada con éxito" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Contraseña actualizada con éxito" },
+      { status: 200 },
+    );
   } catch (error) {
     console.error("[RESET_PASSWORD_ERROR]", error);
     return new NextResponse("Internal Server Error", { status: 500 });

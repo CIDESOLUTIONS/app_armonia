@@ -20,8 +20,10 @@ export async function POST(request: Request) {
     const { name, email, password, schemaName, role } =
       registerSchema.parse(body);
 
-        const publicPrisma = getPublicPrismaClient();
-    const existingUser = await publicPrisma.user.findUnique({ where: { email } });
+    const publicPrisma = getPublicPrismaClient();
+    const existingUser = await publicPrisma.user.findUnique({
+      where: { email },
+    });
     if (existingUser) {
       return NextResponse.json(
         { message: "El usuario ya existe" },
@@ -31,9 +33,10 @@ export async function POST(request: Request) {
 
     let complexId: number | null = null;
     if (schemaName) {
-      const residentialComplex = await publicPrisma.residentialComplex.findUnique({
-        where: { schemaName: schemaName },
-      });
+      const residentialComplex =
+        await publicPrisma.residentialComplex.findUnique({
+          where: { schemaName: schemaName },
+        });
 
       if (!residentialComplex) {
         return NextResponse.json(

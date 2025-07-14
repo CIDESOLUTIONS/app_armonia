@@ -4,6 +4,26 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2, Edit, Trash2, MessageSquare } from "lucide-react";
+import {
+  getPQRById,
+  addPQRComment,
+  updatePQR,
+  assignPQR,
+  deletePQR,
+} from "@/services/pqrService";
+import { getAssignableUsers } from "@/services/userService";
+import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 interface PQR {
   id: number;
@@ -321,7 +341,10 @@ export default function ViewPQRPage() {
                 </SelectTrigger>
                 <SelectContent>
                   {assignableUsers.map((assignee) => (
-                    <SelectItem key={assignee.id} value={assignee.id.toString()}>
+                    <SelectItem
+                      key={assignee.id}
+                      value={assignee.id.toString()}
+                    >
                       {assignee.name} ({assignee.role})
                     </SelectItem>
                   ))}

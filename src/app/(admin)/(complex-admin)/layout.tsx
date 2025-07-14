@@ -4,7 +4,11 @@ import AdminSidebar from "@/components/admin/layout/AdminSidebar";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2 } from "lucide-react";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { user, loading, logout } = useAuthStore();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 

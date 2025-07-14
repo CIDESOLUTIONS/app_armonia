@@ -34,7 +34,10 @@ export async function POST(request: NextRequest) {
     });
 
     if (!existingPQR) {
-      return NextResponse.json({ message: "PQR no encontrada" }, { status: 404 });
+      return NextResponse.json(
+        { message: "PQR no encontrada" },
+        { status: 404 },
+      );
     }
 
     const newComment = await tenantPrisma.pQRComment.create({

@@ -28,7 +28,10 @@ const AmenitySchema = z
     },
   );
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
     const authResult = await authMiddleware(request, [
       "ADMIN",
@@ -41,7 +44,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     const amenityId = parseInt(params.id);
     if (isNaN(amenityId)) {
-      return NextResponse.json({ message: "ID de amenidad inválido" }, { status: 400 });
+      return NextResponse.json(
+        { message: "ID de amenidad inválido" },
+        { status: 400 },
+      );
     }
 
     const body = await request.json();
@@ -69,7 +75,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
     const authResult = await authMiddleware(request, [
       "ADMIN",
@@ -82,7 +91,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     const amenityId = parseInt(params.id);
     if (isNaN(amenityId)) {
-      return NextResponse.json({ message: "ID de amenidad inválido" }, { status: 400 });
+      return NextResponse.json(
+        { message: "ID de amenidad inválido" },
+        { status: 400 },
+      );
     }
 
     const tenantPrisma = getTenantPrismaClient(payload.schemaName);
@@ -93,7 +105,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     ServerLogger.info(
       `Amenidad ${amenityId} eliminada para el complejo ${payload.complexId}`,
     );
-    return NextResponse.json({ message: "Amenidad eliminada exitosamente" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Amenidad eliminada exitosamente" },
+      { status: 200 },
+    );
   } catch (error) {
     ServerLogger.error(`Error al eliminar amenidad ${params.id}:`, error);
     return NextResponse.json({ message: "Error interno" }, { status: 500 });

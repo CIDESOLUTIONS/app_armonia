@@ -279,7 +279,8 @@ export default function PQRListPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Eliminación</AlertDialogTitle>
             <AlertDialogDescription>
-              ¿Estás seguro de que quieres eliminar esta PQR? Esta acción no se puede deshacer.
+              ¿Estás seguro de que quieres eliminar esta PQR? Esta acción no se
+              puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

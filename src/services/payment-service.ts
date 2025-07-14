@@ -6,7 +6,10 @@
 import { PrismaClient } from "@prisma/client";
 import { ServerLogger } from "@/lib/logging/server-logger";
 import { ActivityLogger } from "@/lib/logging/activity-logger";
-import { NotificationService, NotificationData } from "@/lib/notifications/notification-service";
+import {
+  NotificationService,
+  NotificationData,
+} from "@/lib/notifications/notification-service";
 import { generateReceipt } from "@/lib/pdf/receipt-service";
 import { encrypt, decrypt } from "@/lib/security/encryption-service";
 import { TransactionStatus, DiscountType } from "@prisma/client";
@@ -351,7 +354,10 @@ export class PaymentService {
 
       return transaction.paymentUrl;
     } catch (error) {
-      ServerLogger.error(`Error al iniciar el pago de la cuota ${feeId}:`, error);
+      ServerLogger.error(
+        `Error al iniciar el pago de la cuota ${feeId}:`,
+        error,
+      );
       throw new Error("No se pudo iniciar el pago de la cuota.");
     }
   }
@@ -513,9 +519,7 @@ export class PaymentService {
       // Inicializar adaptador con configuración
       const gatewayConfig = {
         apiKey: await decrypt(transaction.gateway.apiKey),
-        apiSecret: await decrypt(
-          transaction.gateway.apiSecret,
-        ),
+        apiSecret: await decrypt(transaction.gateway.apiSecret),
         merchantId: transaction.gateway.merchantId,
         accountId: transaction.gateway.accountId,
         testMode: transaction.gateway.testMode,
@@ -530,7 +534,9 @@ export class PaymentService {
       );
 
       // Determinar estado final
-      const finalStatus = PaymentService.mapGatewayStatus(gatewayResponse.status);
+      const finalStatus = PaymentService.mapGatewayStatus(
+        gatewayResponse.status,
+      );
       const statusChanged = finalStatus !== transaction.status;
       const isCompleted = finalStatus === TransactionStatus.COMPLETED;
 
@@ -560,9 +566,7 @@ export class PaymentService {
           }
 
           // Generar recibo
-          const receipt = await generateReceipt(
-            transaction.id,
-          );
+          const receipt = await generateReceipt(transaction.id);
 
           // Actualizar transacción con recibo
           await this.prisma.transaction.update({
@@ -575,7 +579,12 @@ export class PaymentService {
 
           // Enviar notificación al usuario
           await NotificationService.sendEmail({
-            recipient: (await this.prisma.user.findUnique({ where: { id: transaction.userId } }))?.email || '',
+            recipient:
+              (
+                await this.prisma.user.findUnique({
+                  where: { id: transaction.userId },
+                })
+              )?.email || "",
             subject: "Pago confirmado",
             body: `Su pago por ${transaction.amount} ${transaction.currency} ha sido confirmado.`,
             type: "EMAIL",
@@ -666,7 +675,10 @@ export class PaymentService {
       }
 
       // Extraer estado del payload
-      const gatewayStatus = PaymentService.extractGatewayStatus(gateway.name, payload);
+      const gatewayStatus = PaymentService.extractGatewayStatus(
+        gateway.name,
+        payload,
+      );
       const newStatus = PaymentService.mapGatewayStatus(gatewayStatus);
 
       // Actualizar transacción
@@ -739,9 +751,7 @@ export class PaymentService {
       // Inicializar adaptador con configuración
       const gatewayConfig = {
         apiKey: await decrypt(transaction.gateway.apiKey),
-        apiSecret: await decrypt(
-          transaction.gateway.apiSecret,
-        ),
+        apiSecret: await decrypt(transaction.gateway.apiSecret),
         merchantId: transaction.gateway.merchantId,
         accountId: transaction.gateway.accountId,
         testMode: transaction.gateway.testMode,
@@ -789,7 +799,12 @@ export class PaymentService {
 
       // Enviar notificación al usuario
       await NotificationService.sendEmail({
-        recipient: (await this.prisma.user.findUnique({ where: { id: transaction.userId } }))?.email || '',
+        recipient:
+          (
+            await this.prisma.user.findUnique({
+              where: { id: transaction.userId },
+            })
+          )?.email || "",
         subject: "Reembolso procesado",
         body: `Su pago por ${refundAmount} ${transaction.currency} ha sido reembolsado.`,
         type: "EMAIL",
@@ -937,10 +952,7 @@ export class PaymentService {
   /**
    * Elimina un token de pago
    */
-  async deletePaymentToken(
-    tokenId: string,
-    userId: number,
-  ): Promise<any> {
+  async deletePaymentToken(tokenId: string, userId: number): Promise<any> {
     try {
       // Verificar que el token pertenece al usuario
       const token = await this.prisma.paymentToken.findFirst({
@@ -987,9 +999,7 @@ export class PaymentService {
     try {
       // Encriptar credenciales
       const encryptedApiKey = await encrypt(data.apiKey);
-      const encryptedApiSecret = await encrypt(
-        data.apiSecret,
-      );
+      const encryptedApiSecret = await encrypt(data.apiSecret);
 
       // Buscar si ya existe la pasarela
       const existingGateway = await this.prisma.paymentGateway.findFirst({

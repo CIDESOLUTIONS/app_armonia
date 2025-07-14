@@ -135,7 +135,12 @@ export default function EditPQRPage() {
     );
   }
 
-  if (!user || (user.role !== "ADMIN" && user.role !== "COMPLEX_ADMIN" && user.role !== "STAFF")) {
+  if (
+    !user ||
+    (user.role !== "ADMIN" &&
+      user.role !== "COMPLEX_ADMIN" &&
+      user.role !== "STAFF")
+  ) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

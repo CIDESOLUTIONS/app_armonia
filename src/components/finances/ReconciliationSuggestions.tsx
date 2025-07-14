@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from "react";
@@ -30,7 +29,9 @@ export function ReconciliationSuggestions({ suggestions }: Props) {
 
   return (
     <div className="mt-8">
-      <h3 className="text-lg font-semibold mb-4">Sugerencias de Conciliación</h3>
+      <h3 className="text-lg font-semibold mb-4">
+        Sugerencias de Conciliación
+      </h3>
       <Table>
         <TableHeader>
           <TableRow>

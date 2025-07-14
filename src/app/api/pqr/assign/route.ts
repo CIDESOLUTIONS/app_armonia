@@ -41,7 +41,10 @@ export async function PUT(request: NextRequest) {
     });
 
     if (!existingPQR) {
-      return NextResponse.json({ message: "PQR no encontrada" }, { status: 404 });
+      return NextResponse.json(
+        { message: "PQR no encontrada" },
+        { status: 404 },
+      );
     }
 
     const updatedPQR = await tenantPrisma.pQR.update({

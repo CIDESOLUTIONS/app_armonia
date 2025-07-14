@@ -50,47 +50,48 @@ export async function GET(request: NextRequest) {
 
     if (moduleSettings.length === 0) {
       // Si no hay configuración, devolver una configuración por defecto
-      return NextResponse.json([
-        {
-          id: "inventory",
-          name: "Gestión de Inventario",
-          description:
-            "Permite administrar propiedades, residentes, vehículos y mascotas.",
-          enabled: true,
-          permissions: [
-            { role: "ADMIN", canView: true, canEdit: true },
-            { role: "COMPLEX_ADMIN", canView: true, canEdit: true },
-            { role: "STAFF", canView: true, canEdit: false },
-            { role: "RESIDENT", canView: false, canEdit: false },
-          ],
-        },
-        {
-          id: "finances",
-          name: "Gestión Financiera",
-          description:
-            "Control de ingresos, egresos, presupuestos y cuotas.",
-          enabled: true,
-          permissions: [
-            { role: "ADMIN", canView: true, canEdit: true },
-            { role: "COMPLEX_ADMIN", canView: true, canEdit: true },
-            { role: "STAFF", canView: false, canEdit: false },
-            { role: "RESIDENT", canView: true, canEdit: false },
-          ],
-        },
-        {
-          id: "assemblies",
-          name: "Gestión de Asambleas",
-          description:
-            "Programación, votaciones y actas de asambleas.",
-          enabled: true,
-          permissions: [
-            { role: "ADMIN", canView: true, canEdit: true },
-            { role: "COMPLEX_ADMIN", canView: true, canEdit: true },
-            { role: "STAFF", canView: true, canEdit: false },
-            { role: "RESIDENT", canView: true, canEdit: false },
-          ],
-        },
-      ], { status: 200 });
+      return NextResponse.json(
+        [
+          {
+            id: "inventory",
+            name: "Gestión de Inventario",
+            description:
+              "Permite administrar propiedades, residentes, vehículos y mascotas.",
+            enabled: true,
+            permissions: [
+              { role: "ADMIN", canView: true, canEdit: true },
+              { role: "COMPLEX_ADMIN", canView: true, canEdit: true },
+              { role: "STAFF", canView: true, canEdit: false },
+              { role: "RESIDENT", canView: false, canEdit: false },
+            ],
+          },
+          {
+            id: "finances",
+            name: "Gestión Financiera",
+            description: "Control de ingresos, egresos, presupuestos y cuotas.",
+            enabled: true,
+            permissions: [
+              { role: "ADMIN", canView: true, canEdit: true },
+              { role: "COMPLEX_ADMIN", canView: true, canEdit: true },
+              { role: "STAFF", canView: false, canEdit: false },
+              { role: "RESIDENT", canView: true, canEdit: false },
+            ],
+          },
+          {
+            id: "assemblies",
+            name: "Gestión de Asambleas",
+            description: "Programación, votaciones y actas de asambleas.",
+            enabled: true,
+            permissions: [
+              { role: "ADMIN", canView: true, canEdit: true },
+              { role: "COMPLEX_ADMIN", canView: true, canEdit: true },
+              { role: "STAFF", canView: true, canEdit: false },
+              { role: "RESIDENT", canView: true, canEdit: false },
+            ],
+          },
+        ],
+        { status: 200 },
+      );
     }
 
     ServerLogger.info(
@@ -98,7 +99,10 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(moduleSettings, { status: 200 });
   } catch (error) {
-    ServerLogger.error("Error al obtener configuración de módulos y permisos:", error);
+    ServerLogger.error(
+      "Error al obtener configuración de módulos y permisos:",
+      error,
+    );
     return NextResponse.json(
       { message: "Error interno del servidor" },
       { status: 500 },
@@ -170,7 +174,10 @@ export async function PUT(request: NextRequest) {
         { status: 400 },
       );
     }
-    ServerLogger.error("Error al actualizar configuración de módulos y permisos:", error);
+    ServerLogger.error(
+      "Error al actualizar configuración de módulos y permisos:",
+      error,
+    );
     return NextResponse.json(
       { message: "Error interno del servidor" },
       { status: 500 },

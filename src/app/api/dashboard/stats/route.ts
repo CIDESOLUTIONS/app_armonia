@@ -65,8 +65,8 @@ export async function GET(req: Request) {
             formattedKpis.totalRevenueLastMonth) *
           100
         : formattedKpis.totalRevenue > 0
-        ? 100
-        : 0;
+          ? 100
+          : 0;
 
     const processTrendData = (data: unknown[], valueField: string) => {
       const monthlyData = new Map<string, number>();

@@ -16,7 +16,9 @@ export async function getBrandingSettings(): Promise<BrandingSettings> {
   }
 }
 
-export async function updateBrandingSettings(data: FormData): Promise<BrandingSettings> {
+export async function updateBrandingSettings(
+  data: FormData,
+): Promise<BrandingSettings> {
   try {
     const response = await fetchApi("/api/settings/branding", {
       method: "PUT",

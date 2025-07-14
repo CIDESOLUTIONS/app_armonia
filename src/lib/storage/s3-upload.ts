@@ -1,4 +1,3 @@
-
 import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import { ServerLogger } from "../logging/server-logger";
@@ -25,7 +24,9 @@ export async function uploadFileToS3(
       !process.env.AWS_S3_BUCKET_NAME ||
       !process.env.AWS_S3_REGION
     ) {
-      logger.warn("Credenciales de AWS S3 no configuradas. No se realizará la carga a S3.");
+      logger.warn(
+        "Credenciales de AWS S3 no configuradas. No se realizará la carga a S3.",
+      );
       throw new Error("Credenciales de AWS S3 no configuradas.");
     }
 

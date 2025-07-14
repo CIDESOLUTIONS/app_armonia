@@ -1,8 +1,14 @@
-
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 interface ListingCardProps {
@@ -38,17 +44,29 @@ export function ListingCard({ listing }: ListingCardProps) {
         )}
       </div>
       <CardHeader className="pb-2">
-        <CardTitle className="text-xl font-semibold truncate">{listing.title}</CardTitle>
-        <CardDescription className="text-sm text-gray-600">{listing.category}</CardDescription>
+        <CardTitle className="text-xl font-semibold truncate">
+          {listing.title}
+        </CardTitle>
+        <CardDescription className="text-sm text-gray-600">
+          {listing.category}
+        </CardDescription>
       </CardHeader>
       <CardContent className="flex-grow">
-        <p className="text-lg font-bold text-indigo-600 mb-2">${listing.price.toFixed(2)}</p>
-        <p className="text-sm text-gray-700 line-clamp-3">{listing.description}</p>
+        <p className="text-lg font-bold text-indigo-600 mb-2">
+          ${listing.price.toFixed(2)}
+        </p>
+        <p className="text-sm text-gray-700 line-clamp-3">
+          {listing.description}
+        </p>
       </CardContent>
       <CardFooter className="flex justify-between items-center pt-4">
-        <span className="text-xs text-gray-500">Publicado por: {listing.author.name}</span>
+        <span className="text-xs text-gray-500">
+          Publicado por: {listing.author.name}
+        </span>
         <Link href={`/resident/resident/marketplace/${listing.id}`}>
-          <Button variant="outline" size="sm">Ver Detalles</Button>
+          <Button variant="outline" size="sm">
+            Ver Detalles
+          </Button>
         </Link>
       </CardFooter>
     </Card>

@@ -1,4 +1,3 @@
-
 export async function createPreRegisteredVisitor(data: any) {
   try {
     const response = await fetch("/api/visitors/pre-register", {
@@ -11,7 +10,9 @@ export async function createPreRegisteredVisitor(data: any) {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || "Error al pre-registrar el visitante.");
+      throw new Error(
+        errorData.message || "Error al pre-registrar el visitante.",
+      );
     }
 
     const result = await response.json();

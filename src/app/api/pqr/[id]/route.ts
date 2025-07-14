@@ -5,14 +5,19 @@ import { ServerLogger } from "@/lib/logging/server-logger";
 import { z } from "zod";
 import { UpdatePQRSchema } from "@/validators/pqr/pqr.validator";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
     const { auth, payload } = await verifyAuth(request);
     if (!auth || !payload) {
       return NextResponse.json({ message: "Token requerido" }, { status: 401 });
     }
 
-    if (!["ADMIN", "COMPLEX_ADMIN", "STAFF", "RESIDENT"].includes(payload.role)) {
+    if (
+      !["ADMIN", "COMPLEX_ADMIN", "STAFF", "RESIDENT"].includes(payload.role)
+    ) {
       return NextResponse.json(
         { message: "Permisos insuficientes" },
         { status: 403 },
@@ -28,7 +33,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
     const pqrId = parseInt(params.id);
     if (isNaN(pqrId)) {
-      return NextResponse.json({ message: "ID de PQR inválido" }, { status: 400 });
+      return NextResponse.json(
+        { message: "ID de PQR inválido" },
+        { status: 400 },
+      );
     }
 
     const tenantPrisma = getTenantPrismaClient(payload.schemaName);
@@ -42,7 +50,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     });
 
     if (!pqr) {
-      return NextResponse.json({ message: "PQR no encontrada" }, { status: 404 });
+      return NextResponse.json(
+        { message: "PQR no encontrada" },
+        { status: 404 },
+      );
     }
 
     // Si es residente, asegurarse de que solo pueda ver sus propias PQRs
@@ -63,7 +74,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
     const { auth, payload } = await verifyAuth(request);
     if (!auth || !payload) {
@@ -86,7 +100,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     const pqrId = parseInt(params.id);
     if (isNaN(pqrId)) {
-      return NextResponse.json({ message: "ID de PQR inválido" }, { status: 400 });
+      return NextResponse.json(
+        { message: "ID de PQR inválido" },
+        { status: 400 },
+      );
     }
 
     const body = await request.json();
@@ -114,7 +131,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
     const { auth, payload } = await verifyAuth(request);
     if (!auth || !payload) {
@@ -137,7 +157,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     const pqrId = parseInt(params.id);
     if (isNaN(pqrId)) {
-      return NextResponse.json({ message: "ID de PQR inválido" }, { status: 400 });
+      return NextResponse.json(
+        { message: "ID de PQR inválido" },
+        { status: 400 },
+      );
     }
 
     const tenantPrisma = getTenantPrismaClient(payload.schemaName);
@@ -148,7 +171,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     ServerLogger.info(
       `PQR ${pqrId} eliminada para el complejo ${payload.complexId}`,
     );
-    return NextResponse.json({ message: "PQR eliminada exitosamente" }, { status: 200 });
+    return NextResponse.json(
+      { message: "PQR eliminada exitosamente" },
+      { status: 200 },
+    );
   } catch (error) {
     ServerLogger.error(`Error al eliminar PQR ${params.id}:`, error);
     return NextResponse.json({ message: "Error interno" }, { status: 500 });

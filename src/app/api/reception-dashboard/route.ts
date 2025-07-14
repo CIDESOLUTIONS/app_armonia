@@ -97,7 +97,10 @@ export async function GET(request: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
-    ServerLogger.error("Error al obtener datos del dashboard de recepción:", error);
+    ServerLogger.error(
+      "Error al obtener datos del dashboard de recepción:",
+      error,
+    );
     return NextResponse.json(
       { message: "Error interno del servidor" },
       { status: 500 },
