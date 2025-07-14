@@ -6,7 +6,7 @@
     "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "noEmit": false,
+    "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "node",
@@ -23,7 +23,7 @@
     },
     "plugins": [{ "name": "next" }],
     "typeRoots": ["./node_modules/@types", "./src/types", "./types"],
-    "noImplicitAny": false
+    "noImplicitAny": true
   },
   "include": [
     "next-env.d.ts",
