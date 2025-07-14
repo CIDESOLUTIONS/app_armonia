@@ -1,0 +1,265 @@
+﻿Proyecto Armonía
+Especificaciones Técnicas 
+Sistema de Administración de Conjuntos Residenciales
+Versión: 16
+Fecha de Actualización: 13 de julio de 2025
+Cambios Principales: Se expanden y detallan las especificaciones funcionales para el "Marketplace Comunitario" y el "Módulo de Ecosistema y Alianzas", atendiendo a la necesidad de mayor concreción para el desarrollo.
+ 
+1. Introducción
+
+1.1. Descripción General 
+Armonía es el ecosistema operativo integral diseñado para modernizar y unificar la vida en propiedad horizontal. Superando las limitaciones del software de gestión tradicional, Armonía se posiciona como el socio estratégico indispensable para toda la comunidad. La plataforma está diseñada para servir a un espectro completo de usuarios: desde empresas de administración profesional que gestionan vastos portafolios y exigen máxima eficiencia, hasta administradores de conjuntos individuales que buscan automatizar sus operaciones, residentes que anhelan una experiencia de vida más conectada, segura y conveniente, y el personal de seguridad y recepción que requiere herramientas fiables y sencillas. Armonía no es solo una aplicación; es la solución definitiva a la ineficiencia histórica del sector, centralizando la comunicación, automatizando las finanzas, optimizando la seguridad y fomentando una comunidad próspera y conectada.
+
+1.2. Misión del Producto 
+Nuestra misión es transformar radicalmente la gestión y la experiencia de vida en propiedad horizontal, consolidando a Armonía como el sistema operativo central e indispensable para cada comunidad. Nos dedicamos a:
+* Empoderar a los Administradores: Proporcionar a los administradores individuales y a las empresas de administración profesional las herramientas de automatización y análisis más potentes del mercado, permitiéndoles escalar sus operaciones, eliminar tareas manuales y ofrecer un servicio de excelencia.
+* Mejorar la Calidad de Vida de los Residentes: Ofrecer a los residentes una experiencia de usuario fluida, segura y enriquecedora que simplifique su día a día, desde el pago de sus cuotas hasta la interacción con sus vecinos, convirtiendo la aplicación en el centro de su vida comunitaria.
+* Construir Ecosistemas de Valor: Ir más allá del software para crear un ecosistema de servicios integrados y alianzas estratégicas que aumenten el valor y la seguridad de la propiedad, construyendo barreras de salida y una ventaja competitiva sostenible.
+* Liderar con Innovación Tecnológica: Utilizar nuestra arquitectura técnica superior para ofrecer una plataforma más rápida, segura y fiable, estableciendo el nuevo estándar de lo que es posible en el sector PropTech.
+
+2. Arquitectura y Stack Tecnológico
+* Frontend: Next.js 15+, React 19+ (con Server Components y Actions), TypeScript
+* Backend: Node.js, NestJS
+* Base de Datos: PostgreSQL 17+
+* ORM: Prisma 6+
+* Autenticación: JWT (JSON Web Tokens)
+* Almacenamiento: PostgreSQL
+* Validación: Zod 
+* socket.io: Requerido para funcionalidades en tiempo real.
+* twilio: para comunicaciones.
+* Gráficos y Visualización: Recharts para gráficos y estadísticas
+* Generación de PDFs: pdfkit para reportes exportables
+* CI/CD: GitHub Actions, Vercel o similares
+* Pruebas: Playwright
+* Hosting: Vercel (Frontend), AWS/GCP (Backend/DB)
+* Arquitectura: Multi-tenant (un esquema de base de datos por tenant/conjunto)
+* Métricas de Rendimiento: Core Web Vitals (LCP < 2.5s, INP < 200ms, CLS < 0.1)
+Panel Administrador de la Aplicación
+* Gestión de conjuntos residenciales (número de inscripciones por cada modelo freemium)
+* Ingresos mensuales y acumulados anuales 
+* Monitoreo de uso y rendimiento
+* Estadísticas y métricas de uso
+* Gestión de licencias y planes
+* Soporte y asistencia técnica
+* Gestión comercial de clientes básico para que tomen el modelo estándar o premium.
+* Configuración global del sistema
+
+Interfaces de Usuario
+Diseño General
+* Diseño limpio y moderno con enfoque en usabilidad
+* Paleta de colores principal: Índigo (#4f46e5) y blanco (#ffffff)
+* Soporte para modo oscuro/claro
+* Interfaz responsive para todos los dispositivos
+* Animaciones sutiles para mejorar la experiencia
+
+Componentes UI Reutilizables
+* Sistema de diseño basado en Shadcn/UI
+* Componentes altamente personalizables
+* Consistencia visual en toda la plataforma
+* Accesibilidad (WCAG 2.1 AA)
+
+Plantillas de Páginas
+* Layouts específicos para cada tipo de panel
+* Patrones de navegación intuitivos
+* Breadcrumbs para facilitar la navegación
+* Organización jerárquica de la información
+* Componentes de carga y estados vacíos diseñados
+
+Prácticas de Seguridad
+* Encriptación de datos sensibles de cada conjunto residencial
+* Protección contra ataques CSRF, XSS y SQL Injection
+* Rate limiting para prevenir ataques de fuerza bruta
+* Validación de datos en cliente y servidor
+* Auditoría de accesos y cambios
+* Backups automáticos diarios
+
+Privacidad de Datos
+* Cumplimiento con regulaciones de protección de datos
+* Políticas claras de privacidad y términos de uso
+* Opción de convertir datos a datos anónimos al eliminar cuentas
+* Exportación de datos personales
+* Consentimiento explícito para uso de cookies
+
+Pruebas funcionales
+Estrategia de Pruebas
+* Pruebas unitarias para componentes y flujos de servicios
+* Pruebas de integración para flujos principales
+* Pruebas E2E de las funcionalidades para cada portal
+* Pruebas de rendimiento y carga
+* Pruebas de compatibilidad con navegadores
+
+Control de Calidad
+* Revisión de código 
+* Análisis estático de código
+* Monitoreo de errores en producción
+* Retroalimentación continua de usuarios
+* Métricas de calidad (cobertura de pruebas, complejidad ciclomática)
+
+Despliegue y Operaciones
+Definiciones de Infraestructura (panel administrador de la aplicación)
+* Definiciones y guía de despliegue en la nube (AWS, Azure o GCP)
+* Arquitectura serverless donde sea posible
+* Base de datos PostgreSQL gestionada
+* CDN para activos estáticos
+* Balanceador de carga para alta disponibilidad
+
+CI/CD (panel administrador de la aplicación)
+* Integración continua con GitHub Actions
+* Despliegue continuo en entornos de desarrollo y pruebas
+* Despliegue controlado en producción
+* Rollbacks automatizados en caso de fallos
+* Entornos de desarrollo, staging y producción
+
+Monitoreo (panel administrador de la aplicación)
+* Monitoreo de disponibilidad y tiempos de respuesta
+* Alertas automáticas para incidentes
+* Dashboard de métricas operativas
+* Análisis de logs centralizados
+* Monitoreo de experiencia del usuario real
+
+Mejoras Continuas
+* Optimización de rendimiento
+* Mejoras de usabilidad basadas en feedback
+* Nuevas funcionalidades según necesidades del mercado
+* Expansión internacional con soporte multilenguaje
+* Integraciones con sistemas externos (contabilidad, bancos, etc.)
+
+Consideraciones Especiales
+Accesibilidad
+* Conformidad con WCAG 2.1 nivel AA
+* Soporte para lectores de pantalla
+* Navegación por teclado
+* Alto contraste y fuentes ajustables
+* Textos alternativos para imágenes
+
+Internacionalización
+* Soporte inicial para español, inglés y portugues
+* Estructura preparada para fácil expansión a otros idiomas
+* Formatos de fecha y número según localización
+* Soporte para múltiples monedas
+
+Escalabilidad
+* Arquitectura diseñada para escalar horizontalmente
+* Optimización de consultas a base de datos
+* Caché estratégica para datos frecuentemente accedidos
+* Lazy loading de componentes y datos
+* Particionamiento de base de datos para grandes volúmenes
+
+Panel Administrador de la Aplicación
+* Gestión de conjuntos residenciales (número de inscripciones por cada modelo freemium)
+* Ingresos mensuales y acumulados anuales 
+* Monitoreo de uso y rendimiento
+* Estadísticas y métricas de uso
+* Gestión de licencias y planes
+* Soporte y asistencia técnica
+* Gestión comercial de clientes del plan básico para conversion.
+* Configuración global del sistema
+
+
+
+3. Módulos y Portales de la Plataforma
+3.1. Portal Público y de Adquisición
+Landing page optimizada para SEO y conversión, con información clara de planes y un llamado a la acción para registro o solicitud de demo.
+
+3.2. Portal de Administración (Para Administradores de Conjunto)
+3.2.1. Dashboard Principal
+Vista general con KPIs: estado de cartera, PQR pendientes, reservas del día, últimos comunicados.
+3.2.2. Módulo de Inventario
+* Gestión de inmuebles (apartamentos, casas, oficinas).
+* Base de datos de residentes y propietarios.
+* Inventario de vehículos y parqueaderos.
+* Registro de mascotas.
+3.2.3. Módulo de Comunicaciones
+* Cartelera digital para anuncios oficiales.
+* Sistema de envío de notificaciones push y email masivo.
+* Módulo de encuestas y votaciones simples.
+* Sistema de PQR (Peticiones, Quejas, Reclamos) con seguimiento de estados.
+* Repositorio central de documentos (reglamentos, actas, manuales).
+3.2.4. Módulo Financiero Avanzado
+* Generación y automatización de cuotas de administración, incluyendo cargos fijos y variables.
+* Gestión de multas e intereses por mora.
+* Integración con pasarelas de pago (PSE, Tarjeta de Crédito).
+* Gestión y seguimiento del presupuesto anual.
+* Generación de informes financieros: estado de cartera, paz y salvos, informe de pagos.
+* Conciliación Bancaria Automática:
+  - Descripción: Herramienta para importar extractos bancarios (formatos estándar como Excel, CSV) y cruzarlos automáticamente con los pagos registrados en la  plataforma. El sistema identificará y sugerirá coincidencias, marcando las cuotas como pagadas y señalando discrepancias.
+  - Propósito Estratégico: Reduce drásticamente el trabajo manual y los errores, convirtiéndose en una funcionalidad clave para justificar el valor de los planes Premium y atraer administradores que buscan máxima eficiencia.
+3.2.5. Módulo de Reservas
+Gestión de áreas comunes y amenidades (salón social, BBQ, canchas) con calendario, reglas de uso y sistema de aprobación.
+
+3.3. Portal de Residentes (App Móvil y Web)
+* Acceso a comunicados, cartelera y documentos.
+* Realización de pagos en línea.
+* Reserva de áreas comunes.
+* Pre-registro de visitantes.
+* Recepción de notificaciones (paquetería, anuncios).
+* Marketplace Comunitario:
+   - Descripción: Una sección dentro del portal donde los residentes pueden publicar anuncios clasificados para comprar, vender o intercambiar artículos y servicios con otros miembros de la comunidad.
+   - Propósito Estratégico: Fomentar la interacción horizontal entre residentes, aumentar el compromiso y el uso diario de la aplicación, y transformar la plataforma de una simple herramienta de gestión a un verdadero centro de vida comunitaria.
+   - Especificaciones Funcionales:
+      * Creación de Anuncios: Formulario intuitivo que permita al residente crear un anuncio con:
+         * Título claro y conciso.
+         * Descripción detallada.
+         * Categoría (ej. Hogar, Tecnología, Servicios, Clases, etc.).
+         * Precio (o indicación de "Gratis", "Intercambio").
+         * Subida de hasta 5 fotografías del producto/servicio.
+      * Navegación y Búsqueda:
+         * Vista de galería con los últimos anuncios publicados.
+         * Buscador por palabra clave.
+         * Filtros por categoría y rango de precios.
+      * Interacción y Comunicación:
+         * Sistema de mensajería interna y privada entre el interesado y el vendedor para coordinar la transacción. No se expondrán números de teléfono públicamente.
+         * Notificaciones push cuando se recibe un nuevo mensaje.
+      * Gestión de Anuncios ("Mis Anuncios"):
+         * Panel personal donde el usuario puede ver sus anuncios activos.
+         * Opciones para editar el anuncio, marcarlo como "Vendido" (lo cual lo ocultará de la lista principal) o eliminarlo permanentemente.
+      * Moderación y Seguridad:
+         * Un botón visible en cada anuncio para "Reportar" contenido inapropiado.
+         * Panel de moderación para el administrador del conjunto, donde podrá revisar los anuncios reportados y tomar acciones (eliminar anuncio, advertir al usuario).
+
+3.4. Portal de Seguridad y Recepción (IoT-Ready)
+* Bitácora digital de novedades y registro de incidentes.
+* Gestión Avanzada de Visitantes y Paquetería:
+  - Descripción: Evolución del pre-registro básico. Los residentes podrán generar códigos QR únicos y temporales para sus visitantes desde la app. El personal de seguridad escaneará el QR para un acceso rápido y seguro. Se implementará un sistema de registro de paquetería que enviará una notificación push automática al residente en el momento en que su paquete es recibido en portería.
+   * Propósito Estratégico: Materializar el concepto "IoT-Ready" en funcionalidades tangibles y de alto valor percibido. Mejora drásticamente la seguridad y la conveniencia, siendo un diferenciador clave frente a soluciones más básicas.
+
+3.5. Módulo de Democracia Digital (Asambleas)
+* Plataforma para realizar asambleas virtuales o híbridas.
+* Registro de asistencia y cálculo de quórum en tiempo real.
+* Sistema de votaciones ponderadas según coeficientes.
+* Generación automática del borrador del acta.
+* Servicio Desagregado "Asambleas por Armonía":
+   - Descripción: Empaquetar el Módulo de Democracia Digital como un servicio independiente que puede ser contratado por cualquier conjunto residencial, sin necesidad de que adquieran la plataforma completa de Armonía.
+   - Propósito Estratégico: Crear un nuevo flujo de ingresos, actuar como un potente embudo de generación de prospectos para la plataforma completa y posicionar a Armonía como líder de opinión en un área crítica de la gestión de propiedad horizontal.
+
+3.6. Portal Empresarial "Armonía Portafolio"
+* Descripción: Un nuevo portal y nivel de plan diseñado específicamente para empresas de administración profesional que gestionan múltiples propiedades.
+* Funcionalidades Clave:
+   * Dashboard Multi-Propiedad: Vista consolidada que muestra los KPIs más importantes (cartera total, PQR abiertos, presupuesto ejecutado) de todos los conjuntos administrados en una sola pantalla.
+   * Gestión Centralizada: Capacidad de navegar entre las diferentes propiedades sin necesidad de cerrar e iniciar sesión.
+   * Informes Consolidados: Generación de reportes financieros y operativos que agrupen la información de todo el portafolio.
+   * Personalización de Marca (White-Labeling): Opción para que la empresa administradora personalice la plataforma con su propio logo y colores, ofreciéndola a sus clientes como una solución propia.
+* Propósito Estratégico: Atacar el lucrativo segmento de mercado B2B de administradores profesionales. Esta es la iniciativa más importante para el crecimiento de ingresos y la creación de una ventaja competitiva sostenible.
+
+3.7. Módulo de Ecosistema y Alianzas
+* Descripción: Un centro para integrar servicios de valor agregado a través de alianzas estratégicas, accesible desde el portal de residentes y administradores.
+* Propósito Estratégico: Expandir el modelo de negocio más allá del SaaS. Aumentar el valor de la plataforma, crear nuevas fuentes de ingreso y construir barreras de salida (moat) que hagan a Armonía indispensable para la comunidad.
+  - Especificaciones Funcionales:
+   * Directorio de Servicios para el Hogar:
+      * Vista de Residente: Un directorio navegable con categorías (plomería, electricidad, limpieza, etc.). Cada proveedor tendrá un perfil con descripción, contacto, fotos de trabajos y, crucialmente, calificaciones y reseñas de otros residentes del mismo conjunto.
+      * Proceso de Verificación: Los proveedores deben pasar un proceso de validación básico por parte de Armonía (ej. revisión de documentos) para ser listados, otorgando un sello de "Proveedor Verificado".
+      * Modelo de Negocio: Se explorará un modelo de lead fee (el proveedor paga una pequeña tarifa por cada contacto generado a través de la plataforma) o un destaque patrocinado.
+   * Programa de Alianzas vía API:
+      * Alianzas InsurTech: Integración con aseguradoras para ofrecer cotizaciones de seguros de hogar directamente desde el portal del residente. El flujo sería: Click en banner de seguros -> Formulario pre-llenado con datos del residente/inmueble -> Cotización instantánea del aliado. El modelo de negocio sería una comisión por póliza vendida.
+      * Alianzas FinTech: Acuerdos con entidades financieras para ofrecer soluciones como micro-créditos para el pago de cuotas de administración atrasadas o para reparaciones locativas, directamente desde el portal financiero.
+   * Integración con Medidores Inteligentes (IoT):
+      * Backend: Desarrollar la capacidad de recibir datos vía API desde los principales proveedores de telemetría y medidores inteligentes.
+      * Flujo de Datos: El sistema deberá asociar la lectura del medidor con el inmueble correspondiente en la base de datos.
+      * Automatización de Facturación: El consumo registrado (m³ de agua, kWh de luz) se añadirá automáticamente como un ítem facturable en la cuenta de cobro del mes siguiente para esa unidad residencial.
+
+4. Estructura de Planes y Modelo de Negocio 
+* Plan Básico (Freemium): Gestión de inventario, PQR, cartelera digital, encuestas básicas. Hasta 40 unidades residenciales
+* Plan Estándar: Todo lo del Plan Básico + Módulo de Reservas, Módulo Financiero (sin conciliación), Gestión Avanzada de Visitantes con QR y Paquetería. Hasta 150 unidades residenciales
+* Plan Premium: Todo lo del Estándar + Conciliación Bancaria Automática, Acceso a API, y acceso al Marketplace Comunitario y al Directorio de Servicios. mas de 150 unidades residenciales.
+* Plan Empresarial "Portafolio": Todo lo del Premium + Dashboard "Armonía Portafolio", personalización de marca, soporte prioritario.
+* Plan Democracia Digital
