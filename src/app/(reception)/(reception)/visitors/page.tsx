@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { Card, CardContent } from "@/components/ui/card";
@@ -41,10 +41,12 @@ import {
   AlertCircle,
   CheckCircle,
   X,
+  QrCode,
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import Image from "next/image";
+import { getPreRegisteredVisitors } from "@/services/visitorService";
 
 interface Visitor {
   id: string;
@@ -60,15 +62,34 @@ interface Visitor {
   status: "active" | "departed";
 }
 
+interface PreRegisteredVisitor {
+  id: number;
+  name: string;
+  documentType?: string;
+  documentNumber?: string;
+  expectedDate: string;
+  validFrom: string;
+  validUntil: string;
+  purpose?: string;
+  accessCode: string;
+  qrCodeUrl?: string;
+  resident: {
+    name: string;
+    unit: string;
+  };
+}
+
 export default function ReceptionVisitorsPage() {
-  const { isLoggedIn, schemaName } = useAuthStore();
+  const { isLoggedIn, schemaName, _token } = useAuthStore();
   const _router = useRouter();
   const [loading, setLoading] = useState(true);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
-  const [error, _setError] = useState<string | null>(null);
+  const [preRegisteredVisitors, setPreRegisteredVisitors] = useState<PreRegisteredVisitor[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<
     "active" | "departed" | "all"
   >("active");
+  const [searchTerm, setSearchTerm] = useState("");
   const [isRegisterDialogOpen, setIsRegisterDialogOpen] = useState(false);
   const [newVisitorForm, setNewVisitorForm] = useState({
     name: "",
@@ -124,7 +145,7 @@ export default function ReceptionVisitorsPage() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      _setError(null);
+      setError(null);
 
       // En un entorno real, esto sería una llamada a la API
       // const response = await fetch('/api/visitors');
@@ -135,14 +156,18 @@ export default function ReceptionVisitorsPage() {
       // Simulamos un retraso en la carga de datos
       setTimeout(() => {
         setVisitors(mockVisitors);
-        setLoading(false);
       }, 1000);
+
+      const preRegistered = await getPreRegisteredVisitors();
+      setPreRegisteredVisitors(preRegistered);
+
     } catch (err: any) {
       console.error("[ReceptionVisitors] Error:", err);
-      _setError(err.message || "Error al cargar datos de visitantes");
+      setError(err.message || "Error al cargar datos de visitantes");
+    } finally {
       setLoading(false);
     }
-  }, [mockVisitors, _setError, setVisitors, setLoading]);
+  }, [mockVisitors, setError, setVisitors, setPreRegisteredVisitors]);
 
   useEffect(() => {
     if (!isLoggedIn || !_token || !schemaName) {
@@ -415,6 +440,57 @@ export default function ReceptionVisitorsPage() {
           </Button>
         </Alert>
       )}
+
+      {/* Sección de Visitantes Pre-registrados */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Visitantes Pre-registrados</CardTitle>
+          <CardDescription>Visitantes que han sido pre-autorizados por los residentes.</CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          {preRegisteredVisitors.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Documento</TableHead>
+                  <TableHead>Residente</TableHead>
+                  <TableHead>Unidad</TableHead>
+                  <TableHead>Fecha Esperada</TableHead>
+                  <TableHead>Válido Hasta</TableHead>
+                  <TableHead>Propósito</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {preRegisteredVisitors.map((visitor) => (
+                  <TableRow key={visitor.id}>
+                    <TableCell className="font-medium">{visitor.name}</TableCell>
+                    <TableCell>{visitor.documentNumber}</TableCell>
+                    <TableCell>{visitor.resident.name}</TableCell>
+                    <TableCell>{visitor.resident.unit}</TableCell>
+                    <TableCell>{formatDate(visitor.expectedDate)}</TableCell>
+                    <TableCell>{formatDate(visitor.validUntil)}</TableCell>
+                    <TableCell>{visitor.purpose || "N/A"}</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="outline" size="sm">
+                        <QrCode className="mr-2 h-4 w-4" />
+                        Escanear QR
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <IdCard className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+              <h3 className="text-lg font-medium mb-2">No hay visitantes pre-registrados</h3>
+              <p>Los residentes pueden pre-registrar visitantes desde su portal.</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Filtros y búsqueda */}
       <Card className="mb-6">
@@ -722,3 +798,4 @@ export default function ReceptionVisitorsPage() {
     </div>
   );
 }
+

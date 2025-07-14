@@ -1,51 +1,45 @@
+
 import { NextRequest, NextResponse } from "next/server";
-import { getPublicPrismaClient } from "@/lib/prisma";
-import { generatePasswordResetToken } from "@/lib/auth";
-import { ServerLogger } from "@/lib/logging/server-logger";
-import { z } from "zod";
+import { prisma } from "@/lib/prisma";
+import { randomBytes } from "crypto";
+import { sendPasswordResetEmail } from "@/lib/mailer";
 
-const RequestPasswordResetSchema = z.object({
-  email: z.string().email("Formato de email inválido"),
-});
-
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const body = await request.json();
-    const { email } = RequestPasswordResetSchema.parse(body);
+    const { email } = await req.json();
 
-    const publicPrisma = getPublicPrismaClient();
-    const user = await publicPrisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
 
     if (!user) {
-      // No revelar si el usuario existe o no por razones de seguridad
-      ServerLogger.warn(`Intento de restablecimiento de contraseña para email no registrado: ${email}`);
+      // No revelar si el usuario existe o no por seguridad
       return NextResponse.json(
-        { message: "Si su correo electrónico está registrado, recibirá un enlace para restablecer su contraseña." },
+        { message: "Si el email está registrado, recibirás un enlace." },
         { status: 200 },
       );
     }
 
-    const token = await generatePasswordResetToken(user.id, user.email, user.schemaName || undefined);
+    const resetToken = randomBytes(32).toString("hex");
+    const passwordResetToken = Buffer.from(resetToken).toString("base64");
+    const passwordResetExpires = new Date(Date.now() + 3600000); // 1 hora de expiración
 
-    // TODO: Implement email sending logic here
-    // This would involve using a transactional email service (e.g., SendGrid, Nodemailer)
-    ServerLogger.info(`Enlace de restablecimiento de contraseña generado para ${email}: ${token}`);
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordResetToken,
+        passwordResetExpires,
+      },
+    });
+
+    await sendPasswordResetEmail(user.email, resetToken);
 
     return NextResponse.json(
-      { message: "Si su correo electrónico está registrado, recibirá un enlace para restablecer su contraseña." },
+      { message: "Si el email está registrado, recibirás un enlace." },
       { status: 200 },
     );
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { message: "Error de validación", errors: error.errors },
-        { status: 400 },
-      );
-    }
-    ServerLogger.error("Error al solicitar restablecimiento de contraseña:", error);
-    return NextResponse.json(
-      { message: "Error interno del servidor" },
-      { status: 500 },
-    );
+    console.error("[FORGOT_PASSWORD_ERROR]", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
