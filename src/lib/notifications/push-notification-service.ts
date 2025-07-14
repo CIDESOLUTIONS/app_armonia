@@ -4,7 +4,7 @@
  * Maneja el envío de notificaciones push a dispositivos móviles y web
  */
 
-import * as admin from 'firebase-admin';
+import * as admin from "firebase-admin";
 
 interface PushNotificationPayload {
   title: string;
@@ -99,7 +99,7 @@ export class PushNotificationService {
         admin.initializeApp({
           credential: admin.credential.cert({
             projectId: process.env.FIREBASE_PROJECT_ID,
-            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
             clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
           }),
         });
@@ -205,7 +205,7 @@ export class PushNotificationService {
       data: request.payload.data || {},
       tokens: tokens,
       android: {
-        priority: request.options?.priority || 'normal',
+        priority: request.options?.priority || "normal",
         ttl: request.options?.timeToLive || 3600000, // 1 hora por defecto
       },
       webpush: {
@@ -232,10 +232,12 @@ export class PushNotificationService {
       messageId: `fcm_${Date.now()}`,
       successCount: response.successCount,
       failureCount: response.failureCount,
-      errors: response.responses.filter(res => !res.success).map(res => ({
-        token: res.multicastMessageId || '', // Fallback if token not available
-        error: res.error?.message || 'Unknown error',
-      })),
+      errors: response.responses
+        .filter((res) => !res.success)
+        .map((res) => ({
+          token: res.multicastMessageId || "", // Fallback if token not available
+          error: res.error?.message || "Unknown error",
+        })),
     };
   }
 

@@ -63,7 +63,9 @@ export default function ViewResidentAssemblyPage() {
 
   const [assembly, setAssembly] = useState<Assembly | null>(null);
   const [currentVoting, setCurrentVoting] = useState<Voting | null>(null);
-  const [votingResults, setVotingResults] = useState<VotingResult["results"] | null>(null);
+  const [votingResults, setVotingResults] = useState<
+    VotingResult["results"] | null
+  >(null);
   const [loading, setLoading] = useState(true);
   const [isVotingLoading, setIsVotingLoading] = useState(false);
 
@@ -81,12 +83,13 @@ export default function ViewResidentAssemblyPage() {
       // In a real scenario, there might be an API to get active votings for an assembly
       // For now, we'll assume the first voting in 'votings' array is the active one if any
       // You might need to adjust this based on your backend API for active votings
-      const activeVoting = (fetchedAssembly as any).votings?.find((v: Voting) => v.status === "ACTIVE");
+      const activeVoting = (fetchedAssembly as any).votings?.find(
+        (v: Voting) => v.status === "ACTIVE",
+      );
       if (activeVoting) {
         setCurrentVoting(activeVoting);
         await fetchVotingResults(assemblyId, activeVoting.id);
       }
-
     } catch (error) {
       console.error("Error fetching assembly:", error);
       toast({
@@ -100,24 +103,27 @@ export default function ViewResidentAssemblyPage() {
     }
   }, [assemblyId, router, toast]);
 
-  const fetchVotingResults = useCallback(async (asmId: number, vtgId: number) => {
-    try {
-      const results = await getVotingResults(asmId, vtgId);
-      setVotingResults(results.results);
-      // Check if user has voted
-      // This would require an API endpoint to check user's vote for a specific voting
-      // For now, simulate based on local state or add a new API call
-      // const userVote = await checkUserVote(asmId, vtgId, user.id);
-      // setCurrentVoting(prev => prev ? { ...prev, userHasVoted: !!userVote } : null);
-    } catch (error) {
-      console.error("Error fetching voting results:", error);
-      toast({
-        title: "Error",
-        description: "No se pudieron cargar los resultados de la votación.",
-        variant: "destructive",
-      });
-    }
-  }, [toast]);
+  const fetchVotingResults = useCallback(
+    async (asmId: number, vtgId: number) => {
+      try {
+        const results = await getVotingResults(asmId, vtgId);
+        setVotingResults(results.results);
+        // Check if user has voted
+        // This would require an API endpoint to check user's vote for a specific voting
+        // For now, simulate based on local state or add a new API call
+        // const userVote = await checkUserVote(asmId, vtgId, user.id);
+        // setCurrentVoting(prev => prev ? { ...prev, userHasVoted: !!userVote } : null);
+      } catch (error) {
+        console.error("Error fetching voting results:", error);
+        toast({
+          title: "Error",
+          description: "No se pudieron cargar los resultados de la votación.",
+          variant: "destructive",
+        });
+      }
+    },
+    [toast],
+  );
 
   useEffect(() => {
     if (!authLoading && user && assemblyId) {
@@ -136,7 +142,9 @@ export default function ViewResidentAssemblyPage() {
       });
       // After voting, re-fetch results and mark user as voted
       await fetchVotingResults(assemblyId, currentVoting.id);
-      setCurrentVoting(prev => prev ? { ...prev, userHasVoted: true } : null);
+      setCurrentVoting((prev) =>
+        prev ? { ...prev, userHasVoted: true } : null,
+      );
     } catch (error: any) {
       console.error("Error registering vote:", error);
       toast({
@@ -220,9 +228,12 @@ export default function ViewResidentAssemblyPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {currentVoting.status === "ACTIVE" && !currentVoting.userHasVoted ? (
+            {currentVoting.status === "ACTIVE" &&
+            !currentVoting.userHasVoted ? (
               <div className="space-y-3">
-                <p className="text-gray-700">{currentVoting.description || "Selecciona tu opción:"}</p>
+                <p className="text-gray-700">
+                  {currentVoting.description || "Selecciona tu opción:"}
+                </p>
                 {currentVoting.options.map((optionText, index) => (
                   <Button
                     key={index}
@@ -250,7 +261,8 @@ export default function ViewResidentAssemblyPage() {
                 <h4 className="font-semibold mb-2">Resultados Parciales:</h4>
                 {Object.entries(votingResults).map(([option, data]) => (
                   <p key={option} className="text-sm">
-                    {option}: {data.count} votos ({data.coefficient.toFixed(2)}% coeficiente)
+                    {option}: {data.count} votos ({data.coefficient.toFixed(2)}%
+                    coeficiente)
                   </p>
                 ))}
               </div>

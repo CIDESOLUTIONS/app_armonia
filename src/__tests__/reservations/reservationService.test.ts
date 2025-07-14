@@ -1,7 +1,17 @@
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
 import { getPrisma } from "@/lib/prisma";
 import { PrismaClient, ReservationStatus } from "@prisma/client";
-import { getReservations, createReservation, updateReservationStatus, deleteReservation, getCommonAreaById, checkAvailability, createCommonArea, cancelReservation, getUserNotifications } from "../reservationService";
+import {
+  getReservations,
+  createReservation,
+  updateReservationStatus,
+  deleteReservation,
+  getCommonAreaById,
+  checkAvailability,
+  createCommonArea,
+  cancelReservation,
+  getUserNotifications,
+} from "../reservationService";
 
 // Mock PrismaClient and ReservationStatus
 jest.mock("@prisma/client", () => {
@@ -201,11 +211,7 @@ describe("ReservationService", () => {
       const startDate = new Date("2025-06-01T00:00:00Z");
       const endDate = new Date("2025-06-02T00:00:00Z");
 
-      const result = await checkAvailability(
-        1,
-        startDate,
-        endDate,
-      );
+      const result = await checkAvailability(1, startDate, endDate);
 
       expect(prisma.commonArea.findUnique).toHaveBeenCalled();
       expect(prisma.reservation.findMany).toHaveBeenCalled();
@@ -220,9 +226,9 @@ describe("ReservationService", () => {
       const startDate = new Date("2025-06-01T00:00:00Z");
       const endDate = new Date("2025-06-02T00:00:00Z");
 
-      await expect(
-        checkAvailability(999, startDate, endDate),
-      ).rejects.toThrow("Área común no encontrada");
+      await expect(checkAvailability(999, startDate, endDate)).rejects.toThrow(
+        "Área común no encontrada",
+      );
     });
   });
 

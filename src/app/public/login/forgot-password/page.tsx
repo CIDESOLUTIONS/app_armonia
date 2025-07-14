@@ -31,10 +31,13 @@ export default function ForgotPasswordPage() {
       });
     } catch (error: any) {
       console.error("Error requesting password reset:", error);
-      setMessage(error.message || "Error al solicitar restablecimiento de contraseña.");
+      setMessage(
+        error.message || "Error al solicitar restablecimiento de contraseña.",
+      );
       toast({
         title: "Error",
-        description: error.message || "Error al solicitar restablecimiento de contraseña.",
+        description:
+          error.message || "Error al solicitar restablecimiento de contraseña.",
         variant: "destructive",
       });
     } finally {
@@ -43,9 +46,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div
-      className={`min-h-screen flex flex-col bg-gray-50`}
-    >
+    <div className={`min-h-screen flex flex-col bg-gray-50`}>
       {/* Header */}
       <Header
         theme="Claro"
@@ -66,7 +67,8 @@ export default function ForgotPasswordPage() {
             Recuperar Contraseña
           </h2>
           <p className="text-gray-600 mb-6">
-            Ingrese su correo electrónico para recibir un enlace de restablecimiento de contraseña.
+            Ingrese su correo electrónico para recibir un enlace de
+            restablecimiento de contraseña.
           </p>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -90,11 +92,7 @@ export default function ForgotPasswordPage() {
               Enviar Enlace de Restablecimiento
             </Button>
           </form>
-          {message && (
-            <p className="mt-4 text-sm text-green-600">
-              {message}
-            </p>
-          )}
+          {message && <p className="mt-4 text-sm text-green-600">{message}</p>}
           <button
             onClick={() => router.push("/login")}
             className="mt-4 text-indigo-600 hover:underline"

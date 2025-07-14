@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -30,7 +29,10 @@ interface User {
   email: string;
 }
 
-export function UserSearchSelect({ onUserSelect, initialUserId }: UserSearchSelectProps) {
+export function UserSearchSelect({
+  onUserSelect,
+  initialUserId,
+}: UserSearchSelectProps) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState<number | null>(initialUserId || null);
   const [searchTerm, setSearchTerm] = useState("");

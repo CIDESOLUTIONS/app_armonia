@@ -262,8 +262,14 @@ export function AdminDashboardContent() {
             <div className="text-2xl font-bold text-green-600">
               {formatCurrency(stats.totalRevenue)}
             </div>
-            <p className={`text-xs ${stats.revenueChangePercentage >= 0 ? "text-green-600" : "text-red-600"}`}>
-              {stats.revenueChangePercentage >= 0 ? <TrendingUp className="inline h-3 w-3 mr-1" /> : <TrendingDown className="inline h-3 w-3 mr-1" />}
+            <p
+              className={`text-xs ${stats.revenueChangePercentage >= 0 ? "text-green-600" : "text-red-600"}`}
+            >
+              {stats.revenueChangePercentage >= 0 ? (
+                <TrendingUp className="inline h-3 w-3 mr-1" />
+              ) : (
+                <TrendingDown className="inline h-3 w-3 mr-1" />
+              )}
               {stats.revenueChangePercentage}% vs mes anterior
             </p>
           </CardContent>

@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -11,16 +10,15 @@ export async function GET(
     const userId = parseInt(req.nextUrl.searchParams.get("userId") || "");
 
     if (isNaN(listingId) || isNaN(userId)) {
-      return new NextResponse("ID de anuncio o usuario inválido", { status: 400 });
+      return new NextResponse("ID de anuncio o usuario inválido", {
+        status: 400,
+      });
     }
 
     const messages = await prisma.message.findMany({
       where: {
         listingId: listingId,
-        OR: [
-          { senderId: userId },
-          { receiverId: userId },
-        ],
+        OR: [{ senderId: userId }, { receiverId: userId }],
       },
       orderBy: {
         createdAt: "asc",

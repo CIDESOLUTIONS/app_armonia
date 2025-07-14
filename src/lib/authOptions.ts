@@ -31,8 +31,11 @@ export const authOptions: NextAuthOptions = {
             include: { complex: true },
           });
 
-          const ipAddress = req.headers['x-forwarded-for']?.toString() || req.socket.remoteAddress || 'unknown';
-          const userAgent = req.headers['user-agent'] || 'unknown';
+          const ipAddress =
+            req.headers["x-forwarded-for"]?.toString() ||
+            req.socket.remoteAddress ||
+            "unknown";
+          const userAgent = req.headers["user-agent"] || "unknown";
 
           if (!user) {
             ServerLogger.warn(
@@ -82,9 +85,14 @@ export const authOptions: NextAuthOptions = {
                 status: "SUCCESS",
               },
             });
-            ServerLogger.info(`Inicio de sesión exitoso para ${email} desde ${ipAddress}`);
+            ServerLogger.info(
+              `Inicio de sesión exitoso para ${email} desde ${ipAddress}`,
+            );
           } catch (logError) {
-            ServerLogger.error(`Error al registrar el historial de login para ${email}:`, logError);
+            ServerLogger.error(
+              `Error al registrar el historial de login para ${email}:`,
+              logError,
+            );
           }
 
           if (

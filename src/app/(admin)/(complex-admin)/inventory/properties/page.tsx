@@ -42,7 +42,10 @@ import {
 } from "@/services/propertyService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { propertySchema, PropertyFormValues } from "@/validators/property-schema";
+import {
+  propertySchema,
+  PropertyFormValues,
+} from "@/validators/property-schema";
 import {
   Form,
   FormControl,
@@ -87,7 +90,12 @@ export default function PropertiesPage() {
     },
   });
 
-  const { handleSubmit, control, reset, formState: { isSubmitting } } = form;
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { isSubmitting },
+  } = form;
 
   const fetchProperties = useCallback(async () => {
     setLoading(true);
@@ -303,7 +311,9 @@ export default function PropertiesPage() {
                 name="unitNumber"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Número de Unidad</FormLabel>
+                    <FormLabel className="text-right">
+                      Número de Unidad
+                    </FormLabel>
                     <FormControl>
                       <Input className="col-span-3" {...field} />
                     </FormControl>
@@ -348,7 +358,9 @@ export default function PropertiesPage() {
                         type="number"
                         className="col-span-3"
                         {...field}
-                        onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                        onChange={(e) =>
+                          field.onChange(parseFloat(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
@@ -366,7 +378,9 @@ export default function PropertiesPage() {
                         type="number"
                         className="col-span-3"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
@@ -384,7 +398,9 @@ export default function PropertiesPage() {
                         type="number"
                         className="col-span-3"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
@@ -402,7 +418,9 @@ export default function PropertiesPage() {
                         type="number"
                         className="col-span-3"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
@@ -445,7 +463,8 @@ export default function PropertiesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Eliminación</AlertDialogTitle>
             <AlertDialogDescription>
-              ¿Estás seguro de que quieres eliminar esta propiedad? Esta acción no se puede deshacer.
+              ¿Estás seguro de que quieres eliminar esta propiedad? Esta acción
+              no se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -459,4 +478,3 @@ export default function PropertiesPage() {
     </div>
   );
 }
-

@@ -86,7 +86,13 @@ export default function AmenitiesPage() {
     },
   });
 
-  const { handleSubmit, control, reset, watch, formState: { isSubmitting } } = form;
+  const {
+    handleSubmit,
+    control,
+    reset,
+    watch,
+    formState: { isSubmitting },
+  } = form;
   const hasFee = watch("hasFee");
 
   const fetchAmenities = useCallback(async () => {
@@ -360,7 +366,9 @@ export default function AmenitiesPage() {
                         type="number"
                         className="col-span-3"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
@@ -415,7 +423,9 @@ export default function AmenitiesPage() {
                           type="number"
                           className="col-span-3"
                           {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                          onChange={(e) =>
+                            field.onChange(parseFloat(e.target.value))
+                          }
                         />
                       </FormControl>
                       <FormMessage className="col-span-full text-right" />
@@ -459,7 +469,8 @@ export default function AmenitiesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Eliminación</AlertDialogTitle>
             <AlertDialogDescription>
-              ¿Estás seguro de que quieres eliminar esta amenidad? Esta acción no se puede deshacer.
+              ¿Estás seguro de que quieres eliminar esta amenidad? Esta acción
+              no se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

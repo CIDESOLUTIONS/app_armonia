@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from "react";
@@ -21,7 +20,9 @@ import { Loader2 } from "lucide-react";
 
 const formSchema = z
   .object({
-    password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres."),
+    password: z
+      .string()
+      .min(8, "La contraseña debe tener al menos 8 caracteres."),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {

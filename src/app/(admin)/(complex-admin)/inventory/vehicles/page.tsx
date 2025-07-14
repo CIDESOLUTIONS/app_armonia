@@ -87,7 +87,12 @@ export default function VehiclesPage() {
     },
   });
 
-  const { handleSubmit, control, reset, formState: { isSubmitting } } = form;
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { isSubmitting },
+  } = form;
 
   const fetchVehicles = useCallback(async () => {
     setLoading(true);
@@ -355,7 +360,9 @@ export default function VehiclesPage() {
                 name="ownerName"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Nombre Propietario</FormLabel>
+                    <FormLabel className="text-right">
+                      Nombre Propietario
+                    </FormLabel>
                     <FormControl>
                       <Input className="col-span-3" {...field} />
                     </FormControl>
@@ -374,7 +381,9 @@ export default function VehiclesPage() {
                         type="number"
                         className="col-span-3"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
@@ -430,7 +439,8 @@ export default function VehiclesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Eliminación</AlertDialogTitle>
             <AlertDialogDescription>
-              ¿Estás seguro de que quieres eliminar este vehículo? Esta acción no se puede deshacer.
+              ¿Estás seguro de que quieres eliminar este vehículo? Esta acción
+              no se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

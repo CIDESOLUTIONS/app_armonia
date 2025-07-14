@@ -20,7 +20,10 @@ export async function getDocuments(): Promise<Document[]> {
   }
 }
 
-export async function uploadDocument(name: string, file: File): Promise<Document> {
+export async function uploadDocument(
+  name: string,
+  file: File,
+): Promise<Document> {
   try {
     const formData = new FormData();
     formData.append("name", name);

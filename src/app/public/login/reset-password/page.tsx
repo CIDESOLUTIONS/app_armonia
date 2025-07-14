@@ -62,9 +62,7 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div
-      className={`min-h-screen flex flex-col bg-gray-50`}
-    >
+    <div className={`min-h-screen flex flex-col bg-gray-50`}>
       {/* Header */}
       <Header
         theme="Claro"
@@ -103,7 +101,10 @@ export default function ResetPasswordPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="confirmPassword" className="text-left block mb-1">
+                <Label
+                  htmlFor="confirmPassword"
+                  className="text-left block mb-1"
+                >
                   Confirmar Contraseña
                 </Label>
                 <Input
@@ -125,9 +126,7 @@ export default function ResetPasswordPage() {
             </form>
           )}
           {message && token && (
-            <p className="mt-4 text-sm text-green-600">
-              {message}
-            </p>
+            <p className="mt-4 text-sm text-green-600">{message}</p>
           )}
           <button
             onClick={() => router.push("/login")}

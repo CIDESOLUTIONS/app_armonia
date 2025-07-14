@@ -70,7 +70,9 @@ export default function CommonAssetsPage() {
     isActive: true,
   });
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [commonAssetToDelete, setCommonAssetToDelete] = useState<number | null>(null);
+  const [commonAssetToDelete, setCommonAssetToDelete] = useState<number | null>(
+    null,
+  );
 
   const fetchCommonAssets = useCallback(async () => {
     setLoading(true);
@@ -389,7 +391,8 @@ export default function CommonAssetsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Eliminación</AlertDialogTitle>
             <AlertDialogDescription>
-              ¿Estás seguro de que quieres eliminar este bien común? Esta acción no se puede deshacer.
+              ¿Estás seguro de que quieres eliminar este bien común? Esta acción
+              no se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -83,7 +83,12 @@ export default function PetsPage() {
     },
   });
 
-  const { handleSubmit, control, reset, formState: { isSubmitting } } = form;
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { isSubmitting },
+  } = form;
 
   const fetchPets = useCallback(async () => {
     setLoading(true);
@@ -330,7 +335,9 @@ export default function PetsPage() {
                 name="ownerName"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Nombre Propietario</FormLabel>
+                    <FormLabel className="text-right">
+                      Nombre Propietario
+                    </FormLabel>
                     <FormControl>
                       <Input className="col-span-3" {...field} />
                     </FormControl>
@@ -349,7 +356,9 @@ export default function PetsPage() {
                         type="number"
                         className="col-span-3"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
@@ -392,7 +401,8 @@ export default function PetsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Eliminación</AlertDialogTitle>
             <AlertDialogDescription>
-              ¿Estás seguro de que quieres eliminar esta mascota? Esta acción no se puede deshacer.
+              ¿Estás seguro de que quieres eliminar esta mascota? Esta acción no
+              se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

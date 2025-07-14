@@ -84,7 +84,10 @@ export default function CreateResidentPQRPage() {
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Crear Nueva PQR</h1>
       <Form {...form}>
-        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-6 md:grid-cols-2">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="grid gap-6 md:grid-cols-2"
+        >
           <FormField
             control={control}
             name="subject"
@@ -117,7 +120,10 @@ export default function CreateResidentPQRPage() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Prioridad</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar prioridad" />

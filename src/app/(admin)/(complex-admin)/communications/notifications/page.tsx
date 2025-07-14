@@ -3,6 +3,19 @@
 import React, { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2, Send } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { sendNotification } from "@/services/notificationService";
 
 export default function NotificationsPage() {
   const { user, loading: authLoading } = useAuthStore();

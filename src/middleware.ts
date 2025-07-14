@@ -15,22 +15,8 @@ export default async function middleware(req: NextRequest) {
   const publicPathnameRegex = RegExp(
     `^(/(${locales.join("|")}))?(${publicPages
       .map((p) => (p === "/" ? "" : p))
-      .join("|")})/?import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
-import createIntlMiddleware from "next-intl/middleware";
-import { getTenantSchemaFromToken } from "@/lib/prisma";
-
-const locales = ["en", "es"];
-const publicPages = ["/", "/login", "/register-complex"];
-
-const intlMiddleware = createIntlMiddleware({
-  locales,
-  defaultLocale: "es",
-});
-
-export default async function middleware(req: NextRequest) {
-  ,
-    "i"
+      .join("|")})/?`,
+    "i",
   );
   const isPublicPage = publicPathnameRegex.test(req.nextUrl.pathname);
 

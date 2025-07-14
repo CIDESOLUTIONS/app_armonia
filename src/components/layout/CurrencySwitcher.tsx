@@ -9,7 +9,10 @@ interface CurrencySwitcherProps {
   setCurrency: (currency: string) => void;
 }
 
-export function CurrencySwitcher({ currency, setCurrency }: CurrencySwitcherProps) {
+export function CurrencySwitcher({
+  currency,
+  setCurrency,
+}: CurrencySwitcherProps) {
   const toggleCurrency = () => {
     setCurrency(currency === "COP" ? "USD" : "COP");
   };

@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAuth } from "@/lib/auth";
 import { getTenantPrismaClient } from "@/lib/prisma";

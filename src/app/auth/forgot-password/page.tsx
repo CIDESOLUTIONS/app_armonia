@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from "react";
@@ -38,7 +37,8 @@ export default function ForgotPasswordPage() {
       console.log(values);
       toast({
         title: "Solicitud Enviada",
-        description: "Si el email está registrado, recibirás un enlace para resetear tu contraseña.",
+        description:
+          "Si el email está registrado, recibirás un enlace para resetear tu contraseña.",
       });
     } catch (error) {
       toast({

@@ -107,6 +107,7 @@ describe("PQR System Integration Tests", () => {
       autoAssignEnabled: true,
       autoNotifyEnabled: true,
       satisfactionSurveyEnabled: true,
+    });
 
     // Crear instancias de los servicios con schema de prueba
     assignmentService = new PQRAssignmentService(mockSchemaName);

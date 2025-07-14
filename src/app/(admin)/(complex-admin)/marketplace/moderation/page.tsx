@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -13,7 +12,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getReportedListings, resolveReport } from "@/services/moderationService";
+import {
+  getReportedListings,
+  resolveReport,
+} from "@/services/moderationService";
 import Image from "next/image";
 
 export default function MarketplaceModerationPage() {
@@ -28,7 +30,10 @@ export default function MarketplaceModerationPage() {
         setReportedListings(data);
       } catch (error) {
         console.error("Error fetching reported listings:", error);
-        toast({ title: "Error", description: "No se pudieron cargar los anuncios reportados." });
+        toast({
+          title: "Error",
+          description: "No se pudieron cargar los anuncios reportados.",
+        });
       } finally {
         setLoading(false);
       }
@@ -37,7 +42,10 @@ export default function MarketplaceModerationPage() {
     fetchReportedListings();
   }, [toast]);
 
-  const handleResolveReport = async (reportId: number, action: "APPROVE" | "REJECT") => {
+  const handleResolveReport = async (
+    reportId: number,
+    action: "APPROVE" | "REJECT",
+  ) => {
     setLoading(true);
     try {
       await resolveReport(reportId, action);
@@ -46,7 +54,9 @@ export default function MarketplaceModerationPage() {
         description: `Reporte ${action === "APPROVE" ? "aprobado" : "rechazado"} correctamente.`,
       });
       // Actualizar la lista de reportes
-      setReportedListings((prev) => prev.filter((report) => report.id !== reportId));
+      setReportedListings((prev) =>
+        prev.filter((report) => report.id !== reportId),
+      );
     } catch (error) {
       console.error("Error resolving report:", error);
       toast({
@@ -69,12 +79,16 @@ export default function MarketplaceModerationPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Moderación de Marketplace</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        Moderación de Marketplace
+      </h1>
 
       {reportedListings.length === 0 ? (
         <div className="text-center py-12 text-gray-500">
           <CheckCircle className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-          <h3 className="text-lg font-medium mb-2">No hay anuncios reportados pendientes</h3>
+          <h3 className="text-lg font-medium mb-2">
+            No hay anuncios reportados pendientes
+          </h3>
           <p>Todo el contenido del marketplace está limpio.</p>
         </div>
       ) : (
@@ -93,24 +107,29 @@ export default function MarketplaceModerationPage() {
               <TableRow key={report.id}>
                 <TableCell>
                   <div className="flex items-center space-x-3">
-                    {report.listing.images && report.listing.images.length > 0 && (
-                      <Image
-                        src={report.listing.images[0]}
-                        alt={report.listing.title}
-                        width={50}
-                        height={50}
-                        className="rounded-md object-cover"
-                      />
-                    )}
+                    {report.listing.images &&
+                      report.listing.images.length > 0 && (
+                        <Image
+                          src={report.listing.images[0]}
+                          alt={report.listing.title}
+                          width={50}
+                          height={50}
+                          className="rounded-md object-cover"
+                        />
+                      )}
                     <div>
                       <p className="font-medium">{report.listing.title}</p>
-                      <p className="text-sm text-gray-500">${report.listing.price.toFixed(2)}</p>
+                      <p className="text-sm text-gray-500">
+                        ${report.listing.price.toFixed(2)}
+                      </p>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>{report.reporter.name}</TableCell>
                 <TableCell>{report.reason}</TableCell>
-                <TableCell>{new Date(report.createdAt).toLocaleDateString()}</TableCell>
+                <TableCell>
+                  {new Date(report.createdAt).toLocaleDateString()}
+                </TableCell>
                 <TableCell className="text-right">
                   <Button
                     variant="outline"

@@ -48,7 +48,10 @@ import {
 } from "@/services/residentService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { residentSchema, ResidentFormValues } from "@/validators/resident-schema";
+import {
+  residentSchema,
+  ResidentFormValues,
+} from "@/validators/resident-schema";
 import {
   Form,
   FormControl,
@@ -90,7 +93,12 @@ export default function ResidentsPage() {
     },
   });
 
-  const { handleSubmit, control, reset, formState: { isSubmitting } } = form;
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { isSubmitting },
+  } = form;
 
   const fetchResidents = useCallback(async () => {
     setLoading(true);
@@ -343,7 +351,9 @@ export default function ResidentsPage() {
                         type="number"
                         className="col-span-3"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
@@ -356,7 +366,10 @@ export default function ResidentsPage() {
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center gap-4">
                     <FormLabel className="text-right">Rol</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger className="col-span-3 p-2 border rounded-md">
                           <SelectValue placeholder="Seleccionar Rol" />
@@ -408,7 +421,8 @@ export default function ResidentsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Eliminación</AlertDialogTitle>
             <AlertDialogDescription>
-              ¿Estás seguro de que quieres eliminar este residente? Esta acción no se puede deshacer.
+              ¿Estás seguro de que quieres eliminar este residente? Esta acción
+              no se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

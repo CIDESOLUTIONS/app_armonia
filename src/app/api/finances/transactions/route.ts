@@ -56,20 +56,22 @@ export async function GET(request: NextRequest) {
         id: p.id,
         concepto: p.concept || "Pago",
         monto: p.amount,
-        fecha: p.createdAt.toISOString().split('T')[0],
+        fecha: p.createdAt.toISOString().split("T")[0],
         estado: "Pagado",
       })),
       ...recentExpenses.map((e) => ({
         id: e.id,
         concepto: e.description || "Gasto",
         monto: e.amount,
-        fecha: e.createdAt.toISOString().split('T')[0],
+        fecha: e.createdAt.toISOString().split("T")[0],
         estado: "Registrado", // O el estado que corresponda
       })),
     ];
 
     // Ordenar por fecha descendente
-    transactions.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+    transactions.sort(
+      (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime(),
+    );
 
     ServerLogger.info(
       `Transacciones recientes obtenidas para el complejo ${payload.complexId}`,

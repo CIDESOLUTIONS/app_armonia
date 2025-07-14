@@ -1,4 +1,3 @@
-
 import { prisma } from "@/lib/prisma";
 
 interface BankStatementEntry {
@@ -7,7 +6,9 @@ interface BankStatementEntry {
   amount: number;
 }
 
-export async function reconcileBankStatement(statementEntries: BankStatementEntry[]) {
+export async function reconcileBankStatement(
+  statementEntries: BankStatementEntry[],
+) {
   const pendingPayments = await prisma.payment.findMany({
     where: { status: "PENDING" },
   });

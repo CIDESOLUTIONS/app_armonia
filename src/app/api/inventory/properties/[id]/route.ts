@@ -23,7 +23,10 @@ const PropertySchema = z.object({
   isActive: z.boolean().default(true),
 });
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
     const authResult = await authMiddleware(request, [
       "ADMIN",
@@ -36,7 +39,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     const propertyId = parseInt(params.id);
     if (isNaN(propertyId)) {
-      return NextResponse.json({ message: "ID de propiedad inválido" }, { status: 400 });
+      return NextResponse.json(
+        { message: "ID de propiedad inválido" },
+        { status: 400 },
+      );
     }
 
     const body = await request.json();
@@ -64,7 +70,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
     const authResult = await authMiddleware(request, [
       "ADMIN",
@@ -77,7 +86,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     const propertyId = parseInt(params.id);
     if (isNaN(propertyId)) {
-      return NextResponse.json({ message: "ID de propiedad inválido" }, { status: 400 });
+      return NextResponse.json(
+        { message: "ID de propiedad inválido" },
+        { status: 400 },
+      );
     }
 
     const tenantPrisma = getTenantPrismaClient(payload.schemaName);
@@ -88,7 +100,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     ServerLogger.info(
       `Propiedad ${propertyId} eliminada para el complejo ${payload.complexId}`,
     );
-    return NextResponse.json({ message: "Propiedad eliminada exitosamente" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Propiedad eliminada exitosamente" },
+      { status: 200 },
+    );
   } catch (error) {
     ServerLogger.error(`Error al eliminar propiedad ${params.id}:`, error);
     return NextResponse.json({ message: "Error interno" }, { status: 500 });

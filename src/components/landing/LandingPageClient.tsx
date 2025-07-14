@@ -25,9 +25,7 @@ export default function LandingPageClient() {
   };
 
   return (
-    <div
-      className={`flex flex-col min-h-screen overflow-hidden`}
-    >
+    <div className={`flex flex-col min-h-screen overflow-hidden`}>
       {/* Header */}
       <Header
         language={"Español"}

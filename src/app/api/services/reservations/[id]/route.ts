@@ -29,7 +29,10 @@ const ReservationSchema = z.object({
   cancelledAt: z.string().datetime().optional(),
 });
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
     const authResult = await authMiddleware(request, [
       "ADMIN",
@@ -43,7 +46,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     const reservationId = parseInt(params.id);
     if (isNaN(reservationId)) {
-      return NextResponse.json({ message: "ID de reserva inválido" }, { status: 400 });
+      return NextResponse.json(
+        { message: "ID de reserva inválido" },
+        { status: 400 },
+      );
     }
 
     const body = await request.json();
@@ -71,7 +77,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
     const authResult = await authMiddleware(request, [
       "ADMIN",
@@ -85,7 +94,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     const reservationId = parseInt(params.id);
     if (isNaN(reservationId)) {
-      return NextResponse.json({ message: "ID de reserva inválido" }, { status: 400 });
+      return NextResponse.json(
+        { message: "ID de reserva inválido" },
+        { status: 400 },
+      );
     }
 
     const tenantPrisma = getTenantPrismaClient(payload.schemaName);
@@ -96,7 +108,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     ServerLogger.info(
       `Reserva ${reservationId} eliminada para el complejo ${payload.complexId}`,
     );
-    return NextResponse.json({ message: "Reserva eliminada exitosamente" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Reserva eliminada exitosamente" },
+      { status: 200 },
+    );
   } catch (error) {
     ServerLogger.error(`Error al eliminar reserva ${params.id}:`, error);
     return NextResponse.json({ message: "Error interno" }, { status: 500 });

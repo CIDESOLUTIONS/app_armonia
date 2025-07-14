@@ -161,9 +161,7 @@ export default function InventoryPage() {
                 <p className="text-sm font-medium text-gray-600">
                   {card.title}
                 </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {card.value}
-                </p>
+                <p className="text-2xl font-bold text-gray-900">{card.value}</p>
               </div>
             </div>
           </div>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -49,7 +48,10 @@ export default function ChatPage() {
 
     socket.on("connect", () => {
       console.log("Conectado a Socket.IO");
-      socket.emit("joinChat", { listingId: Number(listingId), userId: user.id });
+      socket.emit("joinChat", {
+        listingId: Number(listingId),
+        userId: user.id,
+      });
     });
 
     socket.on("receiveMessage", (message: any) => {
@@ -76,7 +78,8 @@ export default function ChatPage() {
       const messageData = {
         listingId: Number(listingId),
         senderId: user.id,
-        receiverId: user.id === listing.authorId ? listing.buyerId : listing.authorId, // Lógica para determinar el receptor
+        receiverId:
+          user.id === listing.authorId ? listing.buyerId : listing.authorId, // Lógica para determinar el receptor
         content: newMessage,
       };
       await sendMessage(messageData);
@@ -115,9 +118,11 @@ export default function ChatPage() {
             className={`flex ${msg.senderId === user?.id ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[70%] p-3 rounded-lg ${msg.senderId === user?.id
-                ? "bg-indigo-500 text-white"
-                : "bg-gray-200 text-gray-800"}
+              className={`max-w-[70%] p-3 rounded-lg ${
+                msg.senderId === user?.id
+                  ? "bg-indigo-500 text-white"
+                  : "bg-gray-200 text-gray-800"
+              }
               `}
             >
               <p className="text-sm">{msg.content}</p>

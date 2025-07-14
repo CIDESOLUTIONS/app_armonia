@@ -3,6 +3,12 @@
 import { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2, Send } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { sendMessage } from "@/services/messageService";
 
 export default function MessagesPage() {
   const { user, loading: authLoading } = useAuthStore();

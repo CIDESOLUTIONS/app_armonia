@@ -62,7 +62,10 @@ export async function DELETE(
     if (!bucketName) {
       ServerLogger.error("AWS_S3_BUCKET_NAME no está configurado.");
       return NextResponse.json(
-        { message: "Error de configuración del servidor: Bucket S3 no especificado." },
+        {
+          message:
+            "Error de configuración del servidor: Bucket S3 no especificado.",
+        },
         { status: 500 },
       );
     }
@@ -77,7 +80,9 @@ export async function DELETE(
         await s3Client.send(command);
         ServerLogger.info(`Archivo ${fileKey} eliminado de S3.`);
       } catch (s3Error: any) {
-        ServerLogger.error(`Error al eliminar el archivo de S3: ${s3Error.message}`);
+        ServerLogger.error(
+          `Error al eliminar el archivo de S3: ${s3Error.message}`,
+        );
         // Continuar con la eliminación de la base de datos aunque falle S3
       }
     }
@@ -90,7 +95,10 @@ export async function DELETE(
     ServerLogger.info(
       `Documento ${document.title} eliminado para el complejo ${payload.complexId}`,
     );
-    return NextResponse.json({ message: "Documento eliminado correctamente." }, { status: 200 });
+    return NextResponse.json(
+      { message: "Documento eliminado correctamente." },
+      { status: 200 },
+    );
   } catch (error: any) {
     ServerLogger.error("Error al eliminar documento:", error);
     return NextResponse.json(

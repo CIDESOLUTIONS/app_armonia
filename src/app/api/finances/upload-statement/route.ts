@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import * as xlsx from "xlsx";
@@ -10,7 +9,9 @@ export async function POST(req: NextRequest) {
     const file = formData.get("file") as File;
 
     if (!file) {
-      return new NextResponse("No se ha subido ningún archivo", { status: 400 });
+      return new NextResponse("No se ha subido ningún archivo", {
+        status: 400,
+      });
     }
 
     const buffer = await file.arrayBuffer();

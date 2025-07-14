@@ -85,7 +85,10 @@ export async function PUT(request: NextRequest) {
     const secondaryColor = formData.get("secondaryColor") as string;
     const logoFile = formData.get("logoFile") as File | null;
 
-    const validatedData = BrandingSettingsSchema.parse({ primaryColor, secondaryColor });
+    const validatedData = BrandingSettingsSchema.parse({
+      primaryColor,
+      secondaryColor,
+    });
 
     const tenantPrisma = getTenantPrismaClient(payload.schemaName);
     let logoUrl: string | undefined;
@@ -97,7 +100,10 @@ export async function PUT(request: NextRequest) {
       if (!bucketName) {
         ServerLogger.error("AWS_S3_BUCKET_NAME no está configurado.");
         return NextResponse.json(
-          { message: "Error de configuración del servidor: Bucket S3 no especificado." },
+          {
+            message:
+              "Error de configuración del servidor: Bucket S3 no especificado.",
+          },
           { status: 500 },
         );
       }
@@ -105,7 +111,9 @@ export async function PUT(request: NextRequest) {
       try {
         logoUrl = await uploadFileToS3(logoFile, fileName, bucketName);
       } catch (uploadError: any) {
-        ServerLogger.error(`Error al cargar el logo a S3: ${uploadError.message}`);
+        ServerLogger.error(
+          `Error al cargar el logo a S3: ${uploadError.message}`,
+        );
         return NextResponse.json(
           { message: "Error al cargar el logo.", details: uploadError.message },
           { status: 500 },
@@ -137,4 +145,3 @@ export async function PUT(request: NextRequest) {
     );
   }
 }
-

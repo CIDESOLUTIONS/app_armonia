@@ -18,7 +18,9 @@ export async function getFinancialSettings(): Promise<FinancialSettings> {
   }
 }
 
-export async function updateFinancialSettings(data: FinancialSettings): Promise<FinancialSettings> {
+export async function updateFinancialSettings(
+  data: FinancialSettings,
+): Promise<FinancialSettings> {
   try {
     const response = await fetchApi("/api/settings/financial", {
       method: "PUT",

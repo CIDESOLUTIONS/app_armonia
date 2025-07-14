@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAuth } from "@/lib/auth";
 import { getTenantPrismaClient } from "@/lib/prisma";
@@ -43,7 +42,10 @@ export async function POST(request: NextRequest) {
     if (!bucketName) {
       ServerLogger.error("AWS_S3_BUCKET_NAME no está configurado.");
       return NextResponse.json(
-        { message: "Error de configuración del servidor: Bucket S3 no especificado." },
+        {
+          message:
+            "Error de configuración del servidor: Bucket S3 no especificado.",
+        },
         { status: 500 },
       );
     }
@@ -54,9 +56,14 @@ export async function POST(request: NextRequest) {
     try {
       fileUrl = await uploadFileToS3(file, fileName, bucketName);
     } catch (uploadError: any) {
-      ServerLogger.error(`Error al cargar el archivo a S3: ${uploadError.message}`);
+      ServerLogger.error(
+        `Error al cargar el archivo a S3: ${uploadError.message}`,
+      );
       return NextResponse.json(
-        { message: "Error al cargar el archivo.", details: uploadError.message },
+        {
+          message: "Error al cargar el archivo.",
+          details: uploadError.message,
+        },
         { status: 500 },
       );
     }

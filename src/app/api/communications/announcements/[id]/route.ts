@@ -17,7 +17,10 @@ const AnnouncementSchema = z.object({
   targetRoles: z.array(z.string()).default([]), // Roles a los que va dirigido el anuncio
 });
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
     const authResult = await authMiddleware(request, [
       "ADMIN",
@@ -30,7 +33,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     const announcementId = parseInt(params.id);
     if (isNaN(announcementId)) {
-      return NextResponse.json({ message: "ID de anuncio inválido" }, { status: 400 });
+      return NextResponse.json(
+        { message: "ID de anuncio inválido" },
+        { status: 400 },
+      );
     }
 
     const body = await request.json();
@@ -58,7 +64,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
     const authResult = await authMiddleware(request, [
       "ADMIN",
@@ -71,7 +80,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     const announcementId = parseInt(params.id);
     if (isNaN(announcementId)) {
-      return NextResponse.json({ message: "ID de anuncio inválido" }, { status: 400 });
+      return NextResponse.json(
+        { message: "ID de anuncio inválido" },
+        { status: 400 },
+      );
     }
 
     const tenantPrisma = getTenantPrismaClient(payload.schemaName);
@@ -82,7 +94,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     ServerLogger.info(
       `Anuncio ${announcementId} eliminado para el complejo ${payload.complexId}`,
     );
-    return NextResponse.json({ message: "Anuncio eliminado exitosamente" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Anuncio eliminado exitosamente" },
+      { status: 200 },
+    );
   } catch (error) {
     ServerLogger.error(`Error al eliminar anuncio ${params.id}:`, error);
     return NextResponse.json({ message: "Error interno" }, { status: 500 });

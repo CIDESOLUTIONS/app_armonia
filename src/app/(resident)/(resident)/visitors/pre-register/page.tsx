@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from "react";
@@ -53,7 +52,10 @@ export default function PreRegisterVisitorPage() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!user?.id || !user?.complexId) {
-      toast({ title: "Error", description: "Debes iniciar sesión como residente." });
+      toast({
+        title: "Error",
+        description: "Debes iniciar sesión como residente.",
+      });
       return;
     }
 
@@ -84,7 +86,9 @@ export default function PreRegisterVisitorPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Pre-registrar Visitante</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        Pre-registrar Visitante
+      </h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
@@ -172,7 +176,10 @@ export default function PreRegisterVisitorPage() {
               <FormItem>
                 <FormLabel>Propósito de la Visita (Opcional)</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ej: Visita familiar, entrega" {...field} />
+                  <Input
+                    placeholder="Ej: Visita familiar, entrega"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

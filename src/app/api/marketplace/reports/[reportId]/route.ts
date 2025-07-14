@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -11,7 +10,9 @@ export async function POST(
     const { action } = await req.json(); // 'APPROVE' o 'REJECT'
 
     if (isNaN(reportId) || !action) {
-      return new NextResponse("ID de reporte o acción inválida", { status: 400 });
+      return new NextResponse("ID de reporte o acción inválida", {
+        status: 400,
+      });
     }
 
     if (action === "REJECT") {

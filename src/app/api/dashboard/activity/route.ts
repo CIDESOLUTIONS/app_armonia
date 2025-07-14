@@ -84,7 +84,12 @@ export async function GET(request: NextRequest) {
         title: `PQR: ${p.subject}`,
         description: `Reportado por: ${p.reportedBy?.name || "N/A"} - Estado: ${p.status}`,
         timestamp: p.createdAt.toISOString(),
-        status: p.status === "OPEN" ? "error" : p.status === "IN_PROGRESS" ? "warning" : "info",
+        status:
+          p.status === "OPEN"
+            ? "error"
+            : p.status === "IN_PROGRESS"
+              ? "warning"
+              : "info",
       })),
       ...recentAssemblies.map((a) => ({
         id: `assembly-${a.id}`,
@@ -97,7 +102,10 @@ export async function GET(request: NextRequest) {
     ];
 
     // Sort by timestamp (most recent first)
-    activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    activities.sort(
+      (a, b) =>
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+    );
 
     ServerLogger.info(
       `Actividad del dashboard obtenida para el complejo ${payload.complexId}`,
