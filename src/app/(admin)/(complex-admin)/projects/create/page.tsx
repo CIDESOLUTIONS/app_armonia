@@ -1,4 +1,4 @@
-"use client";
+""use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { createProject } from "@/services/projectService";
+import { UserSearchSelect } from "@/components/ui/UserSearchSelect";
 
 export default function CreateProjectPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -29,7 +30,7 @@ export default function CreateProjectPage() {
     status: "PENDING",
     startDate: "",
     endDate: "",
-    assignedToId: 0, // Placeholder for actual user ID
+    assignedToId: null as number | null, // Ahora puede ser null
   });
   const [loading, setLoading] = useState(false);
 
@@ -47,6 +48,13 @@ export default function CreateProjectPage() {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  const handleUserSelect = (userId: number | null) => {
+    setFormData((prev) => ({
+      ...prev,
+      assignedToId: userId,
     }));
   };
 
@@ -152,14 +160,10 @@ export default function CreateProjectPage() {
           />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="assignedToId">Asignar a (ID de Usuario)</Label>
-          <Input
-            id="assignedToId"
-            name="assignedToId"
-            type="number"
-            value={formData.assignedToId}
-            onChange={handleInputChange}
-            placeholder="Ej: 123"
+          <Label htmlFor="assignedToId">Asignar a</Label>
+          <UserSearchSelect
+            onUserSelect={handleUserSelect}
+            initialUserId={formData.assignedToId}
           />
         </div>
         <div className="grid gap-2 col-span-full">
@@ -183,3 +187,4 @@ export default function CreateProjectPage() {
     </div>
   );
 }
+

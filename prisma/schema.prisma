@@ -363,21 +363,28 @@ model ResidentialComplex {
   updatedAt   DateTime @updatedAt
   users       User[]
   subscriptions Subscription[]
-  
+  listings    Listing[]
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
-  email       String   @unique
-  name        String?
-  password    String
-  role        String   // 'ADMIN', 'COMPLEX_ADMIN', 'RESIDENT', 'STAFF'
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  complexId   Int?
-  complex     ResidentialComplex? @relation(fields: [complexId], references: [id])
-  
+  id                   Int                   @id @default(autoincrement())
+  email                String                @unique
+  name                 String?
+  password             String
+  role                 String   // 'ADMIN', 'COMPLEX_ADMIN', 'RESIDENT', 'STAFF'
+  active               Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  complexId            Int?
+  complex              ResidentialComplex?   @relation(fields: [complexId], references: [id])
+  listings             Listing[]
+  sentMessages         Message[]             @relation("sentMessages")
+  receivedMessages     Message[]             @relation("receivedMessages")
+  reports              Report[]
+  loginHistory         LoginHistory[]
+  passwordResetToken   String?               @unique
+  passwordResetExpires DateTime?
+  preRegisteredVisitors PreRegisteredVisitor[]
 }
 
 model Prospect {
@@ -536,6 +543,7 @@ model PreRegisteredVisitor {
   documentType    DocumentType?
   documentNumber  String?
   residentId      Int
+  resident        User      @relation(fields: [residentId], references: [id])
   unitId          Int
   expectedDate    DateTime
   validFrom       DateTime
@@ -544,6 +552,7 @@ model PreRegisteredVisitor {
   isRecurrent     Boolean   @default(false)
   recurrenceRule  String?
   accessCode      String
+  qrCodeUrl       String? // Nuevo campo para la URL del QR
   status          String
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -748,10 +757,63 @@ model PackageReport {
 model LoginHistory {
   id        Int      @id @default(autoincrement())
   userId    Int?     // Optional, for failed attempts by non-existent users
+  user      User?    @relation(fields: [userId], references: [id])
   email     String?  // Email of the login attempt
   timestamp DateTime @default(now())
   ipAddress String?
   userAgent String?
   status    String   // "SUCCESS" o "FAILED"
   reason    String?  // Reason for failed login (e.g., "User not found", "Incorrect password")
+}
+
+// --- Marketplace Comunitario ---
+
+model Listing {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  price       Float
+  category    String
+  author      User      @relation(fields: [authorId], references: [id])
+  authorId    Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  images      String[]
+  isSold      Boolean   @default(false)
+  reports     Report[]
+  messages    Message[]
+  complexId   Int
+  complex     ResidentialComplex @relation(fields: [complexId], references: [id])
+
+  @@index([authorId])
+  @@index([complexId])
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  sender    User     @relation("sentMessages", fields: [senderId], references: [id])
+  senderId  Int
+  receiver  User     @relation("receivedMessages", fields: [receiverId], references: [id])
+  receiverId Int
+  listingId Int
+  listing   Listing  @relation(fields: [listingId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([listingId])
+}
+
+model Report {
+  id        Int      @id @default(autoincrement())
+  reason    String
+  listing   Listing  @relation(fields: [listingId], references: [id])
+  listingId Int
+  reporter  User     @relation(fields: [reporterId], references: [id])
+  reporterId Int
+  createdAt DateTime @default(now())
+
+  @@index([listingId])
+  @@index([reporterId])
 }

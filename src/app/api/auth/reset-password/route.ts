@@ -1,56 +1,43 @@
+
 import { NextRequest, NextResponse } from "next/server";
-import { getPublicPrismaClient, getTenantPrismaClient } from "@/lib/prisma";
-import { verifyPasswordResetToken } from "@/lib/auth";
-import { ServerLogger } from "@/lib/logging/server-logger";
-import { z } from "zod";
-import bcrypt from "bcryptjs";
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcrypt";
 
-const ResetPasswordSchema = z.object({
-  token: z.string().min(1, "El token es requerido."),
-  newPassword: z.string().min(6, "La nueva contraseña debe tener al menos 6 caracteres."),
-});
-
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const body = await request.json();
-    const { token, newPassword } = ResetPasswordSchema.parse(body);
+    const { token, password } = await req.json();
 
-    const decodedToken = await verifyPasswordResetToken(token);
-
-    if (!decodedToken || !decodedToken.id || !decodedToken.email) {
-      return NextResponse.json({ message: "Token inválido o expirado" }, { status: 400 });
+    if (!token || !password) {
+      return new NextResponse("Token y contraseña son requeridos", { status: 400 });
     }
 
-    const publicPrisma = getPublicPrismaClient();
-    let prismaClient = publicPrisma; // Default to public prisma
+    const hashedToken = Buffer.from(token).toString("base64");
 
-    // If schemaName is present in the token, use the tenant-specific prisma client
-    if (decodedToken.schemaName) {
-      prismaClient = getTenantPrismaClient(decodedToken.schemaName);
-    }
-
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    const updatedUser = await prismaClient.user.update({
-      where: { id: decodedToken.id, email: decodedToken.email },
-      data: { password: hashedPassword },
+    const user = await prisma.user.findFirst({
+      where: {
+        passwordResetToken: hashedToken,
+        passwordResetExpires: { gt: new Date() },
+      },
     });
 
-    ServerLogger.info(
-      `Contraseña restablecida para el usuario ${updatedUser.email}`,
-    );
-    return NextResponse.json({ message: "Contraseña restablecida exitosamente" }, { status: 200 });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { message: "Error de validación", errors: error.errors },
-        { status: 400 },
-      );
+    if (!user) {
+      return new NextResponse("Token no válido o expirado", { status: 400 });
     }
-    ServerLogger.error("Error al restablecer contraseña:", error);
-    return NextResponse.json(
-      { message: "Error interno del servidor" },
-      { status: 500 },
-    );
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        passwordResetToken: null,
+        passwordResetExpires: null,
+      },
+    });
+
+    return NextResponse.json({ message: "Contraseña actualizada con éxito" }, { status: 200 });
+  } catch (error) {
+    console.error("[RESET_PASSWORD_ERROR]", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

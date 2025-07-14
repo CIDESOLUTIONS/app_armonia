@@ -12,14 +12,15 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
-        schemaName: { label: "Schema Name", type: "text", optional: true }, // schemaName ahora es opcional en las credenciales
+        rememberMe: { label: "Remember Me", type: "checkbox" }, // Añadir rememberMe
+        schemaName: { label: "Schema Name", type: "text", optional: true },
       },
       async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
 
-        const { email, password, schemaName } = credentials;
+        const { email, password, schemaName, rememberMe } = credentials;
         const publicPrisma = getPublicPrismaClient();
 
         let user = null;
@@ -27,7 +28,7 @@ export const authOptions: NextAuthOptions = {
         try {
           user = await publicPrisma.user.findUnique({
             where: { email: email },
-            include: { complex: true }, // Incluir la relación con ResidentialComplex
+            include: { complex: true },
           });
 
           const ipAddress = req.headers['x-forwarded-for']?.toString() || req.socket.remoteAddress || 'unknown';
@@ -70,7 +71,6 @@ export const authOptions: NextAuthOptions = {
             return null;
           }
 
-          // Registrar el inicio de sesión exitoso
           try {
             await publicPrisma.loginHistory.create({
               data: {
@@ -87,7 +87,6 @@ export const authOptions: NextAuthOptions = {
             ServerLogger.error(`Error al registrar el historial de login para ${email}:`, logError);
           }
 
-          // Validar que el usuario pertenece al schemaName proporcionado (si aplica)
           if (
             user.complexId &&
             schemaName &&
@@ -105,7 +104,8 @@ export const authOptions: NextAuthOptions = {
             name: user.name,
             role: user.role,
             complexId: user.complexId?.toString(),
-            schemaName: user.complex?.schemaName || null, // Usar el schemaName del complejo asociado
+            schemaName: user.complex?.schemaName || null,
+            rememberMe: rememberMe,
           };
         } catch (error) {
           ServerLogger.error(`Error en la autorización para ${email}:`, error);
@@ -119,6 +119,7 @@ export const authOptions: NextAuthOptions = {
   },
   jwt: {
     secret: process.env.NEXTAUTH_SECRET,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -128,7 +129,8 @@ export const authOptions: NextAuthOptions = {
         token.role = user.role;
         token.name = user.name;
         token.complexId = user.complexId;
-        token.schemaName = (user as any).schemaName; // Asegurar que schemaName se propague
+        token.schemaName = (user as any).schemaName;
+        token.rememberMe = (user as any).rememberMe;
       }
       return token;
     },
@@ -139,13 +141,17 @@ export const authOptions: NextAuthOptions = {
         session.user.name = token.name;
         session.user.role = token.role;
         session.user.complexId = token.complexId;
-        session.user.schemaName = token.schemaName; // Asegurar que schemaName se propague
+        session.user.schemaName = token.schemaName;
+      }
+      // Si rememberMe no es true, la sesión expirará cuando se cierre el navegador
+      if (!token.rememberMe) {
+        session.expires = ""; // Esto hará que la cookie sea de sesión
       }
       return session;
     },
   },
   pages: {
-    signIn: "/public/login", // Asegurar que la ruta de signIn sea correcta
+    signIn: "/public/login",
     error: "/public/login",
   },
   secret: process.env.NEXTAUTH_SECRET,
