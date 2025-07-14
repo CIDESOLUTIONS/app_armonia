@@ -10,7 +10,7 @@ interface FinancialSettings {
 
 export async function getFinancialSettings(): Promise<FinancialSettings> {
   try {
-    const response = await fetchApi("/api/settings/financial");
+    const response = await fetchApi("/finances/settings");
     return response;
   } catch (error) {
     console.error("Error fetching financial settings:", error);
@@ -22,7 +22,7 @@ export async function updateFinancialSettings(
   data: FinancialSettings,
 ): Promise<FinancialSettings> {
   try {
-    const response = await fetchApi("/api/settings/financial", {
+    const response = await fetchApi("/finances/settings", {
       method: "PUT",
       body: JSON.stringify(data),
     });

@@ -33,7 +33,7 @@ interface UpdateCommonAssetData {
 
 export async function getCommonAssets(): Promise<CommonAsset[]> {
   try {
-    const response = await fetchApi("/api/inventory/common-assets");
+    const response = await fetchApi("/inventory/common-assets");
     return response;
   } catch (error) {
     console.error("Error fetching common assets:", error);
@@ -45,7 +45,7 @@ export async function createCommonAsset(
   data: CreateCommonAssetData,
 ): Promise<CommonAsset> {
   try {
-    const response = await fetchApi("/api/inventory/common-assets", {
+    const response = await fetchApi("/inventory/common-assets", {
       method: "POST",
       body: JSON.stringify(data),
     });
@@ -61,9 +61,9 @@ export async function updateCommonAsset(
   data: UpdateCommonAssetData,
 ): Promise<CommonAsset> {
   try {
-    const response = await fetchApi("/api/inventory/common-assets", {
+    const response = await fetchApi(`/inventory/common-assets/${id}`, {
       method: "PUT",
-      body: JSON.stringify({ id, ...data }),
+      body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
@@ -74,7 +74,7 @@ export async function updateCommonAsset(
 
 export async function deleteCommonAsset(id: number): Promise<void> {
   try {
-    await fetchApi("/api/inventory/common-assets", {
+    await fetchApi(`/inventory/common-assets/${id}`, {
       method: "DELETE",
       body: JSON.stringify({ id }),
     });

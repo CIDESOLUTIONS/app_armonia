@@ -1,0 +1,166 @@
+// Esquema para el Sistema de Comunicaciones
+// Este archivo define los modelos de datos para el tablón de anuncios digital
+// y el sistema de notificaciones para residentes
+
+// Modelo para anuncios
+model Announcement {
+  id                Int               @id @default(autoincrement())
+  title             String            // Título del anuncio
+  content           String            // Contenido del anuncio
+  categoryId        Int               // ID de la categoría
+  category          AnnouncementCategory @relation(fields: [categoryId], references: [id])
+  authorId          Int               // ID del usuario que creó el anuncio
+  authorName        String            // Nombre del autor
+  isPinned          Boolean           @default(false) // Si está fijado en la parte superior
+  isImportant       Boolean           @default(false) // Si es marcado como importante
+  publishDate       DateTime          @default(now()) // Fecha de publicación
+  expiryDate        DateTime?         // Fecha de expiración (opcional)
+  attachments       String[]          // URLs de archivos adjuntos
+  visibleToRoles    String[]          // Roles que pueden ver el anuncio
+  visibleToUnits    String[]          // Unidades que pueden ver el anuncio (vacío = todas)
+  status            AnnouncementStatus @default(PUBLISHED)
+  views             Int               @default(0) // Contador de vistas
+  reactions         Json?             // Reacciones de usuarios {userId: reaction}
+  comments          AnnouncementComment[] // Comentarios relacionados
+  readBy            AnnouncementRead[] // Registro de lecturas
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([categoryId])
+  @@index([publishDate])
+  @@index([status])
+  @@schema("tenant")
+}
+
+// Modelo para categorías de anuncios
+model AnnouncementCategory {
+  id                Int               @id @default(autoincrement())
+  name              String            // Nombre de la categoría
+  description       String?           // Descripción
+  color             String            @default("#3B82F6") // Color para UI
+  icon              String            @default("announcement") // Icono para UI
+  isDefault         Boolean           @default(false) // Si es la categoría por defecto
+  isActive          Boolean           @default(true) // Si está activa
+  announcements     Announcement[]    // Anuncios en esta categoría
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@schema("tenant")
+}
+
+// Modelo para comentarios en anuncios
+model AnnouncementComment {
+  id                Int               @id @default(autoincrement())
+  announcementId    Int               // ID del anuncio
+  announcement      Announcement      @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  authorId          Int               // ID del usuario que comentó
+  authorName        String            // Nombre del autor
+  content           String            // Contenido del comentario
+  isApproved        Boolean           @default(true) // Si está aprobado
+  parentId          Int?              // ID del comentario padre (para respuestas)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([announcementId])
+  @@schema("tenant")
+}
+
+// Modelo para registro de lecturas de anuncios
+model AnnouncementRead {
+  id                Int               @id @default(autoincrement())
+  announcementId    Int               // ID del anuncio
+  announcement      Announcement      @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  userId            Int               // ID del usuario que leyó
+  readAt            DateTime          @default(now()) // Fecha de lectura
+
+  @@unique([announcementId, userId])
+  @@index([announcementId])
+  @@index([userId])
+  @@schema("tenant")
+}
+
+// Modelo para notificaciones
+model Notification {
+  id                Int               @id @default(autoincrement())
+  userId            Int               // ID del usuario destinatario
+  title             String            // Título de la notificación
+  content           String            // Contenido de la notificación
+  type              NotificationType  // Tipo de notificación
+  status            NotificationStatus @default(UNREAD) // Estado de la notificación
+  relatedEntityType String?           // Tipo de entidad relacionada (ej. "announcement", "pqr")
+  relatedEntityId   Int?              // ID de la entidad relacionada
+  actionUrl         String?           // URL de acción (opcional)
+  isRead            Boolean           @default(false) // Si ha sido leída
+  readAt            DateTime?         // Fecha de lectura
+  createdAt         DateTime          @default(now())
+  expiresAt         DateTime?         // Fecha de expiración
+
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
+  @@schema("tenant")
+}
+
+// Modelo para configuración de notificaciones por usuario
+model NotificationPreference {
+  id                Int               @id @default(autoincrement())
+  userId            Int               // ID del usuario
+  notificationType  NotificationType  // Tipo de notificación
+  email             Boolean           @default(true) // Recibir por email
+  push              Boolean           @default(true) // Recibir por push
+  inApp             Boolean           @default(true) // Recibir en la aplicación
+  sms               Boolean           @default(false) // Recibir por SMS
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@unique([userId, notificationType])
+  @@schema("tenant")
+}
+
+// Modelo para plantillas de notificaciones
+model NotificationTemplate {
+  id                Int               @id @default(autoincrement())
+  name              String            // Nombre de la plantilla
+  description       String?           // Descripción
+  type              NotificationType  // Tipo de notificación
+  titleTemplate     String            // Plantilla para el título
+  contentTemplate   String            // Plantilla para el contenido
+  emailSubject      String?           // Asunto para email
+  emailTemplate     String?           // Plantilla para email
+  pushTemplate      String?           // Plantilla para push
+  smsTemplate       String?           // Plantilla para SMS
+  isActive          Boolean           @default(true) // Si está activa
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@unique([type])
+  @@schema("tenant")
+}
+
+// Enumeraciones
+enum AnnouncementStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  DELETED
+}
+
+enum NotificationType {
+  ANNOUNCEMENT
+  PQR
+  PAYMENT
+  RESERVATION
+  ASSEMBLY
+  SECURITY
+  MAINTENANCE
+  SYSTEM
+  OTHER
+}
+
+enum NotificationStatus {
+  UNREAD
+  READ
+  ARCHIVED
+  DELETED
+}

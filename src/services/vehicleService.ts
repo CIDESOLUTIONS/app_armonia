@@ -37,7 +37,7 @@ interface UpdateVehicleData {
 
 export async function getVehicles(): Promise<Vehicle[]> {
   try {
-    const response = await fetchApi("/api/inventory/vehicles");
+    const response = await fetchApi("/inventory/vehicles");
     return response;
   } catch (error) {
     console.error("Error fetching vehicles:", error);
@@ -47,7 +47,7 @@ export async function getVehicles(): Promise<Vehicle[]> {
 
 export async function createVehicle(data: CreateVehicleData): Promise<Vehicle> {
   try {
-    const response = await fetchApi("/api/inventory/vehicles", {
+    const response = await fetchApi("/inventory/vehicles", {
       method: "POST",
       body: JSON.stringify(data),
     });
@@ -63,9 +63,9 @@ export async function updateVehicle(
   data: UpdateVehicleData,
 ): Promise<Vehicle> {
   try {
-    const response = await fetchApi("/api/inventory/vehicles", {
+    const response = await fetchApi(`/inventory/vehicles/${id}`, {
       method: "PUT",
-      body: JSON.stringify({ id, ...data }),
+      body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
@@ -76,7 +76,7 @@ export async function updateVehicle(
 
 export async function deleteVehicle(id: number): Promise<void> {
   try {
-    await fetchApi(`/api/inventory/vehicles/${id}`, {
+    await fetchApi(`/inventory/vehicles/${id}`, {
       method: "DELETE",
     });
   } catch (error) {

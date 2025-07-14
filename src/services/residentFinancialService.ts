@@ -24,8 +24,8 @@ interface PendingFee {
 
 export async function getResidentFinancialSummary(): Promise<FinancialSummary> {
   try {
-    const response = await fetchApi("/api/resident-financial");
-    return response.summary;
+    const response = await fetchApi("/finances/resident/summary");
+    return response;
   } catch (error) {
     console.error("Error fetching resident financial summary:", error);
     throw error;
@@ -34,8 +34,8 @@ export async function getResidentFinancialSummary(): Promise<FinancialSummary> {
 
 export async function getResidentPayments(): Promise<Payment[]> {
   try {
-    const response = await fetchApi("/api/resident-financial");
-    return response.payments;
+    const response = await fetchApi("/finances/resident/payments");
+    return response;
   } catch (error) {
     console.error("Error fetching resident payments:", error);
     throw error;
@@ -44,8 +44,8 @@ export async function getResidentPayments(): Promise<Payment[]> {
 
 export async function getResidentPendingFees(): Promise<PendingFee[]> {
   try {
-    const response = await fetchApi("/api/resident-financial");
-    return response.pendingFees;
+    const response = await fetchApi("/finances/resident/pending-fees");
+    return response;
   } catch (error) {
     console.error("Error fetching resident pending fees:", error);
     throw error;
@@ -54,7 +54,7 @@ export async function getResidentPendingFees(): Promise<PendingFee[]> {
 
 export async function initiatePayment(feeId: number): Promise<string> {
   try {
-    const response = await fetchApi("/api/payments/initiate", {
+    const response = await fetchApi("/finances/payments/initiate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

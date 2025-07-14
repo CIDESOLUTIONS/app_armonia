@@ -36,7 +36,7 @@ interface UpdatePropertyData {
 
 export async function getProperties(): Promise<Property[]> {
   try {
-    const response = await fetchApi("/api/inventory/properties");
+    const response = await fetchApi("/inventory/properties");
     return response;
   } catch (error) {
     console.error("Error fetching properties:", error);
@@ -48,7 +48,7 @@ export async function createProperty(
   data: CreatePropertyData,
 ): Promise<Property> {
   try {
-    const response = await fetchApi("/api/inventory/properties", {
+    const response = await fetchApi("/inventory/properties", {
       method: "POST",
       body: JSON.stringify(data),
     });
@@ -64,9 +64,9 @@ export async function updateProperty(
   data: UpdatePropertyData,
 ): Promise<Property> {
   try {
-    const response = await fetchApi("/api/inventory/properties", {
+    const response = await fetchApi(`/inventory/properties/${id}`, {
       method: "PUT",
-      body: JSON.stringify({ id, ...data }),
+      body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
@@ -77,7 +77,7 @@ export async function updateProperty(
 
 export async function deleteProperty(id: number): Promise<void> {
   try {
-    await fetchApi(`/api/inventory/properties/${id}`, {
+    await fetchApi(`/inventory/properties/${id}`, {
       method: "DELETE",
     });
   } catch (error) {

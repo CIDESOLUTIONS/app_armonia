@@ -9,11 +9,12 @@ import { Check, ArrowLeft, AlertCircle } from "lucide-react";
 import { FormField } from "@/components/common/FormField";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
+import { useAuthStore } from "@/store/authStore";
 
 // Textos para soportar múltiples idiomas
 const texts = {
@@ -494,10 +495,7 @@ export default function RegisterComplex() {
       setError("");
 
       // Convertir los servicios a un formato adecuado para el API
-      const propertyTypes = formData.services.map((service) => ({
-        name: service,
-        enabled: true,
-      }));
+      const propertyTypes = formData.services.map((service) => service.toUpperCase());
 
       // Verificar si tenemos transactionId para planes pagados
       let txId = transactionId;
@@ -535,18 +533,18 @@ export default function RegisterComplex() {
         state: formData.state,
         country: formData.country,
         propertyTypes,
-        planCode: plan,
+        planType: plan.toUpperCase(),
         username: formData.username,
         transactionId: txId,
       };
 
       console.log("Enviando datos de registro:", {
         complexName: requestData.complexName,
-        planCode: requestData.planCode,
+        planCode: requestData.planType,
         transactionId: requestData.transactionId,
       });
       // Enviar datos al API
-      const response = await fetch("/api/auth/register", {
+      const response = await fetch("http://localhost:3000/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -560,15 +558,18 @@ export default function RegisterComplex() {
         throw new Error(data.message || "Error al registrar el conjunto");
       }
 
+      // Si el registro es exitoso, iniciar sesión automáticamente
+      await login(formData.adminEmail, formData.password, data.complexId, data.schemaName); // Usar los datos devueltos por el registro
+
       // Registro exitoso
-      alert("¡Conjunto registrado exitosamente! Ahora puede iniciar sesión.");
+      alert(t.successMessage);
 
       // Redirigir al portal selector
       router.push("/portal-selector");
     } catch (err: unknown) {
       console.error("Error de registro:", err);
       setError(
-        err.message ||
+        (err as Error).message ||
           "Ocurrió un error durante el registro. Por favor, inténtelo de nuevo.",
       );
     } finally {

@@ -23,166 +23,164 @@ interface AuthState {
   complexId: number | null;
   schemaName: string | null;
   token: string | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, complexId: number, schemaName: string) => Promise<void>;
   logout: () => Promise<void>;
   forceLogin: (userData: User, authToken: string) => void; // Método para test-login
   changeUserRole: (newRole: string) => Promise<void>; // Nueva función para cambiar el rol
   initializeAuth: () => Promise<void>; // Para inicializar el estado al cargar la app
 }
 
-export const useAuthStore = create<AuthState>()((set, get) => ({
-  user: null,
-  loading: true,
-  error: null,
-  isLoggedIn: false,
-  adminName: null,
-  complexName: null,
-  complexId: null,
-  schemaName: null,
-  token: null,
-
-  initializeAuth: async () => {
-    set({ loading: true });
-    try {
-      const response = await fetch("/api/auth/check", {
-        method: "GET",
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        set({
-          user: data.user,
-          isLoggedIn: true,
-          adminName: data.user.name || null,
-          complexId: data.user.complexId || null,
-          complexName:
-            data.user.complexName || `Conjunto ${data.user.complexId}`,
-          schemaName: data.user.schemaName || null,
-        });
-      } else {
-        set({
-          user: null,
-          isLoggedIn: false,
-          token: null,
-          error: "Sesión expirada",
-        });
-      }
-    } catch (err: any) {
-      console.error("Error initializing auth:", err);
-      set({ user: null, isLoggedIn: false, token: null, error: err.message });
-    } finally {
-      set({ loading: false });
-    }
-  },
-
-  login: async (email, password) => {
-    set({ loading: true, error: null });
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Error al iniciar sesión");
-      }
-
-      const user: User = data.user;
-
-      set({
-        user,
-        isLoggedIn: true,
-        adminName: user.name || null,
-        complexId: user.complexId || null,
-        complexName: user.complexName || `Conjunto ${user.complexId}`,
-        schemaName: user.schemaName || null,
-      });
-    } catch (err: any) {
-      set({ error: err.message, isLoggedIn: false });
-      throw err;
-    } finally {
-      set({ loading: false });
-    }
-  },
-
-  logout: async () => {
-    set({ loading: true });
-    try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-      });
-    } catch (err) {
-      console.warn("Error al llamar endpoint de logout:", err);
-    } finally {
-      set({
-        user: null,
-        loading: false,
-        error: null,
-        isLoggedIn: false,
-        adminName: null,
-        complexName: null,
-        complexId: null,
-        schemaName: null,
-        token: null,
-      });
-    }
-  },
-
-  forceLogin: (userData, authToken) => {
-    set({
-      user: userData,
-      isLoggedIn: true,
-      adminName: userData.name || null,
-      complexId: userData.complexId || null,
-      complexName: userData.complexName || `Conjunto ${userData.complexId}`,
-      schemaName: userData.schemaName || null,
-      loading: false,
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => ({
+      user: null,
+      loading: true,
       error: null,
-    });
-  },
+      isLoggedIn: false,
+      adminName: null,
+      complexName: null,
+      complexId: null,
+      schemaName: null,
+      token: null,
 
-  changeUserRole: async (newRole) => {
-    set({ loading: true, error: null });
-    try {
-      const currentUser = get().user;
+      initializeAuth: async () => {
+        set({ loading: true });
+        // Por ahora, solo verificamos si hay un token en el almacenamiento
+        const storedToken = get().token;
+        if (storedToken) {
+          // En un entorno real, aquí se debería validar el token con el backend
+          set({ isLoggedIn: true, loading: false });
+        } else {
+          set({ isLoggedIn: false, loading: false });
+        }
+      },
 
-      if (!currentUser) {
-        throw new Error("No hay usuario para cambiar el rol.");
-      }
+      login: async (email, password, complexId, schemaName) => {
+        set({ loading: true, error: null });
+        try {
+          const response = await fetch("http://localhost:3000/auth/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password, complexId, schemaName }),
+          });
 
-      const response = await fetch("/api/auth/change-role", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ newRole, targetUserId: currentUser.id }),
-      });
+          const data = await response.json();
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al cambiar el rol.");
-      }
+          if (!response.ok) {
+            throw new Error(data.message || "Error al iniciar sesión");
+          }
 
-      const updatedUser = { ...currentUser, role: newRole };
-      set({
-        user: updatedUser,
-        adminName: updatedUser.name || null,
-        complexId: updatedUser.complexId || null,
-        complexName:
-          updatedUser.complexName || `Conjunto ${updatedUser.complexId}`,
-        schemaName: updatedUser.schemaName || null,
-      });
-      console.log("Rol de usuario actualizado a:", newRole);
-    } catch (err: any) {
-      set({ error: err.message });
-      throw err;
-    } finally {
-      set({ loading: false });
-    }
-  },
-}));
+          const { access_token, user: userData } = data;
+
+          set({
+            user: userData,
+            isLoggedIn: true,
+            adminName: userData.name || null,
+            complexId: userData.complexId || null,
+            complexName: userData.complexName || `Conjunto ${userData.complexId}`,
+            schemaName: userData.schemaName || null,
+            token: access_token,
+          });
+        } catch (err: any) {
+          set({ error: err.message, isLoggedIn: false });
+          throw err;
+        } finally {
+          set({ loading: false });
+        }
+      },
+
+      logout: async () => {
+        set({ loading: true });
+        try {
+          // No hay un endpoint de logout en NestJS que invalide el token JWT en el servidor
+          // Simplemente eliminamos el token del lado del cliente
+          // await fetch("http://localhost:3000/auth/logout", { method: "POST" });
+        } catch (err) {
+          console.warn("Error al llamar endpoint de logout:", err);
+        } finally {
+          set({
+            user: null,
+            loading: false,
+            error: null,
+            isLoggedIn: false,
+            adminName: null,
+            complexName: null,
+            complexId: null,
+            schemaName: null,
+            token: null,
+          });
+        }
+      },
+
+      forceLogin: (userData, authToken) => {
+        set({
+          user: userData,
+          isLoggedIn: true,
+          adminName: userData.name || null,
+          complexId: userData.complexId || null,
+          complexName: userData.complexName || `Conjunto ${userData.complexId}`,
+          schemaName: userData.schemaName || null,
+          loading: false,
+          error: null,
+          token: authToken,
+        });
+      },
+
+      changeUserRole: async (newRole) => {
+        set({ loading: true, error: null });
+        try {
+          const currentUser = get().user;
+          const currentToken = get().token;
+
+          if (!currentUser || !currentToken) {
+            throw new Error("No hay usuario o token para cambiar el rol.");
+          }
+
+          const response = await fetch("http://localhost:3000/auth/change-role", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${currentToken}`,
+            },
+            body: JSON.stringify({ newRole, targetUserId: currentUser.id }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Error al cambiar el rol.");
+          }
+
+          const updatedUser = { ...currentUser, role: newRole };
+          set({
+            user: updatedUser,
+            adminName: updatedUser.name || null,
+            complexId: updatedUser.complexId || null,
+            complexName:
+              updatedUser.complexName || `Conjunto ${updatedUser.complexId}`,
+            schemaName: updatedUser.schemaName || null,
+          });
+          console.log("Rol de usuario actualizado a:", newRole);
+        } catch (err: any) {
+          set({ error: err.message });
+          throw err;
+        } finally {
+          set({ loading: false });
+        }
+      },
+    }),
+    {
+      name: "auth-storage", // name of the item in the storage (must be unique)
+      storage: createJSONStorage(() => localStorage), // use localStorage for persistence
+      partialize: (state) => ({
+        user: state.user,
+        isLoggedIn: state.isLoggedIn,
+        adminName: state.adminName,
+        complexName: state.complexName,
+        complexId: state.complexId,
+        schemaName: state.schemaName,
+        token: state.token,
+      }),
+    },
+);

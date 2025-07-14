@@ -56,7 +56,7 @@ export async function getPQRs(params?: GetPQRParams): Promise<PQR[]> {
     if (params?.priority) query.append("priority", params.priority);
     if (params?.search) query.append("search", params.search);
 
-    const response = await fetchApi(`/api/pqr?${query.toString()}`);
+    const response = await fetchApi(`/pqr?${query.toString()}`);
     return response;
   } catch (error) {
     console.error("Error fetching PQRs:", error);
@@ -66,8 +66,8 @@ export async function getPQRs(params?: GetPQRParams): Promise<PQR[]> {
 
 export async function getPQRById(id: number): Promise<PQR> {
   try {
-    const response = await fetchApi(`/api/pqr?id=${id}`);
-    return response[0]; // Assuming the API returns an array with one PQR
+    const response = await fetchApi(`/pqr/${id}`);
+    return response; // Assuming the API returns a single PQR object
   } catch (error) {
     console.error(`Error fetching PQR with ID ${id}:`, error);
     throw error;
@@ -76,7 +76,7 @@ export async function getPQRById(id: number): Promise<PQR> {
 
 export async function createPQR(data: CreatePQRData): Promise<PQR> {
   try {
-    const response = await fetchApi("/api/pqr", {
+    const response = await fetchApi("/pqr", {
       method: "POST",
       body: JSON.stringify(data),
     });
@@ -92,9 +92,9 @@ export async function updatePQR(
   data: Partial<UpdatePQRData>,
 ): Promise<PQR> {
   try {
-    const response = await fetchApi("/api/pqr", {
+    const response = await fetchApi(`/pqr/${id}`, {
       method: "PUT",
-      body: JSON.stringify({ id, ...data }),
+      body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
@@ -105,9 +105,8 @@ export async function updatePQR(
 
 export async function deletePQR(id: number): Promise<void> {
   try {
-    await fetchApi("/api/pqr", {
+    await fetchApi(`/pqr/${id}`, {
       method: "DELETE",
-      body: JSON.stringify({ id }),
     });
   } catch (error) {
     console.error("Error deleting PQR:", error);
@@ -120,9 +119,9 @@ export async function addPQRComment(
   comment: string,
 ): Promise<PQRComment> {
   try {
-    const response = await fetchApi("/api/pqr/comment", {
+    const response = await fetchApi(`/pqr/${pqrId}/comment`, {
       method: "POST",
-      body: JSON.stringify({ pqrId, comment }),
+      body: JSON.stringify({ comment }),
     });
     return response;
   } catch (error) {
@@ -136,9 +135,9 @@ export async function assignPQR(
   assignedToId: number,
 ): Promise<PQR> {
   try {
-    const response = await fetchApi("/api/pqr/assign", {
+    const response = await fetchApi(`/pqr/${pqrId}/assign`, {
       method: "PUT",
-      body: JSON.stringify({ pqrId, assignedToId }),
+      body: JSON.stringify({ assignedToId }),
     });
     return response;
   } catch (error) {

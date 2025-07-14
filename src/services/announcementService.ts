@@ -31,7 +31,7 @@ interface UpdateAnnouncementData {
 
 export async function getAnnouncements(): Promise<Announcement[]> {
   try {
-    const response = await fetchApi("/api/communications/announcements");
+    const response = await fetchApi("/communications/announcements");
     return response;
   } catch (error) {
     console.error("Error fetching announcements:", error);
@@ -43,7 +43,7 @@ export async function createAnnouncement(
   data: CreateAnnouncementData,
 ): Promise<Announcement> {
   try {
-    const response = await fetchApi("/api/communications/announcements", {
+    const response = await fetchApi("/communications/announcements", {
       method: "POST",
       body: JSON.stringify(data),
     });
@@ -59,9 +59,9 @@ export async function updateAnnouncement(
   data: UpdateAnnouncementData,
 ): Promise<Announcement> {
   try {
-    const response = await fetchApi("/api/communications/announcements", {
+    const response = await fetchApi(`/communications/announcements/${id}`, {
       method: "PUT",
-      body: JSON.stringify({ id, ...data }),
+      body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
@@ -72,7 +72,7 @@ export async function updateAnnouncement(
 
 export async function deleteAnnouncement(id: number): Promise<void> {
   try {
-    await fetchApi(`/api/communications/announcements/${id}`, {
+    await fetchApi(`/communications/announcements/${id}`, {
       method: "DELETE",
     });
   } catch (error) {

@@ -31,7 +31,7 @@ interface UpdatePetData {
 
 export async function getPets(): Promise<Pet[]> {
   try {
-    const response = await fetchApi("/api/inventory/pets");
+    const response = await fetchApi("/inventory/pets");
     return response;
   } catch (error) {
     console.error("Error fetching pets:", error);
@@ -41,7 +41,7 @@ export async function getPets(): Promise<Pet[]> {
 
 export async function createPet(data: CreatePetData): Promise<Pet> {
   try {
-    const response = await fetchApi("/api/inventory/pets", {
+    const response = await fetchApi("/inventory/pets", {
       method: "POST",
       body: JSON.stringify(data),
     });
@@ -54,9 +54,9 @@ export async function createPet(data: CreatePetData): Promise<Pet> {
 
 export async function updatePet(id: number, data: UpdatePetData): Promise<Pet> {
   try {
-    const response = await fetchApi("/api/inventory/pets", {
+    const response = await fetchApi(`/inventory/pets/${id}`, {
       method: "PUT",
-      body: JSON.stringify({ id, ...data }),
+      body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
@@ -67,7 +67,7 @@ export async function updatePet(id: number, data: UpdatePetData): Promise<Pet> {
 
 export async function deletePet(id: number): Promise<void> {
   try {
-    await fetchApi(`/api/inventory/pets/${id}`, {
+    await fetchApi(`/inventory/pets/${id}`, {
       method: "DELETE",
     });
   } catch (error) {

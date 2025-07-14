@@ -21,7 +21,11 @@ export async function fetchApi(
     options.body = JSON.stringify(body);
   }
 
-  const response = await fetch(url, options);
+  // Modificar la URL para apuntar al backend de NestJS
+  const nestJsBaseUrl = "http://localhost:3000"; // Usar directamente por ahora
+  const fullUrl = `${nestJsBaseUrl}${url}`;
+
+  const response = await fetch(fullUrl, options);
 
   if (!response.ok) {
     const errorData = await response

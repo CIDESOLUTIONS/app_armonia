@@ -31,7 +31,7 @@ interface UpdateResidentData {
 
 export async function getResidents(): Promise<Resident[]> {
   try {
-    const response = await fetchApi("/api/inventory/residents");
+    const response = await fetchApi("/inventory/residents");
     return response;
   } catch (error) {
     console.error("Error fetching residents:", error);
@@ -43,7 +43,7 @@ export async function createResident(
   data: CreateResidentData,
 ): Promise<Resident> {
   try {
-    const response = await fetchApi("/api/inventory/residents", {
+    const response = await fetchApi("/inventory/residents", {
       method: "POST",
       body: JSON.stringify(data),
     });
@@ -59,9 +59,9 @@ export async function updateResident(
   data: UpdateResidentData,
 ): Promise<Resident> {
   try {
-    const response = await fetchApi("/api/inventory/residents", {
+    const response = await fetchApi(`/inventory/residents/${id}`, {
       method: "PUT",
-      body: JSON.stringify({ id, ...data }),
+      body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
@@ -72,7 +72,7 @@ export async function updateResident(
 
 export async function deleteResident(id: number): Promise<void> {
   try {
-    await fetchApi(`/api/inventory/residents/${id}`, {
+    await fetchApi(`/inventory/residents/${id}`, {
       method: "DELETE",
     });
   } catch (error) {
