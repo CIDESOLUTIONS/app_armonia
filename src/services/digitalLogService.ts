@@ -24,7 +24,7 @@ interface UpdateDigitalLogData {
 
 export async function getDigitalLogs(): Promise<DigitalLog[]> {
   try {
-    const response = await fetchApi("/api/security/digital-logs");
+    const response = await fetchApi("/security/digital-logs");
     return response;
   } catch (error) {
     console.error("Error fetching digital logs:", error);
@@ -36,7 +36,7 @@ export async function createDigitalLog(
   data: CreateDigitalLogData,
 ): Promise<DigitalLog> {
   try {
-    const response = await fetchApi("/api/security/digital-logs", {
+    const response = await fetchApi("/security/digital-logs", {
       method: "POST",
       body: JSON.stringify(data),
     });
@@ -52,9 +52,9 @@ export async function updateDigitalLog(
   data: UpdateDigitalLogData,
 ): Promise<DigitalLog> {
   try {
-    const response = await fetchApi("/api/security/digital-logs", {
+    const response = await fetchApi(`/security/digital-logs/${id}`, {
       method: "PUT",
-      body: JSON.stringify({ id, ...data }),
+      body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
@@ -65,9 +65,8 @@ export async function updateDigitalLog(
 
 export async function deleteDigitalLog(id: number): Promise<void> {
   try {
-    await fetchApi("/api/security/digital-logs", {
+    await fetchApi(`/security/digital-logs/${id}`, {
       method: "DELETE",
-      body: JSON.stringify({ id }),
     });
   } catch (error) {
     console.error("Error deleting digital log:", error);

@@ -34,7 +34,7 @@ interface UpdateCameraData {
 
 export async function getCameras(): Promise<Camera[]> {
   try {
-    const response = await fetchApi("/api/security/cameras");
+    const response = await fetchApi("/security/cameras");
     return response;
   } catch (error) {
     console.error("Error fetching cameras:", error);
@@ -44,7 +44,7 @@ export async function getCameras(): Promise<Camera[]> {
 
 export async function createCamera(data: CreateCameraData): Promise<Camera> {
   try {
-    const response = await fetchApi("/api/security/cameras", {
+    const response = await fetchApi("/security/cameras", {
       method: "POST",
       body: JSON.stringify(data),
     });
@@ -60,9 +60,9 @@ export async function updateCamera(
   data: UpdateCameraData,
 ): Promise<Camera> {
   try {
-    const response = await fetchApi("/api/security/cameras", {
+    const response = await fetchApi(`/security/cameras/${id}`, {
       method: "PUT",
-      body: JSON.stringify({ id, ...data }),
+      body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
@@ -73,9 +73,8 @@ export async function updateCamera(
 
 export async function deleteCamera(id: number): Promise<void> {
   try {
-    await fetchApi("/api/security/cameras", {
+    await fetchApi(`/security/cameras/${id}`, {
       method: "DELETE",
-      body: JSON.stringify({ id }),
     });
   } catch (error) {
     console.error("Error deleting camera:", error);

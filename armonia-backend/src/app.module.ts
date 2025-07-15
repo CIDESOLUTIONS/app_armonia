@@ -12,6 +12,7 @@ import { FinancesModule } from './finances/finances.module';
 import { PqrModule } from './pqr/pqr.module';
 import { ProjectsModule } from './projects/projects.module';
 import { SecurityModule } from './security/security.module';
+import { PlansModule } from './plans/plans.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { SecurityModule } from './security/security.module';
     PqrModule,
     ProjectsModule,
     SecurityModule,
+    PlansModule,
   ],
   controllers: [AppController],
   providers: [AppService],

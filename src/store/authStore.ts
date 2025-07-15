@@ -11,6 +11,7 @@ interface User {
   schemaName?: string;
   complexName?: string;
   isGlobalAdmin?: boolean;
+  planFeatures?: string[];
 }
 
 interface AuthState {
@@ -25,9 +26,10 @@ interface AuthState {
   token: string | null;
   login: (email: string, password: string, complexId: number, schemaName: string) => Promise<void>;
   logout: () => Promise<void>;
-  forceLogin: (userData: User, authToken: string) => void; // Método para test-login
-  changeUserRole: (newRole: string) => Promise<void>; // Nueva función para cambiar el rol
-  initializeAuth: () => Promise<void>; // Para inicializar el estado al cargar la app
+  forceLogin: (userData: User, authToken: string) => void;
+  changeUserRole: (newRole: string) => Promise<void>;
+  initializeAuth: () => Promise<void>;
+  hasFeature: (feature: string) => boolean;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -45,10 +47,8 @@ export const useAuthStore = create<AuthState>()(
 
       initializeAuth: async () => {
         set({ loading: true });
-        // Por ahora, solo verificamos si hay un token en el almacenamiento
         const storedToken = get().token;
         if (storedToken) {
-          // En un entorno real, aquí se debería validar el token con el backend
           set({ isLoggedIn: true, loading: false });
         } else {
           set({ isLoggedIn: false, loading: false });
@@ -74,8 +74,16 @@ export const useAuthStore = create<AuthState>()(
 
           const { access_token, user: userData } = data;
 
+          // Obtener las características del plan del usuario desde el backend
+          const featuresResponse = await fetch(`http://localhost:3000/plans/check-feature/${userData.complexId}`, {
+            headers: {
+              "Authorization": `Bearer ${access_token}`,
+            },
+          });
+          const featuresData = await featuresResponse.json();
+
           set({
-            user: userData,
+            user: { ...userData, planFeatures: featuresData.features },
             isLoggedIn: true,
             adminName: userData.name || null,
             complexId: userData.complexId || null,
@@ -96,7 +104,6 @@ export const useAuthStore = create<AuthState>()(
         try {
           // No hay un endpoint de logout en NestJS que invalide el token JWT en el servidor
           // Simplemente eliminamos el token del lado del cliente
-          // await fetch("http://localhost:3000/auth/logout", { method: "POST" });
         } catch (err) {
           console.warn("Error al llamar endpoint de logout:", err);
         } finally {
@@ -169,10 +176,15 @@ export const useAuthStore = create<AuthState>()(
           set({ loading: false });
         }
       },
+
+      hasFeature: (feature: string) => {
+        const user = get().user;
+        return user?.planFeatures?.includes(feature) || false;
+      },
     }),
     {
-      name: "auth-storage", // name of the item in the storage (must be unique)
-      storage: createJSONStorage(() => localStorage), // use localStorage for persistence
+      name: "auth-storage",
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         user: state.user,
         isLoggedIn: state.isLoggedIn,
