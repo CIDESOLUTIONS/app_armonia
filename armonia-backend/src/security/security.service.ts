@@ -1,71 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
-
-interface DigitalLog {
-  id: number;
-  title: string;
-  content: string;
-  logDate: string;
-  createdBy: number;
-  createdByName: string;
-}
-
-interface CreateDigitalLogData {
-  title: string;
-  content: string;
-  logDate: string;
-}
-
-interface UpdateDigitalLogData {
-  id: number;
-  title?: string;
-  content?: string;
-  logDate?: string;
-}
-
-interface Camera {
-  id: number;
-  name: string;
-  ipAddress: string;
-  port: number;
-  username?: string;
-  password?: string;
-  location: string;
-  isActive: boolean;
-}
-
-interface CreateCameraData {
-  name: string;
-  ipAddress: string;
-  port?: number;
-  username?: string;
-  password?: string;
-  location: string;
-  isActive?: boolean;
-}
-
-interface UpdateCameraData {
-  id: number;
-  name?: string;
-  ipAddress?: string;
-  port?: number;
-  username?: string;
-  password?: string;
-  location?: string;
-  isActive?: boolean;
-}
+import { PrismaService } from '../prisma/prisma.service';
+import {
+  DigitalLogDto,
+  CreateDigitalLogDto,
+  UpdateDigitalLogDto,
+  CameraDto,
+  CreateCameraDto,
+  UpdateCameraDto,
+} from '../common/dto/security.dto';
 
 @Injectable()
 export class SecurityService {
-  constructor(private prismaClientManager: PrismaClientManager) {}
+  constructor(
+    private prismaClientManager: PrismaClientManager,
+    private prisma: PrismaService,
+  ) {}
 
-  private getPrismaClient(schemaName: string) {
+  private getTenantPrismaClient(schemaName: string) {
     return this.prismaClientManager.getClient(schemaName);
   }
 
   // DIGITAL LOGS
-  async getDigitalLogs(schemaName: string): Promise<DigitalLog[]> {
-    const prisma = this.getPrismaClient(schemaName);
+  async getDigitalLogs(schemaName: string): Promise<DigitalLogDto[]> {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const logs = await prisma.digitalLog.findMany({
         include: {
@@ -82,8 +40,8 @@ export class SecurityService {
     }
   }
 
-  async createDigitalLog(schemaName: string, data: CreateDigitalLogData, createdById: number): Promise<DigitalLog> {
-    const prisma = this.getPrismaClient(schemaName);
+  async createDigitalLog(schemaName: string, data: CreateDigitalLogDto, createdById: number): Promise<DigitalLogDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const log = await prisma.digitalLog.create({
         data: {
@@ -91,21 +49,29 @@ export class SecurityService {
           createdBy: { connect: { id: createdById } },
         },
       });
-      return this.getDigitalLogs(schemaName).then(logs => logs.find(l => l.id === log.id));
+      const createdLogWithUser = await prisma.digitalLog.findUnique({
+        where: { id: log.id },
+        include: { createdBy: { select: { name: true } } },
+      });
+      return { ...createdLogWithUser, createdByName: createdLogWithUser.createdBy?.name || 'N/A' };
     } catch (error) {
       console.error("Error creating digital log:", error);
       throw new Error("Error creating digital log");
     }
   }
 
-  async updateDigitalLog(schemaName: string, id: number, data: UpdateDigitalLogData): Promise<DigitalLog> {
-    const prisma = this.getPrismaClient(schemaName);
+  async updateDigitalLog(schemaName: string, id: number, data: UpdateDigitalLogDto): Promise<DigitalLogDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const log = await prisma.digitalLog.update({
         where: { id },
         data,
       });
-      return this.getDigitalLogs(schemaName).then(logs => logs.find(l => l.id === log.id));
+      const updatedLogWithUser = await prisma.digitalLog.findUnique({
+        where: { id: log.id },
+        include: { createdBy: { select: { name: true } } },
+      });
+      return { ...updatedLogWithUser, createdByName: updatedLogWithUser.createdBy?.name || 'N/A' };
     } catch (error) {
       console.error("Error updating digital log:", error);
       throw new Error("Error updating digital log");
@@ -113,7 +79,7 @@ export class SecurityService {
   }
 
   async deleteDigitalLog(schemaName: string, id: number): Promise<void> {
-    const prisma = this.getPrismaClient(schemaName);
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       await prisma.digitalLog.delete({ where: { id } });
     } catch (error) {
@@ -123,8 +89,8 @@ export class SecurityService {
   }
 
   // CAMERAS
-  async getCameras(schemaName: string): Promise<Camera[]> {
-    const prisma = this.getPrismaClient(schemaName);
+  async getCameras(schemaName: string): Promise<CameraDto[]> {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       return await prisma.camera.findMany();
     } catch (error) {
@@ -133,8 +99,8 @@ export class SecurityService {
     }
   }
 
-  async createCamera(schemaName: string, data: CreateCameraData): Promise<Camera> {
-    const prisma = this.getPrismaClient(schemaName);
+  async createCamera(schemaName: string, data: CreateCameraDto): Promise<CameraDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       return await prisma.camera.create({ data });
     } catch (error) {
@@ -143,18 +109,18 @@ export class SecurityService {
     }
   }
 
-  async updateCamera(schemaName: string, id: number, data: UpdateCameraData): Promise<Camera> {
-    const prisma = this.getPrismaClient(schemaName);
+  async updateCamera(schemaName: string, id: number, data: UpdateCameraDto): Promise<CameraDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       return await prisma.camera.update({ where: { id }, data });
-    } catch (error) {
+    }  catch (error) {
       console.error("Error updating camera:", error);
       throw new Error("Error updating camera");
     }
   }
 
   async deleteCamera(schemaName: string, id: number): Promise<void> {
-    const prisma = this.getPrismaClient(schemaName);
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       await prisma.camera.delete({ where: { id } });
     } catch (error) {

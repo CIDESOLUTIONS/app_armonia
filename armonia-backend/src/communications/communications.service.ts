@@ -1,92 +1,37 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
-
-// Tipos para notificaciones
-export type NotificationType = "info" | "success" | "warning" | "error";
-export type NotificationPriority = "low" | "medium" | "high" | "urgent";
-export type NotificationSourceType =
-  | "system"
-  | "reservation"
-  | "assembly"
-  | "financial"
-  | "security"
-  | "message";
-
-// Interfaces para datos
-export interface NotificationData {
-  type: NotificationType;
-  title: string;
-  message: string;
-  link?: string;
-  data?: Record<string, any>;
-  sourceType: NotificationSourceType;
-  sourceId?: string;
-  priority?: NotificationPriority;
-  requireConfirmation?: boolean;
-  expiresAt?: Date;
-}
-
-export interface AnnouncementData {
-  title: string;
-  content: string;
-  type?: "general" | "important" | "emergency";
-  visibility?: "public" | "private" | "role-based";
-  targetRoles?: string[];
-  requiresConfirmation?: boolean;
-  expiresAt?: Date;
-  attachments?: {
-    name: string;
-    url: string;
-    type: string;
-    size?: number;
-  }[];
-}
-
-export interface MessageData {
-  content: string;
-  attachments?: {
-    name: string;
-    url: string;
-    type: string;
-    size?: number;
-  }[];
-}
-
-export interface EventData {
-  title: string;
-  description: string;
-  startDateTime: Date;
-  endDateTime: Date;
-  location: string;
-  type?: "general" | "meeting" | "social" | "maintenance";
-  visibility?: "public" | "private" | "role-based";
-  targetRoles?: string[];
-  maxAttendees?: number;
-  attachments?: {
-    name: string;
-    url: string;
-    type: string;
-    size?: number;
-  }[];
-}
+import { PrismaService } from '../prisma/prisma.service';
+import {
+  NotificationType,
+  NotificationDataDto,
+  AnnouncementDataDto,
+  MessageDataDto,
+  EventDataDto,
+  NotificationPriority,
+  NotificationSourceType,
+} from '../common/dto/communications.dto';
 
 @Injectable()
 export class CommunicationsService {
-  constructor(private prismaClientManager: PrismaClientManager) {}
+  constructor(
+    private prismaClientManager: PrismaClientManager,
+    private prisma: PrismaService, // Inyectar PrismaService global
+  ) {}
 
-  private getPrismaClient(schemaName: string) {
+  private getTenantPrismaClient(schemaName: string) {
     return this.prismaClientManager.getClient(schemaName);
   }
 
-  // NOTIFICACIONES
-  async notifyUser(schemaName: string, userId: number, notification: NotificationData) {
-    const prisma = this.getPrismaClient(schemaName);
+  // NOTIFICACIONES (Modelos globales)
+  async notifyUser(userId: number, notification: NotificationDataDto) {
     try {
-      const user = await prisma.user.findUnique({ where: { id: userId } });
+      // Usar this.prisma para acceder al modelo User global
+      const user = await this.prisma.user.findUnique({ where: { id: userId } });
       if (!user) {
         throw new Error(`Usuario con ID ${userId} no encontrado`);
       }
-      const dbNotification = await prisma.notification.create({
+      // Usar this.prisma para acceder al modelo Notification global
+      const dbNotification = await this.prisma.notification.create({
         data: {
           recipientId: userId,
           type: notification.type,
@@ -96,14 +41,11 @@ export class CommunicationsService {
           data: notification.data,
           sourceType: notification.sourceType,
           sourceId: notification.sourceId,
-          priority: notification.priority || "medium",
+          priority: notification.priority || NotificationPriority.MEDIUM,
           requireConfirmation: notification.requireConfirmation || false,
           expiresAt: notification.expiresAt,
-          read: false,
         },
       });
-      // Enviar notificación en tiempo real (simulado)
-      // await sendNotificationToUser(userId, { ... });
       return dbNotification;
     } catch (error) {
       console.error("Error al enviar notificación al usuario:", error);
@@ -111,12 +53,11 @@ export class CommunicationsService {
     }
   }
 
-  async notifyUsers(schemaName: string, userIds: number[], notification: NotificationData) {
-    const prisma = this.getPrismaClient(schemaName);
+  async notifyUsers(userIds: number[], notification: NotificationDataDto) {
     const results = [];
     for (const userId of userIds) {
       try {
-        const result = await this.notifyUser(schemaName, userId, notification);
+        const result = await this.notifyUser(userId, notification);
         results.push(result);
       } catch (error) {
         console.error(`Error al enviar notificación al usuario ${userId}:`, error);
@@ -125,17 +66,17 @@ export class CommunicationsService {
     return results;
   }
 
-  async notifyByRole(schemaName: string, role: string, notification: NotificationData) {
-    const prisma = this.getPrismaClient(schemaName);
-    const users = await prisma.user.findMany({ where: { role }, select: { id: true } });
+  async notifyByRole(role: string, notification: NotificationDataDto) {
+    // Usar this.prisma para acceder al modelo User global
+    const users = await this.prisma.user.findMany({ where: { role }, select: { id: true } });
     const userIds = users.map((user) => user.id);
-    return await this.notifyUsers(schemaName, userIds, notification);
+    return await this.notifyUsers(userIds, notification);
   }
 
-  async getUserNotifications(schemaName: string, userId: number, filters: any = {}) {
-    const prisma = this.getPrismaClient(schemaName);
+  async getUserNotifications(userId: number, filters: any = {}) {
+    // Usar this.prisma para acceder al modelo Notification global
     const { read, type, sourceType, priority, limit } = filters;
-    return await prisma.notification.findMany({
+    return await this.prisma.notification.findMany({
       where: {
         recipientId: userId,
         ...(read !== undefined && { read }),
@@ -150,9 +91,9 @@ export class CommunicationsService {
     });
   }
 
-  async markNotificationAsRead(schemaName: string, notificationId: string, userId: number) {
-    const prisma = this.getPrismaClient(schemaName);
-    const notification = await prisma.notification.findFirst({
+  async markNotificationAsRead(notificationId: string, userId: number) {
+    // Usar this.prisma para acceder al modelo Notification global
+    const notification = await this.prisma.notification.findFirst({
       where: {
         id: notificationId,
         recipientId: userId,
@@ -161,7 +102,7 @@ export class CommunicationsService {
     if (!notification) {
       throw new Error("Notificación no encontrada o no pertenece al usuario");
     }
-    return await prisma.notification.update({
+    return await this.prisma.notification.update({
       where: { id: notificationId },
       data: {
         read: true,
@@ -170,9 +111,9 @@ export class CommunicationsService {
     });
   }
 
-  async markAllNotificationsAsRead(schemaName: string, userId: number) {
-    const prisma = this.getPrismaClient(schemaName);
-    return await prisma.notification.updateMany({
+  async markAllNotificationsAsRead(userId: number) {
+    // Usar this.prisma para acceder al modelo Notification global
+    return await this.prisma.notification.updateMany({
       where: {
         recipientId: userId,
         read: false,
@@ -184,9 +125,9 @@ export class CommunicationsService {
     });
   }
 
-  async confirmNotificationReading(schemaName: string, notificationId: string, userId: number) {
-    const prisma = this.getPrismaClient(schemaName);
-    const notification = await prisma.notification.findFirst({
+  async confirmNotificationReading(notificationId: string, userId: number) {
+    // Usar this.prisma para acceder al modelo Notification global
+    const notification = await this.prisma.notification.findFirst({
       where: {
         id: notificationId,
         recipientId: userId,
@@ -196,13 +137,14 @@ export class CommunicationsService {
     if (!notification) {
       throw new Error("Notificación no encontrada, no pertenece al usuario o no requiere confirmación");
     }
-    await prisma.notificationConfirmation.create({
+    // Usar this.prisma para acceder al modelo NotificationConfirmation global
+    await this.prisma.notificationConfirmation.create({
       data: {
         notificationId,
         userId,
       },
     });
-    return await prisma.notification.update({
+    return await this.prisma.notification.update({
       where: { id: notificationId },
       data: {
         read: true,
@@ -211,9 +153,9 @@ export class CommunicationsService {
     });
   }
 
-  // ANUNCIOS
+  // ANUNCIOS (Modelos de tenant)
   async getAnnouncements(schemaName: string, userId: number, userRole: string, filters: any = {}) {
-    const prisma = this.getPrismaClient(schemaName);
+    const prisma = this.getTenantPrismaClient(schemaName);
     const { type, read, limit } = filters;
     const queryOptions: any = {
       where: {},
@@ -221,9 +163,7 @@ export class CommunicationsService {
         createdAt: "desc",
       },
       include: {
-        createdBy: {
-          select: { id: true, name: true, image: true },
-        },
+        createdBy: { select: { id: true, name: true, image: true } },
         readBy: {
           where: {
             userId,
@@ -275,8 +215,8 @@ export class CommunicationsService {
     }));
   }
 
-  async createAnnouncement(schemaName: string, userId: number, data: AnnouncementData) {
-    const prisma = this.getPrismaClient(schemaName);
+  async createAnnouncement(schemaName: string, userId: number, data: AnnouncementDataDto) {
+    const prisma = this.getTenantPrismaClient(schemaName);
     const announcement = await prisma.announcement.create({
       data: {
         title: data.title,
@@ -308,37 +248,39 @@ export class CommunicationsService {
     });
     let targetUserIds: number[] = [];
     if (completeAnnouncement.visibility === "public") {
-      const users = await prisma.user.findMany({ select: { id: true } });
+      // Usar this.prisma para acceder al modelo User global
+      const users = await this.prisma.user.findMany({ select: { id: true } });
       targetUserIds = users.map((user) => user.id);
     } else if (
       completeAnnouncement.visibility === "role-based" &&
       completeAnnouncement.targetRoles.length > 0
     ) {
-      const users = await prisma.user.findMany({
+      // Usar this.prisma para acceder al modelo User global
+      const users = await this.prisma.user.findMany({
         where: { role: { in: completeAnnouncement.targetRoles } },
         select: { id: true },
       });
       targetUserIds = users.map((user) => user.id);
     }
     if (targetUserIds.length > 0) {
-      await this.notifyUsers(schemaName, targetUserIds, {
+      await this.notifyUsers(targetUserIds, {
         type:
           completeAnnouncement.type === "emergency"
-            ? "error"
+            ? NotificationType.ERROR
             : completeAnnouncement.type === "important"
-              ? "warning"
-              : "info",
+              ? NotificationType.WARNING
+              : NotificationType.INFO,
         title: completeAnnouncement.title,
         message: `Nuevo anuncio: ${completeAnnouncement.title}`,
         link: `/announcements/${completeAnnouncement.id}`,
-        sourceType: "system",
+        sourceType: NotificationSourceType.SYSTEM,
         sourceId: completeAnnouncement.id,
         priority:
           completeAnnouncement.type === "emergency"
-            ? "urgent"
+            ? NotificationPriority.URGENT
             : completeAnnouncement.type === "important"
-              ? "high"
-              : "medium",
+              ? NotificationPriority.HIGH
+              : NotificationPriority.MEDIUM,
         requiresConfirmation: completeAnnouncement.requiresConfirmation,
         expiresAt: completeAnnouncement.expiresAt,
       });
@@ -346,8 +288,8 @@ export class CommunicationsService {
     return completeAnnouncement;
   }
 
-  async updateAnnouncement(schemaName: string, id: number, data: AnnouncementData) {
-    const prisma = this.getPrismaClient(schemaName);
+  async updateAnnouncement(schemaName: string, id: number, data: AnnouncementDataDto) {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const announcement = await prisma.announcement.update({
         where: { id },
@@ -369,7 +311,7 @@ export class CommunicationsService {
   }
 
   async deleteAnnouncement(schemaName: string, id: number) {
-    const prisma = this.getPrismaClient(schemaName);
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       await prisma.announcement.delete({ where: { id } });
       return { message: "Anuncio eliminado correctamente" };
@@ -380,8 +322,8 @@ export class CommunicationsService {
   }
 
   async markAnnouncementAsRead(schemaName: string, announcementId: string, userId: number) {
-    const prisma = this.getPrismaClient(schemaName);
-    const existingRead = await prisma.announcementRead.findUnique({
+    // Usar this.prisma para acceder al modelo AnnouncementRead global
+    const existingRead = await this.prisma.announcementRead.findUnique({
       where: {
         announcementId_userId: { announcementId, userId },
       },
@@ -389,15 +331,15 @@ export class CommunicationsService {
     if (existingRead) {
       return existingRead;
     }
-    return await prisma.announcementRead.create({
+    return await this.prisma.announcementRead.create({
       data: { announcementId, userId },
     });
   }
 
-  // MENSAJES
-  async getOrCreateDirectConversation(schemaName: string, userId1: number, userId2: number) {
-    const prisma = this.getPrismaClient(schemaName);
-    const existingConversation = await prisma.conversation.findFirst({
+  // MENSAJES (Modelos globales)
+  async getOrCreateDirectConversation(userId1: number, userId2: number) {
+    // Usar this.prisma para acceder a los modelos Conversation y ConversationParticipant globales
+    const existingConversation = await this.prisma.conversation.findFirst({
       where: {
         type: "direct",
         participants: {
@@ -413,7 +355,7 @@ export class CommunicationsService {
     if (existingConversation) {
       return existingConversation;
     }
-    const newConversation = await prisma.conversation.create({
+    const newConversation = await this.prisma.conversation.create({
       data: {
         type: "direct",
         participants: {
@@ -428,15 +370,15 @@ export class CommunicationsService {
     return newConversation;
   }
 
-  async sendMessage(schemaName: string, conversationId: string, senderId: number, data: MessageData) {
-    const prisma = this.getPrismaClient(schemaName);
-    const participant = await prisma.conversationParticipant.findFirst({
+  async sendMessage(schemaName: string, conversationId: string, senderId: number, data: MessageDataDto) {
+    // Usar this.prisma para acceder a los modelos ConversationParticipant y Message globales
+    const participant = await this.prisma.conversationParticipant.findFirst({
       where: { conversationId, userId: senderId },
     });
     if (!participant) {
       throw new Error("El usuario no pertenece a esta conversación");
     }
-    const message = await prisma.message.create({
+    const message = await this.prisma.message.create({
       data: { conversationId, senderId, content: data.content, status: "sent" },
       include: { sender: { select: { id: true, name: true, image: true } } },
     });
@@ -448,32 +390,32 @@ export class CommunicationsService {
         type: attachment.type,
         size: attachment.size,
       }));
-      await prisma.messageAttachment.createMany({ data: attachmentRecords });
+      await this.prisma.messageAttachment.createMany({ data: attachmentRecords });
     }
-    await prisma.conversation.update({
+    await this.prisma.conversation.update({
       where: { id: conversationId },
       data: { updatedAt: new Date() },
     });
-    const otherParticipants = await prisma.conversationParticipant.findMany({
+    const otherParticipants = await this.prisma.conversationParticipant.findMany({
       where: { conversationId, userId: { not: senderId } },
     });
     for (const participant of otherParticipants) {
-      await this.notifyUser(schemaName, participant.userId, {
-        type: "info",
+      await this.notifyUser(participant.userId, {
+        type: NotificationType.INFO,
         title: "Nuevo mensaje",
         message: `${message.sender.name}: ${data.content.substring(0, 50)}${data.content.length > 50 ? "..." : ""}`,
         link: `/messages/${conversationId}`,
-        sourceType: "message",
+        sourceType: NotificationSourceType.MESSAGE,
         sourceId: message.id,
-        priority: "medium",
+        priority: NotificationPriority.MEDIUM,
       });
     }
     return message;
   }
 
   async getConversationMessages(schemaName: string, conversationId: string, userId: number, options: any = {}) {
-    const prisma = this.getPrismaClient(schemaName);
-    const participant = await prisma.conversationParticipant.findFirst({
+    // Usar this.prisma para acceder a los modelos ConversationParticipant y Message globales
+    const participant = await this.prisma.conversationParticipant.findFirst({
       where: { conversationId, userId },
     });
     if (!participant) {
@@ -494,12 +436,12 @@ export class CommunicationsService {
     if (options.limit) {
       queryOptions.take = options.limit;
     }
-    const messages = await prisma.message.findMany(queryOptions);
+    const messages = await this.prisma.message.findMany(queryOptions);
     const messagesToUpdate = messages.filter(
       (m) => m.senderId !== userId && m.status === "sent",
     );
     if (messagesToUpdate.length > 0) {
-      await prisma.message.updateMany({
+      await this.prisma.message.updateMany({
         where: { id: { in: messagesToUpdate.map((m) => m.id) } },
         data: { status: "delivered" },
       });
@@ -508,8 +450,8 @@ export class CommunicationsService {
   }
 
   async markMessageAsRead(schemaName: string, messageId: string, userId: number) {
-    const prisma = this.getPrismaClient(schemaName);
-    const message = await prisma.message.findUnique({
+    // Usar this.prisma para acceder a los modelos Message y MessageRead globales
+    const message = await this.prisma.message.findUnique({
       where: { id: messageId },
       include: {
         conversation: { include: { participants: { where: { userId } } } },
@@ -521,23 +463,23 @@ export class CommunicationsService {
     if (message.conversation.participants.length === 0) {
       throw new Error("El usuario no pertenece a esta conversación");
     }
-    const existingRead = await prisma.messageRead.findUnique({
+    const existingRead = await this.prisma.messageRead.findUnique({
       where: { messageId_userId: { messageId, userId } },
     });
     if (existingRead) {
       return existingRead;
     }
-    const messageRead = await prisma.messageRead.create({
+    const messageRead = await this.prisma.messageRead.create({
       data: { messageId, userId },
     });
-    const allParticipants = await prisma.conversationParticipant.findMany({
+    const allParticipants = await this.prisma.conversationParticipant.findMany({
       where: { conversationId: message.conversationId, userId: { not: message.senderId } },
     });
-    const allReads = await prisma.messageRead.findMany({
+    const allReads = await this.prisma.messageRead.findMany({
       where: { messageId },
     });
     if (allReads.length >= allParticipants.length) {
-      await prisma.message.update({
+      await this.prisma.message.update({
         where: { id: messageId },
         data: { status: "read" },
       });
@@ -545,9 +487,9 @@ export class CommunicationsService {
     return messageRead;
   }
 
-  // EVENTOS COMUNITARIOS
-  async createEvent(schemaName: string, organizerId: number, data: EventData) {
-    const prisma = this.getPrismaClient(schemaName);
+  // EVENTOS COMUNITARIOS (Modelos de tenant)
+  async createEvent(schemaName: string, organizerId: number, data: EventDataDto) {
+    const prisma = this.getTenantPrismaClient(schemaName);
     const event = await prisma.communityEvent.create({
       data: {
         title: data.title,
@@ -581,34 +523,36 @@ export class CommunicationsService {
     });
     let targetUserIds: number[] = [];
     if (completeEvent.visibility === "public") {
-      const users = await prisma.user.findMany({ select: { id: true } });
+      // Usar this.prisma para acceder al modelo User global
+      const users = await this.prisma.user.findMany({ select: { id: true } });
       targetUserIds = users.map((user) => user.id);
     } else if (
       completeEvent.visibility === "role-based" &&
       completeEvent.targetRoles.length > 0
     ) {
-      const users = await prisma.user.findMany({
+      // Usar this.prisma para acceder al modelo User global
+      const users = await this.prisma.user.findMany({
         where: { role: { in: completeEvent.targetRoles } },
         select: { id: true },
       });
       targetUserIds = users.map((user) => user.id);
     }
     if (targetUserIds.length > 0) {
-      await this.notifyUsers(schemaName, targetUserIds, {
-        type: "info",
+      await this.notifyUsers(targetUserIds, {
+        type: NotificationType.INFO,
         title: "Nuevo evento",
         message: `${completeEvent.title} - ${new Date(completeEvent.startDateTime).toLocaleDateString()}`,
         link: `/events/${completeEvent.id}`,
-        sourceType: "system",
+        sourceType: NotificationSourceType.SYSTEM,
         sourceId: completeEvent.id,
-        priority: "medium",
+        priority: NotificationPriority.MEDIUM,
       });
     }
     return completeEvent;
   }
 
-  async updateEvent(schemaName: string, id: number, data: EventData) {
-    const prisma = this.getPrismaClient(schemaName);
+  async updateEvent(schemaName: string, id: number, data: EventDataDto) {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const event = await prisma.communityEvent.update({
         where: { id },
@@ -632,7 +576,7 @@ export class CommunicationsService {
   }
 
   async deleteEvent(schemaName: string, id: number) {
-    const prisma = this.getPrismaClient(schemaName);
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       await prisma.communityEvent.delete({ where: { id } });
       return { message: "Evento eliminado correctamente" };
@@ -643,7 +587,7 @@ export class CommunicationsService {
   }
 
   async getEvents(schemaName: string, userId: number, userRole: string, filters: any = {}) {
-    const prisma = this.getPrismaClient(schemaName);
+    const prisma = this.getTenantPrismaClient(schemaName);
     const { type, upcoming, limit, startDate, endDate } = filters;
     const queryOptions: any = {
       where: {},
@@ -701,7 +645,7 @@ export class CommunicationsService {
   }
 
   async registerEventAttendance(schemaName: string, eventId: string, userId: number, status: "confirmed" | "tentative" | "declined") {
-    const prisma = this.getPrismaClient(schemaName);
+    const prisma = this.getTenantPrismaClient(schemaName);
     const event = await prisma.communityEvent.findUnique({
       where: { id: eventId },
       include: { attendees: { where: { userId } } },
@@ -729,14 +673,15 @@ export class CommunicationsService {
     }
   }
 
-  // UTILIDADES
+  // UTILIDADES (Modelos globales y de tenant)
   async cleanupExpiredItems(schemaName: string) {
-    const prisma = this.getPrismaClient(schemaName);
+    const prismaTenant = this.getTenantPrismaClient(schemaName);
     const now = new Date();
-    const deletedNotifications = await prisma.notification.deleteMany({
+    // Usar this.prisma para acceder al modelo Notification global
+    const deletedNotifications = await this.prisma.notification.deleteMany({
       where: { expiresAt: { lt: now } },
     });
-    const updatedAnnouncements = await prisma.announcement.updateMany({
+    const updatedAnnouncements = await prismaTenant.announcement.updateMany({
       where: { expiresAt: { lt: now } },
       data: { data: { expired: true } },
     });
@@ -744,24 +689,25 @@ export class CommunicationsService {
   }
 
   async migrateReservationNotifications(schemaName: string) {
-    const prisma = this.getPrismaClient(schemaName);
-    const reservationNotifications = await prisma.reservationNotification.findMany({
+    const prismaTenant = this.getTenantPrismaClient(schemaName);
+    // Usar this.prisma para acceder al modelo ReservationNotification global
+    const reservationNotifications = await this.prisma.reservationNotification.findMany({
       where: { migrated: false },
       include: { reservation: true },
     });
     let migratedCount = 0;
     for (const oldNotification of reservationNotifications) {
       try {
-        let type: NotificationType = "info";
-        if (oldNotification.type === "rejection") type = "error";
-        if (oldNotification.type === "cancellation") type = "warning";
-        await prisma.notification.create({
+        let type: NotificationType = NotificationType.INFO;
+        if (oldNotification.type === "rejection") type = NotificationType.ERROR;
+        if (oldNotification.type === "cancellation") type = NotificationType.WARNING;
+        await this.prisma.notification.create({
           data: {
             recipientId: oldNotification.userId,
             type,
             title: "Notificación de reserva",
             message: oldNotification.message,
-            sourceType: "reservation",
+            sourceType: NotificationSourceType.RESERVATION,
             sourceId: oldNotification.reservationId?.toString(),
             read: oldNotification.isRead || false,
             readAt: oldNotification.readAt,
@@ -771,7 +717,7 @@ export class CommunicationsService {
             },
           },
         });
-        await prisma.reservationNotification.update({
+        await this.prisma.reservationNotification.update({
           where: { id: oldNotification.id },
           data: { migrated: true },
         });

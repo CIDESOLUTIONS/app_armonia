@@ -2,6 +2,17 @@ import { Controller, Get, Post, Put, Body, Param, UseGuards, Query } from '@nest
 import { FinancesService } from './finances.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { GetUser } from '../common/decorators/user.decorator';
+import {
+  FeeDto,
+  FeeListResponseDto,
+  CreateFeeDto,
+  UpdateFeeDto,
+  CreatePaymentDto,
+  CreateBudgetDto,
+  FeeFilterParamsDto,
+  PaymentDto,
+  BudgetDto,
+} from '../common/dto/finances.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('finances')
@@ -9,32 +20,32 @@ export class FinancesController {
   constructor(private readonly financesService: FinancesService) {}
 
   @Get('fees')
-  async getFees(@GetUser() user: any, @Query() filters: any) {
+  async getFees(@GetUser() user: any, @Query() filters: FeeFilterParamsDto): Promise<FeeListResponseDto> {
     return this.financesService.getFees(user.schemaName, filters);
   }
 
   @Get('fees/:id')
-  async getFee(@GetUser() user: any, @Param('id') id: string) {
+  async getFee(@GetUser() user: any, @Param('id') id: string): Promise<FeeDto> {
     return this.financesService.getFee(user.schemaName, +id);
   }
 
   @Post('fees')
-  async createFee(@GetUser() user: any, @Body() createFeeDto: any) {
+  async createFee(@GetUser() user: any, @Body() createFeeDto: CreateFeeDto): Promise<FeeDto> {
     return this.financesService.createFee(user.schemaName, createFeeDto);
   }
 
   @Put('fees/:id')
-  async updateFee(@GetUser() user: any, @Param('id') id: string, @Body() updateFeeDto: any) {
+  async updateFee(@GetUser() user: any, @Param('id') id: string, @Body() updateFeeDto: UpdateFeeDto): Promise<FeeDto> {
     return this.financesService.updateFee(user.schemaName, +id, updateFeeDto);
   }
 
   @Post('payments')
-  async createPayment(@GetUser() user: any, @Body() createPaymentDto: any) {
+  async createPayment(@GetUser() user: any, @Body() createPaymentDto: CreatePaymentDto): Promise<PaymentDto> {
     return this.financesService.createPayment(user.schemaName, createPaymentDto);
   }
 
   @Get('properties/:propertyId/payments')
-  async getPropertyPayments(@GetUser() user: any, @Param('propertyId') propertyId: string) {
+  async getPropertyPayments(@GetUser() user: any, @Param('propertyId') propertyId: string): Promise<PaymentDto[]> {
     return this.financesService.getPropertyPayments(user.schemaName, +propertyId);
   }
 
@@ -50,17 +61,17 @@ export class FinancesController {
   }
 
   @Post('budgets')
-  async createBudget(@GetUser() user: any, @Body() createBudgetDto: any) {
+  async createBudget(@GetUser() user: any, @Body() createBudgetDto: CreateBudgetDto): Promise<BudgetDto> {
     return this.financesService.createBudget(user.schemaName, createBudgetDto);
   }
 
   @Get('budgets')
-  async getBudgetsByYear(@GetUser() user: any, @Query('year') year: string) {
+  async getBudgetsByYear(@GetUser() user: any, @Query('year') year: string): Promise<BudgetDto[]> {
     return this.financesService.getBudgetsByYear(user.schemaName, +year);
   }
 
   @Put('budgets/:id/approve')
-  async approveBudget(@GetUser() user: any, @Param('id') id: string) {
+  async approveBudget(@GetUser() user: any, @Param('id') id: string): Promise<BudgetDto> {
     return this.financesService.approveBudget(user.schemaName, +id);
   }
 
