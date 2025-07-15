@@ -105,9 +105,14 @@ export default function ResidentSidebar({
         },
         {
           label: language === "Español" ? "Realizar Pago" : "Make Payment",
-          path: "/resident/payments/new",
+          path: "/resident/resident/financial",
+        },
+        {
+          label: language === "Español" ? "Presupuesto Familiar" : "Family Budget",
+          path: "/resident/resident/personal-finances",
         },
       ],
+    },
     },
     {
       icon: <Coffee className="w-6 h-6" />,

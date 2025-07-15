@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Put, Body, Param, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Param, UseGuards, Query, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { FinancesService } from './finances.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { GetUser } from '../common/decorators/user.decorator';
@@ -84,5 +85,11 @@ export class FinancesController {
   async generateFinancialReport(@GetUser() user: any, @Body() reportDto: any) {
     const { startDate, endDate, type } = reportDto;
     return this.financesService.generateFinancialReport(user.schemaName, startDate, endDate, type);
+  }
+
+  @Post('upload-statement')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadStatement(@GetUser() user: any, @UploadedFile() file: Express.Multer.File) {
+    return this.financesService.processBankStatement(user.schemaName, file);
   }
 }

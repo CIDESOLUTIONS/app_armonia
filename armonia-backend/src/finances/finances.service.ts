@@ -218,4 +218,37 @@ export class FinancesService {
     console.log(`Generando reporte ${type} para ${schemaName} de ${startDate} a ${endDate}`);
     return { report: `Reporte ${type} generado` };
   }
+
+  async processBankStatement(schemaName: string, file: Express.Multer.File): Promise<any[]> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    // Aquí iría la lógica para leer el archivo (CSV/XLSX) y procesar las transacciones.
+    // Por ahora, es un placeholder que simula sugerencias de conciliación.
+    console.log(`Procesando extracto bancario para ${schemaName}: ${file.originalname}`);
+
+    // Simulación de lectura y procesamiento
+    const transactions = [
+      { date: '2025-07-01', description: 'Pago Cuota Admin Apto 101', amount: 350000 },
+      { date: '2025-07-02', description: 'Transferencia Residente 203', amount: 400000 },
+    ];
+
+    const suggestions = [];
+
+    for (const transaction of transactions) {
+      // Simular búsqueda de pagos coincidentes en la DB
+      const matchingPayment = await prisma.payment.findFirst({
+        where: {
+          amount: transaction.amount,
+          // Aquí se añadirían más criterios de búsqueda como fecha, referencia, etc.
+        },
+      });
+
+      suggestions.push({
+        transaction,
+        matchingPayment: matchingPayment || null,
+        status: matchingPayment ? 'MATCHED' : 'UNMATCHED',
+      });
+    }
+
+    return suggestions;
+  }
 }

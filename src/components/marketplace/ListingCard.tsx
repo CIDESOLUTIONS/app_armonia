@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -10,6 +10,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Flag } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
+import { reportListing } from "@/services/marketplaceService";
 
 interface ListingCardProps {
   listing: {
@@ -26,6 +31,26 @@ interface ListingCardProps {
 }
 
 export function ListingCard({ listing }: ListingCardProps) {
+  const [reportReason, setReportReason] = useState("");
+  const { toast } = useToast();
+
+  const handleReport = async () => {
+    try {
+      await reportListing({ listingId: listing.id, reason: reportReason });
+      toast({
+        title: "Anuncio Reportado",
+        description: "Gracias por tu reporte. Lo revisaremos pronto.",
+      });
+    } catch (error) {
+      console.error("Error reporting listing:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo reportar el anuncio.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Card className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
       <div className="relative w-full h-48 bg-gray-200">
@@ -68,7 +93,32 @@ export function ListingCard({ listing }: ListingCardProps) {
             Ver Detalles
           </Button>
         </Link>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600">
+              <Flag className="h-4 w-4" />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Reportar Anuncio</AlertDialogTitle>
+              <AlertDialogDescription>
+                Por favor, describe por qué estás reportando este anuncio.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <Textarea
+              placeholder="Razón del reporte..."
+              value={reportReason}
+              onChange={(e) => setReportReason(e.target.value)}
+            />
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={handleReport}>Reportar</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardFooter>
     </Card>
   );
 }
+

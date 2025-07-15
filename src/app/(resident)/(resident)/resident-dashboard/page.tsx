@@ -35,7 +35,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { getResidentDashboardStats } from "@/services/residentDashboardService";
+import { createPanicAlert } from "@/services/panicService";
 import { useAuthStore } from "@/store/authStore";
+import { useToast } from "@/components/ui/use-toast";
 
 interface PendingFee {
   id: number;
@@ -78,6 +80,7 @@ export default function ResidentDashboard() {
     MonthlyExpenseData[]
   >([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -98,6 +101,38 @@ export default function ResidentDashboard() {
       console.error("Error fetching resident dashboard data:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePanicTrigger = async () => {
+    if (!user || !user.propertyId) {
+      toast({
+        title: "Error",
+        description: "No se pudo activar la alerta de pánico. Información de usuario incompleta.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await createPanicAlert({
+        userId: user.id,
+        propertyId: user.propertyId,
+        location: "Ubicación del residente (ej. Apto 101)", // Esto debería ser dinámico
+        message: "Alerta de pánico activada por el residente.",
+      });
+      toast({
+        title: "Alerta de Pánico",
+        description: "Alerta de pánico enviada a seguridad. Mantén la calma.",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("Error triggering panic alert:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo enviar la alerta de pánico.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -179,6 +214,10 @@ export default function ResidentDashboard() {
               </h1>
             </div>
             <div className="flex items-center space-x-4">
+              <Button variant="destructive" size="sm" onClick={handlePanicTrigger}>
+                <Bell className="h-4 w-4 mr-2" />
+                Pánico
+              </Button>
               <Button variant="ghost" size="sm">
                 <Bell className="h-4 w-4" />
               </Button>

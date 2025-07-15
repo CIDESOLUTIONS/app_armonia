@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
+import { io } from "socket.io-client";
 import {
   Loader2,
   Calendar,
@@ -13,13 +14,16 @@ import {
   XCircle,
   Edit,
   Clock,
+  Vote,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { getAssemblyById } from "@/services/assemblyService";
+import { getAssemblyById, registerAttendance, createVote, submitVote, getVoteResults, generateMeetingMinutes } from "@/services/assemblyService";
 import { useToast } from "@/components/ui/use-toast";
+
+const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"; // Ajusta esto a la URL de tu backend NestJS
 
 export default function ViewAssemblyPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -28,8 +32,11 @@ export default function ViewAssemblyPage() {
   const params = useParams();
   const assemblyId = params.id ? parseInt(params.id as string) : null;
 
-  const [assembly, setAssembly] = useState<Assembly | null>(null);
+  const [assembly, setAssembly] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const [currentQuorum, setCurrentQuorum] = useState(0);
+  const [activeVote, setActiveVote] = useState<any | null>(null);
+  const [voteResults, setVoteResults] = useState<any | null>(null);
 
   const fetchAssembly = useCallback(async () => {
     setLoading(true);
@@ -61,8 +68,96 @@ export default function ViewAssemblyPage() {
   useEffect(() => {
     if (!authLoading && user && assemblyId) {
       fetchAssembly();
+
+      const socket = io(`${SOCKET_URL}/assembly`, {
+        query: { assemblyId, schemaName: user.schemaName, userId: user.id },
+      });
+
+      socket.on('connect', () => {
+        console.log('Conectado al socket de asamblea');
+        socket.emit('joinAssembly', { assemblyId, schemaName: user.schemaName, userId: user.id });
+      });
+
+      socket.on('quorumUpdate', (data: { currentQuorum: number }) => {
+        setCurrentQuorum(data.currentQuorum);
+      });
+
+      socket.on('newVote', (vote: any) => {
+        setActiveVote(vote);
+        setVoteResults(null); // Resetear resultados al iniciar nueva votación
+      });
+
+      socket.on('voteResultsUpdate', (results: any) => {
+        setVoteResults(results);
+      });
+
+      socket.on('disconnect', () => {
+        console.log('Desconectado del socket de asamblea');
+      });
+
+      return () => {
+        socket.disconnect();
+      };
     }
   }, [authLoading, user, assemblyId, fetchAssembly]);
+
+  const handleRegisterAttendance = async () => {
+    if (!user || !assemblyId) return;
+    try {
+      await registerAttendance(assemblyId, { assemblyId, userId: user.id, present: true });
+      toast({ title: "Asistencia Registrada", description: "Tu asistencia ha sido registrada." });
+    } catch (error) {
+      toast({ title: "Error", description: "No se pudo registrar la asistencia.", variant: "destructive" });
+    }
+  };
+
+  const handleCreateVote = async () => {
+    if (!assemblyId) return;
+    try {
+      const newVote = await createVote(assemblyId, {
+        assemblyId,
+        question: "¿Aprueba el presupuesto 2025?",
+        options: ["Sí", "No", "Abstención"],
+        isWeighted: true,
+      });
+      setActiveVote(newVote);
+      toast({ title: "Votación Iniciada", description: "Se ha iniciado una nueva votación." });
+    } catch (error) {
+      toast({ title: "Error", description: "No se pudo iniciar la votación.", variant: "destructive" });
+    }
+  };
+
+  const handleSubmitVote = async (optionIndex: number) => {
+    if (!activeVote || !user) return;
+    try {
+      await submitVote(activeVote.id, { voteId: activeVote.id, optionIndex, userId: user.id });
+      toast({ title: "Voto Registrado", description: "Tu voto ha sido registrado." });
+    } catch (error) {
+      toast({ title: "Error", description: "No se pudo registrar el voto.", variant: "destructive" });
+    }
+  };
+
+  const handleGetVoteResults = async () => {
+    if (!activeVote) return;
+    try {
+      const results = await getVoteResults(activeVote.id);
+      setVoteResults(results);
+      toast({ title: "Resultados Obtenidos", description: "Resultados de la votación actualizados." });
+    } catch (error) {
+      toast({ title: "Error", description: "No se pudieron obtener los resultados.", variant: "destructive" });
+    }
+  };
+
+  const handleGenerateMinutes = async () => {
+    if (!assemblyId) return;
+    try {
+      const result = await generateMeetingMinutes(assemblyId);
+      toast({ title: "Acta Generada", description: "El borrador del acta ha sido generado." });
+      // Aquí podrías redirigir o mostrar un enlace al acta
+    } catch (error) {
+      toast({ title: "Error", description: "No se pudo generar el acta.", variant: "destructive" });
+    }
+  };
 
   if (authLoading || loading) {
     return (
@@ -166,7 +261,7 @@ export default function ViewAssemblyPage() {
         </CardContent>
       </Card>
 
-      {/* Sección de Quórum y Asistencia (Placeholder) */}
+      {/* Sección de Quórum y Asistencia */}
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="flex items-center">
@@ -174,35 +269,64 @@ export default function ViewAssemblyPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-600">
-            La funcionalidad de verificación de quórum y registro de asistencia
-            se implementará aquí.
+          <p className="text-gray-600 mb-4">
+            Quórum Actual: <span className="font-bold">{currentQuorum}%</span>
           </p>
-          <Button variant="outline" className="mt-4">
-            Gestionar Asistencia
+          <Button onClick={handleRegisterAttendance} disabled={!user || assembly.status !== 'IN_PROGRESS'}>
+            Registrar mi Asistencia
           </Button>
         </CardContent>
       </Card>
 
-      {/* Sección de Votaciones (Placeholder) */}
+      {/* Sección de Votaciones */}
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="flex items-center">
-            <CheckCircle className="mr-2 h-5 w-5" /> Votaciones
+            <Vote className="mr-2 h-5 w-5" /> Votaciones
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-600">
-            El sistema de votaciones en línea y resultados en tiempo real se
-            implementará aquí.
-          </p>
-          <Button variant="outline" className="mt-4">
-            Iniciar Votación
-          </Button>
+          {activeVote ? (
+            <div>
+              <h3 className="text-lg font-semibold mb-2">{activeVote.question}</h3>
+              <div className="space-y-2">
+                {activeVote.options.map((option: string, index: number) => (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => handleSubmitVote(index)}
+                  >
+                    {option}
+                  </Button>
+                ))}
+              </div>
+              {voteResults && (
+                <div className="mt-4 p-4 border rounded-md bg-gray-50">
+                  <h4 className="font-semibold mb-2">Resultados:</h4>
+                  {voteResults.results.map((result: any, index: number) => (
+                    <p key={index}>{result.option}: {result.count} votos ({result.percentage}%)</p>
+                  ))}
+                </div>
+              )}
+              {user?.role === 'COMPLEX_ADMIN' && (
+                <Button onClick={handleGetVoteResults} className="mt-4">Ver Resultados</Button>
+              )}
+            </div>
+          ) : (
+            <p className="text-gray-600 mb-4">
+              No hay votaciones activas en este momento.
+            </p>
+          )}
+          {user?.role === 'COMPLEX_ADMIN' && (
+            <Button onClick={handleCreateVote} disabled={assembly.status !== 'IN_PROGRESS'}>
+              Iniciar Nueva Votación
+            </Button>
+          )}
         </CardContent>
       </Card>
 
-      {/* Sección de Actas y Documentos (Placeholder) */}
+      {/* Sección de Actas y Documentos */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
@@ -210,15 +334,20 @@ export default function ViewAssemblyPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-600">
-            La elaboración y firma digital de actas, junto con el repositorio de
-            documentos, se implementará aquí.
+          <p className="text-gray-600 mb-4">
+            Aquí se mostrarán las actas de la asamblea y otros documentos relevantes.
           </p>
+          {user?.role === 'COMPLEX_ADMIN' && (
+            <Button onClick={handleGenerateMinutes} disabled={assembly.status !== 'COMPLETED'}>
+              Generar Borrador de Acta
+            </Button>
+          )}
           <Button variant="outline" className="mt-4">
-            Ver Actas
+            Ver Actas Anteriores
           </Button>
         </CardContent>
       </Card>
     </div>
   );
 }
+

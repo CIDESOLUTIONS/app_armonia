@@ -1,7 +1,7 @@
 Gemini CLI
 prompt
 
-iNEstas ubicado en el directorio raíz del proyecto llamado armonía; es el desarrollo de una aplicación para ser usada en  web y móvil, las especificaciones técnicas se encuentran ubicadas en la carpeta docs, revisa en profundidad las especificaciones y compárala con los desarrollos que se encuentra en este directorio del proyecto. genera un resumen técnico, funcional y de estilo de lo que entendiste. revisa lo que se debes ajustar o cambiar usando las mejores prácticas de desarrollo, si se requiere desarrollar nuevo código para cumplir con las especificaciones técnicas, debes buscar primero en la carpeta .git, debido a que mucho código fue elaborado pero pudo haber sido descartado por error, si definitivamente no esta, se debe desarrollar teniendo en cuenta las especificaciones técnicas y el estilo que se viene manejando; si es necesario incluye la reorganización de la estructura del proyecto para que sea eficiente, conversión de .JS a .TS, eliminar dependencias, funciones y código que no se necesitan, optimiza el código; después se debe realizar las pruebas individuales y las pruebas e2e; después se debe preparar la aplicación para el despliegue en producción. por ultimo, genera un plan de ajuste con todas las tareas detalladas que se deban realizar para alcanzar el objetivo y esta será la guía de trabajo. debes mantener en la memoria el plan para seguirlo y ejecutarlo en su totalidad.
+Estas ubicado en el directorio raíz del proyecto llamado armonía; es el desarrollo de una aplicación para ser usada en  web y móvil, las especificaciones técnicas se encuentran ubicadas en la carpeta docs, revisa en profundidad las especificaciones y compárala con los desarrollos que se encuentra en este directorio del proyecto. genera un resumen técnico, funcional y de estilo de lo que entendiste. revisa lo que se debes ajustar o cambiar usando las mejores prácticas de desarrollo, si se requiere desarrollar nuevo código para cumplir con las especificaciones técnicas, debes buscar primero en la carpeta .git, debido a que mucho código fue elaborado pero pudo haber sido descartado por error, si definitivamente no esta, se debe desarrollar teniendo en cuenta las especificaciones técnicas y el estilo que se viene manejando; si es necesario incluye la reorganización de la estructura del proyecto para que sea eficiente, conversión de .JS a .TS, eliminar dependencias, funciones y código que no se necesitan, optimiza el código; después se debe realizar las pruebas individuales y las pruebas e2e; después se debe preparar la aplicación para el despliegue en producción. por ultimo, genera un plan de ajuste con todas las tareas detalladas que se deban realizar para alcanzar el objetivo y esta será la guía de trabajo. debes mantener en la memoria el plan para seguirlo y ejecutarlo en su totalidad.
 
 resumen
  Resumen Técnico y Funcional del Proyecto "Armonía"
@@ -414,65 +414,6 @@ Interacciones solo en español. Compórtese como un experto en desarrollo y audi
 
 
  
-Resumen General y Análisis Inicial
-   1. Resumen Técnico:
-       * Stack Tecnológico: El package.json confirma que el proyecto utiliza las tecnologías clave especificadas: Next.js (^15.3.5), React (^19.1.0), Prisma (^6.5.0), TypeScript, y Tailwind CSS. Las dependencias para autenticación (next-auth), validación (zod), y pruebas E2E (@playwright/test) están presentes, lo cual se alinea con las especificaciones.
-       * Calidad de Código: Se han configurado herramientas como ESLint, lo que indica una intención de mantener la calidad del código.
-       * Pruebas: ¡Alerta Crítica! El script de test en package.json está deshabilitado ("echo \"Jest tests temporarily disabled...\""). Aunque existen dependencias de Jest, esto significa que las pruebas unitarias y de integración no se están ejecutando, lo cual es un riesgo significativo y una desviación mayor de las especificaciones que exigen una estrategia de pruebas robusta.
-
-
-   2. Resumen Funcional (Basado en Especificaciones):
-       * El proyecto está diseñado para ser una plataforma multi-tenant con cuatro portales principales: Público/Landing Page, Administrador de Conjunto, Residente y Recepción/Vigilancia, además de una consola de Administración de la Aplicación.
-       * Las funcionalidades son extensas y complejas, abarcando desde gestión de inventario y finanzas hasta asambleas virtuales y comunicaciones integradas.
-       * El modelo de negocio Freemium (Básico, Estándar, Premium) debe estar integrado en la lógica de la aplicación.
-
-   3. Análisis de Estilo y Estructura (Basado en Especificaciones):
-       * Las especificaciones son muy claras en cuanto a las convenciones de nombrado (PascalCase para componentes, camelCase para funciones) y la estructura de directorios, que debe estar organizada por portales (ej. src/app/(admin), src/app/(resident)).
-       * Se requiere un sistema de diseño basado en Shadcn/UI y un enfoque en la reutilización de componentes y la accesibilidad (WCAG 2.1 AA).
-
-
-  Principales Desviaciones y Riesgos Identificados
-
-   1. Ausencia de Pruebas Unitarias/Integración: La desactivación de Jest es el problema más urgente. Sin esta red de seguridad, la refactorización y el nuevo desarrollo son arriesgados y propensos a errores.
-   2. Brecha Funcional Desconocida: Es necesario realizar una auditoría de código para determinar qué porcentaje de las funcionalidades especificadas está realmente implementado y funcionando correctamente.
-   3. Alineación de la Estructura: Se debe verificar si la estructura de archivos actual sigue el patrón de portales definido en las especificaciones, ya que esto es clave para la mantenibilidad del proyecto.
-
-  Plan de Trabajo Propuesto
-
-  Para abordar esto de manera sistemática, he creado un plan de trabajo detallado. Lo guardaré en mi memoria para que guíe todas nuestras interacciones futuras hasta completar el proyecto.
-
-
-  Plan de Trabajo: Auditoría y Alineación del Proyecto Armonía
-
-  Fase 1: Análisis Profundo y Preparación del Entorno
-   1. Auditoría de Código y Funcionalidades: Revisar cada módulo funcional (Inventario, Asambleas, Finanzas, PQR, etc.) comparando el código existente con las Especificaciones_Tecnicas_Armonia_Ver.15.txt. Documentar las desviaciones y funcionalidades faltantes. Verificar la correcta implementación de la arquitectura multi-tenant.
-   2. Análisis del Historial de Git: Buscar en el historial de .git código relevante que pudo haber sido descartado accidentalmente, especialmente para funcionalidades faltantes.
-   3. Configuración del Entorno de Desarrollo: Asegurar que todas las dependencias estén instaladas y sean compatibles. Configurar y ejecutar las herramientas de calidad de código (ESLint, Prettier) para obtener un informe del estado actual.
-
-  Fase 2: Refactorización y Alineación del Código
-   1. Reorganización de la Estructura de Archivos: Reestructurar el directorio src/app para reflejar los portales definidos (admin, resident, reception, public).
-   2. Migración a TypeScript: Identificar todos los archivos .js y .jsx y planificar su migración a .ts y .tsx.
-   3. Optimización y Limpieza: Eliminar código muerto, dependencias no utilizadas y funcionalidades redundantes. Refactorizar componentes grandes y complejos para mejorar la mantenibilidad. Asegurar que todo el código nuevo y existente siga las convenciones de nombrado y estilo definidas.
-
-  Fase 3: Desarrollo y Completitud de Funcionalidades
-   1. Ajuste de Funcionalidades Existentes: Modificar las funcionalidades actuales para que se ajusten 100% a las especificaciones.
-   2. Desarrollo de Funcionalidades Faltantes: Implementar las funcionalidades que no existen actualmente, comenzando por las más críticas para el flujo de la aplicación.
-
-  Fase 4: Pruebas y Aseguramiento de la Calidad
-   1. Pruebas Unitarias y de Integración: Desarrollar y/o completar las pruebas unitarias y de integración para todos los módulos.
-   2. Pruebas End-to-End (E2E): Crear y ejecutar scripts de Playwright para simular los flujos de usuario completos en todos los portales.
-   3. Pruebas de Rendimiento y Seguridad: Realizar pruebas de carga para asegurar la escalabilidad y analizar la seguridad para identificar y corregir vulnerabilidades.
-
-
-  Fase 5: Despliegue y Documentación
-   1. Preparación para Producción: Configurar los pipelines de CI/CD en GitHub Actions para el despliegue automatizado. Asegurar que la aplicación se construya (build) correctamente sin errores.
-   2. Documentación Final: Actualizar la documentación técnica para que refleje el estado final del proyecto.
-
- 
->>>>>>> 
-Inicio rápido
-Requisitos previos: asegúrese de tener instalada la versión 20 o superior de Node.js.
-
 Ejecute la CLI: ejecute el siguiente comando en su terminal:
 npx https://github.com/google-gemini/gemini-cli
 
@@ -491,72 +432,6 @@ ajuste prompt chatgpt
 
 Interacciones solo en español. Actúas como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas (Clean Code, SOLID, TDD, CI/CD, etc.). Estás ubicado en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales se encuentran en la carpeta docs. Tu tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto. A partir de esa comparación, debes generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre lo especificado y lo implementado; e identificación de funcionalidades faltantes, incompletas o que deban ajustarse. Evalúa especialmente desde el acceso a la landing page (clave para conversión) hasta todos los portales: Administrador del conjunto residencial, Residentes, Recepción/Vigilancia y la Consola de Administración de la aplicación. Evalúa si se están aplicando estándares modernos de calidad, accesibilidad, rendimiento, seguridad y mantenibilidad. Si se detectan problemas, sugiere correcciones o mejoras específicas. Verifica si es conveniente, eliminar dependencias o funciones innecesarias, optimizar estructuras o reorganizar la arquitectura para mejorar eficiencia. Antes de desarrollar nuevo código, es muy importante revisar el historial de la carpeta .git para rescatar implementaciones descartadas. Si no existen, desarrolla desde cero respetando el estilo del proyecto. Evita proponer múltiples alternativas para una misma solución salvo que se indique lo contrario. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones en docs/, resume sus puntos clave y procede paso a paso siguiendo este flujo.
 
-
- Resumen Consolidado de Auditoría y Plan de Corrección
-
-  I. Problemas Críticos Identificados (Requieren Atención Inmediata):
-   
-    5. Funcionalidad de Recuperación de Contraseña Incompleta:
-       * Problema: La página de "olvidé mi contraseña" es un placeholder.
-       * Corrección: Pendiente de implementar el flujo completo de restablecimiento de contraseña (endpoints de API y lógica de frontend).
-   6. Endpoints CRUD Incompletos (PUT/DELETE):
-       * Problema: Varios endpoints de API (Residentes, Vehículos, Mascotas, Amenidades, Anuncios, PQR) solo tenían implementados GET y POST, a pesar de que el frontend ya llamaba a PUT y DELETE.
-       * Corrección: Pendiente de implementar los métodos PUT y DELETE en los archivos route.ts correspondientes o en archivos [id]/route.ts.
-   7. Endpoint `/api/dashboard/activity` Faltante:
-       * Problema: El dashboard del administrador llama a este endpoint, pero no existe.
-       * Corrección: Pendiente de implementar src/app/api/dashboard/activity/route.ts.
-   8. Funcionalidad de Mensajería Digital y Notificaciones (Backend):
-       * Problema: La integración real con Twilio/Telegram y la lógica de envío de notificaciones no están implementadas en el backend.
-       * Corrección: Pendiente de implementar la integración con servicios de comunicación y la lógica de envío dentro de NotificationService.
-   9. Carga de Archivos de Logotipo (Backend):
-       * Problema: La implementación de la carga de archivos en el backend para el logotipo es un placeholder.
-       * Corrección: Pendiente de implementar la integración con un servicio de almacenamiento de archivos.
-   10. Funcionalidad de Pago en Finanzas del Residente:
-       * Problema: No hay funcionalidad para realizar pagos.
-       * Corrección: Pendiente de implementar la funcionalidad de pago y la integración con pasarelas de pago.
-   11. Funcionalidad de Documentos del Residente:
-       * Problema: La página de documentos es un placeholder.
-       * Corrección: Pendiente de implementar la funcionalidad de listar y descargar documentos.
-   12. Funcionalidad de Votación en Asambleas del Residente:
-       * Problema: La votación es simulada.
-       * Corrección: Pendiente de implementar la funcionalidad de votación real en el backend y frontend.
-
-  II. Problemas de Usabilidad y Mantenibilidad (Requieren Mejora):
-
-   1. `window.confirm` para Eliminación:
-       * Problema: Uso inconsistente de window.confirm en lugar de diálogos de Shadcn/UI.
-       * Corrección: Pendiente de reemplazar en todas las páginas donde se utilice.
-   2. Validación Frontend Básica:
-       * Problema: La validación en el frontend es básica (atributos HTML).
-       * Corrección: Pendiente de mejorar con react-hook-form y zod para una mejor experiencia de usuario.
-   3. UX de Selección de `propertyId`:
-       * Problema: En formularios de Residentes, Vehículos y Mascotas, propertyId es un input numérico.
-       * Corrección: Pendiente de mejorar con un selector de propiedades más amigable.
-   4. Refactorización de Componentes de Layout:
-       * Problema: AdminHeader y AdminSidebar se renderizan en cada página, causando duplicación.
-       * Corrección: Pendiente de refactorizar a un layout superior.
-   5. `getPQRById` Ineficiente:
-       * Problema: La función getPQRById en pqrService.ts realiza una llamada ineficiente.
-       * Corrección: Pendiente de refactorizar para usar un endpoint dedicado /api/pqr/[id]/route.ts.
-   6. Página de Edición de PQR Faltante:
-       * Problema: La página src/app/(admin)/(complex-admin)/pqr/[id]/edit/page.tsx no existe.
-       * Corrección: Pendiente de implementar.
-   7. Carga Dinámica de Usuarios Asignables (PQR):
-       * Problema: La lista de usuarios a los que se puede asignar una PQR no se carga dinámicamente.
-       * Corrección: Pendiente de implementar.
-
-  III. Tareas de Verificación y Refinamiento:
-
-   1. Verificar Modelos de Prisma:
-       * Problema: Se asume la existencia y estructura de modelos de Prisma para Payment, Expense y Fee.
-       * Corrección: Pendiente de verificar en el esquema de Prisma.
-   2. Consistencia de Fechas/Horas:
-       * Problema: Asegurar un manejo robusto y consistente de fechas y horas en toda la aplicación.
-       * Corrección: Pendiente de revisión y ajuste.
-
-Plan de Ejecución de Correcciones Unificadas de auditoria:
-
-Ahora que tenemos un resumen claro, procederé a implementar estas correcciones. Dada la cantidad y la interdependencia de algunas de  ellas, las abordaré en un orden lógico, priorizando las críticas y las que desbloquean otras funcionalidades.
 
 
 Interacciones solo en español. Actúas como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas (Clean Code, SOLID, TDD, CI/CD, etc.). Estás ubicado en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales se encuentran en la carpeta docs. Tu tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto. A partir de esa comparación, debes generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre lo especificado y lo implementado; e identificación de funcionalidades faltantes, incompletas o que deban ajustarse. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. en tu última iteración de auditoria encontraste estas correcciones por realizar, valida el avance y retoma en la tarea que quedaste( no estoy seguro pero era remplazar window.confirm).
@@ -614,191 +489,97 @@ plan de acción para las pruebas será el siguiente:
 
 
 
-en el chat de Vicky pro. (mañana es el primero en enviar)
 
-Interacciones solo en español. Actúas como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas (Clean Code, SOLID, TDD, CI/CD, etc.). Estás ubicado en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales se encuentran en la carpeta docs. Tu tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto. A partir de esa comparación, debes generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre lo especificado y lo implementado; e identificación de funcionalidades faltantes, incompletas o que deban ajustarse. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. en tu última iteración de auditoria encontraste estas correcciones para realizar, 
-Lista de Tareas Priorizada auditoria proyecto Armonía: 
-A continuación, se presenta el listado de tareas de desarrollo, ordenado por prioridad decreciente (P0 a P3), para completar el proyecto "Armonía"
-Prioridad P0 (Crítica - Iniciar Inmediatamente)
-1.	Corregir Configuración de TypeScript:
-	En el archivo tsconfig.json, modifica la opción "noImplicitAny": false a "noImplicitAny": true.
-	Resuelve todos los errores de tipado que surjan en el código como resultado de este cambio para garantizar un tipado estricto.
-2.	Desarrollar API para Gestión de Tenants (SAAS):
-	Crea las rutas de API en src/app/api/ necesarias para administrar los conjuntos residenciales (tenants).
-	Implementa los endpoints para:
-■	Crear un nuevo tenant (conjunto), lo que debe incluir la creación de su esquema de base de datos (tenant_cjXXXX).
-■	Listar todos los tenants existentes.
-■	Obtener los detalles de un tenant específico.
-■	Actualizar la información de un tenant.
-3.	Desarrollar Interfaz de Administración de Tenants (SAAS):
-	En el portal de Administrador de la Aplicación (src/app/(admin)/(app-admin)/), crea una nueva página para la gestión de conjuntos.
-	Implementa una tabla que liste los tenants existentes, consumiendo el endpoint del paso anterior.
-	Crea un formulario para registrar nuevos conjuntos y para editar los existentes.
-4.	Implementar Lógica de Planes y Suscripciones (SAAS):
-	Modifica el modelo de datos (prisma.schema) para asociar cada Tenant (Conjunto) con un plan (Básico, Estándar, Premium).
-	Crea un servicio de backend que verifique el plan de un tenant y aplique las limitaciones correspondientes (ej. número máximo de propiedades, acceso a funcionalidades).
-	Integra esta lógica en el middleware.ts para restringir el acceso a funcionalidades premium si el tenant no tiene el plan adecuado.
-Prioridad P1 (Alta)
-5.	Finalizar Integración de Citofonía Virtual:
-	Desarrolla el servicio de backend en src/lib/communications/ que contenga la lógica para enviar notificaciones a través de WhatsApp (Twilio) y/o Telegram.
-	Integra este servicio en el portal de Recepción/Vigilancia para que, desde la interfaz, se pueda activar la citofonía para un visitante registrado.
-6.	Finalizar Integración de Cámaras IP:
-	Implementa un servicio en el backend (src/services/cameraService.ts) que utilice node-onvif para descubrir y obtener el stream de cámaras IP.
-	En el portal de Seguridad (/security/cameras/page.tsx), crea los componentes de React necesarios para mostrar el stream de video de las cámaras configuradas.
-7.	Crear Pruebas Unitarias (Jest):
-	Desarrolla pruebas unitarias para todos los servicios críticos de la carpeta src/services/, enfocándote en la lógica de negocio de finanzas, asambleas y seguridad.
-	Asegura una cobertura de pruebas de al menos el 80% para estos servicios críticos.
-8.	Crear Pruebas End-to-End (Playwright):
-	Desarrolla scripts de prueba E2E que simulen los flujos de usuario más importantes:
-■	Registro de un nuevo conjunto.
-■	Login de un administrador y creación de una propiedad.
-■	Login de un residente y pago de una cuota de administración.
-■	Login de un vigilante y registro de un visitante.
-9.	Configurar Pipeline de CI/CD:
-	Edita los archivos de GitHub Actions (.github/workflows/) para crear un pipeline que se ejecute en cada push a la rama principal.
-	El pipeline debe ejecutar: linting, pruebas unitarias y pruebas E2E. El build del proyecto debe fallar si alguna de estas etapas no se completa con éxito.
-10.	Auditoría y Hardening de Seguridad:
-	Revisa todas las API Routes en src/app/api/ y asegúrate de que cada una valide los datos de entrada (payload) usando los esquemas de Zod correspondientes.
-	Verifica que todas las operaciones de base de datos que reciben parámetros del cliente estén protegidas contra inyecciones SQL (Prisma ayuda, pero la validación es clave).
-Prioridad P2 (Media)
-11.	Implementar Minuta Digital:
-	Crea el modelo de datos en prisma.schema para la "Minuta Digital", que debe incluir campos como timestamp, author, novedad, etc.
-	Desarrolla la API y los componentes del frontend en el portal de Recepción para registrar y consultar las novedades del día.
-12.	Implementar Blog Funcional:
-	Crea un modelo en prisma.schema para las entradas del Blog (Post).
-	Desarrolla las API Routes para obtener la lista de posts y un post individual por su slug.
-	Crea las páginas dinámicas en src/app/blog/[slug]/page.tsx para mostrar el contenido de cada post.
-13.	Implementar Firma Digital de Actas:
-	Integra la librería pdf-lib en el backend para permitir la adición de una imagen (firma) a un documento PDF (acta de asamblea) existente.
-	Crea la interfaz en el portal de Administrador para subir una imagen de firma y aplicarla a un acta generada.
-Prioridad P3 (Baja)
-14.	Unificar Librerías de Generación de PDF:
-	Evalúa jspdf y pdf-lib. Selecciona una como la librería estándar para la generación de PDFs en todo el proyecto.
-	Refactoriza el código existente para usar únicamente la librería seleccionada, eliminando la otra de las dependencias en package.json.
-15.	Implementar Directorio de Residentes:
-	Crea un componente en el portal de Residente que muestre una lista de los residentes del conjunto.
-	Añade una opción en la configuración del conjunto (Portal de Administrador) para habilitar o deshabilitar la visibilidad de este directorio, considerando la privacidad de los datos.
 
 
 Con análisis de mercado
-Interacciones solo en español. Actúas como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas (Clean Code, SOLID, TDD, CI/CD, etc.). Estás ubicado en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales se encuentran en la carpeta docs. Tu tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto. A partir de esa comparación, debes generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre lo especificado y lo implementado; e identificación de funcionalidades faltantes, incompletas o que deban ajustarse. Evalúa especialmente desde el acceso a la landing page (clave para conversión) hasta todos los portales: Administrador del conjunto residencial, Residentes, Recepción/Vigilancia y la Consola de Administración de la aplicación, evalúa la adopción del modelo de negocio incluyendo el plan empresarial, y el uso del modulo de democracia digital pueda ser integrado o independiente. Evalúa si se están aplicando estándares modernos de calidad, accesibilidad, rendimiento, seguridad y mantenibilidad. Si se detectan problemas, sugiere correcciones o mejoras específicas. Verifica si es conveniente, eliminar dependencias o funciones innecesarias, optimizar estructuras o reorganizar la arquitectura para mejorar eficiencia.si se requiere desarrollar desde cero respeta el estilo del proyecto. Evita proponer múltiples alternativas para una misma solución salvo que se indique lo contrario. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones en docs/, resume sus puntos clave y procede paso a paso siguiendo este flujo.
+Interacciones solo en español. Actúas como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas (Clean Code, SOLID, TDD, CI/CD, etc.). Estás ubicado en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales se encuentran en la carpeta docs. Tu tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto. A partir de esa comparación, debes generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre lo especificado y lo implementado, identificación de funcionalidades faltantes, incompletas o que deban ajustarse. Evalúa especialmente que cumpla con estrictamente con el stack tecnológico del frontend (Next.js, React, TypeScript, Prisma, shadcn/ui, zustand) y backend (NestJS) y verifica desde el acceso a la landing page (clave para conversión) hasta todos los portales (Administrador del conjunto residencial, Residentes, Recepción/Vigilancia y la Consola de Administración de la aplicación), evalúa la adopción del modelo de negocio incluyendo el plan empresarial, y el uso del modulo de democracia digital para que pueda ser integrado o independiente. Evalúa si se están aplicando estándares modernos de calidad, accesibilidad, rendimiento, seguridad y mantenibilidad. Si se detectan problemas, sugiere correcciones o mejoras específicas. Verifica si es conveniente, eliminar dependencias o funciones innecesarias, optimizar estructuras o reorganizar la arquitectura para mejorar eficiencia.si se requiere desarrollar desde cero respeta el estilo del proyecto. Evita proponer múltiples alternativas para una misma solución salvo que se indique lo contrario. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones en docs/, resume sus puntos clave y procede paso a paso siguiendo este flujo.
 
  
-Plan de Trabajo: Recuperación y Alineación del Proyecto Armonía
-Este plan está diseñado para transformar el prototipo actual en una aplicación robusta, segura y escalable, alineada con las
- especificaciones técnicas y de negocio.
+Informe de Auditoría del Proyecto "Armonía"
 
-  Fase 1: Estabilización y Cimientos (Triage Inmediato)
-  Objetivo: Solucionar los problemas más críticos que impiden que la aplicación funcione y que presentan riesgos de seguridad. Dejar el
-  código base en un estado estable y legible.
+  1. Resumen Ejecutivo:
 
-   * Tarea 1.1: Corrección de Errores Críticos de Linting y Sintaxis. (ok)
-       * Acción: Identificar y corregir todos los errores de react/jsx-no-undef (importaciones de componentes faltantes) y otros errores de
-         parsing en todo el proyecto.
-       * Justificación: Es la tarea más urgente. La aplicación es actualmente inoperable en muchas de sus vistas. Esto nos permitirá
-         renderizar la UI completa para una evaluación visual.
+  El proyecto "Armonía" posee una base arquitectónica y tecnológica sólida y moderna, alineada en gran medida con las especificaciones. El
+  uso de Next.js, NestJS, TypeScript y Prisma, junto con una estructura de proyecto bien organizada, demuestra un alto nivel de competencia
+  técnica. Sin embargo, la auditoría ha revelado deficiencias críticas en la implementación de funcionalidades clave que son vitales para el
+  modelo de negocio y la propuesta de valor de la aplicación. Cuatro de las funcionalidades más importantes están incompletas, no
+  implementadas o existen solo como marcadores de posición. Además, la cobertura de pruebas unitarias es prácticamente inexistente, lo que
+  representa un riesgo significativo para la estabilidad y mantenibilidad a largo plazo del proyecto.
 
-   * Tarea 1.2: Implementación de Autenticación y Autorización (Seguridad Crítica). (pend.)
-       * Acción: Proteger todos los endpoints de la API actual (Next.js API Routes) para que requieran un token de autenticación válido.
-         Implementar una verificación de rol básica (ej. COMPLEX_ADMIN) en los endpoints que lo necesiten.
-       * Justificación: Cierra la brecha de seguridad más grave del proyecto. Ninguna funcionalidad que implique datos sensibles puede
-         permanecer pública.
+  2. Análisis Funcional, Técnico y de Estilo:
 
-   * Tarea 1.3: Incorporación de `tenantId` en Consultas. (pend.)
-       * Acción: Refactorizar los endpoints existentes (como el de conciliación) para que identifiquen el tenantId (ID del conjunto) a partir
-         del usuario autenticado y lo usen en todas las consultas a la base de datos.
-       * Justificación: Corrige el error fatal de lógica multi-tenant, evitando que los datos de un conjunto se mezclen con los de otros.
+   * Funcional: La aplicación cuenta con una landing page de alta calidad y un flujo de autenticación robusto. Sin embargo, las funcionalidades
+      principales que diferencian los planes de pago y fomentan la interacción del usuario (Conciliación Bancaria, Marketplace, Democracia
+     Digital, Portal Empresarial) están rotas o incompletas.
+   * Técnico: El stack tecnológico es el correcto. La arquitectura multi-tenant y la separación entre frontend y backend son adecuadas. El
+     principal problema técnico es la discrepancia entre el frontend y el backend: el frontend intenta consumir APIs que no existen.
+   * Estilo: El código existente es limpio, legible y sigue buenas prácticas (Clean Code, SOLID). La estructura de carpetas es semántica y
+     mantenible.
 
-   * Tarea 1.4: Resolución de Advertencias de Linting y Deuda Técnica. (pend.)
-       * Acción: Realizar una pasada para eliminar la mayor cantidad posible de las 1178 advertencias: eliminar variables no utilizadas,
-         reemplazar any por tipos específicos y estandarizar el uso de import/export.
-       * Justificación: Limpia el ruido del código base, mejora la legibilidad y previene futuros bugs, preparando el terreno para la
-         migración arquitectónica.
-
-  ---
-
-  Fase 2: Alineación Arquitectónica y Backend Core (NestJS) (ok)
-
-  Objetivo: Construir el backend dedicado con NestJS como se especifica, migrando la lógica de negocio más crítica fuera de las API Routes
-  de Next.js.
-
-   * Tarea 2.1: Estructuración del Backend con NestJS.
-       * Acción: Crear un nuevo directorio backend/ en el proyecto. Inicializar una nueva aplicación de NestJS. Configurar la conexión a la
-         base de datos (PostgreSQL con Prisma) y la estructura de módulos principal.
-
-   * Tarea 2.2: Migración del Módulo de Autenticación y Usuarios a NestJS.
-       * Acción: Reimplementar toda la lógica de registro, inicio de sesión y gestión de tokens JWT en un AuthModule y UsersModule en NestJS,
-         usando las mejores prácticas de la plataforma (ej. Passport.js).
-
-   * Tarea 2.3: Implementación del Modelo Multi-Tenant y Gestión de Conjuntos.
-       * Acción: Crear un ComplexesModule en NestJS para manejar la creación y gestión de los conjuntos residenciales (tenants). Este será el
-         endpoint que consumirá el formulario de registro de la landing page.
-
-   * Tarea 2.4: Refactorización del Frontend para Consumir el Nuevo Backend.
-       * Acción: Modificar las llamadas fetch en el frontend (ej. en el login, en el registro de conjuntos) para que apunten a los nuevos
-         endpoints del backend de NestJS en lugar de a las API Routes de Next.js. Las API Routes antiguas se marcarán como obsoletas.
-
-  ---
-
-  Fase 3: Completitud de Funcionalidades (Módulo por Módulo)
-
-  Objetivo: Con una arquitectura sólida, implementar la lógica de backend completa para las funcionalidades clave.
-
-   * Tarea 3.1: Módulo Financiero Avanzado. (ok)
-       * Acción: Crear un FinancesModule en NestJS. Reimplementar la subida de extractos y desarrollar el algoritmo de conciliación mejorado
-         (basado en puntuación y análisis de descripción). Crear los endpoints para que el administrador apruebe las sugerencias.
-
-   * Tarea 3.2: Módulo de Democracia Digital (Asambleas).
-       * Acción: Crear un AssembliesModule en NestJS. Implementar la lógica para cálculo de quórum en tiempo real, sistema de votaciones
-         ponderadas y generación del borrador del acta.
-
-   * Tarea 3.3: Portal de Seguridad (Gestión de Visitantes/QR).
-       * Acción: Crear un SecurityModule en NestJS. Desarrollar los endpoints para la generación de códigos QR únicos y temporales, y un
-         endpoint para que la recepción pueda validarlos.
-
-   * Tarea 3.4: Revisión y Completitud de Módulos Restantes.
-       * Acción: Migrar y completar la lógica de backend para los módulos restantes (Inventario, Comunicaciones, PQR, Marketplace) a NestJS,
-         asegurando que todos sigan la nueva arquitectura.
-
-  ---
-
-  Fase 4: Lógica de Negocio y Monetización
-
-  Objetivo: Implementar la infraestructura necesaria para soportar el modelo de negocio del proyecto.
-
-   * Tarea 4.1: Implementación de Gestión de Planes y Suscripciones.
-       * Acción: Diseñar y crear los modelos en la base de datos para Plans, Subscriptions y Features. Crear un BillingModule en NestJS.
-         Implementar un middleware de "feature flagging" que verifique la suscripción de un tenant antes de darle acceso a una funcionalidad
-         premium.
-
-   * Tarea 4.2: Desarrollo del Portal de Administración de la Aplicación (`app-admin`).
-       * Acción: Construir la interfaz y los endpoints necesarios para que el administrador de Armonía pueda gestionar los conjuntos, asignar
-         planes y ver estadísticas de uso e ingresos.
-
-   * Tarea 4.3: Desarrollo del Portal Empresarial (`Armonía Portafolio`).
-       * Acción: Adaptar el modelo de datos para permitir que una cuenta de usuario (empresa) esté asociada a múltiples tenants (conjuntos).
-         Desarrollar el dashboard multi-propiedad y la navegación centralizada.
-
-  ---
-
-  Fase 5: Aseguramiento de Calidad y Despliegue
-
-  Objetivo: Garantizar la calidad y la robustez de la aplicación final y prepararla para producción.
-
-   * Tarea 5.1: Estrategia de Pruebas (Unitarias y E2E).
-       * Acción: Escribir pruebas unitarias para los servicios críticos en NestJS (ej. el algoritmo de conciliación). Crear pruebas E2E con
-         Playwright para los flujos de usuario más importantes (registro, pago, reserva, votación).
-
-   * Tarea 5.2: Configuración de CI/CD.
-       * Acción: Crear o ajustar los workflows de GitHub Actions para que ejecuten el linting, las pruebas unitarias y las pruebas E2E tanto
-         para el frontend como para el nuevo backend en cada commit.
-
-   * Tarea 5.3: Documentación Final y Preparación para Producción.
-       * Acción: Actualizar toda la documentación técnica para que refleje la nueva arquitectura. Crear los scripts y la configuración de
-         entorno necesarios para el despliegue del frontend y el backend de NestJS.
-
-  ---
-
-  Este plan es una hoja de ruta completa. Procederé a ejecutarlo paso a paso, informándote del progreso en cada tarea.
+  3. Lista de Desviaciones y Funcionalidades Faltantes:
 
 
+  ┌─────────────────────────┬─────────────────┬───────────────────────────────────────────────────────────────────────┬───────────┐
+  │ Módulo/Funcionalidad    │ Estado Actual   │ Desviación/Problema                                                   │ Prioridad │
+  ├─────────────────────────┼─────────────────┼───────────────────────────────────────────────────────────────────────┼───────────┤
+  │ Conciliación Bancaria   │ Incompleto      │ Falta el endpoint y la lógica en el backend.                          │ MUY ALTA  │
+  │ Portal Empresarial      │ No Implementado │ Funcionalidad clave para ingresos B2B no existe.                      │ MUY ALTA  │
+  │ Marketplace Comunitario │ Incompleto      │ Falta el backend. Faltan búsqueda, filtros y reportes en el frontend. │ ALTA      │
+  │ Democracia Digital      │ Incompleto      │ Funcionalidades clave (quórum, votación) son placeholders.            │ ALTA      │
+  │ Pruebas Unitarias       │ Inexistentes    │ Cobertura de pruebas unitarias es cercana al 0%.                      │ ALTA      │
+  │ Pruebas E2E             │ Parcial         │ No cubren las funcionalidades críticas faltantes.                     │ MEDIA     │
+  │ Datos Dinámicos (Admin) │ Incompleto      │ El dashboard de admin global usa datos estáticos.                     │ MEDIA     │
+  └─────────────────────────┴─────────────────┴───────────────────────────────────────────────────────────────────────┴───────────┘
+
+  4. Plan de Acción Detallado y Priorizado:
+
+  El siguiente plan de acción está diseñado para abordar las deficiencias críticas y alinear el proyecto con las especificaciones. Las
+  tareas se deben ejecutar en el orden presentado.
+
+  Fase 1: Implementación de Funcionalidades Críticas (Backend)
+
+   1. Desarrollar Backend del Portal Empresarial:
+       * Crear módulo, controlador y servicio en NestJS.
+       * Implementar endpoints para KPIs y reportes consolidados.
+   2. Desarrollar Backend de Conciliación Bancaria:
+       * Crear el endpoint para la subida de archivos.
+       * Implementar la lógica de análisis de extractos y sugerencias de conciliación.
+   3. Desarrollar Backend del Marketplace:
+       * Crear un módulo completo en NestJS para gestionar los anuncios (CRUD, reportes, moderación).
+   4. Desarrollar Backend de Democracia Digital:
+       * Implementar el AssemblyGateway con socket.io.
+       * Desarrollar la lógica para quórum, votaciones y actas en tiempo real.
+
+  Fase 2: Completar Funcionalidades (Frontend)
+
+   5. Conectar Frontend a los Nuevos Endpoints:
+       * Ajustar los servicios del frontend (financeService, etc.) para que apunten a las nuevas APIs.
+   6. Completar UI del Marketplace:
+       * Añadir búsqueda, filtros y botón de reporte.
+       * Implementar el chat.
+   7. Completar UI de Democracia Digital:
+       * Reemplazar los placeholders con los componentes interactivos conectados al Gateway.
+   8. Desarrollar UI del Portal Empresarial:
+       * Crear el nuevo dashboard multi-propiedad.
+
+  Fase 3: Calidad y Pruebas
+
+   9. Escribir Pruebas Unitarias (Backend y Frontend):
+       * Crear pruebas unitarias con Jest para todos los servicios, controladores, componentes y hooks nuevos y existentes. Apuntar a una
+         cobertura > 80%.
+   10. Actualizar y Crear Pruebas E2E (Playwright):
+       * Crear pruebas E2E para todas las funcionalidades nuevas (Portal Empresarial, Marketplace, etc.).
+       * Asegurarse de que todas las pruebas existentes pasen.
+   11. Ejecución Masiva de Pruebas:
+       * Correr todos los tests (unitarios y E2E) para garantizar la estabilidad total de la aplicación.
+
+  Fase 4: Preparación para Producción
+
+   12. Conectar Datos Dinámicos:
+       * Reemplazar todos los datos estáticos y TODOs con llamadas a la API.
+   13. Build de Producción y Verificación:
+       * Ejecutar npm run build y solucionar cualquier error.
+       * Realizar una última ronda de pruebas manuales en el build de producción.
+   14. Análisis de Rendimiento:
+       * Utilizar Lighthouse para identificar y corregir cuellos de botella.

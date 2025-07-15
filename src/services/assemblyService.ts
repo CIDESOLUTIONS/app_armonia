@@ -1,82 +1,10 @@
 import { fetchApi } from "@/lib/api";
+import { CreateAssemblyDto, UpdateAssemblyDto, RegisterAttendanceDto, CreateVoteDto, SubmitVoteDto } from "@/common/dto/assembly.dto";
 
-interface Assembly {
-  id: number;
-  title: string;
-  description?: string;
-  scheduledDate: string;
-  location: string;
-  type: "ORDINARY" | "EXTRAORDINARY";
-  agenda: string;
-  status: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
-  complexId: number;
-  createdBy: number;
-}
-
-interface GetAssembliesParams {
-  page?: number;
-  limit?: number;
-  status?: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
-}
-
-interface CreateAssemblyData {
-  title: string;
-  description?: string;
-  scheduledDate: string;
-  location: string;
-  type: "ORDINARY" | "EXTRAORDINARY";
-  agenda: string;
-}
-
-interface UpdateAssemblyData {
-  id: number;
-  title?: string;
-  description?: string;
-  scheduledDate?: string;
-  location?: string;
-  type?: "ORDINARY" | "EXTRAORDINARY";
-  agenda?: string;
-  status?: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
-}
-
-interface VotingResult {
-  voting: any; // Replace with actual Voting interface
-  results: { [key: string]: { count: number; coefficient: number } };
-}
-
-export async function getAssemblyById(id: number): Promise<Assembly> {
+export async function createAssembly(data: CreateAssemblyDto): Promise<any> {
   try {
-    const response = await fetchApi(`/api/assemblies/${id}`);
-    return response;
-  } catch (error) {
-    console.error(`Error fetching assembly ${id}:`, error);
-    throw error;
-  }
-}
-
-export async function getAssemblies(
-  params?: GetAssembliesParams,
-): Promise<{ data: Assembly[]; pagination: any }> {
-  try {
-    const query = new URLSearchParams();
-    if (params?.page) query.append("page", params.page.toString());
-    if (params?.limit) query.append("limit", params.limit.toString());
-    if (params?.status) query.append("status", params.status);
-
-    const response = await fetchApi(`/api/assemblies?${query.toString()}`);
-    return response;
-  } catch (error) {
-    console.error("Error fetching assemblies:", error);
-    throw error;
-  }
-}
-
-export async function createAssembly(
-  data: CreateAssemblyData,
-): Promise<Assembly> {
-  try {
-    const response = await fetchApi("/api/assemblies", {
-      method: "POST",
+    const response = await fetchApi("/assemblies", {
+      method: 'POST',
       body: JSON.stringify(data),
     });
     return response;
@@ -86,12 +14,30 @@ export async function createAssembly(
   }
 }
 
-export async function updateAssembly(
-  data: UpdateAssemblyData,
-): Promise<Assembly> {
+export async function getAssemblies(): Promise<any[]> {
   try {
-    const response = await fetchApi("/api/assemblies", {
-      method: "PUT",
+    const response = await fetchApi("/assemblies");
+    return response;
+  } catch (error) {
+    console.error("Error fetching assemblies:", error);
+    throw error;
+  }
+}
+
+export async function getAssemblyById(id: number): Promise<any> {
+  try {
+    const response = await fetchApi(`/assemblies/${id}`);
+    return response;
+  } catch (error) {
+    console.error("Error fetching assembly by ID:", error);
+    throw error;
+  }
+}
+
+export async function updateAssembly(id: number, data: UpdateAssemblyDto): Promise<any> {
+  try {
+    const response = await fetchApi(`/assemblies/${id}`, {
+      method: 'PUT',
       body: JSON.stringify(data),
     });
     return response;
@@ -101,48 +47,75 @@ export async function updateAssembly(
   }
 }
 
-export async function deleteAssembly(id: number): Promise<void> {
+export async function deleteAssembly(id: number): Promise<any> {
   try {
-    await fetchApi(`/api/assemblies/${id}`, {
-      method: "DELETE",
+    const response = await fetchApi(`/assemblies/${id}`, {
+      method: 'DELETE',
     });
+    return response;
   } catch (error) {
     console.error("Error deleting assembly:", error);
     throw error;
   }
 }
 
-export async function registerVote(
-  assemblyId: number,
-  votingId: number,
-  optionValue: string,
-): Promise<any> {
+export async function registerAttendance(assemblyId: number, data: RegisterAttendanceDto): Promise<any> {
   try {
-    const response = await fetchApi(`/api/assemblies/${assemblyId}/vote`, {
-      method: "POST",
-      body: JSON.stringify({ votingId, optionValue }),
+    const response = await fetchApi(`/assemblies/${assemblyId}/attendance`, {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
     return response;
   } catch (error) {
-    console.error(`Error registering vote for assembly ${assemblyId}:`, error);
+    console.error("Error registering attendance:", error);
     throw error;
   }
 }
 
-export async function getVotingResults(
-  assemblyId: number,
-  votingId: number,
-): Promise<VotingResult> {
+export async function createVote(assemblyId: number, data: CreateVoteDto): Promise<any> {
   try {
-    const response = await fetchApi(
-      `/api/assemblies/${assemblyId}/voting-results?votingId=${votingId}`,
-    );
+    const response = await fetchApi(`/assemblies/${assemblyId}/votes`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
     return response;
   } catch (error) {
-    console.error(
-      `Error fetching voting results for assembly ${assemblyId}:`,
-      error,
-    );
+    console.error("Error creating vote:", error);
+    throw error;
+  }
+}
+
+export async function submitVote(voteId: number, data: SubmitVoteDto): Promise<any> {
+  try {
+    const response = await fetchApi(`/assemblies/${voteId}/submit-vote`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response;
+  } catch (error) {
+    console.error("Error submitting vote:", error);
+    throw error;
+  }
+}
+
+export async function getVoteResults(voteId: number): Promise<any> {
+  try {
+    const response = await fetchApi(`/assemblies/${voteId}/results`);
+    return response;
+  } catch (error) {
+    console.error("Error fetching vote results:", error);
+    throw error;
+  }
+}
+
+export async function generateMeetingMinutes(assemblyId: number): Promise<any> {
+  try {
+    const response = await fetchApi(`/assemblies/${assemblyId}/generate-minutes`, {
+      method: 'POST',
+    });
+    return response;
+  } catch (error) {
+    console.error("Error generating meeting minutes:", error);
     throw error;
   }
 }
