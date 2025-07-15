@@ -2,6 +2,16 @@ import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request } f
 import { InventoryService } from './inventory.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { GetUser } from '../common/decorators/user.decorator';
+import {
+  PropertyWithDetailsDto,
+  PetWithDetailsDto,
+  VehicleWithDetailsDto,
+  CreatePropertyDto,
+  UpdatePropertyDto,
+  CreatePetDto,
+  CreateVehicleDto,
+  UpdateResidentDto,
+} from '../common/dto/inventory.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('inventory')
@@ -9,37 +19,37 @@ export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
 
   @Get('properties')
-  async getProperties(@GetUser() user: any) {
+  async getProperties(@GetUser() user: any): Promise<PropertyWithDetailsDto[]> {
     return this.inventoryService.getProperties(user.schemaName, user.complexId);
   }
 
   @Post('properties')
-  async createProperty(@GetUser() user: any, @Body() createPropertyDto: any) {
+  async createProperty(@GetUser() user: any, @Body() createPropertyDto: CreatePropertyDto) {
     return this.inventoryService.createProperty(user.schemaName, { ...createPropertyDto, complexId: user.complexId });
   }
 
   @Put('properties/:id')
-  async updateProperty(@GetUser() user: any, @Param('id') id: string, @Body() updatePropertyDto: any) {
+  async updateProperty(@GetUser() user: any, @Param('id') id: string, @Body() updatePropertyDto: UpdatePropertyDto) {
     return this.inventoryService.updateProperty(user.schemaName, +id, updatePropertyDto);
   }
 
   @Get('pets')
-  async getPets(@GetUser() user: any) {
+  async getPets(@GetUser() user: any): Promise<PetWithDetailsDto[]> {
     return this.inventoryService.getPets(user.schemaName, user.complexId);
   }
 
   @Post('pets')
-  async createPet(@GetUser() user: any, @Body() createPetDto: any) {
+  async createPet(@GetUser() user: any, @Body() createPetDto: CreatePetDto) {
     return this.inventoryService.createPet(user.schemaName, { ...createPetDto, complexId: user.complexId });
   }
 
   @Get('vehicles')
-  async getVehicles(@GetUser() user: any) {
+  async getVehicles(@GetUser() user: any): Promise<VehicleWithDetailsDto[]> {
     return this.inventoryService.getVehicles(user.schemaName, user.complexId);
   }
 
   @Post('vehicles')
-  async createVehicle(@GetUser() user: any, @Body() createVehicleDto: any) {
+  async createVehicle(@GetUser() user: any, @Body() createVehicleDto: CreateVehicleDto) {
     return this.inventoryService.createVehicle(user.schemaName, { ...createVehicleDto, complexId: user.complexId });
   }
 
@@ -49,7 +59,7 @@ export class InventoryController {
   }
 
   @Put('residents/:id')
-  async updateResident(@GetUser() user: any, @Param('id') id: string, @Body() updateResidentDto: any) {
+  async updateResident(@GetUser() user: any, @Param('id') id: string, @Body() updateResidentDto: UpdateResidentDto) {
     return this.inventoryService.updateResident(user.schemaName, +id, updateResidentDto);
   }
 

@@ -1,33 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
-
-enum PlanType {
-  BASIC = "BASIC",
-  STANDARD = "STANDARD",
-  PREMIUM = "PREMIUM",
-  ENTERPRISE = "ENTERPRISE", // Nuevo plan
-}
-
-interface Plan {
-  code: PlanType;
-  name: string;
-  description: string;
-  priceMonthly: number;
-  maxUnits: number;
-  features: string[];
-}
-
-interface Subscription {
-  id: number;
-  complexId: number;
-  planType: PlanType;
-  startDate: Date;
-  endDate?: Date;
-  isActive: boolean;
-  amount: number;
-  currency: string;
-}
+import {
+  PlanType,
+  PlanDto,
+  SubscriptionDto,
+} from '../common/dto/plans.dto';
 
 @Injectable()
 export class PlansService {
@@ -40,7 +18,7 @@ export class PlansService {
     return this.prismaClientManager.getClient('public'); // Asumiendo un esquema 'public' para datos globales
   }
 
-  async getAvailablePlans(): Promise<Plan[]> {
+  async getAvailablePlans(): Promise<PlanDto[]> {
     // Estos datos podrían venir de una DB o ser estáticos
     return [
       {
@@ -78,9 +56,9 @@ export class PlansService {
     ];
   }
 
-  async createSubscription(complexId: number, planType: PlanType, amount: number, currency: string): Promise<Subscription> {
-    const prisma = this.getPublicPrismaClient();
-    return prisma.subscription.create({
+  async createSubscription(complexId: number, planType: PlanType, amount: number, currency: string): Promise<SubscriptionDto> {
+    // Usar this.prisma para acceder al modelo Subscription global
+    return this.prisma.subscription.create({
       data: {
         complexId,
         planType,
@@ -93,17 +71,16 @@ export class PlansService {
   }
 
   async updateComplexPlan(complexId: number, newPlanType: PlanType): Promise<any> {
-    const prisma = this.getPublicPrismaClient();
-    // Lógica para actualizar el plan del complejo y posiblemente crear una nueva suscripción
-    return prisma.residentialComplex.update({
+    // Usar this.prisma para acceder al modelo ResidentialComplex global
+    return this.prisma.residentialComplex.update({
       where: { id: complexId },
       data: { planType: newPlanType },
     });
   }
 
-  async getComplexSubscription(complexId: number): Promise<Subscription | null> {
-    const prisma = this.getPublicPrismaClient();
-    return prisma.subscription.findFirst({
+  async getComplexSubscription(complexId: number): Promise<SubscriptionDto | null> {
+    // Usar this.prisma para acceder al modelo Subscription global
+    return this.prisma.subscription.findFirst({
       where: { complexId, isActive: true },
       orderBy: { startDate: 'desc' },
     });

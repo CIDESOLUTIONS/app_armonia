@@ -1,70 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
-
-// Interfaces de respuesta (pueden ser DTOs en NestJS)
-export interface PropertyWithDetails {
-  id: number;
-  complexId: number;
-  unitNumber: string;
-  type: string;
-  status: string;
-  area?: number;
-  block?: string;
-  zone?: string;
-  ownerId?: number;
-  ownerName?: string;
-  ownerEmail?: string;
-  totalResidents: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface PetWithDetails {
-  id: number;
-  name: string;
-  type: string;
-  breed?: string;
-  age?: number;
-  weight?: number;
-  color?: string;
-  vaccinated: boolean;
-  vaccineExpiryDate?: Date;
-  notes?: string;
-  propertyId: number;
-  residentId: number;
-  unitNumber: string;
-  residentName: string;
-  createdAt: Date;
-}
-
-export interface VehicleWithDetails {
-  id: number;
-  licensePlate: string;
-  brand: string;
-  model: string;
-  year: number;
-  color: string;
-  type: string;
-  parkingSpot?: string;
-  notes?: string;
-  propertyId: number;
-  residentId: number;
-  unitNumber: string;
-  residentName: string;
-  createdAt: Date;
-}
+import { PrismaService } from '../prisma/prisma.service';
+import {
+  PropertyWithDetailsDto,
+  PetWithDetailsDto,
+  VehicleWithDetailsDto,
+  CreatePropertyDto,
+  UpdatePropertyDto,
+  CreatePetDto,
+  CreateVehicleDto,
+  UpdateResidentDto,
+} from '../common/dto/inventory.dto';
 
 @Injectable()
 export class InventoryService {
-  constructor(private prismaClientManager: PrismaClientManager) {}
+  constructor(
+    private prismaClientManager: PrismaClientManager,
+    private prisma: PrismaService,
+  ) {}
 
-  private getPrismaClient(schemaName: string) {
+  private getTenantPrismaClient(schemaName: string) {
     return this.prismaClientManager.getClient(schemaName);
   }
 
   // PROPIEDADES
-  async getProperties(schemaName: string, complexId: number): Promise<PropertyWithDetails[]> {
-    const prisma = this.getPrismaClient(schemaName);
+  async getProperties(schemaName: string, complexId: number): Promise<PropertyWithDetailsDto[]> {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const properties = await prisma.property.findMany({
         where: { complexId },
@@ -102,8 +63,8 @@ export class InventoryService {
     }
   }
 
-  async createProperty(schemaName: string, data: any) {
-    const prisma = this.getPrismaClient(schemaName);
+  async createProperty(schemaName: string, data: CreatePropertyDto) {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const property = await prisma.property.create({
         data: {
@@ -122,6 +83,7 @@ export class InventoryService {
           },
         },
       });
+
       return property;
     } catch (error) {
       console.error("[INVENTORY SERVICE] Error creando propiedad:", error);
@@ -129,8 +91,8 @@ export class InventoryService {
     }
   }
 
-  async updateProperty(schemaName: string, id: number, data: any) {
-    const prisma = this.getPrismaClient(schemaName);
+  async updateProperty(schemaName: string, id: number, data: UpdatePropertyDto) {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const property = await prisma.property.update({
         where: { id },
@@ -141,6 +103,7 @@ export class InventoryService {
           },
         },
       });
+
       return property;
     } catch (error) {
       console.error("[INVENTORY SERVICE] Error actualizando propiedad:", error);
@@ -149,8 +112,8 @@ export class InventoryService {
   }
 
   // MASCOTAS
-  async getPets(schemaName: string, complexId: number, propertyId?: number): Promise<PetWithDetails[]> {
-    const prisma = this.getPrismaClient(schemaName);
+  async getPets(schemaName: string, complexId: number, propertyId?: number): Promise<PetWithDetailsDto[]> {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const whereClause: any = {
         property: { complexId },
@@ -193,8 +156,8 @@ export class InventoryService {
     }
   }
 
-  async createPet(schemaName: string, data: any) {
-    const prisma = this.getPrismaClient(schemaName);
+  async createPet(schemaName: string, data: CreatePetDto) {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const pet = await prisma.pet.create({
         data: {
@@ -221,6 +184,7 @@ export class InventoryService {
           },
         },
       });
+
       return pet;
     } catch (error) {
       console.error("[INVENTORY SERVICE] Error creando mascota:", error);
@@ -229,8 +193,8 @@ export class InventoryService {
   }
 
   // VEHÍCULOS
-  async getVehicles(schemaName: string, complexId: number, propertyId?: number): Promise<VehicleWithDetails[]> {
-    const prisma = this.getPrismaClient(schemaName);
+  async getVehicles(schemaName: string, complexId: number, propertyId?: number): Promise<VehicleWithDetailsDto[]> {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const whereClause: any = {
         property: { complexId },
@@ -272,8 +236,8 @@ export class InventoryService {
     }
   }
 
-  async createVehicle(schemaName: string, data: any) {
-    const prisma = this.getPrismaClient(schemaName);
+  async createVehicle(schemaName: string, data: CreateVehicleDto) {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const vehicle = await prisma.vehicle.create({
         data: {
@@ -297,6 +261,7 @@ export class InventoryService {
           },
         },
       });
+
       return vehicle;
     } catch (error) {
       console.error("[INVENTORY SERVICE] Error creando vehículo:", error);
@@ -306,7 +271,7 @@ export class InventoryService {
 
   // RESIDENTES
   async getResidents(schemaName: string, complexId: number, propertyId?: number) {
-    const prisma = this.getPrismaClient(schemaName);
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const whereClause: any = {
         property: { complexId },
@@ -329,6 +294,7 @@ export class InventoryService {
         },
         orderBy: { name: "asc" },
       });
+
       return residents;
     } catch (error) {
       console.error("[INVENTORY SERVICE] Error obteniendo residentes:", error);
@@ -336,8 +302,8 @@ export class InventoryService {
     }
   }
 
-  async updateResident(schemaName: string, id: number, data: any) {
-    const prisma = this.getPrismaClient(schemaName);
+  async updateResident(schemaName: string, id: number, data: UpdateResidentDto) {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const resident = await prisma.resident.update({
         where: { id },
@@ -348,6 +314,7 @@ export class InventoryService {
           },
         },
       });
+
       return resident;
     } catch (error) {
       console.error("[INVENTORY SERVICE] Error actualizando residente:", error);
@@ -357,7 +324,7 @@ export class InventoryService {
 
   // SERVICIOS COMUNES
   async getServices(schemaName: string, complexId: number) {
-    const prisma = this.getPrismaClient(schemaName);
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const services = await prisma.commonService.findMany({
         where: { complexId },
@@ -368,6 +335,7 @@ export class InventoryService {
         },
         orderBy: { name: "asc" },
       });
+
       return services;
     } catch (error) {
       console.error("[INVENTORY SERVICE] Error obteniendo servicios:", error);
@@ -377,7 +345,7 @@ export class InventoryService {
 
   // ESTADÍSTICAS GENERALES
   async getInventoryStats(schemaName: string, complexId: number) {
-    const prisma = this.getPrismaClient(schemaName);
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const [
         totalProperties,

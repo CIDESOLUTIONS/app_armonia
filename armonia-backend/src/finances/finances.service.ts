@@ -1,142 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
-
-// Tipos para el módulo Financiero
-export enum PaymentStatus {
-  PENDING = "PENDING",
-  PAID = "PAID",
-  OVERDUE = "OVERDUE",
-  CANCELLED = "CANCELLED",
-  PARTIAL = "PARTIAL",
-}
-
-export enum FeeType {
-  ORDINARY = "ORDINARY",
-  EXTRAORDINARY = "EXTRAORDINARY",
-  PENALTY = "PENALTY",
-  OTHER = "OTHER",
-}
-
-export interface Fee {
-  id: number;
-  title: string;
-  description: string;
-  amount: number;
-  type: FeeType;
-  dueDate: string;
-  createdAt: string;
-  updatedAt: string;
-  propertyId: number;
-  status: PaymentStatus;
-  paymentDate?: string;
-  receiptNumber?: string;
-  paymentMethod?: string;
-  paymentReference?: string;
-}
-
-export interface Payment {
-  id: number;
-  amount: number;
-  date: string;
-  method: string;
-  reference: string;
-  receiptNumber: string;
-  description?: string;
-  feeId: number;
-  propertyId: number;
-  createdAt: string;
-  updatedAt: string;
-  createdBy: number;
-}
-
-export interface Budget {
-  id: number;
-  year: number;
-  month: number;
-  title: string;
-  description?: string;
-  totalAmount: number;
-  approvedDate?: string;
-  status: "DRAFT" | "APPROVED" | "EXECUTED";
-  items: BudgetItem[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface BudgetItem {
-  id: number;
-  budgetId: number;
-  description: string;
-  amount: number;
-  category: string;
-  order: number;
-}
-
-export interface FeeListResponse {
-  fees: Fee[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
-export interface CreateFeeDto {
-  title: string;
-  description: string;
-  amount: number;
-  type: FeeType;
-  dueDate: string;
-  propertyId: number;
-}
-
-export interface UpdateFeeDto {
-  title?: string;
-  description?: string;
-  amount?: number;
-  type?: FeeType;
-  dueDate?: string;
-  status?: PaymentStatus;
-}
-
-export interface CreatePaymentDto {
-  amount: number;
-  date: string;
-  method: string;
-  reference: string;
-  description?: string;
-  feeId: number;
-  propertyId: number;
-}
-
-export interface CreateBudgetDto {
-  year: number;
-  month: number;
-  title: string;
-  description?: string;
-  totalAmount: number;
-  items: Omit<BudgetItem, "id" | "budgetId">[];
-}
-
-export interface FeeFilterParams {
-  page?: number;
-  limit?: number;
-  status?: PaymentStatus;
-  type?: FeeType;
-  propertyId?: number;
-  startDate?: string;
-  endDate?: string;
-  search?: string;
-}
+import { PrismaService } from '../prisma/prisma.service';
+import {
+  PaymentStatus,
+  FeeType,
+  FeeDto,
+  PaymentDto,
+  BudgetDto,
+  FeeListResponseDto,
+  CreateFeeDto,
+  UpdateFeeDto,
+  CreatePaymentDto,
+  CreateBudgetDto,
+  FeeFilterParamsDto,
+  BudgetStatus,
+} from '../common/dto/finances.dto';
 
 @Injectable()
 export class FinancesService {
-  constructor(private prismaClientManager: PrismaClientManager) {}
+  constructor(
+    private prismaClientManager: PrismaClientManager,
+    private prisma: PrismaService,
+  ) {}
 
-  private getPrismaClient(schemaName: string) {
+  private getTenantPrismaClient(schemaName: string) {
     return this.prismaClientManager.getClient(schemaName);
   }
 
-  async getFees(schemaName: string, filters: FeeFilterParams = {}): Promise<FeeListResponse> {
-    const prisma = this.getPrismaClient(schemaName);
+  async getFees(schemaName: string, filters: FeeFilterParamsDto = {}): Promise<FeeListResponseDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const where: any = {};
       if (filters.status) where.status = filters.status;
@@ -166,8 +58,8 @@ export class FinancesService {
     }
   }
 
-  async getFee(schemaName: string, id: number): Promise<Fee> {
-    const prisma = this.getPrismaClient(schemaName);
+  async getFee(schemaName: string, id: number): Promise<FeeDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       return await prisma.fee.findUnique({ where: { id } });
     } catch (error) {
@@ -176,8 +68,8 @@ export class FinancesService {
     }
   }
 
-  async createFee(schemaName: string, data: CreateFeeDto): Promise<Fee> {
-    const prisma = this.getPrismaClient(schemaName);
+  async createFee(schemaName: string, data: CreateFeeDto): Promise<FeeDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       return await prisma.fee.create({ data });
     } catch (error) {
@@ -186,8 +78,8 @@ export class FinancesService {
     }
   }
 
-  async updateFee(schemaName: string, id: number, data: UpdateFeeDto): Promise<Fee> {
-    const prisma = this.getPrismaClient(schemaName);
+  async updateFee(schemaName: string, id: number, data: UpdateFeeDto): Promise<FeeDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       return await prisma.fee.update({ where: { id }, data });
     } catch (error) {
@@ -196,8 +88,8 @@ export class FinancesService {
     }
   }
 
-  async createPayment(schemaName: string, data: CreatePaymentDto): Promise<Payment> {
-    const prisma = this.getPrismaClient(schemaName);
+  async createPayment(schemaName: string, data: CreatePaymentDto): Promise<PaymentDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       return await prisma.payment.create({ data });
     } catch (error) {
@@ -206,8 +98,8 @@ export class FinancesService {
     }
   }
 
-  async getPropertyPayments(schemaName: string, propertyId: number): Promise<Payment[]> {
-    const prisma = this.getPrismaClient(schemaName);
+  async getPropertyPayments(schemaName: string, propertyId: number): Promise<PaymentDto[]> {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       return await prisma.payment.findMany({ where: { propertyId } });
     } catch (error) {
@@ -217,7 +109,7 @@ export class FinancesService {
   }
 
   async getPropertyBalance(schemaName: string, propertyId: number) {
-    const prisma = this.getPrismaClient(schemaName);
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const totalFees = await prisma.fee.aggregate({
         _sum: { amount: true },
@@ -236,7 +128,7 @@ export class FinancesService {
   }
 
   async generateOrdinaryFees(schemaName: string, amount: number, dueDate: string, title: string, description: string) {
-    const prisma = this.getPrismaClient(schemaName);
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const properties = await prisma.property.findMany({ select: { id: true } });
       const feesToCreate = properties.map(prop => ({
@@ -255,8 +147,8 @@ export class FinancesService {
     }
   }
 
-  async createBudget(schemaName: string, data: CreateBudgetDto): Promise<Budget> {
-    const prisma = this.getPrismaClient(schemaName);
+  async createBudget(schemaName: string, data: CreateBudgetDto): Promise<BudgetDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const { items, ...budgetData } = data;
       const budget = await prisma.budget.create({
@@ -273,8 +165,8 @@ export class FinancesService {
     }
   }
 
-  async getBudgetsByYear(schemaName: string, year: number): Promise<Budget[]> {
-    const prisma = this.getPrismaClient(schemaName);
+  async getBudgetsByYear(schemaName: string, year: number): Promise<BudgetDto[]> {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       return await prisma.budget.findMany({ where: { year }, include: { items: true } });
     } catch (error) {
@@ -283,10 +175,10 @@ export class FinancesService {
     }
   }
 
-  async approveBudget(schemaName: string, id: number): Promise<Budget> {
-    const prisma = this.getPrismaClient(schemaName);
+  async approveBudget(schemaName: string, id: number): Promise<BudgetDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
-      return await prisma.budget.update({ where: { id }, data: { status: "APPROVED" } });
+      return await prisma.budget.update({ where: { id }, data: { status: BudgetStatus.APPROVED } });
     } catch (error) {
       console.error(`Error al aprobar presupuesto ${id}:`, error);
       throw new Error("Error al aprobar presupuesto");
@@ -294,18 +186,18 @@ export class FinancesService {
   }
 
   async getFinancialStats(schemaName: string) {
-    const prisma = this.getPrismaClient(schemaName);
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const totalIncome = await prisma.payment.aggregate({
         _sum: { amount: true },
       });
       const totalExpenses = await prisma.fee.aggregate({
         _sum: { amount: true },
-        where: { status: "PAID" }, // Asumiendo que las cuotas pagadas son egresos
+        where: { status: PaymentStatus.PAID }, // Asumiendo que las cuotas pagadas son egresos
       });
       const pendingFees = await prisma.fee.aggregate({
         _sum: { amount: true },
-        where: { status: "PENDING" },
+        where: { status: PaymentStatus.PENDING },
       });
 
       return {
@@ -321,7 +213,7 @@ export class FinancesService {
   }
 
   async generateFinancialReport(schemaName: string, startDate: string, endDate: string, type: "INCOME" | "EXPENSE" | "BALANCE") {
-    const prisma = this.getPrismaClient(schemaName);
+    const prisma = this.getTenantPrismaClient(schemaName);
     // Lógica de generación de reportes más compleja, aquí un placeholder
     console.log(`Generando reporte ${type} para ${schemaName} de ${startDate} a ${endDate}`);
     return { report: `Reporte ${type} generado` };

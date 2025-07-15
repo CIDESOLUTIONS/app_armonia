@@ -13,6 +13,7 @@ import { PqrModule } from './pqr/pqr.module';
 import { ProjectsModule } from './projects/projects.module';
 import { SecurityModule } from './security/security.module';
 import { PlansModule } from './plans/plans.module';
+import { BankReconciliationModule } from './bank-reconciliation/bank-reconciliation.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { PlansModule } from './plans/plans.module';
     ProjectsModule,
     SecurityModule,
     PlansModule,
+    BankReconciliationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

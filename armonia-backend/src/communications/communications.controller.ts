@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Query } fro
 import { CommunicationsService } from './communications.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { GetUser } from '../common/decorators/user.decorator';
+import { NotificationDataDto, AnnouncementDataDto, MessageDataDto, EventDataDto } from '../common/dto/communications.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('communications')
@@ -36,12 +37,12 @@ export class CommunicationsController {
   }
 
   @Post('announcements')
-  async createAnnouncement(@GetUser() user: any, @Body() createAnnouncementDto: any) {
+  async createAnnouncement(@GetUser() user: any, @Body() createAnnouncementDto: AnnouncementDataDto) {
     return this.communicationsService.createAnnouncement(user.schemaName, user.userId, createAnnouncementDto);
   }
 
   @Put('announcements/:id')
-  async updateAnnouncement(@GetUser() user: any, @Param('id') id: string, @Body() updateAnnouncementDto: any) {
+  async updateAnnouncement(@GetUser() user: any, @Param('id') id: string, @Body() updateAnnouncementDto: AnnouncementDataDto) {
     return this.communicationsService.updateAnnouncement(user.schemaName, +id, updateAnnouncementDto);
   }
 
@@ -57,7 +58,7 @@ export class CommunicationsController {
   }
 
   @Post('messages/:id')
-  async sendMessage(@GetUser() user: any, @Param('id') conversationId: string, @Body() messageDto: any) {
+  async sendMessage(@GetUser() user: any, @Param('id') conversationId: string, @Body() messageDto: MessageDataDto) {
     return this.communicationsService.sendMessage(user.schemaName, conversationId, user.userId, messageDto);
   }
 
@@ -73,12 +74,12 @@ export class CommunicationsController {
   }
 
   @Post('events')
-  async createEvent(@GetUser() user: any, @Body() createEventDto: any) {
+  async createEvent(@GetUser() user: any, @Body() createEventDto: EventDataDto) {
     return this.communicationsService.createEvent(user.schemaName, user.userId, createEventDto);
   }
 
   @Put('events/:id')
-  async updateEvent(@GetUser() user: any, @Param('id') id: string, @Body() updateEventDto: any) {
+  async updateEvent(@GetUser() user: any, @Param('id') id: string, @Body() updateEventDto: EventDataDto) {
     return this.communicationsService.updateEvent(user.schemaName, +id, updateEventDto);
   }
 
