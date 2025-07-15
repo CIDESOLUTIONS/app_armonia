@@ -110,13 +110,6 @@ CI/CD (panel administrador de la aplicación)
 * Rollbacks automatizados en caso de fallos
 * Entornos de desarrollo, staging y producción
 
-Monitoreo (panel administrador de la aplicación)
-* Monitoreo de disponibilidad y tiempos de respuesta
-* Alertas automáticas para incidentes
-* Dashboard de métricas operativas
-* Análisis de logs centralizados
-* Monitoreo de experiencia del usuario real
-
 Mejoras Continuas
 * Optimización de rendimiento
 * Mejoras de usabilidad basadas en feedback
@@ -133,10 +126,11 @@ Accesibilidad
 * Textos alternativos para imágenes
 
 Internacionalización
-* Soporte inicial para español, inglés y portugues
+* Soporte inicial para español, inglés y portugués
 * Estructura preparada para fácil expansión a otros idiomas
 * Formatos de fecha y número según localización
-* Soporte para múltiples monedas
+* Soporte para múltiples monedas (dólares americanos, real brasileño y pesos colombianos)
+por defecto debe arrancar en español, pesos colombianos y modo claro.
 
 Escalabilidad
 * Arquitectura diseñada para escalar horizontalmente
@@ -154,12 +148,17 @@ Panel Administrador de la Aplicación
 * Soporte y asistencia técnica
 * Gestión comercial de clientes del plan básico para conversion.
 * Configuración global del sistema
-
-
+Monitoreo 
+* Monitoreo de disponibilidad y tiempos de respuesta
+* Alertas automáticas para incidentes
+* Dashboard de métricas operativas
+* Análisis de logs centralizados
+* Monitoreo de experiencia del usuario real
+ 
 
 3. Módulos y Portales de la Plataforma
 3.1. Portal Público y de Adquisición
-Landing page optimizada para SEO y conversión, con información clara de planes y un llamado a la acción para registro o solicitud de demo.
+Landing page optimizada para SEO y conversión, con información clara de planes y un llamado a la acción para registro o solicitud de demo, con imágenes alusivas a las amenidades de los conjuntos residenciales y una sección de videos con los flujos de las funcionalidades mas importantes (acceso via QR, asambleas, generación y pago de cuotas, reservas de amenidades y el uso del merketplace).
 
 3.2. Portal de Administración (Para Administradores de Conjunto)
 3.2.1. Dashboard Principal
@@ -192,7 +191,9 @@ Gestión de áreas comunes y amenidades (salón social, BBQ, canchas) con calend
 * Realización de pagos en línea.
 * Reserva de áreas comunes.
 * Pre-registro de visitantes.
+* Botón de pánico
 * Recepción de notificaciones (paquetería, anuncios).
+* Gestión de presupuesto familiar por inmueble (plantilla de ayuda para manejo de ingresos y gastos por mes y por año, máximo 2 años de histórico)	
 * Marketplace Comunitario:
    - Descripción: Una sección dentro del portal donde los residentes pueden publicar anuncios clasificados para comprar, vender o intercambiar artículos y servicios con otros miembros de la comunidad.
    - Propósito Estratégico: Fomentar la interacción horizontal entre residentes, aumentar el compromiso y el uso diario de la aplicación, y transformar la plataforma de una simple herramienta de gestión a un verdadero centro de vida comunitaria.
@@ -218,7 +219,7 @@ Gestión de áreas comunes y amenidades (salón social, BBQ, canchas) con calend
          * Panel de moderación para el administrador del conjunto, donde podrá revisar los anuncios reportados y tomar acciones (eliminar anuncio, advertir al usuario).
 
 3.4. Portal de Seguridad y Recepción (IoT-Ready)
-* Bitácora digital de novedades y registro de incidentes.
+* Bitácora digital de novedades y registro de incidentes (atención botón de pánico).
 * Gestión Avanzada de Visitantes y Paquetería:
   - Descripción: Evolución del pre-registro básico. Los residentes podrán generar códigos QR únicos y temporales para sus visitantes desde la app. El personal de seguridad escaneará el QR para un acceso rápido y seguro. Se implementará un sistema de registro de paquetería que enviará una notificación push automática al residente en el momento en que su paquete es recibido en portería.
    * Propósito Estratégico: Materializar el concepto "IoT-Ready" en funcionalidades tangibles y de alto valor percibido. Mejora drásticamente la seguridad y la conveniencia, siendo un diferenciador clave frente a soluciones más básicas.

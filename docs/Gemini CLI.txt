@@ -480,6 +480,10 @@ O instálalo con:
 npm install -g @google/gemini-cli
 gemini
 
+Enterprise plan with higher limits at  https://goo.gle/set-up-gemini-code-assist
+Or you can utilize a Gemini API Key. See: https://goo.gle/gemini-cli-docs-auth#gemini-api-key
+You can switch authentication methods by typing /auth
+
 
 quinta interacción
 
@@ -678,5 +682,123 @@ Prioridad P3 (Baja)
 
 Con análisis de mercado
 Interacciones solo en español. Actúas como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas (Clean Code, SOLID, TDD, CI/CD, etc.). Estás ubicado en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales se encuentran en la carpeta docs. Tu tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto. A partir de esa comparación, debes generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre lo especificado y lo implementado; e identificación de funcionalidades faltantes, incompletas o que deban ajustarse. Evalúa especialmente desde el acceso a la landing page (clave para conversión) hasta todos los portales: Administrador del conjunto residencial, Residentes, Recepción/Vigilancia y la Consola de Administración de la aplicación, evalúa la adopción del modelo de negocio incluyendo el plan empresarial, y el uso del modulo de democracia digital pueda ser integrado o independiente. Evalúa si se están aplicando estándares modernos de calidad, accesibilidad, rendimiento, seguridad y mantenibilidad. Si se detectan problemas, sugiere correcciones o mejoras específicas. Verifica si es conveniente, eliminar dependencias o funciones innecesarias, optimizar estructuras o reorganizar la arquitectura para mejorar eficiencia.si se requiere desarrollar desde cero respeta el estilo del proyecto. Evita proponer múltiples alternativas para una misma solución salvo que se indique lo contrario. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones en docs/, resume sus puntos clave y procede paso a paso siguiendo este flujo.
+
+ 
+Plan de Trabajo: Recuperación y Alineación del Proyecto Armonía
+Este plan está diseñado para transformar el prototipo actual en una aplicación robusta, segura y escalable, alineada con las
+ especificaciones técnicas y de negocio.
+
+  Fase 1: Estabilización y Cimientos (Triage Inmediato)
+  Objetivo: Solucionar los problemas más críticos que impiden que la aplicación funcione y que presentan riesgos de seguridad. Dejar el
+  código base en un estado estable y legible.
+
+   * Tarea 1.1: Corrección de Errores Críticos de Linting y Sintaxis. (ok)
+       * Acción: Identificar y corregir todos los errores de react/jsx-no-undef (importaciones de componentes faltantes) y otros errores de
+         parsing en todo el proyecto.
+       * Justificación: Es la tarea más urgente. La aplicación es actualmente inoperable en muchas de sus vistas. Esto nos permitirá
+         renderizar la UI completa para una evaluación visual.
+
+   * Tarea 1.2: Implementación de Autenticación y Autorización (Seguridad Crítica). (pend.)
+       * Acción: Proteger todos los endpoints de la API actual (Next.js API Routes) para que requieran un token de autenticación válido.
+         Implementar una verificación de rol básica (ej. COMPLEX_ADMIN) en los endpoints que lo necesiten.
+       * Justificación: Cierra la brecha de seguridad más grave del proyecto. Ninguna funcionalidad que implique datos sensibles puede
+         permanecer pública.
+
+   * Tarea 1.3: Incorporación de `tenantId` en Consultas. (pend.)
+       * Acción: Refactorizar los endpoints existentes (como el de conciliación) para que identifiquen el tenantId (ID del conjunto) a partir
+         del usuario autenticado y lo usen en todas las consultas a la base de datos.
+       * Justificación: Corrige el error fatal de lógica multi-tenant, evitando que los datos de un conjunto se mezclen con los de otros.
+
+   * Tarea 1.4: Resolución de Advertencias de Linting y Deuda Técnica. (pend.)
+       * Acción: Realizar una pasada para eliminar la mayor cantidad posible de las 1178 advertencias: eliminar variables no utilizadas,
+         reemplazar any por tipos específicos y estandarizar el uso de import/export.
+       * Justificación: Limpia el ruido del código base, mejora la legibilidad y previene futuros bugs, preparando el terreno para la
+         migración arquitectónica.
+
+  ---
+
+  Fase 2: Alineación Arquitectónica y Backend Core (NestJS) (ok)
+
+  Objetivo: Construir el backend dedicado con NestJS como se especifica, migrando la lógica de negocio más crítica fuera de las API Routes
+  de Next.js.
+
+   * Tarea 2.1: Estructuración del Backend con NestJS.
+       * Acción: Crear un nuevo directorio backend/ en el proyecto. Inicializar una nueva aplicación de NestJS. Configurar la conexión a la
+         base de datos (PostgreSQL con Prisma) y la estructura de módulos principal.
+
+   * Tarea 2.2: Migración del Módulo de Autenticación y Usuarios a NestJS.
+       * Acción: Reimplementar toda la lógica de registro, inicio de sesión y gestión de tokens JWT en un AuthModule y UsersModule en NestJS,
+         usando las mejores prácticas de la plataforma (ej. Passport.js).
+
+   * Tarea 2.3: Implementación del Modelo Multi-Tenant y Gestión de Conjuntos.
+       * Acción: Crear un ComplexesModule en NestJS para manejar la creación y gestión de los conjuntos residenciales (tenants). Este será el
+         endpoint que consumirá el formulario de registro de la landing page.
+
+   * Tarea 2.4: Refactorización del Frontend para Consumir el Nuevo Backend.
+       * Acción: Modificar las llamadas fetch en el frontend (ej. en el login, en el registro de conjuntos) para que apunten a los nuevos
+         endpoints del backend de NestJS en lugar de a las API Routes de Next.js. Las API Routes antiguas se marcarán como obsoletas.
+
+  ---
+
+  Fase 3: Completitud de Funcionalidades (Módulo por Módulo)
+
+  Objetivo: Con una arquitectura sólida, implementar la lógica de backend completa para las funcionalidades clave.
+
+   * Tarea 3.1: Módulo Financiero Avanzado. (ok)
+       * Acción: Crear un FinancesModule en NestJS. Reimplementar la subida de extractos y desarrollar el algoritmo de conciliación mejorado
+         (basado en puntuación y análisis de descripción). Crear los endpoints para que el administrador apruebe las sugerencias.
+
+   * Tarea 3.2: Módulo de Democracia Digital (Asambleas).
+       * Acción: Crear un AssembliesModule en NestJS. Implementar la lógica para cálculo de quórum en tiempo real, sistema de votaciones
+         ponderadas y generación del borrador del acta.
+
+   * Tarea 3.3: Portal de Seguridad (Gestión de Visitantes/QR).
+       * Acción: Crear un SecurityModule en NestJS. Desarrollar los endpoints para la generación de códigos QR únicos y temporales, y un
+         endpoint para que la recepción pueda validarlos.
+
+   * Tarea 3.4: Revisión y Completitud de Módulos Restantes.
+       * Acción: Migrar y completar la lógica de backend para los módulos restantes (Inventario, Comunicaciones, PQR, Marketplace) a NestJS,
+         asegurando que todos sigan la nueva arquitectura.
+
+  ---
+
+  Fase 4: Lógica de Negocio y Monetización
+
+  Objetivo: Implementar la infraestructura necesaria para soportar el modelo de negocio del proyecto.
+
+   * Tarea 4.1: Implementación de Gestión de Planes y Suscripciones.
+       * Acción: Diseñar y crear los modelos en la base de datos para Plans, Subscriptions y Features. Crear un BillingModule en NestJS.
+         Implementar un middleware de "feature flagging" que verifique la suscripción de un tenant antes de darle acceso a una funcionalidad
+         premium.
+
+   * Tarea 4.2: Desarrollo del Portal de Administración de la Aplicación (`app-admin`).
+       * Acción: Construir la interfaz y los endpoints necesarios para que el administrador de Armonía pueda gestionar los conjuntos, asignar
+         planes y ver estadísticas de uso e ingresos.
+
+   * Tarea 4.3: Desarrollo del Portal Empresarial (`Armonía Portafolio`).
+       * Acción: Adaptar el modelo de datos para permitir que una cuenta de usuario (empresa) esté asociada a múltiples tenants (conjuntos).
+         Desarrollar el dashboard multi-propiedad y la navegación centralizada.
+
+  ---
+
+  Fase 5: Aseguramiento de Calidad y Despliegue
+
+  Objetivo: Garantizar la calidad y la robustez de la aplicación final y prepararla para producción.
+
+   * Tarea 5.1: Estrategia de Pruebas (Unitarias y E2E).
+       * Acción: Escribir pruebas unitarias para los servicios críticos en NestJS (ej. el algoritmo de conciliación). Crear pruebas E2E con
+         Playwright para los flujos de usuario más importantes (registro, pago, reserva, votación).
+
+   * Tarea 5.2: Configuración de CI/CD.
+       * Acción: Crear o ajustar los workflows de GitHub Actions para que ejecuten el linting, las pruebas unitarias y las pruebas E2E tanto
+         para el frontend como para el nuevo backend en cada commit.
+
+   * Tarea 5.3: Documentación Final y Preparación para Producción.
+       * Acción: Actualizar toda la documentación técnica para que refleje la nueva arquitectura. Crear los scripts y la configuración de
+         entorno necesarios para el despliegue del frontend y el backend de NestJS.
+
+  ---
+
+  Este plan es una hoja de ruta completa. Procederé a ejecutarlo paso a paso, informándote del progreso en cada tarea.
 
 
