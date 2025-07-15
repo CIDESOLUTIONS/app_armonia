@@ -12,22 +12,22 @@ export class CommunicationsController {
   // NOTIFICACIONES
   @Get('notifications')
   async getUserNotifications(@GetUser() user: any, @Query() filters: any) {
-    return this.communicationsService.getUserNotifications(user.schemaName, user.userId, filters);
+    return this.communicationsService.getUserNotifications(user.userId, filters);
   }
 
   @Post('notifications/mark-read/:id')
   async markNotificationAsRead(@GetUser() user: any, @Param('id') id: string) {
-    return this.communicationsService.markNotificationAsRead(user.schemaName, id, user.userId);
+    return this.communicationsService.markNotificationAsRead(id, user.userId);
   }
 
   @Post('notifications/mark-all-read')
   async markAllNotificationsAsRead(@GetUser() user: any) {
-    return this.communicationsService.markAllNotificationsAsRead(user.schemaName, user.userId);
+    return this.communicationsService.markAllNotificationsAsRead(user.userId);
   }
 
   @Post('notifications/confirm-reading/:id')
   async confirmNotificationReading(@GetUser() user: any, @Param('id') id: string) {
-    return this.communicationsService.confirmNotificationReading(user.schemaName, id, user.userId);
+    return this.communicationsService.confirmNotificationReading(id, user.userId);
   }
 
   // ANUNCIOS

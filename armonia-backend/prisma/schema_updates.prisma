@@ -1,102 +1,101 @@
 // Modelos para el sistema de votaciones en tiempo real
 
-// Modelo para Asambleas
-model Assembly {
-  id              Int         @id @default(autoincrement())
-  title           String      // Título de la asamblea
-  description     String?     // Descripción opcional
-  date            DateTime    // Fecha programada
-  startTime       DateTime?   // Hora de inicio real
-  endTime         DateTime?   // Hora de finalización
-  status          String      // 'scheduled', 'in_progress', 'completed', 'cancelled'
-  location        String?     // Ubicación física o virtual
-  quorumRequired  Float       // Porcentaje de coeficiente requerido para quórum (ej: 0.51 para 51%)
-  quorumReached   Boolean     @default(false) // Si se alcanzó el quórum
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  agendaItems     AgendaItem[] // Relación con los puntos de agenda
-  attendees       Attendance[] // Relación con los asistentes
-  
-  @@schema("tenant")
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
 }
 
-// Modelo para Puntos de Agenda
-model AgendaItem {
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+model AssemblyUpdate {
   id              Int         @id @default(autoincrement())
-  assemblyId      Int         // ID de la asamblea
+  assemblyId      Int
   assembly        Assembly    @relation(fields: [assemblyId], references: [id])
-  numeral         Int         // Número de orden en la agenda
-  topic           String      // Tema o título
-  description     String?     // Descripción detallada
-  votingStatus    String      // 'pending', 'open', 'closed'
-  votingStartTime DateTime?   // Hora de inicio de la votación
-  votingEndTime   DateTime?   // Hora de finalización de la votación
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  votes           Vote[]      // Relación con los votos
-  documents       Document[]  // Relación con documentos asociados
+  content         String
+  authorId        Int
+  authorName      String
+  timestamp       DateTime    @default(now())
+  type            String
   
+  @@index([assemblyId])
+  @@index([timestamp])
   @@schema("tenant")
 }
 
-// Modelo para Votos
-model Vote {
+model AgendaItemUpdate {
   id              Int         @id @default(autoincrement())
-  agendaItemId    Int         // ID del punto de agenda
+  agendaItemId    Int
   agendaItem      AgendaItem  @relation(fields: [agendaItemId], references: [id])
-  userId          Int         // ID del usuario que vota
-  value           String      // 'YES', 'NO', 'ABSTAIN'
-  coefficient     Float       // Coeficiente de propiedad para ponderación
-  createdAt       DateTime    @default(now())
+  content         String
+  authorId        Int
+  authorName      String
+  timestamp       DateTime    @default(now())
+  type            String
   
-  @@unique([agendaItemId, userId]) // Un usuario solo puede votar una vez por punto de agenda
+  @@index([agendaItemId])
+  @@index([timestamp])
   @@schema("tenant")
 }
 
-// Modelo para Asistencia
-model Attendance {
+model VoteUpdate {
   id              Int         @id @default(autoincrement())
-  assemblyId      Int         // ID de la asamblea
-  assembly        Assembly    @relation(fields: [assemblyId], references: [id])
-  userId          Int         // ID del usuario asistente
-  status          String      // 'confirmed', 'attended', 'absent', 'proxy'
-  proxyUserId     Int?        // ID del usuario que tiene el poder (si aplica)
-  coefficient     Float       // Coeficiente de propiedad
-  joinTime        DateTime?   // Hora de ingreso
-  leaveTime       DateTime?   // Hora de salida
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  voteId          Int
+  vote            Vote        @relation(fields: [voteId], references: [id])
+  content         String
+  authorId        Int
+  authorName      String
+  timestamp       DateTime    @default(now())
+  type            String
   
-  @@unique([assemblyId, userId]) // Un usuario solo puede tener un registro de asistencia por asamblea
+  @@index([voteId])
+  @@index([timestamp])
   @@schema("tenant")
 }
 
-// Modelo para Documentos de Asamblea
-model Document {
+model AttendanceUpdate {
   id              Int         @id @default(autoincrement())
-  agendaItemId    Int?        // ID del punto de agenda (opcional)
-  agendaItem      AgendaItem? @relation(fields: [agendaItemId], references: [id])
-  title           String      // Título del documento
-  type            String      // 'minutes', 'attachment', 'presentation', 'report'
-  fileUrl         String      // URL del archivo
-  version         Int         @default(1) // Versión del documento
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  attendanceId    Int
+  attendance      Attendance  @relation(fields: [attendanceId], references: [id])
+  content         String
+  authorId        Int
+  authorName      String
+  timestamp       DateTime    @default(now())
+  type            String
   
+  @@index([attendanceId])
+  @@index([timestamp])
   @@schema("tenant")
 }
 
-// Modelo para Auditoría
-model AuditLog {
+model DocumentUpdate {
   id              Int         @id @default(autoincrement())
-  userId          Int         // ID del usuario que realizó la acción
-  entityType      String      // Tipo de entidad ('ASSEMBLY', 'VOTING', etc.)
-  entityId        String      // ID de la entidad (puede ser compuesto, ej: "1-2" para agendaItem)
-  action          String      // Acción realizada ('VOTE_SUBMITTED', 'VOTING_OPENED', etc.)
-  details         String      // Detalles en formato JSON
-  ipAddress       String?     // Dirección IP
-  userAgent       String?     // User agent
-  createdAt       DateTime    @default(now())
+  documentId      Int
+  document        Document    @relation(fields: [documentId], references: [id])
+  content         String
+  authorId        Int
+  authorName      String
+  timestamp       DateTime    @default(now())
+  type            String
   
+  @@index([documentId])
+  @@index([timestamp])
+  @@schema("tenant")
+}
+
+model AuditLogUpdate {
+  id              Int         @id @default(autoincrement())
+  auditLogId      Int
+  auditLog        AuditLog    @relation(fields: [auditLogId], references: [id])
+  content         String
+  authorId        Int
+  authorName      String
+  timestamp       DateTime    @default(now())
+  type            String
+  
+  @@index([auditLogId])
+  @@index([timestamp])
   @@schema("tenant")
 }

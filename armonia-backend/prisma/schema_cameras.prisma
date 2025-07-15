@@ -1,13 +1,13 @@
 // Esquema Prisma para la integración con cámaras IP
-// Parte del sistema Armonía - Fase 3
-
-generator client {
-  provider = "prisma-client-js"
-}
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 model Camera {
@@ -42,6 +42,8 @@ model Camera {
   recordings        Recording[]
   snapshots         Snapshot[]
   cameraPermissions CameraPermission[]
+
+  @@schema("tenant")
 }
 
 model Zone {
@@ -52,6 +54,8 @@ model Zone {
   cameras     Camera[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  @@schema("tenant")
 }
 
 model Recording {
@@ -68,6 +72,8 @@ model Recording {
   status      String    // RECORDING, COMPLETED, FAILED
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  @@schema("tenant")
 }
 
 model Snapshot {
@@ -80,6 +86,8 @@ model Snapshot {
   takenById   Int?
   description String?
   createdAt   DateTime  @default(now())
+
+  @@schema("tenant")
 }
 
 model CameraPermission {
@@ -99,16 +107,5 @@ model CameraPermission {
   createdById Int?
 
   @@unique([cameraId, userId])
-}
-
-// Referencias a modelos existentes
-model User {
-  id                  Int       @id @default(autoincrement())
-  // Campos existentes...
-  
-  // Nuevas relaciones para cámaras
-  createdCameras      Camera[]  @relation("CameraCreator")
-  takenSnapshots      Snapshot[]
-  cameraPermissions   CameraPermission[]
-  createdPermissions  CameraPermission[] @relation("PermissionCreator")
+  @@schema("tenant")
 }
