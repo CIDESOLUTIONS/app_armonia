@@ -12,8 +12,8 @@ export class AuthService {
     private tenantService: TenantService,
   ) {}
 
-  async validateUser(email: string, pass: string, schemaName: string): Promise<any> {
-    const user = await this.userService.findByEmail(email, schemaName);
+  async validateUser(email: string, pass: string): Promise<any> {
+    const user = await this.userService.findByEmail(email);
     if (user && (await bcrypt.compare(pass, user.password))) {
       const { password, ...result } = user;
       return result;
@@ -30,10 +30,10 @@ export class AuthService {
   }
 
   async register(data: any) {
-    const existingUser = await this.userService.findByEmail(data.email, data.schemaName);
+    const existingUser = await this.userService.findByEmail(data.email);
     if (existingUser) {
       throw new UnauthorizedException('User with this email already exists');
     }
-    return this.userService.createUser(data, data.schemaName);
+    return this.userService.createUser(data);
   }
 }

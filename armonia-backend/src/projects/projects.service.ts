@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
+import { PrismaService } from '../prisma/prisma.service'; // Importar PrismaService
 
 interface Project {
   id: number;
@@ -43,14 +44,17 @@ interface UpdateProjectData {
 
 @Injectable()
 export class ProjectsService {
-  constructor(private prismaClientManager: PrismaClientManager) {}
+  constructor(
+    private prismaClientManager: PrismaClientManager,
+    private prisma: PrismaService, // Inyectar PrismaService
+  ) {}
 
-  private getPrismaClient(schemaName: string) {
+  private getTenantPrismaClient(schemaName: string) {
     return this.prismaClientManager.getClient(schemaName);
   }
 
   async getProjects(schemaName: string, params?: GetProjectsParams): Promise<Project[]> {
-    const prisma = this.getPrismaClient(schemaName);
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const where: any = {};
       if (params?.status) where.status = params.status;
@@ -63,8 +67,8 @@ export class ProjectsService {
       const projects = await prisma.project.findMany({
         where,
         include: {
-          assignedTo: { select: { name: true } },
-          createdBy: { select: { name: true } },
+          assignedTo: { select: { name: true } }, // Usar el modelo User del esquema del tenant
+          createdBy: { select: { name: true } }, // Usar el modelo User del esquema del tenant
         },
       });
       return projects.map(project => ({
@@ -79,13 +83,13 @@ export class ProjectsService {
   }
 
   async getProjectById(schemaName: string, id: number): Promise<Project> {
-    const prisma = this.getPrismaClient(schemaName);
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const project = await prisma.project.findUnique({
         where: { id },
         include: {
-          assignedTo: { select: { name: true } },
-          createdBy: { select: { name: true } },
+          assignedTo: { select: { name: true } }, // Usar el modelo User del esquema del tenant
+          createdBy: { select: { name: true } }, // Usar el modelo User del esquema del tenant
         },
       });
       if (!project) {
@@ -103,7 +107,7 @@ export class ProjectsService {
   }
 
   async createProject(schemaName: string, data: CreateProjectData): Promise<Project> {
-    const prisma = this.getPrismaClient(schemaName);
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const project = await prisma.project.create({ data });
       return this.getProjectById(schemaName, project.id);
@@ -114,7 +118,7 @@ export class ProjectsService {
   }
 
   async updateProject(schemaName: string, id: number, data: Partial<UpdateProjectData>): Promise<Project> {
-    const prisma = this.getPrismaClient(schemaName);
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const project = await prisma.project.update({ where: { id }, data });
       return this.getProjectById(schemaName, project.id);
@@ -125,7 +129,7 @@ export class ProjectsService {
   }
 
   async deleteProject(schemaName: string, id: number): Promise<void> {
-    const prisma = this.getPrismaClient(schemaName);
+    const prisma = this.getTenantPrismaClient(schemaName);
     try {
       await prisma.project.delete({ where: { id } });
     } catch (error) {

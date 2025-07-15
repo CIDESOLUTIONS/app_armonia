@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 @Injectable()
 export class PrismaClientManager {
@@ -7,14 +7,23 @@ export class PrismaClientManager {
 
   getClient(schemaName: string): PrismaClient {
     if (!this.clients.has(schemaName)) {
+      const databaseUrl = process.env.DATABASE_URL;
+      if (!databaseUrl) {
+        throw new InternalServerErrorException('DATABASE_URL environment variable is not set.');
+      }
       const prisma = new PrismaClient({
         datasources: {
-          db: { url: process.env.DATABASE_URL + `?schema=${schemaName}` },
+          db: { url: `${databaseUrl}?schema=${schemaName}` },
         },
       });
       this.clients.set(schemaName, prisma);
     }
-    return this.clients.get(schemaName);
+    const client = this.clients.get(schemaName);
+    if (!client) {
+      // Esto no debería ocurrir si el has(schemaName) es verdadero, pero es una salvaguarda
+      throw new InternalServerErrorException(`PrismaClient for schema ${schemaName} could not be retrieved.`);
+    }
+    return client;
   }
 
   async disconnectAll() {
