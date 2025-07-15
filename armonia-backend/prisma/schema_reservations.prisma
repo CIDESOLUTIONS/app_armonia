@@ -1,5 +1,24 @@
 // Modelos Prisma para el sistema de reservas de áreas comunes
 
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+// Enumeración para el estado de las reservas
+enum ReservationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+  COMPLETED
+}
+
 // Modelo para áreas comunes (instalaciones que pueden ser reservadas)
 model CommonArea {
   id                Int                 @id @default(autoincrement())
@@ -77,15 +96,6 @@ model ReservationRule {
   
   // Esquema multi-tenant
   @@schema("tenant")
-}
-
-// Enumeración para el estado de las reservas
-enum ReservationStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  CANCELLED
-  COMPLETED
 }
 
 // Modelo para reservas de áreas comunes

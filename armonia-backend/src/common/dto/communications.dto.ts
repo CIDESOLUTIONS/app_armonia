@@ -7,6 +7,9 @@ export enum NotificationType {
   PUSH = "PUSH",
   APP = "APP",
   WHATSAPP = "WHATSAPP",
+  INFO = "info",
+  WARNING = "warning",
+  ERROR = "error",
 }
 
 export enum NotificationPriority {
@@ -99,7 +102,7 @@ export class AnnouncementDataDto {
 
   @IsOptional()
   @IsBoolean()
-  requiresConfirmation?: boolean;
+  requireConfirmation?: boolean; // Corregido de requiresConfirmation
 
   @IsOptional()
   @IsDateString()
