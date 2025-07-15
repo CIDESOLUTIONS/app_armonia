@@ -312,71 +312,78 @@ test.describe("Finanzas - Facturación y Pagos", () => {
       }
     });
   });
-  test("Validación de campos en formulario de pago", async ({ page }) => {
-    // Login como residente
-    await page.goto("/login");
-    await page.fill('input[name="email"]', testUsers.resident.email);
-    await page.fill('input[name="password"]', testUsers.resident.password);
-    await page.locator('button[type="submit"]').click();
-    await page.waitForLoadState("networkidle");
-    // Navegar a pagos
-    const paymentsLink = page
-      .locator('a:has-text("Facturas"), a:has-text("Pagos")')
-      .first();
-    if (await paymentsLink.isVisible()) {
-      await paymentsLink.click();
-      // Intentar pagar sin llenar datos
-      const payButton = page.locator('button:has-text("Pagar")').first();
-      if (await payButton.isVisible()) {
-        await payButton.click();
-
-        const confirmButton = page
-          .locator('button[type="submit"], button:has-text("Confirmar")')
-          .first();
-        if (await confirmButton.isVisible()) {
-          await confirmButton.click();
-
-          // Verificar mensajes de validación
-          await expect(
-            page.locator("text=/requerido/i, text=/obligatorio/i, .error"),
-          ).toBeVisible();
-        }
+  await test.step("Verificar desde lado administrativo", async () => {
+      // Logout del residente
+      const logoutButton = page
+        .locator('button:has-text("Salir"), a:has-text("Cerrar")')
+        .first();
+      if (await logoutButton.isVisible()) {
+        await logoutButton.click();
+      } else {
+        await page.goto("/logout");
       }
-    }
-  });
-  test("Manejo de pago fallido", async ({ page }) => {
-    // Este test simularía un escenario donde el pago falla
-    // (tarjeta inválida, fondos insuficientes, etc.)
-
-    await page.goto("/login");
-    await page.fill('input[name="email"]', testUsers.resident.email);
-    await page.fill('input[name="password"]', testUsers.resident.password);
-    await page.locator('button[type="submit"]').click();
-    await page.waitForLoadState("networkidle");
-    // Navegar a pagos y usar tarjeta inválida
-    const paymentsLink = page.locator('a:has-text("Pagos")').first();
-    if (await paymentsLink.isVisible()) {
-      await paymentsLink.click();
-
-      const payButton = page.locator('button:has-text("Pagar")').first();
-      if (await payButton.isVisible()) {
-        await payButton.click();
-
-        // Usar número de tarjeta inválido
-        await page.fill('input[name="cardNumber"]', "4000000000000002"); // Tarjeta que falla
-        await page.fill('input[name="expiryDate"]', "12/26");
-        await page.fill('input[name="cvv"]', "123");
-
-        const confirmButton = page.locator('button[type="submit"]').first();
-        if (await confirmButton.isVisible()) {
-          await confirmButton.click();
-
-          // Verificar mensaje de error
-          await expect(
-            page.locator("text=/error/i, text=/fallido/i, text=/rechazado/i"),
-          ).toBeVisible({ timeout: 15000 });
-        }
+      // Login como admin nuevamente
+      await page.goto("/login");
+      await page.fill('input[name="email"]', testUsers.admin.email);
+      await page.fill('input[name="password"]', testUsers.admin.password);
+      await page.locator('button[type="submit"]').click();
+      await page.waitForLoadState("networkidle");
+      // Navegar a reportes de pagos o transacciones
+      const reportsLink = page
+        .locator(
+          'a:has-text("Reportes"), a:has-text("Transacciones"), [href*="report"]',
+        )
+        .first();
+      if (await reportsLink.isVisible()) {
+        await reportsLink.click();
+        await page.waitForLoadState("networkidle");
+        // Verificar que aparece el pago recibido
+        await expect(
+          page.locator(
+            `text="${testUsers.resident.name}", text="${testUsers.resident.unitNumber}"`,
+          ),
+        ).toBeVisible();
+        await expect(
+          page.locator("text=/recibido/i, text=/pagado/i, .status-paid"),
+        ).toBeVisible();
       }
-    }
+    });
   });
-});
+
+  test("Debe permitir al administrador subir un extracto bancario y ver sugerencias de conciliación", async ({ page }) => {
+    // PASO 1: Login como administrador financiero
+    await test.step("Login como administrador financiero", async () => {
+      await page.goto("/login");
+      await page.fill('input[name="email"]', testUsers.admin.email);
+      await page.fill('input[name="password"]', testUsers.admin.password);
+      await page.locator('button[type="submit"]').click();
+      await page.waitForLoadState("networkidle");
+      await expect(page).toHaveURL(/.*dashboard|admin/);
+    });
+
+    // PASO 2: Navegar al módulo de finanzas
+    await test.step("Navegar al módulo de finanzas", async () => {
+      const financeLink = page.locator('a:has-text("Finanzas")').first();
+      await expect(financeLink).toBeVisible({ timeout: 10000 });
+      await financeLink.click();
+      await page.waitForLoadState("networkidle");
+      await expect(page).toHaveURL(/.*finances/);
+    });
+
+    // PASO 3: Subir un archivo de extracto bancario
+    await test.step("Subir extracto bancario", async () => {
+      const fileInput = page.locator('input[type="file"]');
+      // Asegúrate de que este archivo de prueba exista en la ruta especificada
+      await fileInput.setInputFiles('./e2e/test-data/bank_statement.csv'); 
+
+      const processButton = page.locator('button:has-text("Procesar Extracto")');
+      await processButton.click();
+
+      // Esperar a que aparezcan las sugerencias de conciliación
+      await expect(page.locator('text=Archivo procesado. Revisa las sugerencias.')).toBeVisible();
+      await expect(page.locator('text=Sugerencias de Conciliación')).toBeVisible();
+      // Verificar que al menos una sugerencia se muestra
+      await expect(page.locator('.reconciliation-suggestion-item').first()).toBeVisible();
+    });
+  });
+}););

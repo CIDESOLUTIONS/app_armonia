@@ -34,3 +34,18 @@ export async function getRecentTransactions(): Promise<FinancialTransaction[]> {
     throw error;
   }
 }
+
+export async function uploadBankStatement(file: File): Promise<any> {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await fetchApi("/finances/upload-statement", {
+      method: 'POST',
+      body: formData,
+    }, true); // El tercer parámetro indica que no se debe añadir Content-Type automáticamente
+    return response;
+  } catch (error) {
+    console.error("Error uploading bank statement:", error);
+    throw error;
+  }
+}

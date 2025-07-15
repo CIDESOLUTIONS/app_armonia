@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { usePassiveEvent } from "@/hooks/use-passive-event";
+import { useAuthStore } from "@/store/authStore";
 import {
   BarChart2,
   Calendar,
@@ -17,6 +18,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Coffee,
+  Briefcase,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -44,6 +46,7 @@ export default function Sidebar({
 }: SidebarProps) {
   const _router = useRouter();
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
+  const { user } = useAuthStore();
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -52,7 +55,7 @@ export default function Sidebar({
   const handleItemClick = (label: string, path?: string) => {
     console.log(`[Sidebar] Click en ${label}, path: ${path}`);
     if (path) {
-      router.push(path);
+      _router.push(path);
     } else {
       setExpandedMenu(expandedMenu === label ? null : label);
       if (isCollapsed) {
@@ -65,191 +68,211 @@ export default function Sidebar({
     {
       icon: <BarChart2 className="w-6 h-6" />,
       label: language === "Español" ? "Dashboard" : "Dashboard",
-      path: "/dashboard",
+      path: "/admin/complex-admin/admin-dashboard",
+      roles: ["COMPLEX_ADMIN"],
+    },
+    {
+      icon: <Briefcase className="w-6 h-6" />,
+      label: language === "Español" ? "Portafolio" : "Portfolio",
+      path: "/admin/app-admin/portfolio",
+      roles: ["ADMIN"],
     },
     {
       icon: <Building className="w-6 h-6" />,
       label: language === "Español" ? "Inventario" : "Inventory",
+      roles: ["COMPLEX_ADMIN"],
       subitems: [
         {
           label: language === "Español" ? "Datos del Conjunto" : "Complex Data",
-          path: "/dashboard/inventory",
+          path: "/admin/complex-admin/inventory",
         },
         {
           label: language === "Español" ? "Inmuebles" : "Properties",
-          path: "/dashboard/inventory/properties",
+          path: "/admin/complex-admin/inventory/properties",
         },
         {
           label: language === "Español" ? "Vehículos" : "Vehicles",
-          path: "/dashboard/inventory/vehicles",
+          path: "/admin/complex-admin/inventory/vehicles",
         },
         {
           label: language === "Español" ? "Mascotas" : "Pets",
-          path: "/dashboard/inventory/pets",
+          path: "/admin/complex-admin/inventory/pets",
         },
         {
           label:
             language === "Español" ? "Servicios Comunes" : "Common Services",
-          path: "/dashboard/inventory/services",
+          path: "/admin/complex-admin/inventory/services",
         },
       ],
     },
     {
       icon: <Calendar className="w-6 h-6" />,
       label: language === "Español" ? "Asambleas" : "Assemblies",
+      roles: ["COMPLEX_ADMIN"],
       subitems: [
         {
           label: language === "Español" ? "Programación" : "Scheduling",
-          path: "/dashboard/assemblies/scheduling",
+          path: "/admin/complex-admin/assemblies/scheduling",
         },
         {
           label:
             language === "Español"
               ? "Control Asistencia"
               : "Attendance Control",
-          path: "/dashboard/assemblies/attendance",
+          path: "/admin/complex-admin/assemblies/attendance",
         },
         {
           label: language === "Español" ? "Control Votación" : "Voting Control",
-          path: "/dashboard/assemblies/voting",
+          path: "/admin/complex-admin/assemblies/voting",
         },
         {
           label:
             language === "Español"
               ? "Actas y Documentos"
               : "Minutes and Documents",
-          path: "/dashboard/assemblies/documents",
+          path: "/admin/complex-admin/assemblies/documents",
         },
       ],
     },
     {
       icon: <DollarSign className="w-6 h-6" />,
       label: language === "Español" ? "Finanzas" : "Finances",
+      roles: ["COMPLEX_ADMIN"],
       subitems: [
         {
           label: language === "Español" ? "Presupuesto" : "Budget",
-          path: "/dashboard/finances/budget",
+          path: "/admin/complex-admin/finances/budget",
         },
         {
           label: language === "Español" ? "Proyectos" : "Projects",
-          path: "/dashboard/finances/projects",
+          path: "/admin/complex-admin/finances/projects",
         },
         {
           label: language === "Español" ? "Cuotas Ordinarias" : "Regular Fees",
-          path: "/dashboard/finances/regular-fees",
+          path: "/admin/complex-admin/finances/regular-fees",
         },
         {
           label:
             language === "Español"
               ? "Cuotas Extraordinarias"
               : "Extraordinary Fees",
-          path: "/dashboard/finances/extra-fees",
+          path: "/admin/complex-admin/finances/extra-fees",
         },
         {
           label: language === "Español" ? "Certificados" : "Certificates",
-          path: "/dashboard/finances/certificates",
+          path: "/admin/complex-admin/finances/certificates",
         },
       ],
     },
     {
       icon: <Coffee className="w-6 h-6" />,
       label: language === "Español" ? "Servicios" : "Services",
+      roles: ["COMPLEX_ADMIN"],
       subitems: [
         {
           label:
             language === "Español" ? "Servicios Comunes" : "Common Services",
-          path: "/dashboard/services/common",
+          path: "/admin/complex-admin/services/common",
         },
         {
           label: language === "Español" ? "Reservas" : "Reservations",
-          path: "/dashboard/services/reservations",
+          path: "/admin/complex-admin/services/reservations",
         },
       ],
     },
     {
       icon: <Users className="w-6 h-6" />,
       label: language === "Español" ? "Residentes" : "Residents",
+      roles: ["COMPLEX_ADMIN"],
       subitems: [
         {
           label:
             language === "Español" ? "Listado de Residentes" : "Residents List",
-          path: "/dashboard/residents",
+          path: "/admin/complex-admin/residents",
         },
         {
           label:
             language === "Español"
               ? "Registro de Residentes"
               : "Residents Registry",
-          path: "/dashboard/residents/registry",
+          path: "/admin/complex-admin/residents/registry",
         },
       ],
     },
     {
       icon: <Shield className="w-6 h-6" />,
       label: language === "Español" ? "Usuarios" : "Users",
+      roles: ["COMPLEX_ADMIN"],
       subitems: [
         {
           label:
             language === "Español" ? "Registro de Usuarios" : "User Registry",
-          path: "/dashboard/users/registry",
+          path: "/admin/complex-admin/users/registry",
         },
         {
           label: language === "Español" ? "Recepcionistas" : "Reception Staff",
-          path: "/dashboard/users/reception",
+          path: "/admin/complex-admin/users/reception",
         },
         {
           label: language === "Español" ? "Vigilantes" : "Security Staff",
-          path: "/dashboard/users/security",
+          path: "/admin/complex-admin/users/security",
         },
         {
           label:
             language === "Español"
               ? "Servicios Generales"
               : "Maintenance Staff",
-          path: "/dashboard/users/staff",
+          path: "/admin/complex-admin/users/staff",
         },
       ],
     },
     {
       icon: <AlertCircle className="w-6 h-6" />,
       label: language === "Español" ? "PQR" : "PQR",
+      roles: ["COMPLEX_ADMIN"],
       subitems: [
         {
           label:
             language === "Español"
               ? "Gestión y Asignación"
               : "Management and Assignment",
-          path: "/dashboard/pqr/management",
+          path: "/admin/complex-admin/pqr/management",
         },
         {
           label: language === "Español" ? "Seguimiento" : "Tracking",
-          path: "/dashboard/pqr",
+          path: "/admin/complex-admin/pqr",
         },
       ],
     },
     {
       icon: <Settings className="w-6 h-6" />,
       label: language === "Español" ? "Configuraciones" : "Settings",
+      roles: ["COMPLEX_ADMIN"],
       subitems: [
         {
           label: language === "Español" ? "General" : "General",
-          path: "/dashboard/configuration",
+          path: "/admin/complex-admin/configuration",
         },
         {
           label: language === "Español" ? "APIs de Pagos" : "Payment APIs",
-          path: "/dashboard/configuration/payment-gateway",
+          path: "/admin/complex-admin/configuration/payment-gateway",
         },
         {
           label: language === "Español" ? "WhatsApp" : "WhatsApp",
-          path: "/dashboard/configuration/whatsapp",
+          path: "/admin/complex-admin/configuration/whatsapp",
         },
         {
           label: language === "Español" ? "Cámaras" : "Cameras",
-          path: "/dashboard/configuration/cameras",
+          path: "/admin/complex-admin/configuration/cameras",
         },
       ],
     },
   ];
+
+  const filteredSidebarItems = sidebarItems.filter(item => {
+    if (!item.roles || !user?.role) return false; // Si no hay roles definidos o el usuario no tiene rol, no mostrar
+    return item.roles.includes(user.role);
+  });
 
   usePassiveEvent(
     typeof window !== "undefined" ? window : null,
@@ -283,7 +306,7 @@ export default function Sidebar({
         </Button>
       </div>
       <nav className="mt-4">
-        {sidebarItems.map((item, index) => (
+        {filteredSidebarItems.map((item, index) => (
           <div key={index}>
             <Button
               variant="ghost"
@@ -320,3 +343,4 @@ export default function Sidebar({
     </aside>
   );
 }
+

@@ -1,62 +1,99 @@
-import { prisma } from "@/lib/prisma";
+import { fetchApi } from "@/lib/api";
+import { CreateListingDto, UpdateListingDto, ListingFilterParamsDto, ReportListingDto } from "@/common/dto/marketplace.dto";
 
-export async function getListings() {
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+
+export async function getListings(filters?: ListingFilterParamsDto): Promise<any[]> {
   try {
-    const listings = await prisma.listing.findMany({
-      include: {
-        author: {
-          select: {
-            name: true,
-          },
-        },
-      },
-      where: {
-        isSold: false,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-    return listings;
+    const query = filters ? new URLSearchParams(filters as any).toString() : '';
+    const response = await fetchApi(`/marketplace/listings?${query}`);
+    return response;
   } catch (error) {
     console.error("Error fetching listings:", error);
-    throw new Error("No se pudieron obtener los anuncios.");
+    throw error;
   }
 }
 
-export async function getListingById(id: number) {
+export async function createListing(data: CreateListingDto): Promise<any> {
   try {
-    const listing = await prisma.listing.findUnique({
-      where: { id },
-      include: {
-        author: {
-          select: {
-            name: true,
-            id: true,
-          },
-        },
-      },
+    const response = await fetchApi("/marketplace/listings", {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
-    return listing;
-  } catch (error) {
-    console.error("Error fetching listing by ID:", error);
-    throw new Error("No se pudo obtener el anuncio.");
-  }
-}
-
-export async function createListing(data: any) {
-  try {
-    const newListing = await prisma.listing.create({
-      data: {
-        ...data,
-        // Asegúrate de que complexId se pase correctamente desde el frontend o se obtenga del contexto del usuario
-        // Por ahora, lo dejaremos como un placeholder o asumiremos que viene en `data`
-        complexId: 1, // Placeholder: Reemplazar con el complexId real del usuario autenticado
-      },
-    });
-    return newListing;
+    return response;
   } catch (error) {
     console.error("Error creating listing:", error);
-    throw new Error("No se pudo crear el anuncio.");
+    throw error;
+  }
+}
+
+export async function getListingById(id: number): Promise<any> {
+  try {
+    const response = await fetchApi(`/marketplace/listings/${id}`);
+    return response;
+  } catch (error) {
+    console.error("Error fetching listing by ID:", error);
+    throw error;
+  }
+}
+
+export async function updateListing(id: number, data: UpdateListingDto): Promise<any> {
+  try {
+    const response = await fetchApi(`/marketplace/listings/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response;
+  } catch (error) {
+    console.error("Error updating listing:", error);
+    throw error;
+  }
+}
+
+export async function deleteListing(id: number): Promise<any> {
+  try {
+    const response = await fetchApi(`/marketplace/listings/${id}`, {
+      method: 'DELETE',
+    });
+    return response;
+  } catch (error) {
+    console.error("Error deleting listing:", error);
+    throw error;
+  }
+}
+
+export async function reportListing(data: ReportListingDto): Promise<any> {
+  try {
+    const response = await fetchApi("/marketplace/listings/report", {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response;
+  } catch (error) {
+    console.error("Error reporting listing:", error);
+    throw error;
+  }
+}
+
+export async function getReportedListings(): Promise<any[]> {
+  try {
+    const response = await fetchApi("/marketplace/moderation/reports");
+    return response;
+  } catch (error) {
+    console.error("Error fetching reported listings:", error);
+    throw error;
+  }
+}
+
+export async function resolveReport(reportId: number, action: 'APPROVE' | 'REJECT'): Promise<any> {
+  try {
+    const response = await fetchApi(`/marketplace/moderation/reports/${reportId}/resolve`, {
+      method: 'POST',
+      body: JSON.stringify({ action }),
+    });
+    return response;
+  } catch (error) {
+    console.error("Error resolving report:", error);
+    throw error;
   }
 }

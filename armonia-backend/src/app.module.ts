@@ -30,7 +30,11 @@ import { BankReconciliationModule } from './bank-reconciliation/bank-reconciliat
     SecurityModule,
     PlansModule,
     BankReconciliationModule,
-  ],
+    PortfolioModule,
+    MarketplaceModule,
+    AssemblyModule,
+    PanicModule,
+  ],,
   controllers: [AppController],
   providers: [AppService],
 })
