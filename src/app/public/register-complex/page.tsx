@@ -495,7 +495,9 @@ export default function RegisterComplex() {
       setError("");
 
       // Convertir los servicios a un formato adecuado para el API
-      const propertyTypes = formData.services.map((service) => service.toUpperCase());
+      const propertyTypes = formData.services.map((service) =>
+        service.toUpperCase(),
+      );
 
       // Verificar si tenemos transactionId para planes pagados
       let txId = transactionId;
@@ -559,7 +561,12 @@ export default function RegisterComplex() {
       }
 
       // Si el registro es exitoso, iniciar sesión automáticamente
-      await login(formData.adminEmail, formData.password, data.complexId, data.schemaName); // Usar los datos devueltos por el registro
+      await login(
+        formData.adminEmail,
+        formData.password,
+        data.complexId,
+        data.schemaName,
+      ); // Usar los datos devueltos por el registro
 
       // Registro exitoso
       alert(t.successMessage);

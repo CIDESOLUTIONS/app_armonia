@@ -4,6 +4,6 @@ import { BankReconciliationController } from './bank-reconciliation.controller';
 
 @Module({
   providers: [BankReconciliationService],
-  controllers: [BankReconciliationController]
+  controllers: [BankReconciliationController],
 })
 export class BankReconciliationModule {}

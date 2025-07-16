@@ -108,7 +108,8 @@ export default function ResidentDashboard() {
     if (!user || !user.propertyId) {
       toast({
         title: "Error",
-        description: "No se pudo activar la alerta de pánico. Información de usuario incompleta.",
+        description:
+          "No se pudo activar la alerta de pánico. Información de usuario incompleta.",
         variant: "destructive",
       });
       return;
@@ -214,7 +215,11 @@ export default function ResidentDashboard() {
               </h1>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="destructive" size="sm" onClick={handlePanicTrigger}>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handlePanicTrigger}
+              >
                 <Bell className="h-4 w-4 mr-2" />
                 Pánico
               </Button>

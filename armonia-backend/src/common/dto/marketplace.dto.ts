@@ -1,4 +1,10 @@
-import { IsString, IsNumber, IsOptional, IsArray, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsOptional,
+  IsArray,
+  IsEnum,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export enum ListingCategory {
@@ -69,6 +75,29 @@ export class ResolveReportDto {
 
   @IsEnum(['APPROVE', 'REJECT'])
   action: 'APPROVE' | 'REJECT';
+}
+
+export class CreateMessageDto {
+  @IsNumber()
+  listingId: number;
+
+  @IsNumber()
+  senderId: number;
+
+  @IsNumber()
+  receiverId: number;
+
+  @IsString()
+  content: string;
+}
+
+export class MessageDto {
+  id: number;
+  listingId: number;
+  senderId: number;
+  receiverId: number;
+  content: string;
+  createdAt: Date;
 }
 
 export class ListingFilterParamsDto {

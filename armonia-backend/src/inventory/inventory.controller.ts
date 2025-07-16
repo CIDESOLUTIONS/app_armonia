@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { InventoryService } from './inventory.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { GetUser } from '../common/decorators/user.decorator';
@@ -24,13 +34,27 @@ export class InventoryController {
   }
 
   @Post('properties')
-  async createProperty(@GetUser() user: any, @Body() createPropertyDto: CreatePropertyDto) {
-    return this.inventoryService.createProperty(user.schemaName, { ...createPropertyDto, complexId: user.complexId });
+  async createProperty(
+    @GetUser() user: any,
+    @Body() createPropertyDto: CreatePropertyDto,
+  ) {
+    return this.inventoryService.createProperty(user.schemaName, {
+      ...createPropertyDto,
+      complexId: user.complexId,
+    });
   }
 
   @Put('properties/:id')
-  async updateProperty(@GetUser() user: any, @Param('id') id: string, @Body() updatePropertyDto: UpdatePropertyDto) {
-    return this.inventoryService.updateProperty(user.schemaName, +id, updatePropertyDto);
+  async updateProperty(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() updatePropertyDto: UpdatePropertyDto,
+  ) {
+    return this.inventoryService.updateProperty(
+      user.schemaName,
+      +id,
+      updatePropertyDto,
+    );
   }
 
   @Get('pets')
@@ -40,7 +64,10 @@ export class InventoryController {
 
   @Post('pets')
   async createPet(@GetUser() user: any, @Body() createPetDto: CreatePetDto) {
-    return this.inventoryService.createPet(user.schemaName, { ...createPetDto, complexId: user.complexId });
+    return this.inventoryService.createPet(user.schemaName, {
+      ...createPetDto,
+      complexId: user.complexId,
+    });
   }
 
   @Get('vehicles')
@@ -49,8 +76,14 @@ export class InventoryController {
   }
 
   @Post('vehicles')
-  async createVehicle(@GetUser() user: any, @Body() createVehicleDto: CreateVehicleDto) {
-    return this.inventoryService.createVehicle(user.schemaName, { ...createVehicleDto, complexId: user.complexId });
+  async createVehicle(
+    @GetUser() user: any,
+    @Body() createVehicleDto: CreateVehicleDto,
+  ) {
+    return this.inventoryService.createVehicle(user.schemaName, {
+      ...createVehicleDto,
+      complexId: user.complexId,
+    });
   }
 
   @Get('residents')
@@ -59,8 +92,16 @@ export class InventoryController {
   }
 
   @Put('residents/:id')
-  async updateResident(@GetUser() user: any, @Param('id') id: string, @Body() updateResidentDto: UpdateResidentDto) {
-    return this.inventoryService.updateResident(user.schemaName, +id, updateResidentDto);
+  async updateResident(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() updateResidentDto: UpdateResidentDto,
+  ) {
+    return this.inventoryService.updateResident(
+      user.schemaName,
+      +id,
+      updateResidentDto,
+    );
   }
 
   @Get('services')
@@ -70,6 +111,9 @@ export class InventoryController {
 
   @Get('stats')
   async getInventoryStats(@GetUser() user: any) {
-    return this.inventoryService.getInventoryStats(user.schemaName, user.complexId);
+    return this.inventoryService.getInventoryStats(
+      user.schemaName,
+      user.complexId,
+    );
   }
 }

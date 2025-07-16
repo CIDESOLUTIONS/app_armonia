@@ -13,7 +13,10 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { getActivePanicAlerts, updatePanicAlertStatus } from "@/services/panicService";
+import {
+  getActivePanicAlerts,
+  updatePanicAlertStatus,
+} from "@/services/panicService";
 
 export default function PanicAlertsPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -44,12 +47,18 @@ export default function PanicAlertsPage() {
     }
   };
 
-  const handleResolveAlert = async (alertId: number, status: 'RESOLVED' | 'DISMISSED') => {
+  const handleResolveAlert = async (
+    alertId: number,
+    status: "RESOLVED" | "DISMISSED",
+  ) => {
     try {
-      await updatePanicAlertStatus(alertId, { status, resolvedBy: user?.name || 'Desconocido' });
+      await updatePanicAlertStatus(alertId, {
+        status,
+        resolvedBy: user?.name || "Desconocido",
+      });
       toast({
         title: "Alerta Actualizada",
-        description: `Alerta ${status === 'RESOLVED' ? 'resuelta' : 'descartada'} correctamente.`, 
+        description: `Alerta ${status === "RESOLVED" ? "resuelta" : "descartada"} correctamente.`,
       });
       fetchPanicAlerts(); // Refrescar la lista
     } catch (error) {
@@ -113,16 +122,18 @@ export default function PanicAlertsPage() {
           <TableBody>
             {alerts.map((alert) => (
               <TableRow key={alert.id} className="bg-red-50">
-                <TableCell>{alert.user?.name || 'Desconocido'}</TableCell>
+                <TableCell>{alert.user?.name || "Desconocido"}</TableCell>
                 <TableCell>{alert.location}</TableCell>
-                <TableCell>{alert.message || 'N/A'}</TableCell>
-                <TableCell>{new Date(alert.createdAt).toLocaleString()}</TableCell>
+                <TableCell>{alert.message || "N/A"}</TableCell>
+                <TableCell>
+                  {new Date(alert.createdAt).toLocaleString()}
+                </TableCell>
                 <TableCell className="text-right">
                   <Button
                     variant="outline"
                     size="sm"
                     className="mr-2"
-                    onClick={() => handleResolveAlert(alert.id, 'RESOLVED')}
+                    onClick={() => handleResolveAlert(alert.id, "RESOLVED")}
                   >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Resolver
@@ -130,7 +141,7 @@ export default function PanicAlertsPage() {
                   <Button
                     variant="destructive"
                     size="sm"
-                    onClick={() => handleResolveAlert(alert.id, 'DISMISSED')}
+                    onClick={() => handleResolveAlert(alert.id, "DISMISSED")}
                   >
                     <XCircle className="mr-2 h-4 w-4" />
                     Descartar

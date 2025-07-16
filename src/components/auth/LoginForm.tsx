@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Por favor, introduce un email válido." }),
@@ -29,6 +30,7 @@ const formSchema = z.object({
 export default function LoginForm() {
   const { login, loading, error } = useAuth();
   const { toast } = useToast();
+  const t = useTranslations("Login");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -42,12 +44,12 @@ export default function LoginForm() {
   useEffect(() => {
     if (error) {
       toast({
-        title: "Error de Autenticación",
+        title: t("toast.authErrorTitle"),
         description: error,
         variant: "destructive",
       });
     }
-  }, [error, toast]);
+  }, [error, toast, t]);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     login(values);
@@ -57,7 +59,7 @@ export default function LoginForm() {
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
       <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
         <h2 className="text-center text-3xl font-extrabold text-gray-900">
-          Iniciar Sesión
+          {t("title")}
         </h2>
         <Form {...form}>
           <form
@@ -69,10 +71,10 @@ export default function LoginForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Correo electrónico</FormLabel>
+                  <FormLabel>{t("emailLabel")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="tu@email.com"
+                      placeholder={t("emailPlaceholder")}
                       {...field}
                       type="email"
                       autoComplete="email"
@@ -87,11 +89,11 @@ export default function LoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Contraseña</FormLabel>
+                  <FormLabel>{t("passwordLabel")}</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="********"
+                      placeholder={t("passwordPlaceholder")}
                       {...field}
                       autoComplete="current-password"
                     />
@@ -116,7 +118,7 @@ export default function LoginForm() {
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none">
-                      <FormLabel>Recordarme</FormLabel>
+                      <FormLabel>{t("rememberMeLabel")}</FormLabel>
                     </div>
                   </FormItem>
                 )}
@@ -126,7 +128,7 @@ export default function LoginForm() {
                   href="#"
                   className="font-medium text-indigo-600 hover:text-indigo-500"
                 >
-                  ¿Olvidaste tu contraseña?
+                  {t("forgotPasswordLink")}
                 </Link>
               </div>
             </div>
@@ -134,7 +136,7 @@ export default function LoginForm() {
             <div>
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Iniciar Sesión
+                {t("loginButton")}
               </Button>
             </div>
           </form>
@@ -146,7 +148,9 @@ export default function LoginForm() {
               <div className="w-full border-t border-gray-300" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">O</span>
+              <span className="px-2 bg-white text-gray-500">
+                {t("orSeparator")}
+              </span>
             </div>
           </div>
 
@@ -155,7 +159,7 @@ export default function LoginForm() {
               href="/auth/register"
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              Registrarse
+              {t("registerLink")}
             </Link>
           </div>
         </div>

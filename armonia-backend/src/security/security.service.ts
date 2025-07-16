@@ -30,17 +30,21 @@ export class SecurityService {
           createdBy: { select: { name: true } },
         },
       });
-      return logs.map(log => ({
+      return logs.map((log) => ({
         ...log,
         createdByName: log.createdBy?.name || 'N/A',
       }));
     } catch (error) {
-      console.error("Error fetching digital logs:", error);
-      throw new Error("Error fetching digital logs");
+      console.error('Error fetching digital logs:', error);
+      throw new Error('Error fetching digital logs');
     }
   }
 
-  async createDigitalLog(schemaName: string, data: CreateDigitalLogDto, createdById: number): Promise<DigitalLogDto> {
+  async createDigitalLog(
+    schemaName: string,
+    data: CreateDigitalLogDto,
+    createdById: number,
+  ): Promise<DigitalLogDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const log = await prisma.digitalLog.create({
@@ -53,14 +57,21 @@ export class SecurityService {
         where: { id: log.id },
         include: { createdBy: { select: { name: true } } },
       });
-      return { ...createdLogWithUser, createdByName: createdLogWithUser.createdBy?.name || 'N/A' };
+      return {
+        ...createdLogWithUser,
+        createdByName: createdLogWithUser.createdBy?.name || 'N/A',
+      };
     } catch (error) {
-      console.error("Error creating digital log:", error);
-      throw new Error("Error creating digital log");
+      console.error('Error creating digital log:', error);
+      throw new Error('Error creating digital log');
     }
   }
 
-  async updateDigitalLog(schemaName: string, id: number, data: UpdateDigitalLogDto): Promise<DigitalLogDto> {
+  async updateDigitalLog(
+    schemaName: string,
+    id: number,
+    data: UpdateDigitalLogDto,
+  ): Promise<DigitalLogDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const log = await prisma.digitalLog.update({
@@ -71,10 +82,13 @@ export class SecurityService {
         where: { id: log.id },
         include: { createdBy: { select: { name: true } } },
       });
-      return { ...updatedLogWithUser, createdByName: updatedLogWithUser.createdBy?.name || 'N/A' };
+      return {
+        ...updatedLogWithUser,
+        createdByName: updatedLogWithUser.createdBy?.name || 'N/A',
+      };
     } catch (error) {
-      console.error("Error updating digital log:", error);
-      throw new Error("Error updating digital log");
+      console.error('Error updating digital log:', error);
+      throw new Error('Error updating digital log');
     }
   }
 
@@ -83,8 +97,8 @@ export class SecurityService {
     try {
       await prisma.digitalLog.delete({ where: { id } });
     } catch (error) {
-      console.error("Error deleting digital log:", error);
-      throw new Error("Error deleting digital log");
+      console.error('Error deleting digital log:', error);
+      throw new Error('Error deleting digital log');
     }
   }
 
@@ -94,28 +108,35 @@ export class SecurityService {
     try {
       return await prisma.camera.findMany();
     } catch (error) {
-      console.error("Error fetching cameras:", error);
-      throw new Error("Error fetching cameras");
+      console.error('Error fetching cameras:', error);
+      throw new Error('Error fetching cameras');
     }
   }
 
-  async createCamera(schemaName: string, data: CreateCameraDto): Promise<CameraDto> {
+  async createCamera(
+    schemaName: string,
+    data: CreateCameraDto,
+  ): Promise<CameraDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       return await prisma.camera.create({ data });
     } catch (error) {
-      console.error("Error creating camera:", error);
-      throw new Error("Error creating camera");
+      console.error('Error creating camera:', error);
+      throw new Error('Error creating camera');
     }
   }
 
-  async updateCamera(schemaName: string, id: number, data: UpdateCameraDto): Promise<CameraDto> {
+  async updateCamera(
+    schemaName: string,
+    id: number,
+    data: UpdateCameraDto,
+  ): Promise<CameraDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       return await prisma.camera.update({ where: { id }, data });
-    }  catch (error) {
-      console.error("Error updating camera:", error);
-      throw new Error("Error updating camera");
+    } catch (error) {
+      console.error('Error updating camera:', error);
+      throw new Error('Error updating camera');
     }
   }
 
@@ -124,8 +145,8 @@ export class SecurityService {
     try {
       await prisma.camera.delete({ where: { id } });
     } catch (error) {
-      console.error("Error deleting camera:", error);
-      throw new Error("Error deleting camera");
+      console.error('Error deleting camera:', error);
+      throw new Error('Error deleting camera');
     }
   }
 }

@@ -1,5 +1,7 @@
 "use client";
 
+"use client";
+
 import React from "react";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -17,24 +19,24 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Loader2 } from "lucide-react";
-
-const formSchema = z
-  .object({
-    password: z
-      .string()
-      .min(8, "La contraseña debe tener al menos 8 caracteres."),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Las contraseñas no coinciden.",
-    path: ["confirmPassword"],
-  });
+import { useTranslations } from "next-intl";
 
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const { toast } = useToast();
   const [loading, setLoading] = React.useState(false);
+  const t = useTranslations("ResetPassword");
+
+  const formSchema = z
+    .object({
+      password: z.string().min(8, t("validation.passwordMinLength")),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t("validation.passwordsMismatch"),
+      path: ["confirmPassword"],
+    });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -43,7 +45,10 @@ export default function ResetPasswordPage() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!token) {
-      toast({ title: "Error", description: "Token no válido o faltante." });
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("toast.invalidToken"),
+      });
       return;
     }
     setLoading(true);
@@ -51,13 +56,13 @@ export default function ResetPasswordPage() {
       // Lógica para llamar a la API de reseteo de contraseña
       console.log({ ...values, token });
       toast({
-        title: "Contraseña Actualizada",
-        description: "Tu contraseña ha sido actualizada con éxito.",
+        title: t("toast.passwordUpdatedTitle"),
+        description: t("toast.passwordUpdatedDescription"),
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "No se pudo actualizar la contraseña.",
+        title: t("toast.errorTitle"),
+        description: t("toast.updateErrorDescription"),
         variant: "destructive",
       });
     } finally {
@@ -70,7 +75,7 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <h2 className="text-center text-2xl font-bold text-gray-900 mb-6">
-            Crea tu Nueva Contraseña
+            {t("title")}
           </h2>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -79,7 +84,7 @@ export default function ResetPasswordPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nueva Contraseña</FormLabel>
+                    <FormLabel>{t("newPasswordLabel")}</FormLabel>
                     <FormControl>
                       <Input type="password" {...field} />
                     </FormControl>
@@ -92,7 +97,7 @@ export default function ResetPasswordPage() {
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Confirmar Contraseña</FormLabel>
+                    <FormLabel>{t("confirmPasswordLabel")}</FormLabel>
                     <FormControl>
                       <Input type="password" {...field} />
                     </FormControl>
@@ -102,7 +107,7 @@ export default function ResetPasswordPage() {
               />
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Actualizar Contraseña
+                {t("updatePasswordButton")}
               </Button>
             </form>
           </Form>

@@ -24,7 +24,11 @@ const config: Config = {
   },
   transformIgnorePatterns: [], // Temporarily transpile all node_modules to debug syntax errors
   testMatch: ["**/?(*.)+(spec|test).[tj]s?(x)"],
-  testPathIgnorePatterns: ["/e2e/", "/dist-jest/", "<rootDir>/armonia-backend/"],
+  testPathIgnorePatterns: [
+    "/e2e/",
+    "/dist-jest/",
+    "<rootDir>/armonia-backend/",
+  ],
   modulePathIgnorePatterns: ["<rootDir>/dist-jest/"],
   collectCoverageFrom: [
     "src/**/*.{js,jsx,ts,tsx}",

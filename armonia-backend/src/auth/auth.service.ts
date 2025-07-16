@@ -22,8 +22,16 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const schemaName = user.complexId ? await this.tenantService.getTenantSchemaName(user.complexId) : null;
-    const payload = { email: user.email, sub: user.id, role: user.role, complexId: user.complexId, schemaName: schemaName };
+    const schemaName = user.complexId
+      ? await this.tenantService.getTenantSchemaName(user.complexId)
+      : null;
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      role: user.role,
+      complexId: user.complexId,
+      schemaName: schemaName,
+    };
     return {
       access_token: this.jwtService.sign(payload),
     };

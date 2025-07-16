@@ -1,10 +1,18 @@
-import { IsString, IsNumber, IsOptional, IsEnum, IsArray, IsDateString, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsOptional,
+  IsEnum,
+  IsArray,
+  IsDateString,
+  IsBoolean,
+} from 'class-validator';
 
 export enum PlanType {
-  BASIC = "BASIC",
-  STANDARD = "STANDARD",
-  PREMIUM = "PREMIUM",
-  ENTERPRISE = "ENTERPRISE",
+  BASIC = 'BASIC',
+  STANDARD = 'STANDARD',
+  PREMIUM = 'PREMIUM',
+  ENTERPRISE = 'ENTERPRISE',
 }
 
 export class PlanDto {

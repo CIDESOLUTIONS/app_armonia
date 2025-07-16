@@ -5,13 +5,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { PlusCircle, MinusCircle, DollarSign, CalendarDays } from "lucide-react";
+import {
+  PlusCircle,
+  MinusCircle,
+  DollarSign,
+  CalendarDays,
+} from "lucide-react";
 
 interface Transaction {
   id: number;
-  type: 'income' | 'expense';
+  type: "income" | "expense";
   description: string;
   amount: number;
   date: string;
@@ -20,20 +31,22 @@ interface Transaction {
 export default function PersonalFinancesPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [newTransaction, setNewTransaction] = useState({
-    type: 'expense', // default to expense
-    description: '',
-    amount: '',
-    date: new Date().toISOString().split('T')[0],
+    type: "expense", // default to expense
+    description: "",
+    amount: "",
+    date: new Date().toISOString().split("T")[0],
   });
   const { toast } = useToast();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
-    setNewTransaction(prev => ({ ...prev, [name]: value }));
+    setNewTransaction((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setNewTransaction(prev => ({ ...prev, [name]: value }));
+    setNewTransaction((prev) => ({ ...prev, [name]: value }));
   };
 
   const addTransaction = () => {
@@ -41,7 +54,8 @@ export default function PersonalFinancesPage() {
     if (!newTransaction.description || isNaN(amount) || amount <= 0) {
       toast({
         title: "Error",
-        description: "Por favor, completa todos los campos y asegúrate de que el monto sea válido.",
+        description:
+          "Por favor, completa todos los campos y asegúrate de que el monto sea válido.",
         variant: "destructive",
       });
       return;
@@ -49,18 +63,18 @@ export default function PersonalFinancesPage() {
 
     const transactionToAdd: Transaction = {
       id: Date.now(), // Simple unique ID
-      type: newTransaction.type as 'income' | 'expense',
+      type: newTransaction.type as "income" | "expense",
       description: newTransaction.description,
       amount: amount,
       date: newTransaction.date,
     };
 
-    setTransactions(prev => [...prev, transactionToAdd]);
+    setTransactions((prev) => [...prev, transactionToAdd]);
     setNewTransaction({
-      type: 'expense',
-      description: '',
-      amount: '',
-      date: new Date().toISOString().split('T')[0],
+      type: "expense",
+      description: "",
+      amount: "",
+      date: new Date().toISOString().split("T")[0],
     });
     toast({
       title: "Transacción Añadida",
@@ -70,10 +84,10 @@ export default function PersonalFinancesPage() {
 
   const calculateSummary = () => {
     const totalIncome = transactions
-      .filter(t => t.type === 'income')
+      .filter((t) => t.type === "income")
       .reduce((sum, t) => sum + t.amount, 0);
     const totalExpenses = transactions
-      .filter(t => t.type === 'expense')
+      .filter((t) => t.type === "expense")
       .reduce((sum, t) => sum + t.amount, 0);
     const balance = totalIncome - totalExpenses;
     return { totalIncome, totalExpenses, balance };
@@ -90,7 +104,9 @@ export default function PersonalFinancesPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ingresos Totales</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Ingresos Totales
+            </CardTitle>
             <DollarSign className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
@@ -99,11 +115,15 @@ export default function PersonalFinancesPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Gastos Totales</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Gastos Totales
+            </CardTitle>
             <MinusCircle className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">-${totalExpenses.toFixed(2)}</div>
+            <div className="text-2xl font-bold">
+              -${totalExpenses.toFixed(2)}
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -112,7 +132,9 @@ export default function PersonalFinancesPage() {
             <CalendarDays className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <div
+              className={`text-2xl font-bold ${balance >= 0 ? "text-green-600" : "text-red-600"}`}
+            >
               ${balance.toFixed(2)}
             </div>
           </CardContent>
@@ -130,7 +152,7 @@ export default function PersonalFinancesPage() {
               <Select
                 name="type"
                 value={newTransaction.type}
-                onValueChange={(value) => handleSelectChange('type', value)}
+                onValueChange={(value) => handleSelectChange("type", value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecciona tipo" />
@@ -186,31 +208,47 @@ export default function PersonalFinancesPage() {
         </CardHeader>
         <CardContent>
           {transactions.length === 0 ? (
-            <p className="text-gray-500 text-center">No hay transacciones registradas.</p>
+            <p className="text-gray-500 text-center">
+              No hay transacciones registradas.
+            </p>
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full bg-white">
                 <thead>
                   <tr>
-                    <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tipo</th>
-                    <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Descripción</th>
-                    <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Monto</th>
-                    <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha</th>
+                    <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Tipo
+                    </th>
+                    <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Descripción
+                    </th>
+                    <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Monto
+                    </th>
+                    <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Fecha
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {transactions.map(t => (
+                  {transactions.map((t) => (
                     <tr key={t.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {t.type === 'income' ? (
+                        {t.type === "income" ? (
                           <span className="text-green-600">Ingreso</span>
                         ) : (
                           <span className="text-red-600">Gasto</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{t.description}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${t.amount.toFixed(2)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{t.date}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {t.description}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${t.amount.toFixed(2)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {t.date}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

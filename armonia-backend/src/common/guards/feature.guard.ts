@@ -1,4 +1,9 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PlansService } from '../../plans/plans.service'; // Adjust path as needed
 import { Observable } from 'rxjs';
@@ -30,12 +35,14 @@ export class FeatureGuard implements CanActivate {
     }
 
     // Check if the user's plan supports all required features
-    const hasAccess = requiredFeatures.every(feature =>
+    const hasAccess = requiredFeatures.every((feature) =>
       this.plansService.checkFeatureAccess(user.complexId, feature),
     );
 
     if (!hasAccess) {
-      throw new ForbiddenException('Your current plan does not support this feature.');
+      throw new ForbiddenException(
+        'Your current plan does not support this feature.',
+      );
     }
 
     return true;

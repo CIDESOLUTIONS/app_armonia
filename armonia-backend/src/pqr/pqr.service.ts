@@ -22,7 +22,10 @@ export class PqrService {
     return this.prismaClientManager.getClient(schemaName);
   }
 
-  async getPQRs(schemaName: string, params?: GetPQRParamsDto): Promise<PQRDto[]> {
+  async getPQRs(
+    schemaName: string,
+    params?: GetPQRParamsDto,
+  ): Promise<PQRDto[]> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const where: any = {};
@@ -41,14 +44,14 @@ export class PqrService {
           assignedTo: { select: { name: true } }, // Usar el modelo User del esquema del tenant
         },
       });
-      return pqrs.map(pqr => ({
+      return pqrs.map((pqr) => ({
         ...pqr,
         reportedByName: pqr.reportedBy?.name || 'N/A',
         assignedToName: pqr.assignedTo?.name || 'N/A',
       }));
     } catch (error) {
-      console.error("Error fetching PQRs:", error);
-      throw new Error("Error fetching PQRs");
+      console.error('Error fetching PQRs:', error);
+      throw new Error('Error fetching PQRs');
     }
   }
 
@@ -64,20 +67,20 @@ export class PqrService {
         },
       });
       if (!pqr) {
-        throw new Error("PQR no encontrada");
+        throw new Error('PQR no encontrada');
       }
       return {
         ...pqr,
         reportedByName: pqr.reportedBy?.name || 'N/A',
         assignedToName: pqr.assignedTo?.name || 'N/A',
-        comments: pqr.comments.map(comment => ({
+        comments: pqr.comments.map((comment) => ({
           ...comment,
           authorName: comment.author?.name || 'N/A',
         })),
       };
     } catch (error) {
       console.error(`Error fetching PQR with ID ${id}:`, error);
-      throw new Error("Error fetching PQR");
+      throw new Error('Error fetching PQR');
     }
   }
 
@@ -87,19 +90,23 @@ export class PqrService {
       const pqr = await prisma.pQR.create({ data });
       return this.getPQRById(schemaName, pqr.id);
     } catch (error) {
-      console.error("Error creating PQR:", error);
-      throw new Error("Error creating PQR");
+      console.error('Error creating PQR:', error);
+      throw new Error('Error creating PQR');
     }
   }
 
-  async updatePQR(schemaName: string, id: number, data: Partial<UpdatePQRDto>): Promise<PQRDto> {
+  async updatePQR(
+    schemaName: string,
+    id: number,
+    data: Partial<UpdatePQRDto>,
+  ): Promise<PQRDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const pqr = await prisma.pQR.update({ where: { id }, data });
       return this.getPQRById(schemaName, pqr.id);
     } catch (error) {
-      console.error("Error updating PQR:", error);
-      throw new Error("Error updating PQR");
+      console.error('Error updating PQR:', error);
+      throw new Error('Error updating PQR');
     }
   }
 
@@ -108,12 +115,17 @@ export class PqrService {
     try {
       await prisma.pQR.delete({ where: { id } });
     } catch (error) {
-      console.error("Error deleting PQR:", error);
-      throw new Error("Error deleting PQR");
+      console.error('Error deleting PQR:', error);
+      throw new Error('Error deleting PQR');
     }
   }
 
-  async addPQRComment(schemaName: string, pqrId: number, comment: string, authorId: number): Promise<PQRCommentDto> {
+  async addPQRComment(
+    schemaName: string,
+    pqrId: number,
+    comment: string,
+    authorId: number,
+  ): Promise<PQRCommentDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const pqrComment = await prisma.pQRComment.create({
@@ -122,19 +134,26 @@ export class PqrService {
       });
       return { ...pqrComment, authorName: pqrComment.author?.name || 'N/A' };
     } catch (error) {
-      console.error("Error adding PQR comment:", error);
-      throw new Error("Error adding PQR comment");
+      console.error('Error adding PQR comment:', error);
+      throw new Error('Error adding PQR comment');
     }
   }
 
-  async assignPQR(schemaName: string, pqrId: number, assignedToId: number): Promise<PQRDto> {
+  async assignPQR(
+    schemaName: string,
+    pqrId: number,
+    assignedToId: number,
+  ): Promise<PQRDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
-      const pqr = await prisma.pQR.update({ where: { id: pqrId }, data: { assignedToId } });
+      const pqr = await prisma.pQR.update({
+        where: { id: pqrId },
+        data: { assignedToId },
+      });
       return this.getPQRById(schemaName, pqr.id);
     } catch (error) {
-      console.error("Error assigning PQR:", error);
-      throw new Error("Error assigning PQR");
+      console.error('Error assigning PQR:', error);
+      throw new Error('Error assigning PQR');
     }
   }
 }

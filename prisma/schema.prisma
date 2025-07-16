@@ -164,6 +164,19 @@ model Incident {
   
 }
 
+model Document {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  url         String
+  type        String // e.g., 'GENERAL', 'FINANCIAL', 'LEGAL', 'ASSEMBLY'
+  uploadedBy  Int
+  uploadedAt  DateTime @default(now())
+
+  @@index([type])
+  @@index([uploadedBy])
+}
+
 // Modelo mejorado para actualizaciones de incidentes
 model IncidentUpdate {
   id                Int               @id @default(autoincrement())
@@ -364,6 +377,7 @@ model ResidentialComplex {
   users       User[]
   subscriptions Subscription[]
   listings    Listing[]
+  properties  Property[]
 }
 
 model User {
@@ -384,7 +398,29 @@ model User {
   loginHistory         LoginHistory[]
   passwordResetToken   String?               @unique
   passwordResetExpires DateTime?
-  preRegisteredVisitors PreRegisteredVisitor[]
+  preRegisteredVisitors MicroCreditApplication[]
+  reviews Review[]
+  userVotes UserVote[]
+  paymentAttempts PaymentAttempt[]
+  createdPayments Payment[] @relation("CreatedPayments")
+  attendances Attendance[]
+  ownedProperties Property[] @relation("OwnedProperties")
+  reportedListings ReportedListing[] @relation("ReportedListings")
+  createdFees Fee[] @relation("CreatedFees")
+  createdBudgets Budget[] @relation("CreatedBudgets")
+  createdSurveys Survey[] @relation("CreatedSurveys")
+  createdServiceProviders ServiceProvider[] @relation("CreatedServiceProviders")
+  createdDocuments Document[] @relation("CreatedDocuments")
+  registeredVisitors Visitor[] @relation("RegisteredVisitors")
+  registeredPackages Package[] @relation("RegisteredPackages")
+  reportedListings ReportedListing[]
+  createdFees Fee[] @relation("CreatedFees")
+  createdBudgets Budget[] @relation("CreatedBudgets")
+  createdSurveys Survey[] @relation("CreatedSurveys")
+  createdServiceProviders ServiceProvider[] @relation("CreatedServiceProviders")
+  createdDocuments Document[] @relation("CreatedDocuments")
+  registeredVisitors Visitor[] @relation("RegisteredVisitors")
+  registeredPackages Package[] @relation("RegisteredPackages")
 }
 
 model Prospect {
@@ -766,6 +802,193 @@ model LoginHistory {
   reason    String?  // Reason for failed login (e.g., "User not found", "Incorrect password")
 }
 
+model MicroCreditApplication {
+  id              Int      @id @default(autoincrement())
+  amount          Float
+  purpose         String
+  status          String   @default("pending") // pending, approved, rejected, paid
+  applicationDate DateTime @default(now())
+  approvalDate    DateTime?
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model SmartMeterReading {
+  id        Int      @id @default(autoincrement())
+  meterId   String
+  unitId    String
+  reading   Float
+  unit      String // e.g., kWh, m3
+  timestamp DateTime @default(now())
+
+  @@index([meterId])
+  @@index([unitId])
+  @@index([timestamp])
+}
+
+model ServiceProvider {
+  id          Int      @id @default(autoincrement())
+  name        String
+  category    String
+  description String
+  contactPhone String
+  contactEmail String
+  address     String
+  rating      Float
+  reviewCount Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  reviews     Review[]
+
+  @@index([category])
+  @@index([name])
+}
+
+model Review {
+  id                Int      @id @default(autoincrement())
+  serviceProvider   ServiceProvider @relation(fields: [serviceProviderId], references: [id])
+  serviceProviderId Int
+  user              User     @relation(fields: [userId], references: [id])
+  userId            Int
+  userName          String
+  rating            Int
+  comment           String?
+  createdAt         DateTime @default(now())
+
+  @@index([serviceProviderId])
+  @@index([userId])
+}
+
+model Survey {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  status      String   @default("draft") // draft, active, completed
+  startDate   DateTime
+  endDate     DateTime
+  createdBy   Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  questions   Question[]
+
+  @@index([status])
+  @@index([startDate])
+  @@index([endDate])
+}
+
+model Question {
+  id        Int      @id @default(autoincrement())
+  surveyId  Int
+  survey    Survey   @relation(fields: [surveyId], references: [id])
+  text      String
+  options   Option[]
+
+  @@index([surveyId])
+}
+
+model Option {
+  id         Int      @id @default(autoincrement())
+  questionId Int
+  question   Question @relation(fields: [questionId], references: [id])
+  text       String
+  votes      Int      @default(0) // Denormalized vote count
+  userVotes  UserVote[]
+
+  @@index([questionId])
+}
+
+model UserVote {
+  id        Int      @id @default(autoincrement())
+  voteId    Int
+  vote      Vote     @relation(fields: [voteId], references: [id])
+  optionId  Int
+  option    Option   @relation(fields: [optionId], references: [id])
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  weight    Float    @default(1.0)
+  createdAt DateTime @default(now())
+
+  @@unique([voteId, userId]) // Ensure one vote per user per vote
+  @@index([voteId])
+  @@index([optionId])
+  @@index([userId])
+}
+
+model PaymentAttempt {
+  id            Int      @id @default(autoincrement())
+  feeId         Int
+  fee           Fee      @relation(fields: [feeId], references: [id])
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  amount        Float
+  paymentMethod String
+  transactionId String   @unique
+  status        String   // PENDING, COMPLETED, FAILED
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([feeId])
+  @@index([userId])
+  @@index([transactionId])
+}
+
+model Attendance {
+  id         Int      @id @default(autoincrement())
+  assemblyId Int
+  assembly   Assembly @relation(fields: [assemblyId], references: [id])
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+  present    Boolean
+  joinedAt   DateTime @default(now())
+
+  @@unique([userId, assemblyId])
+  @@index([assemblyId])
+  @@index([userId])
+}
+
+model Assembly {
+  id                       Int        @id @default(autoincrement())
+  title                    String
+  description              String
+  scheduledDate            DateTime
+  location                 String
+  type                     String
+  status                   String     @default("SCHEDULED")
+  agenda                   String
+  createdBy                Int
+  createdAt                DateTime   @default(now())
+  updatedAt                DateTime   @updatedAt
+  attendances              Attendance[]
+  votes                    Vote[]
+  currentAttendance        Int        @default(0)
+  quorumMet                Boolean    @default(false)
+  totalRegisteredAttendees Int        @default(0) // Placeholder for total attendees for quorum calculation
+
+  @@index([status])
+  @@index([scheduledDate])
+}
+
+model Vote {
+  id          Int      @id @default(autoincrement())
+  assemblyId  Int
+  assembly    Assembly @relation(fields: [assemblyId], references: [id])
+  question    String
+  options     Json // Store options as JSON array of strings
+  isWeighted  Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userVotes   UserVote[]
+
+  @@index([assemblyId])
+  @@index([isActive])
+}
+
 // --- Marketplace Comunitario ---
 
 model Listing {
@@ -782,6 +1005,7 @@ model Listing {
   isSold      Boolean   @default(false)
   reports     Report[]
   messages    Message[]
+  reportedListings ReportedListing[]
   complexId   Int
   complex     ResidentialComplex @relation(fields: [complexId], references: [id])
 
@@ -816,4 +1040,313 @@ model Report {
 
   @@index([listingId])
   @@index([reporterId])
+}
+
+model ReportedListing {
+  id        Int      @id @default(autoincrement())
+  listing   Listing  @relation(fields: [listingId], references: [id])
+  listingId Int
+  reporter  User     @relation("ReportedListings", fields: [reporterId], references: [id])
+  reporterId Int
+  reason    String
+  status    String   @default("PENDING") // PENDING, RESOLVED, REJECTED
+  createdAt DateTime @default(now())
+
+  @@index([listingId])
+  @@index([reporterId])
+  @@index([status])
+}
+
+model Fee {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  amount      Float
+  type        String   // ORDINARY, EXTRAORDINARY, PENALTY, OTHER
+  dueDate     DateTime
+  propertyId  Int
+  property    Property @relation(fields: [propertyId], references: [id])
+  status      String   @default("PENDING") // PENDING, PAID, OVERDUE, CANCELLED, PARTIAL
+  paymentDate DateTime?
+  receiptNumber String?
+  paymentMethod String?
+  paymentReference String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  payments    Payment[]
+  paymentAttempts PaymentAttempt[]
+  createdBy   User     @relation("CreatedFees", fields: [createdById], references: [id])
+  createdById Int
+
+  @@index([propertyId])
+  @@index([type])
+  @@index([status])
+  @@index([dueDate])
+}
+
+model Payment {
+  id          Int      @id @default(autoincrement())
+  amount      Float
+  date        DateTime
+  method      String
+  reference   String
+  receiptNumber String
+  description String?
+  feeId       Int
+  fee         Fee      @relation(fields: [feeId], references: [id])
+  propertyId  Int
+  property    Property @relation(fields: [propertyId], references: [id])
+  createdBy   Int
+  user        User     @relation("CreatedPayments", fields: [createdBy], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([feeId])
+  @@index([propertyId])
+  @@index([date])
+}
+
+model Property {
+  id          Int      @id @default(autoincrement())
+  unitNumber  String
+  complexId   Int
+  complex     ResidentialComplex @relation(fields: [complexId], references: [id])
+  ownerId     Int
+  owner       User     @relation("OwnedProperties", fields: [ownerId], references: [id])
+  type        String // e.g., apartment, house, commercial
+  area        Float?
+  bedrooms    Int?
+  bathrooms   Int?
+  address     String?
+  fees        Fee[]
+  payments    Payment[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([complexId, unitNumber])
+  @@index([ownerId])
+}
+
+model Budget {
+  id          Int      @id @default(autoincrement())
+  year        Int
+  month       Int
+  title       String
+  description String?
+  totalAmount Float
+  approvedDate DateTime?
+  status      String   @default("DRAFT") // DRAFT, APPROVED, EXECUTED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  items       BudgetItem[]
+  createdBy   User     @relation("CreatedBudgets", fields: [createdById], references: [id])
+  createdById Int
+
+  @@unique([year, month])
+  @@index([status])
+}
+
+model BudgetItem {
+  id          Int      @id @default(autoincrement())
+  budgetId    Int
+  budget      Budget   @relation(fields: [budgetId], references: [id])
+  description String
+  amount      Float
+  category    String
+  order       Int
+
+  @@index([budgetId])
+}
+
+model Survey {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  status      String   @default("draft") // draft, active, completed
+  startDate   DateTime
+  endDate     DateTime
+  createdBy   Int
+  creator     User     @relation("CreatedSurveys", fields: [createdBy], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  questions   Question[]
+
+  @@index([status])
+  @@index([startDate])
+  @@index([endDate])
+}
+
+model Question {
+  id        Int      @id @default(autoincrement())
+  surveyId  Int
+  survey    Survey   @relation(fields: [surveyId], references: [id])
+  text      String
+  options   Option[]
+
+  @@index([surveyId])
+}
+
+model Option {
+  id         Int      @id @default(autoincrement())
+  questionId Int
+  question   Question @relation(fields: [questionId], references: [id])
+  text       String
+  votes      Int      @default(0) // Denormalized vote count
+  userVotes  UserVote[]
+
+  @@index([questionId])
+}
+
+model UserVote {
+  id        Int      @id @default(autoincrement())
+  voteId    Int
+  vote      Vote     @relation(fields: [voteId], references: [id])
+  optionId  Int
+  option    Option   @relation(fields: [optionId], references: [id])
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  weight    Float    @default(1.0)
+  createdAt DateTime @default(now())
+
+  @@unique([voteId, userId]) // Ensure one vote per user per vote
+  @@index([voteId])
+  @@index([optionId])
+  @@index([userId])
+}
+
+model ServiceProvider {
+  id          Int      @id @default(autoincrement())
+  name        String
+  category    String
+  description String
+  contactPhone String
+  contactEmail String
+  address     String
+  rating      Float
+  reviewCount Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  reviews     Review[]
+  createdBy   User     @relation("CreatedServiceProviders", fields: [createdById], references: [id])
+  createdById Int
+
+  @@index([category])
+  @@index([name])
+}
+
+model Review {
+  id                Int      @id @default(autoincrement())
+  serviceProvider   ServiceProvider @relation(fields: [serviceProviderId], references: [id])
+  serviceProviderId Int
+  user              User     @relation(fields: [userId], references: [id])
+  userId            Int
+  userName          String
+  rating            Int
+  comment           String?
+  createdAt         DateTime @default(now())
+
+  @@index([serviceProviderId])
+  @@index([userId])
+}
+
+model Document {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  url         String
+  type        String // e.g., 'GENERAL', 'FINANCIAL', 'LEGAL', 'ASSEMBLY'
+  uploadedBy  Int
+  uploader    User     @relation("CreatedDocuments", fields: [uploadedBy], references: [id])
+  uploadedAt  DateTime @default(now())
+
+  @@index([type])
+  @@index([uploadedBy])
+}
+
+model Visitor {
+  id              Int       @id @default(autoincrement())
+  name            String
+  documentType    DocumentType
+  documentNumber  String
+  destination     String
+  residentName    String?
+  entryTime       DateTime
+  exitTime        DateTime?
+  plate           String?
+  photoUrl        String?
+  status          VisitorStatus
+  notes           String?
+  preRegisterId   Int?
+  preRegister     PreRegisteredVisitor? @relation(fields: [preRegisterId], references: [id])
+  accessPassId    Int?
+  accessPass      AccessPass? @relation(fields: [accessPassId], references: [id])
+  purpose         String?
+  company         String?
+  temperature     Float?
+  belongings      Json?
+  signature       String?
+  registeredBy    Int
+  registrar       User      @relation("RegisteredVisitors", fields: [registeredBy], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  accessLogs      AccessLog[]
+  
+  @@index([documentType, documentNumber])
+  @@index([status])
+  @@index([entryTime])
+  @@index([destination])
+  @@index([preRegisterId])
+  
+  
+}
+
+model Package {
+  id                Int             @id @default(autoincrement())
+  trackingCode      String?
+  type              PackageType
+  trackingNumber    String?
+  courier           String?
+  senderName        String?
+  senderCompany     String?
+  residentId        Int?
+  unitId            Int
+  unitNumber        String
+  residentName      String
+  receivedAt        DateTime
+  notifiedAt        DateTime?
+  deliveredAt       DateTime?
+  expirationDate    DateTime?
+  status            PackageStatus   @default(RECEIVED)
+  priority          PackagePriority @default(NORMAL)
+  receivedByStaffId Int
+  receivedByStaffName String
+  deliveredByStaffId Int?
+  deliveredByStaffName String?
+  receivedByResidentId Int?
+  receivedByResidentName String?
+  size              String?
+  weight            Float?
+  isFragile         Boolean         @default(false)
+  needsRefrigeration Boolean        @default(false)
+  description       String?
+  notes             String?
+  tags              String[]
+  mainPhotoUrl      String?
+  attachments       Json?
+  signatureUrl      String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  statusHistory     PackageStatusHistory[]
+  notifications     PackageNotification[]
+  registeredBy      User            @relation("RegisteredPackages", fields: [registeredBy], references: [id])
+  registeredBy      Int
+  
+  @@index([status])
+  @@index([receivedAt])
+  @@index([unitNumber])
+  @@index([residentId])
+  @@index([trackingCode])
+  @@index([trackingNumber])
+  
+  
 }

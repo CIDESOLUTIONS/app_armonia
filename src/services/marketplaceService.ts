@@ -1,11 +1,18 @@
 import { fetchApi } from "@/lib/api";
-import { CreateListingDto, UpdateListingDto, ListingFilterParamsDto, ReportListingDto } from "@/common/dto/marketplace.dto";
+import {
+  CreateListingDto,
+  UpdateListingDto,
+  ListingFilterParamsDto,
+  ReportListingDto,
+} from "@/common/dto/marketplace.dto";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 
-export async function getListings(filters?: ListingFilterParamsDto): Promise<any[]> {
+export async function getListings(
+  filters?: ListingFilterParamsDto & { authorId?: number },
+): Promise<any[]> {
   try {
-    const query = filters ? new URLSearchParams(filters as any).toString() : '';
+    const query = filters ? new URLSearchParams(filters as any).toString() : "";
     const response = await fetchApi(`/marketplace/listings?${query}`);
     return response;
   } catch (error) {
@@ -17,7 +24,7 @@ export async function getListings(filters?: ListingFilterParamsDto): Promise<any
 export async function createListing(data: CreateListingDto): Promise<any> {
   try {
     const response = await fetchApi("/marketplace/listings", {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(data),
     });
     return response;
@@ -37,10 +44,13 @@ export async function getListingById(id: number): Promise<any> {
   }
 }
 
-export async function updateListing(id: number, data: UpdateListingDto): Promise<any> {
+export async function updateListing(
+  id: number,
+  data: UpdateListingDto,
+): Promise<any> {
   try {
     const response = await fetchApi(`/marketplace/listings/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(data),
     });
     return response;
@@ -53,7 +63,7 @@ export async function updateListing(id: number, data: UpdateListingDto): Promise
 export async function deleteListing(id: number): Promise<any> {
   try {
     const response = await fetchApi(`/marketplace/listings/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
     return response;
   } catch (error) {
@@ -65,7 +75,7 @@ export async function deleteListing(id: number): Promise<any> {
 export async function reportListing(data: ReportListingDto): Promise<any> {
   try {
     const response = await fetchApi("/marketplace/listings/report", {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(data),
     });
     return response;
@@ -85,12 +95,18 @@ export async function getReportedListings(): Promise<any[]> {
   }
 }
 
-export async function resolveReport(reportId: number, action: 'APPROVE' | 'REJECT'): Promise<any> {
+export async function resolveReport(
+  reportId: number,
+  action: "APPROVE" | "REJECT",
+): Promise<any> {
   try {
-    const response = await fetchApi(`/marketplace/moderation/reports/${reportId}/resolve`, {
-      method: 'POST',
-      body: JSON.stringify({ action }),
-    });
+    const response = await fetchApi(
+      `/marketplace/moderation/reports/${reportId}/resolve`,
+      {
+        method: "POST",
+        body: JSON.stringify({ action }),
+      },
+    );
     return response;
   } catch (error) {
     console.error("Error resolving report:", error);

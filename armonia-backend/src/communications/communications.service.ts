@@ -23,7 +23,11 @@ export class CommunicationsService {
   }
 
   // NOTIFICACIONES (Modelos de tenant)
-  async notifyUser(schemaName: string, userId: number, notification: NotificationDataDto) {
+  async notifyUser(
+    schemaName: string,
+    userId: number,
+    notification: NotificationDataDto,
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       // Usar this.prisma para acceder al modelo User global
@@ -49,32 +53,50 @@ export class CommunicationsService {
       });
       return dbNotification;
     } catch (error) {
-      console.error("Error al enviar notificación al usuario:", error);
-      throw new Error("No se pudo enviar la notificación");
+      console.error('Error al enviar notificación al usuario:', error);
+      throw new Error('No se pudo enviar la notificación');
     }
   }
 
-  async notifyUsers(schemaName: string, userIds: number[], notification: NotificationDataDto) {
+  async notifyUsers(
+    schemaName: string,
+    userIds: number[],
+    notification: NotificationDataDto,
+  ) {
     const results = [];
     for (const userId of userIds) {
       try {
         const result = await this.notifyUser(schemaName, userId, notification);
         results.push(result);
       } catch (error) {
-        console.error(`Error al enviar notificación al usuario ${userId}:`, error);
+        console.error(
+          `Error al enviar notificación al usuario ${userId}:`,
+          error,
+        );
       }
     }
     return results;
   }
 
-  async notifyByRole(schemaName: string, role: string, notification: NotificationDataDto) {
+  async notifyByRole(
+    schemaName: string,
+    role: string,
+    notification: NotificationDataDto,
+  ) {
     // Usar this.prisma para acceder al modelo User global
-    const users = await this.prisma.user.findMany({ where: { role }, select: { id: true } });
+    const users = await this.prisma.user.findMany({
+      where: { role },
+      select: { id: true },
+    });
     const userIds = users.map((user) => user.id);
     return await this.notifyUsers(schemaName, userIds, notification);
   }
 
-  async getUserNotifications(schemaName: string, userId: number, filters: any = {}) {
+  async getUserNotifications(
+    schemaName: string,
+    userId: number,
+    filters: any = {},
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     // Usar prisma (tenant-specific) para acceder al modelo Notification
     const { read, type, sourceType, priority, limit } = filters;
@@ -87,13 +109,17 @@ export class CommunicationsService {
         ...(priority !== undefined && { priority }),
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
       ...(limit !== undefined && { take: limit }),
     });
   }
 
-  async markNotificationAsRead(schemaName: string, notificationId: string, userId: number) {
+  async markNotificationAsRead(
+    schemaName: string,
+    notificationId: string,
+    userId: number,
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     // Usar prisma (tenant-specific) para acceder al modelo Notification
     const notification = await prisma.notification.findFirst({
@@ -103,7 +129,7 @@ export class CommunicationsService {
       },
     });
     if (!notification) {
-      throw new Error("Notificación no encontrada o no pertenece al usuario");
+      throw new Error('Notificación no encontrada o no pertenece al usuario');
     }
     return await prisma.notification.update({
       where: { id: notificationId },
@@ -129,7 +155,11 @@ export class CommunicationsService {
     });
   }
 
-  async confirmNotificationReading(schemaName: string, notificationId: string, userId: number) {
+  async confirmNotificationReading(
+    schemaName: string,
+    notificationId: string,
+    userId: number,
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     // Usar prisma (tenant-specific) para acceder al modelo Notification
     const notification = await prisma.notification.findFirst({
@@ -140,7 +170,9 @@ export class CommunicationsService {
       },
     });
     if (!notification) {
-      throw new Error("Notificación no encontrada, no pertenece al usuario o no requiere confirmación");
+      throw new Error(
+        'Notificación no encontrada, no pertenece al usuario o no requiere confirmación',
+      );
     }
     // Asumiendo que NotificationConfirmation es un modelo de tenant
     await prisma.notificationConfirmation.create({
@@ -159,13 +191,18 @@ export class CommunicationsService {
   }
 
   // ANUNCIOS (Modelos de tenant)
-  async getAnnouncements(schemaName: string, userId: number, userRole: string, filters: any = {}) {
+  async getAnnouncements(
+    schemaName: string,
+    userId: number,
+    userRole: string,
+    filters: any = {},
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     const { type, read, limit } = filters;
     const queryOptions: any = {
       where: {},
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
       include: {
         createdBy: { select: { id: true, name: true, image: true } },
@@ -190,11 +227,11 @@ export class CommunicationsService {
       queryOptions.take = Number(limit);
     }
     let announcements;
-    if (userRole === "ADMIN" || userRole === "COMPLEX_ADMIN") {
+    if (userRole === 'ADMIN' || userRole === 'COMPLEX_ADMIN') {
       announcements = await prisma.announcement.findMany(queryOptions);
     } else {
       queryOptions.where.OR = [
-        { visibility: "public" },
+        { visibility: 'public' },
         { targetRoles: { has: userRole } },
       ];
       announcements = await prisma.announcement.findMany(queryOptions);
@@ -220,14 +257,18 @@ export class CommunicationsService {
     }));
   }
 
-  async createAnnouncement(schemaName: string, userId: number, data: AnnouncementDataDto) {
+  async createAnnouncement(
+    schemaName: string,
+    userId: number,
+    data: AnnouncementDataDto,
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     const announcement = await prisma.announcement.create({
       data: {
         title: data.title,
         content: data.content,
-        type: data.type || "general",
-        visibility: data.visibility || "public",
+        type: data.type || 'general',
+        visibility: data.visibility || 'public',
         targetRoles: data.targetRoles || [],
         requireConfirmation: data.requireConfirmation || false, // Corregido
         expiresAt: data.expiresAt,
@@ -242,7 +283,9 @@ export class CommunicationsService {
         type: attachment.type,
         size: attachment.size,
       }));
-      await prisma.announcementAttachment.createMany({ data: attachmentRecords });
+      await prisma.announcementAttachment.createMany({
+        data: attachmentRecords,
+      });
     }
     const completeAnnouncement = await prisma.announcement.findUnique({
       where: { id: announcement.id },
@@ -252,12 +295,12 @@ export class CommunicationsService {
       },
     });
     let targetUserIds: number[] = [];
-    if (completeAnnouncement.visibility === "public") {
+    if (completeAnnouncement.visibility === 'public') {
       // Usar this.prisma para acceder al modelo User global
       const users = await this.prisma.user.findMany({ select: { id: true } });
       targetUserIds = users.map((user) => user.id);
     } else if (
-      completeAnnouncement.visibility === "role-based" &&
+      completeAnnouncement.visibility === 'role-based' &&
       completeAnnouncement.targetRoles.length > 0
     ) {
       // Usar this.prisma para acceder al modelo User global
@@ -270,9 +313,9 @@ export class CommunicationsService {
     if (targetUserIds.length > 0) {
       await this.notifyUsers(schemaName, targetUserIds, {
         type:
-          completeAnnouncement.type === "emergency"
+          completeAnnouncement.type === 'emergency'
             ? NotificationType.ERROR
-            : completeAnnouncement.type === "important"
+            : completeAnnouncement.type === 'important'
               ? NotificationType.WARNING
               : NotificationType.INFO,
         title: completeAnnouncement.title,
@@ -281,9 +324,9 @@ export class CommunicationsService {
         sourceType: NotificationSourceType.SYSTEM,
         sourceId: completeAnnouncement.id,
         priority:
-          completeAnnouncement.type === "emergency"
+          completeAnnouncement.type === 'emergency'
             ? NotificationPriority.URGENT
-            : completeAnnouncement.type === "important"
+            : completeAnnouncement.type === 'important'
               ? NotificationPriority.HIGH
               : NotificationPriority.MEDIUM,
         requireConfirmation: completeAnnouncement.requireConfirmation, // Corregido
@@ -293,7 +336,11 @@ export class CommunicationsService {
     return completeAnnouncement;
   }
 
-  async updateAnnouncement(schemaName: string, id: number, data: AnnouncementDataDto) {
+  async updateAnnouncement(
+    schemaName: string,
+    id: number,
+    data: AnnouncementDataDto,
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const announcement = await prisma.announcement.update({
@@ -310,8 +357,8 @@ export class CommunicationsService {
       });
       return announcement;
     } catch (error) {
-      console.error("Error al actualizar anuncio:", error);
-      throw new Error("No se pudo actualizar el anuncio");
+      console.error('Error al actualizar anuncio:', error);
+      throw new Error('No se pudo actualizar el anuncio');
     }
   }
 
@@ -319,14 +366,18 @@ export class CommunicationsService {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       await prisma.announcement.delete({ where: { id } });
-      return { message: "Anuncio eliminado correctamente" };
+      return { message: 'Anuncio eliminado correctamente' };
     } catch (error) {
-      console.error("Error al eliminar anuncio:", error);
-      throw new Error("No se pudo eliminar el anuncio");
+      console.error('Error al eliminar anuncio:', error);
+      throw new Error('No se pudo eliminar el anuncio');
     }
   }
 
-  async markAnnouncementAsRead(schemaName: string, announcementId: string, userId: number) {
+  async markAnnouncementAsRead(
+    schemaName: string,
+    announcementId: string,
+    userId: number,
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     // Usar prisma (tenant-specific) para acceder al modelo AnnouncementRead
     const existingRead = await prisma.announcementRead.findUnique({
@@ -343,12 +394,16 @@ export class CommunicationsService {
   }
 
   // MENSAJES (Modelos de tenant)
-  async getOrCreateDirectConversation(schemaName: string, userId1: number, userId2: number) {
+  async getOrCreateDirectConversation(
+    schemaName: string,
+    userId1: number,
+    userId2: number,
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     // Usar prisma (tenant-specific) para acceder a los modelos Conversation y ConversationParticipant
     const existingConversation = await prisma.conversation.findFirst({
       where: {
-        type: "direct",
+        type: 'direct',
         participants: {
           every: { userId: { in: [userId1, userId2] } },
         },
@@ -364,11 +419,11 @@ export class CommunicationsService {
     }
     const newConversation = await prisma.conversation.create({
       data: {
-        type: "direct",
+        type: 'direct',
         participants: {
           create: [
-            { userId: userId1, role: "member" },
-            { userId: userId2, role: "member" },
+            { userId: userId1, role: 'member' },
+            { userId: userId2, role: 'member' },
           ],
         },
       },
@@ -377,17 +432,22 @@ export class CommunicationsService {
     return newConversation;
   }
 
-  async sendMessage(schemaName: string, conversationId: string, senderId: number, data: MessageDataDto) {
+  async sendMessage(
+    schemaName: string,
+    conversationId: string,
+    senderId: number,
+    data: MessageDataDto,
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     // Usar prisma (tenant-specific) para acceder a los modelos ConversationParticipant y Message
     const participant = await prisma.conversationParticipant.findFirst({
       where: { conversationId, userId: senderId },
     });
     if (!participant) {
-      throw new Error("El usuario no pertenece a esta conversación");
+      throw new Error('El usuario no pertenece a esta conversación');
     }
     const message = await prisma.message.create({
-      data: { conversationId, senderId, content: data.content, status: "sent" },
+      data: { conversationId, senderId, content: data.content, status: 'sent' },
       include: { sender: { select: { id: true, name: true, image: true } } },
     });
     if (data.attachments && data.attachments.length > 0) {
@@ -410,8 +470,8 @@ export class CommunicationsService {
     for (const participant of otherParticipants) {
       await this.notifyUser(schemaName, participant.userId, {
         type: NotificationType.INFO,
-        title: "Nuevo mensaje",
-        message: `${message.sender.name}: ${data.content.substring(0, 50)}${data.content.length > 50 ? "..." : ""}`,
+        title: 'Nuevo mensaje',
+        message: `${message.sender.name}: ${data.content.substring(0, 50)}${data.content.length > 50 ? '...' : ''}`,
         link: `/messages/${conversationId}`,
         sourceType: NotificationSourceType.MESSAGE,
         sourceId: message.id.toString(), // Convertir a string
@@ -421,18 +481,23 @@ export class CommunicationsService {
     return message;
   }
 
-  async getConversationMessages(schemaName: string, conversationId: string, userId: number, options: any = {}) {
+  async getConversationMessages(
+    schemaName: string,
+    conversationId: string,
+    userId: number,
+    options: any = {},
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     // Usar prisma (tenant-specific) para acceder a los modelos ConversationParticipant y Message
     const participant = await prisma.conversationParticipant.findFirst({
       where: { conversationId, userId },
     });
     if (!participant) {
-      throw new Error("El usuario no pertenece a esta conversación");
+      throw new Error('El usuario no pertenece a esta conversación');
     }
     const queryOptions: any = {
       where: { conversationId },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
       include: {
         sender: { select: { id: true, name: true, image: true } },
         attachments: true,
@@ -447,18 +512,22 @@ export class CommunicationsService {
     }
     const messages = await prisma.message.findMany(queryOptions);
     const messagesToUpdate = messages.filter(
-      (m) => m.senderId !== userId && m.status === "sent",
+      (m) => m.senderId !== userId && m.status === 'sent',
     );
     if (messagesToUpdate.length > 0) {
       await prisma.message.updateMany({
         where: { id: { in: messagesToUpdate.map((m) => m.id) } },
-        data: { status: "delivered" },
+        data: { status: 'delivered' },
       });
     }
     return messages;
   }
 
-  async markMessageAsRead(schemaName: string, messageId: string, userId: number) {
+  async markMessageAsRead(
+    schemaName: string,
+    messageId: string,
+    userId: number,
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     // Usar prisma (tenant-specific) para acceder a los modelos Message y MessageRead
     const message = await prisma.message.findUnique({
@@ -468,10 +537,10 @@ export class CommunicationsService {
       },
     });
     if (!message) {
-      throw new Error("Mensaje no encontrado");
+      throw new Error('Mensaje no encontrado');
     }
     if (message.conversation.participants.length === 0) {
-      throw new Error("El usuario no pertenece a esta conversación");
+      throw new Error('El usuario no pertenece a esta conversación');
     }
     const existingRead = await prisma.messageRead.findUnique({
       where: { messageId_userId: { messageId, userId } },
@@ -483,7 +552,10 @@ export class CommunicationsService {
       data: { messageId, userId },
     });
     const allParticipants = await prisma.conversationParticipant.findMany({
-      where: { conversationId: message.conversationId, userId: { not: message.senderId } },
+      where: {
+        conversationId: message.conversationId,
+        userId: { not: message.senderId },
+      },
     });
     const allReads = await prisma.messageRead.findMany({
       where: { messageId },
@@ -491,14 +563,18 @@ export class CommunicationsService {
     if (allReads.length >= allParticipants.length) {
       await prisma.message.update({
         where: { id: +messageId }, // Convertir a number
-        data: { status: "read" },
+        data: { status: 'read' },
       });
     }
     return messageRead;
   }
 
   // EVENTOS COMUNITARIOS (Modelos de tenant)
-  async createEvent(schemaName: string, organizerId: number, data: EventDataDto) {
+  async createEvent(
+    schemaName: string,
+    organizerId: number,
+    data: EventDataDto,
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     const event = await prisma.communityEvent.create({
       data: {
@@ -507,8 +583,8 @@ export class CommunicationsService {
         location: data.location,
         startDateTime: data.startDateTime,
         endDateTime: data.endDateTime,
-        type: data.type || "general",
-        visibility: data.visibility || "public",
+        type: data.type || 'general',
+        visibility: data.visibility || 'public',
         targetRoles: data.targetRoles || [],
         maxAttendees: data.maxAttendees,
         organizerId,
@@ -532,12 +608,12 @@ export class CommunicationsService {
       },
     });
     let targetUserIds: number[] = [];
-    if (completeEvent.visibility === "public") {
+    if (completeEvent.visibility === 'public') {
       // Usar this.prisma para acceder al modelo User global
       const users = await this.prisma.user.findMany({ select: { id: true } });
       targetUserIds = users.map((user) => user.id);
     } else if (
-      completeEvent.visibility === "role-based" &&
+      completeEvent.visibility === 'role-based' &&
       completeEvent.targetRoles.length > 0
     ) {
       // Usar this.prisma para acceder al modelo User global
@@ -550,7 +626,7 @@ export class CommunicationsService {
     if (targetUserIds.length > 0) {
       await this.notifyUsers(schemaName, targetUserIds, {
         type: NotificationType.INFO,
-        title: "Nuevo evento",
+        title: 'Nuevo evento',
         message: `${completeEvent.title} - ${new Date(completeEvent.startDateTime).toLocaleDateString()}`,
         link: `/events/${completeEvent.id}`,
         sourceType: NotificationSourceType.SYSTEM,
@@ -580,8 +656,8 @@ export class CommunicationsService {
       });
       return event;
     } catch (error) {
-      console.error("Error al actualizar evento:", error);
-      throw new Error("No se pudo actualizar el evento");
+      console.error('Error al actualizar evento:', error);
+      throw new Error('No se pudo actualizar el evento');
     }
   }
 
@@ -589,20 +665,25 @@ export class CommunicationsService {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       await prisma.communityEvent.delete({ where: { id } });
-      return { message: "Evento eliminado correctamente" };
+      return { message: 'Evento eliminado correctamente' };
     } catch (error) {
-      console.error("Error al eliminar evento:", error);
-      throw new Error("No se pudo eliminar el evento");
+      console.error('Error al eliminar evento:', error);
+      throw new Error('No se pudo eliminar el evento');
     }
   }
 
-  async getEvents(schemaName: string, userId: number, userRole: string, filters: any = {}) {
+  async getEvents(
+    schemaName: string,
+    userId: number,
+    userRole: string,
+    filters: any = {},
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     const { type, upcoming, limit, startDate, endDate } = filters;
     const queryOptions: any = {
       where: {},
       orderBy: {
-        startDateTime: upcoming ? "asc" : "desc",
+        startDateTime: upcoming ? 'asc' : 'desc',
       },
       include: {
         organizer: { select: { id: true, name: true, image: true } },
@@ -617,17 +698,20 @@ export class CommunicationsService {
       queryOptions.where.startDateTime = { gte: new Date() };
     }
     if (startDate) {
-      queryOptions.where.startDateTime = { ...queryOptions.where.startDateTime, gte: startDate };
+      queryOptions.where.startDateTime = {
+        ...queryOptions.where.startDateTime,
+        gte: startDate,
+      };
     }
     if (endDate) {
       queryOptions.where.endDateTime = { lte: endDate };
     }
     let events;
-    if (userRole === "ADMIN" || userRole === "COMPLEX_ADMIN") {
+    if (userRole === 'ADMIN' || userRole === 'COMPLEX_ADMIN') {
       events = await prisma.communityEvent.findMany(queryOptions);
     } else {
       queryOptions.where.OR = [
-        { visibility: "public" },
+        { visibility: 'public' },
         { targetRoles: { has: userRole } },
       ];
       events = await prisma.communityEvent.findMany(queryOptions);
@@ -654,21 +738,29 @@ export class CommunicationsService {
     }));
   }
 
-  async registerEventAttendance(schemaName: string, eventId: string, userId: number, status: "confirmed" | "tentative" | "declined") {
+  async registerEventAttendance(
+    schemaName: string,
+    eventId: string,
+    userId: number,
+    status: 'confirmed' | 'tentative' | 'declined',
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     const event = await prisma.communityEvent.findUnique({
       where: { id: eventId },
       include: { attendees: { where: { userId } } },
     });
     if (!event) {
-      throw new Error("Evento no encontrado");
+      throw new Error('Evento no encontrado');
     }
-    if (status === "confirmed" && event.maxAttendees) {
+    if (status === 'confirmed' && event.maxAttendees) {
       const confirmedCount = await prisma.eventAttendee.count({
-        where: { eventId, status: "confirmed" },
+        where: { eventId, status: 'confirmed' },
       });
-      if (confirmedCount >= event.maxAttendees && event.attendees.length === 0) {
-        throw new Error("El evento ha alcanzado su capacidad máxima");
+      if (
+        confirmedCount >= event.maxAttendees &&
+        event.attendees.length === 0
+      ) {
+        throw new Error('El evento ha alcanzado su capacidad máxima');
       }
     }
     if (event.attendees.length > 0) {
@@ -695,28 +787,33 @@ export class CommunicationsService {
       where: { expiresAt: { lt: now } },
       data: { data: { expired: true } },
     });
-    return { deletedNotifications: deletedNotifications.count, updatedAnnouncements: updatedAnnouncements.count };
+    return {
+      deletedNotifications: deletedNotifications.count,
+      updatedAnnouncements: updatedAnnouncements.count,
+    };
   }
 
   async migrateReservationNotifications(schemaName: string) {
     // Usar this.prisma para acceder al modelo ReservationNotification global
-    const reservationNotifications = await this.prisma.reservationNotification.findMany({
-      where: { migrated: false },
-      include: { reservation: true },
-    });
+    const reservationNotifications =
+      await this.prisma.reservationNotification.findMany({
+        where: { migrated: false },
+        include: { reservation: true },
+      });
     let migratedCount = 0;
     for (const oldNotification of reservationNotifications) {
       try {
         let type: NotificationType = NotificationType.INFO;
-        if (oldNotification.type === "rejection") type = NotificationType.ERROR;
-        if (oldNotification.type === "cancellation") type = NotificationType.WARNING;
+        if (oldNotification.type === 'rejection') type = NotificationType.ERROR;
+        if (oldNotification.type === 'cancellation')
+          type = NotificationType.WARNING;
         const prisma = this.getTenantPrismaClient(schemaName);
         // Usar prisma (tenant-specific) para acceder al modelo Notification
         await prisma.notification.create({
           data: {
             recipientId: oldNotification.userId,
             type,
-            title: "Notificación de reserva",
+            title: 'Notificación de reserva',
             message: oldNotification.message,
             sourceType: NotificationSourceType.RESERVATION,
             sourceId: oldNotification.reservationId?.toString(),
@@ -734,7 +831,10 @@ export class CommunicationsService {
         });
         migratedCount++;
       } catch (error) {
-        console.error(`Error al migrar notificación ${oldNotification.id}:`, error);
+        console.error(
+          `Error al migrar notificación ${oldNotification.id}:`,
+          error,
+        );
       }
     }
     return { migratedCount };

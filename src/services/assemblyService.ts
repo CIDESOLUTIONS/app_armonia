@@ -1,10 +1,16 @@
 import { fetchApi } from "@/lib/api";
-import { CreateAssemblyDto, UpdateAssemblyDto, RegisterAttendanceDto, CreateVoteDto, SubmitVoteDto } from "@/common/dto/assembly.dto";
+import {
+  CreateAssemblyDto,
+  UpdateAssemblyDto,
+  RegisterAttendanceDto,
+  CreateVoteDto,
+  SubmitVoteDto,
+} from "@/common/dto/assembly.dto";
 
 export async function createAssembly(data: CreateAssemblyDto): Promise<any> {
   try {
     const response = await fetchApi("/assemblies", {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(data),
     });
     return response;
@@ -34,10 +40,13 @@ export async function getAssemblyById(id: number): Promise<any> {
   }
 }
 
-export async function updateAssembly(id: number, data: UpdateAssemblyDto): Promise<any> {
+export async function updateAssembly(
+  id: number,
+  data: UpdateAssemblyDto,
+): Promise<any> {
   try {
     const response = await fetchApi(`/assemblies/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(data),
     });
     return response;
@@ -50,7 +59,7 @@ export async function updateAssembly(id: number, data: UpdateAssemblyDto): Promi
 export async function deleteAssembly(id: number): Promise<any> {
   try {
     const response = await fetchApi(`/assemblies/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
     return response;
   } catch (error) {
@@ -59,10 +68,13 @@ export async function deleteAssembly(id: number): Promise<any> {
   }
 }
 
-export async function registerAttendance(assemblyId: number, data: RegisterAttendanceDto): Promise<any> {
+export async function registerAttendance(
+  assemblyId: number,
+  data: RegisterAttendanceDto,
+): Promise<any> {
   try {
     const response = await fetchApi(`/assemblies/${assemblyId}/attendance`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(data),
     });
     return response;
@@ -72,10 +84,13 @@ export async function registerAttendance(assemblyId: number, data: RegisterAtten
   }
 }
 
-export async function createVote(assemblyId: number, data: CreateVoteDto): Promise<any> {
+export async function createVote(
+  assemblyId: number,
+  data: CreateVoteDto,
+): Promise<any> {
   try {
     const response = await fetchApi(`/assemblies/${assemblyId}/votes`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(data),
     });
     return response;
@@ -85,10 +100,13 @@ export async function createVote(assemblyId: number, data: CreateVoteDto): Promi
   }
 }
 
-export async function submitVote(voteId: number, data: SubmitVoteDto): Promise<any> {
+export async function submitVote(
+  voteId: number,
+  data: SubmitVoteDto,
+): Promise<any> {
   try {
     const response = await fetchApi(`/assemblies/${voteId}/submit-vote`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(data),
     });
     return response;
@@ -110,9 +128,12 @@ export async function getVoteResults(voteId: number): Promise<any> {
 
 export async function generateMeetingMinutes(assemblyId: number): Promise<any> {
   try {
-    const response = await fetchApi(`/assemblies/${assemblyId}/generate-minutes`, {
-      method: 'POST',
-    });
+    const response = await fetchApi(
+      `/assemblies/${assemblyId}/generate-minutes`,
+      {
+        method: "POST",
+      },
+    );
     return response;
   } catch (error) {
     console.error("Error generating meeting minutes:", error);

@@ -36,3 +36,65 @@ export async function getPreRegisteredVisitors() {
     throw new Error("No se pudieron obtener los visitantes pre-registrados.");
   }
 }
+
+export async function scanQrCode(qrCode: string): Promise<any> {
+  try {
+    // Placeholder for API call to validate QR code and get visitor info
+    console.log("Scanning QR Code:", qrCode);
+    // Simulate API response
+    const response = await new Promise((resolve) =>
+      setTimeout(() => {
+        if (qrCode === "VALID_QR_CODE") {
+          resolve({
+            success: true,
+            visitor: {
+              id: "qr_vis_1",
+              name: "Visitante QR",
+              documentNumber: "12345",
+              destination: "Apto 101",
+              status: "active",
+            },
+          });
+        } else {
+          resolve({ success: false, message: "QR Code inválido." });
+        }
+      }, 1000),
+    );
+    return response;
+  } catch (error) {
+    console.error("Error scanning QR code:", error);
+    throw new Error("Error al escanear el código QR.");
+  }
+}
+
+export async function registerPackage(data: any): Promise<any> {
+  try {
+    // Placeholder for API call to register a package
+    console.log("Registering package:", data);
+    const response = await new Promise((resolve) =>
+      setTimeout(() => {
+        resolve({ success: true, packageId: `pkg_${Date.now()}` });
+      }, 1000),
+    );
+    return response;
+  } catch (error) {
+    console.error("Error registering package:", error);
+    throw new Error("Error al registrar el paquete.");
+  }
+}
+
+export async function deliverPackage(packageId: string): Promise<any> {
+  try {
+    // Placeholder for API call to mark package as delivered
+    console.log("Delivering package:", packageId);
+    const response = await new Promise((resolve) =>
+      setTimeout(() => {
+        resolve({ success: true, message: "Paquete entregado." });
+      }, 1000),
+    );
+    return response;
+  } catch (error) {
+    console.error("Error delivering package:", error);
+    throw new Error("Error al entregar el paquete.");
+  }
+}

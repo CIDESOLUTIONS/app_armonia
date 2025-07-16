@@ -9,7 +9,9 @@ export class PrismaClientManager {
     if (!this.clients.has(schemaName)) {
       const databaseUrl = process.env.DATABASE_URL;
       if (!databaseUrl) {
-        throw new InternalServerErrorException('DATABASE_URL environment variable is not set.');
+        throw new InternalServerErrorException(
+          'DATABASE_URL environment variable is not set.',
+        );
       }
       const prisma = new PrismaClient({
         datasources: {
@@ -21,7 +23,9 @@ export class PrismaClientManager {
     const client = this.clients.get(schemaName);
     if (!client) {
       // Esto no debería ocurrir si el has(schemaName) es verdadero, pero es una salvaguarda
-      throw new InternalServerErrorException(`PrismaClient for schema ${schemaName} could not be retrieved.`);
+      throw new InternalServerErrorException(
+        `PrismaClient for schema ${schemaName} could not be retrieved.`,
+      );
     }
     return client;
   }

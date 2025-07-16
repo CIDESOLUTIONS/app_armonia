@@ -1,4 +1,12 @@
-import { IsString, IsNumber, IsDateString, IsArray, IsOptional, IsBoolean, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsDateString,
+  IsArray,
+  IsOptional,
+  IsBoolean,
+  IsEnum,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export enum AssemblyType {
@@ -88,4 +96,7 @@ export class SubmitVoteDto {
 
   @IsNumber()
   userId: number;
+
+  @IsNumber()
+  weight: number;
 }

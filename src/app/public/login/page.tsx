@@ -128,94 +128,91 @@ export default function LoginPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
       <div className="mb-4 flex">
-          <Button
-            variant="ghost"
-            onClick={() => router.push(ROUTES.PORTAL_SELECTOR)}
-            className={`${portalInfo.textColor}`}
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Volver al selector
-          </Button>
+        <Button
+          variant="ghost"
+          onClick={() => router.push(ROUTES.PORTAL_SELECTOR)}
+          className={`${portalInfo.textColor}`}
+        >
+          <ArrowLeft className="h-4 w-4 mr-1" />
+          Volver al selector
+        </Button>
+      </div>
+
+      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+        <div className={`${portalInfo.color} p-6 text-white`}>
+          <div className="flex items-center mb-4">
+            {portalInfo.icon}
+            <h2 className="text-2xl font-bold ml-2">{portalInfo.title}</h2>
+          </div>
+          <p>{portalInfo.description}</p>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-          <div className={`${portalInfo.color} p-6 text-white`}>
-            <div className="flex items-center mb-4">
-              {portalInfo.icon}
-              <h2 className="text-2xl font-bold ml-2">{portalInfo.title}</h2>
-            </div>
-            <p>{portalInfo.description}</p>
-          </div>
+        <div className="p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <FormField
+              label={_language === "Español" ? "Email" : "Email"}
+              id="email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+              required
+              disabled={loading}
+              placeholder={
+                _language === "Español" ? "Tu correo electrónico" : "Your email"
+              }
+            />
 
-          <div className="p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <FormField
-                label={_language === "Español" ? "Email" : "Email"}
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                required
-                disabled={loading}
-                placeholder={
-                  _language === "Español"
-                    ? "Tu correo electrónico"
-                    : "Your email"
-                }
-              />
+            <FormField
+              label={_language === "Español" ? "Contraseña" : "Password"}
+              id="password"
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
+              required
+              disabled={loading}
+              placeholder={
+                _language === "Español" ? "Tu contraseña" : "Your password"
+              }
+            />
 
-              <FormField
-                label={_language === "Español" ? "Contraseña" : "Password"}
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
-                required
-                disabled={loading}
-                placeholder={
-                  _language === "Español" ? "Tu contraseña" : "Your password"
-                }
-              />
-
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded text-sm flex items-start">
-                  <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              <Button
-                type="submit"
-                className={`w-full ${portalInfo.color} hover:opacity-90 text-white h-10`}
-                disabled={loading}
-              >
-                {loading
-                  ? _language === "Español"
-                    ? "Iniciando sesión..."
-                    : "Logging in..."
-                  : _language === "Español"
-                    ? "Iniciar Sesión"
-                    : "Log In"}
-              </Button>
-
-              <div className="flex justify-between text-sm">
-                <Button
-                  type="button"
-                  variant="link"
-                  onClick={() => router.push(ROUTES.HOME)}
-                  className={`${portalInfo.textColor}`}
-                >
-                  {_language === "Español" ? "Volver al inicio" : "Back to home"}
-                </Button>
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded text-sm flex items-start">
+                <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
+                <span>{error}</span>
               </div>
-            </form>
-          </div>
+            )}
+
+            <Button
+              type="submit"
+              className={`w-full ${portalInfo.color} hover:opacity-90 text-white h-10`}
+              disabled={loading}
+            >
+              {loading
+                ? _language === "Español"
+                  ? "Iniciando sesión..."
+                  : "Logging in..."
+                : _language === "Español"
+                  ? "Iniciar Sesión"
+                  : "Log In"}
+            </Button>
+
+            <div className="flex justify-between text-sm">
+              <Button
+                type="button"
+                variant="link"
+                onClick={() => router.push(ROUTES.HOME)}
+                className={`${portalInfo.textColor}`}
+              >
+                {_language === "Español" ? "Volver al inicio" : "Back to home"}
+              </Button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

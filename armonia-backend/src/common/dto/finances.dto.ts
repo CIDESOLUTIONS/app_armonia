@@ -1,25 +1,33 @@
-import { IsString, IsNumber, IsOptional, IsEnum, IsDateString, IsArray, ValidateNested } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsOptional,
+  IsEnum,
+  IsDateString,
+  IsArray,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export enum PaymentStatus {
-  PENDING = "PENDING",
-  PAID = "PAID",
-  OVERDUE = "OVERDUE",
-  CANCELLED = "CANCELLED",
-  PARTIAL = "PARTIAL",
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  OVERDUE = 'OVERDUE',
+  CANCELLED = 'CANCELLED',
+  PARTIAL = 'PARTIAL',
 }
 
 export enum FeeType {
-  ORDINARY = "ORDINARY",
-  EXTRAORDINARY = "EXTRAORDINARY",
-  PENALTY = "PENALTY",
-  OTHER = "OTHER",
+  ORDINARY = 'ORDINARY',
+  EXTRAORDINARY = 'EXTRAORDINARY',
+  PENALTY = 'PENALTY',
+  OTHER = 'OTHER',
 }
 
 export enum BudgetStatus {
-  DRAFT = "DRAFT",
-  APPROVED = "APPROVED",
-  EXECUTED = "EXECUTED",
+  DRAFT = 'DRAFT',
+  APPROVED = 'APPROVED',
+  EXECUTED = 'EXECUTED',
 }
 
 export class FeeDto {
@@ -274,7 +282,53 @@ export class CreateBudgetDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => BudgetItemDto)
-  items: Omit<BudgetItemDto, "id" | "budgetId">[];
+  items: Omit<BudgetItemDto, 'id' | 'budgetId'>[];
+}
+
+export class InitiatePaymentDto {
+  @IsNumber()
+  feeId: number;
+
+  @IsString()
+  paymentMethod: string;
+
+  @IsString()
+  returnUrl: string;
+}
+
+export class PaymentGatewayCallbackDto {
+  @IsString()
+  transactionId: string;
+
+  @IsString()
+  status: string;
+
+  @IsOptional()
+  @IsString()
+  signature?: string;
+}
+
+export class FinancialReportResponseDto {
+  @IsNumber()
+  totalIncome: number;
+
+  @IsNumber()
+  totalExpenses: number;
+
+  @IsNumber()
+  netBalance: number;
+
+  @IsArray()
+  @IsOptional()
+  transactions?: any[]; // Simplified for now, could be more specific DTOs
+
+  @IsArray()
+  @IsOptional()
+  fees?: any[]; // Simplified for now
+
+  @IsArray()
+  @IsOptional()
+  payments?: any[]; // Simplified for now
 }
 
 export class FeeFilterParamsDto {

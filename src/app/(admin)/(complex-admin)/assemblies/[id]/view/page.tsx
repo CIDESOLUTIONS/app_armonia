@@ -20,7 +20,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { getAssemblyById, registerAttendance, createVote, submitVote, getVoteResults, generateMeetingMinutes } from "@/services/assemblyService";
+import {
+  getAssemblyById,
+  registerAttendance,
+  createVote,
+  submitVote,
+  getVoteResults,
+  generateMeetingMinutes,
+} from "@/services/assemblyService";
 import { useToast } from "@/components/ui/use-toast";
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"; // Ajusta esto a la URL de tu backend NestJS
@@ -73,26 +80,30 @@ export default function ViewAssemblyPage() {
         query: { assemblyId, schemaName: user.schemaName, userId: user.id },
       });
 
-      socket.on('connect', () => {
-        console.log('Conectado al socket de asamblea');
-        socket.emit('joinAssembly', { assemblyId, schemaName: user.schemaName, userId: user.id });
+      socket.on("connect", () => {
+        console.log("Conectado al socket de asamblea");
+        socket.emit("joinAssembly", {
+          assemblyId,
+          schemaName: user.schemaName,
+          userId: user.id,
+        });
       });
 
-      socket.on('quorumUpdate', (data: { currentQuorum: number }) => {
+      socket.on("quorumUpdate", (data: { currentQuorum: number }) => {
         setCurrentQuorum(data.currentQuorum);
       });
 
-      socket.on('newVote', (vote: any) => {
+      socket.on("newVote", (vote: any) => {
         setActiveVote(vote);
         setVoteResults(null); // Resetear resultados al iniciar nueva votación
       });
 
-      socket.on('voteResultsUpdate', (results: any) => {
+      socket.on("voteResultsUpdate", (results: any) => {
         setVoteResults(results);
       });
 
-      socket.on('disconnect', () => {
-        console.log('Desconectado del socket de asamblea');
+      socket.on("disconnect", () => {
+        console.log("Desconectado del socket de asamblea");
       });
 
       return () => {
@@ -104,10 +115,21 @@ export default function ViewAssemblyPage() {
   const handleRegisterAttendance = async () => {
     if (!user || !assemblyId) return;
     try {
-      await registerAttendance(assemblyId, { assemblyId, userId: user.id, present: true });
-      toast({ title: "Asistencia Registrada", description: "Tu asistencia ha sido registrada." });
+      await registerAttendance(assemblyId, {
+        assemblyId,
+        userId: user.id,
+        present: true,
+      });
+      toast({
+        title: "Asistencia Registrada",
+        description: "Tu asistencia ha sido registrada.",
+      });
     } catch (error) {
-      toast({ title: "Error", description: "No se pudo registrar la asistencia.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "No se pudo registrar la asistencia.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -121,19 +143,37 @@ export default function ViewAssemblyPage() {
         isWeighted: true,
       });
       setActiveVote(newVote);
-      toast({ title: "Votación Iniciada", description: "Se ha iniciado una nueva votación." });
+      toast({
+        title: "Votación Iniciada",
+        description: "Se ha iniciado una nueva votación.",
+      });
     } catch (error) {
-      toast({ title: "Error", description: "No se pudo iniciar la votación.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "No se pudo iniciar la votación.",
+        variant: "destructive",
+      });
     }
   };
 
   const handleSubmitVote = async (optionIndex: number) => {
     if (!activeVote || !user) return;
     try {
-      await submitVote(activeVote.id, { voteId: activeVote.id, optionIndex, userId: user.id });
-      toast({ title: "Voto Registrado", description: "Tu voto ha sido registrado." });
+      await submitVote(activeVote.id, {
+        voteId: activeVote.id,
+        optionIndex,
+        userId: user.id,
+      });
+      toast({
+        title: "Voto Registrado",
+        description: "Tu voto ha sido registrado.",
+      });
     } catch (error) {
-      toast({ title: "Error", description: "No se pudo registrar el voto.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "No se pudo registrar el voto.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -142,9 +182,16 @@ export default function ViewAssemblyPage() {
     try {
       const results = await getVoteResults(activeVote.id);
       setVoteResults(results);
-      toast({ title: "Resultados Obtenidos", description: "Resultados de la votación actualizados." });
+      toast({
+        title: "Resultados Obtenidos",
+        description: "Resultados de la votación actualizados.",
+      });
     } catch (error) {
-      toast({ title: "Error", description: "No se pudieron obtener los resultados.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "No se pudieron obtener los resultados.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -152,10 +199,17 @@ export default function ViewAssemblyPage() {
     if (!assemblyId) return;
     try {
       const result = await generateMeetingMinutes(assemblyId);
-      toast({ title: "Acta Generada", description: "El borrador del acta ha sido generado." });
+      toast({
+        title: "Acta Generada",
+        description: "El borrador del acta ha sido generado.",
+      });
       // Aquí podrías redirigir o mostrar un enlace al acta
     } catch (error) {
-      toast({ title: "Error", description: "No se pudo generar el acta.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "No se pudo generar el acta.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -272,7 +326,10 @@ export default function ViewAssemblyPage() {
           <p className="text-gray-600 mb-4">
             Quórum Actual: <span className="font-bold">{currentQuorum}%</span>
           </p>
-          <Button onClick={handleRegisterAttendance} disabled={!user || assembly.status !== 'IN_PROGRESS'}>
+          <Button
+            onClick={handleRegisterAttendance}
+            disabled={!user || assembly.status !== "IN_PROGRESS"}
+          >
             Registrar mi Asistencia
           </Button>
         </CardContent>
@@ -288,7 +345,9 @@ export default function ViewAssemblyPage() {
         <CardContent>
           {activeVote ? (
             <div>
-              <h3 className="text-lg font-semibold mb-2">{activeVote.question}</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                {activeVote.question}
+              </h3>
               <div className="space-y-2">
                 {activeVote.options.map((option: string, index: number) => (
                   <Button
@@ -305,12 +364,17 @@ export default function ViewAssemblyPage() {
                 <div className="mt-4 p-4 border rounded-md bg-gray-50">
                   <h4 className="font-semibold mb-2">Resultados:</h4>
                   {voteResults.results.map((result: any, index: number) => (
-                    <p key={index}>{result.option}: {result.count} votos ({result.percentage}%)</p>
+                    <p key={index}>
+                      {result.option}: {result.count} votos ({result.percentage}
+                      %)
+                    </p>
                   ))}
                 </div>
               )}
-              {user?.role === 'COMPLEX_ADMIN' && (
-                <Button onClick={handleGetVoteResults} className="mt-4">Ver Resultados</Button>
+              {user?.role === "COMPLEX_ADMIN" && (
+                <Button onClick={handleGetVoteResults} className="mt-4">
+                  Ver Resultados
+                </Button>
               )}
             </div>
           ) : (
@@ -318,8 +382,11 @@ export default function ViewAssemblyPage() {
               No hay votaciones activas en este momento.
             </p>
           )}
-          {user?.role === 'COMPLEX_ADMIN' && (
-            <Button onClick={handleCreateVote} disabled={assembly.status !== 'IN_PROGRESS'}>
+          {user?.role === "COMPLEX_ADMIN" && (
+            <Button
+              onClick={handleCreateVote}
+              disabled={assembly.status !== "IN_PROGRESS"}
+            >
               Iniciar Nueva Votación
             </Button>
           )}
@@ -335,10 +402,14 @@ export default function ViewAssemblyPage() {
         </CardHeader>
         <CardContent>
           <p className="text-gray-600 mb-4">
-            Aquí se mostrarán las actas de la asamblea y otros documentos relevantes.
+            Aquí se mostrarán las actas de la asamblea y otros documentos
+            relevantes.
           </p>
-          {user?.role === 'COMPLEX_ADMIN' && (
-            <Button onClick={handleGenerateMinutes} disabled={assembly.status !== 'COMPLETED'}>
+          {user?.role === "COMPLEX_ADMIN" && (
+            <Button
+              onClick={handleGenerateMinutes}
+              disabled={assembly.status !== "COMPLETED"}
+            >
               Generar Borrador de Acta
             </Button>
           )}
@@ -350,4 +421,3 @@ export default function ViewAssemblyPage() {
     </div>
   );
 }
-

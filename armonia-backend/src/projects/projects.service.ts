@@ -20,7 +20,10 @@ export class ProjectsService {
     return this.prismaClientManager.getClient(schemaName);
   }
 
-  async getProjects(schemaName: string, params?: GetProjectsParamsDto): Promise<ProjectDto[]> {
+  async getProjects(
+    schemaName: string,
+    params?: GetProjectsParamsDto,
+  ): Promise<ProjectDto[]> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const where: any = {};
@@ -38,14 +41,14 @@ export class ProjectsService {
           createdBy: { select: { name: true } }, // Usar el modelo User del esquema del tenant
         },
       });
-      return projects.map(project => ({
+      return projects.map((project) => ({
         ...project,
         assignedToName: project.assignedTo?.name || 'N/A',
         createdByName: project.createdBy?.name || 'N/A',
       }));
     } catch (error) {
-      console.error("Error fetching projects:", error);
-      throw new Error("Error fetching projects");
+      console.error('Error fetching projects:', error);
+      throw new Error('Error fetching projects');
     }
   }
 
@@ -60,7 +63,7 @@ export class ProjectsService {
         },
       });
       if (!project) {
-        throw new Error("Proyecto no encontrado");
+        throw new Error('Proyecto no encontrado');
       }
       return {
         ...project,
@@ -69,29 +72,36 @@ export class ProjectsService {
       };
     } catch (error) {
       console.error(`Error fetching project with ID ${id}:`, error);
-      throw new Error("Error fetching project");
+      throw new Error('Error fetching project');
     }
   }
 
-  async createProject(schemaName: string, data: CreateProjectDto): Promise<ProjectDto> {
+  async createProject(
+    schemaName: string,
+    data: CreateProjectDto,
+  ): Promise<ProjectDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const project = await prisma.project.create({ data });
       return this.getProjectById(schemaName, project.id);
     } catch (error) {
-      console.error("Error creating project:", error);
-      throw new Error("Error creating project");
+      console.error('Error creating project:', error);
+      throw new Error('Error creating project');
     }
   }
 
-  async updateProject(schemaName: string, id: number, data: Partial<UpdateProjectDto>): Promise<ProjectDto> {
+  async updateProject(
+    schemaName: string,
+    id: number,
+    data: Partial<UpdateProjectDto>,
+  ): Promise<ProjectDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const project = await prisma.project.update({ where: { id }, data });
       return this.getProjectById(schemaName, project.id);
     } catch (error) {
-      console.error("Error updating project:", error);
-      throw new Error("Error updating project");
+      console.error('Error updating project:', error);
+      throw new Error('Error updating project');
     }
   }
 
@@ -100,8 +110,8 @@ export class ProjectsService {
     try {
       await prisma.project.delete({ where: { id } });
     } catch (error) {
-      console.error("Error deleting project:", error);
-      throw new Error("Error deleting project");
+      console.error('Error deleting project:', error);
+      throw new Error('Error deleting project');
     }
   }
 }

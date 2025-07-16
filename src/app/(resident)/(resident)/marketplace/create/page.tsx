@@ -1,5 +1,7 @@
 "use client";
 
+"use client";
+
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -8,19 +10,32 @@ import * as z from "zod";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Loader2 } from "lucide-react";
-import { createListing } from "@/services/marketplaceService";
-import { useAuthStore } from "@/store/authStore";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+// Placeholder for image upload service
+const uploadImage = async (file: File): Promise<string> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log("Uploading file:", file.name);
+      resolve(`https://example.com/images/${file.name}`);
+    }, 1000);
+  });
+};
+
+const categories = [
+  "Electrónica",
+  "Servicios",
+  "Hogar",
+  "Vehículos",
+  "Inmuebles",
+  "Otros",
+];
 
 const formSchema = z.object({
   title: z.string().min(5, "El título debe tener al menos 5 caracteres."),
@@ -31,8 +46,10 @@ const formSchema = z.object({
     (val) => Number(val),
     z.number().positive("El precio debe ser un número positivo."),
   ),
-  category: z.string().min(1, "La categoría es requerida."),
-  images: z.array(z.string()).optional(), // Simplificado por ahora
+  category: z.enum(categories as [string, ...string[]], {
+    errorMap: () => ({ message: "La categoría es requerida." }),
+  }),
+  images: z.array(z.any()).optional(), // Will be refined to z.instanceof(File) later
 });
 
 export default function CreateListingPage() {
@@ -40,6 +57,7 @@ export default function CreateListingPage() {
   const { toast } = useToast();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,6 +70,15 @@ export default function CreateListingPage() {
     },
   });
 
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const files = Array.from(event.target.files);
+      form.setValue("images", files);
+      const previews = files.map((file) => URL.createObjectURL(file));
+      setImagePreviews(previews);
+    }
+  };
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!user?.id) {
       toast({
@@ -63,10 +90,19 @@ export default function CreateListingPage() {
 
     setLoading(true);
     try {
+      const imageUrls: string[] = [];
+      if (values.images && values.images.length > 0) {
+        for (const imageFile of values.images) {
+          const url = await uploadImage(imageFile);
+          imageUrls.push(url);
+        }
+      }
+
       await createListing({
         ...values,
+        images: imageUrls,
         authorId: user.id,
-        // complexId: user.complexId, // Asegúrate de que el complexId se obtenga del usuario autenticado
+        complexId: user.complexId, // Asegúrate de que el complexId se obtenga del usuario autenticado
       });
       toast({
         title: "Éxito",
@@ -141,17 +177,55 @@ export default function CreateListingPage() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Categoría</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Ej: Electrónica, Servicios, Hogar"
-                    {...field}
-                  />
-                </FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona una categoría" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
           />
-          {/* Campo para imágenes - simplificado por ahora */}
+          <FormField
+            control={form.control}
+            name="images"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Imágenes</FormLabel>
+                <FormControl>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageChange}
+                  />
+                </FormControl>
+                <FormMessage />
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {imagePreviews.map((src, index) => (
+                    <img
+                      key={index}
+                      src={src}
+                      alt={`Preview ${index}`}
+                      className="w-24 h-24 object-cover rounded-md"
+                    />
+                  ))}
+                </div>
+              </FormItem>
+            )}
+          />
           <Button type="submit" className="w-full" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Publicar Anuncio

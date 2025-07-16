@@ -7,6 +7,11 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Module({
   controllers: [AssemblyController],
-  providers: [AssemblyService, AssemblyGateway, PrismaClientManager, PrismaService],
+  providers: [
+    AssemblyService,
+    AssemblyGateway,
+    PrismaClientManager,
+    PrismaService,
+  ],
 })
 export class AssemblyModule {}

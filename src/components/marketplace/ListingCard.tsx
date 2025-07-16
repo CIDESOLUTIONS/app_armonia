@@ -11,7 +11,17 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Flag } from "lucide-react";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { reportListing } from "@/services/marketplaceService";
@@ -95,7 +105,11 @@ export function ListingCard({ listing }: ListingCardProps) {
         </Link>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-red-500 hover:text-red-600"
+            >
               <Flag className="h-4 w-4" />
             </Button>
           </AlertDialogTrigger>
@@ -113,7 +127,9 @@ export function ListingCard({ listing }: ListingCardProps) {
             />
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction onClick={handleReport}>Reportar</AlertDialogAction>
+              <AlertDialogAction onClick={handleReport}>
+                Reportar
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
@@ -121,4 +137,3 @@ export function ListingCard({ listing }: ListingCardProps) {
     </Card>
   );
 }
-

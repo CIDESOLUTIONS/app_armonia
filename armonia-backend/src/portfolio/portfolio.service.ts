@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
-import { PortfolioMetricDto, ComplexMetricDto } from '../common/dto/portfolio.dto';
+import {
+  PortfolioMetricDto,
+  ComplexMetricDto,
+} from '../common/dto/portfolio.dto';
 
 @Injectable()
 export class PortfolioService {
@@ -12,9 +15,9 @@ export class PortfolioService {
     const schemas = ['complex1', 'complex2']; // Esto debería venir de la DB
 
     let totalProperties = 0;
-    let totalResidents = 0;
-    let totalPendingFees = 0;
-    let totalIncome = 0;
+    const totalResidents = 0;
+    const totalPendingFees = 0;
+    const totalIncome = 0;
 
     for (const schema of schemas) {
       const prisma = this.prismaClientManager.getClient(schema);
