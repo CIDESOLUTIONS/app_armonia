@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common'; // Importar NotFoundException
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
@@ -14,6 +14,9 @@ import {
   CreateBudgetDto,
   FeeFilterParamsDto,
   BudgetStatus,
+  FinancialReportResponseDto, // Importar FinancialReportResponseDto
+  InitiatePaymentDto, // Importar InitiatePaymentDto
+  PaymentGatewayCallbackDto, // Importar PaymentGatewayCallbackDto
 } from '../common/dto/finances.dto';
 
 @Injectable()
@@ -50,8 +53,8 @@ export class FinancesService {
 
       const fees = await prisma.fee.findMany({
         where,
-        skip: (filters.page - 1) * filters.limit || 0,
-        take: filters.limit || 10,
+        skip: ((filters.page ?? 1) - 1) * (filters.limit ?? 10), // Usar ??
+        take: filters.limit ?? 10, // Usar ??
         orderBy: { createdAt: 'desc' },
       });
       const total = await prisma.fee.count({ where });
@@ -294,7 +297,7 @@ export class FinancesService {
       fees = await prisma.fee.findMany({
         where: {
           dueDate: { gte: start, lte: end },
-          status: PaymentStatus.PAID, // Assuming paid fees are expenses
+          status: PaymentStatus.PAID, // Asumiendo que las cuotas pagadas son egresos
         },
       });
       totalExpenses = fees.reduce((sum, f) => sum + f.amount, 0);
@@ -316,7 +319,7 @@ export class FinancesService {
 
   async processBankStatement(
     schemaName: string,
-    file: Express.Multer.File,
+    file: any, // Cambiado a any
   ): Promise<any[]> {
     const prisma = this.getTenantPrismaClient(schemaName);
     // Aquí iría la lógica para leer el archivo (CSV/XLSX) y procesar las transacciones.
@@ -339,7 +342,7 @@ export class FinancesService {
       },
     ];
 
-    const suggestions = [];
+    const suggestions: any[] = []; // Tipado explícito como any[]
 
     for (const transaction of transactions) {
       // Simular búsqueda de pagos coincidentes en la DB
@@ -403,6 +406,7 @@ export class FinancesService {
     // Buscar el intento de pago
     const paymentAttempt = await prisma.paymentAttempt.findUnique({
       where: { transactionId: data.transactionId },
+      include: { fee: true }, // Incluir la relación con Fee
     });
 
     if (!paymentAttempt) {
@@ -427,7 +431,7 @@ export class FinancesService {
           reference: paymentAttempt.transactionId,
           receiptNumber: `REC-${Date.now()}`,
           feeId: paymentAttempt.feeId,
-          propertyId: paymentAttempt.propertyId, // Asumiendo que propertyId está en paymentAttempt
+          propertyId: paymentAttempt.fee.propertyId, // Obtener propertyId de la Fee
           createdBy: paymentAttempt.userId,
         },
       });

@@ -46,7 +46,7 @@ generator client {
 /// @prisma.schema ./schema_question.prisma
 /// @prisma.schema ./schema_option.prisma
 /// @prisma.schema ./schema_user_vote.prisma
-/// @prisma.schema ./schema_payment_attempt.prisma
+/// @prisma.schema ./armonia-backend/prisma/schema_payment_attempt.prisma
 /// @prisma.schema ./schema_attendance.prisma
 /// @prisma.schema ./schema_assembly.prisma
 /// @prisma.schema ./schema_vote.prisma
