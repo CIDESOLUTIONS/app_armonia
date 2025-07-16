@@ -3,7 +3,14 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { getListingById } from "@/services/marketplaceService";
-import { Loader2, MessageSquare, DollarSign, Tag, Calendar, User } from "lucide-react";
+import {
+  Loader2,
+  MessageSquare,
+  DollarSign,
+  Tag,
+  Calendar,
+  User,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -42,8 +49,12 @@ export default function ListingDetailPage() {
   if (!listing) {
     return (
       <div className="container mx-auto p-6 text-center">
-        <h1 className="text-2xl font-bold text-gray-900">Anuncio no encontrado</h1>
-        <p className="text-gray-600">El anuncio que buscas no existe o ha sido eliminado.</p>
+        <h1 className="text-2xl font-bold text-gray-900">
+          Anuncio no encontrado
+        </h1>
+        <p className="text-gray-600">
+          El anuncio que buscas no existe o ha sido eliminado.
+        </p>
       </div>
     );
   }
@@ -54,7 +65,8 @@ export default function ListingDetailPage() {
         <CardHeader>
           <CardTitle className="text-3xl font-bold">{listing.title}</CardTitle>
           <p className="text-gray-600 flex items-center mt-2">
-            <User className="h-4 w-4 mr-1" /> Publicado por: {listing.author.name}
+            <User className="h-4 w-4 mr-1" /> Publicado por:{" "}
+            {listing.author.name}
           </p>
         </CardHeader>
         <CardContent>
@@ -71,21 +83,26 @@ export default function ListingDetailPage() {
                 </div>
               )}
               <div className="flex space-x-2 overflow-x-auto">
-                {listing.images && listing.images.map((img: string, index: number) => (
-                  <div key={index} className="relative w-24 h-24 rounded-md overflow-hidden cursor-pointer">
-                    <Image
-                      src={img}
-                      alt={`Thumbnail ${index + 1}`}
-                      layout="fill"
-                      objectFit="cover"
-                    />
-                  </div>
-                ))}
+                {listing.images &&
+                  listing.images.map((img: string, index: number) => (
+                    <div
+                      key={index}
+                      className="relative w-24 h-24 rounded-md overflow-hidden cursor-pointer"
+                    >
+                      <Image
+                        src={img}
+                        alt={`Thumbnail ${index + 1}`}
+                        layout="fill"
+                        objectFit="cover"
+                      />
+                    </div>
+                  ))}
               </div>
             </div>
             <div>
               <p className="text-4xl font-extrabold text-indigo-600 mb-4 flex items-center">
-                <DollarSign className="h-8 w-8 mr-2" /> ${listing.price.toFixed(2)}
+                <DollarSign className="h-8 w-8 mr-2" /> $
+                {listing.price.toFixed(2)}
               </p>
               <p className="text-gray-700 mb-4">{listing.description}</p>
               <div className="flex items-center text-gray-600 mb-2">
@@ -96,7 +113,9 @@ export default function ListingDetailPage() {
                 <Calendar className="h-5 w-5 mr-2" />
                 Publicado: {new Date(listing.createdAt).toLocaleDateString()}
               </div>
-              <Link href={`/resident/resident/marketplace/chat/${listing.authorId}`}>
+              <Link
+                href={`/resident/resident/marketplace/chat/${listing.authorId}`}
+              >
                 <Button className="w-full">
                   <MessageSquare className="mr-2 h-4 w-4" /> Contactar Vendedor
                 </Button>

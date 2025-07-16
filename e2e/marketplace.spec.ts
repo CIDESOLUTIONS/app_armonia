@@ -56,17 +56,23 @@ test.describe("Marketplace Comunitario", () => {
 
       // Seleccionar categoría
       await page.locator('div[role="combobox"]').click(); // Click en el SelectTrigger
-      await page.locator(`div[role="option"]:has-text("${testListing.category}")`).click();
+      await page
+        .locator(`div[role="option"]:has-text("${testListing.category}")`)
+        .click();
 
       await page.locator('button[type="submit"]').click();
 
-      await expect(page.locator('text=Anuncio publicado exitosamente.')).toBeVisible();
+      await expect(
+        page.locator("text=Anuncio publicado exitosamente."),
+      ).toBeVisible();
       await expect(page).toHaveURL(/.*marketplace/);
       await expect(page.locator(`text="${testListing.title}"`)).toBeVisible();
     });
   });
 
-  test("Debe permitir a un residente buscar y filtrar anuncios", async ({ page }) => {
+  test("Debe permitir a un residente buscar y filtrar anuncios", async ({
+    page,
+  }) => {
     // Login como residente
     await test.step("Login como residente", async () => {
       await page.goto("/login");
@@ -89,21 +95,29 @@ test.describe("Marketplace Comunitario", () => {
       await page.fill('input[placeholder="Buscar anuncios..."]', "Bicicleta");
       await page.waitForTimeout(2000); // Esperar a que se aplique el filtro
       await expect(page.locator(`text="${testListing.title}"`)).toBeVisible();
-      await expect(page.locator('text=No se encontraron anuncios.')).not.toBeVisible();
+      await expect(
+        page.locator("text=No se encontraron anuncios."),
+      ).not.toBeVisible();
     });
 
     // Realizar filtro por categoría
     await test.step("Realizar filtro por categoría", async () => {
       await page.locator('input[placeholder="Buscar anuncios..."]').fill(""); // Limpiar búsqueda
       await page.locator('div[role="combobox"]').click(); // Click en el SelectTrigger
-      await page.locator(`div[role="option"]:has-text("${testListing.category}")`).click();
+      await page
+        .locator(`div[role="option"]:has-text("${testListing.category}")`)
+        .click();
       await page.waitForTimeout(2000); // Esperar a que se aplique el filtro
       await expect(page.locator(`text="${testListing.title}"`)).toBeVisible();
-      await expect(page.locator('text=No se encontraron anuncios.')).not.toBeVisible();
+      await expect(
+        page.locator("text=No se encontraron anuncios."),
+      ).not.toBeVisible();
     });
   });
 
-  test("Debe permitir a un residente reportar un anuncio y al administrador moderarlo", async ({ page }) => {
+  test("Debe permitir a un residente reportar un anuncio y al administrador moderarlo", async ({
+    page,
+  }) => {
     // Login como residente
     await test.step("Login como residente", async () => {
       await page.goto("/login");
@@ -123,10 +137,15 @@ test.describe("Marketplace Comunitario", () => {
 
     // Reportar un anuncio (asume que hay al menos un anuncio visible)
     await test.step("Reportar un anuncio", async () => {
-      await page.locator('button[aria-label="Reportar Anuncio"]').first().click();
-      await page.locator('textarea[placeholder="Razón del reporte..."]').fill(reportReason);
+      await page
+        .locator('button[aria-label="Reportar Anuncio"]')
+        .first()
+        .click();
+      await page
+        .locator('textarea[placeholder="Razón del reporte..."]')
+        .fill(reportReason);
       await page.locator('button:has-text("Reportar")').click();
-      await expect(page.locator('text=Anuncio Reportado')).toBeVisible();
+      await expect(page.locator("text=Anuncio Reportado")).toBeVisible();
     });
 
     // Logout del residente
@@ -159,8 +178,12 @@ test.describe("Marketplace Comunitario", () => {
       await expect(page.locator(`text="${reportReason}"`)).toBeVisible();
 
       await page.locator('button:has-text("Rechazar")').first().click(); // O Aprobar
-      await expect(page.locator('text=Reporte rechazado correctamente.')).toBeVisible();
-      await expect(page.locator(`text="${testListing.title}"`)).not.toBeVisible(); // El anuncio reportado ya no debería estar en la lista
+      await expect(
+        page.locator("text=Reporte rechazado correctamente."),
+      ).toBeVisible();
+      await expect(
+        page.locator(`text="${testListing.title}"`),
+      ).not.toBeVisible(); // El anuncio reportado ya no debería estar en la lista
     });
   });
 });

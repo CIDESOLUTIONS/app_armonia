@@ -269,7 +269,7 @@ export default function Sidebar({
     },
   ];
 
-  const filteredSidebarItems = sidebarItems.filter(item => {
+  const filteredSidebarItems = sidebarItems.filter((item) => {
     if (!item.roles || !user?.role) return false; // Si no hay roles definidos o el usuario no tiene rol, no mostrar
     return item.roles.includes(user.role);
   });
@@ -343,4 +343,3 @@ export default function Sidebar({
     </aside>
   );
 }
-

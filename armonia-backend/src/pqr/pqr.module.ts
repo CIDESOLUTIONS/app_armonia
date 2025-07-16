@@ -4,6 +4,6 @@ import { PqrController } from './pqr.controller';
 
 @Module({
   providers: [PqrService],
-  controllers: [PqrController]
+  controllers: [PqrController],
 })
 export class PqrModule {}

@@ -13,7 +13,8 @@ import { TenantModule } from '../tenant/tenant.module';
     PassportModule,
     TenantModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET_KEY || 'superSecretKeyThatShouldBeLongAndRandom',
+      secret:
+        process.env.JWT_SECRET_KEY || 'superSecretKeyThatShouldBeLongAndRandom',
       signOptions: { expiresIn: '60m' },
     }),
   ],
@@ -21,7 +22,11 @@ import { TenantModule } from '../tenant/tenant.module';
     AuthService,
     {
       provide: JwtStrategy,
-      useFactory: () => new JwtStrategy(process.env.JWT_SECRET_KEY || 'superSecretKeyThatShouldBeLongAndRandom'),
+      useFactory: () =>
+        new JwtStrategy(
+          process.env.JWT_SECRET_KEY ||
+            'superSecretKeyThatShouldBeLongAndRandom',
+        ),
     },
   ],
   controllers: [AuthController],

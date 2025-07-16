@@ -13,7 +13,9 @@ test.describe("Portal Empresarial", () => {
     await page.waitForLoadState("networkidle");
   });
 
-  test("Debe mostrar el dashboard del portafolio para un administrador global", async ({ page }) => {
+  test("Debe mostrar el dashboard del portafolio para un administrador global", async ({
+    page,
+  }) => {
     // Login como administrador global
     await test.step("Login como administrador global", async () => {
       await page.goto("/login");
@@ -36,18 +38,28 @@ test.describe("Portal Empresarial", () => {
 
     // Verificar que se muestran las métricas del portafolio
     await test.step("Verificar métricas del portafolio", async () => {
-      await expect(page.locator('h2:has-text("Dashboard Armonía Portafolio")')).toBeVisible();
-      await expect(page.locator('text=Ingresos Totales Portafolio')).toBeVisible();
-      await expect(page.locator('text=Total Conjuntos')).toBeVisible();
-      await expect(page.locator('text=Total Residentes')).toBeVisible();
-      await expect(page.locator('text=Cuotas Pendientes Portafolio')).toBeVisible();
+      await expect(
+        page.locator('h2:has-text("Dashboard Armonía Portafolio")'),
+      ).toBeVisible();
+      await expect(
+        page.locator("text=Ingresos Totales Portafolio"),
+      ).toBeVisible();
+      await expect(page.locator("text=Total Conjuntos")).toBeVisible();
+      await expect(page.locator("text=Total Residentes")).toBeVisible();
+      await expect(
+        page.locator("text=Cuotas Pendientes Portafolio"),
+      ).toBeVisible();
     });
 
     // Verificar que se muestran las métricas por conjunto (al menos una)
     await test.step("Verificar métricas por conjunto", async () => {
-      await expect(page.locator('h3:has-text("Métricas por Conjunto")')).toBeVisible();
+      await expect(
+        page.locator('h3:has-text("Métricas por Conjunto")'),
+      ).toBeVisible();
       // Asume que al menos un conjunto se muestra
-      await expect(page.locator('.Métricas por Conjunto card').first()).toBeVisible();
+      await expect(
+        page.locator(".Métricas por Conjunto card").first(),
+      ).toBeVisible();
     });
   });
 });

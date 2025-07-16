@@ -23,37 +23,35 @@ export default function ResidentDirectoryPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const fetchResidents = useCallback(async () => {
-    setLoading(true);
-    try {
-      // Fetch all residents, then filter on client-side for simplicity
-      // In a large application, filtering would be done on the server
-      const data = await getResidents();
-      setResidents(data);
-    } catch (error) {
-      console.error("Error fetching residents for directory:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo cargar el directorio de residentes.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+  const fetchResidents = useCallback(
+    async (term: string) => {
+      setLoading(true);
+      try {
+        const data = await getResidents(term);
+        setResidents(data);
+      } catch (error) {
+        console.error("Error fetching residents for directory:", error);
+        toast({
+          title: "Error",
+          description: "No se pudo cargar el directorio de residentes.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast],
+  );
 
   useEffect(() => {
     if (!authLoading && user) {
-      fetchResidents();
+      fetchResidents(searchTerm);
     }
-  }, [authLoading, user, fetchResidents]);
+  }, [authLoading, user, fetchResidents, searchTerm]);
 
-  const filteredResidents = residents.filter(
-    (resident) =>
-      resident.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      resident.unitNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      resident.email.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
 
   if (authLoading || loading) {
     return (
@@ -78,14 +76,14 @@ export default function ResidentDirectoryPage() {
           type="text"
           placeholder="Buscar residente por nombre, unidad o email..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={handleSearchChange}
           className="w-full md:w-1/2"
         />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredResidents.length > 0 ? (
-          filteredResidents.map((resident) => (
+        {residents.length > 0 ? (
+          residents.map((resident) => (
             <Card key={resident.id}>
               <CardHeader>
                 <CardTitle className="flex items-center">

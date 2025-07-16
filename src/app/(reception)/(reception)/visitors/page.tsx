@@ -48,11 +48,19 @@ import {
   CheckCircle,
   X,
   QrCode,
+  Scan,
+  Package,
+  Truck,
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import Image from "next/image";
-import { getPreRegisteredVisitors } from "@/services/visitorService";
+import {
+  getPreRegisteredVisitors,
+  scanQrCode,
+  registerPackage,
+  deliverPackage,
+} from "@/services/visitorService";
 
 interface Visitor {
   id: string;
@@ -110,6 +118,20 @@ export default function ReceptionVisitorsPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [qrCodeInput, setQrCodeInput] = useState("");
+  const [qrScanResult, setQrScanResult] = useState<any>(null);
+  const [isPackageRegisterDialogOpen, setIsPackageRegisterDialogOpen] =
+    useState(false);
+  const [newPackageForm, setNewPackageForm] = useState({
+    trackingNumber: "",
+    recipientUnit: "",
+    sender: "",
+    description: "",
+  });
+  const [isPackageDeliverDialogOpen, setIsPackageDeliverDialogOpen] =
+    useState(false);
+  const [deliverPackageTrackingNumber, setDeliverPackageTrackingNumber] =
+    useState("");
 
   // Datos de ejemplo para desarrollo y pruebas
   const mockVisitors: Visitor[] = useMemo(
@@ -372,6 +394,77 @@ export default function ReceptionVisitorsPage() {
     }
   };
 
+  const handleScanQrCode = async () => {
+    if (!qrCodeInput) {
+      setError("Por favor, introduce un código QR.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const result = await scanQrCode(qrCodeInput);
+      if (result.success) {
+        setQrScanResult(result.visitor);
+        setSuccessMessage("QR Code escaneado con éxito.");
+      } else {
+        setError(result.message || "QR Code inválido.");
+      }
+    } catch (err: any) {
+      setError(err.message || "Error al escanear el código QR.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePackageFormChange = (field: string, value: unknown) => {
+    setNewPackageForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleSubmitNewPackage = async () => {
+    if (!newPackageForm.trackingNumber || !newPackageForm.recipientUnit) {
+      setError(
+        "Número de seguimiento y unidad de destinatario son requeridos.",
+      );
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      await registerPackage(newPackageForm);
+      setSuccessMessage("Paquete registrado exitosamente.");
+      setIsPackageRegisterDialogOpen(false);
+      setNewPackageForm({
+        trackingNumber: "",
+        recipientUnit: "",
+        sender: "",
+        description: "",
+      });
+    } catch (err: any) {
+      setError(err.message || "Error al registrar el paquete.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeliverPackage = async () => {
+    if (!deliverPackageTrackingNumber) {
+      setError("El número de seguimiento es requerido para la entrega.");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      await deliverPackage(deliverPackageTrackingNumber);
+      setSuccessMessage("Paquete entregado exitosamente.");
+      setIsPackageDeliverDialogOpen(false);
+      setDeliverPackageTrackingNumber("");
+    } catch (err: any) {
+      setError(err.message || "Error al entregar el paquete.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // Renderizado de estado de carga
   if (loading) {
     return (
@@ -457,6 +550,28 @@ export default function ReceptionVisitorsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
+          <div className="p-4 border-b flex items-center space-x-2">
+            <Input
+              placeholder="Escanear o introducir código QR"
+              value={qrCodeInput}
+              onChange={(e) => setQrCodeInput(e.target.value)}
+            />
+            <Button
+              onClick={handleScanQrCode}
+              disabled={!qrCodeInput || loading}
+            >
+              <Scan className="mr-2 h-4 w-4" /> Escanear QR
+            </Button>
+          </div>
+          {qrScanResult && (
+            <div className="p-4 bg-blue-50 border-l-4 border-blue-400 text-blue-800">
+              <p className="font-bold">Resultado del Escaneo:</p>
+              <p>Nombre: {qrScanResult.name}</p>
+              <p>Documento: {qrScanResult.documentNumber}</p>
+              <p>Destino: {qrScanResult.destination}</p>
+              {qrScanResult.status && <p>Estado: {qrScanResult.status}</p>}
+            </div>
+          )}
           {preRegisteredVisitors.length > 0 ? (
             <Table>
               <TableHeader>
@@ -504,6 +619,109 @@ export default function ReceptionVisitorsPage() {
               </p>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Sección de Gestión de Paquetería */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Gestión de Paquetería</CardTitle>
+          <CardDescription>
+            Registre la entrada y salida de paquetes.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Registrar Paquete */}
+            <Card className="border-dashed border-2 p-4">
+              <CardTitle className="text-lg mb-4 flex items-center">
+                <Package className="mr-2 h-5 w-5" /> Registrar Paquete
+              </CardTitle>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="trackingNumber">Número de Seguimiento</Label>
+                  <Input
+                    id="trackingNumber"
+                    placeholder="Ej: ABC123XYZ"
+                    value={newPackageForm.trackingNumber}
+                    onChange={(e) =>
+                      handlePackageFormChange("trackingNumber", e.target.value)
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="recipientUnit">Unidad Destinataria</Label>
+                  <Input
+                    id="recipientUnit"
+                    placeholder="Ej: Apto 101"
+                    value={newPackageForm.recipientUnit}
+                    onChange={(e) =>
+                      handlePackageFormChange("recipientUnit", e.target.value)
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="sender">Remitente (Opcional)</Label>
+                  <Input
+                    id="sender"
+                    placeholder="Nombre del remitente"
+                    value={newPackageForm.sender}
+                    onChange={(e) =>
+                      handlePackageFormChange("sender", e.target.value)
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Descripción (Opcional)</Label>
+                  <Input
+                    id="description"
+                    placeholder="Contenido del paquete"
+                    value={newPackageForm.description}
+                    onChange={(e) =>
+                      handlePackageFormChange("description", e.target.value)
+                    }
+                  />
+                </div>
+                <Button
+                  onClick={handleSubmitNewPackage}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Registrar Paquete
+                </Button>
+              </div>
+            </Card>
+
+            {/* Entregar Paquete */}
+            <Card className="border-dashed border-2 p-4">
+              <CardTitle className="text-lg mb-4 flex items-center">
+                <Truck className="mr-2 h-5 w-5" /> Entregar Paquete
+              </CardTitle>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="deliverTrackingNumber">
+                    Número de Seguimiento
+                  </Label>
+                  <Input
+                    id="deliverTrackingNumber"
+                    placeholder="Número de seguimiento del paquete a entregar"
+                    value={deliverPackageTrackingNumber}
+                    onChange={(e) =>
+                      setDeliverPackageTrackingNumber(e.target.value)
+                    }
+                  />
+                </div>
+                <Button onClick={handleDeliverPackage} disabled={isSubmitting}>
+                  {isSubmitting && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Marcar como Entregado
+                </Button>
+              </div>
+            </Card>
+          </div>
         </CardContent>
       </Card>
 
@@ -806,6 +1024,143 @@ export default function ReceptionVisitorsPage() {
               }
             >
               {isSubmitting ? "Registrando..." : "Registrar Ingreso"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Diálogo para registrar nuevo paquete */}
+      <Dialog
+        open={isPackageRegisterDialogOpen}
+        onOpenChange={setIsPackageRegisterDialogOpen}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Registrar Nuevo Paquete</DialogTitle>
+            <DialogDescription>
+              Complete la información del paquete para registrar su ingreso.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="packageTrackingNumber">
+                Número de Seguimiento
+              </Label>
+              <Input
+                id="packageTrackingNumber"
+                placeholder="Ej: ABC123XYZ"
+                value={newPackageForm.trackingNumber}
+                onChange={(e) =>
+                  setNewPackageForm({
+                    ...newPackageForm,
+                    trackingNumber: e.target.value,
+                  })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="packageRecipientUnit">Unidad Destinataria</Label>
+              <Input
+                id="packageRecipientUnit"
+                placeholder="Ej: Apto 101"
+                value={newPackageForm.recipientUnit}
+                onChange={(e) =>
+                  setNewPackageForm({
+                    ...newPackageForm,
+                    recipientUnit: e.target.value,
+                  })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="packageSender">Remitente (Opcional)</Label>
+              <Input
+                id="packageSender"
+                placeholder="Nombre del remitente"
+                value={newPackageForm.sender}
+                onChange={(e) =>
+                  setNewPackageForm({
+                    ...newPackageForm,
+                    sender: e.target.value,
+                  })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="packageDescription">Descripción (Opcional)</Label>
+              <Input
+                id="packageDescription"
+                placeholder="Contenido del paquete"
+                value={newPackageForm.description}
+                onChange={(e) =>
+                  setNewPackageForm({
+                    ...newPackageForm,
+                    description: e.target.value,
+                  })
+                }
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsPackageRegisterDialogOpen(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleSubmitNewPackage}
+              disabled={
+                isSubmitting ||
+                !newPackageForm.trackingNumber ||
+                !newPackageForm.recipientUnit
+              }
+            >
+              {isSubmitting ? "Registrando..." : "Registrar Paquete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Diálogo para entregar paquete */}
+      <Dialog
+        open={isPackageDeliverDialogOpen}
+        onOpenChange={setIsPackageDeliverDialogOpen}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Entregar Paquete</DialogTitle>
+            <DialogDescription>
+              Introduce el número de seguimiento del paquete a entregar.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="deliverPackageTrackingNumber">
+                Número de Seguimiento
+              </Label>
+              <Input
+                id="deliverPackageTrackingNumber"
+                placeholder="Número de seguimiento"
+                value={deliverPackageTrackingNumber}
+                onChange={(e) =>
+                  setDeliverPackageTrackingNumber(e.target.value)
+                }
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsPackageDeliverDialogOpen(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleDeliverPackage}
+              disabled={isSubmitting || !deliverPackageTrackingNumber}
+            >
+              {isSubmitting ? "Entregando..." : "Marcar como Entregado"}
             </Button>
           </DialogFooter>
         </DialogContent>

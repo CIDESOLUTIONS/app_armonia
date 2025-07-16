@@ -1,31 +1,39 @@
-import { IsString, IsOptional, IsNumber, IsBoolean, IsArray, IsDateString, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsBoolean,
+  IsArray,
+  IsDateString,
+  IsEnum,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export enum NotificationType {
-  EMAIL = "EMAIL",
-  SMS = "SMS",
-  PUSH = "PUSH",
-  APP = "APP",
-  WHATSAPP = "WHATSAPP",
-  INFO = "info",
-  WARNING = "warning",
-  ERROR = "error",
+  EMAIL = 'EMAIL',
+  SMS = 'SMS',
+  PUSH = 'PUSH',
+  APP = 'APP',
+  WHATSAPP = 'WHATSAPP',
+  INFO = 'info',
+  WARNING = 'warning',
+  ERROR = 'error',
 }
 
 export enum NotificationPriority {
-  LOW = "low",
-  MEDIUM = "medium",
-  HIGH = "high",
-  URGENT = "urgent",
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  URGENT = 'urgent',
 }
 
 export enum NotificationSourceType {
-  SYSTEM = "system",
-  RESERVATION = "reservation",
-  ASSEMBLY = "assembly",
-  FINANCIAL = "financial",
-  SECURITY = "security",
-  MESSAGE = "message",
+  SYSTEM = 'system',
+  RESERVATION = 'reservation',
+  ASSEMBLY = 'assembly',
+  FINANCIAL = 'financial',
+  SECURITY = 'security',
+  MESSAGE = 'message',
 }
 
 export class NotificationDataDto {
@@ -89,11 +97,11 @@ export class AnnouncementDataDto {
 
   @IsOptional()
   @IsString()
-  type?: "general" | "important" | "emergency";
+  type?: 'general' | 'important' | 'emergency';
 
   @IsOptional()
   @IsString()
-  visibility?: "public" | "private" | "role-based";
+  visibility?: 'public' | 'private' | 'role-based';
 
   @IsOptional()
   @IsArray()
@@ -142,11 +150,11 @@ export class EventDataDto {
 
   @IsOptional()
   @IsString()
-  type?: "general" | "meeting" | "social" | "maintenance";
+  type?: 'general' | 'meeting' | 'social' | 'maintenance';
 
   @IsOptional()
   @IsString()
-  visibility?: "public" | "private" | "role-based";
+  visibility?: 'public' | 'private' | 'role-based';
 
   @IsOptional()
   @IsArray()

@@ -18,7 +18,9 @@ test.describe("Botón de Pánico", () => {
     await page.waitForLoadState("networkidle");
   });
 
-  test("Debe permitir a un residente activar una alerta de pánico y al personal de seguridad recibirla y resolverla", async ({ browser }) => {
+  test("Debe permitir a un residente activar una alerta de pánico y al personal de seguridad recibirla y resolverla", async ({
+    browser,
+  }) => {
     const residentPage = await browser.newPage();
     const receptionPage = await browser.newPage();
 
@@ -26,7 +28,10 @@ test.describe("Botón de Pánico", () => {
     await test.step("Login como residente", async () => {
       await residentPage.goto("/login");
       await residentPage.fill('input[name="email"]', testUsers.resident.email);
-      await residentPage.fill('input[name="password"]', testUsers.resident.password);
+      await residentPage.fill(
+        'input[name="password"]',
+        testUsers.resident.password,
+      );
       await residentPage.locator('button[type="submit"]').click();
       await residentPage.waitForLoadState("networkidle");
       await expect(residentPage).toHaveURL(/.*dashboard|resident/);
@@ -35,8 +40,14 @@ test.describe("Botón de Pánico", () => {
     // PASO 2: Login como personal de seguridad/recepción
     await test.step("Login como personal de seguridad/recepción", async () => {
       await receptionPage.goto("/login");
-      await receptionPage.fill('input[name="email"]', testUsers.reception.email);
-      await receptionPage.fill('input[name="password"]', testUsers.reception.password);
+      await receptionPage.fill(
+        'input[name="email"]',
+        testUsers.reception.email,
+      );
+      await receptionPage.fill(
+        'input[name="password"]',
+        testUsers.reception.password,
+      );
       await receptionPage.locator('button[type="submit"]').click();
       await receptionPage.waitForLoadState("networkidle");
       await expect(receptionPage).toHaveURL(/.*dashboard|reception/);
@@ -52,21 +63,36 @@ test.describe("Botón de Pánico", () => {
     // PASO 4: Residente activa el botón de pánico
     await test.step("Residente activa el botón de pánico", async () => {
       await residentPage.locator('button:has-text("Pánico")').click();
-      await expect(residentPage.locator('text=Alerta de pánico enviada a seguridad.')).toBeVisible();
+      await expect(
+        residentPage.locator("text=Alerta de pánico enviada a seguridad."),
+      ).toBeVisible();
     });
 
     // PASO 5: Personal de seguridad recibe la alerta en tiempo real
     await test.step("Personal de seguridad recibe la alerta", async () => {
-      await receptionPage.waitForSelector('text=Alerta de Pánico Activa', { timeout: 15000 }); // Esperar a que aparezca la alerta
-      await expect(receptionPage.locator('text=Alerta de Pánico Activa')).toBeVisible();
-      await expect(receptionPage.locator('text=Ubicación del residente')).toBeVisible(); // Verificar detalles
+      await receptionPage.waitForSelector("text=Alerta de Pánico Activa", {
+        timeout: 15000,
+      }); // Esperar a que aparezca la alerta
+      await expect(
+        receptionPage.locator("text=Alerta de Pánico Activa"),
+      ).toBeVisible();
+      await expect(
+        receptionPage.locator("text=Ubicación del residente"),
+      ).toBeVisible(); // Verificar detalles
     });
 
     // PASO 6: Personal de seguridad resuelve la alerta
     await test.step("Personal de seguridad resuelve la alerta", async () => {
-      await receptionPage.locator('button:has-text("Resolver")').first().click();
-      await expect(receptionPage.locator('text=Alerta resuelta correctamente.')).toBeVisible();
-      await expect(receptionPage.locator('text=No hay alertas de pánico activas.')).toBeVisible();
+      await receptionPage
+        .locator('button:has-text("Resolver")')
+        .first()
+        .click();
+      await expect(
+        receptionPage.locator("text=Alerta resuelta correctamente."),
+      ).toBeVisible();
+      await expect(
+        receptionPage.locator("text=No hay alertas de pánico activas."),
+      ).toBeVisible();
     });
   });
 });

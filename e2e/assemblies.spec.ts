@@ -16,7 +16,8 @@ const testAssembly = {
   description: "Discusión y aprobación del presupuesto anual.",
   location: "Salón Comunal",
   type: "ORDINARY",
-  agenda: "1. Verificación de Quórum\n2. Lectura y Aprobación de Acta Anterior\n3. Presentación y Aprobación de Presupuesto 2025\n4. Elección de Consejo de Administración\n5. Varios",
+  agenda:
+    "1. Verificación de Quórum\n2. Lectura y Aprobación de Acta Anterior\n3. Presentación y Aprobación de Presupuesto 2025\n4. Elección de Consejo de Administración\n5. Varios",
 };
 
 test.describe("Módulo de Democracia Digital (Asambleas)", () => {
@@ -26,7 +27,9 @@ test.describe("Módulo de Democracia Digital (Asambleas)", () => {
     await page.waitForLoadState("networkidle");
   });
 
-  test("Debe permitir al administrador crear y gestionar una asamblea", async ({ page }) => {
+  test("Debe permitir al administrador crear y gestionar una asamblea", async ({
+    page,
+  }) => {
     // Login como administrador
     await test.step("Login como administrador", async () => {
       await page.goto("/login");
@@ -58,14 +61,18 @@ test.describe("Módulo de Democracia Digital (Asambleas)", () => {
       await page.fill('textarea[name="agenda"]', testAssembly.agenda);
 
       await page.locator('button[type="submit"]').click();
-      await expect(page.locator('text=Asamblea creada exitosamente.')).toBeVisible();
+      await expect(
+        page.locator("text=Asamblea creada exitosamente."),
+      ).toBeVisible();
       await page.waitForURL(/.*assemblies\/\d+\/view/); // Esperar a la página de detalles
-      assemblyId = page.url().split('/').pop().split('/view')[0];
+      assemblyId = page.url().split("/").pop().split("/view")[0];
     });
 
     // Verificar detalles de la asamblea
     await test.step("Verificar detalles de la asamblea", async () => {
-      await expect(page.locator(`h1:has-text("${testAssembly.title}")`)).toBeVisible();
+      await expect(
+        page.locator(`h1:has-text("${testAssembly.title}")`),
+      ).toBeVisible();
       await expect(page.locator(`text=${testAssembly.location}`)).toBeVisible();
     });
 
@@ -77,34 +84,50 @@ test.describe("Módulo de Democracia Digital (Asambleas)", () => {
 
       // Registrar asistencia
       await page.locator('button:has-text("Registrar mi Asistencia")').click();
-      await expect(page.locator('text=Tu asistencia ha sido registrada.')).toBeVisible();
+      await expect(
+        page.locator("text=Tu asistencia ha sido registrada."),
+      ).toBeVisible();
 
       // Iniciar votación
       await page.locator('button:has-text("Iniciar Nueva Votación")').click();
-      await expect(page.locator('text=Se ha iniciado una nueva votación.')).toBeVisible();
-      await expect(page.locator('h3:has-text("¿Aprueba el presupuesto 2025?")')).toBeVisible();
+      await expect(
+        page.locator("text=Se ha iniciado una nueva votación."),
+      ).toBeVisible();
+      await expect(
+        page.locator('h3:has-text("¿Aprueba el presupuesto 2025?")'),
+      ).toBeVisible();
 
       // Votar
       await page.locator('button:has-text("Sí")').click();
-      await expect(page.locator('text=Tu voto ha sido registrado.')).toBeVisible();
+      await expect(
+        page.locator("text=Tu voto ha sido registrado."),
+      ).toBeVisible();
 
       // Ver resultados (si el botón está disponible)
-      const viewResultsButton = page.locator('button:has-text("Ver Resultados")');
+      const viewResultsButton = page.locator(
+        'button:has-text("Ver Resultados")',
+      );
       if (await viewResultsButton.isVisible()) {
         await viewResultsButton.click();
         await expect(page.locator('h4:has-text("Resultados:")')).toBeVisible();
       }
 
       // Generar acta (asume que el admin puede cambiar el estado a 'COMPLETED')
-      const generateMinutesButton = page.locator('button:has-text("Generar Borrador de Acta")');
+      const generateMinutesButton = page.locator(
+        'button:has-text("Generar Borrador de Acta")',
+      );
       if (await generateMinutesButton.isVisible()) {
         await generateMinutesButton.click();
-        await expect(page.locator('text=El borrador del acta ha sido generado.')).toBeVisible();
+        await expect(
+          page.locator("text=El borrador del acta ha sido generado."),
+        ).toBeVisible();
       }
     });
   });
 
-  test("Debe permitir a un residente participar en una asamblea", async ({ page }) => {
+  test("Debe permitir a un residente participar en una asamblea", async ({
+    page,
+  }) => {
     // Precondición: Una asamblea debe estar creada y en progreso
     // Esto se puede hacer a través de la API o un test.beforeAll
 
@@ -135,14 +158,20 @@ test.describe("Módulo de Democracia Digital (Asambleas)", () => {
     // Registrar asistencia
     await test.step("Registrar asistencia", async () => {
       await page.locator('button:has-text("Registrar mi Asistencia")').click();
-      await expect(page.locator('text=Tu asistencia ha sido registrada.')).toBeVisible();
+      await expect(
+        page.locator("text=Tu asistencia ha sido registrada."),
+      ).toBeVisible();
     });
 
     // Participar en votación (asume que hay una votación activa)
     await test.step("Participar en votación", async () => {
-      await expect(page.locator('h3:has-text("¿Aprueba el presupuesto 2025?")')).toBeVisible();
+      await expect(
+        page.locator('h3:has-text("¿Aprueba el presupuesto 2025?")'),
+      ).toBeVisible();
       await page.locator('button:has-text("Sí")').click();
-      await expect(page.locator('text=Tu voto ha sido registrado.')).toBeVisible();
+      await expect(
+        page.locator("text=Tu voto ha sido registrado."),
+      ).toBeVisible();
     });
   });
 });

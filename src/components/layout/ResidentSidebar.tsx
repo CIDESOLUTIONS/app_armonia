@@ -114,6 +114,8 @@ export default function ResidentSidebar({
       ],
     },
     },
+      ],
+    },
     {
       icon: <Coffee className="w-6 h-6" />,
       label: language === "Español" ? "Servicios" : "Services",

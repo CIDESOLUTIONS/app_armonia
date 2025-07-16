@@ -24,7 +24,10 @@ export class InventoryService {
   }
 
   // PROPIEDADES
-  async getProperties(schemaName: string, complexId: number): Promise<PropertyWithDetailsDto[]> {
+  async getProperties(
+    schemaName: string,
+    complexId: number,
+  ): Promise<PropertyWithDetailsDto[]> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const properties = await prisma.property.findMany({
@@ -35,10 +38,10 @@ export class InventoryService {
           },
           residents: {
             select: { id: true },
-            where: { status: "ACTIVE" },
+            where: { status: 'ACTIVE' },
           },
         },
-        orderBy: { unitNumber: "asc" },
+        orderBy: { unitNumber: 'asc' },
       });
 
       return properties.map((property) => ({
@@ -58,8 +61,8 @@ export class InventoryService {
         updatedAt: property.updatedAt,
       }));
     } catch (error) {
-      console.error("[INVENTORY SERVICE] Error obteniendo propiedades:", error);
-      throw new Error("Error obteniendo propiedades");
+      console.error('[INVENTORY SERVICE] Error obteniendo propiedades:', error);
+      throw new Error('Error obteniendo propiedades');
     }
   }
 
@@ -86,12 +89,16 @@ export class InventoryService {
 
       return property;
     } catch (error) {
-      console.error("[INVENTORY SERVICE] Error creando propiedad:", error);
-      throw new Error("Error creando propiedad");
+      console.error('[INVENTORY SERVICE] Error creando propiedad:', error);
+      throw new Error('Error creando propiedad');
     }
   }
 
-  async updateProperty(schemaName: string, id: number, data: UpdatePropertyDto) {
+  async updateProperty(
+    schemaName: string,
+    id: number,
+    data: UpdatePropertyDto,
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const property = await prisma.property.update({
@@ -106,13 +113,17 @@ export class InventoryService {
 
       return property;
     } catch (error) {
-      console.error("[INVENTORY SERVICE] Error actualizando propiedad:", error);
-      throw new Error("Error actualizando propiedad");
+      console.error('[INVENTORY SERVICE] Error actualizando propiedad:', error);
+      throw new Error('Error actualizando propiedad');
     }
   }
 
   // MASCOTAS
-  async getPets(schemaName: string, complexId: number, propertyId?: number): Promise<PetWithDetailsDto[]> {
+  async getPets(
+    schemaName: string,
+    complexId: number,
+    propertyId?: number,
+  ): Promise<PetWithDetailsDto[]> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const whereClause: any = {
@@ -131,7 +142,7 @@ export class InventoryService {
             select: { id: true, name: true },
           },
         },
-        orderBy: { name: "asc" },
+        orderBy: { name: 'asc' },
       });
       return pets.map((pet) => ({
         id: pet.id,
@@ -151,8 +162,8 @@ export class InventoryService {
         createdAt: pet.createdAt,
       }));
     } catch (error) {
-      console.error("[INVENTORY SERVICE] Error obteniendo mascotas:", error);
-      throw new Error("Error obteniendo mascotas");
+      console.error('[INVENTORY SERVICE] Error obteniendo mascotas:', error);
+      throw new Error('Error obteniendo mascotas');
     }
   }
 
@@ -187,13 +198,17 @@ export class InventoryService {
 
       return pet;
     } catch (error) {
-      console.error("[INVENTORY SERVICE] Error creando mascota:", error);
-      throw new Error("Error creando mascota");
+      console.error('[INVENTORY SERVICE] Error creando mascota:', error);
+      throw new Error('Error creando mascota');
     }
   }
 
   // VEHÍCULOS
-  async getVehicles(schemaName: string, complexId: number, propertyId?: number): Promise<VehicleWithDetailsDto[]> {
+  async getVehicles(
+    schemaName: string,
+    complexId: number,
+    propertyId?: number,
+  ): Promise<VehicleWithDetailsDto[]> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const whereClause: any = {
@@ -212,7 +227,7 @@ export class InventoryService {
             select: { id: true, name: true },
           },
         },
-        orderBy: { licensePlate: "asc" },
+        orderBy: { licensePlate: 'asc' },
       });
       return vehicles.map((vehicle) => ({
         id: vehicle.id,
@@ -231,8 +246,8 @@ export class InventoryService {
         createdAt: vehicle.createdAt,
       }));
     } catch (error) {
-      console.error("[INVENTORY SERVICE] Error obteniendo vehículos:", error);
-      throw new Error("Error obteniendo vehículos");
+      console.error('[INVENTORY SERVICE] Error obteniendo vehículos:', error);
+      throw new Error('Error obteniendo vehículos');
     }
   }
 
@@ -264,13 +279,17 @@ export class InventoryService {
 
       return vehicle;
     } catch (error) {
-      console.error("[INVENTORY SERVICE] Error creando vehículo:", error);
-      throw new Error("Error creando vehículo");
+      console.error('[INVENTORY SERVICE] Error creando vehículo:', error);
+      throw new Error('Error creando vehículo');
     }
   }
 
   // RESIDENTES
-  async getResidents(schemaName: string, complexId: number, propertyId?: number) {
+  async getResidents(
+    schemaName: string,
+    complexId: number,
+    propertyId?: number,
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const whereClause: any = {
@@ -292,17 +311,21 @@ export class InventoryService {
             select: { id: true, licensePlate: true, brand: true, model: true },
           },
         },
-        orderBy: { name: "asc" },
+        orderBy: { name: 'asc' },
       });
 
       return residents;
     } catch (error) {
-      console.error("[INVENTORY SERVICE] Error obteniendo residentes:", error);
-      throw new Error("Error obteniendo residentes");
+      console.error('[INVENTORY SERVICE] Error obteniendo residentes:', error);
+      throw new Error('Error obteniendo residentes');
     }
   }
 
-  async updateResident(schemaName: string, id: number, data: UpdateResidentDto) {
+  async updateResident(
+    schemaName: string,
+    id: number,
+    data: UpdateResidentDto,
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const resident = await prisma.resident.update({
@@ -317,8 +340,8 @@ export class InventoryService {
 
       return resident;
     } catch (error) {
-      console.error("[INVENTORY SERVICE] Error actualizando residente:", error);
-      throw new Error("Error actualizando residente");
+      console.error('[INVENTORY SERVICE] Error actualizando residente:', error);
+      throw new Error('Error actualizando residente');
     }
   }
 
@@ -333,13 +356,13 @@ export class InventoryService {
             select: { reservations: true },
           },
         },
-        orderBy: { name: "asc" },
+        orderBy: { name: 'asc' },
       });
 
       return services;
     } catch (error) {
-      console.error("[INVENTORY SERVICE] Error obteniendo servicios:", error);
-      throw new Error("Error obteniendo servicios");
+      console.error('[INVENTORY SERVICE] Error obteniendo servicios:', error);
+      throw new Error('Error obteniendo servicios');
     }
   }
 
@@ -356,11 +379,11 @@ export class InventoryService {
         totalServices,
       ] = await Promise.all([
         prisma.property.count({ where: { complexId } }),
-        prisma.property.count({ where: { complexId, status: "OCCUPIED" } }),
+        prisma.property.count({ where: { complexId, status: 'OCCUPIED' } }),
         prisma.resident.count({
           where: {
             property: { complexId },
-            status: "ACTIVE",
+            status: 'ACTIVE',
           },
         }),
         prisma.pet.count({ where: { property: { complexId } } }),
@@ -405,10 +428,10 @@ export class InventoryService {
       };
     } catch (error) {
       console.error(
-        "[INVENTORY SERVICE] Error obteniendo estadísticas:",
+        '[INVENTORY SERVICE] Error obteniendo estadísticas:',
         error,
       );
-      throw new Error("Error obteniendo estadísticas de inventario");
+      throw new Error('Error obteniendo estadísticas de inventario');
     }
   }
 }

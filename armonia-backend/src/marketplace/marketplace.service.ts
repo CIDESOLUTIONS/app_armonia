@@ -20,14 +20,21 @@ export class MarketplaceService {
     return this.prismaClientManager.getClient(schemaName);
   }
 
-  async createListing(schemaName: string, userId: number, data: CreateListingDto): Promise<ListingDto> {
+  async createListing(
+    schemaName: string,
+    userId: number,
+    data: CreateListingDto,
+  ): Promise<ListingDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     return prisma.listing.create({
       data: { ...data, authorId: userId, status: ListingStatus.ACTIVE },
     });
   }
 
-  async getListings(schemaName: string, filters: ListingFilterParamsDto): Promise<ListingDto[]> {
+  async getListings(
+    schemaName: string,
+    filters: ListingFilterParamsDto,
+  ): Promise<ListingDto[]> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const where: any = { status: ListingStatus.ACTIVE };
 
@@ -68,12 +75,19 @@ export class MarketplaceService {
     return listing;
   }
 
-  async updateListing(schemaName: string, id: number, userId: number, data: UpdateListingDto): Promise<ListingDto> {
+  async updateListing(
+    schemaName: string,
+    id: number,
+    userId: number,
+    data: UpdateListingDto,
+  ): Promise<ListingDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const listing = await prisma.listing.findUnique({ where: { id } });
 
     if (!listing || listing.authorId !== userId) {
-      throw new NotFoundException(`Anuncio con ID ${id} no encontrado o no autorizado.`);
+      throw new NotFoundException(
+        `Anuncio con ID ${id} no encontrado o no autorizado.`,
+      );
     }
 
     return prisma.listing.update({
@@ -82,18 +96,29 @@ export class MarketplaceService {
     });
   }
 
-  async deleteListing(schemaName: string, id: number, userId: number): Promise<void> {
+  async deleteListing(
+    schemaName: string,
+    id: number,
+    userId: number,
+  ): Promise<void> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const listing = await prisma.listing.findUnique({ where: { id } });
 
     if (!listing || listing.authorId !== userId) {
-      throw new NotFoundException(`Anuncio con ID ${id} no encontrado o no autorizado.`);
+      throw new NotFoundException(
+        `Anuncio con ID ${id} no encontrado o no autorizado.`,
+      );
     }
 
     await prisma.listing.delete({ where: { id } });
   }
 
-  async reportListing(schemaName: string, listingId: number, reporterId: number, reason: string): Promise<any> {
+  async reportListing(
+    schemaName: string,
+    listingId: number,
+    reporterId: number,
+    reason: string,
+  ): Promise<any> {
     const prisma = this.getTenantPrismaClient(schemaName);
     return prisma.reportedListing.create({
       data: {
@@ -109,13 +134,22 @@ export class MarketplaceService {
     const prisma = this.getTenantPrismaClient(schemaName);
     return prisma.reportedListing.findMany({
       where: { status: 'PENDING' },
-      include: { listing: { include: { author: { select: { name: true } } } }, reporter: { select: { name: true } } },
+      include: {
+        listing: { include: { author: { select: { name: true } } } },
+        reporter: { select: { name: true } },
+      },
     });
   }
 
-  async resolveReport(schemaName: string, reportId: number, action: 'APPROVE' | 'REJECT'): Promise<any> {
+  async resolveReport(
+    schemaName: string,
+    reportId: number,
+    action: 'APPROVE' | 'REJECT',
+  ): Promise<any> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    const report = await prisma.reportedListing.findUnique({ where: { id: reportId } });
+    const report = await prisma.reportedListing.findUnique({
+      where: { id: reportId },
+    });
 
     if (!report) {
       throw new NotFoundException(`Reporte con ID ${reportId} no encontrado.`);
@@ -134,6 +168,43 @@ export class MarketplaceService {
       });
     }
 
-    return { message: `Reporte ${action === 'APPROVE' ? 'aprobado' : 'rechazado'} correctamente.` };
+    return {
+      message: `Reporte ${action === 'APPROVE' ? 'aprobado' : 'rechazado'} correctamente.`,
+    };
+  }
+
+  async createMessage(
+    schemaName: string,
+    data: {
+      listingId: number;
+      senderId: number;
+      receiverId: number;
+      content: string;
+    },
+  ): Promise<any> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    return prisma.message.create({
+      data: {
+        listingId: data.listingId,
+        senderId: data.senderId,
+        receiverId: data.receiverId,
+        content: data.content,
+      },
+    });
+  }
+
+  async getMessages(
+    schemaName: string,
+    listingId: number,
+    userId: number,
+  ): Promise<any[]> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    return prisma.message.findMany({
+      where: {
+        listingId: listingId,
+        OR: [{ senderId: userId }, { receiverId: userId }],
+      },
+      orderBy: { createdAt: 'asc' },
+    });
   }
 }

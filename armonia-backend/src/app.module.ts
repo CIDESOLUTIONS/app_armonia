@@ -14,6 +14,7 @@ import { ProjectsModule } from './projects/projects.module';
 import { SecurityModule } from './security/security.module';
 import { PlansModule } from './plans/plans.module';
 import { BankReconciliationModule } from './bank-reconciliation/bank-reconciliation.module';
+import { DocumentsModule } from './documents/documents.module';
 
 @Module({
   imports: [
@@ -30,11 +31,18 @@ import { BankReconciliationModule } from './bank-reconciliation/bank-reconciliat
     SecurityModule,
     PlansModule,
     BankReconciliationModule,
+    DocumentsModule,
+    VisitorsModule,
+    PackagesModule,
+    SurveysModule,
+    ServiceProvidersModule,
+    FintechModule,
+    IotModule,
     PortfolioModule,
     MarketplaceModule,
     AssemblyModule,
     PanicModule,
-  ],,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

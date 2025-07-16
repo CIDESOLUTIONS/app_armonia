@@ -7,14 +7,22 @@ import { Loader2, PlusCircle, Search } from "lucide-react";
 import { getListings } from "@/services/marketplaceService";
 import { ListingCard } from "@/components/marketplace/ListingCard";
 import Link from "next/link";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ListingCategory } from "@/common/dto/marketplace.dto";
 
 export default function MarketplacePage() {
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<ListingCategory | "">("");
+  const [selectedCategory, setSelectedCategory] = useState<
+    ListingCategory | ""
+  >("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
@@ -63,7 +71,9 @@ export default function MarketplacePage() {
           />
         </div>
         <Select
-          onValueChange={(value: ListingCategory | "") => setSelectedCategory(value)}
+          onValueChange={(value: ListingCategory | "") =>
+            setSelectedCategory(value)
+          }
           value={selectedCategory}
         >
           <SelectTrigger className="w-full">
@@ -73,7 +83,8 @@ export default function MarketplacePage() {
             <SelectItem value="">Todas las Categorías</SelectItem>
             {Object.values(ListingCategory).map((category) => (
               <SelectItem key={category} value={category}>
-                {category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()}
+                {category.charAt(0).toUpperCase() +
+                  category.slice(1).toLowerCase()}
               </SelectItem>
             ))}
           </SelectContent>
@@ -112,4 +123,3 @@ export default function MarketplacePage() {
     </div>
   );
 }
-

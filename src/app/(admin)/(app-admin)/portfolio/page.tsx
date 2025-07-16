@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Users, BarChart, Building } from "lucide-react";
-import { getPortfolioMetrics, getComplexMetrics } from "@/services/portfolioService";
+import {
+  getPortfolioMetrics,
+  getComplexMetrics,
+} from "@/services/portfolioService";
 import { Loader2 } from "lucide-react";
 
 export default function PortfolioDashboardPage() {
@@ -51,7 +54,9 @@ export default function PortfolioDashboardPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${portfolioMetrics?.totalIncome?.toFixed(2) || '0.00'}</div>
+            <div className="text-2xl font-bold">
+              ${portfolioMetrics?.totalIncome?.toFixed(2) || "0.00"}
+            </div>
             <p className="text-xs text-muted-foreground">
               Monto total de ingresos en el portafolio
             </p>
@@ -65,7 +70,9 @@ export default function PortfolioDashboardPage() {
             <Building className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{portfolioMetrics?.totalProperties || 0}</div>
+            <div className="text-2xl font-bold">
+              {portfolioMetrics?.totalProperties || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               Número total de conjuntos administrados
             </p>
@@ -79,7 +86,9 @@ export default function PortfolioDashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{portfolioMetrics?.totalResidents || 0}</div>
+            <div className="text-2xl font-bold">
+              {portfolioMetrics?.totalResidents || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               Número total de residentes en el portafolio
             </p>
@@ -93,7 +102,9 @@ export default function PortfolioDashboardPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${portfolioMetrics?.totalPendingFees?.toFixed(2) || '0.00'}</div>
+            <div className="text-2xl font-bold">
+              ${portfolioMetrics?.totalPendingFees?.toFixed(2) || "0.00"}
+            </div>
             <p className="text-xs text-muted-foreground">
               Monto total de cuotas pendientes en el portafolio
             </p>
@@ -101,7 +112,9 @@ export default function PortfolioDashboardPage() {
         </Card>
       </div>
 
-      <h3 className="text-2xl font-bold tracking-tight mt-8 mb-4">Métricas por Conjunto</h3>
+      <h3 className="text-2xl font-bold tracking-tight mt-8 mb-4">
+        Métricas por Conjunto
+      </h3>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {complexMetrics.map((complex) => (
           <Card key={complex.id}>
@@ -112,8 +125,10 @@ export default function PortfolioDashboardPage() {
             </CardHeader>
             <CardContent>
               <p>Residentes: {complex.residents}</p>
-              <p>Cuotas Pendientes: ${complex.pendingFees?.toFixed(2) || '0.00'}</p>
-              <p>Ingresos: ${complex.income?.toFixed(2) || '0.00'}</p>
+              <p>
+                Cuotas Pendientes: ${complex.pendingFees?.toFixed(2) || "0.00"}
+              </p>
+              <p>Ingresos: ${complex.income?.toFixed(2) || "0.00"}</p>
             </CardContent>
           </Card>
         ))}

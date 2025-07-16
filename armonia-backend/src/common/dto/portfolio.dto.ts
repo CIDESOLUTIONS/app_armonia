@@ -1,4 +1,3 @@
-
 export class PortfolioMetricDto {
   totalProperties: number;
   totalResidents: number;

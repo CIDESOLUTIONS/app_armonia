@@ -29,9 +29,10 @@ interface UpdateResidentData {
   isActive?: boolean;
 }
 
-export async function getResidents(): Promise<Resident[]> {
+export async function getResidents(searchTerm?: string): Promise<Resident[]> {
   try {
-    const response = await fetchApi("/inventory/residents");
+    const query = searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : "";
+    const response = await fetchApi(`/inventory/residents${query}`);
     return response;
   } catch (error) {
     console.error("Error fetching residents:", error);

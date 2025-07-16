@@ -14,13 +14,21 @@ export class BankReconciliationService {
     return this.prismaClientManager.getClient(schemaName);
   }
 
-  async processBankStatement(schemaName: string, fileBuffer: Buffer, mimetype: string, complexId: number) {
+  async processBankStatement(
+    schemaName: string,
+    fileBuffer: Buffer,
+    mimetype: string,
+    complexId: number,
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     let workbook;
 
     if (mimetype === 'text/csv') {
       workbook = XLSX.read(fileBuffer.toString('utf8'), { type: 'string' });
-    } else if (mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+    } else if (
+      mimetype ===
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ) {
       workbook = XLSX.read(fileBuffer, { type: 'buffer' });
     } else {
       throw new Error('Unsupported file type');

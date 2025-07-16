@@ -1,10 +1,15 @@
 import { fetchApi } from "@/lib/api";
-import { CreatePanicAlertDto, UpdatePanicAlertDto } from "@/common/dto/panic.dto";
+import {
+  CreatePanicAlertDto,
+  UpdatePanicAlertDto,
+} from "@/common/dto/panic.dto";
 
-export async function createPanicAlert(data: CreatePanicAlertDto): Promise<any> {
+export async function createPanicAlert(
+  data: CreatePanicAlertDto,
+): Promise<any> {
   try {
     const response = await fetchApi("/panic/alert", {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(data),
     });
     return response;
@@ -24,10 +29,13 @@ export async function getActivePanicAlerts(): Promise<any[]> {
   }
 }
 
-export async function updatePanicAlertStatus(id: number, data: UpdatePanicAlertDto): Promise<any> {
+export async function updatePanicAlertStatus(
+  id: number,
+  data: UpdatePanicAlertDto,
+): Promise<any> {
   try {
     const response = await fetchApi(`/panic/alert/${id}/status`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(data),
     });
     return response;
