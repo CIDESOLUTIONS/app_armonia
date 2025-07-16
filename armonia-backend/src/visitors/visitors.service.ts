@@ -7,6 +7,7 @@ import {
   VisitorDto,
   VisitorFilterParamsDto,
   VisitorStatus,
+  DocumentType as VisitorDocumentType, // Importar DocumentType como VisitorDocumentType
 } from '../common/dto/visitors.dto';
 
 @Injectable()
@@ -71,8 +72,8 @@ export class VisitorsService {
 
     return prisma.visitor.findMany({
       where,
-      skip: (filters.page - 1) * filters.limit || 0,
-      take: filters.limit || 10,
+      skip: ((filters.page ?? 1) - 1) * (filters.limit ?? 10), // Usar ??
+      take: filters.limit ?? 10, // Usar ??
       orderBy: { entryTime: 'desc' },
     });
   }
