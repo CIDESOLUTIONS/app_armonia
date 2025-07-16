@@ -493,93 +493,244 @@ plan de acción para las pruebas será el siguiente:
 
 
 Con análisis de mercado
-Interacciones solo en español. Actúas como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas (Clean Code, SOLID, TDD, CI/CD, etc.). Estás ubicado en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales se encuentran en la carpeta docs. Tu tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto. A partir de esa comparación, debes generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre lo especificado y lo implementado, identificación de funcionalidades faltantes, incompletas o que deban ajustarse. Evalúa especialmente que cumpla con estrictamente con el stack tecnológico del frontend (Next.js, React, TypeScript, Prisma, shadcn/ui, zustand) y backend (NestJS) y verifica desde el acceso a la landing page (clave para conversión) hasta todos los portales (Administrador del conjunto residencial, Residentes, Recepción/Vigilancia y la Consola de Administración de la aplicación), evalúa la adopción del modelo de negocio incluyendo el plan empresarial, y el uso del modulo de democracia digital para que pueda ser integrado o independiente. Evalúa si se están aplicando estándares modernos de calidad, accesibilidad, rendimiento, seguridad y mantenibilidad. Si se detectan problemas, sugiere correcciones o mejoras específicas. Verifica si es conveniente, eliminar dependencias o funciones innecesarias, optimizar estructuras o reorganizar la arquitectura para mejorar eficiencia.si se requiere desarrollar desde cero respeta el estilo del proyecto. Evita proponer múltiples alternativas para una misma solución salvo que se indique lo contrario. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones en docs/, resume sus puntos clave y procede paso a paso siguiendo este flujo.
+Interacciones solo en español. Actúas como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas (Clean Code, SOLID, TDD, CI/CD, etc.). Estás ubicado en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales se encuentran en la carpeta docs. Tu tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto. A partir de esa comparación, debes generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre lo especificado y lo implementado, identificación de funcionalidades faltantes, incompletas o que deban ajustarse. Evalúa especialmente que cumpla con estrictamente con el stack tecnológico del frontend (Next.js, React, TypeScript, Prisma, shadcn/ui, zustand) y backend (NestJS) y verifica desde el acceso a la landing page (clave para conversión) hasta todos los portales (Administrador del conjunto residencial, Residentes, Recepción/Vigilancia y la Consola de Administración de la aplicación), evalúa la adopción del modelo de negocio incluyendo el plan empresarial, y el uso del modulo de democracia digital para que pueda ser integrado o independiente. Evalúa si se están aplicando estándares modernos de calidad, accesibilidad, rendimiento, seguridad y mantenibilidad. Si se detectan problemas, sugiere correcciones o mejoras específicas. Verifica si es conveniente, eliminar dependencias o funciones innecesarias, optimizar estructuras para mejorar eficiencia.si se requiere desarrollar desde cero respeta el estilo del proyecto. Evita proponer múltiples alternativas para una misma solución salvo que se indique lo contrario. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto al 100%. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones en docs/, resume sus puntos clave y procede paso a paso siguiendo este flujo.
+
+ Conclusión de la Auditoría:
+
+  La auditoría ha revelado un proyecto con una buena base técnica y una estructura modular, pero con varias funcionalidades incompletas o
+  ausentes según las especificaciones, y áreas de mejora en la calidad del código y la configuración de CI/CD.
+
+  Informe Resumen de la Auditoría:
+
+  1. Resumen Funcional:
+   * Landing Page: Bien estructurada, pero la internacionalización de idiomas está incompleta.
+   * Flujos de Autenticación: Login, registro, recuperación y restablecimiento de contraseña están presentes. El login y restablecimiento usan
+     react-hook-form y zod, pero el registro y recuperación no, lo que genera inconsistencia y falta de validación robusta.
+   * Panel Administrador de la Aplicación: Dashboard con KPIs estáticos. Faltan módulos clave como gestión de licencias, soporte y gestión
+     comercial.
+   * Portal Empresarial "Armonía Portafolio": Dashboard con métricas dinámicas. Faltan KPIs específicos, navegación centralizada entre
+     propiedades, informes consolidados y personalización de marca.
+   * Módulo de Inventario (Admin): Estructura completa con sub-módulos. Necesita clarificación en "Amenidades" y "Activos Comunes", y
+     definición de "Complex Setup".
+   * Módulo de Comunicaciones (Admin):
+       * Anuncios: Gestión completa (CRUD) pero sin validación robusta de formulario y con confirm() nativo.
+       * Notificaciones: Envío de notificaciones con selección de destinatarios, pero sin validación robusta de formulario y sin diferenciación
+         clara entre push y email masivo. La selección de destinatarios por ID es poco amigable.
+       * Eventos Comunitarios: Gestión completa (CRUD) pero sin validación robusta de formulario. El módulo de encuestas y votaciones simples
+         está ausente.
+       * Documentos: El repositorio central de documentos está ausente.
+   * Sistema de PQR (Admin/Residente):
+       * Listado: Funcional con filtros, pero sin paginación/ordenamiento y con mensajes de error genéricos.
+       * Creación: Utiliza react-hook-form y zod (buena práctica), pero la categoría es texto libre y falta la asignación inicial.
+       * Detalle/Edición: Permite ver y gestionar PQR, comentarios, cambio de estado y asignación. Falta usar AlertDialog para eliminación y
+         mejorar mensajes de error.
+   * Módulo de Reservas (Admin): Listado y gestión de estado/eliminación. Falta la creación de reservas por el admin, un calendario visual y la
+     aplicación de reglas de uso. URL de detalle incorrecta.
+   * Portal de Residentes:
+       * Dashboard: KPIs dinámicos, gráfico de gastos, cuotas pendientes, próximas reservas, acciones rápidas y botón de pánico. La gestión de
+         presupuesto familiar está incompleta. La ubicación del pánico es estática.
+       * Marketplace Comunitario: Listado, búsqueda y filtrado de anuncios. Falta la subida de fotografías, sistema de mensajería interna,
+         moderación y sección "Mis Anuncios".
+       * Directorio de Residentes: Implementado, pero las especificaciones pedían un "Directorio de Servicios para el Hogar" (proveedores).
+
+  2. Resumen Técnico y de Estilo:
+   * Stack Tecnológico: Next.js, React, TypeScript, Shadcn/UI, Zustand, Socket.IO, Prisma, NestJS, PostgreSQL. El stack se está utilizando,
+     pero hay inconsistencias en la aplicación de herramientas como react-hook-form y zod.
+   * Modularización: Buena estructura de directorios y componentes.
+   * Manejo de Estado: Uso de Zustand para el estado global.
+   * Comunicación con API: Uso de servicios para interactuar con el backend.
+   * Internacionalización: Presente, pero no aplicada consistentemente en toda la UI.
+   * Manejo de Errores: Uso de useToast para feedback, pero los mensajes de error son a menudo genéricos.
+   * CI/CD: Flujos de trabajo para backup de código y despliegue. Falta backup de base de datos, pruebas completas en el pipeline de
+     despliegue, rollbacks automatizados y despliegue explícito de backend.
+   * Seguridad: Uso de .env para variables sensibles, pero algunos placeholders persisten.
+
+  3. Identificación de Funcionalidades Faltantes, Incompletas o que Deban Ajustarse:
+
+   * Funcionalidades Críticas Faltantes:
+       * Módulo Financiero (Admin): Generación de cuotas, gestión de multas/intereses, integración con pasarelas de pago, gestión de
+         presupuesto anual, generación de informes financieros (más allá de la conciliación bancaria).
+       * Módulo de Comunicaciones (Admin): Módulo de encuestas y votaciones simples, Repositorio central de documentos.
+       * Marketplace Comunitario (Residente): Subida de fotografías, sistema de mensajería interna, moderación, sección "Mis Anuncios".
+       * Portal de Seguridad y Recepción: Interfaz para registro de novedades/incidentes, gestión de atención de botón de pánico, escaneo de
+         QR para visitantes, registro de recepción/entrega de paquetería.
+       * Módulo de Ecosistema y Alianzas: Implementación del "Directorio de Servicios para el Hogar" (proveedores), Alianzas FinTech,
+         Integración con Medidores Inteligentes (IoT).
+       * Módulo de Democracia Digital (Asambleas): Plataforma para asambleas virtuales/híbridas, registro de asistencia y quórum en tiempo
+         real, sistema de votaciones ponderadas, generación automática de borrador de acta.
+
+   * Funcionalidades Incompletas/Necesitan Ajustes:
+       * Landing Page: Internacionalización de idiomas.
+       * Flujos de Autenticación: Consistencia en el uso de react-hook-form y zod en todos los formularios.
+       * Panel Administrador de la Aplicación: KPIs dinámicos, módulos faltantes.
+       * Portal Empresarial "Armonía Portafolio": KPIs específicos, navegación centralizada, informes consolidados, personalización de marca.
+       * Módulo de Inventario (Admin): Clarificación de "Amenidades" y "Activos Comunes", definición de "Complex Setup".
+       * Módulo de Comunicaciones (Anuncios/Notificaciones/Eventos): Validación robusta de formularios, uso consistente de AlertDialog, mejora
+         en la selección de destinatarios.
+       * Sistema de PQR: Paginación/ordenamiento en listado, categoría como select, asignación en creación/edición, internacionalización de
+         estados/prioridades.
+       * Módulo de Reservas (Admin): Creación de reservas por admin, calendario visual, reglas de uso, URL de detalle correcta,
+         paginación/filtrado/ordenamiento.
+       * Portal de Residentes (Dashboard): Gestión de presupuesto familiar, ubicación dinámica para pánico, formato de moneda dinámico, enlace
+         a PQRs, funcionalidad de notificaciones.
+       * Calidad de Código: Errores de linting, uso excesivo de any, variables no utilizadas, inconsistencias en importaciones.
+       * CI/CD: Falta de pruebas completas en el pipeline de despliegue, rollbacks automatizados, despliegue explícito de backend, gestión de
+         migraciones de DB.
+       * Seguridad: Revisión de fetchApi y manejo de credenciales en secretos.
 
  
-Informe de Auditoría del Proyecto "Armonía"
-
-  1. Resumen Ejecutivo:
-
-  El proyecto "Armonía" posee una base arquitectónica y tecnológica sólida y moderna, alineada en gran medida con las especificaciones. El
-  uso de Next.js, NestJS, TypeScript y Prisma, junto con una estructura de proyecto bien organizada, demuestra un alto nivel de competencia
-  técnica. Sin embargo, la auditoría ha revelado deficiencias críticas en la implementación de funcionalidades clave que son vitales para el
-  modelo de negocio y la propuesta de valor de la aplicación. Cuatro de las funcionalidades más importantes están incompletas, no
-  implementadas o existen solo como marcadores de posición. Además, la cobertura de pruebas unitarias es prácticamente inexistente, lo que
-  representa un riesgo significativo para la estabilidad y mantenibilidad a largo plazo del proyecto.
-
-  2. Análisis Funcional, Técnico y de Estilo:
-
-   * Funcional: La aplicación cuenta con una landing page de alta calidad y un flujo de autenticación robusto. Sin embargo, las funcionalidades
-      principales que diferencian los planes de pago y fomentan la interacción del usuario (Conciliación Bancaria, Marketplace, Democracia
-     Digital, Portal Empresarial) están rotas o incompletas.
-   * Técnico: El stack tecnológico es el correcto. La arquitectura multi-tenant y la separación entre frontend y backend son adecuadas. El
-     principal problema técnico es la discrepancia entre el frontend y el backend: el frontend intenta consumir APIs que no existen.
-   * Estilo: El código existente es limpio, legible y sigue buenas prácticas (Clean Code, SOLID). La estructura de carpetas es semántica y
-     mantenible.
-
-  3. Lista de Desviaciones y Funcionalidades Faltantes:
 
 
-  ┌─────────────────────────┬─────────────────┬───────────────────────────────────────────────────────────────────────┬───────────┐
-  │ Módulo/Funcionalidad    │ Estado Actual   │ Desviación/Problema                                                   │ Prioridad │
-  ├─────────────────────────┼─────────────────┼───────────────────────────────────────────────────────────────────────┼───────────┤
-  │ Conciliación Bancaria   │ Incompleto      │ Falta el endpoint y la lógica en el backend.                          │ MUY ALTA  │
-  │ Portal Empresarial      │ No Implementado │ Funcionalidad clave para ingresos B2B no existe.                      │ MUY ALTA  │
-  │ Marketplace Comunitario │ Incompleto      │ Falta el backend. Faltan búsqueda, filtros y reportes en el frontend. │ ALTA      │
-  │ Democracia Digital      │ Incompleto      │ Funcionalidades clave (quórum, votación) son placeholders.            │ ALTA      │
-  │ Pruebas Unitarias       │ Inexistentes    │ Cobertura de pruebas unitarias es cercana al 0%.                      │ ALTA      │
-  │ Pruebas E2E             │ Parcial         │ No cubren las funcionalidades críticas faltantes.                     │ MEDIA     │
-  │ Datos Dinámicos (Admin) │ Incompleto      │ El dashboard de admin global usa datos estáticos.                     │ MEDIA     │
-  └─────────────────────────┴─────────────────┴───────────────────────────────────────────────────────────────────────┴───────────┘
+ Plan de Trabajo Detallado (Priorizado por Dependencias y Criticidad):
 
-  4. Plan de Acción Detallado y Priorizado:
+  Este plan se centrará en completar las funcionalidades críticas y mejorar la calidad del código para un despliegue exitoso.
 
-  El siguiente plan de acción está diseñado para abordar las deficiencias críticas y alinear el proyecto con las especificaciones. Las
-  tareas se deben ejecutar en el orden presentado.
+  Fase 1: Estabilización y Funcionalidades Críticas (Frontend y Backend)
 
-  Fase 1: Implementación de Funcionalidades Críticas (Backend)
+   1. Corrección de Errores de Linting y Configuración de Entorno: (pend)
+       * Tarea: Resolver todos los errores de análisis sintáctico y los errores relacionados con module en el frontend y backend.
+       * Prioridad: Crítica (bloquea el desarrollo y la compilación).
+       * Dependencia: Ninguna.
+       * Estimación: 1 día.
+       * Nota: Esto incluye la revisión de eslint.config.mjs y la eliminación de cualquier configuración problemática.
 
-   1. Desarrollar Backend del Portal Empresarial:
-       * Crear módulo, controlador y servicio en NestJS.
-       * Implementar endpoints para KPIs y reportes consolidados.
-   2. Desarrollar Backend de Conciliación Bancaria:
-       * Crear el endpoint para la subida de archivos.
-       * Implementar la lógica de análisis de extractos y sugerencias de conciliación.
-   3. Desarrollar Backend del Marketplace:
-       * Crear un módulo completo en NestJS para gestionar los anuncios (CRUD, reportes, moderación).
-   4. Desarrollar Backend de Democracia Digital:
-       * Implementar el AssemblyGateway con socket.io.
-       * Desarrollar la lógica para quórum, votaciones y actas en tiempo real.
+   2. Implementación de `react-hook-form` y `zod` en Formularios Inconsistentes: (ok)
+       * Tarea: Refactorizar RegisterForm.tsx, CreateAssemblyPage.tsx, EditAssemblyPage.tsx, NotificationsPage.tsx, CreateListingPage.tsx para
+         usar react-hook-form y zod para la validación y gestión de formularios.
+       * Prioridad: Alta (mejora la calidad del código, reduce errores, mejora la UX).
+       * Dependencia: Corrección de errores de linting.
+       * Estimación: 3 días.
 
-  Fase 2: Completar Funcionalidades (Frontend)
+   3. Implementación de Funcionalidades Críticas del Módulo Financiero (Frontend y Backend): (ok)
+       * Tarea (Frontend): Completar src/app/(admin)/(complex-admin)/finances/page.tsx para incluir la generación de cuotas, gestión de multas/intereses, integración con pasarelas de pago y generación de informes financieros.
+       * Tarea (Backend): Desarrollar los endpoints de NestJS para soportar estas funcionalidades, incluyendo la lógica de negocio y la integración con Prisma.
+       * Prioridad: Crítica (funcionalidad central del negocio).
+       * Dependencia: Backend.
+       * Estimación: 5 días.
 
-   5. Conectar Frontend a los Nuevos Endpoints:
-       * Ajustar los servicios del frontend (financeService, etc.) para que apunten a las nuevas APIs.
-   6. Completar UI del Marketplace:
-       * Añadir búsqueda, filtros y botón de reporte.
-       * Implementar el chat.
-   7. Completar UI de Democracia Digital:
-       * Reemplazar los placeholders con los componentes interactivos conectados al Gateway.
-   8. Desarrollar UI del Portal Empresarial:
-       * Crear el nuevo dashboard multi-propiedad.
+   4. Implementación del Repositorio Central de Documentos (Frontend y Backend): (ok)
+       * Tarea (Frontend): Crear src/app/(admin)/(complex-admin)/communications/documents con interfaz para subir, listar, visualizar y descargar documentos.
+       * Tarea (Backend): Desarrollar los endpoints de NestJS para la gestión de documentos y la integración con un servicio de almacenamiento
+         (ej. AWS S3).
+       * Prioridad: Alta.
+       * Dependencia: Backend, AWS S3 (si aplica).
+       * Estimación: 4 días.
 
-  Fase 3: Calidad y Pruebas
+   5. Implementación de Subida de Fotografías en Marketplace (Frontend y Backend): (ok)
+       * Tarea (Frontend): Añadir componente de subida de imágenes a CreateListingPage.tsx.
+       * Tarea (Backend): Desarrollar los endpoints de NestJS para manejar la subida de imágenes y el almacenamiento (ej. AWS S3).
+       * Prioridad: Alta.
+       * Dependencia: Backend, AWS S3.
+       * Estimación: 3 días.
 
-   9. Escribir Pruebas Unitarias (Backend y Frontend):
-       * Crear pruebas unitarias con Jest para todos los servicios, controladores, componentes y hooks nuevos y existentes. Apuntar a una
-         cobertura > 80%.
-   10. Actualizar y Crear Pruebas E2E (Playwright):
-       * Crear pruebas E2E para todas las funcionalidades nuevas (Portal Empresarial, Marketplace, etc.).
-       * Asegurarse de que todas las pruebas existentes pasen.
-   11. Ejecución Masiva de Pruebas:
-       * Correr todos los tests (unitarios y E2E) para garantizar la estabilidad total de la aplicación.
+   6. Implementación del Sistema de Mensajería Interna en Marketplace (Frontend y Backend): (ok)
+       * Tarea (Frontend): Integrar la interfaz de chat en src/app/(resident)/(resident)/marketplace/chat/[listingId]/page.tsx con la
+         visualización de mensajes y envío.
+       * Tarea (Backend): Desarrollar los endpoints de NestJS para la gestión de mensajes y la integración con Socket.IO.
+       * Prioridad: Alta.
+       * Dependencia: Backend, Socket.IO.
+       * Estimación: 4 días.
 
-  Fase 4: Preparación para Producción
+   7. Implementación de Gestión Avanzada de Visitantes y Paquetería (Frontend y Backend): (ok)
+       * Tarea (Frontend): Desarrollar interfaz para registro de novedades/incidentes, escaneo de QR para visitantes, registro de recepción/entrega de paquetería en el Portal de Seguridad y Recepción.
+       * Tarea (Backend): Desarrollar los endpoints de NestJS para soportar estas funcionalidades.
+       * Prioridad: Alta.
+       * Dependencia: Backend.
+       * Estimación: 5 días.
 
-   12. Conectar Datos Dinámicos:
-       * Reemplazar todos los datos estáticos y TODOs con llamadas a la API.
-   13. Build de Producción y Verificación:
-       * Ejecutar npm run build y solucionar cualquier error.
-       * Realizar una última ronda de pruebas manuales en el build de producción.
-   14. Análisis de Rendimiento:
-       * Utilizar Lighthouse para identificar y corregir cuellos de botella.
+  Fase 2: Mejora de Funcionalidades Existentes y Calidad (Frontend y Backend) (ok)del 
+
+   1. Mejora de Internacionalización:
+       * Tarea: Aplicar useTranslations consistentemente en todos los componentes y traducir textos hardcodeados.
+       * Prioridad: Media.
+       * Dependencia: Ninguna.
+       * Estimación: 2 días.
+
+   2. Optimización de Listados (Paginación, Filtrado, Ordenamiento): (ok)
+       * Tarea: Implementar paginación, filtrado y ordenamiento en las tablas de listado de PQRs, Reservas y Marketplace.
+       * Prioridad: Media.
+       * Dependencia: Backend (endpoints deben soportar estos parámetros).
+       * Estimación: 3 días.
+
+   3. Mejora de Mensajes de Error:
+       * Tarea: Asegurar que los servicios de frontend y los endpoints de backend devuelvan mensajes de error más específicos y amigables para el usuario.
+       * Prioridad: Media.
+       * Dependencia: Backend.
+       * Estimación: 2 días.
+
+   4. Implementación de "Directorio de Servicios para el Hogar" (Proveedores): (ok)
+       * Tarea (Frontend): Crear la interfaz para listar proveedores, perfiles, calificaciones y reseñas.
+       * Tarea (Backend): Desarrollar los endpoints de NestJS para la gestión de proveedores.
+       * Prioridad: Media.
+       * Dependencia: Backend.
+       * Estimación: 4 días.
+
+   5. Implementación de Alianzas FinTech e Integración IoT (Frontend y Backend): (ok)
+       * Tarea (Frontend): Desarrollar la interfaz para micro-créditos y visualización de datos de medidores inteligentes.
+       * Tarea (Backend): Desarrollar los endpoints de NestJS para estas integraciones.
+       * Prioridad: Media.
+       * Dependencia: Backend, APIs de terceros.
+       * Estimación: 5 días.
+
+   6. Implementación de Funcionalidades Avanzadas de Asambleas (Democracia Digital): (ok)
+       * Tarea (Frontend): Desarrollar interfaz para registro de asistencia y quórum en tiempo real, sistema de votaciones ponderadas, y
+         generación de borrador de acta.
+       * Tarea (Backend): Desarrollar la lógica de NestJS para estas funcionalidades, incluyendo la ponderación de votos.
+       * Prioridad: Alta.
+       * Dependencia: Backend, Socket.IO.
+       * Estimación: 7 días.
+
+  Fase 3: Pruebas y Despliegue
+
+   1. Desarrollo de Pruebas Unitarias:
+       * Tarea: Escribir pruebas unitarias con Jest/RTL para componentes y servicios críticos del frontend.
+       * Prioridad: Alta.
+       * Dependencia: Funcionalidades completas.
+       * Estimación: 5 días.
+
+   2. Desarrollo y Actualización de Pruebas E2E:
+       * Tarea: Crear nuevas pruebas E2E con Playwright para las funcionalidades recién implementadas y actualizar las existentes.
+       * Prioridad: Alta.
+       * Dependencia: Funcionalidades completas.
+       * Estimación: 7 días.
+
+   3. Configuración Completa de CI/CD:
+       * Tarea:
+           * Añadir backup de base de datos al flujo de trabajo daily-backup.yml.
+           * Integrar la ejecución de pruebas unitarias y E2E en el deploy.yml antes del despliegue.
+           * Implementar lógica de rollback automatizado en deploy.yml.
+           * Asegurar el despliegue explícito de frontend y backend.
+           * Configurar migraciones de DB en el pipeline.
+           * Mover credenciales a secretos de GitHub.
+       * Prioridad: Crítica.
+       * Dependencia: Pruebas completas.
+       * Estimación: 3 días.
+
+   4. Optimización de Rendimiento:
+       * Tarea: Analizar el rendimiento con Lighthouse y aplicar optimizaciones (lazy loading, optimización de imágenes, etc.).
+       * Prioridad: Media.
+       * Dependencia: Aplicación funcional y estable.
+       * Estimación: 3 días.
+
+   5. Preparación Final para Producción:
+       * Tarea: Reemplazar todos los placeholders en .env.production con valores reales y seguros.
+       * Prioridad: Crítica.
+       * Dependencia: Ninguna.
+       * Estimación: 1 día.
+
+  Total Estimado: Aproximadamente 46 días de trabajo de desarrollo y auditoría. 
+
+
+Exiten varios schemas prisma en el directorio /aap-armonia/prisma/ diferentes al principal (schema.prisma), se deben validar que estén en el backend y borrarlos para que no generen confusion y errores.  (schema_assembly.prisma; schema_cameras.prisma, schema_communications.prisma, etc.)
+
+
+   * schema_updates.prisma
+   * schema_security.prisma
+   * schema_reservations.prisma
+   * schema_pqr_advanced.prisma
+   * schema_payments.prisma
+   * schema_monitoring.prisma
+   * schema_intercom.prisma
+   * schema_communications.prisma
+   * schema_cameras.prisma
+
