@@ -1,99 +1,67 @@
 // Esquema para el Sistema de Citofonía Virtual
-
-datasource db {
-  provider   = "postgresql"
-  url        = env("DATABASE_URL")
-}
-
-generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["multiSchema"]
-}
+// Este archivo define los modelos de datos para la integración con WhatsApp y Telegram
+// para notificaciones de visitantes y control de accesos
 
 // Enumeraciones para el sistema de citofonía virtual
 enum VisitStatus {
-  PENDING
-  NOTIFIED
-  APPROVED
-  REJECTED
-  IN_PROGRESS
-  COMPLETED
-  CANCELLED
-}
-
-enum NotificationChannel {
-  WHATSAPP
-  TELEGRAM
-  SMS
-  EMAIL
-  APP
-}
-
-enum IntercomNotificationStatus {
-  PENDING
-  SENT
-  DELIVERED
-  READ
-  RESPONDED
-  FAILED
-  EXPIRED
-}
-
-enum ResponseType {
-  APPROVE
-  REJECT
-  CUSTOM
-}
-
-// Modelo para tipos de visitantes
-model VisitorType {
-  id                Int               @id @default(autoincrement())
-  name              String
-  description       String?
-  requiresApproval  Boolean           @default(true)
-  color             String?
-  icon              String?
-  visitors          Visitor[]
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-
+  PENDING      // Visita pendiente de notificación
+  NOTIFIED     // Visitante notificado al residente
+  APPROVED     // Visita aprobada por el residente
+  REJECTED     // Visita rechazada por el residente
+  IN_PROGRESS  // Visita en curso (visitante dentro)
+  COMPLETED    // Visita completada (visitante salió)
+  CANCELLED    // Visita cancelada
+  
   @@schema("tenant")
 }
 
-// Modelo para unidades residenciales
-model Unit {
-  id                Int               @id @default(autoincrement())
-  number            String
-  type              String
-  floor             Int?
-  tower             String?
-  ownerId           Int?
-  residents         Int[]
-  visits            Visit[]
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
+enum NotificationChannel {
+  WHATSAPP     // Notificación por WhatsApp
+  TELEGRAM     // Notificación por Telegram
+  SMS          // Notificación por SMS
+  EMAIL        // Notificación por Email
+  APP          // Notificación en la aplicación
+  
+  @@schema("tenant")
+}
 
-  @@unique([number, tower])
+enum NotificationStatus {
+  PENDING      // Pendiente de envío
+  SENT         // Enviada
+  DELIVERED    // Entregada al dispositivo
+  READ         // Leída por el usuario
+  RESPONDED    // Respondida por el usuario
+  FAILED       // Falló el envío
+  EXPIRED      // Expiró sin respuesta
+  
+  @@schema("tenant")
+}
+
+enum ResponseType {
+  APPROVE      // Aprobación de acceso
+  REJECT       // Rechazo de acceso
+  CUSTOM       // Respuesta personalizada
+  
   @@schema("tenant")
 }
 
 // Modelo para visitas
 model Visit {
   id                String            @id @default(uuid())
-  visitorId         String
+  visitorId         String            // Visitante
   visitor           Visitor           @relation(fields: [visitorId], references: [id])
-  unitId            Int
+  unitId            Int               // Unidad a visitar
   unit              Unit              @relation(fields: [unitId], references: [id])
-  purpose           String
-  status            VisitStatus       @default(PENDING)
-  entryTime         DateTime?
-  exitTime          DateTime?
-  authorizedBy      Int?
-  notes             String?
-  notifications     VirtualIntercomNotification[]
+  purpose           String            // Propósito de la visita
+  status            VisitStatus       @default(PENDING) // Estado de la visita
+  entryTime         DateTime?         // Hora de entrada
+  exitTime          DateTime?         // Hora de salida
+  authorizedBy      Int?              // Usuario que autorizó
+  notes             String?           // Notas adicionales
+  notifications     VirtualIntercomNotification[] // Notificaciones enviadas
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
-
+  
   @@index([visitorId])
   @@index([unitId])
   @@index([status])
@@ -104,21 +72,21 @@ model Visit {
 // Modelo para notificaciones de citofonía virtual
 model VirtualIntercomNotification {
   id                String            @id @default(uuid())
-  visitId           String
+  visitId           String            // Visita asociada
   visit             Visit             @relation(fields: [visitId], references: [id])
-  userId            Int
-  channel           NotificationChannel
-  status            IntercomNotificationStatus @default(PENDING)
-  sentAt            DateTime          @default(now())
-  deliveredAt       DateTime?
-  readAt            DateTime?
-  respondedAt       DateTime?
-  response          String?
-  responseType      ResponseType?
-  messageId         String?
-  errorMessage      String?
-  retries           Int               @default(0)
-
+  userId            Int               // Usuario notificado
+  channel           NotificationChannel // Canal de notificación (WhatsApp, Telegram)
+  status            NotificationStatus @default(PENDING) // Estado de la notificación
+  sentAt            DateTime          @default(now()) // Fecha de envío
+  deliveredAt       DateTime?         // Fecha de entrega
+  readAt            DateTime?         // Fecha de lectura
+  respondedAt       DateTime?         // Fecha de respuesta
+  response          String?           // Respuesta del usuario
+  responseType      ResponseType?     // Tipo de respuesta (Aprobar, Rechazar)
+  messageId         String?           // ID del mensaje en el canal
+  errorMessage      String?           // Mensaje de error (si aplica)
+  retries           Int               @default(0) // Número de reintentos
+  
   @@index([visitId])
   @@index([userId])
   @@index([channel])
@@ -129,20 +97,20 @@ model VirtualIntercomNotification {
 // Modelo para preferencias de citofonía por usuario
 model UserIntercomPreference {
   id                Int               @id @default(autoincrement())
-  userId            Int
-  whatsappEnabled   Boolean           @default(true)
-  whatsappNumber    String?
-  telegramEnabled   Boolean           @default(false)
-  telegramUsername  String?
-  telegramChatId    String?
-  notifyAllVisitors Boolean           @default(true)
-  allowedVisitorTypes Int[]
-  autoApproveTypes  Int[]
-  quietHoursStart   String?
-  quietHoursEnd     String?
+  userId            Int               // Usuario
+  whatsappEnabled   Boolean           @default(true) // Notificaciones por WhatsApp habilitadas
+  whatsappNumber    String?           // Número de WhatsApp
+  telegramEnabled   Boolean           @default(false) // Notificaciones por Telegram habilitadas
+  telegramUsername  String?           // Usuario de Telegram
+  telegramChatId    String?           // Chat ID de Telegram
+  notifyAllVisitors Boolean           @default(true) // Notificar todos los visitantes
+  allowedVisitorTypes Int[]           // Tipos de visitantes permitidos sin notificación
+  autoApproveTypes  Int[]             // Tipos de visitantes con aprobación automática
+  quietHoursStart   String?           // Inicio de horas de silencio (HH:MM)
+  quietHoursEnd     String?           // Fin de horas de silencio (HH:MM)
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
-
+  
   @@unique([userId])
   @@schema("tenant")
 }
@@ -150,35 +118,36 @@ model UserIntercomPreference {
 // Modelo para configuración general de citofonía virtual
 model IntercomSettings {
   id                Int               @id @default(autoincrement())
-  whatsappEnabled   Boolean           @default(true)
-  whatsappProvider  String?
-  whatsappConfig    Json?
-  telegramEnabled   Boolean           @default(true)
-  telegramBotToken  String?
-  telegramConfig    Json?
-  defaultResponseTimeout Int          @default(60)
-  maxRetries        Int               @default(2)
-  retryDelay        Int               @default(30)
-  messageTemplates  Json
+  whatsappEnabled   Boolean           @default(true) // WhatsApp habilitado a nivel de sistema
+  whatsappProvider  String?           // Proveedor de WhatsApp (Twilio, MessageBird, etc.)
+  whatsappConfig    Json?             // Configuración de WhatsApp
+  telegramEnabled   Boolean           @default(true) // Telegram habilitado a nivel de sistema
+  telegramBotToken  String?           // Token del bot de Telegram
+  telegramConfig    Json?             // Configuración de Telegram
+  defaultResponseTimeout Int          @default(60) // Tiempo de espera para respuesta (segundos)
+  maxRetries        Int               @default(2) // Máximo de reintentos
+  retryDelay        Int               @default(30) // Tiempo entre reintentos (segundos)
+  messageTemplates  Json              // Plantillas de mensajes
   updatedAt         DateTime          @updatedAt
-
+  
   @@schema("tenant")
 }
 
 // Modelo para registro de actividad de citofonía virtual
 model IntercomActivityLog {
   id                String            @id @default(uuid())
-  eventType         String
-  visitId           String?
-  userId            Int?
-  visitorId         String?
-  channel           NotificationChannel?
-  details           Json
+  eventType         String            // Tipo de evento
+  visitId           String?           // ID de visita relacionada
+  userId            Int?              // ID de usuario relacionado
+  visitorId         String?           // ID de visitante relacionado
+  channel           NotificationChannel? // Canal utilizado
+  details           Json              // Detalles del evento
   timestamp         DateTime          @default(now())
-
+  
   @@index([eventType])
   @@index([visitId])
   @@index([userId])
+  @@index([visitorId])
   @@index([timestamp])
   @@schema("tenant")
 }

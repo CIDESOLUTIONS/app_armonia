@@ -1,0 +1,19 @@
+model ServiceProvider {
+  id          Int      @id @default(autoincrement())
+  name        String
+  category    String
+  description String
+  contactPhone String
+  contactEmail String
+  address     String
+  rating      Float
+  reviewCount Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  reviews     Review[]
+  createdBy   User     @relation("CreatedServiceProviders", fields: [createdById], references: [id])
+  createdById Int
+
+  @@index([category])
+  @@index([name])
+}

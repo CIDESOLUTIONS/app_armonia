@@ -1,0 +1,15 @@
+model Vote {
+  id          Int      @id @default(autoincrement())
+  assemblyId  Int
+  assembly    Assembly @relation(fields: [assemblyId], references: [id])
+  question    String
+  options     Json // Store options as JSON array of strings
+  isWeighted  Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userVotes   UserVote[]
+
+  @@index([assemblyId])
+  @@index([isActive])
+}

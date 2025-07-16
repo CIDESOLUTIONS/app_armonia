@@ -1,0 +1,18 @@
+model Budget {
+  id          Int      @id @default(autoincrement())
+  year        Int
+  month       Int
+  title       String
+  description String?
+  totalAmount Float
+  approvedDate DateTime?
+  status      String   @default("DRAFT") // DRAFT, APPROVED, EXECUTED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  items       BudgetItem[]
+  createdBy   User     @relation("CreatedBudgets", fields: [createdById], references: [id])
+  createdById Int
+
+  @@unique([year, month])
+  @@index([status])
+}

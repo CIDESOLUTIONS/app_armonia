@@ -1,0 +1,13 @@
+model Document {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  url         String
+  type        String // e.g., 'GENERAL', 'FINANCIAL', 'LEGAL', 'ASSEMBLY'
+  uploadedBy  Int
+  uploader    User     @relation("CreatedDocuments", fields: [uploadedBy], references: [id])
+  uploadedAt  DateTime @default(now())
+
+  @@index([type])
+  @@index([uploadedBy])
+}

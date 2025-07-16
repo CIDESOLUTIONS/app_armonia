@@ -1,0 +1,12 @@
+model SmartMeterReading {
+  id        Int      @id @default(autoincrement())
+  meterId   String
+  unitId    String
+  reading   Float
+  unit      String // e.g., kWh, m3
+  timestamp DateTime @default(now())
+
+  @@index([meterId])
+  @@index([unitId])
+  @@index([timestamp])
+}

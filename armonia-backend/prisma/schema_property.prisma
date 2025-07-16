@@ -1,0 +1,20 @@
+model Property {
+  id          Int      @id @default(autoincrement())
+  unitNumber  String
+  complexId   Int
+  complex     ResidentialComplex @relation(fields: [complexId], references: [id])
+  ownerId     Int
+  owner       User     @relation("OwnedProperties", fields: [ownerId], references: [id])
+  type        String // e.g., apartment, house, commercial
+  area        Float?
+  bedrooms    Int?
+  bathrooms   Int?
+  address     String?
+  fees        Fee[]
+  payments    Payment[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([complexId, unitNumber])
+  @@index([ownerId])
+}
