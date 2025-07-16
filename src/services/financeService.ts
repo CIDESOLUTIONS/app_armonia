@@ -9,15 +9,72 @@ interface FinanceSummary {
 
 interface FinancialTransaction {
   id: number;
-  concepto: string;
-  monto: number;
-  fecha: string;
-  estado: string;
+  amount: number;
+  date: string;
+  method: string;
+  reference: string;
+  receiptNumber: string;
+  feeId: number;
+  propertyId: number;
+  createdBy: number;
 }
 
-export async function getFinanceSummary(): Promise<FinanceSummary> {
+// New DTOs for Fee Management
+export interface FeeDto {
+  id: number;
+  title: string;
+  description?: string;
+  amount: number;
+  dueDate: string;
+  status: "PENDING" | "PAID" | "OVERDUE";
+  type: "ORDINARY" | "EXTRAORDINARY" | "FINE"; // Added FINE type
+  propertyId: number;
+  unitId?: number;
+  residentId?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateFeeDto {
+  title: string;
+  description?: string;
+  amount: number;
+  dueDate: string;
+  type: "ORDINARY" | "EXTRAORDINARY" | "FINE";
+  propertyId: number;
+  unitId?: number;
+  residentId?: number;
+}
+
+export interface UpdateFeeDto {
+  title?: string;
+  description?: string;
+  amount?: number;
+  dueDate?: string;
+  status?: "PENDING" | "PAID" | "OVERDUE";
+  type?: "ORDINARY" | "EXTRAORDINARY" | "FINE";
+}
+
+export interface FeeFilterParamsDto {
+  status?: "PENDING" | "PAID" | "OVERDUE";
+  type?: "ORDINARY" | "EXTRAORDINARY" | "FINE";
+  propertyId?: number;
+  unitId?: number;
+  residentId?: number;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface FeeListResponseDto {
+  data: FeeDto[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export async function getFinanceSummary(complexId: string): Promise<FinanceSummary> {
   try {
-    const response = await fetchApi("/finances/stats");
+    const response = await fetchApi(`/finances/stats?complexId=${complexId}`);
     return response;
   } catch (error) {
     console.error("Error fetching finance summary:", error);
@@ -25,9 +82,9 @@ export async function getFinanceSummary(): Promise<FinanceSummary> {
   }
 }
 
-export async function getRecentTransactions(): Promise<FinancialTransaction[]> {
+export async function getRecentTransactions(complexId: string): Promise<FinancialTransaction[]> {
   try {
-    const response = await fetchApi("/finances/transactions"); // Este endpoint no existe en el backend NestJS, lo dejaré así por ahora.
+    const response = await fetchApi(`/finances/properties/${complexId}/payments`);
     return response;
   } catch (error) {
     console.error("Error fetching recent transactions:", error);
@@ -50,6 +107,69 @@ export async function uploadBankStatement(file: File): Promise<any> {
     return response;
   } catch (error) {
     console.error("Error uploading bank statement:", error);
+    throw error;
+  }
+}
+
+// New functions for Fee Management
+export async function getFees(filters?: FeeFilterParamsDto): Promise<FeeListResponseDto> {
+  try {
+    const query = new URLSearchParams();
+    if (filters) {
+      for (const key in filters) {
+        if (filters[key as keyof FeeFilterParamsDto] !== undefined) {
+          query.append(key, String(filters[key as keyof FeeFilterParamsDto]));
+        }
+      }
+    }
+    const response = await fetchApi(`/finances/fees?${query.toString()}`);
+    return response;
+  } catch (error) {
+    console.error("Error fetching fees:", error);
+    throw error;
+  }
+}
+
+export async function createFee(fee: CreateFeeDto): Promise<FeeDto> {
+  try {
+    const response = await fetchApi("/finances/fees", {
+      method: "POST",
+      body: JSON.stringify(fee),
+    });
+    return response;
+  } catch (error) {
+    console.error("Error creating fee:", error);
+    throw error;
+  }
+}
+
+export async function updateFee(id: number, fee: UpdateFeeDto): Promise<FeeDto> {
+  try {
+    const response = await fetchApi(`/finances/fees/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(fee),
+    });
+    return response;
+  } catch (error) {
+    console.error("Error updating fee:", error);
+    throw error;
+  }
+}
+
+export async function generateOrdinaryFees(
+  amount: number,
+  dueDate: string,
+  title: string,
+  description?: string,
+): Promise<any> {
+  try {
+    const response = await fetchApi("/finances/generate-ordinary-fees", {
+      method: "POST",
+      body: JSON.stringify({ amount, dueDate, title, description }),
+    });
+    return response;
+  } catch (error) {
+    console.error("Error generating ordinary fees:", error);
     throw error;
   }
 }

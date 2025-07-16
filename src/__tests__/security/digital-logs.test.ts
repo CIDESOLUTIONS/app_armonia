@@ -2,17 +2,18 @@
 import { useDigitalLogs, DigitalLog } from "@/hooks/useDigitalLogs";
 import { renderHook, act } from "@testing-library/react";
 
-// Mock de API client
-jest.mock("@/lib/api-client", () => ({
-  apiClient: {
-    post: jest.fn(),
-    get: jest.fn(),
-    put: jest.fn(),
-    delete: jest.fn(),
-  },
+import { createDigitalLog, updateDigitalLog, deleteDigitalLog, getDigitalLog, searchDigitalLogs, reviewDigitalLog } from "@/services/digitalLogService";
+
+jest.mock("@/services/digitalLogService", () => ({
+  createDigitalLog: jest.fn(),
+  updateDigitalLog: jest.fn(),
+  deleteDigitalLog: jest.fn(),
+  getDigitalLog: jest.fn(),
+  searchDigitalLogs: jest.fn(),
+  reviewDigitalLog: jest.fn(),
 }));
 
-import { apiClient as mockApiClient } from "@/lib/api-client";
+import { createDigitalLog as mockCreateDigitalLog, updateDigitalLog as mockUpdateDigitalLog, deleteDigitalLog as mockDeleteDigitalLog, getDigitalLog as mockGetDigitalLog, searchDigitalLogs as mockSearchDigitalLogs, reviewDigitalLog as mockReviewDigitalLog } from "@/services/digitalLogService";
 
 describe("useDigitalLogs Hook", () => {
   const mockLog: DigitalLog = {
@@ -56,7 +57,7 @@ describe("useDigitalLogs Hook", () => {
         message: "Minuta digital creada exitosamente",
       };
 
-      mockApiClient.post.mockResolvedValue(mockResponse);
+      mockCreateDigitalLog.mockResolvedValue(mockResponse);
 
       const { result } = renderHook(() => useDigitalLogs());
 
@@ -77,10 +78,7 @@ describe("useDigitalLogs Hook", () => {
         expect(success).toBe(true);
       });
 
-      expect(mockApiClient.post).toHaveBeenCalledWith(
-        "/security/digital-logs",
-        createData,
-      );
+      expect(mockCreateDigitalLog).toHaveBeenCalledWith(createData);
       expect(result.current.digitalLogs).toContain(mockLog);
     });
 
@@ -90,7 +88,7 @@ describe("useDigitalLogs Hook", () => {
         message: "Error creando minuta",
       };
 
-      mockApiClient.post.mockResolvedValue(mockError);
+      mockCreateDigitalLog.mockResolvedValue(mockError);
 
       const { result } = renderHook(() => useDigitalLogs());
 
@@ -123,7 +121,7 @@ describe("useDigitalLogs Hook", () => {
         message: "Minuta actualizada exitosamente",
       };
 
-      mockApiClient.put.mockResolvedValue(mockResponse);
+      mockUpdateDigitalLog.mockResolvedValue(mockResponse);
 
       const { result } = renderHook(() => useDigitalLogs());
 
@@ -139,10 +137,7 @@ describe("useDigitalLogs Hook", () => {
         expect(success).toBe(true);
       });
 
-      expect(mockApiClient.put).toHaveBeenCalledWith(
-        "/security/digital-logs/1",
-        { status: "RESOLVED" },
-      );
+      expect(mockUpdateDigitalLog).toHaveBeenCalledWith(1, { status: "RESOLVED" });
     });
 
     it("should handle update errors", async () => {
@@ -151,7 +146,7 @@ describe("useDigitalLogs Hook", () => {
         message: "Error actualizando minuta",
       };
 
-      mockApiClient.put.mockResolvedValue(mockError);
+      mockUpdateDigitalLog.mockResolvedValue(mockError);
 
       const { result } = renderHook(() => useDigitalLogs());
 
@@ -173,7 +168,7 @@ describe("useDigitalLogs Hook", () => {
         message: "Minuta eliminada exitosamente",
       };
 
-      mockApiClient.delete.mockResolvedValue(mockResponse);
+      mockDeleteDigitalLog.mockResolvedValue(mockResponse);
 
       const { result } = renderHook(() => useDigitalLogs());
 
@@ -182,9 +177,7 @@ describe("useDigitalLogs Hook", () => {
         expect(success).toBe(true);
       });
 
-      expect(mockApiClient.delete).toHaveBeenCalledWith(
-        "/security/digital-logs/1",
-      );
+      expect(mockDeleteDigitalLog).toHaveBeenCalledWith(1);
     });
   });
 
@@ -203,7 +196,7 @@ describe("useDigitalLogs Hook", () => {
         },
       };
 
-      mockApiClient.get.mockResolvedValue(mockResponse);
+      mockSearchDigitalLogs.mockResolvedValue(mockResponse);
 
       const { result } = renderHook(() => useDigitalLogs());
 
@@ -218,9 +211,7 @@ describe("useDigitalLogs Hook", () => {
         await result.current.searchLogs(filters);
       });
 
-      expect(mockApiClient.get).toHaveBeenCalledWith(
-        expect.stringContaining("/security/digital-logs?"),
-      );
+      expect(mockSearchDigitalLogs).toHaveBeenCalledWith(filters);
       expect(result.current.digitalLogs).toEqual([mockLog]);
       expect(result.current.pagination).toEqual(mockResponse.pagination);
     });
@@ -231,7 +222,7 @@ describe("useDigitalLogs Hook", () => {
         message: "Error buscando minutas",
       };
 
-      mockApiClient.get.mockResolvedValue(mockError);
+      mockSearchDigitalLogs.mockResolvedValue(mockError);
 
       const { result } = renderHook(() => useDigitalLogs());
 
@@ -250,7 +241,7 @@ describe("useDigitalLogs Hook", () => {
         digitalLog: mockLog,
       };
 
-      mockApiClient.get.mockResolvedValue(mockResponse);
+      mockGetDigitalLog.mockResolvedValue(mockResponse);
 
       const { result } = renderHook(() => useDigitalLogs());
 
@@ -259,9 +250,7 @@ describe("useDigitalLogs Hook", () => {
         expect(log).toEqual(mockLog);
       });
 
-      expect(mockApiClient.get).toHaveBeenCalledWith(
-        "/security/digital-logs/1",
-      );
+      expect(mockGetDigitalLog).toHaveBeenCalledWith(1);
     });
 
     it("should return null on error", async () => {
@@ -270,7 +259,7 @@ describe("useDigitalLogs Hook", () => {
         message: "Minuta no encontrada",
       };
 
-      mockApiClient.get.mockResolvedValue(mockError);
+      mockGetDigitalLog.mockResolvedValue(mockError);
 
       const { result } = renderHook(() => useDigitalLogs());
 
@@ -298,7 +287,7 @@ describe("useDigitalLogs Hook", () => {
         message: "Minuta actualizada exitosamente",
       };
 
-      mockApiClient.put.mockResolvedValue(mockResponse);
+      mockReviewDigitalLog.mockResolvedValue(mockResponse);
 
       const { result } = renderHook(() => useDigitalLogs());
 
@@ -310,8 +299,8 @@ describe("useDigitalLogs Hook", () => {
         expect(success).toBe(true);
       });
 
-      expect(mockApiClient.put).toHaveBeenCalledWith(
-        "/security/digital-logs/1",
+      expect(mockReviewDigitalLog).toHaveBeenCalledWith(
+        1,
         {
           supervisorReview: true,
           reviewNotes: "Revisado por supervisor",
@@ -426,7 +415,7 @@ describe("useDigitalLogs Hook", () => {
       };
 
       // Simular delay en la respuesta
-      mockApiClient.post.mockImplementation(
+      mockCreateDigitalLog.mockImplementation(
         () =>
           new Promise((resolve) =>
             setTimeout(() => resolve(mockResponse), 100),
@@ -460,7 +449,7 @@ describe("useDigitalLogs Hook", () => {
 
   describe("Edge Cases", () => {
     it("should handle network errors gracefully", async () => {
-      mockApiClient.post.mockRejectedValue(new Error("Network error"));
+      mockCreateDigitalLog.mockRejectedValue(new Error("Network error"));
 
       const { result } = renderHook(() => useDigitalLogs());
 
@@ -482,7 +471,11 @@ describe("useDigitalLogs Hook", () => {
     });
 
     it("should handle invalid responses", async () => {
-      mockApiClient.get.mockResolvedValue(null);
+      const mockResponse = {
+        success: true,
+        digitalLog: mockLog,
+      };
+      mockGetDigitalLog.mockResolvedValue(mockResponse);
 
       const { result } = renderHook(() => useDigitalLogs());
 
@@ -500,7 +493,7 @@ describe("useDigitalLogs Hook", () => {
         digitalLog: updatedLog,
       };
 
-      mockApiClient.put.mockResolvedValue(mockResponse);
+      mockUpdateDigitalLog.mockResolvedValue(mockResponse);
 
       const { result } = renderHook(() => useDigitalLogs());
 

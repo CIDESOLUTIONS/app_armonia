@@ -1,6 +1,3 @@
-import { BillingEngine } from "@/lib/financial/billing-engine";
-import { FreemiumService } from "@/lib/freemium-service";
-
 // Mock de Prisma
 const mockPrismaClient = {
   residentialComplex: {
@@ -40,13 +37,12 @@ jest.mock("@/lib/prisma", () => ({
   })),
 }));
 
-describe("BillingEngine", () => {
-  let billingEngineService: BillingEngine;
-  const mockSchemaName = "test_schema";
+import { BillingEngine } from "@/lib/financial/billing-engine";
+import { FreemiumService } from "@/lib/freemium-service";
 
+describe("BillingEngine", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    billingEngineService = new BillingEngine(mockSchemaName);
   });
 
   describe("generateBillsForPeriod", () => {
@@ -110,7 +106,7 @@ describe("BillingEngine", () => {
       };
 
       // Execute
-      const bills = await billingEngineService.generateBillsForPeriod(
+      const bills = await BillingEngine.generateBillsForPeriod(
         1,
         period,
       );
@@ -168,7 +164,7 @@ describe("BillingEngine", () => {
       };
 
       await expect(
-        billingEngineService.generateBillsForPeriod(1, period),
+        BillingEngine.generateBillsForPeriod(1, period),
       ).rejects.toThrow("Funcionalidad no disponible en su plan actual");
     });
   });
@@ -203,7 +199,7 @@ describe("BillingEngine", () => {
 
       mockPrismaClient.bill.findUnique.mockResolvedValue(mockBill);
 
-      const result = await billingEngineService.processPayment(
+      const result = await BillingEngine.processPayment(
         1,
         100000,
         "BANK_TRANSFER",
@@ -224,7 +220,7 @@ describe("BillingEngine", () => {
 
       mockPrismaClient.bill.findUnique.mockResolvedValue(mockBill);
 
-      const result = await billingEngineService.processPayment(
+      const result = await BillingEngine.processPayment(
         1,
         50000,
         "CREDIT_CARD",
@@ -244,7 +240,7 @@ describe("BillingEngine", () => {
       mockPrismaClient.bill.findUnique.mockResolvedValue(mockBill);
 
       await expect(
-        billingEngineService.processPayment(1, 100000, "CASH"),
+        BillingEngine.processPayment(1, 100000, "CASH", undefined, 1),
       ).rejects.toThrow("Factura ya está pagada");
     });
   });

@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { apiClient } from "@/lib/api-client";
+import { createPQR } from "@/services/pqrService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,11 +25,7 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-enum PQRType {
-  PETITION = "PETITION",
-  COMPLAINT = "COMPLAINT",
-  CLAIM = "CLAIM",
-}
+
 
 enum PQRPriority {
   LOW = "LOW",
@@ -53,7 +49,6 @@ export function CreatePQRForm({
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    type: PQRType.PETITION,
     priority: PQRPriority.MEDIUM,
     category: "",
     propertyUnit: "",
@@ -121,15 +116,14 @@ export function CreatePQRForm({
     setError(null);
 
     try {
-      // Crear PQR usando el cliente API seguro
-      const response = await apiClient.pqr.create({
-        title: formData.title.trim(),
+      // Crear PQR usando el servicio centralizado
+      const response = await createPQR({
+        subject: formData.title.trim(), // 'title' en el formulario, 'subject' en el servicio
         description: formData.description.trim(),
-        type: formData.type,
-        priority: formData.priority,
         category: formData.category,
+        priority: formData.priority,
         propertyUnit: formData.propertyUnit.trim() || undefined,
-        submittedBy: user?.id,
+        reportedById: user?.id, // 'submittedBy' en el formulario, 'reportedById' en el servicio
       });
 
       console.log("PQR creado exitosamente:", response.data);
@@ -138,7 +132,6 @@ export function CreatePQRForm({
       setFormData({
         title: "",
         description: "",
-        type: PQRType.PETITION,
         priority: PQRPriority.MEDIUM,
         category: "",
         propertyUnit: "",
@@ -175,22 +168,7 @@ export function CreatePQRForm({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="type">Tipo</Label>
-            <Select
-              value={formData.type}
-              onValueChange={(value) => handleSelectChange("type", value)}
-            >
-              <SelectTrigger id="type">
-                <SelectValue placeholder="Selecciona el tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={PQRType.PETITION}>Petición</SelectItem>
-                <SelectItem value={PQRType.COMPLAINT}>Queja</SelectItem>
-                <SelectItem value={PQRType.CLAIM}>Reclamo</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          
 
           <div>
             <Label htmlFor="priority">Prioridad</Label>

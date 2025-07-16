@@ -5,12 +5,8 @@
  * más complejos, múltiples canales y escenarios de error.
  */
 
-import { PQRNotificationService } from "../pqrNotificationService";
+import { PQRNotificationService } from "@/services/pqrNotificationService";
 import { PrismaClient, PQRStatus, NotificationChannel } from "@prisma/client";
-import { sendEmail } from "@/lib/communications/email-service";
-import { sendPushNotification } from "@/lib/communications/push-notification-service";
-import { sendSMS } from "@/lib/communications/sms-service";
-import { sendWhatsAppMessage } from "@/lib/communications/whatsapp-service";
 
 // Mock de PrismaClient
 jest.mock("@prisma/client", () => {
@@ -36,9 +32,34 @@ jest.mock("@prisma/client", () => {
   };
 
   return {
+    __esModule: true,
     PrismaClient: jest.fn(() => mockPrismaClient),
+    PQRStatus: {
+      OPEN: 'OPEN',
+      CATEGORIZED: 'CATEGORIZED',
+      ASSIGNED: 'ASSIGNED',
+      IN_PROGRESS: 'IN_PROGRESS',
+      WAITING: 'WAITING',
+      RESOLVED: 'RESOLVED',
+      CLOSED: 'CLOSED',
+      REOPENED: 'REOPENED',
+      CANCELLED: 'CANCELLED',
+    },
+    NotificationChannel: {
+      WHATSAPP: 'WHATSAPP',
+      TELEGRAM: 'TELEGRAM',
+      SMS: 'SMS',
+      EMAIL: 'EMAIL',
+      APP: 'APP',
+    },
   };
 });
+import { sendEmail } from "@/lib/communications/email-service";
+import { sendPushNotification } from "@/lib/communications/push-notification-service";
+import { sendSMS } from "@/lib/communications/sms-service";
+import { sendWhatsAppMessage } from "@/lib/communications/whatsapp-service";
+
+
 
 // Mock de servicios de comunicación
 jest.mock("@/lib/communications/email-service", () => ({
@@ -180,6 +201,7 @@ describe("PQRNotificationService - Pruebas Avanzadas", () => {
       // Configurar fecha actual para simular horario nocturno
       const nightTime = new Date("2025-06-02T23:30:00");
       jest.spyOn(global, "Date").mockImplementation(() => nightTime as any);
+      jest.spyOn(Date, 'now').mockReturnValue(nightTime.getTime());
 
       // Mock para PQR
       prisma.pQR.findUnique.mockResolvedValue({
@@ -294,6 +316,7 @@ describe("PQRNotificationService - Pruebas Avanzadas", () => {
       // Configurar fecha actual para simular horario nocturno
       const nightTime = new Date("2025-06-02T23:30:00");
       jest.spyOn(global, "Date").mockImplementation(() => nightTime as any);
+      jest.spyOn(Date, 'now').mockReturnValue(nightTime.getTime());
 
       // Mock para PQR urgente
       prisma.pQR.findUnique.mockResolvedValue({

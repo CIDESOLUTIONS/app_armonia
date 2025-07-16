@@ -12,7 +12,7 @@ import MonitoringService, {
   AlertSeverity,
   AlertStatus,
 } from "@/lib/services/monitoring-service";
-import { NotificationService } from "@/lib/services/notification-service";
+import { NotificationService } from "@/services/notification-service-impl";
 import { ServerLogger } from "@/lib/logging/server-logger";
 import axios from "axios";
 import { performance } from "perf_hooks";

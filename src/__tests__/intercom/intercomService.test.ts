@@ -8,7 +8,8 @@ import {
 } from "@jest/globals";
 import { PrismaClient } from "@prisma/client";
 import { MessageAdapter } from "../../lib/communications/message-adapters";
-import { IntercomService } from "../../lib/services/intercom-service"; // Moved to top level
+import { IntercomService } from "../../lib/services/intercom-service";
+import { TelegramAdapter } from "../../lib/communications/telegram-adapter";
 
 const mockVisitStatus = {
   PENDING: "PENDING",
@@ -87,9 +88,6 @@ let intercomService: IntercomService; // Declare intercomService here
 
 // Mock PrismaClient globally
 jest.mock("@prisma/client", () => {
-  // This factory function will be called once per test file due to jest.resetModules()
-  // We need to ensure mockPrisma is defined before this factory is called.
-  // So, mockPrisma must be defined outside this mock factory.
   return {
     PrismaClient: jest.fn(() => mockPrisma),
     VisitStatus: mockVisitStatus,
@@ -103,10 +101,8 @@ beforeEach(() => {
   jest.clearAllMocks();
   jest.resetModules(); // Reset module registry to ensure fresh imports
 
-  // Explicitly clear the global Prisma instance to ensure a fresh mock is used
   (globalThis as any).prisma = undefined;
 
-  // Initialize mockPrisma and its mocks here for each test
   mockPrisma = {
     visitor: {
       findFirst: jest.fn(),
@@ -126,7 +122,7 @@ beforeEach(() => {
       findUnique: jest.fn(),
       update: jest.fn(),
       create: jest.fn(),
-      findFirst: jest.fn(), // Ensure findFirst is mocked
+      findFirst: jest.fn(),
     },
     virtualIntercomNotification: {
       create: jest.fn(),
@@ -146,7 +142,6 @@ beforeEach(() => {
     $transaction: jest.fn(async (callback) => callback(mockPrisma)),
   };
 
-  // Mock intercomSettings.findFirst to return a default configuration
   mockPrisma.intercomSettings.findFirst.mockResolvedValue({
     id: 1,
     whatsappEnabled: true,
@@ -164,12 +159,10 @@ beforeEach(() => {
     },
   });
 
-  // Mock for virtualIntercomNotification.create to return an object with an id
   mockPrisma.virtualIntercomNotification.create.mockResolvedValue({
     id: "notification-id-123",
   });
 
-  // Instantiate intercomService after mocks are set up
   intercomService = new IntercomService();
 });
 
@@ -179,7 +172,6 @@ afterEach(() => {
 
 describe("registerVisit", () => {
   it("debe registrar una nueva visita cuando el visitante no existe", async () => {
-    // Configurar mocks
     const mockVisitor = {
       id: "visitor-123",
       name: "Juan Pérez",
@@ -193,9 +185,8 @@ describe("registerVisit", () => {
       visitorId: "visitor-123",
       unitId: 1,
       purpose: "Entrega de paquete",
-      status: mockVisitStatus.PENDING, // Use mockVisitStatus
+      status: mockVisitStatus.PENDING,
       visitor: {
-        // Added visitor.type
         id: "visitor-123",
         name: "Juan Pérez",
         typeId: 1,
@@ -203,38 +194,24 @@ describe("registerVisit", () => {
       },
     };
 
-    // Mock para visitor.findFirst (no encuentra visitante)
     (mockPrisma.visitor.findFirst as jest.Mock).mockResolvedValue(null);
-
-    // Mock para visitor.create
     (mockPrisma.visitor.create as jest.Mock).mockResolvedValue(mockVisitor);
-
-    // Mock para visit.create
     (mockPrisma.visit.create as jest.Mock).mockResolvedValue(mockVisit);
-
-    // Mock para unit.findUnique
     (mockPrisma.unit.findUnique as jest.Mock).mockResolvedValue({
       id: 1,
       number: "101",
       residents: [1, 2],
     });
-
-    // Mock para userIntercomPreference.findUnique
-    (
-      mockPrisma.userIntercomPreference.findUnique as jest.Mock
-    ).mockResolvedValue({
+    (mockPrisma.userIntercomPreference.findUnique as jest.Mock).mockResolvedValue({
       userId: 1,
       whatsappEnabled: true,
       whatsappNumber: "+573001234567",
       notifyAllVisitors: true,
-      allowedVisitorTypes: [], // Added missing properties
-      autoApproveTypes: [], // Added missing properties
+      allowedVisitorTypes: [],
+      autoApproveTypes: [],
     });
-
-    // Mock para visit.findUnique dentro de notifyResidents
     (mockPrisma.visit.findUnique as jest.Mock).mockResolvedValue(mockVisit);
 
-    // Ejecutar función
     const result = await intercomService.registerVisit(
       {
         name: "Juan Pérez",
@@ -246,18 +223,15 @@ describe("registerVisit", () => {
       "Entrega de paquete",
     );
 
-    // Verificaciones
     expect(mockPrisma.visitor.findFirst).toHaveBeenCalledWith({
       where: { identification: "1234567890" },
     });
-
     expect(mockPrisma.visitor.create).toHaveBeenCalled();
     expect(mockPrisma.visit.create).toHaveBeenCalled();
     expect(result).toEqual(mockVisit);
   });
 
   it("debe reutilizar un visitante existente", async () => {
-    // Configurar mocks
     const mockVisitor = {
       id: "visitor-123",
       name: "Juan Pérez",
@@ -265,15 +239,13 @@ describe("registerVisit", () => {
       phone: "+573001234567",
       typeId: 1,
     };
-
     const mockVisit = {
       id: "visit-123",
       visitorId: "visitor-123",
       unitId: 1,
       purpose: "Entrega de paquete",
-      status: mockVisitStatus.PENDING, // Use mockVisitStatus
+      status: mockVisitStatus.PENDING,
       visitor: {
-        // Added visitor.type
         id: "visitor-123",
         name: "Juan Pérez",
         typeId: 1,
@@ -281,35 +253,23 @@ describe("registerVisit", () => {
       },
     };
 
-    // Mock para visitor.findFirst (encuentra visitante)
     (mockPrisma.visitor.findFirst as jest.Mock).mockResolvedValue(mockVisitor);
-
-    // Mock para visit.create
     (mockPrisma.visit.create as jest.Mock).mockResolvedValue(mockVisit);
-
-    // Mock para unit.findUnique
     (mockPrisma.unit.findUnique as jest.Mock).mockResolvedValue({
       id: 1,
       number: "101",
       residents: [],
     });
-
-    // Mock para userIntercomPreference.findUnique
-    (
-      mockPrisma.userIntercomPreference.findUnique as jest.Mock
-    ).mockResolvedValue({
+    (mockPrisma.userIntercomPreference.findUnique as jest.Mock).mockResolvedValue({
       userId: 1,
       whatsappEnabled: true,
       whatsappNumber: "+573001234567",
       notifyAllVisitors: true,
-      allowedVisitorTypes: [], // Added missing properties
-      autoApproveTypes: [], // Added missing properties
+      allowedVisitorTypes: [],
+      autoApproveTypes: [],
     });
-
-    // Mock para visit.findUnique dentro de notifyResidents
     (mockPrisma.visit.findUnique as jest.Mock).mockResolvedValue(mockVisit);
 
-    // Ejecutar función
     const result = await intercomService.registerVisit(
       {
         name: "Juan Pérez",
@@ -321,11 +281,9 @@ describe("registerVisit", () => {
       "Entrega de paquete",
     );
 
-    // Verificaciones
     expect(mockPrisma.visitor.findFirst).toHaveBeenCalledWith({
       where: { identification: "1234567890" },
     });
-
     expect(mockPrisma.visitor.create).not.toHaveBeenCalled();
     expect(mockPrisma.visit.create).toHaveBeenCalled();
     expect(result).toEqual(mockVisit);
@@ -334,7 +292,6 @@ describe("registerVisit", () => {
 
 describe("notifyResidents", () => {
   it("debe notificar a los residentes de una unidad", async () => {
-    // Configurar mocks
     const mockVisit = {
       id: "visit-123",
       visitorId: "visitor-123",
@@ -355,17 +312,12 @@ describe("notifyResidents", () => {
       },
     };
 
-    // Mock para visit.findUnique
     (mockPrisma.visit.findUnique as jest.Mock).mockResolvedValue(mockVisit);
-
-    // Mock para unit.findUnique
     (mockPrisma.unit.findUnique as jest.Mock).mockResolvedValue({
       id: 1,
       number: "101",
       residents: [1, 2],
     });
-
-    // Mock para userIntercomPreference.findUnique
     (mockPrisma.userIntercomPreference.findUnique as jest.Mock)
       .mockResolvedValueOnce({
         userId: 1,
@@ -385,28 +337,20 @@ describe("notifyResidents", () => {
         allowedVisitorTypes: [],
         autoApproveTypes: [],
       });
-
-    // Mock para virtualIntercomNotification.create
-    (
-      mockPrisma.virtualIntercomNotification.create as jest.Mock
-    ).mockResolvedValue({
+    (mockPrisma.virtualIntercomNotification.create as jest.Mock).mockResolvedValue({
       id: "notification-1",
       visitId: "visit-123",
       userId: 1,
       channel: mockNotificationChannel.WHATSAPP,
       status: mockNotificationStatus.PENDING,
     });
-
-    // Mock para visit.update
     (mockPrisma.visit.update as jest.Mock).mockResolvedValue({
       ...mockVisit,
       status: mockVisitStatus.NOTIFIED,
     });
 
-    // Ejecutar función
     await intercomService.notifyResidents("visit-123");
 
-    // Verificaciones
     expect(mockPrisma.visit.findUnique).toHaveBeenCalledWith({
       where: { id: "visit-123" },
       include: {
@@ -416,18 +360,11 @@ describe("notifyResidents", () => {
         unit: true,
       },
     });
-
     expect(mockPrisma.unit.findUnique).toHaveBeenCalledWith({
       where: { id: 1 },
     });
-
-    expect(mockPrisma.userIntercomPreference.findUnique).toHaveBeenCalledTimes(
-      2,
-    );
-    expect(mockPrisma.virtualIntercomNotification.create).toHaveBeenCalledTimes(
-      2,
-    );
-
+    expect(mockPrisma.userIntercomPreference.findUnique).toHaveBeenCalledTimes(2);
+    expect(mockPrisma.virtualIntercomNotification.create).toHaveBeenCalledTimes(2);
     expect(mockPrisma.visit.update).toHaveBeenCalledWith({
       where: { id: "visit-123" },
       data: { status: mockVisitStatus.NOTIFIED },
@@ -435,7 +372,6 @@ describe("notifyResidents", () => {
   });
 
   it("debe manejar la aprobación automática para tipos de visitantes configurados", async () => {
-    // Configurar mocks
     const mockVisit = {
       id: "visit-123",
       visitorId: "visitor-123",
@@ -457,95 +393,63 @@ describe("notifyResidents", () => {
       },
     };
 
-    // Mock para visit.findUnique
     (mockPrisma.visit.findUnique as jest.Mock).mockResolvedValue(mockVisit);
-
-    // Mock para unit.findUnique
     (mockPrisma.unit.findUnique as jest.Mock).mockResolvedValue({
       id: 1,
       number: "101",
       residents: [1],
     });
-
-    // Mock para userIntercomPreference.findUnique (con auto-aprobación para tipo 2)
-    (
-      mockPrisma.userIntercomPreference.findUnique as jest.Mock
-    ).mockResolvedValue({
+    (mockPrisma.userIntercomPreference.findUnique as jest.Mock).mockResolvedValue({
       userId: 1,
       whatsappEnabled: true,
       whatsappNumber: "+573001234567",
       notifyAllVisitors: true,
       allowedVisitorTypes: [],
-      autoApproveTypes: [2], // Auto-aprobar tipo 2 (Familiar)
+      autoApproveTypes: [2],
     });
 
-    // Spy en approveVisit
-    const approveVisitSpy = jest
-      .spyOn(intercomService, "approveVisit")
-      .mockResolvedValue(undefined);
+    const approveVisitSpy = jest.spyOn(intercomService, "approveVisit").mockResolvedValue(undefined as any);
 
-    // Ejecutar función
     await intercomService.notifyResidents("visit-123");
 
-    // Verificaciones
     expect(approveVisitSpy).toHaveBeenCalledWith("visit-123", 1);
-    expect(
-      mockPrisma.virtualIntercomNotification.create,
-    ).not.toHaveBeenCalled();
+    expect(mockPrisma.virtualIntercomNotification.create).not.toHaveBeenCalled();
   });
 });
 
 describe("processWebhook", () => {
   it("debe procesar una respuesta de aprobación por WhatsApp", async () => {
-    // Configurar mocks
     const mockPayload = {
       From: "whatsapp:+573001234567",
       Body: "si",
       MessageSid: "message-123",
     };
 
-    // Mock para userIntercomPreference.findFirst
-    (
-      mockPrisma.userIntercomPreference.findFirst as jest.Mock
-    ).mockResolvedValue({
+    (mockPrisma.userIntercomPreference.findFirst as jest.Mock).mockResolvedValue({
       userId: 1,
       whatsappNumber: "+573001234567",
     });
-
-    // Mock para virtualIntercomNotification.findFirst
-    (
-      mockPrisma.virtualIntercomNotification.findFirst as jest.Mock
-    ).mockResolvedValue({
+    (mockPrisma.virtualIntercomNotification.findFirst as jest.Mock).mockResolvedValue({
       id: "notification-1",
       visitId: "visit-123",
       userId: 1,
       channel: mockNotificationChannel.WHATSAPP,
       status: mockNotificationStatus.SENT,
     });
+    (mockPrisma.virtualIntercomNotification.update as jest.Mock).mockResolvedValue({});
 
-    // Mock para virtualIntercomNotification.update
-    (
-      mockPrisma.virtualIntercomNotification.update as jest.Mock
-    ).mockResolvedValue({});
+    const processApprovalSpy = jest.spyOn(intercomService, "processApproval" as any).mockResolvedValue(undefined as any);
 
-    // Spy en processApproval
-    const processApprovalSpy = jest
-      .spyOn(intercomService, "processApproval" as any)
-      .mockResolvedValue(undefined);
-
-    // Ejecutar función
     const result = await intercomService.processWebhook(
       mockNotificationChannel.WHATSAPP,
       mockPayload,
     );
 
-    // Verificaciones
     expect(result).toEqual({ success: true });
     expect(processApprovalSpy).toHaveBeenCalledWith("notification-1");
   });
 
   it("debe procesar una respuesta de rechazo por Telegram", async () => {
-    // Configurar mocks
     const mockPayload = {
       update_id: 123456789,
       callback_query: {
@@ -559,54 +463,24 @@ describe("processWebhook", () => {
       },
     };
 
-    // Mock the verifyWebhook method of the TelegramAdapter instance created by IntercomService
-    // This simulates a scenario where the webhook verification fails.
-    import { TelegramAdapter } from "../../lib/communications/telegram-adapter";
-    (TelegramAdapter as jest.Mock).mockImplementationOnce(() => ({
-      sendMessage: jest.fn().mockResolvedValue({
-        success: true,
-        messageId: "mock-telegram-message-id",
-      }),
-      verifyWebhook: jest.fn().mockReturnValue(false), // Simulate verification failure
-      parseResponse: jest.fn().mockReturnValue({
-        from: "mock-telegram-from",
-        text: "mock-telegram-text",
-        timestamp: new Date(),
-        messageId: "mock-telegram-message-id",
-        type: "text",
-      }),
-    }));
+    (TelegramAdapter.prototype.verifyWebhook as jest.Mock).mockReturnValue(false);
 
-    // Re-instantiate intercomService to pick up the new mock behavior
-    import { IntercomService } from "../../lib/services/intercom-service";
-    intercomService = new intercomServiceModule.IntercomService();
+    const processRejectionSpy = jest.spyOn(intercomService, "processRejection" as any).mockResolvedValue(undefined as any);
 
-    // Spy en processRejection
-    const processRejectionSpy = jest
-      .spyOn(intercomService, "processRejection" as any)
-      .mockResolvedValue(undefined);
-
-    // Ejecutar función
     const result = await intercomService.processWebhook(
       mockNotificationChannel.TELEGRAM,
       mockPayload,
     );
 
-    // Verificaciones
-    expect(result).toEqual({
-      success: false,
-      error: "No hay adaptador configurado para el canal TELEGRAM",
-    });
-    expect(processRejectionSpy).not.toHaveBeenCalled(); // Should not be called if verification fails
+    expect(result).toEqual({ success: false, error: "Webhook verification failed" });
+    expect(processRejectionSpy).not.toHaveBeenCalled();
   });
 });
 
 describe("approveVisit", () => {
   it("debe actualizar el estado de la visita a APPROVED", async () => {
-    // Ejecutar función
     await intercomService.approveVisit("visit-123", 1);
 
-    // Verificaciones
     expect(mockPrisma.visit.update).toHaveBeenCalledWith({
       where: { id: "visit-123" },
       data: {
@@ -619,10 +493,8 @@ describe("approveVisit", () => {
 
 describe("rejectVisit", () => {
   it("debe actualizar el estado de la visita a REJECTED", async () => {
-    // Ejecutar función
     await intercomService.rejectVisit("visit-123", 1);
 
-    // Verificaciones
     expect(mockPrisma.visit.update).toHaveBeenCalledWith({
       where: { id: "visit-123" },
       data: {
@@ -635,7 +507,6 @@ describe("rejectVisit", () => {
 
 describe("getVisitHistory", () => {
   it("debe obtener el historial de visitas con paginación", async () => {
-    // Configurar mocks
     const mockVisits = [
       {
         id: "visit-123",
@@ -653,19 +524,14 @@ describe("getVisitHistory", () => {
       },
     ];
 
-    // Mock para visit.findMany
     (mockPrisma.visit.findMany as jest.Mock).mockResolvedValue(mockVisits);
-
-    // Mock para visit.count
     (mockPrisma.visit.count as jest.Mock).mockResolvedValue(1);
 
-    // Ejecutar función
     const result = await intercomService.getVisitHistory(1, {
       page: 1,
       pageSize: 10,
     });
 
-    // Verificaciones
     expect(mockPrisma.visit.findMany).toHaveBeenCalledWith({
       where: { unitId: 1 },
       include: {
@@ -680,11 +546,9 @@ describe("getVisitHistory", () => {
       skip: 0,
       take: 10,
     });
-
     expect(mockPrisma.visit.count).toHaveBeenCalledWith({
       where: { unitId: 1 },
     });
-
     expect(result).toEqual({
       data: mockVisits,
       pagination: {
@@ -697,15 +561,12 @@ describe("getVisitHistory", () => {
   });
 
   it("debe aplicar filtros correctamente", async () => {
-    // Configurar mocks
     (mockPrisma.visit.findMany as jest.Mock).mockResolvedValue([]);
     (mockPrisma.visit.count as jest.Mock).mockResolvedValue(0);
 
-    // Fechas para filtros
     const startDate = new Date("2025-01-01");
     const endDate = new Date("2025-01-31");
 
-    // Ejecutar función con filtros
     await intercomService.getVisitHistory(1, {
       status: mockVisitStatus.APPROVED,
       startDate: startDate.toISOString(),
@@ -714,7 +575,6 @@ describe("getVisitHistory", () => {
       pageSize: 5,
     });
 
-    // Verificaciones
     expect(mockPrisma.visit.findMany).toHaveBeenCalledWith({
       where: {
         unitId: 1,
@@ -741,7 +601,6 @@ describe("getVisitHistory", () => {
 
 describe("updateUserPreferences", () => {
   it("debe actualizar preferencias existentes", async () => {
-    // Configurar mocks
     const mockPreferences = {
       userId: 1,
       whatsappEnabled: true,
@@ -749,32 +608,21 @@ describe("updateUserPreferences", () => {
       telegramEnabled: false,
     };
 
-    // Mock para userIntercomPreference.findUnique
-    (
-      mockPrisma.userIntercomPreference.findUnique as jest.Mock
-    ).mockResolvedValue({
+    (mockPrisma.userIntercomPreference.findUnique as jest.Mock).mockResolvedValue({
       id: 1,
       userId: 1,
     });
-
-    // Mock para userIntercomPreference.update
     (mockPrisma.userIntercomPreference.update as jest.Mock).mockResolvedValue({
       id: 1,
       ...mockPreferences,
     });
 
-    // Ejecutar función
-    const result = await intercomService.updateUserPreferences(
-      1,
-      mockPreferences,
-    );
+    const result = await intercomService.updateUserPreferences(1, mockPreferences);
 
-    // Verificaciones
     expect(mockPrisma.userIntercomPreference.update).toHaveBeenCalledWith({
       where: { userId: 1 },
       data: mockPreferences,
     });
-
     expect(result).toEqual({
       id: 1,
       ...mockPreferences,
@@ -782,7 +630,6 @@ describe("updateUserPreferences", () => {
   });
 
   it("debe crear nuevas preferencias si no existen", async () => {
-    // Configurar mocks
     const mockPreferences = {
       userId: 1,
       whatsappEnabled: true,
@@ -790,32 +637,21 @@ describe("updateUserPreferences", () => {
       telegramEnabled: false,
     };
 
-    // Mock para userIntercomPreference.findUnique
-    (
-      mockPrisma.userIntercomPreference.findUnique as jest.Mock
-    ).mockResolvedValue(null);
-
-    // Mock para userIntercomPreference.create
+    (mockPrisma.userIntercomPreference.findUnique as jest.Mock).mockResolvedValue(null);
     (mockPrisma.userIntercomPreference.create as jest.Mock).mockResolvedValue({
       id: 1,
       userId: 1,
       ...mockPreferences,
     });
 
-    // Ejecutar función
-    const result = await intercomService.updateUserPreferences(
-      1,
-      mockPreferences,
-    );
+    const result = await intercomService.updateUserPreferences(1, mockPreferences);
 
-    // Verificaciones
     expect(mockPrisma.userIntercomPreference.create).toHaveBeenCalledWith({
       data: {
         userId: 1,
         ...mockPreferences,
       },
     });
-
     expect(result).toEqual({
       id: 1,
       ...mockPreferences,
@@ -825,33 +661,24 @@ describe("updateUserPreferences", () => {
 
 describe("updateSettings", () => {
   it("debe actualizar la configuración existente", async () => {
-    // Configurar mocks
     const mockSettings = {
       whatsappEnabled: true,
       telegramEnabled: true,
       defaultResponseTimeout: 60,
     };
 
-    // Mock para intercomSettings.findFirst
-    (mockPrisma.intercomSettings.findFirst as jest.Mock).mockResolvedValue({
-      id: 1,
-    });
-
-    // Mock para intercomSettings.update
+    (mockPrisma.intercomSettings.findFirst as jest.Mock).mockResolvedValue({ id: 1 });
     (mockPrisma.intercomSettings.update as jest.Mock).mockResolvedValue({
       id: 1,
       ...mockSettings,
     });
 
-    // Ejecutar función
     const result = await intercomService.updateSettings(mockSettings);
 
-    // Verificaciones
     expect(mockPrisma.intercomSettings.update).toHaveBeenCalledWith({
       where: { id: 1 },
       data: mockSettings,
     });
-
     expect(result).toEqual({
       id: 1,
       ...mockSettings,
@@ -859,32 +686,21 @@ describe("updateSettings", () => {
   });
 
   it("debe crear nueva configuración si no existe", async () => {
-    // Configurar mocks
     const mockSettings = {
       whatsappEnabled: true,
       telegramEnabled: true,
       defaultResponseTimeout: 60,
     };
 
-    // Mock para intercomSettings.findFirst
-    (mockPrisma.intercomSettings.findFirst as jest.Mock).mockResolvedValue(
-      null,
-    );
-
-    // Mock para intercomSettings.create
+    (mockPrisma.intercomSettings.findFirst as jest.Mock).mockResolvedValue(null);
     (mockPrisma.intercomSettings.create as jest.Mock).mockResolvedValue({
       id: 1,
       ...mockSettings,
     });
 
-    // Ejecutar función
     const result = await intercomService.updateSettings(mockSettings);
 
-    // Verificaciones
-    expect(mockPrisma.intercomSettings.create).toHaveBeenCalledWith({
-      data: mockSettings,
-    });
-
+    expect(mockPrisma.intercomSettings.create).toHaveBeenCalledWith({ data: mockSettings });
     expect(result).toEqual({
       id: 1,
       ...mockSettings,
