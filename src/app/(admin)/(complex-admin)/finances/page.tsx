@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2 } from "lucide-react";
+import { Loader2, DollarSign } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -15,58 +15,46 @@ import {
   getRecentTransactions,
 } from "@/services/financeService";
 import { BankStatementUpload } from "@/components/finances/BankStatementUpload";
+import { FeeGenerationForm } from "@/components/finances/FeeGenerationForm";
+import { FineManagementForm } from "@/components/finances/FineManagementForm";
+import { PaymentGatewayConfig } from "@/components/finances/PaymentGatewayConfig";
+import { FinancialReportsGenerator } from "@/components/finances/FinancialReportsGenerator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+// Define interfaces for the data structures
+interface FinanceSummary {
+  currentBalance: number;
+  balanceChange: string;
+  monthlyIncome: number;
+  incomeChange: string;
+  monthlyExpenses: number;
+  expenseChange: string;
+  pendingBills: number;
+  pendingBillsAmount: number;
+}
+
+interface Transaction {
+  id: string;
+  date: string;
+  description: string;
+  amount: number;
+  type: "income" | "expense";
+}
+
 // Placeholder Components for missing functionalities
-const FeeGenerationSection = () => (
-  <Card>
-    <CardHeader>
-      <CardTitle>Generación de Cuotas</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <p>Aquí se gestionará la generación de cuotas.</p>
-    </CardContent>
-  </Card>
-);
+<FeeGenerationForm />
 
-const FineManagementSection = () => (
-  <Card>
-    <CardHeader>
-      <CardTitle>Gestión de Multas e Intereses</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <p>Aquí se gestionarán las multas e intereses.</p>
-    </CardContent>
-  </Card>
-);
+<FineManagementForm />
 
-const PaymentGatewaySection = () => (
-  <Card>
-    <CardHeader>
-      <CardTitle>Integración con Pasarelas de Pago</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <p>Aquí se configurarán las pasarelas de pago.</p>
-    </CardContent>
-  </Card>
-);
+<PaymentGatewayConfig />
 
-const FinancialReportsSection = () => (
-  <Card>
-    <CardHeader>
-      <CardTitle>Informes Financieros</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <p>Aquí se generarán los informes financieros.</p>
-    </CardContent>
-  </Card>
-);
+<FinancialReportsGenerator />
 
 export default function FinancesPage() {
   const { user } = useAuthStore();
-  const [summary, setSummary] = useState<any>(null);
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [summary, setSummary] = useState<FinanceSummary | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -126,7 +114,7 @@ export default function FinancesPage() {
           <TabsTrigger value="fees">Cuotas</TabsTrigger>
           <TabsTrigger value="fines">Multas/Intereses</TabsTrigger>
           <TabsTrigger value="payments">Pagos</TabsTrigger>
-          <TabsTrigger value="reports">Informes</TabsTrigger>
+          <TabsTrigger value="reports">Informes</T>
         </TabsList>
 
         <TabsContent value="overview" className="mt-6">
@@ -212,7 +200,7 @@ export default function FinancesPage() {
               </TableHeader>
               <TableBody>
                 {transactions.length > 0 ? (
-                  transactions.map((transaction: any) => (
+                  transactions.map((transaction) => (
                     <TableRow key={transaction.id}>
                       <TableCell>
                         {new Date(transaction.date).toLocaleDateString()}

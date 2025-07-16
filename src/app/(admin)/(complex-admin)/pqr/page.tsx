@@ -4,6 +4,7 @@ import { useAuthStore } from "@/store/authStore";
 import AdminHeader from "@/components/admin/layout/AdminHeader";
 import AdminSidebar from "@/components/admin/layout/AdminSidebar";
 import { Loader2 } from "lucide-react";
+import PQRManagement from "@/components/pqr/PQRManagement";
 
 export default function PQRPage() {
   const { user, loading, logout } = useAuthStore();
@@ -31,10 +32,7 @@ export default function PQRPage() {
           className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? "ml-16" : "ml-64"}`}
         >
           <div className="p-6">
-            <h1 className="text-2xl font-bold mb-6">Gestión de PQR</h1>
-            <div className="bg-white rounded-lg shadow p-6">
-              <p>Sistema de Peticiones, Quejas y Reclamos</p>
-            </div>
+            <PQRManagement />
           </div>
         </main>
       </div>

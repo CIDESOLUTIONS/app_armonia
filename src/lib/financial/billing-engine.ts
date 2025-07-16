@@ -1,6 +1,6 @@
 // src/lib/financial/billing-engine.ts
 import { PlanType } from "@prisma/client";
-import { getPrisma } from "@/lib/prisma";
+import { getTenantPrismaClient, getPublicPrismaClient } from "@/lib/prisma";
 import { FreemiumService } from "@/lib/freemium-service";
 
 export interface BillingPeriod {
@@ -43,7 +43,8 @@ export class BillingEngine {
     complexId: number,
     period: BillingPeriod,
   ): Promise<GeneratedBill[]> {
-    const prisma = getPrisma();
+    const schemaName = `tenant_${complexId}`;
+    const prisma = getTenantPrismaClient(schemaName);
 
     // Verificar si el complejo tiene acceso a facturación avanzada
     const complex = await prisma.residentialComplex.findUnique({
@@ -131,8 +132,9 @@ export class BillingEngine {
   /**
    * Persiste las facturas generadas en la base de datos
    */
-  static async saveBills(bills: GeneratedBill[]): Promise<void> {
-    const prisma = getPrisma();
+  static async saveBills(bills: GeneratedBill[], complexId: number): Promise<void> {
+    const schemaName = `tenant_${complexId}`;
+    const prisma = getTenantPrismaClient(schemaName);
 
     await prisma.$transaction(async (tx) => {
       for (const bill of bills) {
@@ -257,7 +259,8 @@ export class BillingEngine {
     startDate: Date,
     endDate: Date,
   ) {
-    const prisma = getPrisma();
+    const schemaName = `tenant_${complexId}`;
+    const prisma = getTenantPrismaClient(schemaName);
 
     const [bills, payments, expenses] = await Promise.all([
       // Facturas del período

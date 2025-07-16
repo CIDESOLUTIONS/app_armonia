@@ -11,7 +11,7 @@ import {
   createCommonArea,
   cancelReservation,
   getUserNotifications,
-} from "../reservationService";
+} from "@/services/reservationService";
 
 // Mock PrismaClient and ReservationStatus
 jest.mock("@prisma/client", () => {
@@ -362,7 +362,7 @@ describe("ReservationService", () => {
 
       // Execute & Verify
       await expect(
-        reservationService.createReservation(mockReservationData),
+        createReservation(mockReservationData),
       ).rejects.toThrow("El horario solicitado no está disponible");
     });
   });

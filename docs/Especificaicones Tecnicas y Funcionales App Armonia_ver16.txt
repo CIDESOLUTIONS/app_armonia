@@ -138,7 +138,7 @@ Panel Administrador de la Aplicación
 * Estadísticas y métricas de uso
 * Gestión de licencias y planes
 * Soporte y asistencia técnica
-* Gestión comercial de clientes del plan básico para conversion.
+* Gestión comercial de clientes del plan básico para conversión.
 * Configuración global del sistema
 * Monitoreo de disponibilidad y tiempos de respuesta
 * Alertas automáticas para incidentes

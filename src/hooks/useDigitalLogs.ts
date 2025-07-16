@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { apiClient } from "@/lib/api-client";
+import { createDigitalLog, updateDigitalLog, deleteDigitalLog, getDigitalLog, searchDigitalLogs, reviewDigitalLog, DigitalLog, CreateDigitalLogData, SearchFilters, Pagination } from "@/services/digitalLogService";
 
 export interface DigitalLog {
   id: number;
@@ -199,7 +199,7 @@ export function useDigitalLogs(): UseDigitalLogsReturn {
         setLoading(true);
         setError(null);
 
-        const response = await apiClient.post("/security/digital-logs", data);
+        const response = await createDigitalLog(data);
 
         if (response.success) {
           // Actualizar lista local
@@ -227,10 +227,7 @@ export function useDigitalLogs(): UseDigitalLogsReturn {
         setLoading(true);
         setError(null);
 
-        const response = await apiClient.put(
-          `/security/digital-logs/${id}`,
-          updates,
-        );
+        const response = await updateDigitalLog(id, updates);
 
         if (response.success) {
           // Actualizar en lista local
@@ -268,7 +265,7 @@ export function useDigitalLogs(): UseDigitalLogsReturn {
         setLoading(true);
         setError(null);
 
-        const response = await apiClient.delete(`/security/digital-logs/${id}`);
+        const response = await deleteDigitalLog(id);
 
         if (response.success) {
           // Remover de lista local
@@ -300,7 +297,7 @@ export function useDigitalLogs(): UseDigitalLogsReturn {
     try {
       setError(null);
 
-      const response = await apiClient.get(`/security/digital-logs/${id}`);
+      const response = await getDigitalLog(id);
 
       if (response.success) {
         return response.digitalLog;
@@ -329,9 +326,7 @@ export function useDigitalLogs(): UseDigitalLogsReturn {
           }
         });
 
-        const response = await apiClient.get(
-          `/security/digital-logs?${params.toString()}`,
-        );
+        const response = await searchDigitalLogs(filters);
 
         if (response.success) {
           setDigitalLogs(response.digitalLogs);
@@ -360,11 +355,7 @@ export function useDigitalLogs(): UseDigitalLogsReturn {
 
   const reviewLog = useCallback(
     async (id: number, reviewNotes?: string): Promise<boolean> => {
-      return await updateLog(id, {
-        supervisorReview: true,
-        reviewNotes,
-        status: "IN_REVIEW",
-      });
+      return await reviewDigitalLog(id, reviewNotes);
     },
     [updateLog],
   );

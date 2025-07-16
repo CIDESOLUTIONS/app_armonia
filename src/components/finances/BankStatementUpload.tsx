@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, UploadCloud } from "lucide-react";
 import { ReconciliationSuggestions } from "./ReconciliationSuggestions";
+import { uploadBankStatement } from "@/services/financeService";
 
 export function BankStatementUpload() {
   const { toast } = useToast();
@@ -29,26 +30,16 @@ export function BankStatementUpload() {
     }
 
     setLoading(true);
-    const formData = new FormData();
-    formData.append("file", file);
 
     try {
-      const response = await fetch("/api/finances/upload-statement", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al subir el archivo.");
-      }
-
-      const data = await response.json();
+      const data = await uploadBankStatement(file);
       setSuggestions(data);
       toast({
         title: "Éxito",
         description: "Archivo procesado. Revisa las sugerencias.",
       });
     } catch (error) {
+      console.error("Error uploading bank statement:", error);
       toast({ title: "Error", description: "No se pudo subir el archivo." });
     } finally {
       setLoading(false);
