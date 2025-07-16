@@ -21,7 +21,7 @@ export class DocumentsService {
   async uploadDocument(
     schemaName: string,
     userId: number,
-    file: Express.Multer.File,
+    file: any, // Cambiado a any
     createDocumentDto: CreateDocumentDto,
   ): Promise<DocumentDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
@@ -74,8 +74,8 @@ export class DocumentsService {
 
     return prisma.document.findMany({
       where,
-      skip: (filters.page - 1) * filters.limit || 0,
-      take: filters.limit || 10,
+      skip: ((filters.page ?? 1) - 1) * (filters.limit ?? 10), // Usar ??
+      take: filters.limit ?? 10, // Usar ??
       orderBy: { uploadedAt: 'desc' },
       // include: { uploadedBy: { select: { name: true } } }, // Uncomment if User relation exists
     });

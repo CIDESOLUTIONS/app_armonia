@@ -366,7 +366,7 @@ export class FinancesService {
   async initiatePayment(
     schemaName: string,
     userId: number,
-    data: InitiatePaymentDto,
+    data: any, // Cambiado de InitiatePaymentDto a any
   ): Promise<any> {
     const prisma = this.getTenantPrismaClient(schemaName);
     // Lógica para iniciar el pago con una pasarela externa
