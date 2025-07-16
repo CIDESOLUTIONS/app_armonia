@@ -2,7 +2,7 @@
 Especificaciones Técnicas 
 Sistema de Administración de Conjuntos Residenciales
 Versión: 16
-Fecha de Actualización: 13 de julio de 2025
+Fecha de Actualización: 16 de julio de 2025
 Cambios Principales: Se expanden y detallan las especificaciones funcionales para el "Marketplace Comunitario" y el "Módulo de Ecosistema y Alianzas", atendiendo a la necesidad de mayor concreción para el desarrollo.
  
 1. Introducción
@@ -34,15 +34,6 @@ Nuestra misión es transformar radicalmente la gestión y la experiencia de vida
 * Hosting: Vercel (Frontend), AWS/GCP (Backend/DB)
 * Arquitectura: Multi-tenant (un esquema de base de datos por tenant/conjunto)
 * Métricas de Rendimiento: Core Web Vitals (LCP < 2.5s, INP < 200ms, CLS < 0.1)
-Panel Administrador de la Aplicación
-* Gestión de conjuntos residenciales (número de inscripciones por cada modelo freemium)
-* Ingresos mensuales y acumulados anuales 
-* Monitoreo de uso y rendimiento
-* Estadísticas y métricas de uso
-* Gestión de licencias y planes
-* Soporte y asistencia técnica
-* Gestión comercial de clientes básico para que tomen el modelo estándar o premium.
-* Configuración global del sistema
 
 Interfaces de Usuario
 Diseño General
@@ -141,6 +132,7 @@ Escalabilidad
 
 Panel Administrador de la Aplicación
 * Gestión de conjuntos residenciales (número de inscripciones por cada modelo freemium)
+* Dashboard de métricas operativas 
 * Ingresos mensuales y acumulados anuales 
 * Monitoreo de uso y rendimiento
 * Estadísticas y métricas de uso
@@ -148,13 +140,11 @@ Panel Administrador de la Aplicación
 * Soporte y asistencia técnica
 * Gestión comercial de clientes del plan básico para conversion.
 * Configuración global del sistema
-Monitoreo 
 * Monitoreo de disponibilidad y tiempos de respuesta
 * Alertas automáticas para incidentes
-* Dashboard de métricas operativas
 * Análisis de logs centralizados
 * Monitoreo de experiencia del usuario real
- 
+
 
 3. Módulos y Portales de la Plataforma
 3.1. Portal Público y de Adquisición
@@ -185,6 +175,7 @@ Vista general con KPIs: estado de cartera, PQR pendientes, reservas del día, ú
   - Propósito Estratégico: Reduce drásticamente el trabajo manual y los errores, convirtiéndose en una funcionalidad clave para justificar el valor de los planes Premium y atraer administradores que buscan máxima eficiencia.
 3.2.5. Módulo de Reservas
 Gestión de áreas comunes y amenidades (salón social, BBQ, canchas) con calendario, reglas de uso y sistema de aprobación.
+3.2.6. Módulo de manejo de proyectos y obras del conjunto (desde la aprobación en asamblea, presupuestos, recolección de cuotas extras, planeación, ejecución y entrega). debe tener visibilidad de avance para dashboard de residente.
 
 3.3. Portal de Residentes (App Móvil y Web)
 * Acceso a comunicados, cartelera y documentos.
