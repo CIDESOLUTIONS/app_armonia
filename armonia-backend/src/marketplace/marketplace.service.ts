@@ -56,8 +56,8 @@ export class MarketplaceService {
 
     return prisma.listing.findMany({
       where,
-      skip: (filters.page - 1) * filters.limit || 0,
-      take: filters.limit || 10,
+      skip: ((filters.page ?? 1) - 1) * (filters.limit ?? 10),
+      take: filters.limit ?? 10,
       orderBy: { createdAt: 'desc' },
       include: { author: { select: { name: true } } },
     });

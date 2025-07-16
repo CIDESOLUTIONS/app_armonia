@@ -1,45 +1,45 @@
-// Esquema para el sistema de visitantes
-
-datasource db {
-  provider   = "postgresql"
-  url        = env("DATABASE_URL")
-}
-
-generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["multiSchema"]
-}
+// Actualización del esquema Prisma para incluir las ampliaciones del modelo de visitantes
 
 // Enumeraciones para el sistema de visitantes
 enum DocumentType {
-  CC
-  CE
-  PASSPORT
-  OTHER
+  CC      // Cédula de Ciudadanía
+  CE      // Cédula de Extranjería
+  PASSPORT // Pasaporte
+  OTHER   // Otro tipo de documento
+  
+  @@schema("tenant")
 }
 
 enum VisitorStatus {
-  ACTIVE
-  DEPARTED
+  ACTIVE   // Visitante actualmente en las instalaciones
+  DEPARTED // Visitante que ya salió
+  
+  @@schema("tenant")
 }
 
 enum AccessPassType {
-  SINGLE_USE
-  TEMPORARY
-  RECURRENT
+  SINGLE_USE // Pase de un solo uso
+  TEMPORARY  // Pase temporal con validez limitada
+  RECURRENT  // Pase recurrente (ej: servicios de limpieza)
+  
+  @@schema("tenant")
 }
 
 enum AccessPassStatus {
-  ACTIVE
-  USED
-  EXPIRED
-  REVOKED
+  ACTIVE  // Pase activo y válido
+  USED    // Pase ya utilizado (para single_use)
+  EXPIRED // Pase expirado
+  REVOKED // Pase revocado por administración
+  
+  @@schema("tenant")
 }
 
 enum AccessAction {
-  ENTRY
-  EXIT
-  DENIED
+  ENTRY  // Registro de entrada
+  EXIT   // Registro de salida
+  DENIED // Acceso denegado
+  
+  @@schema("tenant")
 }
 
 // Modelo actualizado para Visitantes
@@ -89,7 +89,6 @@ model PreRegisteredVisitor {
   documentType    DocumentType? // Tipo de documento (opcional en pre-registro)
   documentNumber  String?   // Número de documento (opcional en pre-registro)
   residentId      Int       // ID del residente que autoriza
-  resident        User      @relation(fields: [residentId], references: [id])
   unitId          Int       // ID de la unidad de destino
   expectedDate    DateTime  // Fecha esperada de visita
   validFrom       DateTime  // Inicio de validez del pre-registro

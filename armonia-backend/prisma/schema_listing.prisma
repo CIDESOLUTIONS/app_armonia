@@ -1,0 +1,21 @@
+model Listing {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  price       Float
+  category    String
+  author      User      @relation(fields: [authorId], references: [id])
+  authorId    Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  images      String[]
+  isSold      Boolean   @default(false)
+  reports     Report[]
+  messages    Message[]
+  reportedListings ReportedListing[]
+  complexId   Int
+  complex     ResidentialComplex @relation(fields: [complexId], references: [id])
+
+  @@index([authorId])
+  @@index([complexId])
+}

@@ -1,5 +1,14 @@
 import { pathsToModuleNameMapper } from 'ts-jest';
-import { compilerOptions } from './tsconfig.json';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const tsConfigPath = path.resolve(__dirname, 'tsconfig.json');
+const tsConfig = JSON.parse(fs.readFileSync(tsConfigPath, 'utf8'));
+const { compilerOptions } = tsConfig;
 
 const config = {
   moduleFileExtensions: [
@@ -19,7 +28,7 @@ const config = {
   testEnvironment: 'node',
   roots: ['.'],
   modulePaths: [compilerOptions.baseUrl],
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
+  
 };
 
 export default config;

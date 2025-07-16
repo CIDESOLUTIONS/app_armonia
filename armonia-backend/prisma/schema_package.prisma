@@ -1,0 +1,50 @@
+model Package {
+  id                Int             @id @default(autoincrement())
+  trackingCode      String?
+  type              PackageType
+  trackingNumber    String?
+  courier           String?
+  senderName        String?
+  senderCompany     String?
+  residentId        Int?
+  unitId            Int
+  unitNumber        String
+  residentName      String
+  receivedAt        DateTime
+  notifiedAt        DateTime?
+  deliveredAt       DateTime?
+  expirationDate    DateTime?
+  status            PackageStatus   @default(RECEIVED)
+  priority          PackagePriority @default(NORMAL)
+  receivedByStaffId Int
+  receivedByStaffName String
+  deliveredByStaffId Int?
+  deliveredByStaffName String?
+  receivedByResidentId Int?
+  receivedByResidentName String?
+  size              String?
+  weight            Float?
+  isFragile         Boolean         @default(false)
+  needsRefrigeration Boolean        @default(false)
+  description       String?
+  notes             String?
+  tags              String[]
+  mainPhotoUrl      String?
+  attachments       Json?
+  signatureUrl      String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  statusHistory     PackageStatusHistory[]
+  notifications     PackageNotification[]
+  registeredBy      User            @relation("RegisteredPackages", fields: [registeredBy], references: [id])
+  registeredById    Int
+  
+  @@index([status])
+  @@index([receivedAt])
+  @@index([unitNumber])
+  @@index([residentId])
+  @@index([trackingCode])
+  @@index([trackingNumber])
+  
+  
+}

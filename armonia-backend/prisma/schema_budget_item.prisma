@@ -1,0 +1,11 @@
+model BudgetItem {
+  id          Int      @id @default(autoincrement())
+  budgetId    Int
+  budget      Budget   @relation(fields: [budgetId], references: [id])
+  description String
+  amount      Float
+  category    String
+  order       Int
+
+  @@index([budgetId])
+}

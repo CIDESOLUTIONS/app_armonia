@@ -1,0 +1,20 @@
+model PaymentAttempt {
+  id            Int      @id @default(autoincrement())
+  feeId         Int
+  fee           Fee      @relation(fields: [feeId], references: [id])
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  amount        Float
+  paymentMethod String
+  transactionId String   @unique
+  status        String   // PENDING, COMPLETED, FAILED
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  propertyId    Int
+  property      Property @relation(fields: [propertyId], references: [id])
+
+  @@index([feeId])
+  @@index([userId])
+  @@index([transactionId])
+  @@index([propertyId])
+}
