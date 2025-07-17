@@ -256,3 +256,4 @@ Gestión de áreas comunes y amenidades (salón social, BBQ, canchas) con calend
 * Plan Premium: Todo lo del Estándar + Conciliación Bancaria Automática, Acceso a API, y acceso al Marketplace Comunitario y al Directorio de Servicios y Democracia Digital integrada. mas de 150 unidades residenciales.
 * Plan Empresarial "Portafolio": Todo lo del Premium + Dashboard "Armonía Portafolio", personalización de marca, soporte prioritario.
 * Plan Democracia Digital
+
