@@ -6,18 +6,20 @@
  * para implementar los requisitos avanzados de la especificación v10.
  */
 
+import { Injectable } from '@nestjs/common';
+import { PrismaClientManager } from '../prisma/prisma-client-manager';
+import { PrismaService } from '../prisma/prisma.service';
 import {
-  PrismaClient,
   AssemblyStatus,
   VotingStatus,
   QuorumStatus,
   MinutesStatus,
   SignatureStatus,
 } from "@prisma/client";
-import { getTenantPrismaClient } from "@/lib/prisma";
 import { ServerLogger } from "../logging/server-logger";
 import { ActivityLogger } from "../logging/activity-logger";
 import { WebSocketService } from "../communications/websocket-service";
+import { DigitalSignatureService } from "./digital-signature-service";
 import {
   notifyAssemblyConvocation,
   notifyQuorumReached,
@@ -27,23 +29,19 @@ import {
   notifyMinutesAvailable,
 } from "../communications/integrations/assembly-notifications";
 import { generatePdf } from "../pdf/pdfGenerator";
-import { DigitalSignatureService } from "./digital-signature-service";
 
 /**
  * Servicio avanzado para gestión de asambleas
  */
+@Injectable()
 export class AssemblyAdvancedService {
-  private prisma: PrismaClient;
-  private activityLogger: ActivityLogger;
-  private wsService: WebSocketService;
-  private signatureService: DigitalSignatureService;
-
-  constructor(schemaName: string) {
-    this.prisma = getTenantPrismaClient(schemaName);
-    this.activityLogger = new ActivityLogger(); // Assuming ActivityLogger doesn't need schemaName in constructor
-    this.wsService = new WebSocketService(); // Assuming WebSocketService doesn't need schemaName in constructor
-    this.signatureService = new DigitalSignatureService(); // Assuming DigitalSignatureService doesn't need schemaName in constructor
-  }
+  constructor(
+    private prismaClientManager: PrismaClientManager,
+    private prisma: PrismaService,
+    private activityLogger: ActivityLogger,
+    private wsService: WebSocketService,
+    private signatureService: DigitalSignatureService,
+  ) {}
   /**
    * Crea una nueva asamblea con configuración avanzada
    *

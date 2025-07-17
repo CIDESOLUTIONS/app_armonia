@@ -10,6 +10,8 @@ model Property {
   bedrooms    Int?
   bathrooms   Int?
   address     String?
+  hasParking  Boolean @default(false)
+  isActive    Boolean @default(true)
   fees        Fee[]
   payments    Payment[]
   createdAt   DateTime @default(now())

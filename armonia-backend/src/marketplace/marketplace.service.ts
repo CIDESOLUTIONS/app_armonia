@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
+import { uploadFileToS3 } from '../../src/lib/storage/s3-upload'; // Importar el servicio S3
 import {
   CreateListingDto,
   UpdateListingDto,
@@ -18,6 +19,11 @@ export class MarketplaceService {
 
   private getTenantPrismaClient(schemaName: string) {
     return this.prismaClientManager.getClient(schemaName);
+  }
+
+  async uploadImage(file: Express.Multer.File): Promise<{ url: string }> {
+    const fileUrl = await uploadFileToS3(file);
+    return { url: fileUrl };
   }
 
   async createListing(

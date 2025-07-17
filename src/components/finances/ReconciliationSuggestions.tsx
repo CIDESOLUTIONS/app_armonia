@@ -21,10 +21,17 @@ interface Props {
   suggestions: ReconciliationSuggestion[];
 }
 
+import { approveReconciliation } from "@/services/financeService";
+
 export function ReconciliationSuggestions({ suggestions }: Props) {
-  const handleApprove = (suggestion: ReconciliationSuggestion) => {
-    // Lógica para aprobar la conciliación
-    console.log("Approving:", suggestion);
+  const handleApprove = async (suggestion: ReconciliationSuggestion) => {
+    try {
+      await approveReconciliation(suggestion);
+      // Aquí podrías actualizar el estado local o recargar las sugerencias
+      console.log("Conciliación aprobada:", suggestion);
+    } catch (error) {
+      console.error("Error al aprobar la conciliación:", error);
+    }
   };
 
   return (

@@ -292,6 +292,76 @@ export class CreateVehicleDto {
   residentId: number;
 }
 
+export class CreateVehicleDto {
+  @IsString()
+  licensePlate: string;
+
+  @IsString()
+  brand: string;
+
+  @IsString()
+  model: string;
+
+  @IsNumber()
+  year: number;
+
+  @IsString()
+  color: string;
+
+  @IsString()
+  type: string;
+
+  @IsOptional()
+  @IsString()
+  parkingSpot?: string;
+
+  @IsOptional()
+  @IsString()
+  notes?: string;
+
+  @IsNumber()
+  propertyId: number;
+
+  @IsNumber()
+  residentId: number;
+}
+
+export class CreateResidentDto {
+  @IsString()
+  name: string;
+
+  @IsString()
+  email: string;
+
+  @IsString()
+  phone: string;
+
+  @IsNumber()
+  propertyId: number;
+
+  @IsString()
+  role: string;
+
+  @IsBoolean()
+  isActive: boolean;
+
+  @IsOptional()
+  @IsString()
+  idNumber?: string;
+
+  @IsOptional()
+  @IsString()
+  idType?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isOwner?: boolean;
+
+  @IsOptional()
+  @IsString()
+  relationshipWithOwner?: string;
+}
+
 export class UpdateResidentDto {
   @IsOptional()
   @IsString()
@@ -316,4 +386,20 @@ export class UpdateResidentDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @IsOptional()
+  @IsString()
+  idNumber?: string;
+
+  @IsOptional()
+  @IsString()
+  idType?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isOwner?: boolean;
+
+  @IsOptional()
+  @IsString()
+  relationshipWithOwner?: string;
 }

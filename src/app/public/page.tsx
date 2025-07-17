@@ -1,8 +1,3 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-
 import { Header } from "@/components/layout/header";
 import { Testimonials } from "@/components/landing/Testimonials";
 import { BlogSection } from "@/components/landing/BlogSection";
@@ -33,36 +28,12 @@ export const metadata: Metadata = {
 };
 
 export default function LandingPage() {
-  const _router = useRouter();
-  const [currency, setCurrency] = useState("Pesos");
-  const [theme, setTheme] = useState("Claro");
-
-  // Aplicar configuraciones
-  useEffect(() => {
-    if (theme === "Oscuro") {
-      document.body.classList.add("dark-theme");
-    } else {
-      document.body.classList.remove("dark-theme");
-    }
-  }, [theme]);
-
-  const handleLanguageChange = (lang: string) => {
-    console.log(`Language change to ${lang} not implemented yet.`);
-  };
-
   return (
     <div
-      className={`flex flex-col min-h-screen overflow-hidden ${theme === "Oscuro" ? "bg-gray-900 text-white" : "bg-white text-gray-900"}`}
+      className={`flex flex-col min-h-screen overflow-hidden bg-white text-gray-900 dark:bg-gray-900 dark:text-white`}
     >
       {/* Header */}
-      <Header
-        theme={theme}
-        setTheme={setTheme}
-        language={"Español"}
-        setLanguage={handleLanguageChange}
-        currency={currency}
-        setCurrency={setCurrency}
-      />
+      <Header />
 
       <FadeInWhenVisible>
         <HeroSection />
@@ -94,7 +65,7 @@ export default function LandingPage() {
       </FadeInWhenVisible>
 
       <FadeInWhenVisible>
-        <PricingPlans theme={theme} currency={currency} />
+        <PricingPlans />
       </FadeInWhenVisible>
 
       <section className="py-16 md:py-24 bg-gray-50 dark:bg-gray-800">

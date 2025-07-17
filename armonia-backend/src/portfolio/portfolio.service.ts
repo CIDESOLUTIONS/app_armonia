@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
+import { PrismaService } from '../prisma/prisma.service';
 import {
   PortfolioMetricDto,
   ComplexMetricDto,
@@ -7,38 +8,82 @@ import {
 
 @Injectable()
 export class PortfolioService {
-  constructor(private prismaClientManager: PrismaClientManager) {}
+  constructor(
+    private prismaClientManager: PrismaClientManager,
+    private prisma: PrismaService,
+  ) {}
 
   async getPortfolioMetrics(userId: number): Promise<PortfolioMetricDto> {
-    // Lógica para obtener los esquemas de los conjuntos asociados al usuario empresarial
-    // Esta es una implementación placeholder y necesita ser desarrollada
-    const schemas = ['complex1', 'complex2']; // Esto debería venir de la DB
+    // Para un APP_ADMIN, obtener todos los schemas de los complejos residenciales
+    const complexes = await this.prisma.residentialComplex.findMany({
+      select: { schemaName: true, id: true, name: true },
+    });
 
     let totalProperties = 0;
-    const totalResidents = 0;
-    const totalPendingFees = 0;
-    const totalIncome = 0;
+    let totalResidents = 0;
+    let totalPendingFees = 0;
+    let totalIncome = 0;
 
-    for (const schema of schemas) {
-      const prisma = this.prismaClientManager.getClient(schema);
-      const properties = await prisma.property.count();
-      totalProperties += properties;
-      // ... Lógica similar para las otras métricas
+    for (const complex of complexes) {
+      const tenantPrisma = this.prismaClientManager.getClient(complex.schemaName);
+      // Obtener métricas de cada tenant
+      const propertiesCount = await tenantPrisma.property.count();
+      totalProperties += propertiesCount;
+
+      const residentsCount = await tenantPrisma.user.count({
+        where: { role: 'RESIDENT' },
+      });
+      totalResidents += residentsCount;
+
+      const pendingFees = await tenantPrisma.fee.aggregate({
+        _sum: { amount: true },
+        where: { status: 'PENDING' },
+      });
+      totalPendingFees += pendingFees._sum.amount || 0;
+
+      const income = await tenantPrisma.payment.aggregate({
+        _sum: { amount: true },
+        where: { status: 'COMPLETED' },
+      });
+      totalIncome += income._sum.amount || 0;
     }
 
     return { totalProperties, totalResidents, totalPendingFees, totalIncome };
   }
 
   async getComplexMetrics(userId: number): Promise<ComplexMetricDto[]> {
-    // Lógica placeholder similar a la anterior
-    return [
-      {
-        id: 1,
-        name: 'Conjunto Residencial El Parque',
-        residents: 150,
-        pendingFees: 12500000,
-        income: 85000000,
-      },
-    ];
+    const complexes = await this.prisma.residentialComplex.findMany({
+      select: { schemaName: true, id: true, name: true },
+    });
+
+    const complexMetrics: ComplexMetricDto[] = [];
+
+    for (const complex of complexes) {
+      const tenantPrisma = this.prismaClientManager.getClient(complex.schemaName);
+
+      const residentsCount = await tenantPrisma.user.count({
+        where: { role: 'RESIDENT' },
+      });
+
+      const pendingFees = await tenantPrisma.fee.aggregate({
+        _sum: { amount: true },
+        where: { status: 'PENDING' },
+      });
+
+      const income = await tenantPrisma.payment.aggregate({
+        _sum: { amount: true },
+        where: { status: 'COMPLETED' },
+      });
+
+      complexMetrics.push({
+        id: complex.id,
+        name: complex.name,
+        residents: residentsCount,
+        pendingFees: pendingFees._sum.amount || 0,
+        income: income._sum.amount || 0,
+      });
+    }
+
+    return complexMetrics;
   }
 }

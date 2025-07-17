@@ -18,8 +18,8 @@ export class SmartMeterReadingDto {
   @IsString()
   meterId: string;
 
-  @IsString()
-  unitId: string; // e.g., Apartment 101
+  @IsNumber()
+  propertyId: number; // Relacionar con Property
 
   @IsNumber()
   reading: number;
@@ -37,8 +37,8 @@ export class SmartMeterFilterParamsDto {
   meterId?: string;
 
   @IsOptional()
-  @IsString()
-  unitId?: string;
+  @IsNumber()
+  propertyId?: number;
 
   @IsOptional()
   @IsEnum(SmartMeterUnit)

@@ -38,6 +38,7 @@ export class CreateListingDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
+  @ArrayMaxSize(5)
   images?: string[]; // URLs de las imágenes
 }
 

@@ -49,7 +49,8 @@ model Visitor {
   documentType    DocumentType // Tipo de documento
   documentNumber  String    // Número de documento
   destination     String    // Destino dentro del conjunto (ej: "Apartamento 101")
-  residentName    String?   // Nombre del residente que visita
+  residentId      Int?      // ID del residente al que visita
+  resident        Resident? @relation(fields: [residentId], references: [id])
   entryTime       DateTime  // Hora de entrada
   exitTime        DateTime? // Hora de salida (null si aún no ha salido)
   plate           String?   // Placa del vehículo (si aplica)
@@ -89,6 +90,7 @@ model PreRegisteredVisitor {
   documentType    DocumentType? // Tipo de documento (opcional en pre-registro)
   documentNumber  String?   // Número de documento (opcional en pre-registro)
   residentId      Int       // ID del residente que autoriza
+  resident        Resident  @relation(fields: [residentId], references: [id])
   unitId          Int       // ID de la unidad de destino
   expectedDate    DateTime  // Fecha esperada de visita
   validFrom       DateTime  // Inicio de validez del pre-registro

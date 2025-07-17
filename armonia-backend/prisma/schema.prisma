@@ -1,0 +1,52 @@
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+/// @prisma.schema ./schema_residential_complex.prisma
+/// @prisma.schema ./schema_pet.prisma
+/// @prisma.schema ./schema_vehicle.prisma
+/// @prisma.schema ./schema_resident.prisma
+/// @prisma.schema ./schema_assembly.prisma
+/// @prisma.schema ./schema_attendance.prisma
+/// @prisma.schema ./schema_budget_item.prisma
+/// @prisma.schema ./schema_budget.prisma
+/// @prisma.schema ./schema_cameras.prisma
+/// @prisma.schema ./schema_communications.prisma
+/// @prisma.schema ./schema_correspondence.prisma
+/// @prisma.schema ./schema_documents.prisma
+/// @prisma.schema ./schema_fee.prisma
+/// @prisma.schema ./schema_financial.prisma
+/// @prisma.schema ./schema_incidents_complete.prisma
+/// @prisma.schema ./schema_intercom.prisma
+/// @prisma.schema ./schema_listing.prisma
+/// @prisma.schema ./schema_message.prisma
+/// @prisma.schema ./schema_micro_credit_application.prisma
+/// @prisma.schema ./schema_monitoring.prisma
+/// @prisma.schema ./schema_option.prisma
+/// @prisma.schema ./schema_package.prisma
+/// @prisma.schema ./schema_payment_attempt.prisma
+/// @prisma.schema ./schema_payment.prisma
+/// @prisma.schema ./schema_payments.prisma
+/// @prisma.schema ./schema_pqr_advanced.prisma
+/// @prisma.schema ./schema_property.prisma
+/// @prisma.schema ./schema_question.prisma
+/// @prisma.schema ./schema_report.prisma
+/// @prisma.schema ./schema_reported_listing.prisma
+/// @prisma.schema ./schema_reservations.prisma
+/// @prisma.schema ./schema_review.prisma
+/// @prisma.schema ./schema_security.prisma
+/// @prisma.schema ./schema_service_provider.prisma
+/// @prisma.schema ./schema_smart_meter_reading.prisma
+/// @prisma.schema ./schema_survey.prisma
+/// @prisma.schema ./schema_user_vote.prisma
+/// @prisma.schema ./schema_user.prisma
+/// @prisma.schema ./schema_visitor.prisma
+/// @prisma.schema ./schema_visitors.prisma
+/// @prisma.schema ./schema_vote.prisma

@@ -27,8 +27,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
+import { createMicroCreditApplication, getMicroCreditApplications } from "@/services/microCreditService";
+
 interface MicroCreditApplication {
-  id: string;
+  id: number;
   amount: number;
   purpose: string;
   status: "pending" | "approved" | "rejected" | "paid";
@@ -65,31 +67,7 @@ export default function MicroCreditsPage() {
   const fetchApplications = useCallback(async () => {
     setLoading(true);
     try {
-      // TODO: Call backend API to fetch micro-credit applications
-      const fetchedApplications: MicroCreditApplication[] = [
-        {
-          id: "app1",
-          amount: 500000,
-          purpose: "Reparación de electrodoméstico",
-          status: "pending",
-          applicationDate: "2024-07-10T10:00:00",
-        },
-        {
-          id: "app2",
-          amount: 1000000,
-          purpose: "Educación de hijo",
-          status: "approved",
-          applicationDate: "2024-06-01T09:00:00",
-          approvalDate: "2024-06-05T14:00:00",
-        },
-        {
-          id: "app3",
-          amount: 200000,
-          purpose: "Compra de víveres",
-          status: "rejected",
-          applicationDate: "2024-05-20T11:00:00",
-        },
-      ];
+      const fetchedApplications = await getMicroCreditApplications();
       setApplications(fetchedApplications);
     } catch (error) {
       console.error("Error fetching applications:", error);
@@ -120,8 +98,7 @@ export default function MicroCreditsPage() {
 
     setLoading(true);
     try {
-      // TODO: Call backend API to submit micro-credit application
-      console.log("Submitting application:", values);
+      await createMicroCreditApplication(values);
       toast({
         title: "Solicitud Enviada",
         description:

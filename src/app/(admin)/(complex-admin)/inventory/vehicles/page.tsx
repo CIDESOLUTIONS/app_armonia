@@ -57,18 +57,35 @@ interface Vehicle {
   licensePlate: string;
   brand: string;
   model: string;
+  year: number;
   color: string;
-  ownerName: string;
+  type: string;
+  parkingSpot?: string;
+  notes?: string;
   propertyId: number;
-  unitNumber: string; // Para mostrar en la tabla
-  parkingSpace: string;
+  residentId: number;
   isActive: boolean;
+}
+
+import { getProperties } from "@/services/propertyService";
+import { getResidents } from "@/services/residentService";
+
+interface PropertyOption {
+  id: number;
+  unitNumber: string;
+}
+
+interface ResidentOption {
+  id: number;
+  name: string;
 }
 
 export default function VehiclesPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [properties, setProperties] = useState<PropertyOption[]>([]);
+  const [residents, setResidents] = useState<ResidentOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentVehicle, setCurrentVehicle] = useState<Vehicle | null>(null);
@@ -79,10 +96,13 @@ export default function VehiclesPage() {
       licensePlate: "",
       brand: "",
       model: "",
+      year: 2020,
       color: "",
-      ownerName: "",
+      type: "CAR",
+      parkingSpace: undefined,
+      notes: undefined,
       propertyId: 0,
-      parkingSpace: "",
+      residentId: 0,
       isActive: true,
     },
   });
@@ -94,16 +114,22 @@ export default function VehiclesPage() {
     formState: { isSubmitting },
   } = form;
 
-  const fetchVehicles = useCallback(async () => {
+  const fetchVehiclesAndRelatedData = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getVehicles();
-      setVehicles(data);
+      const [vehiclesData, propertiesData, residentsData] = await Promise.all([
+        getVehicles(),
+        getProperties(),
+        getResidents(),
+      ]);
+      setVehicles(vehiclesData);
+      setProperties(propertiesData.map((p: any) => ({ id: p.id, unitNumber: p.unitNumber })));
+      setResidents(residentsData.map((r: any) => ({ id: r.id, name: r.name })));
     } catch (error) {
-      console.error("Error fetching vehicles:", error);
+      console.error("Error fetching data:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar los vehículos.",
+        description: "No se pudieron cargar los datos.",
         variant: "destructive",
       });
     } finally {
@@ -113,9 +139,9 @@ export default function VehiclesPage() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      fetchVehicles();
+      fetchVehiclesAndRelatedData();
     }
-  }, [authLoading, user, fetchVehicles]);
+  }, [authLoading, user, fetchVehiclesAndRelatedData]);
 
   const handleAddVehicle = () => {
     setCurrentVehicle(null);
@@ -123,10 +149,13 @@ export default function VehiclesPage() {
       licensePlate: "",
       brand: "",
       model: "",
+      year: 2020,
       color: "",
-      ownerName: "",
+      type: "CAR",
+      parkingSpace: undefined,
+      notes: undefined,
       propertyId: 0,
-      parkingSpace: "",
+      residentId: 0,
       isActive: true,
     });
     setIsModalOpen(true);
@@ -138,10 +167,13 @@ export default function VehiclesPage() {
       licensePlate: vehicle.licensePlate,
       brand: vehicle.brand,
       model: vehicle.model,
+      year: vehicle.year,
       color: vehicle.color,
-      ownerName: vehicle.ownerName,
-      propertyId: vehicle.propertyId,
+      type: vehicle.type,
       parkingSpace: vehicle.parkingSpace,
+      notes: vehicle.notes,
+      propertyId: vehicle.propertyId,
+      residentId: vehicle.residentId,
       isActive: vehicle.isActive,
     });
     setIsModalOpen(true);
@@ -246,9 +278,8 @@ export default function VehiclesPage() {
               <TableHead>Placa</TableHead>
               <TableHead>Marca</TableHead>
               <TableHead>Modelo</TableHead>
-              <TableHead>Color</TableHead>
-              <TableHead>Propietario</TableHead>
-              <TableHead>Propiedad</TableHead>
+              <TableHead>Tipo</TableHead>
+              <TableHead>Año</TableHead>
               <TableHead>Parqueadero</TableHead>
               <TableHead>Activo</TableHead>
               <TableHead></TableHead>
@@ -261,8 +292,8 @@ export default function VehiclesPage() {
                 <TableCell>{vehicle.brand}</TableCell>
                 <TableCell>{vehicle.model}</TableCell>
                 <TableCell>{vehicle.color}</TableCell>
-                <TableCell>{vehicle.ownerName}</TableCell>
-                <TableCell>{vehicle.unitNumber}</TableCell>
+                <TableCell>{vehicle.type}</TableCell>
+                <TableCell>{vehicle.year}</TableCell>
                 <TableCell>{vehicle.parkingSpace}</TableCell>
                 <TableCell>
                   {vehicle.isActive ? (
@@ -357,25 +388,10 @@ export default function VehiclesPage() {
               />
               <FormField
                 control={control}
-                name="ownerName"
+                name="year"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">
-                      Nombre Propietario
-                    </FormLabel>
-                    <FormControl>
-                      <Input className="col-span-3" {...field} />
-                    </FormControl>
-                    <FormMessage className="col-span-full text-right" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name="propertyId"
-                render={({ field }) => (
-                  <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">ID Propiedad</FormLabel>
+                    <FormLabel className="text-right">Año</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -386,6 +402,105 @@ export default function VehiclesPage() {
                         }
                       />
                     </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Tipo</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="col-span-3 p-2 border rounded-md">
+                          <SelectValue placeholder="Seleccionar Tipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="CAR">Coche</SelectItem>
+                        <SelectItem value="MOTORCYCLE">Motocicleta</SelectItem>
+                        <SelectItem value="BICYCLE">Bicicleta</SelectItem>
+                        <SelectItem value="OTHER">Otro</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Notas</FormLabel>
+                    <FormControl>
+                      <Textarea className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="propertyId"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Propiedad</FormLabel>
+                    <Select
+                      onValueChange={(value) => field.onChange(parseInt(value))}
+                      value={field.value ? String(field.value) : ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="col-span-3 p-2 border rounded-md">
+                          <SelectValue placeholder="Seleccionar Propiedad" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {properties.map((property) => (
+                          <SelectItem
+                            key={property.id}
+                            value={String(property.id)}
+                          >
+                            {property.unitNumber}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="residentId"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Residente</FormLabel>
+                    <Select
+                      onValueChange={(value) => field.onChange(parseInt(value))}
+                      value={field.value ? String(field.value) : ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="col-span-3 p-2 border rounded-md">
+                          <SelectValue placeholder="Seleccionar Residente" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {residents.map((resident) => (
+                          <SelectItem
+                            key={resident.id}
+                            value={String(resident.id)}
+                          >
+                            {resident.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
                 )}

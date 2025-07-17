@@ -59,12 +59,12 @@ import { Checkbox } from "@/components/ui/checkbox"; // Assuming Shadcn Checkbox
 interface Property {
   id: number;
   unitNumber: string;
-  address: string;
+  address?: string;
   type: string;
-  area: number;
-  bedrooms: number;
-  bathrooms: number;
-  parkingSpaces: number;
+  area?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  hasParking: boolean;
   isActive: boolean;
 }
 
@@ -80,12 +80,12 @@ export default function PropertiesPage() {
     resolver: zodResolver(propertySchema),
     defaultValues: {
       unitNumber: "",
-      address: "",
+      address: undefined,
       type: "",
-      area: 0,
-      bedrooms: 0,
-      bathrooms: 0,
-      parkingSpaces: 0,
+      area: undefined,
+      bedrooms: undefined,
+      bathrooms: undefined,
+      hasParking: false,
       isActive: true,
     },
   });
@@ -409,21 +409,19 @@ export default function PropertiesPage() {
               />
               <FormField
                 control={control}
-                name="parkingSpaces"
+                name="hasParking"
                 render={({ field }) => (
-                  <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Parqueaderos</FormLabel>
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
                     <FormControl>
-                      <Input
-                        type="number"
-                        className="col-span-3"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(parseInt(e.target.value))
-                        }
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
                       />
                     </FormControl>
-                    <FormMessage className="col-span-full text-right" />
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Tiene Parqueadero</FormLabel>
+                    </div>
+                    <FormMessage />
                   </FormItem>
                 )}
               />

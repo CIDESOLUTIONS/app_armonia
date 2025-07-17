@@ -37,13 +37,12 @@ const headerTexts = {
   },
 };
 
+
+import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
+
 interface HeaderProps {
-  theme: string;
-  setTheme: (theme: string) => void;
-  langlanguage: string;
-  setLanglanguage: (language: string) => void;
-  currency: string;
-  setCurrency: (currency: string) => void;
   logout?: () => void;
   isLoggedIn?: boolean;
   complexName?: string | null;
@@ -52,18 +51,14 @@ interface HeaderProps {
 }
 
 export function Header({
-  theme,
-  setTheme,
-  langlanguage,
-  setLanglanguage,
-  currency,
-  setCurrency,
   logout,
   isLoggedIn = false,
   complexName = null,
   adminName = null,
   hideNavLinks = false,
 }: HeaderProps) {
+  const [theme, setTheme] = useState("Claro");
+  const [currency, setCurrency] = useState("Pesos");
   const router = useRouter();
   const pathname = usePathname();
   const locale = useLocale();

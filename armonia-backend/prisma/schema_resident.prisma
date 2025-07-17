@@ -1,0 +1,31 @@
+model Resident {
+  id          Int      @id @default(autoincrement())
+  name        String
+  email       String?  @unique
+  phone       String?
+  idNumber    String?
+  idType      String?
+  propertyId  Int
+  property    Property @relation(fields: [propertyId], references: [id])
+  userId      Int?     @unique // Si el residente es también un usuario del sistema
+  user        User?    @relation(fields: [userId], references: [id])
+  isOwner     Boolean  @default(false)
+  relationshipWithOwner String? // Ej: 'Hijo', 'Cónyuge', 'Inquilino'
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  pets        Pet[]
+  vehicles    Vehicle[]
+  correspondences Correspondence[]
+  packages    Package[]
+  visitors    Visitor[]
+  preRegisteredVisitors PreRegisteredVisitor[]
+  microCreditApplications MicroCreditApplication[]
+  reviews     Review[]
+  userVotes   UserVote[]
+  attendances Attendance[]
+
+  @@index([propertyId])
+  @@index([userId])
+}
