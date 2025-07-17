@@ -1,40 +1,71 @@
-import {
-  IsString,
-  IsNumber,
-  IsOptional,
-  IsDateString,
-  IsEnum,
-  IsArray,
-  ValidateNested,
-} from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsDateString, IsArray, ValidateNested, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export enum SurveyStatus {
-  DRAFT = 'draft',
-  ACTIVE = 'active',
-  COMPLETED = 'completed',
+  DRAFT = 'DRAFT',
+  PUBLISHED = 'PUBLISHED',
+  CLOSED = 'CLOSED',
 }
 
-export class OptionDto {
-  @IsString()
-  text: string;
-
-  @IsOptional()
-  @IsNumber()
-  votes?: number;
+export enum QuestionType {
+  SINGLE_CHOICE = 'SINGLE_CHOICE',
+  MULTIPLE_CHOICE = 'MULTIPLE_CHOICE',
+  TEXT = 'TEXT',
+  RATING = 'RATING',
 }
 
 export class QuestionDto {
+  @IsNumber()
+  id: number;
+
+  @IsNumber()
+  surveyId: number;
+
   @IsString()
   text: string;
 
+  @IsEnum(QuestionType)
+  type: QuestionType;
+
+  @IsOptional()
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => OptionDto)
-  options: OptionDto[];
+  @IsString({ each: true })
+  options?: string[];
+
+  @IsNumber()
+  order: number;
 }
 
-export class CreateSurveyDto {
+export class AnswerDto {
+  @IsNumber()
+  id: number;
+
+  @IsNumber()
+  questionId: number;
+
+  @IsNumber()
+  userId: number;
+
+  @IsOptional()
+  @IsString()
+  textAnswer?: string;
+
+  @IsOptional()
+  @IsString({ each: true })
+  selectedOptions?: string[];
+
+  @IsOptional()
+  @IsNumber()
+  rating?: number;
+
+  @IsDateString()
+  answeredAt: Date;
+}
+
+export class SurveyDto {
+  @IsNumber()
+  id: number;
+
   @IsString()
   title: string;
 
@@ -46,6 +77,38 @@ export class CreateSurveyDto {
   status: SurveyStatus;
 
   @IsDateString()
+  startDate: Date;
+
+  @IsDateString()
+  endDate: Date;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => QuestionDto)
+  questions: QuestionDto[];
+
+  @IsNumber()
+  complexId: number;
+
+  @IsNumber()
+  createdBy: number;
+
+  @IsDateString()
+  createdAt: Date;
+
+  @IsDateString()
+  updatedAt: Date;
+}
+
+export class CreateSurveyDto {
+  @IsString()
+  title: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsDateString()
   startDate: string;
 
   @IsDateString()
@@ -54,7 +117,7 @@ export class CreateSurveyDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => QuestionDto)
-  questions: QuestionDto[];
+  questions: Omit<QuestionDto, 'id' | 'surveyId'>[];
 }
 
 export class UpdateSurveyDto {
@@ -82,82 +145,23 @@ export class UpdateSurveyDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => QuestionDto)
-  questions?: QuestionDto[];
+  questions?: Omit<QuestionDto, 'id' | 'surveyId'>[];
 }
 
-export class SurveyDto {
-  @IsNumber()
-  id: number;
-
-  @IsString()
-  title: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @IsEnum(SurveyStatus)
-  status: SurveyStatus;
-
-  @IsDateString()
-  startDate: string;
-
-  @IsDateString()
-  endDate: string;
-
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => QuestionDto)
-  questions: QuestionDto[];
-
-  @IsNumber()
-  createdBy: number;
-
-  @IsString()
-  createdAt: string;
-
-  @IsString()
-  updatedAt: string;
-}
-
-export class SurveyFilterParamsDto {
-  @IsOptional()
-  @IsString()
-  search?: string;
-
-  @IsOptional()
-  @IsEnum(SurveyStatus)
-  status?: SurveyStatus;
-
-  @IsOptional()
-  @IsDateString()
-  startDate?: string;
-
-  @IsOptional()
-  @IsDateString()
-  endDate?: string;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  page?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  limit?: number;
-}
-
-export class SubmitVoteDto {
-  @IsNumber()
-  surveyId: number;
-
+export class CreateAnswerDto {
   @IsNumber()
   questionId: number;
 
-  @IsNumber()
-  optionId: number;
+  @IsOptional()
+  @IsString()
+  textAnswer?: string;
 
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  selectedOptions?: string[];
+
+  @IsOptional()
   @IsNumber()
-  userId: number;
+  rating?: number;
 }

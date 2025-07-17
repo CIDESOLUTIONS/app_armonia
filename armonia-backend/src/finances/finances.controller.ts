@@ -84,6 +84,11 @@ export class FinancesController {
     return this.financesService.updateFee(user.schemaName, +id, updateFeeDto);
   }
 
+  @Delete('fees/:id')
+  async deleteFee(@GetUser() user: any, @Param('id') id: string): Promise<void> {
+    return this.financesService.deleteFee(user.schemaName, +id);
+  }
+
   @Post('payments')
   async createPayment(
     @GetUser() user: any,

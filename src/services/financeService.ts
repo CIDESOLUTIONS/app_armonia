@@ -162,6 +162,17 @@ export async function updateFee(id: number, fee: UpdateFeeDto): Promise<FeeDto> 
   }
 }
 
+export async function deleteFee(id: number): Promise<void> {
+  try {
+    await fetchApi(`/finances/fees/${id}`, {
+      method: "DELETE",
+    });
+  } catch (error) {
+    console.error("Error deleting fee:", error);
+    throw error;
+  }
+}
+
 export async function generateOrdinaryFees(
   amount: number,
   dueDate: string,

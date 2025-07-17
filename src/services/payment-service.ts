@@ -6,10 +6,7 @@
 import { PrismaClient } from "@prisma/client";
 import { ServerLogger } from "@/lib/logging/server-logger";
 import { ActivityLogger } from "@/lib/logging/activity-logger";
-import {
-  NotificationService,
-  NotificationData,
-} from "@/lib/notifications/notification-service";
+import { CommunicationService } from "@/services/communicationService";
 import { generateReceipt } from "@/lib/pdf/receipt-service";
 import { encrypt, decrypt } from "@/lib/security/encryption-service";
 import { TransactionStatus, DiscountType } from "@prisma/client";
@@ -298,9 +295,11 @@ export class PaymentGatewayFactory {
 // Servicio principal de pagos
 export class PaymentService {
   private prisma: PrismaClient;
+  private communicationService: CommunicationService;
 
-  constructor(prismaClient: PrismaClient) {
+  constructor(prismaClient: PrismaClient, communicationService: CommunicationService) {
     this.prisma = prismaClient;
+    this.communicationService = communicationService;
   }
 
   /**
@@ -578,18 +577,12 @@ export class PaymentService {
           });
 
           // Enviar notificación al usuario
-          await NotificationService.sendEmail({
-            recipient:
-              (
-                await this.prisma.user.findUnique({
-                  where: { id: transaction.userId },
-                })
-              )?.email || "",
-            subject: "Pago confirmado",
-            body: `Su pago por ${transaction.amount} ${transaction.currency} ha sido confirmado.`,
-            type: "EMAIL",
-            entityType: "PAYMENT",
-            entityId: transaction.id,
+          await this.communicationService.notifyUser(transaction.userId, {
+            type: "info",
+            title: "Pago confirmado",
+            message: `Su pago por ${transaction.amount} ${transaction.currency} ha sido confirmado.`,
+            sourceType: "financial",
+            sourceId: transaction.id,
           });
 
           // Registrar actividad

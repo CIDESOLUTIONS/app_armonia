@@ -155,12 +155,10 @@ export function FineManagementForm() {
     }
     setLoading(true);
     try {
-      // Assuming a deleteFee function exists or can be implemented via updateFee status
-      // For now, we'll simulate or mark as deleted if no direct delete API
-      // await deleteFee(id);
+      await deleteFee(id);
       toast({
         title: 'Éxito',
-        description: 'Multa eliminada correctamente (simulado).',
+        description: 'Multa eliminada correctamente.',
       });
       fetchFines();
     } catch (error) {
