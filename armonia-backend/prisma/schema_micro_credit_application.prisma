@@ -1,15 +1,33 @@
+enum MicroCreditStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PAID
+
+  @@schema("tenant")
+}
+
 model MicroCreditApplication {
-  id              Int      @id @default(autoincrement())
+  id              Int               @id @default(autoincrement())
   amount          Float
   purpose         String
-  status          String   @default("pending") // pending, approved, rejected, paid
-  applicationDate DateTime @default(now())
+  status          MicroCreditStatus @default(PENDING)
+  applicationDate DateTime          @default(now())
   approvalDate    DateTime?
   userId          Int
-  user            User     @relation(fields: [userId], references: [id])
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  user            User              @relation(fields: [userId], references: [id])
+  complexId       Int
+  complex         ResidentialComplex @relation(fields: [complexId], references: [id])
+  interestRate    Float
+  termMonths      Int
+  approvedAmount  Float?
+  reviewedById    Int?
+  reviewedBy      User?             @relation("ReviewedMicroCredits", fields: [reviewedById], references: [id])
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 
   @@index([userId])
   @@index([status])
+  @@index([complexId])
+  @@index([reviewedById])
 }

@@ -1,46 +1,62 @@
-import { IsString, IsNumber, IsOptional, IsEnum } from 'class-validator';
-
-export enum PanicStatus {
-  ACTIVE = 'ACTIVE',
-  RESOLVED = 'RESOLVED',
-  DISMISSED = 'DISMISSED',
-}
+import { IsString, IsOptional, IsNumber, IsDateString, IsEnum } from 'class-validator';
+import { PanicStatus, PanicType } from '@prisma/client';
 
 export class CreatePanicAlertDto {
   @IsNumber()
   userId: number;
 
   @IsNumber()
-  propertyId: number;
+  complexId: number;
 
-  @IsString()
-  location: string;
+  @IsOptional()
+  @IsNumber()
+  propertyId?: number;
+
+  @IsEnum(PanicType)
+  type: PanicType;
 
   @IsOptional()
   @IsString()
-  message?: string;
+  location?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
 }
 
 export class UpdatePanicAlertDto {
+  @IsOptional()
   @IsEnum(PanicStatus)
-  status: PanicStatus;
+  status?: PanicStatus;
+
+  @IsOptional()
+  @IsDateString()
+  resolvedTime?: Date;
+
+  @IsOptional()
+  @IsNumber()
+  resolvedById?: number;
 
   @IsOptional()
   @IsString()
-  resolvedBy?: string;
+  location?: string;
 
   @IsOptional()
   @IsString()
-  resolutionNotes?: string;
+  description?: string;
 }
 
-export class PanicAlertDto {
-  id: number;
-  userId: number;
-  propertyId: number;
-  location: string;
-  message?: string;
-  status: PanicStatus;
-  createdAt: Date;
-  updatedAt: Date;
+export class CreatePanicResponseDto {
+  @IsNumber()
+  alertId: number;
+
+  @IsNumber()
+  respondedBy: number;
+
+  @IsString()
+  actionTaken: string;
+
+  @IsOptional()
+  @IsString()
+  notes?: string;
 }

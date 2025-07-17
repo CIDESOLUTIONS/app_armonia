@@ -3,6 +3,9 @@ export class PortfolioMetricDto {
   totalResidents: number;
   totalPendingFees: number;
   totalIncome: number;
+  totalOpenPqrs: number; // New metric
+  totalBudgetsApproved: number; // New metric
+  totalExpenses: number; // New metric
 }
 
 export class ComplexMetricDto {
@@ -11,4 +14,7 @@ export class ComplexMetricDto {
   residents: number;
   pendingFees: number;
   income: number;
+  openPqrs: number; // New metric
+  budgetApproved: number; // New metric
+  expenses: number; // New metric
 }

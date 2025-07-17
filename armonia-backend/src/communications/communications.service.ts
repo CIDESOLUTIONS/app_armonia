@@ -531,7 +531,7 @@ export class CommunicationsService {
     const prisma = this.getTenantPrismaClient(schemaName);
     // Usar prisma (tenant-specific) para acceder a los modelos Message y MessageRead
     const message = await prisma.message.findUnique({
-      where: { id: +messageId }, // Convertir a number
+      where: { id: parseInt(messageId) }, // Convertir a number
       include: {
         conversation: { include: { participants: { where: { userId } } } },
       },

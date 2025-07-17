@@ -1,75 +1,102 @@
-import {
-  IsString,
-  IsNumber,
-  IsOptional,
-  IsEnum,
-  IsArray,
-  IsDateString,
-  IsBoolean,
-} from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsBoolean, IsDateString, IsArray, IsEnum } from 'class-validator';
+import { Type } from 'class-transformer';
+import { PlanType } from '@prisma/client';
 
-export enum PlanType {
-  BASIC = 'BASIC',
-  STANDARD = 'STANDARD',
-  PREMIUM = 'PREMIUM',
-  ENTERPRISE = 'ENTERPRISE',
-}
-
-export class PlanDto {
-  @IsEnum(PlanType)
-  code: PlanType;
-
+export class CreateFeatureDto {
   @IsString()
   name: string;
 
+  @IsOptional()
   @IsString()
-  description: string;
-
-  @IsNumber()
-  priceMonthly: number;
-
-  @IsNumber()
-  maxUnits: number;
-
-  @IsArray()
-  @IsString({ each: true })
-  features: string[];
+  description?: string;
 }
 
-export class SubscriptionDto {
-  @IsNumber()
-  id: number;
+export class CreatePlanDto {
+  @IsString()
+  name: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
 
   @IsNumber()
-  complexId: number;
+  price: number;
 
   @IsEnum(PlanType)
   planType: PlanType;
 
+  @IsOptional()
+  @IsNumber()
+  maxUnits?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @Type(() => CreateFeatureDto)
+  features?: CreateFeatureDto[];
+}
+
+export class UpdatePlanDto {
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsNumber()
+  price?: number;
+
+  @IsOptional()
+  @IsEnum(PlanType)
+  planType?: PlanType;
+
+  @IsOptional()
+  @IsNumber()
+  maxUnits?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
+}
+
+export class CreateSubscriptionDto {
+  @IsNumber()
+  complexId: number;
+
+  @IsNumber()
+  planId: number;
+
   @IsDateString()
   startDate: Date;
+
+  @IsDateString()
+  endDate: Date;
+
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
+}
+
+export class UpdateSubscriptionDto {
+  @IsOptional()
+  @IsNumber()
+  planId?: number;
+
+  @IsOptional()
+  @IsDateString()
+  startDate?: Date;
 
   @IsOptional()
   @IsDateString()
   endDate?: Date;
 
+  @IsOptional()
   @IsBoolean()
-  isActive: boolean;
-
-  @IsNumber()
-  amount: number;
-
-  @IsString()
-  currency: string;
-}
-
-export class SubscribeToPlanDto {
-  @IsEnum(PlanType)
-  planType: PlanType;
-
-  @IsNumber()
-  amount: number;
-
-  @IsString()
-  currency: string;
+  isActive?: boolean;
 }

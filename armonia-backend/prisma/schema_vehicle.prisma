@@ -7,6 +7,8 @@ model Vehicle {
   color        String
   type         String // CAR, MOTORCYCLE, BICYCLE, OTHER
   parkingSpot  String?
+  parkingSpotType String? // e.g., COVERED, UNCOVERED, VISITOR
+  isParkingSpotAssigned Boolean @default(false)
   notes        String?
   isActive     Boolean @default(true)
   propertyId   Int

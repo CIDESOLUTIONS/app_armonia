@@ -182,7 +182,7 @@ Gestión de áreas comunes y amenidades (salón social, BBQ, canchas) con calend
 * Acceso a comunicados, cartelera y documentos.
 * Realización de pagos en línea.
 * Reserva de amenidades y áreas comunes.
-* Pre-registro de visitantes.
+* Pre-registro de visitantes y generación de QR temporal.
 * Botón de pánico
 * Recepción de notificaciones (paquetería, anuncios).
 * Gestión de presupuesto familiar por inmueble (plantilla de ayuda para manejo de ingresos y gastos por mes y por año, máximo 2 años de histórico)	

@@ -1,14 +1,27 @@
+enum SurveyStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  CANCELLED
+
+  @@schema("tenant")
+}
+
 model Survey {
-  id          Int      @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   title       String
   description String?
-  status      String   @default("draft") // draft, active, completed
+  status      SurveyStatus @default(DRAFT)
+  type        String?    // e.g., general, satisfaction, feedback
+  visibility  String?    // e.g., public, private, role-based
+  targetRoles String[]   @default([])
+  targetProperties Int[] @default([])
   startDate   DateTime
   endDate     DateTime
   createdBy   Int
-  creator     User     @relation("CreatedSurveys", fields: [createdBy], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  creator     User       @relation("CreatedSurveys", fields: [createdBy], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   questions   Question[]
 
   @@index([status])

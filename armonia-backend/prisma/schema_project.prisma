@@ -1,0 +1,51 @@
+model Project {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  status      String   @default("PLANNED") // PLANNED, IN_PROGRESS, COMPLETED, CANCELLED
+  budget      Decimal  @db.Decimal(10, 2)
+  complexId   Int
+  complex     ResidentialComplex @relation(fields: [complexId], references: [id])
+  createdBy   User     @relation("CreatedProjects", fields: [createdById], references: [id])
+  createdById Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tasks       ProjectTask[]
+  updates     ProjectUpdate[]
+
+  @@index([complexId])
+  @@index([status])
+}
+
+model ProjectTask {
+  id          Int      @id @default(autoincrement())
+  projectId   Int
+  project     Project  @relation(fields: [projectId], references: [id])
+  title       String
+  description String?
+  status      String   @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, BLOCKED
+  assignedTo  User?    @relation("AssignedTasks", fields: [assignedToId], references: [id])
+  assignedToId Int?
+  dueDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([assignedToId])
+  @@index([status])
+}
+
+model ProjectUpdate {
+  id          Int      @id @default(autoincrement())
+  projectId   Int
+  project     Project  @relation(fields: [projectId], references: [id])
+  title       String
+  description String
+  progress    Float    // Percentage of completion
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([projectId])
+}

@@ -63,6 +63,8 @@ enum BudgetStatus {
   @@schema("tenant")
 }
 
+
+
 enum ReportType {
   INCOME_EXPENSE
   BALANCE

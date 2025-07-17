@@ -1,143 +1,48 @@
-import {
-  IsString,
-  IsNumber,
-  IsOptional,
-  IsBoolean,
-  IsDateString,
-} from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsBoolean, IsDateString, IsEnum } from 'class-validator';
+import { SecurityEventType } from '@prisma/client';
 
-export class DigitalLogDto {
+export class CreateSecurityLogDto {
   @IsNumber()
-  id: number;
-
-  @IsString()
-  title: string;
-
-  @IsString()
-  content: string;
-
-  @IsString()
-  logDate: string;
-
-  @IsNumber()
-  createdBy: number;
-
-  @IsString()
-  createdByName: string;
-}
-
-export class CreateDigitalLogDto {
-  @IsString()
-  title: string;
-
-  @IsString()
-  content: string;
-
-  @IsDateString()
-  logDate: string;
-}
-
-export class UpdateDigitalLogDto {
-  @IsNumber()
-  id: number;
-
-  @IsOptional()
-  @IsString()
-  title?: string;
-
-  @IsOptional()
-  @IsString()
-  content?: string;
-
-  @IsOptional()
-  @IsDateString()
-  logDate?: string;
-}
-
-export class CameraDto {
-  @IsNumber()
-  id: number;
-
-  @IsString()
-  name: string;
-
-  @IsString()
-  ipAddress: string;
-
-  @IsNumber()
-  port: number;
-
-  @IsOptional()
-  @IsString()
-  username?: string;
-
-  @IsOptional()
-  @IsString()
-  password?: string;
-
-  @IsString()
-  location: string;
-
-  @IsBoolean()
-  isActive: boolean;
-}
-
-export class CreateCameraDto {
-  @IsString()
-  name: string;
-
-  @IsString()
-  ipAddress: string;
+  complexId: number;
 
   @IsOptional()
   @IsNumber()
-  port?: number;
+  userId?: number;
 
-  @IsOptional()
-  @IsString()
-  username?: string;
-
-  @IsOptional()
-  @IsString()
-  password?: string;
+  @IsEnum(SecurityEventType)
+  eventType: SecurityEventType;
 
   @IsString()
-  location: string;
-
-  @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
-}
-
-export class UpdateCameraDto {
-  @IsNumber()
-  id: number;
-
-  @IsOptional()
-  @IsString()
-  name?: string;
+  description: string;
 
   @IsOptional()
   @IsString()
   ipAddress?: string;
 
   @IsOptional()
+  @IsString()
+  userAgent?: string;
+
+  @IsOptional()
+  details?: Record<string, any>;
+}
+
+export class CreateAccessAttemptDto {
+  @IsOptional()
   @IsNumber()
-  port?: number;
+  userId?: number;
+
+  @IsString()
+  ipAddress: string;
 
   @IsOptional()
   @IsString()
-  username?: string;
+  userAgent?: string;
 
-  @IsOptional()
-  @IsString()
-  password?: string;
-
-  @IsOptional()
-  @IsString()
-  location?: string;
-
-  @IsOptional()
   @IsBoolean()
-  isActive?: boolean;
+  success: boolean;
+
+  @IsOptional()
+  @IsString()
+  reason?: string;
 }

@@ -6,13 +6,16 @@ model Budget {
   description String?
   totalAmount Float
   approvedDate DateTime?
-  status      String   @default("DRAFT") // DRAFT, APPROVED, EXECUTED
+  status      BudgetStatus @default(DRAFT) // Usar el enum de schema_financial.prisma
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   items       BudgetItem[]
   createdBy   User     @relation("CreatedBudgets", fields: [createdById], references: [id])
   createdById Int
+  approvedBy  User?    @relation("ApprovedBudgets", fields: [approvedById], references: [id])
+  approvedById Int?
 
   @@unique([year, month])
   @@index([status])
+  @@index([approvedById])
 }

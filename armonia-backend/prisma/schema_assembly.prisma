@@ -99,6 +99,8 @@ model Assembly {
   realtimeChannel   String?       // Canal de WebSocket para esta asamblea
   
   // Relaciones
+  complexId         Int
+  complex           ResidentialComplex @relation(fields: [complexId], references: [id])
   attendees         AssemblyAttendee[]
   votings           Voting[]
   minutes           AssemblyMinutes? // Relación uno a uno con el acta
@@ -110,6 +112,7 @@ model Assembly {
   
   @@index([status])
   @@index([date])
+  @@index([complexId])
   @@schema("tenant")
 }
 
@@ -118,7 +121,8 @@ model AssemblyAttendee {
   assemblyId        Int
   assembly          Assembly      @relation(fields: [assemblyId], references: [id])
   userId            Int           // ID del usuario asistente
-  propertyUnitId    Int           // ID de la unidad/propiedad representada
+  propertyId        Int           // ID de la unidad/propiedad representada
+  property          Property      @relation(fields: [propertyId], references: [id])
   coefficient       Float         // Coeficiente de la propiedad
   attendanceType    AttendanceType
   proxyUserId       Int?          // ID del usuario que otorga el poder (si aplica)
@@ -126,11 +130,12 @@ model AssemblyAttendee {
   checkInTime       DateTime      @default(now())
   checkOutTime      DateTime?
   ipAddress         String?       // IP para asistentes virtuales
-  userAgent         String?       // User agent para asistentes virtuales
+  userAgent         String?
   
-  @@unique([assemblyId, userId, propertyUnitId]) // Evita duplicados
+  @@unique([assemblyId, userId, propertyId]) // Evita duplicados
   @@index([assemblyId])
   @@index([userId])
+  @@index([propertyId])
   @@schema("tenant")
 }
 
@@ -193,11 +198,13 @@ model AssemblyMinutes {
   id                Int           @id @default(autoincrement())
   assemblyId        Int           @unique // Clave única para relación uno a uno
   assembly          Assembly      @relation(fields: [assemblyId], references: [id])
+  complexId         Int
+  complex           ResidentialComplex @relation(fields: [complexId], references: [id])
   status            MinutesStatus @default(PENDING)
   content           String?       // Contenido del acta (puede ser Markdown o HTML)
   generatedAt       DateTime?
   pdfUrl            String?       // URL del PDF generado
-  generationLog     String?       // Log de la generación
+  generationLog     String?
   
   // Firmas
   signaturesRequired Int          @default(2) // Número de firmas requeridas (ej: Presidente, Secretario)
@@ -211,6 +218,7 @@ model AssemblyMinutes {
   
   @@index([assemblyId])
   @@index([status])
+  @@index([complexId])
   @@schema("tenant")
 }
 

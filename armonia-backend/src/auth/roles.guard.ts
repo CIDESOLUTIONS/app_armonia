@@ -20,7 +20,7 @@ export const RolesGuard = (roles: UserRole[]): Type<CanActivate> => {
       const request = context.switchToHttp().getRequest();
       const user = request.user; // Asumiendo que el usuario está adjunto a la solicitud por JwtAuthGuard
 
-      return requiredRoles.some((role) => user.role?.includes(role));
+      return requiredRoles.some((role) => user.role === role);
     }
   }
   return mixin(RolesGuardMixin);
