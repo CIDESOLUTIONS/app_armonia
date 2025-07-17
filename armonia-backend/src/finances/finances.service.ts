@@ -105,6 +105,16 @@ export class FinancesService {
     }
   }
 
+  async deleteFee(schemaName: string, id: number): Promise<void> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    try {
+      await prisma.fee.delete({ where: { id } });
+    } catch (error) {
+      console.error(`Error al eliminar cuota ${id}:`, error);
+      throw new Error('Error al eliminar cuota');
+    }
+  }
+
   async createPayment(
     schemaName: string,
     data: CreatePaymentDto,
@@ -366,7 +376,7 @@ export class FinancesService {
   async initiatePayment(
     schemaName: string,
     userId: number,
-    data: any, // Cambiado de InitiatePaymentDto a any
+    data: InitiatePaymentDto,
   ): Promise<any> {
     const prisma = this.getTenantPrismaClient(schemaName);
     // Lógica para iniciar el pago con una pasarela externa
@@ -374,10 +384,18 @@ export class FinancesService {
       `Iniciando pago para la cuota ${data.feeId} a través de ${data.paymentMethod}`,
     );
 
+    const bill = await prisma.bill.findUnique({
+      where: { id: data.feeId },
+    });
+
+    if (!bill) {
+      throw new NotFoundException(`Factura con ID ${data.feeId} no encontrada.`);
+    }
+
     // Simulación de una respuesta de pasarela de pago
     const paymentGatewayResponse = {
       transactionId: `txn_${Date.now()}`,
-      paymentUrl: `https://mock-payment-gateway.com/pay?id=${data.feeId}&amount=${data.amount}&ref=${data.feeId}`,
+      paymentUrl: `https://mock-payment-gateway.com/pay?id=${data.feeId}&amount=${bill.totalAmount}&ref=${data.feeId}`,
       status: 'PENDING',
     };
 
@@ -386,7 +404,7 @@ export class FinancesService {
       data: {
         feeId: data.feeId,
         userId: userId,
-        amount: data.amount,
+        amount: bill.totalAmount.toNumber(),
         paymentMethod: data.paymentMethod,
         transactionId: paymentGatewayResponse.transactionId,
         status: paymentGatewayResponse.status,

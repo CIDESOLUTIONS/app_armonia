@@ -1,61 +1,41 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Chip,
-  CircularProgress,
-  Divider,
-  FormControl,
-  FormControlLabel,
-  FormHelperText,
-  Grid,
-  InputAdornment,
-  InputLabel,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Select,
-  Stack,
-  TextField,
-  Typography,
-  useTheme,
-} from "@mui/material";
-import {
-  CreditCard as CreditCardIcon,
-  AccountBalance as BankIcon,
-  Receipt as ReceiptIcon,
-  Lock as LockIcon,
-  CheckCircle as CheckIcon,
-  Error as ErrorIcon,
-} from "@mui/icons-material";
-import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { useRouter } from "next/router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
+import { CreditCard, Banknote, Receipt, Lock, CheckCircle, XCircle, Loader2 } from "lucide-react";
+
+// Shadcn UI Components
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 // Servicios y utilidades
 import { createTransaction, processTransaction } from "@/lib/api/payments";
 import { formatCurrency } from "@/lib/utils/format";
 
 // Esquema de validación
-const paymentSchema = yup.object({
-  amount: yup
-    .number()
-    .required("El monto es obligatorio")
-    .positive("El monto debe ser positivo"),
-  description: yup
+const paymentSchema = z.object({
+  amount: z.preprocess(
+    (val) => Number(val),
+    z.number().positive("El monto debe ser positivo."),
+  ),
+  description: z
     .string()
-    .required("La descripción es obligatoria")
-    .min(3, "Mínimo 3 caracteres"),
-  paymentMethodId: yup.number().required("Seleccione un método de pago"),
-  invoiceId: yup.number().optional(),
-  savePaymentMethod: yup.boolean().optional(),
+    .min(3, "La descripción es obligatoria y debe tener al menos 3 caracteres."),
+  paymentMethodId: z.number().int().positive("Seleccione un método de pago."),
+  invoiceId: z.number().optional(),
+  savePaymentMethod: z.boolean().optional(),
 });
+
+type PaymentFormValues = z.infer<typeof paymentSchema>;
 
 // Componente principal de pago
 const PaymentForm = ({
@@ -65,7 +45,6 @@ const PaymentForm = ({
   onSuccess,
   onCancel,
 }) => {
-  const theme = useTheme();
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -76,41 +55,38 @@ const PaymentForm = ({
       id: 1,
       name: "Tarjeta de Crédito",
       type: "CREDIT_CARD",
-      icon: <CreditCardIcon />,
+      icon: <CreditCard />,
     },
-    { id: 2, name: "PSE - Débito bancario", type: "PSE", icon: <BankIcon /> },
+    { id: 2, name: "PSE - Débito bancario", type: "PSE", icon: <Banknote /> },
     {
       id: 3,
       name: "Efectivo (Efecty, Baloto)",
       type: "CASH",
-      icon: <ReceiptIcon />,
+      icon: <Receipt />,
     },
   ]);
   const [processingStatus, setProcessingStatus] = useState(null);
 
   // Configuración del formulario
-  const {
-    control,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(paymentSchema),
+  const form = useForm<PaymentFormValues>({
+    resolver: zodResolver(paymentSchema),
     defaultValues: {
       amount: initialAmount,
       description: description,
-      paymentMethodId: "",
+      paymentMethodId: 0, // Default to 0 or a valid initial ID
       invoiceId: invoiceId,
       savePaymentMethod: false,
     },
   });
+
+  const { control, handleSubmit, watch, formState: { errors } } = form;
 
   // Observar método de pago seleccionado
   const selectedMethodId = watch("paymentMethodId");
   const selectedMethod = paymentMethods.find((m) => m.id === selectedMethodId);
 
   // Manejar envío del formulario
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: PaymentFormValues) => {
     try {
       setLoading(true);
       setProcessingStatus("processing");
@@ -160,17 +136,17 @@ const PaymentForm = ({
 
     const statusConfig = {
       processing: {
-        icon: <CircularProgress size={40} />,
+        icon: <Loader2 className="h-10 w-10 animate-spin text-primary" />,
         title: "Procesando pago",
         description: "Por favor espere mientras procesamos su pago...",
       },
       success: {
-        icon: <CheckIcon color="success" sx={{ fontSize: 40 }} />,
+        icon: <CheckCircle className="h-10 w-10 text-green-500" />,
         title: "Pago exitoso",
         description: "Su pago ha sido procesado correctamente.",
       },
       error: {
-        icon: <ErrorIcon color="error" sx={{ fontSize: 40 }} />,
+        icon: <XCircle className="h-10 w-10 text-red-500" />,
         title: "Error en el pago",
         description:
           "Ha ocurrido un error al procesar su pago. Por favor intente nuevamente.",
@@ -180,15 +156,15 @@ const PaymentForm = ({
     const config = statusConfig[processingStatus];
 
     return (
-      <Box sx={{ textAlign: "center", py: 4 }}>
+      <div className="text-center py-4">
         {config.icon}
-        <Typography variant="h6" sx={{ mt: 2 }}>
+        <h3 className="text-lg font-semibold mt-2">
           {config.title}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
+        </h3>
+        <p className="text-sm text-gray-500">
           {config.description}
-        </Typography>
-      </Box>
+        </p>
+      </div>
     );
   };
 
@@ -196,7 +172,9 @@ const PaymentForm = ({
   if (processingStatus === "processing" || processingStatus === "success") {
     return (
       <Card>
-        <CardHeader title="Procesando Pago" />
+        <CardHeader>
+          <CardTitle>Procesando Pago</CardTitle>
+        </CardHeader>
         <CardContent>{renderProcessingStatus()}</CardContent>
       </Card>
     );
@@ -206,223 +184,157 @@ const PaymentForm = ({
     <Card>
       <CardHeader
         title="Realizar Pago"
-        subheader="Complete los datos para procesar su pago"
-        avatar={<LockIcon color="primary" />}
+        description="Complete los datos para procesar su pago"
+        // avatar={<LockIcon color="primary" />}
       />
       <CardContent>
         {processingStatus === "error" && (
-          <Box sx={{ mb: 3 }}>{renderProcessingStatus()}</Box>
+          <div className="mb-3">{renderProcessingStatus()}</div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container spacing={3}>
+        <Form {...form}>
+          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
             {/* Monto */}
-            <Grid item xs={12} md={6}>
-              <Controller
-                name="amount"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Monto a pagar"
-                    fullWidth
-                    type="number"
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">$</InputAdornment>
-                      ),
-                    }}
-                    error={!!errors.amount}
-                    helperText={errors.amount?.message}
-                    disabled={!!invoiceId}
-                  />
-                )}
-              />
-            </Grid>
+            <FormField
+              control={control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Monto a pagar</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="number"
+                      placeholder="Ej: 100000"
+                      // InputProps={{
+                      //   startAdornment: (
+                      //     <InputAdornment position="start">$</InputAdornment>
+                      //   ),
+                      // }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Descripción */}
-            <Grid item xs={12} md={6}>
-              <Controller
-                name="description"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Descripción"
-                    fullWidth
-                    error={!!errors.description}
-                    helperText={errors.description?.message}
-                    disabled={!!invoiceId}
-                  />
-                )}
-              />
-            </Grid>
+            <FormField
+              control={control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Descripción</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Ej: Pago de cuota de administración"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Métodos de pago */}
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" gutterBottom>
-                Seleccione un método de pago
-              </Typography>
-
-              <Controller
-                name="paymentMethodId"
-                control={control}
-                render={({ field }) => (
-                  <FormControl fullWidth error={!!errors.paymentMethodId}>
-                    <RadioGroup
-                      {...field}
-                      onChange={(e) => field.onChange(parseInt(e.target.value))}
-                      value={field.value}
-                    >
-                      <Grid container spacing={2}>
-                        {paymentMethods.map((method) => (
-                          <Grid item xs={12} sm={4} key={method.id}>
-                            <Card
-                              sx={{
-                                border:
-                                  field.value === method.id
-                                    ? `2px solid ${theme.palette.primary.main}`
-                                    : "1px solid #e0e0e0",
-                                cursor: "pointer",
-                                transition: "all 0.2s",
-                                "&:hover": {
-                                  boxShadow: 3,
-                                },
-                              }}
-                              onClick={() => field.onChange(method.id)}
-                            >
-                              <CardContent>
-                                <Box
-                                  sx={{ display: "flex", alignItems: "center" }}
-                                >
-                                  <FormControlLabel
-                                    value={method.id}
-                                    control={<Radio />}
-                                    label=""
-                                    sx={{ mr: 0 }}
-                                  />
-                                  <Box
-                                    sx={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      ml: 1,
-                                    }}
-                                  >
-                                    {method.icon}
-                                    <Typography variant="body1" sx={{ ml: 1 }}>
-                                      {method.name}
-                                    </Typography>
-                                  </Box>
-                                </Box>
-                              </CardContent>
-                            </Card>
-                          </Grid>
-                        ))}
-                      </Grid>
-                    </RadioGroup>
-                    {errors.paymentMethodId && (
-                      <FormHelperText error>
-                        {errors.paymentMethodId.message}
-                      </FormHelperText>
-                    )}
-                  </FormControl>
-                )}
-              />
-            </Grid>
+            <FormItem>
+              <FormLabel>Seleccione un método de pago</FormLabel>
+              <FormControl>
+                <RadioGroup
+                  onValueChange={(value) => form.setValue("paymentMethodId", parseInt(value))}
+                  value={String(watch("paymentMethodId"))}
+                  className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                >
+                  {paymentMethods.map((method) => (
+                    <FormItem key={method.id}>
+                      <FormLabel className="[&:has([data-state=checked])]:border-primary flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground">
+                        <RadioGroupItem value={String(method.id)} className="sr-only" />
+                        {method.icon}
+                        <span className="block text-sm font-medium mt-2">
+                          {method.name}
+                        </span>
+                      </FormLabel>
+                    </FormItem>
+                  ))}
+                </RadioGroup>
+              </FormControl>
+              <FormMessage>{errors.paymentMethodId?.message}</FormMessage>
+            </FormItem>
 
             {/* Guardar método de pago */}
             {selectedMethod?.type === "CREDIT_CARD" && (
-              <Grid item xs={12}>
-                <Controller
-                  name="savePaymentMethod"
-                  control={control}
-                  render={({ field }) => (
-                    <FormControlLabel
-                      control={
-                        <Radio
-                          checked={field.value}
-                          onChange={(e) => field.onChange(e.target.checked)}
-                        />
-                      }
-                      label="Guardar esta tarjeta para pagos futuros"
-                    />
-                  )}
-                />
-              </Grid>
+              <FormField
+                control={control}
+                name="savePaymentMethod"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Guardar esta tarjeta para pagos futuros</FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
             )}
 
             {/* Información adicional según método de pago */}
             {selectedMethod?.type === "PSE" && (
-              <Grid item xs={12}>
-                <Card
-                  variant="outlined"
-                  sx={{ p: 2, bgcolor: "background.default" }}
-                >
-                  <Typography variant="subtitle2" gutterBottom>
-                    Información importante
-                  </Typography>
-                  <Typography variant="body2">
-                    Al seleccionar PSE, será redirigido a su banco para
-                    completar la transacción. Asegúrese de tener habilitado su
-                    servicio de banca en línea.
-                  </Typography>
-                </Card>
-              </Grid>
+              <Card className="p-4 bg-blue-50 border-blue-200 text-blue-800">
+                <CardTitle className="text-base">Información importante</CardTitle>
+                <CardDescription className="text-sm">
+                  Al seleccionar PSE, será redirigido a su banco para
+                  completar la transacción. Asegúrese de tener habilitado su
+                  servicio de banca en línea.
+                </CardDescription>
+              </Card>
             )}
 
             {selectedMethod?.type === "CASH" && (
-              <Grid item xs={12}>
-                <Card
-                  variant="outlined"
-                  sx={{ p: 2, bgcolor: "background.default" }}
-                >
-                  <Typography variant="subtitle2" gutterBottom>
-                    Información importante
-                  </Typography>
-                  <Typography variant="body2">
-                    Al seleccionar pago en efectivo, recibirá un código que
-                    deberá presentar en los puntos de pago autorizados para
-                    completar la transacción.
-                  </Typography>
-                </Card>
-              </Grid>
+              <Card className="p-4 bg-yellow-50 border-yellow-200 text-yellow-800">
+                <CardTitle className="text-base">Información importante</CardTitle>
+                <CardDescription className="text-sm">
+                  Al seleccionar pago en efectivo, recibirá un código que
+                  deberá presentar en los puntos de pago autorizados para
+                  completar la transacción.
+                </CardDescription>
+              </Card>
             )}
 
             {/* Resumen de pago */}
-            <Grid item xs={12}>
-              <Divider sx={{ my: 2 }} />
-              <Box
-                sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
-              >
-                <Typography variant="subtitle1">Total a pagar:</Typography>
-                <Typography variant="h6" color="primary">
-                  {formatCurrency(watch("amount") || 0)}
-                </Typography>
-              </Box>
-            </Grid>
+            <Separator className="my-4" />
+            <div className="flex justify-between items-center mb-2">
+              <Label className="text-lg">Total a pagar:</Label>
+              <span className="text-xl font-bold text-primary">
+                {formatCurrency(watch("amount") || 0)}
+              </span>
+            </div>
 
             {/* Botones de acción */}
-            <Grid item xs={12}>
-              <Stack direction="row" spacing={2} justifyContent="flex-end">
-                <Button
-                  variant="outlined"
-                  onClick={onCancel}
-                  disabled={loading}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  disabled={loading}
-                  startIcon={loading ? <CircularProgress size={20} /> : null}
-                >
-                  {loading ? "Procesando..." : "Realizar Pago"}
-                </Button>
-              </Stack>
-            </Grid>
-          </Grid>
-        </form>
+            <div className="flex justify-end space-x-2">
+              <Button
+                variant="outline"
+                onClick={onCancel}
+                disabled={loading}
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}{" "}
+                Realizar Pago
+              </Button>
+            </div>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   );

@@ -158,7 +158,7 @@ Vista general con KPIs: estado de cartera, PQR pendientes, reservas del día, ú
 * Base de datos de residentes y propietarios.
 * Inventario de vehículos y parqueaderos.
 * Registro de mascotas.
-* Registro y gestión de amenidades y áreas comunes
+* Registro de amenidades y áreas comunes
 3.2.3. Módulo de Comunicaciones
 * Cartelera digital para anuncios oficiales.
 * Sistema de envío de notificaciones push y email masivo.
