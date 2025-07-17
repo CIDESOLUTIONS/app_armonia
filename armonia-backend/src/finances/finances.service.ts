@@ -18,7 +18,7 @@ import {
   InitiatePaymentDto,
   PaymentGatewayCallbackDto,
 } from '../common/dto/finances.dto';
-import { ServerLogger } from '@/lib/logging/server-logger';
+import { ServerLogger } from '@backend/lib/logging/server-logger';
 import { encrypt, decrypt } from '@/lib/security/encryption-service';
 import { ActivityLogger } from '@/lib/logging/activity-logger';
 import { CommunicationService } from '../communications/communications.service';
@@ -487,7 +487,6 @@ export class FinancesService {
 
     switch (type) {
       case 'INCOME':
-      case 'BALANCE':
         payments = await prisma.payment.findMany({
           where: {
             date: { gte: start, lte: end },
@@ -498,7 +497,6 @@ export class FinancesService {
         transactions = payments;
         break;
       case 'EXPENSE':
-      case 'BALANCE':
         fees = await prisma.fee.findMany({
           where: {
             dueDate: { gte: start, lte: end },
@@ -508,6 +506,25 @@ export class FinancesService {
         });
         totalExpenses = fees.reduce((sum, f) => sum + f.amount.toNumber(), 0);
         transactions = fees;
+        break;
+      case 'BALANCE':
+        payments = await prisma.payment.findMany({
+          where: {
+            date: { gte: start, lte: end },
+          },
+          include: { bill: true, property: true, createdByUser: true },
+        });
+        totalIncome = payments.reduce((sum, p) => sum + p.amount.toNumber(), 0);
+
+        fees = await prisma.fee.findMany({
+          where: {
+            dueDate: { gte: start, lte: end },
+            status: PaymentStatus.PAID,
+          },
+          include: { property: true },
+        });
+        totalExpenses = fees.reduce((sum, f) => sum + f.amount.toNumber(), 0);
+        transactions = [...payments, ...fees];
         break;
       case 'DEBTORS':
         const outstandingFees = await prisma.fee.findMany({

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
-import { uploadFileToS3 } from '../../src/lib/storage/s3-upload'; // Importar el servicio S3
+import { uploadFileToS3 } from '@backend/lib/storage/s3-upload';
 import {
   CreateListingDto,
   UpdateListingDto,

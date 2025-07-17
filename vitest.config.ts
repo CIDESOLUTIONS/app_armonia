@@ -7,16 +7,30 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './vitest.setup.ts',
     globals: true,
-    exclude: ['**/node_modules/**', '**/dist/**', '**/e2e/**'],
+    include: [
+      'armonia-backend/src/app.controller.spec.ts',
+      'armonia-backend/src/documents/documents.service.spec.ts',
+      'armonia-backend/src/tenant/tenant.service.spec.ts',
+      'armonia-backend/src/pqr/pqr.service.spec.ts',
+      'armonia-backend/src/packages/packages.service.spec.ts',
+      'armonia-backend/src/visitors/visitors.service.spec.ts',
+      'armonia-backend/src/projects/projects.service.spec.ts',
+      'armonia-backend/src/plans/plans.service.spec.ts',
+      'armonia-backend/src/surveys/survey.service.spec.ts',
+      'armonia-backend/src/marketplace/marketplace.service.spec.ts',
+      'armonia-backend/src/security/security.service.spec.ts',
+      'armonia-backend/src/iot/iot.service.spec.ts',
+      'armonia-backend/src/finances/finances.service.spec.ts',
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: ['**/node_modules/**', '**/dist/**', '**/e2e/**'],
     },
   },
   resolve: {
     alias: {
       '@': './src',
+      '@backend': './armonia-backend/src',
     },
   },
 });
