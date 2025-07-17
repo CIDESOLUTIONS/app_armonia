@@ -14,382 +14,20 @@ You can switch authentication methods by typing /auth
 
 https://github.com/CIDESOLUTIONS/app_armonia.git
 
+Prompt manus
+Interacciones solo en español. Actúa como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas (Clean Code, SOLID, TDD, CI/CD, etc.). clona el proyecto "Armonía", una aplicación web y móvil ubicado en el repositorio https://github.com/CIDESOLUTIONS/app_armonia.git .Las especificaciones técnicas y funcionales se encuentran en la carpeta docs. Su tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto, a partir de esa comparación, debe generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre lo especificado y lo implementado, identificación de funcionalidades faltantes, incompletas o que deban ajustarse. Evalúa especialmente que cumpla con estrictamente con el stack tecnológico del frontend (Next.js, React, TypeScript, Prisma, shadcn/ui, zustand) y backend (NestJS) y verifica desde el acceso a la landing page (clave para conversión) hasta todos los portales (Administrador del conjunto residencial, Residentes, Recepción/Vigilancia y la Consola de Administración de la aplicación) cumplan el detalle funcional, evalúa la adopción del modelo de negocio incluyendo el plan empresarial, y el uso del modulo de democracia digital para que pueda ser integrado o independiente. Evalúa si se están aplicando estándares modernos de calidad, accesibilidad, rendimiento, seguridad y mantenibilidad. Si se detectan problemas, sugiere correcciones o mejoras específicas. Verifica si es conveniente, eliminar dependencias o funciones innecesarias, optimizar estructuras para mejorar eficiencia.si se requiere desarrollar desde cero respeta el estilo del proyecto. Evita proponer múltiples alternativas para una misma solución salvo que se indique lo contrario. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto al 100%. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones técnicas en docs y luego continuas sistemáticamente con lo solicitado.
 
 ajuste prompt chatgpt
-
 Interacciones solo en español. Actúas como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas (Clean Code, SOLID, TDD, CI/CD, etc.). Estás ubicado en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales se encuentran en la carpeta docs. Tu tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto. A partir de esa comparación, debes generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre lo especificado y lo implementado; e identificación de funcionalidades faltantes, incompletas o que deban ajustarse. Evalúa especialmente desde el acceso a la landing page (clave para conversión) hasta todos los portales: Administrador del conjunto residencial, Residentes, Recepción/Vigilancia y la Consola de Administración de la aplicación. Evalúa si se están aplicando estándares modernos de calidad, accesibilidad, rendimiento, seguridad y mantenibilidad. Si se detectan problemas, sugiere correcciones o mejoras específicas. Verifica si es conveniente, eliminar dependencias o funciones innecesarias, optimizar estructuras o reorganizar la arquitectura para mejorar eficiencia. Antes de desarrollar nuevo código, es muy importante revisar el historial de la carpeta .git para rescatar implementaciones descartadas. Si no existen, desarrolla desde cero respetando el estilo del proyecto. Evita proponer múltiples alternativas para una misma solución salvo que se indique lo contrario. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones en docs/, resume sus puntos clave y procede paso a paso siguiendo este flujo.
-
-
-
-I
-
-
-
-Interacciones solo en español. Actúas como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas (Clean Code, SOLID, TDD, CI/CD, etc.). Estás ubicado en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales se encuentran en la carpeta docs. Tu tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto. A partir de esa comparación, debes generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre lo especificado y lo implementado; e identificación de funcionalidades faltantes, incompletas o que deban ajustarse. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias e integrales (E2E). Luego, revisa la calidad del código (Lint) y deja la aplicación lista para su despliegue en producción. en tu última iteración de auditoria encontraste estas correcciones por realizar, inicia en la fase uno.
-
-plan de acción para las pruebas será el siguiente:
-
-  Fase 1: Diagnóstico y Corrección de la Configuración de Jest
-   1. Revisar jest.config.ts y tsconfig.jest.json: Estos son los archivos clave para la configuración de Jest y la transpilación de TypeScript. Buscaré errores en moduleNameMapper y en las opciones de compilación.
-   2. Examinar `babel.config.ts`: Asegurarme de que Babel esté configurado correctamente para trabajar con Jest y TypeScript.
-   3. Resolver errores de `Cannot find module`: Corregir las rutas de importación o los alias en moduleNameMapper.
-
-  Fase 2: Refactorización y Creación de Pruebas Unitarias
-   1. Enfoque modular: Seleccionaré un módulo a la vez, preferiblemente uno que haya modificado recientemente (PQR, financiero, documentos, asambleas), y me aseguraré de que sus pruebas unitarias pasen.
-   2. Implementar mocking adecuado: Asegurarme de que las dependencias de los servicios se mockeen correctamente para aislar la unidad bajo prueba.
-   3. Manejar contextos de React: Para los componentes de React, asegurarme de que se rendericen dentro de los proveedores de contexto necesarios o que el contexto se mockee.
-   4. Escribir nuevas pruebas: Crear pruebas unitarias para la nueva funcionalidad que he añadido.
-   5. Refactorizar pruebas existentes: Mejorar la claridad, mantenibilidad y efectividad de las pruebas existentes. Eliminar pruebas  redundantes o irrelevantes.
-
-  Fase 3: Pruebas E2E
-   1. Examinar `playwright.config.ts`: Entender la configuración de Playwright.
-   2. Identificar pruebas E2E existentes: Revisar el directorio e2e/.
-   3. Ejecutar pruebas E2E individualmente: Intentar ejecutar una sola prueba E2E para diagnosticar problemas.
-   4. Crear/Refactorizar pruebas E2E: Escribir nuevas pruebas E2E para las nuevas características y refactorizar las existentes según sea necesario.
-
-
 
 
 
 
 Con análisis de mercado
-Interacciones solo en español. Actúas como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas (Clean Code, SOLID, TDD, CI/CD, etc.). Estás ubicado en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales se encuentran en la carpeta docs. Tu tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto. A partir de esa comparación, debes generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre lo especificado y lo implementado, identificación de funcionalidades faltantes, incompletas o que deban ajustarse. Evalúa especialmente que cumpla con estrictamente con el stack tecnológico del frontend (Next.js, React, TypeScript, Prisma, shadcn/ui, zustand) y backend (NestJS) y verifica desde el acceso a la landing page (clave para conversión) hasta todos los portales (Administrador del conjunto residencial, Residentes, Recepción/Vigilancia y la Consola de Administración de la aplicación), evalúa la adopción del modelo de negocio incluyendo el plan empresarial, y el uso del modulo de democracia digital para que pueda ser integrado o independiente. Evalúa si se están aplicando estándares modernos de calidad, accesibilidad, rendimiento, seguridad y mantenibilidad. Si se detectan problemas, sugiere correcciones o mejoras específicas. Verifica si es conveniente, eliminar dependencias o funciones innecesarias, optimizar estructuras para mejorar eficiencia.si se requiere desarrollar desde cero respeta el estilo del proyecto. Evita proponer múltiples alternativas para una misma solución salvo que se indique lo contrario. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto al 100%. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones en docs/, resume sus puntos clave y procede paso a paso siguiendo este flujo.
-
- Conclusión de la Auditoría:
-
-  La auditoría ha revelado un proyecto con una buena base técnica y una estructura modular, pero con varias funcionalidades incompletas o
-  ausentes según las especificaciones, y áreas de mejora en la calidad del código y la configuración de CI/CD.
-
-  Informe Resumen de la Auditoría:
-
-  1. Resumen Funcional:
-   * Landing Page: Bien estructurada, pero la internacionalización de idiomas está incompleta.
-   * Flujos de Autenticación: Login, registro, recuperación y restablecimiento de contraseña están presentes. El login y restablecimiento usan
-     react-hook-form y zod, pero el registro y recuperación no, lo que genera inconsistencia y falta de validación robusta.
-   * Panel Administrador de la Aplicación: Dashboard con KPIs estáticos. Faltan módulos clave como gestión de licencias, soporte y gestión
-     comercial.
-   * Portal Empresarial "Armonía Portafolio": Dashboard con métricas dinámicas. Faltan KPIs específicos, navegación centralizada entre
-     propiedades, informes consolidados y personalización de marca.
-   * Módulo de Inventario (Admin): Estructura completa con sub-módulos. Necesita clarificación en "Amenidades" y "Activos Comunes", y
-     definición de "Complex Setup".
-   * Módulo de Comunicaciones (Admin):
-       * Anuncios: Gestión completa (CRUD) pero sin validación robusta de formulario y con confirm() nativo.
-       * Notificaciones: Envío de notificaciones con selección de destinatarios, pero sin validación robusta de formulario y sin diferenciación
-         clara entre push y email masivo. La selección de destinatarios por ID es poco amigable.
-       * Eventos Comunitarios: Gestión completa (CRUD) pero sin validación robusta de formulario. El módulo de encuestas y votaciones simples
-         está ausente.
-       * Documentos: El repositorio central de documentos está ausente.
-   * Sistema de PQR (Admin/Residente):
-       * Listado: Funcional con filtros, pero sin paginación/ordenamiento y con mensajes de error genéricos.
-       * Creación: Utiliza react-hook-form y zod (buena práctica), pero la categoría es texto libre y falta la asignación inicial.
-       * Detalle/Edición: Permite ver y gestionar PQR, comentarios, cambio de estado y asignación. Falta usar AlertDialog para eliminación y
-         mejorar mensajes de error.
-   * Módulo de Reservas (Admin): Listado y gestión de estado/eliminación. Falta la creación de reservas por el admin, un calendario visual y la
-     aplicación de reglas de uso. URL de detalle incorrecta.
-   * Portal de Residentes:
-       * Dashboard: KPIs dinámicos, gráfico de gastos, cuotas pendientes, próximas reservas, acciones rápidas y botón de pánico. La gestión de
-         presupuesto familiar está incompleta. La ubicación del pánico es estática.
-       * Marketplace Comunitario: Listado, búsqueda y filtrado de anuncios. Falta la subida de fotografías, sistema de mensajería interna,
-         moderación y sección "Mis Anuncios".
-       * Directorio de Residentes: Implementado, pero las especificaciones pedían un "Directorio de Servicios para el Hogar" (proveedores).
-
-  2. Resumen Técnico y de Estilo:
-   * Stack Tecnológico: Next.js, React, TypeScript, Shadcn/UI, Zustand, Socket.IO, Prisma, NestJS, PostgreSQL. El stack se está utilizando,
-     pero hay inconsistencias en la aplicación de herramientas como react-hook-form y zod.
-   * Modularización: Buena estructura de directorios y componentes.
-   * Manejo de Estado: Uso de Zustand para el estado global.
-   * Comunicación con API: Uso de servicios para interactuar con el backend.
-   * Internacionalización: Presente, pero no aplicada consistentemente en toda la UI.
-   * Manejo de Errores: Uso de useToast para feedback, pero los mensajes de error son a menudo genéricos.
-   * CI/CD: Flujos de trabajo para backup de código y despliegue. Falta backup de base de datos, pruebas completas en el pipeline de
-     despliegue, rollbacks automatizados y despliegue explícito de backend.
-   * Seguridad: Uso de .env para variables sensibles, pero algunos placeholders persisten.
-
-  3. Identificación de Funcionalidades Faltantes, Incompletas o que Deban Ajustarse:
-
-   * Funcionalidades Críticas Faltantes:
-       * Módulo Financiero (Admin): Generación de cuotas, gestión de multas/intereses, integración con pasarelas de pago, gestión de
-         presupuesto anual, generación de informes financieros (más allá de la conciliación bancaria).
-       * Módulo de Comunicaciones (Admin): Módulo de encuestas y votaciones simples, Repositorio central de documentos.
-       * Marketplace Comunitario (Residente): Subida de fotografías, sistema de mensajería interna, moderación, sección "Mis Anuncios".
-       * Portal de Seguridad y Recepción: Interfaz para registro de novedades/incidentes, gestión de atención de botón de pánico, escaneo de
-         QR para visitantes, registro de recepción/entrega de paquetería.
-       * Módulo de Ecosistema y Alianzas: Implementación del "Directorio de Servicios para el Hogar" (proveedores), Alianzas FinTech,
-         Integración con Medidores Inteligentes (IoT).
-       * Módulo de Democracia Digital (Asambleas): Plataforma para asambleas virtuales/híbridas, registro de asistencia y quórum en tiempo
-         real, sistema de votaciones ponderadas, generación automática de borrador de acta.
-
-   * Funcionalidades Incompletas/Necesitan Ajustes:
-       * Landing Page: Internacionalización de idiomas.
-       * Flujos de Autenticación: Consistencia en el uso de react-hook-form y zod en todos los formularios.
-       * Panel Administrador de la Aplicación: KPIs dinámicos, módulos faltantes.
-       * Portal Empresarial "Armonía Portafolio": KPIs específicos, navegación centralizada, informes consolidados, personalización de marca.
-       * Módulo de Inventario (Admin): Clarificación de "Amenidades" y "Activos Comunes", definición de "Complex Setup".
-       * Módulo de Comunicaciones (Anuncios/Notificaciones/Eventos): Validación robusta de formularios, uso consistente de AlertDialog, mejora
-         en la selección de destinatarios.
-       * Sistema de PQR: Paginación/ordenamiento en listado, categoría como select, asignación en creación/edición, internacionalización de
-         estados/prioridades.
-       * Módulo de Reservas (Admin): Creación de reservas por admin, calendario visual, reglas de uso, URL de detalle correcta,
-         paginación/filtrado/ordenamiento.
-       * Portal de Residentes (Dashboard): Gestión de presupuesto familiar, ubicación dinámica para pánico, formato de moneda dinámico, enlace
-         a PQRs, funcionalidad de notificaciones.
-       * Calidad de Código: Errores de linting, uso excesivo de any, variables no utilizadas, inconsistencias en importaciones.
-       * CI/CD: Falta de pruebas completas en el pipeline de despliegue, rollbacks automatizados, despliegue explícito de backend, gestión de
-         migraciones de DB.
-       * Seguridad: Revisión de fetchApi y manejo de credenciales en secretos.
-
- 
+Interacciones solo en español. Actúa como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas. Está en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales están en la carpeta docs. Su tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto, a partir de esa comparación, debe generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre las funcionalidades especificadas y lo implementado, identificación de funcionalidades faltantes, incompletas o que deban ajustarse. Evalúa especialmente que cumpla con estrictamente con el stack tecnológico y verifica los flujos desde el acceso a la landing page (clave para conversión) hasta todos los portales (Administrador del conjunto residencial, Residentes, Recepción/Vigilancia y la Consola de Administración de la aplicación) cumplan el detalle funcional, evalúa la adopción del modelo de negocio incluyendo el plan empresarial, y el uso del modulo de democracia digital para que pueda ser integrado o independiente. Evalúa si se están aplicando estándares modernos de calidad, accesibilidad, rendimiento, seguridad y mantenibilidad. Si se detectan problemas, realiza las correcciones. Verifica si es conveniente eliminar dependencias o funciones innecesarias, optimizar estructuras para mejorar eficiencia.si se requiere desarrollar desde cero respeta el estilo del proyecto. Evita proponer múltiples alternativas para una misma solución salvo que se indique lo contrario. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias (Vitest) e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto al 100%. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones técnicas en docs y luego continuas sistemáticamente con lo solicitado. 
 
 
- Plan de Trabajo Detallado (Priorizado por Dependencias y Criticidad):
-
-  Este plan se centrará en completar las funcionalidades críticas y mejorar la calidad del código para un despliegue exitoso.
-
-  Fase 1: Estabilización y Funcionalidades Críticas (Frontend y Backend)
-
-   1. Corrección de Errores de Linting y Configuración de Entorno: (pend)
-       * Tarea: Resolver todos los errores de análisis sintáctico y los errores relacionados con module en el frontend y backend.
-       * Prioridad: Crítica (bloquea el desarrollo y la compilación).
-       * Dependencia: Ninguna.
-       * Estimación: 1 día.
-       * Nota: Esto incluye la revisión de eslint.config.mjs y la eliminación de cualquier configuración problemática.
-
-   2. Implementación de `react-hook-form` y `zod` en Formularios Inconsistentes: (ok)
-       * Tarea: Refactorizar RegisterForm.tsx, CreateAssemblyPage.tsx, EditAssemblyPage.tsx, NotificationsPage.tsx, CreateListingPage.tsx para
-         usar react-hook-form y zod para la validación y gestión de formularios.
-       * Prioridad: Alta (mejora la calidad del código, reduce errores, mejora la UX).
-       * Dependencia: Corrección de errores de linting.
-       * Estimación: 3 días.
-
-   3. Implementación de Funcionalidades Críticas del Módulo Financiero (Frontend y Backend): (ok)
-       * Tarea (Frontend): Completar src/app/(admin)/(complex-admin)/finances/page.tsx para incluir la generación de cuotas, gestión de multas/intereses, integración con pasarelas de pago y generación de informes financieros.
-       * Tarea (Backend): Desarrollar los endpoints de NestJS para soportar estas funcionalidades, incluyendo la lógica de negocio y la integración con Prisma.
-       * Prioridad: Crítica (funcionalidad central del negocio).
-       * Dependencia: Backend.
-       * Estimación: 5 días.
-
-   4. Implementación del Repositorio Central de Documentos (Frontend y Backend): (ok)
-       * Tarea (Frontend): Crear src/app/(admin)/(complex-admin)/communications/documents con interfaz para subir, listar, visualizar y descargar documentos.
-       * Tarea (Backend): Desarrollar los endpoints de NestJS para la gestión de documentos y la integración con un servicio de almacenamiento
-         (ej. AWS S3).
-       * Prioridad: Alta.
-       * Dependencia: Backend, AWS S3 (si aplica).
-       * Estimación: 4 días.
-
-   5. Implementación de Subida de Fotografías en Marketplace (Frontend y Backend): (ok)
-       * Tarea (Frontend): Añadir componente de subida de imágenes a CreateListingPage.tsx.
-       * Tarea (Backend): Desarrollar los endpoints de NestJS para manejar la subida de imágenes y el almacenamiento (ej. AWS S3).
-       * Prioridad: Alta.
-       * Dependencia: Backend, AWS S3.
-       * Estimación: 3 días.
-
-   6. Implementación del Sistema de Mensajería Interna en Marketplace (Frontend y Backend): (ok)
-       * Tarea (Frontend): Integrar la interfaz de chat en src/app/(resident)/(resident)/marketplace/chat/[listingId]/page.tsx con la
-         visualización de mensajes y envío.
-       * Tarea (Backend): Desarrollar los endpoints de NestJS para la gestión de mensajes y la integración con Socket.IO.
-       * Prioridad: Alta.
-       * Dependencia: Backend, Socket.IO.
-       * Estimación: 4 días.
-
-   7. Implementación de Gestión Avanzada de Visitantes y Paquetería (Frontend y Backend): (ok)
-       * Tarea (Frontend): Desarrollar interfaz para registro de novedades/incidentes, escaneo de QR para visitantes, registro de recepción/entrega de paquetería en el Portal de Seguridad y Recepción.
-       * Tarea (Backend): Desarrollar los endpoints de NestJS para soportar estas funcionalidades.
-       * Prioridad: Alta.
-       * Dependencia: Backend.
-       * Estimación: 5 días.
-
-  Fase 2: Mejora de Funcionalidades Existentes y Calidad (Frontend y Backend) (ok)del 
-
-   1. Mejora de Internacionalización:
-       * Tarea: Aplicar useTranslations consistentemente en todos los componentes y traducir textos hardcodeados.
-       * Prioridad: Media.
-       * Dependencia: Ninguna.
-       * Estimación: 2 días.
-
-   2. Optimización de Listados (Paginación, Filtrado, Ordenamiento): (ok)
-       * Tarea: Implementar paginación, filtrado y ordenamiento en las tablas de listado de PQRs, Reservas y Marketplace.
-       * Prioridad: Media.
-       * Dependencia: Backend (endpoints deben soportar estos parámetros).
-       * Estimación: 3 días.
-
-   3. Mejora de Mensajes de Error:
-       * Tarea: Asegurar que los servicios de frontend y los endpoints de backend devuelvan mensajes de error más específicos y amigables para el usuario.
-       * Prioridad: Media.
-       * Dependencia: Backend.
-       * Estimación: 2 días.
-
-   4. Implementación de "Directorio de Servicios para el Hogar" (Proveedores): (ok)
-       * Tarea (Frontend): Crear la interfaz para listar proveedores, perfiles, calificaciones y reseñas.
-       * Tarea (Backend): Desarrollar los endpoints de NestJS para la gestión de proveedores.
-       * Prioridad: Media.
-       * Dependencia: Backend.
-       * Estimación: 4 días.
-
-   5. Implementación de Alianzas FinTech e Integración IoT (Frontend y Backend): (ok)
-       * Tarea (Frontend): Desarrollar la interfaz para micro-créditos y visualización de datos de medidores inteligentes.
-       * Tarea (Backend): Desarrollar los endpoints de NestJS para estas integraciones.
-       * Prioridad: Media.
-       * Dependencia: Backend, APIs de terceros.
-       * Estimación: 5 días.
-
-   6. Implementación de Funcionalidades Avanzadas de Asambleas (Democracia Digital): (ok)
-       * Tarea (Frontend): Desarrollar interfaz para registro de asistencia y quórum en tiempo real, sistema de votaciones ponderadas, y
-         generación de borrador de acta.
-       * Tarea (Backend): Desarrollar la lógica de NestJS para estas funcionalidades, incluyendo la ponderación de votos.
-       * Prioridad: Alta.
-       * Dependencia: Backend, Socket.IO.
-       * Estimación: 7 días.
-
-  Fase 3: Pruebas y Despliegue
-
-   1. Desarrollo de Pruebas Unitarias:
-       * Tarea: Escribir pruebas unitarias con Jest/RTL para componentes y servicios críticos del frontend.
-       * Prioridad: Alta.
-       * Dependencia: Funcionalidades completas.
-       * Estimación: 5 días.
-
-   2. Desarrollo y Actualización de Pruebas E2E:
-       * Tarea: Crear nuevas pruebas E2E con Playwright para las funcionalidades recién implementadas y actualizar las existentes.
-       * Prioridad: Alta.
-       * Dependencia: Funcionalidades completas.
-       * Estimación: 7 días.
-
-   3. Configuración Completa de CI/CD:
-       * Tarea:
-           * Añadir backup de base de datos al flujo de trabajo daily-backup.yml.
-           * Integrar la ejecución de pruebas unitarias y E2E en el deploy.yml antes del despliegue.
-           * Implementar lógica de rollback automatizado en deploy.yml.
-           * Asegurar el despliegue explícito de frontend y backend.
-           * Configurar migraciones de DB en el pipeline.
-           * Mover credenciales a secretos de GitHub.
-       * Prioridad: Crítica.
-       * Dependencia: Pruebas completas.
-       * Estimación: 3 días.
-
-   4. Optimización de Rendimiento:
-       * Tarea: Analizar el rendimiento con Lighthouse y aplicar optimizaciones (lazy loading, optimización de imágenes, etc.).
-       * Prioridad: Media.
-       * Dependencia: Aplicación funcional y estable.
-       * Estimación: 3 días.
-
-   5. Preparación Final para Producción:
-       * Tarea: Reemplazar todos los placeholders en .env.production con valores reales y seguros.
-       * Prioridad: Crítica.
-       * Dependencia: Ninguna.
-       * Estimación: 1 día.
-
- 
-
-Con análisis de mercado (2)
-
-Interacciones solo en español. Actúa como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas (Clean Code, SOLID, TDD, CI/CD, etc.). Está ubicado en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales se encuentran en la carpeta docs. Su tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto, a partir de esa comparación, debe generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre lo especificado y lo implementado, identificación de funcionalidades faltantes, incompletas o que deban ajustarse. Evalúa especialmente que cumpla con estrictamente con el stack tecnológico del frontend (Next.js, React, TypeScript, Prisma, shadcn/ui, zustand) y backend (NestJS) y verifica desde el acceso a la landing page (clave para conversión) hasta todos los portales (Administrador del conjunto residencial, Residentes, Recepción/Vigilancia y la Consola de Administración de la aplicación) cumplan el detalle funcional, evalúa la adopción del modelo de negocio incluyendo el plan empresarial, y el uso del modulo de democracia digital para que pueda ser integrado o independiente. Evalúa si se están aplicando estándares modernos de calidad, accesibilidad, rendimiento, seguridad y mantenibilidad. Si se detectan problemas, sugiere correcciones o mejoras específicas. Verifica si es conveniente, eliminar dependencias o funciones innecesarias, optimizar estructuras para mejorar eficiencia.si se requiere desarrollar desde cero respeta el estilo del proyecto. Evita proponer múltiples alternativas para una misma solución salvo que se indique lo contrario. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto al 100%. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones técnicas en docs y luego continuas sistemáticamente con lo solicitado. 
-
-resultado
- Resumen de la Auditoría Completa:
-
-   1. Estructura de Portales: La aplicación está bien estructurada con portales para admin, resident y reception.
-   2. Módulo Financiero (Admin): Identificado como un área crítica con muchas funcionalidades como marcadores de posición, a pesar de un
-      backend robusto.
-   3. Módulo Financiero (Residente): Mucho más completo y funcional.
-   4. Módulo PQR (Admin): Marcador de posición en el frontend, con un backend completo.
-   5. Módulo PQR (Residente): Implementación avanzada para la visualización y creación de PQRs.
-   6. Componentes de UI: Bien estructurados y consistentes.
-   7. Inconsistencias en Llamadas a la API: Se identificaron casos donde los componentes no utilizan los servicios centralizados para las
-      llamadas a la API (BankStatementUpload.tsx y CreatePQRForm.tsx).
-   8. Arquitectura Multi-tenant: Sólidamente implementada a nivel de base de datos y enrutamiento.
-   9. Migración a TypeScript: Completa para el código fuente principal.
-   10. Entorno de Pruebas: Pendiente de estabilización (se dejó en pausa).
-
-  Ahora, con base en esta auditoría exhaustiva, procederé a generar el plan de trabajo detallado para alinear el proyecto al 100% con las
-  especificaciones y prepararlo para el despliegue.
-
-  ---
-
-   Plan de Trabajo Detallado: Auditoría y Alineación del Proyecto Armonía
-
-  Objetivo General: Alinear el proyecto Armonía al 100% con las Especificaicones Tecnicas y Funcionales App Armonia_ver16.txt, estabilizar
-  el entorno de pruebas y preparar la aplicación para el despliegue.
-
-  Fase 1: Refactorización y Optimización del Código (Prioridad Alta) (ok)
-
-   * Tarea 1.1: Centralizar las llamadas a la API.
-       * Acción: Modificar src/components/finances/BankStatementUpload.tsx para utilizar uploadBankStatement de
-         src/services/financeService.ts.
-       * Acción: Modificar src/components/pqr/CreatePQRForm.tsx para utilizar createPQR de src/services/pqrService.ts.
-       * Acción: Auditar otros componentes que puedan estar realizando llamadas directas a la API y refactorizarlos para usar los servicios
-         centralizados.
-       * Verificación: Todas las llamadas a la API desde el frontend deben pasar por los servicios definidos en src/services.
-   * Tarea 1.2: Reorganización de la estructura de archivos (si es necesario).
-       * Acción: Evaluar la anidación (resident)/(resident) y (reception)/(reception). Si bien no es crítica, se podría considerar una
-         refactorización para una estructura más plana si mejora la legibilidad y mantenibilidad. (Decisión pendiente, se evaluará durante la
-         implementación).
-       * Verificación: La estructura de archivos debe ser lógica y fácil de navegar.
-   * Tarea 1.3: Optimización y limpieza general.
-       * Acción: Eliminar código muerto, dependencias no utilizadas y funcionalidades redundantes.
-       * Acción: Refactorizar componentes grandes y complejos para mejorar la mantenibilidad y la legibilidad.
-       * Verificación: El código debe ser limpio, eficiente y seguir las convenciones de nombrado y estilo.
-
-  Fase 2: Desarrollo y Completitud de Funcionalidades (Prioridad Alta)
-
-   * Tarea 2.1: Implementar el Módulo Financiero (Admin).
-       * Acción: Desarrollar las secciones de "Generación de Cuotas" (FeeGenerationSection), "Gestión de Multas e Intereses"
-         (FineManagementSection), "Integración con Pasarelas de Pago" (PaymentGatewaySection) e "Informes Financieros"
-         (FinancialReportsSection) en src/app/(admin)/(complex-admin)/finances/page.tsx.
-       * Acción: Asegurar que estas funcionalidades se integren con las APIs financieras existentes en el backend.
-       * Acción: Implementar el endpoint getRecentTransactions en el backend según el TODO en src/services/financeService.ts.
-       * Verificación: El módulo financiero del administrador debe ser completamente funcional y reflejar todas las especificaciones.
-   * Tarea 2.2: Implementar el Módulo PQR (Admin).
-       * Acción: Desarrollar la interfaz de usuario para la gestión completa de PQR en el portal del administrador, incluyendo listado,
-         visualización de detalles, creación, actualización, eliminación, adición de comentarios y asignación de PQRs.
-       * Acción: Reutilizar los componentes existentes en src/components/pqr y las funciones de servicio en src/services/pqrService.ts tanto
-         como sea posible.
-       * Verificación: El módulo PQR del administrador debe ser completamente funcional.
-   * Tarea 2.3: Completar otros módulos identificados como incompletos (si los hay).
-       * Acción: Durante la implementación de las tareas anteriores, se mantendrá una vigilancia para identificar cualquier otro módulo que
-         sea un marcador de posición o esté incompleto y se agregará al plan.
-       * Verificación: Todos los módulos principales deben estar completamente implementados según las especificaciones.
-
-  Fase 3: Pruebas y Aseguramiento de la Calidad (Prioridad Alta)
-
-   * Tarea 3.1: Estabilización del Entorno de Pruebas.
-       * Acción: Retomar y completar la resolución del error "Identifier 'mockDeep' has already been declared" en el entorno de pruebas.
-           * Acción: Ejecutar npm test para verificar la solución propuesta (eliminación de importación duplicada en src/__mocks__/prisma.ts).
-           * Verificación: Asegurar que no aparezca el error y que las pruebas se ejecuten sin errores de configuración.
-       * Acción: Abordar fallos de pruebas restantes.
-           * Acción: Analizar los resultados de npm test e identificar las pruebas que fallan.
-           * Acción: Para cada prueba fallida, proporcionar datos simulados específicos o ajustar las expectativas de la prueba según sea
-             necesario.
-           * Verificación: Todas las pruebas unitarias y de integración existentes deben pasar.
-       * Acción: Configurar y ejecutar herramientas de calidad de código.
-           * Acción: Ejecutar ESLint y Prettier para identificar y corregir problemas de estilo y formato.
-           * Verificación: El código base debe cumplir con los estándares de estilo definidos.
-   * Tarea 3.2: Pruebas Unitarias y de Integración.
-       * Acción: Desarrollar pruebas unitarias para todas las nuevas funcionalidades implementadas.
-       * Acción: Desarrollar pruebas de integración para asegurar que los componentes y servicios interactúen correctamente.
-       * Verificación: La cobertura de pruebas debe ser adecuada y todas las pruebas deben pasar.
-   * Tarea 3.3: Pruebas End-to-End (E2E).
-       * Acción: Crear y ejecutar scripts de Playwright para simular los flujos de usuario completos en todos los portales (admin, residente,
-         recepción) para las funcionalidades críticas.
-       * Verificación: Los flujos de usuario clave deben funcionar correctamente de principio a fin.
-   * Tarea 3.4: Pruebas de Rendimiento y Seguridad.
-       * Acción: Realizar pruebas de carga para asegurar la escalabilidad de la aplicación.
-       * Acción: Analizar la seguridad para identificar y corregir vulnerabilidades.
-       * Verificación: La aplicación debe ser escalable y segura.
-
-  Fase 4: Despliegue y Documentación (Prioridad Media)
-
-   * Tarea 4.1: Preparación para Producción.
-       * Acción: Configurar los pipelines de CI/CD en GitHub Actions para el despliegue automatizado.
-       * Acción: Asegurar que la aplicación se construya (build) correctamente sin errores.
-       * Verificación: La aplicación debe poder desplegarse de forma automatizada y sin errores.
-   * Tarea 4.2: Documentación Final.
-       * Acción: Actualizar la documentación técnica para que refleje el estado final del proyecto, incluyendo la arquitectura, las
-         funcionalidades implementadas y las decisiones de diseño.
-       * Verificación: La documentación debe ser completa, precisa y útil para futuros desarrolladores.
-
-
-
-se cambia la herramienta de prueba por allas recurrentes
+se cambia la herramienta de prueba por fallas recurrentes
  Ahora, el siguiente paso es actualizar los scripts en package.json para usar vitest en lugar de jest. También eliminaré las
   configuraciones de Jest.
 Dada la persistencia de los problemas con replace y la necesidad de avanzar con el plan general, procederé con la decisión radical que
@@ -405,10 +43,98 @@ Dada la persistencia de los problemas con replace y la necesidad de avanzar con 
      pueden migrar con cambios mínimos. Esto reduce el esfuerzo de refactorización.
    * Mejora del mocking de módulos: Las capacidades de mocking de Vitest suelen ser más sencillas y menos propensas a los tipos de problemas de
      resolución de módulos que hemos estado enfrentando con Jest.
+ 
 
 
-Prompt manus
-Interacciones solo en español. Actúa como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas (Clean Code, SOLID, TDD, CI/CD, etc.). clona el proyecto "Armonía", una aplicación web y móvil ubicado en el repositorio https://github.com/CIDESOLUTIONS/app_armonia.git .Las especificaciones técnicas y funcionales se encuentran en la carpeta docs. Su tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto, a partir de esa comparación, debe generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre lo especificado y lo implementado, identificación de funcionalidades faltantes, incompletas o que deban ajustarse. Evalúa especialmente que cumpla con estrictamente con el stack tecnológico del frontend (Next.js, React, TypeScript, Prisma, shadcn/ui, zustand) y backend (NestJS) y verifica desde el acceso a la landing page (clave para conversión) hasta todos los portales (Administrador del conjunto residencial, Residentes, Recepción/Vigilancia y la Consola de Administración de la aplicación) cumplan el detalle funcional, evalúa la adopción del modelo de negocio incluyendo el plan empresarial, y el uso del modulo de democracia digital para que pueda ser integrado o independiente. Evalúa si se están aplicando estándares modernos de calidad, accesibilidad, rendimiento, seguridad y mantenibilidad. Si se detectan problemas, sugiere correcciones o mejoras específicas. Verifica si es conveniente, eliminar dependencias o funciones innecesarias, optimizar estructuras para mejorar eficiencia.si se requiere desarrollar desde cero respeta el estilo del proyecto. Evita proponer múltiples alternativas para una misma solución salvo que se indique lo contrario. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto al 100%. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones técnicas en docs y luego continuas sistemáticamente con lo solicitado.
+Plan de Trabajo: Auditoría y Refactorización del Proyecto Armonía
+
+   * Fase 1: Análisis y Diagnóstico.
+       * Tarea 1.1: Lectura y análisis profundo de las especificaciones técnicas y funcionales (docs/Especificaicones Tecnicas y Funcionales
+         App Armonia_ver16.txt).
+       * Tarea 1.2: Análisis del package.json para comprender las dependencias, scripts y la configuración general del proyecto.
+       * Tarea 1.3: Inspección de la estructura de directorios y la arquitectura actual del código fuente en src/ y armonia-backend/.
+
+   * Fase 2: Informe de Auditoría y Plan de Acción Detallado.
+       * Tarea 2.1: Generar un informe que resuma el estado actual del proyecto (funcional, técnico, estilo).
+       * Tarea 2.2: Documentar las diferencias entre las especificaciones y la implementación actual, incluyendo funcionalidades faltantes o
+         incompletas.
+       * Tarea 2.3: Evaluar la conformidad con el stack tecnológico, los flujos de usuario, el modelo de negocio y los estándares de calidad.
+       * Tarea 2.4: Crear un plan de refactorización y desarrollo priorizado.
+
+   * Fase 3: Ejecución (Refactorización y Desarrollo).
+       * Tarea 3.1: Corregir los problemas identificados, desde la reorganización estructural hasta la implementación de funcionalidades
+         faltantes.
+       * Tarea 3.2: Optimizar el código, eliminar dependencias innecesarias y mejorar la eficiencia.
+
+   * Fase 4: Pruebas y Verificación.
+       * Tarea 4.1: Desarrollar y ejecutar pruebas unitarias (Vitest) para componentes y lógica de negocio críticos.
+       * Tarea 4.2: Desarrollar y ejecutar pruebas de integración E2E (Playwright) para los flujos de usuario principales.
+       * Tarea 4.3: Ejecutar todas las pruebas de forma masiva para asegurar la estabilidad de la aplicación.
+
+   * Fase 5: Preparación para Producción.
+       * Tarea 5.1: Realizar una build de producción y solucionar cualquier error.
+       * Tarea 5.2: Verificar la configuración de las variables de entorno.
+       * Tarea 5.3: Confirmar que la aplicación está lista para el despliegue.
+
+
+
+
+ Plan de Trabajo Detallado y Priorizado
+
+  Para alinear el proyecto con las especificaciones y asegurar su calidad, se ejecutará el siguiente plan de acción. Las tareas se ordenan
+  por prioridad, abordando primero los problemas estructurales más críticos.
+
+  Fase I: Refactorización y Estandarización del Frontend (Prioridad Máxima)
+
+   1. Tarea F1: Estandarizar el Framework de Pruebas. (ok)
+       * Acción: Eliminar Jest y todas sus dependencias (jest, babel-jest, ts-jest, @testing-library/jest-dom, etc.) del package.json.
+       * Acción: Configurar Vitest como el único corredor de pruebas unitarias. Migrar cualquier prueba existente en __tests__ a la sintaxis de Vitest.
+       * Justificación: Unifica el stack, reduce la complejidad y cumple con las especificaciones.
+
+   2. Tarea F2: Consolidar la Arquitectura de Enrutamiento. (ok)
+       * Acción: Auditar el contenido de los directorios pages y app.
+       * Acción: Planificar y ejecutar la migración completa de toda la funcionalidad del directorio pages al App Router (app).
+       * Acción: Eliminar el directorio pages una vez completada la migración.
+       * Justificación: Resuelve la principal fuente de inconsistencia arquitectónica y alinea el proyecto con las prácticas modernas de Next.js.
+
+   3. Tarea F3: Depurar y Corregir Dependencias. (ok)
+       * Acción: Mover zod de devDependencies a dependencies.
+       * Acción: Eliminar la librería redundante jsonwebtoken.
+       * Acción: Investigar el uso de firebase-admin, nodemailer, xlsx y node-telegram-bot-api. Documentar su propósito y decidir si se mantienen, reemplazan o eliminan.
+       * Justificación: Reduce el tamaño del proyecto, mejora la seguridad y asegura que el build de producción no falle.
+
+  Fase II: Auditoría Funcional y Desarrollo de Backend/Frontend
+
+   4. Tarea B1: Verificar Arquitectura de Base de Datos.(ok)
+       * Acción: Leer el schema.prisma principal y los schemas secundarios en armonia-backend/prisma/ para confirmar que la arquitectura multi-schema está implementada correctamente.
+       * Justificación: Asegura que la base de la persistencia de datos es correcta antes de auditar la lógica de negocio.
+
+   5. Tarea C1: Auditoría y Ajuste de Flujos Críticos.
+       * Acción: Revisar y ajustar la implementación de la Landing Page (src/app/public/landing o similar) para asegurar que cumple con los requisitos de conversión y contenido.
+       * Acción: Auditar el flujo de Autenticación (src/app/auth, middleware.ts) para asegurar que usa next-auth de forma correcta y segura.
+       * Acción: Auditar y completar los módulos principales uno por uno (Marketplace, Financiero, Portafolio, etc.), asegurando la correcta
+         interacción frontend-backend.
+
+  Fase III: Calidad, Pruebas y Preparación para Producción
+
+   6. Tarea Q1: Implementar Pruebas.
+       * Acción: Desarrollar pruebas unitarias (Vitest) para los componentes y la lógica de negocio más crítica del frontend.
+       * Acción: Desarrollar pruebas E2E (Playwright) para los flujos de usuario completos (registro, pago, reserva, etc.).
+       * Acción: Ejecutar todas las suites de pruebas (backend y frontend) para garantizar la estabilidad.
+
+   7. Tarea P1: Despliegue.
+       * Acción: Ejecutar el script build y solucionar cualquier error.
+       * Acción: Verificar la configuración de variables de entorno para producción.
+       * Acción: Generar un informe final de conformidad.
+
+  Comenzaré la ejecución del plan de trabajo con la Tarea F1. Procedo a modificar el package.json para eliminar Jest y sus dependencias.De
+  acuerdo. Procedo con la Tarea F1: Estandarizar el Framework de Pruebas.
+next-intl lo desintlo al itentar arrancar la aplicación
+
+Iniciar la aplicación: Ejecutar tsx server.ts & en segundo plano.
+Ejecutar pruebas Playwright: Ejecutar npx playwright test.
+Detener la aplicación: Una vez que las pruebas finalicen, detener el proceso del servidor.
+
 
 
 
