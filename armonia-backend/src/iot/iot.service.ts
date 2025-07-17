@@ -23,7 +23,18 @@ export class IotService {
     data: SmartMeterReadingDto,
   ): Promise<SmartMeterReadingDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    // In a real scenario, you'd validate the meterId and propertyId against registered devices
+    const device = await prisma.smartMeterDevice.findUnique({
+      where: { meterId: data.meterId },
+    });
+
+    if (!device) {
+      throw new NotFoundException(`Dispositivo de medidor inteligente con ID ${data.meterId} no encontrado.`);
+    }
+
+    if (device.propertyId !== data.propertyId) {
+      throw new Error(`El medidor ${data.meterId} no está asociado a la propiedad ${data.propertyId}.`);
+    }
+
     return prisma.smartMeterReading.create({
       data: { ...data, timestamp: new Date().toISOString() },
     });
@@ -62,49 +73,72 @@ export class IotService {
     data: AutomatedBillingDto,
   ): Promise<any> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    // Lógica para la facturación automatizada basada en lecturas de medidores
-    console.log(
-      `Triggering automated billing for ${schemaName} from ${data.billingPeriodStart} to ${data.billingPeriodEnd}`,
-    );
+
+    if (!data.billingPeriodStart || !data.billingPeriodEnd) {
+      throw new Error('Las fechas de inicio y fin del período de facturación son obligatorias.');
+    }
+
+    const billingPeriodStart = new Date(data.billingPeriodStart);
+    const billingPeriodEnd = new Date(data.billingPeriodEnd);
 
     // Example: Fetch readings for the period and generate fees
     const readings = await prisma.smartMeterReading.findMany({
       where: {
         timestamp: {
-          gte: data.billingPeriodStart
-            ? new Date(data.billingPeriodStart)
-            : undefined,
-          lte: data.billingPeriodEnd
-            ? new Date(data.billingPeriodEnd)
-            : undefined,
+          gte: billingPeriodStart,
+          lte: billingPeriodEnd,
         },
       },
     });
 
     // Group readings by propertyId and calculate consumption
-    const consumptionByProperty: { [propertyId: number]: { minReading: number; maxReading: number; unit: string } } = {};
+    const consumptionByProperty: { [propertyId: number]: { minReading: number; maxReading: number; unit: string; type: string } } = {};
 
-    readings.forEach((reading) => {
+    for (const reading of readings) {
+      const device = await prisma.smartMeterDevice.findUnique({
+        where: { meterId: reading.meterId },
+      });
+      if (!device) continue; // Skip if device not found
+
       if (!consumptionByProperty[reading.propertyId]) {
-        consumptionByProperty[reading.propertyId] = { minReading: reading.reading, maxReading: reading.reading, unit: reading.unit };
+        consumptionByProperty[reading.propertyId] = { minReading: reading.reading, maxReading: reading.reading, unit: reading.unit, type: device.type };
       } else {
         consumptionByProperty[reading.propertyId].minReading = Math.min(consumptionByProperty[reading.propertyId].minReading, reading.reading);
         consumptionByProperty[reading.propertyId].maxReading = Math.max(consumptionByProperty[reading.propertyId].maxReading, reading.reading);
       }
-    });
+    }
 
-    const feesToCreate = Object.entries(consumptionByProperty).map(
-      ([propertyId, data]) => ({
-        title: `Factura de Consumo ${new Date().getFullYear()}-${new Date().getMonth() + 1}`,
-        description: `Consumo de ${data.maxReading - data.minReading} ${data.unit}`,
-        amount: (data.maxReading - data.minReading) * 100, // Example: $100 per unit of consumption
-        type: 'UTILITY',
-        dueDate: new Date(
-          new Date().setMonth(new Date().getMonth() + 1),
-        ).toISOString(),
+    const feesToCreate = [];
+
+    for (const [propertyId, consumptionData] of Object.entries(consumptionByProperty)) {
+      const rate = await prisma.utilityRate.findFirst({
+        where: {
+          complexId: data.complexId, // Assuming complexId is passed in AutomatedBillingDto
+          type: consumptionData.type,
+          unit: consumptionData.unit,
+          effectiveDate: { lte: billingPeriodEnd },
+          isActive: true,
+        },
+        orderBy: { effectiveDate: 'desc' },
+      });
+
+      if (!rate) {
+        ServerLogger.warn(`No se encontró tarifa para el tipo ${consumptionData.type} y unidad ${consumptionData.unit} en el complejo ${data.complexId}.`);
+        continue; // Skip if no rate found
+      }
+
+      const consumedAmount = consumptionData.maxReading - consumptionData.minReading;
+      const calculatedAmount = consumedAmount * rate.rate.toNumber();
+
+      feesToCreate.push({
+        title: `Factura de Consumo ${consumptionData.type} - ${new Date(billingPeriodStart).toLocaleDateString()} a ${new Date(billingPeriodEnd).toLocaleDateString()}`,
+        description: `Consumo de ${consumedAmount} ${consumptionData.unit}`,
+        amount: calculatedAmount,
+        type: FeeType.UTILITY,
+        dueDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(),
         propertyId: parseInt(propertyId),
-      }),
-    );
+      });
+    }
 
     await prisma.fee.createMany({ data: feesToCreate });
 

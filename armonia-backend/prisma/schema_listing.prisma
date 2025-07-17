@@ -9,6 +9,7 @@ model Listing {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   images      String[]
+  location    String?
   isSold      Boolean   @default(false)
   reports     Report[]
   messages    Message[]

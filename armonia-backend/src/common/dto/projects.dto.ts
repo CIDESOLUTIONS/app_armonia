@@ -1,122 +1,130 @@
-import {
-  IsString,
-  IsNumber,
-  IsOptional,
-  IsEnum,
-  IsDateString,
-} from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsDateString, IsArray, IsEnum } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export enum ProjectStatus {
-  PENDING = 'PENDING',
+  PLANNED = 'PLANNED',
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETED = 'COMPLETED',
   CANCELLED = 'CANCELLED',
 }
 
-export class ProjectDto {
-  @IsNumber()
-  id: number;
-
-  @IsString()
-  name: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @IsEnum(ProjectStatus)
-  status: ProjectStatus;
-
-  @IsDateString()
-  startDate: string;
-
-  @IsOptional()
-  @IsDateString()
-  endDate?: string;
-
-  @IsOptional()
-  @IsNumber()
-  assignedToId?: number;
-
-  @IsOptional()
-  @IsString()
-  assignedToName?: string;
-
-  @IsNumber()
-  createdBy: number;
-
-  @IsString()
-  createdByName: string;
-
-  @IsString()
-  createdAt: string;
-
-  @IsString()
-  updatedAt: string;
-}
-
-export class GetProjectsParamsDto {
-  @IsOptional()
-  @IsEnum(ProjectStatus)
-  status?: ProjectStatus;
-
-  @IsOptional()
-  @IsString()
-  search?: string;
+export enum ProjectTaskStatus {
+  PENDING = 'PENDING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  BLOCKED = 'BLOCKED',
 }
 
 export class CreateProjectDto {
   @IsString()
-  name: string;
+  title: string;
 
   @IsOptional()
   @IsString()
   description?: string;
 
-  @IsOptional()
+  @IsDateString()
+  startDate: Date;
+
+  @IsDateString()
+  endDate: Date;
+
   @IsEnum(ProjectStatus)
+  @IsOptional()
   status?: ProjectStatus;
 
-  @IsDateString()
-  startDate: string;
-
-  @IsOptional()
-  @IsDateString()
-  endDate?: string;
-
-  @IsOptional()
   @IsNumber()
-  assignedToId?: number;
+  budget: number;
 
   @IsNumber()
-  createdBy: number;
+  complexId: number;
+
+  @IsNumber()
+  createdById: number;
 }
 
 export class UpdateProjectDto {
-  @IsNumber()
-  id: number;
-
   @IsOptional()
   @IsString()
-  name?: string;
+  title?: string;
 
   @IsOptional()
   @IsString()
   description?: string;
 
   @IsOptional()
+  @IsDateString()
+  startDate?: Date;
+
+  @IsOptional()
+  @IsDateString()
+  endDate?: Date;
+
+  @IsOptional()
   @IsEnum(ProjectStatus)
   status?: ProjectStatus;
 
   @IsOptional()
-  @IsDateString()
-  startDate?: string;
+  @IsNumber()
+  budget?: number;
+}
+
+export class CreateProjectTaskDto {
+  @IsNumber()
+  projectId: number;
+
+  @IsString()
+  title: string;
 
   @IsOptional()
-  @IsDateString()
-  endDate?: string;
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsEnum(ProjectTaskStatus)
+  status?: ProjectTaskStatus;
 
   @IsOptional()
   @IsNumber()
   assignedToId?: number;
+
+  @IsOptional()
+  @IsDateString()
+  dueDate?: Date;
+}
+
+export class UpdateProjectTaskDto {
+  @IsOptional()
+  @IsString()
+  title?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsEnum(ProjectTaskStatus)
+  status?: ProjectTaskStatus;
+
+  @IsOptional()
+  @IsNumber()
+  assignedToId?: number;
+
+  @IsOptional()
+  @IsDateString()
+  dueDate?: Date;
+}
+
+export class CreateProjectUpdateDto {
+  @IsNumber()
+  projectId: number;
+
+  @IsString()
+  title: string;
+
+  @IsString()
+  description: string;
+
+  @IsNumber()
+  progress: number;
 }

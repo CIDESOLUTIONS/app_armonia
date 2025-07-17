@@ -1,19 +1,38 @@
+enum ServiceProviderCategory {
+  PLUMBING
+  ELECTRICITY
+  CLEANING
+  SECURITY
+  MAINTENANCE
+  GARDENING
+  PEST_CONTROL
+  OTHER
+
+  @@schema("tenant")
+}
+
 model ServiceProvider {
-  id          Int      @id @default(autoincrement())
+  id          Int                   @id @default(autoincrement())
   name        String
-  category    String
+  category    ServiceProviderCategory
   description String
   contactPhone String
   contactEmail String
   address     String
-  rating      Float
-  reviewCount Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  rating      Float                 @default(0.0)
+  reviewCount Int                   @default(0)
+  complexId   Int?                  // Opcional, para proveedores locales
+  complex     ResidentialComplex?   @relation(fields: [complexId], references: [id])
+  isVerified  Boolean               @default(false)
+  logoUrl     String?
+  services    String[]              @default([])
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
   reviews     Review[]
-  createdBy   User     @relation("CreatedServiceProviders", fields: [createdById], references: [id])
+  createdBy   User                  @relation("CreatedServiceProviders", fields: [createdById], references: [id])
   createdById Int
 
   @@index([category])
   @@index([name])
+  @@index([complexId])
 }

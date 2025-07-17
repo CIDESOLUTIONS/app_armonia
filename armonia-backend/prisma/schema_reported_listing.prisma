@@ -1,12 +1,22 @@
+enum ReportStatus {
+  PENDING
+  RESOLVED
+  REJECTED
+
+  @@schema("tenant")
+}
+
 model ReportedListing {
-  id        Int      @id @default(autoincrement())
-  listing   Listing  @relation(fields: [listingId], references: [id])
-  listingId Int
-  reporter  User     @relation("ReportedListings", fields: [reporterId], references: [id])
-  reporterId Int
-  reason    String
-  status    String   @default("PENDING") // PENDING, RESOLVED, REJECTED
-  createdAt DateTime @default(now())
+  id               Int          @id @default(autoincrement())
+  listing          Listing      @relation(fields: [listingId], references: [id])
+  listingId        Int
+  reporter         User         @relation("ReportedListings", fields: [reporterId], references: [id])
+  reporterId       Int
+  reason           String
+  status           ReportStatus @default(PENDING)
+  moderatorComments String?
+  actionTaken      String?
+  createdAt        DateTime     @default(now())
 
   @@index([listingId])
   @@index([reporterId])

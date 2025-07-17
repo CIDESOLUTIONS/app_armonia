@@ -48,7 +48,10 @@ model Visitor {
   name            String    // Nombre del visitante
   documentType    DocumentType // Tipo de documento
   documentNumber  String    // Número de documento
-  destination     String    // Destino dentro del conjunto (ej: "Apartamento 101")
+  complexId       Int
+  complex         ResidentialComplex @relation(fields: [complexId], references: [id])
+  propertyId      Int       // ID de la propiedad de destino
+  property        Property  @relation(fields: [propertyId], references: [id])
   residentId      Int?      // ID del residente al que visita
   resident        Resident? @relation(fields: [residentId], references: [id])
   entryTime       DateTime  // Hora de entrada
@@ -69,6 +72,7 @@ model Visitor {
   belongings      Json?     // Registro de pertenencias (ej: equipos, paquetes)
   signature       String?   // URL de la firma digital (si se requiere)
   registeredBy    Int       // ID del usuario que registró al visitante
+  registeredByUser User     @relation("RegisteredVisitors", fields: [registeredBy], references: [id])
   
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -77,9 +81,20 @@ model Visitor {
   @@index([documentType, documentNumber]) // Búsqueda rápida por documento
   @@index([status]) // Filtrado por estado
   @@index([entryTime]) // Búsqueda por fecha de entrada
-  @@index([destination]) // Búsqueda por destino
+  @@index([propertyId]) // Búsqueda por destino
   @@index([preRegisterId]) // Relación con pre-registro
+  @@index([complexId])
   
+  @@schema("tenant")
+}
+
+enum PreRegistrationStatus {
+  PENDING
+  ACTIVE
+  USED
+  EXPIRED
+  CANCELLED
+
   @@schema("tenant")
 }
 
@@ -91,15 +106,18 @@ model PreRegisteredVisitor {
   documentNumber  String?   // Número de documento (opcional en pre-registro)
   residentId      Int       // ID del residente que autoriza
   resident        Resident  @relation(fields: [residentId], references: [id])
-  unitId          Int       // ID de la unidad de destino
+  complexId       Int
+  complex         ResidentialComplex @relation(fields: [complexId], references: [id])
+  propertyId      Int       // ID de la unidad de destino
+  property        Property  @relation(fields: [propertyId], references: [id])
   expectedDate    DateTime  // Fecha esperada de visita
   validFrom       DateTime  // Inicio de validez del pre-registro
   validUntil      DateTime  // Fin de validez del pre-registro
   purpose         String?   // Propósito de la visita
   isRecurrent     Boolean   @default(false) // Si es un visitante recurrente
   recurrenceRule  String?   // Regla de recurrencia (ej: "WEEKLY:MON,WED,FRI")
-  accessCode      String    // Código único para acceso (QR/alfanumérico)
-  status          String    // 'PENDING', 'ACTIVE', 'USED', 'EXPIRED', 'CANCELLED'
+  qrCodeUrl       String?   // URL de la imagen QR generada
+  status          PreRegistrationStatus @default(PENDING)
   
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -109,6 +127,8 @@ model PreRegisteredVisitor {
   @@index([residentId]) // Búsqueda por residente
   @@index([status]) // Filtrado por estado
   @@index([validFrom, validUntil]) // Búsqueda por rango de fechas
+  @@index([complexId])
+  @@index([propertyId])
   
   @@schema("tenant")
 }

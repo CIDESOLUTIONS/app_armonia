@@ -1,10 +1,17 @@
 model ResidentialComplex {
   id          Int      @id @default(autoincrement())
   name        String
-  address     String?
-  city        String?
-  country     String?
+  address     String
+  city        String
+  country     String
   schemaName  String   @unique // Nombre del esquema para el tenant
+  adminId     Int      // ID del administrador principal del complejo
+  admin       User     @relation("ManagedComplexes", fields: [adminId], references: [id])
+  contactEmail String
+  contactPhone String
+  logoUrl     String?
+  planId      Int
+  plan        Plan     @relation(fields: [planId], references: [id])
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -38,4 +45,6 @@ model ResidentialComplex {
   smartMeterReadings SmartMeterReading[]
 
   @@map("ResidentialComplex")
+  @@index([adminId])
+  @@index([planId])
 }

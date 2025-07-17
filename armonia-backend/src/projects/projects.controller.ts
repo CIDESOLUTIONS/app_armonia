@@ -1,74 +1,80 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  UseGuards,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Query } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { UserRole } from '@prisma/client';
 import { GetUser } from '../common/decorators/user.decorator';
 import {
-  ProjectDto,
-  GetProjectsParamsDto,
   CreateProjectDto,
   UpdateProjectDto,
+  CreateProjectTaskDto,
+  UpdateProjectTaskDto,
+  CreateProjectUpdateDto,
 } from '../common/dto/projects.dto';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard(UserRole.COMPLEX_ADMIN, UserRole.ADMIN))
 @Controller('projects')
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
+  @Post()
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async createProject(@GetUser() user: any, @Body() createProjectDto: CreateProjectDto) {
+    return this.projectsService.createProject(user.schemaName, createProjectDto);
+  }
+
   @Get()
-  async getProjects(
-    @GetUser() user: any,
-    @Query() filters: GetProjectsParamsDto,
-  ): Promise<ProjectDto[]> {
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RESIDENT)
+  async getProjects(@GetUser() user: any, @Query() filters: any) {
     return this.projectsService.getProjects(user.schemaName, filters);
   }
 
   @Get(':id')
-  async getProjectById(
-    @GetUser() user: any,
-    @Param('id') id: string,
-  ): Promise<ProjectDto> {
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RESIDENT)
+  async getProjectById(@GetUser() user: any, @Param('id') id: string) {
     return this.projectsService.getProjectById(user.schemaName, +id);
   }
 
-  @Post()
-  async createProject(
-    @GetUser() user: any,
-    @Body() createProjectDto: CreateProjectDto,
-  ): Promise<ProjectDto> {
-    return this.projectsService.createProject(user.schemaName, {
-      ...createProjectDto,
-      createdBy: user.userId,
-    });
-  }
-
   @Put(':id')
-  async updateProject(
-    @GetUser() user: any,
-    @Param('id') id: string,
-    @Body() updateProjectDto: UpdateProjectDto,
-  ): Promise<ProjectDto> {
-    return this.projectsService.updateProject(
-      user.schemaName,
-      +id,
-      updateProjectDto,
-    );
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async updateProject(@GetUser() user: any, @Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
+    return this.projectsService.updateProject(user.schemaName, +id, updateProjectDto);
   }
 
   @Delete(':id')
-  async deleteProject(
-    @GetUser() user: any,
-    @Param('id') id: string,
-  ): Promise<void> {
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async deleteProject(@GetUser() user: any, @Param('id') id: string) {
     return this.projectsService.deleteProject(user.schemaName, +id);
+  }
+
+  @Post('tasks')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async createTask(@GetUser() user: any, @Body() createTaskDto: CreateProjectTaskDto) {
+    return this.projectsService.createTask(user.schemaName, createTaskDto);
+  }
+
+  @Put('tasks/:id')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async updateTask(@GetUser() user: any, @Param('id') id: string, @Body() updateTaskDto: UpdateProjectTaskDto) {
+    return this.projectsService.updateTask(user.schemaName, +id, updateTaskDto);
+  }
+
+  @Delete('tasks/:id')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async deleteTask(@GetUser() user: any, @Param('id') id: string) {
+    return this.projectsService.deleteTask(user.schemaName, +id);
+  }
+
+  @Post('updates')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async addProjectUpdate(@GetUser() user: any, @Body() createProjectUpdateDto: CreateProjectUpdateDto) {
+    return this.projectsService.addProjectUpdate(user.schemaName, createProjectUpdateDto);
+  }
+
+  @Get(':projectId/updates')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RESIDENT)
+  async getProjectUpdates(@GetUser() user: any, @Param('projectId') projectId: string) {
+    return this.projectsService.getProjectUpdates(user.schemaName, +projectId);
   }
 }

@@ -3,6 +3,7 @@ model Question {
   surveyId  Int
   survey    Survey   @relation(fields: [surveyId], references: [id])
   text      String
+  type      String   // e.g., single-choice, multiple-choice, text
   options   Option[]
 
   @@index([surveyId])

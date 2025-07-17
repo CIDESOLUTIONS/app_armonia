@@ -23,6 +23,9 @@ export class PortfolioService {
     let totalResidents = 0;
     let totalPendingFees = 0;
     let totalIncome = 0;
+    let totalOpenPqrs = 0;
+    let totalBudgetsApproved = 0;
+    let totalExpenses = 0;
 
     for (const complex of complexes) {
       const tenantPrisma = this.prismaClientManager.getClient(complex.schemaName);
@@ -46,9 +49,26 @@ export class PortfolioService {
         where: { status: 'COMPLETED' },
       });
       totalIncome += income._sum.amount || 0;
+
+      const openPqrs = await tenantPrisma.pQR.count({
+        where: { status: { notIn: ['RESOLVED', 'CLOSED'] } },
+      });
+      totalOpenPqrs += openPqrs;
+
+      const budgetsApproved = await tenantPrisma.budget.aggregate({
+        _sum: { totalAmount: true },
+        where: { status: 'APPROVED' },
+      });
+      totalBudgetsApproved += budgetsApproved._sum.totalAmount || 0;
+
+      const expenses = await tenantPrisma.expense.aggregate({
+        _sum: { amount: true },
+        where: { status: 'PAID' },
+      });
+      totalExpenses += expenses._sum.amount || 0;
     }
 
-    return { totalProperties, totalResidents, totalPendingFees, totalIncome };
+    return { totalProperties, totalResidents, totalPendingFees, totalIncome, totalOpenPqrs, totalBudgetsApproved, totalExpenses };
   }
 
   async getComplexMetrics(userId: number): Promise<ComplexMetricDto[]> {
@@ -61,7 +81,7 @@ export class PortfolioService {
     for (const complex of complexes) {
       const tenantPrisma = this.prismaClientManager.getClient(complex.schemaName);
 
-      const residentsCount = await tenantPrisma.user.count({
+      const residents = await tenantPrisma.user.count({
         where: { role: 'RESIDENT' },
       });
 
@@ -75,12 +95,29 @@ export class PortfolioService {
         where: { status: 'COMPLETED' },
       });
 
+      const openPqrs = await tenantPrisma.pQR.count({
+        where: { status: { notIn: ['RESOLVED', 'CLOSED'] } },
+      });
+
+      const budgetApproved = await tenantPrisma.budget.aggregate({
+        _sum: { totalAmount: true },
+        where: { status: 'APPROVED' },
+      });
+
+      const expenses = await tenantPrisma.expense.aggregate({
+        _sum: { amount: true },
+        where: { status: 'PAID' },
+      });
+
       complexMetrics.push({
         id: complex.id,
         name: complex.name,
-        residents: residentsCount,
+        residents: residents,
         pendingFees: pendingFees._sum.amount || 0,
         income: income._sum.amount || 0,
+        openPqrs: openPqrs,
+        budgetApproved: budgetApproved._sum.totalAmount || 0,
+        expenses: expenses._sum.amount || 0,
       });
     }
 

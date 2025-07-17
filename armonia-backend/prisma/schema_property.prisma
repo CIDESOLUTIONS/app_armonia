@@ -9,7 +9,8 @@ model Property {
   area        Float?
   bedrooms    Int?
   bathrooms   Int?
-  address     String?
+  address     String
+  parkingSpots Int @default(0)
   hasParking  Boolean @default(false)
   isActive    Boolean @default(true)
   fees        Fee[]

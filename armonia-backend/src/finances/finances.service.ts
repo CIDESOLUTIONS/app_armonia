@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common'; // Importar NotFoundException
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
@@ -14,16 +14,188 @@ import {
   CreateBudgetDto,
   FeeFilterParamsDto,
   BudgetStatus,
-  FinancialReportResponseDto, // Importar FinancialReportResponseDto
-  InitiatePaymentDto, // Importar InitiatePaymentDto
-  PaymentGatewayCallbackDto, // Importar PaymentGatewayCallbackDto
+  FinancialReportResponseDto,
+  InitiatePaymentDto,
+  PaymentGatewayCallbackDto,
 } from '../common/dto/finances.dto';
+import { ServerLogger } from '@/lib/logging/server-logger';
+import { encrypt, decrypt } from '@/lib/security/encryption-service';
+import { ActivityLogger } from '@/lib/logging/activity-logger';
+import { CommunicationService } from '../communications/communications.service';
+import { PdfService } from '../common/services/pdf.service';
+
+// Interfaces para adaptadores de pasarelas de pago
+interface PaymentGatewayAdapter {
+  initialize(config: any): Promise<boolean>;
+  createPayment(transaction: any): Promise<any>;
+  processPayment(transactionId: string, paymentData: any): Promise<any>;
+  verifyPayment(gatewayReference: string): Promise<any>;
+  refundPayment(gatewayReference: string, amount?: number): Promise<any>;
+  validateWebhook(payload: any, signature: string, secret: string): boolean; // Added secret
+}
+
+// Implementación de adaptador para PayU Latam (simplificado)
+export class PayUAdapter implements PaymentGatewayAdapter {
+  private apiKey: string;
+  private apiSecret: string;
+  private merchantId: string;
+  private accountId: string;
+  private testMode: boolean;
+
+  async initialize(config: any): Promise<boolean> {
+    this.apiKey = config.apiKey;
+    this.apiSecret = config.apiSecret;
+    this.merchantId = config.merchantId;
+    this.accountId = config.accountId || '';
+    this.testMode = config.testMode || false;
+    return true; // Simplified for example
+  }
+
+  async createPayment(transaction: any): Promise<any> {
+    const paymentUrl = this.testMode
+      ? `https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu/payment/${transaction.id}`
+      : `https://checkout.payulatam.com/ppp-web-gateway-payu/payment/${transaction.id}`;
+    return {
+      success: true,
+      paymentUrl,
+      gatewayReference: `PAYU_${Date.now()}_${transaction.id}`,
+      status: 'PENDING',
+    };
+  }
+
+  async processPayment(transactionId: string, paymentData: any): Promise<any> {
+    return {
+      success: true,
+      gatewayReference: `PAYU_${Date.now()}_${transactionId}`,
+      status: 'COMPLETED',
+      response: {
+        authorizationCode: `AUTH_${Math.floor(Math.random() * 1000000)}`,
+        processorResponseCode: '00',
+        transactionDate: new Date().toISOString(),
+      },
+    };
+  }
+
+  async verifyPayment(gatewayReference: string): Promise<any> {
+    return {
+      success: true,
+      status: 'COMPLETED',
+      response: {
+        authorizationCode: gatewayReference.split('_')[2],
+        processorResponseCode: '00',
+        transactionDate: new Date().toISOString(),
+      },
+    };
+  }
+
+  async refundPayment(gatewayReference: string, amount?: number): Promise<any> {
+    return {
+      success: true,
+      refundReference: `REFUND_${gatewayReference}`,
+      status: 'REFUNDED',
+      amount: amount,
+    };
+  }
+
+  validateWebhook(payload: any, signature: string, secret: string): boolean {
+    // TODO: Implement real webhook signature validation (e.g., HMAC-SHA256)
+    // For now, a simple check for a shared secret in the payload or header
+    // In a real scenario, this would involve cryptographic verification.
+    ServerLogger.warn('Webhook validation is simplified. Implement real signature verification.');
+    return true; // Placeholder: Critical security vulnerability if not properly implemented
+  }
+}
+
+// Implementación de adaptador para Wompi (simplificado)
+export class WompiAdapter implements PaymentGatewayAdapter {
+  private apiKey: string;
+  private apiSecret: string;
+  private testMode: boolean;
+
+  async initialize(config: any): Promise<boolean> {
+    this.apiKey = config.apiKey;
+    this.apiSecret = config.apiSecret;
+    this.testMode = config.testMode || false;
+    return true; // Simplified for example
+  }
+
+  async createPayment(transaction: any): Promise<any> {
+    const paymentUrl = this.testMode
+      ? `https://sandbox.checkout.wompi.co/p/${transaction.id}`
+      : `https://checkout.wompi.co/p/${transaction.id}`;
+    return {
+      success: true,
+      paymentUrl,
+      gatewayReference: `WOMPI_${Date.now()}_${transaction.id}`,
+      status: 'PENDING',
+    };
+  }
+
+  async processPayment(transactionId: string, paymentData: any): Promise<any> {
+    return {
+      success: true,
+      gatewayReference: `WOMPI_${Date.now()}_${transactionId}`,
+      status: 'COMPLETED',
+      response: {
+        authorizationCode: `AUTH_${Math.floor(Math.random() * 1000000)}`,
+        processorResponseCode: 'APPROVED',
+        transactionDate: new Date().toISOString(),
+      },
+    };
+  }
+
+  async verifyPayment(gatewayReference: string): Promise<any> {
+    return {
+      success: true,
+      status: 'COMPLETED',
+      response: {
+        authorizationCode: gatewayReference.split('_')[2],
+        processorResponseCode: 'APPROVED',
+        transactionDate: new Date().toISOString(),
+      },
+    };
+  }
+
+  async refundPayment(gatewayReference: string, amount?: number): Promise<any> {
+    return {
+      success: true,
+      refundReference: `REFUND_${gatewayReference}`,
+      status: 'REFUNDED',
+      amount: amount,
+    };
+  }
+
+  validateWebhook(payload: any, signature: string, secret: string): boolean {
+    // TODO: Implement real webhook signature validation (e.g., HMAC-SHA256)
+    // For now, a simple check for a shared secret in the payload or header
+    // In a real scenario, this would involve cryptographic verification.
+    ServerLogger.warn('Webhook validation is simplified. Implement real signature verification.');
+    return true; // Placeholder: Critical security vulnerability if not properly implemented
+  }
+}
+
+// Fábrica de adaptadores de pasarelas
+export class PaymentGatewayFactory {
+  static createAdapter(gatewayName: string): PaymentGatewayAdapter | null {
+    switch (gatewayName.toLowerCase()) {
+      case 'payu':
+        return new PayUAdapter();
+      case 'wompi':
+        return new WompiAdapter();
+      default:
+        ServerLogger.error(`Pasarela no soportada: ${gatewayName}`);
+        return null;
+    }
+  }
+}
 
 @Injectable()
 export class FinancesService {
   constructor(
     private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
+    private communicationService: CommunicationService,
+    private pdfService: PdfService, // Inyectar PdfService
   ) {}
 
   private getTenantPrismaClient(schemaName: string) {
@@ -53,8 +225,8 @@ export class FinancesService {
 
       const fees = await prisma.fee.findMany({
         where,
-        skip: ((filters.page ?? 1) - 1) * (filters.limit ?? 10), // Usar ??
-        take: filters.limit ?? 10, // Usar ??
+        skip: ((filters.page ?? 1) - 1) * (filters.limit ?? 10),
+        take: filters.limit ?? 10,
         orderBy: { createdAt: 'desc' },
       });
       const total = await prisma.fee.count({ where });
@@ -237,12 +409,28 @@ export class FinancesService {
     }
   }
 
-  async approveBudget(schemaName: string, id: number): Promise<BudgetDto> {
+  async approveBudget(schemaName: string, id: number, userId: number): Promise<BudgetDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
+      const budget = await prisma.budget.findUnique({
+        where: { id },
+      });
+
+      if (!budget) {
+        throw new NotFoundException(`Presupuesto con ID ${id} no encontrado.`);
+      }
+
+      if (budget.status !== BudgetStatus.DRAFT) {
+        throw new Error(`El presupuesto con ID ${id} no puede ser aprobado porque su estado actual es ${budget.status}. Solo los presupuestos en estado DRAFT pueden ser aprobados.`);
+      }
+
       return await prisma.budget.update({
         where: { id },
-        data: { status: BudgetStatus.APPROVED },
+        data: {
+          status: BudgetStatus.APPROVED,
+          approvedById: userId,
+          approvedDate: new Date(),
+        },
       });
     } catch (error) {
       console.error(`Error al aprobar presupuesto ${id}:`, error);
@@ -282,8 +470,9 @@ export class FinancesService {
     schemaName: string,
     startDate: string,
     endDate: string,
-    type: 'INCOME' | 'EXPENSE' | 'BALANCE',
-  ): Promise<FinancialReportResponseDto> {
+    type: 'INCOME' | 'EXPENSE' | 'BALANCE' | 'DEBTORS' | 'PAYMENTS_REPORT' | 'PEACE_AND_SAFE',
+    format: 'JSON' | 'PDF' = 'JSON',
+  ): Promise<FinancialReportResponseDto | Buffer> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -293,52 +482,111 @@ export class FinancesService {
     let transactions: any[] = [];
     let fees: any[] = [];
     let payments: any[] = [];
+    let debtors: any[] = [];
+    let peaceAndSafes: any[] = [];
 
-    if (type === 'INCOME' || type === 'BALANCE') {
-      payments = await prisma.payment.findMany({
-        where: {
-          date: { gte: start, lte: end },
-        },
-      });
-      totalIncome = payments.reduce((sum, p) => sum + p.amount, 0);
+    switch (type) {
+      case 'INCOME':
+      case 'BALANCE':
+        payments = await prisma.payment.findMany({
+          where: {
+            date: { gte: start, lte: end },
+          },
+          include: { bill: true, property: true, createdByUser: true },
+        });
+        totalIncome = payments.reduce((sum, p) => sum + p.amount.toNumber(), 0);
+        transactions = payments;
+        break;
+      case 'EXPENSE':
+      case 'BALANCE':
+        fees = await prisma.fee.findMany({
+          where: {
+            dueDate: { gte: start, lte: end },
+            status: PaymentStatus.PAID,
+          },
+          include: { property: true },
+        });
+        totalExpenses = fees.reduce((sum, f) => sum + f.amount.toNumber(), 0);
+        transactions = fees;
+        break;
+      case 'DEBTORS':
+        const outstandingFees = await prisma.fee.findMany({
+          where: {
+            status: PaymentStatus.PENDING,
+            dueDate: { lte: new Date() },
+          },
+          include: { property: { include: { residents: true } } },
+        });
+
+        const debtorMap = new Map<number, any>();
+
+        for (const fee of outstandingFees) {
+          if (!debtorMap.has(fee.propertyId)) {
+            debtorMap.set(fee.propertyId, {
+              property: fee.property,
+              outstandingAmount: 0,
+              fees: [],
+            });
+          }
+          const debtor = debtorMap.get(fee.propertyId);
+          debtor.outstandingAmount += fee.amount.toNumber();
+          debtor.fees.push(fee);
+        }
+        debtors = Array.from(debtorMap.values());
+        break;
+      case 'PAYMENTS_REPORT':
+        payments = await prisma.payment.findMany({
+          where: {
+            date: { gte: start, lte: end },
+          },
+          include: { bill: true, property: true, createdByUser: true },
+        });
+        transactions = payments;
+        break;
+      case 'PEACE_AND_SAFE':
+        const allProperties = await prisma.property.findMany({
+          include: { fees: true, residents: true },
+        });
+
+        peaceAndSafes = allProperties.filter(property => {
+          const hasPendingFees = property.fees.some(fee => fee.status === PaymentStatus.PENDING && fee.dueDate <= new Date());
+          return !hasPendingFees;
+        }).map(property => ({
+          property,
+          certificateDate: new Date(),
+        }));
+        break;
+      default:
+        break;
     }
 
-    if (type === 'EXPENSE' || type === 'BALANCE') {
-      fees = await prisma.fee.findMany({
-        where: {
-          dueDate: { gte: start, lte: end },
-          status: PaymentStatus.PAID, // Asumiendo que las cuotas pagadas son egresos
-        },
-      });
-      totalExpenses = fees.reduce((sum, f) => sum + f.amount, 0);
-    }
-
-    // For a more detailed report, you might fetch all relevant transactions
-    // and categorize them. This is a simplified example.
-    transactions = [...payments, ...fees];
-
-    return {
+    const reportData = {
       totalIncome,
       totalExpenses,
       netBalance: totalIncome - totalExpenses,
       transactions,
       fees,
       payments,
+      debtors,
+      peaceAndSafes,
     };
+
+    if (format === 'PDF') {
+      return this.pdfService.generateFinancialReportPdf(reportData);
+    } else {
+      return reportData;
+    }
   }
 
   async processBankStatement(
     schemaName: string,
-    file: any, // Cambiado a any
+    file: any,
   ): Promise<any[]> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    // Aquí iría la lógica para leer el archivo (CSV/XLSX) y procesar las transacciones.
-    // Por ahora, es un placeholder que simula sugerencias de conciliación.
-    console.log(
+    ServerLogger.info(
       `Procesando extracto bancario para ${schemaName}: ${file.originalname}`,
     );
 
-    // Simulación de lectura y procesamiento
     const transactions = [
       {
         date: '2025-07-01',
@@ -352,14 +600,12 @@ export class FinancesService {
       },
     ];
 
-    const suggestions: any[] = []; // Tipado explícito como any[]
+    const suggestions: any[] = [];
 
     for (const transaction of transactions) {
-      // Simular búsqueda de pagos coincidentes en la DB
       const matchingPayment = await prisma.payment.findFirst({
         where: {
           amount: transaction.amount,
-          // Aquí se añadirían más criterios de búsqueda como fecha, referencia, etc.
         },
       });
 
@@ -379,8 +625,7 @@ export class FinancesService {
     data: InitiatePaymentDto,
   ): Promise<any> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    // Lógica para iniciar el pago con una pasarela externa
-    console.log(
+    ServerLogger.info(
       `Iniciando pago para la cuota ${data.feeId} a través de ${data.paymentMethod}`,
     );
 
@@ -392,14 +637,24 @@ export class FinancesService {
       throw new NotFoundException(`Factura con ID ${data.feeId} no encontrada.`);
     }
 
-    // Simulación de una respuesta de pasarela de pago
+    // Obtener pasarela y método de pago dinámicamente
+    const gateway = await this.prisma.paymentGateway.findFirst({
+      where: { isActive: true, supportedMethods: { has: data.paymentMethod } },
+    });
+    const method = await this.prisma.paymentMethod.findFirst({
+      where: { isActive: true, code: data.paymentMethod },
+    });
+
+    if (!gateway || !method) {
+      throw new Error('Pasarela o método de pago no configurado o inactivo.');
+    }
+
     const paymentGatewayResponse = {
       transactionId: `txn_${Date.now()}`,
       paymentUrl: `https://mock-payment-gateway.com/pay?id=${data.feeId}&amount=${bill.totalAmount}&ref=${data.feeId}`,
       status: 'PENDING',
     };
 
-    // Opcional: Registrar el intento de pago en la DB
     await prisma.paymentAttempt.create({
       data: {
         feeId: data.feeId,
@@ -408,6 +663,7 @@ export class FinancesService {
         paymentMethod: data.paymentMethod,
         transactionId: paymentGatewayResponse.transactionId,
         status: paymentGatewayResponse.status,
+        propertyId: bill.propertyId, // Ensure propertyId is set
       },
     });
 
@@ -415,16 +671,14 @@ export class FinancesService {
   }
 
   async handlePaymentCallback(data: PaymentGatewayCallbackDto): Promise<any> {
-    const prisma = this.prisma.client; // Acceder al cliente Prisma global o de esquema si el callback no tiene schemaName
-    // Lógica para manejar el callback de la pasarela de pago
-    console.log(
+    const prisma = this.prisma.client;
+    ServerLogger.info(
       `Callback de pago recibido para transacción ${data.transactionId} con estado ${data.status}`,
     );
 
-    // Buscar el intento de pago
     const paymentAttempt = await prisma.paymentAttempt.findUnique({
       where: { transactionId: data.transactionId },
-      include: { fee: true }, // Incluir la relación con Fee
+      include: { fee: true },
     });
 
     if (!paymentAttempt) {
@@ -433,13 +687,11 @@ export class FinancesService {
       );
     }
 
-    // Actualizar el estado del intento de pago
     await prisma.paymentAttempt.update({
       where: { id: paymentAttempt.id },
       data: { status: data.status },
     });
 
-    // Si el pago fue exitoso, registrar el pago final y actualizar la cuota
     if (data.status === 'COMPLETED') {
       await prisma.payment.create({
         data: {
@@ -449,7 +701,7 @@ export class FinancesService {
           reference: paymentAttempt.transactionId,
           receiptNumber: `REC-${Date.now()}`,
           feeId: paymentAttempt.feeId,
-          propertyId: paymentAttempt.fee.propertyId, // Obtener propertyId de la Fee
+          propertyId: paymentAttempt.fee.propertyId,
           createdBy: paymentAttempt.userId,
         },
       });
@@ -458,6 +710,18 @@ export class FinancesService {
         where: { id: paymentAttempt.feeId },
         data: { status: PaymentStatus.PAID },
       });
+
+      // Notify user about successful payment
+      const user = await prisma.user.findUnique({ where: { id: paymentAttempt.userId } });
+      if (user && user.email) {
+        await this.communicationService.notifyUser('global', user.id, {
+          type: 'success',
+          title: 'Pago Confirmado',
+          message: `Tu pago de ${paymentAttempt.amount} ha sido procesado exitosamente.`,
+          sourceType: 'financial',
+          sourceId: paymentAttempt.transactionId,
+        });
+      }
     }
 
     return { message: `Callback de pago procesado para ${data.transactionId}` };
@@ -465,13 +729,8 @@ export class FinancesService {
 
   async approveReconciliation(schemaName: string, suggestion: any): Promise<any> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    // Lógica para aprobar la sugerencia de conciliación
-    // Esto implicaría marcar el pago como conciliado y posiblemente actualizar el estado de la cuota
-    console.log(
-      `Aprobando conciliación para ${schemaName}:`, suggestion
-    );
+    ServerLogger.info(`Aprobando conciliación para ${schemaName}:`, suggestion);
 
-    // Ejemplo: Marcar el pago sugerido como conciliado y la cuota como pagada
     if (suggestion.payment && suggestion.payment.id) {
       await prisma.payment.update({
         where: { id: suggestion.payment.id },
@@ -485,6 +744,6 @@ export class FinancesService {
       }
     }
 
-    return { message: "Conciliación aprobada exitosamente." };
+    return { message: 'Conciliación aprobada exitosamente.' };
   }
 }

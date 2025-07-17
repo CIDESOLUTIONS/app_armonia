@@ -3,8 +3,8 @@ model Pet {
   name              String
   type              String // DOG, CAT, BIRD, OTHER
   breed             String?
-  age               Int?
-  weight            Float?
+  age               Int
+  weight            Float
   color             String?
   vaccinated        Boolean  @default(false)
   vaccineExpiryDate DateTime?

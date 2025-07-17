@@ -1,23 +1,13 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, UseGuards } from '@nestjs/common';
 import { SecurityService } from './security.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { UserRole } from '@prisma/client';
 import { GetUser } from '../common/decorators/user.decorator';
 import {
-  DigitalLogDto,
-  CreateDigitalLogDto,
-  UpdateDigitalLogDto,
-  CameraDto,
-  CreateCameraDto,
-  UpdateCameraDto,
+  CreateSecurityLogDto,
+  CreateAccessAttemptDto,
 } from '../common/dto/security.dto';
 
 @UseGuards(JwtAuthGuard)
@@ -25,77 +15,26 @@ import {
 export class SecurityController {
   constructor(private readonly securityService: SecurityService) {}
 
-  // DIGITAL LOGS
-  @Get('digital-logs')
-  async getDigitalLogs(@GetUser() user: any): Promise<DigitalLogDto[]> {
-    return this.securityService.getDigitalLogs(user.schemaName);
+  @Post('log')
+  @Roles(UserRole.ADMIN, UserRole.COMPLEX_ADMIN, UserRole.STAFF)
+  async createSecurityLog(@GetUser() user: any, @Body() createSecurityLogDto: CreateSecurityLogDto) {
+    return this.securityService.createSecurityLog(user.schemaName, createSecurityLogDto);
   }
 
-  @Post('digital-logs')
-  async createDigitalLog(
-    @GetUser() user: any,
-    @Body() createDigitalLogDto: CreateDigitalLogDto,
-  ): Promise<DigitalLogDto> {
-    return this.securityService.createDigitalLog(
-      user.schemaName,
-      createDigitalLogDto,
-      user.userId,
-    );
+  @Get('log')
+  @Roles(UserRole.ADMIN, UserRole.COMPLEX_ADMIN)
+  async getSecurityLogs(@GetUser() user: any, @Query() filters: any) {
+    return this.securityService.getSecurityLogs(user.schemaName, filters);
   }
 
-  @Put('digital-logs/:id')
-  async updateDigitalLog(
-    @GetUser() user: any,
-    @Param('id') id: string,
-    @Body() updateDigitalLogDto: UpdateDigitalLogDto,
-  ): Promise<DigitalLogDto> {
-    return this.securityService.updateDigitalLog(
-      user.schemaName,
-      +id,
-      updateDigitalLogDto,
-    );
+  @Post('access-attempt')
+  async createAccessAttempt(@Body() createAccessAttemptDto: CreateAccessAttemptDto) {
+    return this.securityService.createAccessAttempt(createAccessAttemptDto);
   }
 
-  @Delete('digital-logs/:id')
-  async deleteDigitalLog(
-    @GetUser() user: any,
-    @Param('id') id: string,
-  ): Promise<void> {
-    return this.securityService.deleteDigitalLog(user.schemaName, +id);
-  }
-
-  // CAMERAS
-  @Get('cameras')
-  async getCameras(@GetUser() user: any): Promise<CameraDto[]> {
-    return this.securityService.getCameras(user.schemaName);
-  }
-
-  @Post('cameras')
-  async createCamera(
-    @GetUser() user: any,
-    @Body() createCameraDto: CreateCameraDto,
-  ): Promise<CameraDto> {
-    return this.securityService.createCamera(user.schemaName, createCameraDto);
-  }
-
-  @Put('cameras/:id')
-  async updateCamera(
-    @GetUser() user: any,
-    @Param('id') id: string,
-    @Body() updateCameraDto: UpdateCameraDto,
-  ): Promise<CameraDto> {
-    return this.securityService.updateCamera(
-      user.schemaName,
-      +id,
-      updateCameraDto,
-    );
-  }
-
-  @Delete('cameras/:id')
-  async deleteCamera(
-    @GetUser() user: any,
-    @Param('id') id: string,
-  ): Promise<void> {
-    return this.securityService.deleteCamera(user.schemaName, +id);
+  @Get('access-attempt')
+  @Roles(UserRole.ADMIN, UserRole.COMPLEX_ADMIN)
+  async getAccessAttempts(@Query() filters: any) {
+    return this.securityService.getAccessAttempts(filters);
   }
 }
