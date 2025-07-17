@@ -1,26 +1,25 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { VisitorsService } from './visitors.service';
+import { ProjectsService } from './projects.service';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import { vi } from 'vitest';
 
-describe('VisitorsService', () => {
-  let service: VisitorsService;
+describe('ProjectsService', () => {
+  let service: ProjectsService;
   let prisma: PrismaService;
   let prismaClientManager: PrismaClientManager;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        VisitorsService,
+        ProjectsService,
         {
           provide: PrismaClientManager,
           useValue: {
             getClient: vi.fn().mockReturnValue({
-              visitor: { create: vi.fn(), findMany: vi.fn(), findUnique: vi.fn(), update: vi.fn(), delete: vi.fn() },
-              preRegisteredVisitor: { create: vi.fn(), findMany: vi.fn(), findUnique: vi.fn(), update: vi.fn(), delete: vi.fn() },
-              accessPass: { create: vi.fn(), findMany: vi.fn(), findUnique: vi.fn(), update: vi.fn(), delete: vi.fn() },
-              accessLog: { create: vi.fn(), findMany: vi.fn() },
+              project: { create: vi.fn(), findMany: vi.fn(), findUnique: vi.fn(), update: vi.fn(), delete: vi.fn() },
+              projectTask: { create: vi.fn(), update: vi.fn(), delete: vi.fn() },
+              projectUpdate: { create: vi.fn(), findMany: vi.fn() },
             }),
           },
         },
@@ -33,7 +32,7 @@ describe('VisitorsService', () => {
       ],
     }).compile();
 
-    service = module.get<VisitorsService>(VisitorsService);
+    service = module.get<ProjectsService>(ProjectsService);
     prisma = module.get<PrismaService>(PrismaService);
     prismaClientManager = module.get<PrismaClientManager>(PrismaClientManager);
   });
@@ -42,5 +41,5 @@ describe('VisitorsService', () => {
     expect(service).toBeDefined();
   });
 
-  // Add tests for each method in VisitorsService
+  // Add tests for each method in ProjectsService
 });
