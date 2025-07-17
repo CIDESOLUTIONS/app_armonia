@@ -30,8 +30,8 @@ Nuestra misión es transformar radicalmente la gestión y la experiencia de vida
 * Gráficos y Visualización: Recharts para gráficos y estadísticas
 * Generación de PDFs: pdfkit para reportes exportables
 * CI/CD: GitHub Actions, Vercel o similares
-* Pruebas: Playwright
-* Hosting: Vercel (Frontend), AWS/GCP (Backend/DB)
+* Pruebas: Playwright, Vitest
+* Hosting: Plataformas tipo Vercel (Frontend), AWS/GCP (Backend/DB)
 * Arquitectura: Multi-tenant (un esquema de base de datos por tenant/conjunto)
 * Métricas de Rendimiento: Core Web Vitals (LCP < 2.5s, INP < 200ms, CLS < 0.1)
 
