@@ -9,6 +9,7 @@ model User {
   updatedAt            DateTime @updatedAt
   complexId            Int?
   complex              ResidentialComplex?   @relation(fields: [complexId], references: [id])
+  resident             Resident?             @relation(fields: [id], references: [userId])
   listings             Listing[]
   sentMessages         Message[]             @relation("sentMessages")
   receivedMessages     Message[]             @relation("receivedMessages")

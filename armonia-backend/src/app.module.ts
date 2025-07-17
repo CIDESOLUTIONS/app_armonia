@@ -16,6 +16,8 @@ import { PlansModule } from './plans/plans.module';
 import { BankReconciliationModule } from './bank-reconciliation/bank-reconciliation.module';
 import { DocumentsModule } from './documents/documents.module';
 
+import { FintechModule } from './fintech/fintech.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),

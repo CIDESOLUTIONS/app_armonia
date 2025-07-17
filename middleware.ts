@@ -1,64 +1,27 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { jwtVerify } from "jose";
+import { withAuth } from "next-auth/middleware";
+import createIntlMiddleware from "next-intl/middleware";
+import { NextRequest, NextResponse } from "next/server";
 
-function getToken(request: NextRequest): string | null {
-  const authHeader = request.headers.get("authorization");
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    return authHeader.split(" ")[1];
-  }
-  const tokenCookie = request.cookies.get("token");
-  if (tokenCookie) {
-    return tokenCookie.value;
-  }
-  return null;
-}
+const locales = ["es", "en", "pt"];
+const publicPages = ["/public", "/public/login", "/public/register-complex"];
 
-export async function middleware(request: NextRequest) {
-  const path = request.nextUrl.pathname;
-  const isApiRoute = path.startsWith("/api/");
+const intlMiddleware = createIntlMiddleware({
+  locales,
+  defaultLocale: "es",
+  localePrefix: "always", // or 'never' or 'as-needed'
+});
 
-  // Solo aplicar lógica de tenant a rutas de API protegidas
-  if (isApiRoute) {
-    const token = getToken(request);
+const authMiddleware = withAuth(
+  async function middleware(request) {
+    const intlResponse = intlMiddleware(request);
+    const path = request.nextUrl.pathname;
+    const isApiRoute = path.startsWith("/api/");
 
-    if (!token) {
-      // Para las rutas de API, no redirigimos, devolvemos un error 401
-      return new NextResponse(
-        JSON.stringify({ message: "Authentication token not found." }),
-        { status: 401, headers: { "Content-Type": "application/json" } },
-      );
-    }
+    // Lógica para inyectar X-Tenant-Schema en rutas de API
+    if (isApiRoute) {
+      const token = request.nextauth.token;
+      const schemaName = token?.schemaName as string | undefined;
 
-    try {
-      const jwtSecret = process.env.JWT_SECRET;
-      if (!jwtSecret || jwtSecret === "default_secret") {
-        console.error(
-          "CRITICAL SECURITY WARNING: JWT_SECRET is not set or is using the default value.",
-        );
-        return new NextResponse(
-          JSON.stringify({ message: "Server configuration error." }),
-          { status: 500, headers: { "Content-Type": "application/json" } },
-        );
-      }
-
-      const secretKey = new TextEncoder().encode(jwtSecret);
-      const { payload } = await jwtVerify(token, secretKey);
-
-      const schemaName = payload.schemaName as string | undefined;
-
-      if (!schemaName) {
-        // Si la ruta requiere un tenant pero el token no lo tiene, es un error.
-        if (!path.startsWith("/api/auth")) {
-          // Las rutas de auth pueden no tener schema
-          return new NextResponse(
-            JSON.stringify({ message: "Tenant schema not found in token." }),
-            { status: 403, headers: { "Content-Type": "application/json" } },
-          );
-        }
-      }
-
-      // Inyectar el schemaName en las cabeceras para que los endpoints lo usen
       const requestHeaders = new Headers(request.headers);
       if (schemaName) {
         requestHeaders.set("X-Tenant-Schema", schemaName);
@@ -69,37 +32,42 @@ export async function middleware(request: NextRequest) {
           headers: requestHeaders,
         },
       });
-    } catch (_error: any) {
-      return new NextResponse(
-        JSON.stringify({ message: "Invalid or expired token." }),
-        { status: 401, headers: { "Content-Type": "application/json" } },
-      );
     }
-  }
 
-  // Para las rutas de páginas (no API), mantener la lógica de redirección
-  const isProtectedRoute =
-    path.startsWith("/admin") ||
-    path.startsWith("/resident") ||
-    path.startsWith("/reception");
-  if (isProtectedRoute) {
-    const token = getToken(request);
-    if (!token) {
-      const loginUrl = new URL("/public/login", request.url);
-      return NextResponse.redirect(loginUrl);
-    }
-    // Aquí se podría añadir la verificación del token si se quiere ser más estricto antes de renderizar la página
-  }
+    return intlResponse;
+  },
+  {
+    callbacks: {
+      authorized: ({ token, req }) => {
+        const path = req.nextUrl.pathname;
+        // Permitir acceso a páginas públicas sin autenticación
+        if (publicPages.some((p) => path.startsWith(p))) {
+          return true;
+        }
+        // Requerir autenticación para todas las demás rutas
+        return !!token;
+      },
+    },
+    pages: {
+      signIn: "/public/login",
+    },
+  },
+);
 
-  return NextResponse.next();
+export default async function middleware(request: NextRequest) {
+  const publicPathnameRegex = RegExp(
+    `^(/(${locales.join("|")}))?(${publicPages.join("|")})/?$`,
+    "i",
+  );
+  const isPublicPage = publicPathnameRegex.test(request.nextUrl.pathname);
+
+  if (isPublicPage) {
+    return intlMiddleware(request);
+  } else {
+    return (authMiddleware as any)(request);
+  }
 }
 
 export const config = {
-  matcher: [
-    // Proteger rutas de API y de páginas
-    "/api/:path*",
-    "/admin/:path*",
-    "/resident/:path*",
-    "/reception/:path*",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)],
 };

@@ -180,4 +180,12 @@ export class FinancesController {
   ) {
     return this.financesService.processBankStatement(user.schemaName, file);
   }
+
+  @Post('reconcile/approve')
+  async approveReconciliation(
+    @GetUser() user: any,
+    @Body() suggestion: any,
+  ) {
+    return this.financesService.approveReconciliation(user.schemaName, suggestion);
+  }
 }

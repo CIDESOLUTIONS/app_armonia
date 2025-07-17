@@ -4,7 +4,8 @@ model Visitor {
   documentType    DocumentType
   documentNumber  String
   destination     String
-  residentName    String?
+  residentId      Int? // ID del residente al que visita
+  resident        Resident? @relation(fields: [residentId], references: [id])
   entryTime       DateTime
   exitTime        DateTime?
   plate           String?

@@ -19,6 +19,12 @@ interface FinancialTransaction {
   createdBy: number;
 }
 
+interface ReconciliationSuggestion {
+  statementEntry: any;
+  payment: any;
+  status: string;
+}
+
 // New DTOs for Fee Management
 export interface FeeDto {
   id: number;
@@ -170,6 +176,19 @@ export async function generateOrdinaryFees(
     return response;
   } catch (error) {
     console.error("Error generating ordinary fees:", error);
+    throw error;
+  }
+}
+
+export async function approveReconciliation(suggestion: ReconciliationSuggestion): Promise<any> {
+  try {
+    const response = await fetchApi("/finances/reconcile/approve", {
+      method: "POST",
+      body: JSON.stringify(suggestion),
+    });
+    return response;
+  } catch (error) {
+    console.error("Error approving reconciliation:", error);
     throw error;
   }
 }

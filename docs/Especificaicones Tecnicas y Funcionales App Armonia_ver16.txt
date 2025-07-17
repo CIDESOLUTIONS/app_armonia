@@ -21,7 +21,7 @@ Nuestra misión es transformar radicalmente la gestión y la experiencia de vida
 * Frontend: Next.js 15+, React 19+ (con Server Components y Actions), TypeScript
 * Backend: Node.js, NestJS
 * Base de Datos: PostgreSQL 17+
-* ORM: Prisma 6+
+* ORM: Prisma 6+ (schema.prisma con enrutamientos a schemas por funcionalidad en backend)
 * Autenticación: JWT (JSON Web Tokens)
 * Almacenamiento: PostgreSQL
 * Validación: Zod 
@@ -158,6 +158,7 @@ Vista general con KPIs: estado de cartera, PQR pendientes, reservas del día, ú
 * Base de datos de residentes y propietarios.
 * Inventario de vehículos y parqueaderos.
 * Registro de mascotas.
+* Registro y gestión de amenidades y áreas comunes
 3.2.3. Módulo de Comunicaciones
 * Cartelera digital para anuncios oficiales.
 * Sistema de envío de notificaciones push y email masivo.
@@ -180,7 +181,7 @@ Gestión de áreas comunes y amenidades (salón social, BBQ, canchas) con calend
 3.3. Portal de Residentes (App Móvil y Web)
 * Acceso a comunicados, cartelera y documentos.
 * Realización de pagos en línea.
-* Reserva de áreas comunes.
+* Reserva de amenidades y áreas comunes.
 * Pre-registro de visitantes.
 * Botón de pánico
 * Recepción de notificaciones (paquetería, anuncios).
@@ -252,6 +253,6 @@ Gestión de áreas comunes y amenidades (salón social, BBQ, canchas) con calend
 4. Estructura de Planes y Modelo de Negocio 
 * Plan Básico (Freemium): Gestión de inventario, PQR, cartelera digital, encuestas básicas. Hasta 40 unidades residenciales
 * Plan Estándar: Todo lo del Plan Básico + Módulo de Reservas, Módulo Financiero (sin conciliación), Gestión Avanzada de Visitantes con QR y Paquetería. Hasta 150 unidades residenciales
-* Plan Premium: Todo lo del Estándar + Conciliación Bancaria Automática, Acceso a API, y acceso al Marketplace Comunitario y al Directorio de Servicios. mas de 150 unidades residenciales.
+* Plan Premium: Todo lo del Estándar + Conciliación Bancaria Automática, Acceso a API, y acceso al Marketplace Comunitario y al Directorio de Servicios y Democracia Digital integrada. mas de 150 unidades residenciales.
 * Plan Empresarial "Portafolio": Todo lo del Premium + Dashboard "Armonía Portafolio", personalización de marca, soporte prioritario.
 * Plan Democracia Digital

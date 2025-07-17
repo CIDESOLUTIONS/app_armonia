@@ -1,12 +1,13 @@
 model SmartMeterReading {
   id        Int      @id @default(autoincrement())
   meterId   String
-  unitId    String
+  propertyId Int // Relacionar directamente con Property
+  property  Property @relation(fields: [propertyId], references: [id])
   reading   Float
   unit      String // e.g., kWh, m3
   timestamp DateTime @default(now())
 
   @@index([meterId])
-  @@index([unitId])
+  @@index([propertyId])
   @@index([timestamp])
 }

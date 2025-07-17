@@ -104,6 +104,25 @@ export class InventoryController {
     );
   }
 
+  @Post('residents')
+  async createResident(
+    @GetUser() user: any,
+    @Body() createResidentDto: CreateResidentDto,
+  ) {
+    return this.inventoryService.createResident(
+      user.schemaName,
+      createResidentDto,
+    );
+  }
+
+  @Delete('residents/:id')
+  async deleteResident(
+    @GetUser() user: any,
+    @Param('id') id: string,
+  ) {
+    return this.inventoryService.deleteResident(user.schemaName, +id);
+  }
+
   @Get('services')
   async getServices(@GetUser() user: any) {
     return this.inventoryService.getServices(user.schemaName, user.complexId);

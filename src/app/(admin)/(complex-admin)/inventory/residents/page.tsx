@@ -65,18 +65,29 @@ import { Checkbox } from "@/components/ui/checkbox";
 interface Resident {
   id: number;
   name: string;
-  email: string;
-  phone: string;
+  email?: string;
+  phone?: string;
+  idNumber?: string;
+  idType?: string;
   propertyId: number;
-  unitNumber: string; // Para mostrar en la tabla
-  role: string;
+  userId?: number;
+  isOwner?: boolean;
+  relationshipWithOwner?: string;
   isActive: boolean;
+}
+
+import { getProperties } from "@/services/propertyService";
+
+interface PropertyOption {
+  id: number;
+  unitNumber: string;
 }
 
 export default function ResidentsPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
   const [residents, setResidents] = useState<Resident[]>([]);
+  const [properties, setProperties] = useState<PropertyOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentResident, setCurrentResident] = useState<Resident | null>(null);
@@ -85,10 +96,14 @@ export default function ResidentsPage() {
     resolver: zodResolver(residentSchema),
     defaultValues: {
       name: "",
-      email: "",
-      phone: "",
+      email: undefined,
+      phone: undefined,
+      idNumber: undefined,
+      idType: undefined,
       propertyId: 0,
-      role: "RESIDENT", // Default role
+      userId: undefined,
+      isOwner: false,
+      relationshipWithOwner: undefined,
       isActive: true,
     },
   });
@@ -100,16 +115,20 @@ export default function ResidentsPage() {
     formState: { isSubmitting },
   } = form;
 
-  const fetchResidents = useCallback(async () => {
+  const fetchResidentsAndProperties = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getResidents();
-      setResidents(data);
+      const [residentsData, propertiesData] = await Promise.all([
+        getResidents(),
+        getProperties(),
+      ]);
+      setResidents(residentsData);
+      setProperties(propertiesData.map((p: any) => ({ id: p.id, unitNumber: p.unitNumber })));
     } catch (error) {
-      console.error("Error fetching residents:", error);
+      console.error("Error fetching data:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar los residentes.",
+        description: "No se pudieron cargar los datos.",
         variant: "destructive",
       });
     } finally {
@@ -119,18 +138,22 @@ export default function ResidentsPage() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      fetchResidents();
+      fetchResidentsAndProperties();
     }
-  }, [authLoading, user, fetchResidents]);
+  }, [authLoading, user, fetchResidentsAndProperties]);
 
   const handleAddResident = () => {
     setCurrentResident(null);
     reset({
       name: "",
-      email: "",
-      phone: "",
+      email: undefined,
+      phone: undefined,
+      idNumber: undefined,
+      idType: undefined,
       propertyId: 0,
-      role: "RESIDENT",
+      userId: undefined,
+      isOwner: false,
+      relationshipWithOwner: undefined,
       isActive: true,
     });
     setIsModalOpen(true);
@@ -142,8 +165,12 @@ export default function ResidentsPage() {
       name: resident.name,
       email: resident.email,
       phone: resident.phone,
+      idNumber: resident.idNumber,
+      idType: resident.idType,
       propertyId: resident.propertyId,
-      role: resident.role as "RESIDENT" | "OWNER" | "TENANT", // Cast to valid enum type
+      userId: resident.userId,
+      isOwner: resident.isOwner,
+      relationshipWithOwner: resident.relationshipWithOwner,
       isActive: resident.isActive,
     });
     setIsModalOpen(true);
@@ -249,7 +276,7 @@ export default function ResidentsPage() {
               <TableHead>Email</TableHead>
               <TableHead>Teléfono</TableHead>
               <TableHead>Propiedad</TableHead>
-              <TableHead>Rol</TableHead>
+              <TableHead>Es Propietario</TableHead>
               <TableHead>Activo</TableHead>
               <TableHead></TableHead>
             </TableRow>
@@ -260,8 +287,14 @@ export default function ResidentsPage() {
                 <TableCell>{resident.name}</TableCell>
                 <TableCell>{resident.email}</TableCell>
                 <TableCell>{resident.phone}</TableCell>
-                <TableCell>{resident.unitNumber}</TableCell>
-                <TableCell>{resident.role}</TableCell>
+                <TableCell>{resident.propertyId}</TableCell>
+                <TableCell>
+                  {resident.isOwner ? (
+                    <Badge variant="default">Sí</Badge>
+                  ) : (
+                    <Badge variant="destructive">No</Badge>
+                  )}
+                </TableCell>
                 <TableCell>
                   {resident.isActive ? (
                     <Badge variant="default">Sí</Badge>
@@ -345,16 +378,39 @@ export default function ResidentsPage() {
                 name="propertyId"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">ID Propiedad</FormLabel>
+                    <FormLabel className="text-right">Propiedad</FormLabel>
+                    <Select
+                      onValueChange={(value) => field.onChange(parseInt(value))}
+                      value={field.value ? String(field.value) : ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="col-span-3 p-2 border rounded-md">
+                          <SelectValue placeholder="Seleccionar Propiedad" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {properties.map((property) => (
+                          <SelectItem
+                            key={property.id}
+                            value={String(property.id)}
+                          >
+                            {property.unitNumber}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="idNumber"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Número de Identificación</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        className="col-span-3"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(parseInt(e.target.value))
-                        }
-                      />
+                      <Input className="col-span-3" {...field} />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
@@ -362,25 +418,44 @@ export default function ResidentsPage() {
               />
               <FormField
                 control={control}
-                name="role"
+                name="idType"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Rol</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="col-span-3 p-2 border rounded-md">
-                          <SelectValue placeholder="Seleccionar Rol" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="RESIDENT">Residente</SelectItem>
-                        <SelectItem value="OWNER">Propietario</SelectItem>
-                        <SelectItem value="TENANT">Inquilino</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormLabel className="text-right">Tipo de Identificación</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="isOwner"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Es Propietario</FormLabel>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="relationshipWithOwner"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Relación con Propietario</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
                 )}

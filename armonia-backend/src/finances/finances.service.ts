@@ -444,4 +444,29 @@ export class FinancesService {
 
     return { message: `Callback de pago procesado para ${data.transactionId}` };
   }
+
+  async approveReconciliation(schemaName: string, suggestion: any): Promise<any> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    // Lógica para aprobar la sugerencia de conciliación
+    // Esto implicaría marcar el pago como conciliado y posiblemente actualizar el estado de la cuota
+    console.log(
+      `Aprobando conciliación para ${schemaName}:`, suggestion
+    );
+
+    // Ejemplo: Marcar el pago sugerido como conciliado y la cuota como pagada
+    if (suggestion.payment && suggestion.payment.id) {
+      await prisma.payment.update({
+        where: { id: suggestion.payment.id },
+        data: { status: PaymentStatus.COMPLETED, reconciled: true },
+      });
+      if (suggestion.payment.feeId) {
+        await prisma.fee.update({
+          where: { id: suggestion.payment.feeId },
+          data: { status: PaymentStatus.PAID },
+        });
+      }
+    }
+
+    return { message: "Conciliación aprobada exitosamente." };
+  }
 }

@@ -55,11 +55,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 interface Pet {
   id: number;
   name: string;
-  species: string;
-  breed: string;
-  ownerName: string;
+  type: string;
+  breed?: string;
+  age?: number;
+  weight?: number;
+  color?: string;
+  vaccinated: boolean;
+  vaccineExpiryDate?: string;
+  notes?: string;
   propertyId: number;
-  unitNumber: string; // Para mostrar en la tabla
+  residentId: number;
   isActive: boolean;
 }
 
@@ -67,6 +72,8 @@ export default function PetsPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
   const [pets, setPets] = useState<Pet[]>([]);
+  const [properties, setProperties] = useState<PropertyOption[]>([]);
+  const [residents, setResidents] = useState<ResidentOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPet, setCurrentPet] = useState<Pet | null>(null);
@@ -75,10 +82,16 @@ export default function PetsPage() {
     resolver: zodResolver(petSchema),
     defaultValues: {
       name: "",
-      species: "",
-      breed: "",
-      ownerName: "",
+      type: "DOG",
+      breed: undefined,
+      age: undefined,
+      weight: undefined,
+      color: undefined,
+      vaccinated: false,
+      vaccineExpiryDate: undefined,
+      notes: undefined,
       propertyId: 0,
+      residentId: 0,
       isActive: true,
     },
   });
@@ -236,10 +249,14 @@ export default function PetsPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Nombre</TableHead>
-              <TableHead>Especie</TableHead>
+              <TableHead>Tipo</TableHead>
               <TableHead>Raza</TableHead>
-              <TableHead>Propietario</TableHead>
+              <TableHead>Edad</TableHead>
+              <TableHead>Peso</TableHead>
+              <TableHead>Color</TableHead>
+              <TableHead>Vacunado</TableHead>
               <TableHead>Propiedad</TableHead>
+              <TableHead>Residente</TableHead>
               <TableHead>Activa</TableHead>
               <TableHead></TableHead>
             </TableRow>
@@ -248,10 +265,20 @@ export default function PetsPage() {
             {pets.map((pet) => (
               <TableRow key={pet.id}>
                 <TableCell>{pet.name}</TableCell>
-                <TableCell>{pet.species}</TableCell>
+                <TableCell>{pet.type}</TableCell>
                 <TableCell>{pet.breed}</TableCell>
-                <TableCell>{pet.ownerName}</TableCell>
-                <TableCell>{pet.unitNumber}</TableCell>
+                <TableCell>{pet.age}</TableCell>
+                <TableCell>{pet.weight}</TableCell>
+                <TableCell>{pet.color}</TableCell>
+                <TableCell>
+                  {pet.vaccinated ? (
+                    <Badge variant="default">Sí</Badge>
+                  ) : (
+                    <Badge variant="destructive">No</Badge>
+                  )}
+                </TableCell>
+                <TableCell>{pet.propertyId}</TableCell>
+                <TableCell>{pet.residentId}</TableCell>
                 <TableCell>
                   {pet.isActive ? (
                     <Badge variant="default">Sí</Badge>
@@ -306,13 +333,26 @@ export default function PetsPage() {
               />
               <FormField
                 control={control}
-                name="species"
+                name="type"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Especie</FormLabel>
-                    <FormControl>
-                      <Input className="col-span-3" {...field} />
-                    </FormControl>
+                    <FormLabel className="text-right">Tipo</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="col-span-3 p-2 border rounded-md">
+                          <SelectValue placeholder="Seleccionar Tipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="DOG">Perro</SelectItem>
+                        <SelectItem value="CAT">Gato</SelectItem>
+                        <SelectItem value="BIRD">Pájaro</SelectItem>
+                        <SelectItem value="OTHER">Otro</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
                 )}
@@ -332,25 +372,10 @@ export default function PetsPage() {
               />
               <FormField
                 control={control}
-                name="ownerName"
+                name="age"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">
-                      Nombre Propietario
-                    </FormLabel>
-                    <FormControl>
-                      <Input className="col-span-3" {...field} />
-                    </FormControl>
-                    <FormMessage className="col-span-full text-right" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name="propertyId"
-                render={({ field }) => (
-                  <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">ID Propiedad</FormLabel>
+                    <FormLabel className="text-right">Edad</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -361,6 +386,143 @@ export default function PetsPage() {
                         }
                       />
                     </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="weight"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Peso (kg)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        className="col-span-3"
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseFloat(e.target.value))
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="color"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Color</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="vaccinated"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Vacunado</FormLabel>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="vaccineExpiryDate"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Fecha Vencimiento Vacuna</FormLabel>
+                    <FormControl>
+                      <Input type="date" className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Notas</FormLabel>
+                    <FormControl>
+                      <Textarea className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="propertyId"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Propiedad</FormLabel>
+                    <Select
+                      onValueChange={(value) => field.onChange(parseInt(value))}
+                      value={field.value ? String(field.value) : ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="col-span-3 p-2 border rounded-md">
+                          <SelectValue placeholder="Seleccionar Propiedad" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {properties.map((property) => (
+                          <SelectItem
+                            key={property.id}
+                            value={String(property.id)}
+                          >
+                            {property.unitNumber}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="residentId"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Residente</FormLabel>
+                    <Select
+                      onValueChange={(value) => field.onChange(parseInt(value))}
+                      value={field.value ? String(field.value) : ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="col-span-3 p-2 border rounded-md">
+                          <SelectValue placeholder="Seleccionar Residente" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {residents.map((resident) => (
+                          <SelectItem
+                            key={resident.id}
+                            value={String(resident.id)}
+                          >
+                            {resident.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
                 )}

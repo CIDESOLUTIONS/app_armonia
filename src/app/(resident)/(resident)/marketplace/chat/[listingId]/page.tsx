@@ -9,10 +9,25 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Send, Flag } from "lucide-react";
 import { getListingById, reportListing } from "@/services/marketplaceService";
 import { getMessages, sendMessage } from "@/services/messageService";
-import io from "socket.io-client";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Loader2, Send, Flag } from "lucide-react";
+import { getListingById, reportListing } from "@/services/marketplaceService";
+import { getMessages, sendMessage } from "@/services/messageService";
+import { useSocket } from "@/hooks/useSocket";
 import { usePathname } from "next/navigation";
-
-let socket: any;
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function ChatPage() {
   const { listingId } = useParams();
@@ -24,9 +39,12 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const socket = useSocket();
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportReason, setReportReason] = useState("");
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !socket) return;
 
     const fetchListingAndMessages = async () => {
       try {
@@ -44,9 +62,6 @@ export default function ChatPage() {
     };
 
     fetchListingAndMessages();
-
-    // Configurar Socket.IO
-    socket = io(); // Conecta al servidor de Socket.IO
 
     socket.on("connect", () => {
       console.log("Conectado a Socket.IO");
@@ -75,9 +90,11 @@ export default function ChatPage() {
     });
 
     return () => {
-      socket.disconnect();
+      socket.off("connect");
+      socket.off("receiveMessage");
+      socket.off("disconnect");
     };
-  }, [listingId, user, toast, pathname]);
+  }, [listingId, user, toast, pathname, socket]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -103,28 +120,39 @@ export default function ChatPage() {
     }
   };
 
-  const handleReportListing = async () => {
+  const handleReportListing = () => {
     if (!user || !listing) return;
+    setIsReportModalOpen(true);
+  };
 
-    if (confirm("¿Estás seguro de que quieres reportar este anuncio?")) {
-      try {
-        await reportListing({
-          listingId: Number(listingId),
-          reporterId: user.id,
-          reason: "Contenido inapropiado o fraudulento", // Hardcoded reason for now
-        });
-        toast({
-          title: "Anuncio Reportado",
-          description: "Gracias por tu reporte. Lo revisaremos pronto.",
-        });
-      } catch (error) {
-        console.error("Error reporting listing:", error);
-        toast({
-          title: "Error",
-          description: "No se pudo reportar el anuncio.",
-          variant: "destructive",
-        });
-      }
+  const confirmReport = async () => {
+    if (!reportReason.trim()) {
+      toast({
+        title: "Error",
+        description: "Por favor, ingresa una razón para el reporte.",
+        variant: "destructive",
+      });
+      return;
+    }
+    try {
+      await reportListing({
+        listingId: Number(listingId),
+        reporterId: user.id,
+        reason: reportReason,
+      });
+      toast({
+        title: "Anuncio Reportado",
+        description: "Gracias por tu reporte. Lo revisaremos pronto.",
+      });
+      setIsReportModalOpen(false);
+      setReportReason("");
+    } catch (error) {
+      console.error("Error reporting listing:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo reportar el anuncio.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -191,6 +219,30 @@ export default function ChatPage() {
           <Send className="h-5 w-5" />
         </Button>
       </div>
+
+      <AlertDialog open={isReportModalOpen} onOpenChange={setIsReportModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reportar Anuncio</AlertDialogTitle>
+            <AlertDialogDescription>
+              Por favor, describe la razón por la cual deseas reportar este
+              anuncio. Tu reporte nos ayuda a mantener la comunidad segura.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <Textarea
+            placeholder="Razón del reporte..."
+            value={reportReason}
+            onChange={(e) => setReportReason(e.target.value)}
+            rows={5}
+          />
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmReport}>
+              Enviar Reporte
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

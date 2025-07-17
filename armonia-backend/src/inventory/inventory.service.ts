@@ -345,6 +345,33 @@ export class InventoryService {
     }
   }
 
+  async createResident(schemaName: string, data: CreateResidentDto) {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    try {
+      const resident = await prisma.resident.create({
+        data: {
+          ...data,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+      return resident;
+    } catch (error) {
+      console.error('[INVENTORY SERVICE] Error creando residente:', error);
+      throw new Error('Error creando residente');
+    }
+  }
+
+  async deleteResident(schemaName: string, id: number) {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    try {
+      await prisma.resident.delete({ where: { id } });
+    } catch (error) {
+      console.error('[INVENTORY SERVICE] Error eliminando residente:', error);
+      throw new Error('Error eliminando residente');
+    }
+  }
+
   // SERVICIOS COMUNES
   async getServices(schemaName: string, complexId: number) {
     const prisma = this.getTenantPrismaClient(schemaName);

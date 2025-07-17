@@ -1,4 +1,6 @@
-import { prisma } from "@/lib/prisma";
+import { Injectable } from '@nestjs/common';
+import { PrismaClientManager } from '../prisma/prisma-client-manager';
+import { PrismaService } from '../prisma/prisma.service';
 
 interface BankStatementEntry {
   date: string;
@@ -6,18 +8,33 @@ interface BankStatementEntry {
   amount: number;
 }
 
-export async function reconcileBankStatement(
-  statementEntries: BankStatementEntry[],
-) {
-  const pendingPayments = await prisma.payment.findMany({
-    where: { status: "PENDING" },
-  });
+@Injectable()
+export class ReconciliationService {
+  constructor(
+    private prismaClientManager: PrismaClientManager,
+    private prisma: PrismaService,
+  ) {}
+
+  private getTenantPrismaClient(schemaName: string) {
+    return this.prismaClientManager.getClient(schemaName);
+  }
+
+  async reconcileBankStatement(
+    schemaName: string,
+    statementEntries: BankStatementEntry[],
+  ) {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const pendingPayments = await prisma.payment.findMany({
+      where: { status: "PENDING" },
+    });
 
   const suggestions = statementEntries.map((entry) => {
     const potentialMatch = pendingPayments.find(
       (payment) =>
         payment.amount === entry.amount &&
-        isSimilarDate(new Date(payment.dueDate), new Date(entry.date)),
+        isSimilarDate(new Date(payment.date), new Date(entry.date)) &&
+        (entry.description.includes(payment.reference) ||
+          payment.reference.includes(entry.description)),
     );
 
     if (potentialMatch) {

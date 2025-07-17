@@ -20,12 +20,21 @@ import {
 
 // Placeholder for image upload service
 const uploadImage = async (file: File): Promise<string> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      console.log("Uploading file:", file.name);
-      resolve(`https://example.com/images/${file.name}`);
-    }, 1000);
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await fetch('/api/marketplace/upload-image', {
+    method: 'POST',
+    body: formData,
   });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Error al subir la imagen');
+  }
+
+  const data = await response.json();
+  return data.url;
 };
 
 const categories = [
@@ -49,7 +58,10 @@ const formSchema = z.object({
   category: z.enum(categories as [string, ...string[]], {
     errorMap: () => ({ message: "La categoría es requerida." }),
   }),
-  images: z.array(z.any()).optional(), // Will be refined to z.instanceof(File) later
+  images: z
+    .array(z.instanceof(File))
+    .max(5, "Solo se permiten hasta 5 imágenes.")
+    .optional(),
 });
 
 export default function CreateListingPage() {

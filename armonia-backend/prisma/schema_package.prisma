@@ -6,10 +6,10 @@ model Package {
   courier           String?
   senderName        String?
   senderCompany     String?
-  residentId        Int?
-  unitId            Int
-  unitNumber        String
-  residentName      String
+  residentId        Int?            // ID del residente destinatario (si está registrado)
+  resident          Resident?       @relation(fields: [residentId], references: [id])
+  unitId            Int             // ID de la unidad de destino
+  unitNumber        String          // Número de la unidad (ej: "Apartamento 101")
   receivedAt        DateTime
   notifiedAt        DateTime?
   deliveredAt       DateTime?
