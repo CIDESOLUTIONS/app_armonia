@@ -1,26 +1,26 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { VisitorsService } from './visitors.service';
+import { SurveyService } from './survey.service';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import { vi } from 'vitest';
 
-describe('VisitorsService', () => {
-  let service: VisitorsService;
+describe('SurveyService', () => {
+  let service: SurveyService;
   let prisma: PrismaService;
   let prismaClientManager: PrismaClientManager;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        VisitorsService,
+        SurveyService,
         {
           provide: PrismaClientManager,
           useValue: {
             getClient: vi.fn().mockReturnValue({
-              visitor: { create: vi.fn(), findMany: vi.fn(), findUnique: vi.fn(), update: vi.fn(), delete: vi.fn() },
-              preRegisteredVisitor: { create: vi.fn(), findMany: vi.fn(), findUnique: vi.fn(), update: vi.fn(), delete: vi.fn() },
-              accessPass: { create: vi.fn(), findMany: vi.fn(), findUnique: vi.fn(), update: vi.fn(), delete: vi.fn() },
-              accessLog: { create: vi.fn(), findMany: vi.fn() },
+              survey: { create: vi.fn(), findMany: vi.fn(), findUnique: vi.fn(), update: vi.fn(), delete: vi.fn() },
+              question: { create: vi.fn(), findMany: vi.fn(), findUnique: vi.fn(), update: vi.fn(), delete: vi.fn() },
+              option: { create: vi.fn(), findMany: vi.fn(), findUnique: vi.fn(), update: vi.fn(), delete: vi.fn() },
+              userVote: { create: vi.fn(), findMany: vi.fn() },
             }),
           },
         },
@@ -33,7 +33,7 @@ describe('VisitorsService', () => {
       ],
     }).compile();
 
-    service = module.get<VisitorsService>(VisitorsService);
+    service = module.get<SurveyService>(SurveyService);
     prisma = module.get<PrismaService>(PrismaService);
     prismaClientManager = module.get<PrismaClientManager>(PrismaClientManager);
   });
@@ -42,5 +42,5 @@ describe('VisitorsService', () => {
     expect(service).toBeDefined();
   });
 
-  // Add tests for each method in VisitorsService
+  // Add tests for each method in SurveyService
 });
