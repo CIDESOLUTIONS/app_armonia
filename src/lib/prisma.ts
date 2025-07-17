@@ -4,7 +4,25 @@ import { sign, verify } from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET || "default_secret";
 
 // 1. Instancia de Prisma para el esquema público (armonia)
-const publicPrisma = new PrismaClient();
+// Inicialización perezosa para evitar problemas en Edge Runtime
+let publicPrisma: PrismaClient;
+
+function getOrCreatePublicPrisma(): PrismaClient {
+  if (!publicPrisma) {
+    const databaseUrl = process.env.DATABASE_URL;
+    if (!databaseUrl) {
+      throw new Error("DATABASE_URL environment variable is not set.");
+    }
+    publicPrisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: databaseUrl,
+        },
+      },
+    });
+  }
+  return publicPrisma;
+}
 
 // 2. Caché para las instancias de Prisma de los tenants
 const tenantPrismaInstances: Record<string, PrismaClient> = {};
@@ -25,12 +43,15 @@ export function getTenantPrismaClient(schemaName: string): PrismaClient {
     return tenantPrismaInstances[schemaName];
   }
 
-  const databaseUrl = `${process.env.DATABASE_URL}?schema=${schemaName}`;
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    throw new Error("DATABASE_URL environment variable is not set.");
+  }
 
   const newTenantPrisma = new PrismaClient({
     datasources: {
       db: {
-        url: databaseUrl,
+        url: `${databaseUrl}?schema=${schemaName}`,
       },
     },
   });
@@ -45,7 +66,7 @@ export function getTenantPrismaClient(schemaName: string): PrismaClient {
  * @returns La instancia de PrismaClient para el esquema 'armonia'.
  */
 export function getPublicPrismaClient(): PrismaClient {
-  return publicPrisma;
+  return getOrCreatePublicPrisma();
 }
 
 /**

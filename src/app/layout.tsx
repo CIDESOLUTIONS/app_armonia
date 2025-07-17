@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Providers } from "@/components/providers";
 import "./globals.css";
-import { NextIntlClientProvider, useMessages } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: "Armonía - Gestión de Conjuntos Residenciales",
@@ -14,15 +12,10 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const locale = await getLocale();
-  const messages = await getMessages();
-
   return (
-    <html lang={locale}>
+    <html lang="es">
       <body className="font-sans">
-        <NextIntlClientProvider messages={messages}>
-          <Providers>{children}</Providers>
-        </NextIntlClientProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
