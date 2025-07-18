@@ -12,16 +12,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Flag } from "lucide-react";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { reportListing } from "@/services/marketplaceService";
@@ -98,13 +96,13 @@ export function ListingCard({ listing }: ListingCardProps) {
         <span className="text-xs text-gray-500">
           Publicado por: {listing.author.name}
         </span>
-        <Link href={`/resident/marketplace/${listing.id}`}>
+        <Link href={`/resident-portal/marketplace/${listing.id}`}>
           <Button variant="outline" size="sm">
             Ver Detalles
           </Button>
         </Link>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
+        <Dialog>
+          <DialogTrigger asChild>
             <Button
               variant="ghost"
               size="sm"
@@ -112,27 +110,27 @@ export function ListingCard({ listing }: ListingCardProps) {
             >
               <Flag className="h-4 w-4" />
             </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Reportar Anuncio</AlertDialogTitle>
-              <AlertDialogDescription>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Reportar Anuncio</DialogTitle>
+              <DialogDescription>
                 Por favor, describe por qué estás reportando este anuncio.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
+              </DialogDescription>
+            </DialogHeader>
             <Textarea
               placeholder="Razón del reporte..."
               value={reportReason}
               onChange={(e) => setReportReason(e.target.value)}
             />
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction onClick={handleReport}>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsReportModalOpen(false)}>Cancelar</Button>
+              <Button onClick={handleReport}>
                 Reportar
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </CardFooter>
     </Card>
   );

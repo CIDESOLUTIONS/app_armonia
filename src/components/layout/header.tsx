@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   Globe,
   Sun,
@@ -38,8 +38,6 @@ const headerTexts = {
 };
 
 
-import { useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 
 interface HeaderProps {

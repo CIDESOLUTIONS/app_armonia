@@ -35,19 +35,24 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Redirigir la ruta raíz a /home
+  if (pathname === "/") {
+    return NextResponse.redirect(new URL("/home", req.url));
+  }
+
   // Lógica de autorización por rol
   const { pathname } = req.nextUrl;
   const userRole = token.role as string;
 
-  if (pathname.startsWith("/admin") && userRole !== "ADMIN") {
+  if (pathname.startsWith("/admin-portal") && userRole !== "ADMIN") {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
-  if (pathname.startsWith("/resident") && userRole !== "RESIDENT") {
+  if (pathname.startsWith("/resident-portal") && userRole !== "RESIDENT") {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
-  if (pathname.startsWith("/reception") && userRole !== "RECEPTION") {
+  if (pathname.startsWith("/reception-portal") && userRole !== "RECEPTION") {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 

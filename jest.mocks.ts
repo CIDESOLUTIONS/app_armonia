@@ -1,51 +1,75 @@
 import "@testing-library/jest-dom";
 
 // Importar el helper de mock de Prisma
-import { createPrismaClientMock } from "./src/services/__mocks__/prisma-mock-helper";
-
-// Crear un mock avanzado para PrismaClient
-const mockPrismaClient = createPrismaClientMock({
+// Crear un mock simple para PrismaClient
+const mockPrismaClient = {
   pQR: {
-    findUnique: {
-      id: 1,
-      ticketNumber: "PQR-001",
-      title: "Solicitud de prueba",
-      description: "Descripción de prueba",
-      status: "IN_PROGRESS",
-      priority: "MEDIUM",
-      category: "MAINTENANCE",
-      userId: 1,
-      assignedToId: 2,
-      dueDate: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      closedAt: null,
-      reopenedAt: null,
-      reopenReason: null,
-      tags: ["MAINTENANCE", "URGENT"],
-    },
-    findMany: [],
-    groupBy: [],
-    count: 0,
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+    update: jest.fn(),
   },
   user: {
-    findUnique: {
-      id: 1,
-      name: "Usuario de Prueba",
-      email: "usuario@ejemplo.com",
-      role: "RESIDENT",
-      active: true,
-    },
-    findMany: [],
-    count: 0,
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
   },
-  pQRNotification: {},
+  pQRNotification: {
+    create: jest.fn(),
+    findMany: jest.fn(),
+    count: jest.fn(),
+  },
   assembly: {
-    findUnique: { id: 1, title: "Asamblea de Prueba", date: new Date() },
-    findMany: [],
-    create: { id: 1, title: "Nueva Asamblea", date: new Date() },
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+    create: jest.fn(),
   },
-});
+  commonArea: {
+    findMany: jest.fn(),
+    findUnique: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+  },
+  availabilityConfig: {
+    findUnique: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+  },
+  reservationRule: {
+    findMany: jest.fn(),
+    create: jest.fn(),
+  },
+  reservation: {
+    findMany: jest.fn(),
+    findUnique: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+  },
+  reservationNotification: {
+    findMany: jest.fn(),
+    findUnique: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+  },
+  bill: {
+    findUnique: jest.fn(),
+    update: jest.fn(),
+    create: jest.fn(),
+  },
+  payment: {
+    create: jest.fn(),
+  },
+  residentialComplex: {
+    findUnique: jest.fn(),
+  },
+  fee: {
+    findMany: jest.fn(),
+  },
+  property: {
+    findMany: jest.fn(),
+  },
+  expense: {
+    findMany: jest.fn(),
+  },
+};
 
 // Configurar mock para Prisma
 jest.mock("@/lib/prisma", () => ({

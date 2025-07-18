@@ -74,7 +74,7 @@ export default function Sidebar({
     {
       icon: <Briefcase className="w-6 h-6" />,
       label: language === "Español" ? "Portafolio" : "Portfolio",
-      path: "/admin/app-admin/portfolio",
+      path: "/app-admin-portal/portfolio",
       roles: ["ADMIN"],
     },
     {
@@ -263,7 +263,7 @@ export default function Sidebar({
         },
         {
           label: language === "Español" ? "Cámaras" : "Cameras",
-          path: "/admin/complex-admin/configuration/cameras",
+          path: "/admin-portal/configuration/cameras",
         },
       ],
     },

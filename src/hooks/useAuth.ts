@@ -40,7 +40,7 @@ export function useAuth() {
           router.push("/resident/resident-dashboard");
           break;
         case "RECEPTION":
-          router.push("/reception/reception/reception-dashboard");
+          router.push("/reception-portal/reception-dashboard");
           break;
         default:
           router.push("/");
