@@ -13,4 +13,3 @@ model UserVote {
   @@index([voteId])
   @@index([optionId])
   @@index([userId])
-}

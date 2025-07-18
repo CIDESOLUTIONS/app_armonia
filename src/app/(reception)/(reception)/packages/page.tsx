@@ -47,21 +47,7 @@ import {
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import Image from "next/image";
-
-interface PackageItem {
-  id: string;
-  type: "package" | "mail" | "document";
-  trackingNumber?: string;
-  courier?: string;
-  destination: string; // e.g., "Apartamento 101", "Oficina 203"
-  residentName: string;
-  receivedAt: string;
-  deliveredAt?: string;
-  receivedBy?: string;
-  notes?: string;
-  photoUrl?: string;
-  status: "pending" | "delivered" | "returned";
-}
+import { getPackages, registerPackage, deliverPackage, returnPackage, PackageItem, PackageFilterParams } from "@/services/packageService";
 
 export default function ReceptionPackagesPage() {
   const { isLoggedIn, token: _token, schemaName } = useAuthStore();
@@ -69,17 +55,11 @@ export default function ReceptionPackagesPage() {
   const [loading, setLoading] = useState(true);
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [error, _setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<
-    "pending" | "delivered" | "returned" | "all"
-  >("pending");
-  const [typeFilter, setTypeFilter] = useState<
-    "package" | "mail" | "document" | "all"
-  >("all");
+  const [statusFilter, setStatusFilter] = useState<PackageItem["status"] | "all">("pending");
+  const [typeFilter, setTypeFilter] = useState<PackageItem["type"] | "all">("all");
   const [isRegisterDialogOpen, setIsRegisterDialogOpen] = useState(false);
   const [isDeliverDialogOpen, setIsDeliverDialogOpen] = useState(false);
-  const [selectedPackage, setSelectedPackage] = useState<PackageItem | null>(
-    null,
-  );
+  const [selectedPackage, setSelectedPackage] = useState<PackageItem | null>(null);
   const [newPackageForm, setNewPackageForm] = useState({
     type: "package",
     trackingNumber: "",
@@ -96,90 +76,25 @@ export default function ReceptionPackagesPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Datos de ejemplo para desarrollo y pruebas
-  const mockPackages: PackageItem[] = useMemo(
-    () => [
-      {
-        id: "pkg1",
-        type: "package",
-        trackingNumber: "ABC123456789",
-        courier: "Servientrega",
-        destination: "Apartamento 502",
-        residentName: "Ana López",
-        receivedAt: "2025-05-28T14:30:00",
-        notes: "Paquete grande, se dejó en bodega",
-        photoUrl:
-          "https://images.unsplash.com/photo-1565791380713-1756b9a05343?auto=format&fit=crop&q=80&w=500",
-        status: "pending",
-      },
-      {
-        id: "pkg2",
-        type: "mail",
-        destination: "Apartamento 301",
-        residentName: "Carlos Rodríguez",
-        receivedAt: "2025-05-29T09:15:00",
-        deliveredAt: "2025-05-29T18:20:00",
-        receivedBy: "Carlos Rodríguez",
-        status: "delivered",
-      },
-      {
-        id: "pkg3",
-        type: "document",
-        courier: "DHL Express",
-        destination: "Apartamento 101",
-        residentName: "Luis Martínez",
-        receivedAt: "2025-05-29T11:45:00",
-        notes: "Sobre con documentos importantes",
-        status: "pending",
-      },
-      {
-        id: "pkg4",
-        type: "package",
-        trackingNumber: "XYZ987654321",
-        courier: "Coordinadora",
-        destination: "Apartamento 202",
-        residentName: "María Gómez",
-        receivedAt: "2025-05-27T16:20:00",
-        deliveredAt: "2025-05-28T10:30:00",
-        receivedBy: "Juan Gómez (Familiar)",
-        notes: "Entregado con autorización verbal",
-        status: "delivered",
-      },
-      {
-        id: "pkg5",
-        type: "mail",
-        destination: "Apartamento 404",
-        residentName: "Pedro Sánchez",
-        receivedAt: "2025-05-26T14:10:00",
-        status: "returned",
-        notes: "Devuelto al remitente después de 3 días sin reclamar",
-      },
-    ],
-    [],
-  );
-
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       _setError(null);
 
-      // En un entorno real, esto sería una llamada a la API
-      // const response = await fetch('/api/packages');
-      // const result = await response.json();
-      // if (!response.ok) throw new Error(result.message || 'Error al cargar datos');
-      // setPackages(result.packages);
-
-      // Simulamos un retraso en la carga de datos
-      setTimeout(() => {
-        setPackages(mockPackages);
-        setLoading(false);
-      }, 1000);
+      const filters: PackageFilterParams = {
+        status: statusFilter,
+        type: typeFilter,
+        search: searchTerm || undefined,
+      };
+      const fetchedPackages = await getPackages(filters);
+      setPackages(fetchedPackages);
     } catch (err: any) {
       console.error("[ReceptionPackages] Error:", err);
       _setError(err.message || "Error al cargar datos de paquetes");
+    } finally {
       setLoading(false);
     }
-  }, [mockPackages, _setError, setPackages, setLoading]);
+  }, [statusFilter, typeFilter, searchTerm]);
 
   useEffect(() => {
     if (!isLoggedIn || !_token || !schemaName) {
@@ -313,41 +228,7 @@ export default function ReceptionPackagesPage() {
     setIsSubmitting(true);
 
     try {
-      // En un entorno real, esto sería una llamada a la API
-      // const formData = new FormData();
-      // formData.append('type', newPackageForm.type);
-      // formData.append('destination', newPackageForm.destination);
-      // formData.append('residentName', newPackageForm.residentName);
-      // if (newPackageForm.trackingNumber) formData.append('trackingNumber', newPackageForm.trackingNumber);
-      // if (newPackageForm.courier) formData.append('courier', newPackageForm.courier);
-      // if (newPackageForm.notes) formData.append('notes', newPackageForm.notes);
-      // if (newPackageForm.photo) formData.append('photo', newPackageForm.photo);
-
-      // // Variable response eliminada por lint
-
-      // if (!response.ok) {
-      //   throw new Error('Error al registrar paquete');
-      // }
-
-      // Simulamos un retraso en el envío
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Simulamos una respuesta exitosa
-      const newPackage: PackageItem = {
-        id: `pkg${Date.now()}`,
-        type: newPackageForm.type as PackageItem["type"],
-        trackingNumber: newPackageForm.trackingNumber || undefined,
-        courier: newPackageForm.courier || undefined,
-        destination: newPackageForm.destination,
-        residentName: newPackageForm.residentName,
-        receivedAt: new Date().toISOString(),
-        notes: newPackageForm.notes || undefined,
-        photoUrl: newPackageForm.photo
-          ? URL.createObjectURL(newPackageForm.photo)
-          : undefined,
-        status: "pending",
-      };
-
+      const newPackage = await registerPackage(newPackageForm);
       setPackages((prev) => [newPackage, ...prev]);
       setSuccessMessage("Paquete registrado exitosamente.");
       setIsRegisterDialogOpen(false);
@@ -362,9 +243,9 @@ export default function ReceptionPackagesPage() {
         notes: "",
         photo: null,
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error("[ReceptionPackages] Error:", err);
-      setError("Error al registrar el paquete. Por favor, inténtelo de nuevo.");
+      _setError(err.message || "Error al registrar el paquete. Por favor, inténtelo de nuevo.");
     } finally {
       setIsSubmitting(false);
     }
@@ -390,40 +271,17 @@ export default function ReceptionPackagesPage() {
     setIsSubmitting(true);
 
     try {
-      // En un entorno real, esto sería una llamada a la API
-      // // Variable response eliminada por lint
-
-      // if (!response.ok) {
-      //   throw new Error('Error al registrar entrega');
-      // }
-
-      // Simulamos un retraso
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // Actualizamos el estado local
+      const updatedPackage = await deliverPackage(selectedPackage.id, deliveryForm);
       setPackages((prev) =>
         prev.map((pkg) =>
-          pkg.id === selectedPackage.id
-            ? {
-                ...pkg,
-                status: "delivered",
-                deliveredAt: new Date().toISOString(),
-                receivedBy: deliveryForm.receivedBy,
-                notes: deliveryForm.notes
-                  ? pkg.notes
-                    ? `${pkg.notes}; ${deliveryForm.notes}`
-                    : deliveryForm.notes
-                  : pkg.notes,
-              }
-            : pkg,
+          pkg.id === updatedPackage.id ? updatedPackage : pkg,
         ),
       );
-
       setSuccessMessage("Entrega registrada exitosamente.");
       setIsDeliverDialogOpen(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error("[ReceptionPackages] Error:", err);
-      setError("Error al registrar la entrega. Por favor, inténtelo de nuevo.");
+      _setError(err.message || "Error al registrar la entrega. Por favor, inténtelo de nuevo.");
     } finally {
       setIsSubmitting(false);
     }
@@ -437,30 +295,23 @@ export default function ReceptionPackagesPage() {
       return;
     }
 
+    setIsSubmitting(true);
+
     try {
-      // En un entorno real, esto sería una llamada a la API
-      // // Variable response eliminada por lint
-
-      // if (!response.ok) {
-      //   throw new Error('Error al marcar como devuelto');
-      // }
-
-      // Simulamos un retraso
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // Actualizamos el estado local
+      const returnedPackage = await returnPackage(packageId);
       setPackages((prev) =>
         prev.map((pkg) =>
-          pkg.id === packageId ? { ...pkg, status: "returned" } : pkg,
+          pkg.id === returnedPackage.id ? returnedPackage : pkg,
         ),
       );
-
       setSuccessMessage("Paquete marcado como devuelto.");
-    } catch (err) {
+    } catch (err: any) {
       console.error("[ReceptionPackages] Error:", err);
-      setError(
-        "Error al marcar el paquete como devuelto. Por favor, inténtelo de nuevo.",
+      _setError(
+        err.message || "Error al marcar el paquete como devuelto. Por favor, inténtelo de nuevo.",
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

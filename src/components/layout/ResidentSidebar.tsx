@@ -105,11 +105,11 @@ export default function ResidentSidebar({
         },
         {
           label: language === "Español" ? "Realizar Pago" : "Make Payment",
-          path: "/resident/resident/financial",
+          path: "/resident/financial",
         },
         {
           label: language === "Español" ? "Presupuesto Familiar" : "Family Budget",
-          path: "/resident/resident/personal-finances",
+          path: "/resident/personal-finances",
         },
       ],
     },

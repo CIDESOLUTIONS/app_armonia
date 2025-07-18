@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
+import { PDFDocument } from 'pdfkit';
 import {
   CreateAssemblyDto,
   UpdateAssemblyDto,
@@ -116,49 +117,119 @@ export class AssemblyService {
   // Lógica de votaciones (placeholder)
   async createVote(schemaName: string, data: CreateVoteDto): Promise<any> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    // Aquí se crearía la votación en la DB
-    return prisma.vote.create({
-      data: { ...data, assemblyId: data.assemblyId, isActive: true },
+    const vote = await prisma.vote.create({
+      data: {
+        assemblyId: data.assemblyId,
+        question: data.question,
+        isWeighted: data.isWeighted,
+        options: {
+          create: data.options.map(optionText => ({ value: optionText }))
+        },
+        isActive: true,
+      },
     });
+    return vote;
   }
 
   async submitVote(schemaName: string, data: SubmitVoteDto): Promise<any> {
     const prisma = this.getTenantPrismaClient(schemaName);
     // Aquí se registraría el voto del usuario con su ponderación
     return prisma.userVote.create({
-      data: { ...data, userId: data.userId, weight: data.weight },
+      data: {
+        voteId: data.voteId,
+        optionId: data.optionId,
+        userId: data.userId,
+        weight: data.weight,
+      },
     });
   }
 
   async getVoteResults(schemaName: string, voteId: number): Promise<any> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    // Aquí se calcularían los resultados de la votación, incluyendo ponderación
-    const votes = await prisma.userVote.findMany({
-      where: { voteId },
-      select: {
-        optionIndex: true,
-        weight: true,
+    const vote = await prisma.vote.findUnique({
+      where: { id: voteId },
+      include: {
+        options: true,
+        userVotes: true,
       },
     });
 
-    const results: { [optionIndex: number]: number } = {};
-    votes.forEach((vote) => {
-      if (!results[vote.optionIndex]) {
-        results[vote.optionIndex] = 0;
-      }
-      results[vote.optionIndex] += vote.weight;
+    if (!vote) {
+      throw new NotFoundException(`Votación con ID ${voteId} no encontrada.`);
+    }
+
+    const results: { [optionId: number]: { value: string; totalWeight: number } } = {};
+    vote.options.forEach(option => {
+      results[option.id] = { value: option.value, totalWeight: 0 };
     });
 
-    return { voteId, results };
+    vote.userVotes.forEach(userVote => {
+      if (results[userVote.optionId]) {
+        results[userVote.optionId].totalWeight += userVote.weight;
+      }
+    });
+
+    return { voteId, question: vote.question, results: Object.values(results) };
   }
 
   // Lógica de actas (placeholder)
   async generateMeetingMinutes(
     schemaName: string,
     assemblyId: number,
-  ): Promise<any> {
-    // Aquí se generaría el borrador del acta
-    return { documentUrl: 'placeholder.pdf' };
+  ): Promise<Buffer> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const assembly = await prisma.assembly.findUnique({
+      where: { id: assemblyId },
+      include: {
+        votes: { include: { options: true, userVotes: true } },
+        attendances: { include: { user: true } },
+      },
+    });
+
+    if (!assembly) {
+      throw new NotFoundException(`Asamblea con ID ${assemblyId} no encontrada.`);
+    }
+
+    const doc = new PDFDocument();
+    const buffers: Buffer[] = [];
+    doc.on('data', buffers.push.bind(buffers));
+    doc.on('end', () => resolve(Buffer.concat(buffers)));
+
+    doc.fontSize(20).text(`Acta de Asamblea: ${assembly.title}`, { align: 'center' });
+    doc.fontSize(12).text(`Fecha: ${assembly.scheduledDate.toLocaleDateString()}`, { align: 'center' });
+    doc.fontSize(12).text(`Lugar: ${assembly.location}`, { align: 'center' });
+    doc.moveDown();
+
+    doc.fontSize(16).text('Descripción:');
+    doc.fontSize(12).text(assembly.description);
+    doc.moveDown();
+
+    doc.fontSize(16).text('Agenda:');
+    doc.fontSize(12).text(assembly.agenda);
+    doc.moveDown();
+
+    doc.fontSize(16).text('Asistencia:');
+    assembly.attendances.forEach(attendance => {
+      doc.fontSize(12).text(`- ${attendance.user.name}: ${attendance.present ? 'Presente' : 'Ausente'}`);
+    });
+    doc.moveDown();
+
+    doc.fontSize(16).text('Resultados de Votaciones:');
+    for (const vote of assembly.votes) {
+      doc.fontSize(14).text(`Pregunta: ${vote.question}`);
+      const results = await this.getVoteResults(schemaName, vote.id);
+      results.results.forEach((result: any) => {
+        doc.fontSize(12).text(`  - ${result.value}: ${result.totalWeight} votos`);
+      });
+      doc.moveDown();
+    }
+
+    doc.end();
+
+    return new Promise((resolve, reject) => {
+      doc.on('end', () => resolve(Buffer.concat(buffers)));
+      doc.on('error', reject);
+    });
   }
 
   async getAssemblyQuorumStatus(

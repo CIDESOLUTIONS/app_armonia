@@ -27,113 +27,14 @@ Con análisis de mercado
 Interacciones solo en español. Actúa como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas. Está en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales están en la carpeta docs. Su tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto, a partir de esa comparación, debe generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre las funcionalidades especificadas y lo implementado, identificación de funcionalidades faltantes, incompletas o que deban ajustarse. Evalúa especialmente que cumpla con estrictamente con el stack tecnológico y verifica los flujos desde el acceso a la landing page (clave para conversión) hasta todos los portales (Administrador del conjunto residencial, Residentes, Recepción/Vigilancia y la Consola de Administración de la aplicación) cumplan el detalle funcional, evalúa la adopción del modelo de negocio incluyendo el plan empresarial, y el uso del modulo de democracia digital para que pueda ser integrado o independiente. Evalúa si se están aplicando estándares modernos de calidad, accesibilidad, rendimiento, seguridad y mantenibilidad. Si se detectan problemas, realiza las correcciones. Verifica si es conveniente eliminar dependencias o funciones innecesarias, optimizar estructuras para mejorar eficiencia.si se requiere desarrollar desde cero respeta el estilo del proyecto. Evita proponer múltiples alternativas para una misma solución salvo que se indique lo contrario. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias (Vitest) e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto al 100%. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones técnicas en docs y luego continuas sistemáticamente con lo solicitado. 
 
 
-se cambia la herramienta de prueba por fallas recurrentes
- Ahora, el siguiente paso es actualizar los scripts en package.json para usar vitest en lugar de jest. También eliminaré las
-  configuraciones de Jest.
-Dada la persistencia de los problemas con replace y la necesidad de avanzar con el plan general, procederé con la decisión radical que
-  mencioné: migraré el framework de pruebas unitarias de Jest a Vitest.
-
-  Vitest ofrece varias ventajas que podrían resolver los problemas actuales y mejorar la experiencia de prueba:
-   * Ejecución más rápida: Vitest es significativamente más rápido que Jest, especialmente para grandes bases de código, debido a su soporte
-     nativo de ESM y su arquitectura nativa de Vite.
-   * Nativo de Vite: Se integra perfectamente con Vite, que probablemente ya forma parte de la configuración de compilación del proyecto (dado
-     los archivos next.config.mjs y postcss.config.mjs, lo que sugiere una compilación frontend moderna). Esto puede simplificar la
-     configuración y mejorar el rendimiento.
-   * API compatible con Jest: Vitest tiene una API compatible con Jest, lo que significa que la mayoría de las pruebas Jest existentes se
-     pueden migrar con cambios mínimos. Esto reduce el esfuerzo de refactorización.
-   * Mejora del mocking de módulos: Las capacidades de mocking de Vitest suelen ser más sencillas y menos propensas a los tipos de problemas de
-     resolución de módulos que hemos estado enfrentando con Jest.
  
-
-
-Plan de Trabajo: Auditoría y Refactorización del Proyecto Armonía
-
-   * Fase 1: Análisis y Diagnóstico.
-       * Tarea 1.1: Lectura y análisis profundo de las especificaciones técnicas y funcionales (docs/Especificaicones Tecnicas y Funcionales
-         App Armonia_ver16.txt).
-       * Tarea 1.2: Análisis del package.json para comprender las dependencias, scripts y la configuración general del proyecto.
-       * Tarea 1.3: Inspección de la estructura de directorios y la arquitectura actual del código fuente en src/ y armonia-backend/.
-
-   * Fase 2: Informe de Auditoría y Plan de Acción Detallado.
-       * Tarea 2.1: Generar un informe que resuma el estado actual del proyecto (funcional, técnico, estilo).
-       * Tarea 2.2: Documentar las diferencias entre las especificaciones y la implementación actual, incluyendo funcionalidades faltantes o
-         incompletas.
-       * Tarea 2.3: Evaluar la conformidad con el stack tecnológico, los flujos de usuario, el modelo de negocio y los estándares de calidad.
-       * Tarea 2.4: Crear un plan de refactorización y desarrollo priorizado.
-
-   * Fase 3: Ejecución (Refactorización y Desarrollo).
-       * Tarea 3.1: Corregir los problemas identificados, desde la reorganización estructural hasta la implementación de funcionalidades
-         faltantes.
-       * Tarea 3.2: Optimizar el código, eliminar dependencias innecesarias y mejorar la eficiencia.
-
-   * Fase 4: Pruebas y Verificación.
-       * Tarea 4.1: Desarrollar y ejecutar pruebas unitarias (Vitest) para componentes y lógica de negocio críticos.
-       * Tarea 4.2: Desarrollar y ejecutar pruebas de integración E2E (Playwright) para los flujos de usuario principales.
-       * Tarea 4.3: Ejecutar todas las pruebas de forma masiva para asegurar la estabilidad de la aplicación.
-
-   * Fase 5: Preparación para Producción.
-       * Tarea 5.1: Realizar una build de producción y solucionar cualquier error.
-       * Tarea 5.2: Verificar la configuración de las variables de entorno.
-       * Tarea 5.3: Confirmar que la aplicación está lista para el despliegue.
-
-
-
-
- Plan de Trabajo Detallado y Priorizado
-
-  Para alinear el proyecto con las especificaciones y asegurar su calidad, se ejecutará el siguiente plan de acción. Las tareas se ordenan
-  por prioridad, abordando primero los problemas estructurales más críticos.
-
-  Fase I: Refactorización y Estandarización del Frontend (Prioridad Máxima)
-
-   1. Tarea F1: Estandarizar el Framework de Pruebas. (ok)
-       * Acción: Eliminar Jest y todas sus dependencias (jest, babel-jest, ts-jest, @testing-library/jest-dom, etc.) del package.json.
-       * Acción: Configurar Vitest como el único corredor de pruebas unitarias. Migrar cualquier prueba existente en __tests__ a la sintaxis de Vitest.
-       * Justificación: Unifica el stack, reduce la complejidad y cumple con las especificaciones.
-
-   2. Tarea F2: Consolidar la Arquitectura de Enrutamiento. (ok)
-       * Acción: Auditar el contenido de los directorios pages y app.
-       * Acción: Planificar y ejecutar la migración completa de toda la funcionalidad del directorio pages al App Router (app).
-       * Acción: Eliminar el directorio pages una vez completada la migración.
-       * Justificación: Resuelve la principal fuente de inconsistencia arquitectónica y alinea el proyecto con las prácticas modernas de Next.js.
-
-   3. Tarea F3: Depurar y Corregir Dependencias. (ok)
-       * Acción: Mover zod de devDependencies a dependencies.
-       * Acción: Eliminar la librería redundante jsonwebtoken.
-       * Acción: Investigar el uso de firebase-admin, nodemailer, xlsx y node-telegram-bot-api. Documentar su propósito y decidir si se mantienen, reemplazan o eliminan.
-       * Justificación: Reduce el tamaño del proyecto, mejora la seguridad y asegura que el build de producción no falle.
-
-  Fase II: Auditoría Funcional y Desarrollo de Backend/Frontend
-
-   4. Tarea B1: Verificar Arquitectura de Base de Datos.(ok)
-       * Acción: Leer el schema.prisma principal y los schemas secundarios en armonia-backend/prisma/ para confirmar que la arquitectura multi-schema está implementada correctamente.
-       * Justificación: Asegura que la base de la persistencia de datos es correcta antes de auditar la lógica de negocio.
-
-   5. Tarea C1: Auditoría y Ajuste de Flujos Críticos.
-       * Acción: Revisar y ajustar la implementación de la Landing Page (src/app/public/landing o similar) para asegurar que cumple con los requisitos de conversión y contenido.
-       * Acción: Auditar el flujo de Autenticación (src/app/auth, middleware.ts) para asegurar que usa next-auth de forma correcta y segura.
-       * Acción: Auditar y completar los módulos principales uno por uno (Marketplace, Financiero, Portafolio, etc.), asegurando la correcta
-         interacción frontend-backend.
-
-  Fase III: Calidad, Pruebas y Preparación para Producción
-
-   6. Tarea Q1: Implementar Pruebas.
-       * Acción: Desarrollar pruebas unitarias (Vitest) para los componentes y la lógica de negocio más crítica del frontend.
-       * Acción: Desarrollar pruebas E2E (Playwright) para los flujos de usuario completos (registro, pago, reserva, etc.).
-       * Acción: Ejecutar todas las suites de pruebas (backend y frontend) para garantizar la estabilidad.
-
-   7. Tarea P1: Despliegue.
-       * Acción: Ejecutar el script build y solucionar cualquier error.
-       * Acción: Verificar la configuración de variables de entorno para producción.
-       * Acción: Generar un informe final de conformidad.
-
-  Comenzaré la ejecución del plan de trabajo con la Tarea F1. Procedo a modificar el package.json para eliminar Jest y sus dependencias.De
-  acuerdo. Procedo con la Tarea F1: Estandarizar el Framework de Pruebas.
-next-intl lo desintlo al itentar arrancar la aplicación
 
 Iniciar la aplicación: Ejecutar tsx server.ts & en segundo plano.
 Ejecutar pruebas Playwright: Ejecutar npx playwright test.
 Detener la aplicación: Una vez que las pruebas finalicen, detener el proceso del servidor.
+
+
+Interacciones solo en español. Actúa como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas. Está en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales están en la carpeta docs. Su tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto, a partir de esa comparación, debe generar un informe que incluya: un resumen funcional, técnico y de estilo del estado actual; una lista clara de diferencias entre las funcionalidades especificadas y lo implementado, identificación de funcionalidades faltantes, incompletas o que deban ajustarse. Evalúa especialmente que cumpla estrictamente con lo definido en la s especificaciones tanto técnica como el detalle funcional, evalúa la adopción del modelo de negocio incluyendo el plan empresarial, y el uso del modulo de democracia digital para que pueda ser usado integrado y de forma independiente. Evalúa si se están aplicando estándares modernos de calidad, accesibilidad, rendimiento, seguridad y mantenibilidad. Si se detectan problemas, realiza las correcciones. Verifica si es conveniente eliminar dependencias o funciones innecesarias, optimizar estructuras para mejorar eficiencia.si se requiere desarrollar desde cero respeta el estilo del proyecto. Evita proponer múltiples alternativas para una misma solución salvo que se indique lo contrario. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto al 100% y lograr el objetivo del despliegue a producción. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones técnicas en docs y luego continuas sistemáticamente con lo solicitado. 
 
 
 

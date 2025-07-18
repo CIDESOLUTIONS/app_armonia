@@ -1,21 +1,30 @@
 import { fetchApi } from "@/lib/api";
 
-export const getPortfolioMetrics = async () => {
-  try {
-    const response = await fetchApi("/portfolio/metrics");
-    return response;
-  } catch (error) {
-    console.error("Error fetching portfolio metrics:", error);
-    throw error;
-  }
-};
+export interface PortfolioMetric {
+  totalProperties: number;
+  totalResidents: number;
+  totalPendingFees: number;
+  totalIncome: number;
+  totalOpenPqrs: number;
+  totalBudgetsApproved: number;
+  totalExpenses: number;
+}
 
-export const getComplexMetrics = async () => {
-  try {
-    const response = await fetchApi("/portfolio/complexes");
-    return response;
-  } catch (error) {
-    console.error("Error fetching complex metrics:", error);
-    throw error;
-  }
-};
+export interface ComplexMetric {
+  id: number;
+  name: string;
+  residents: number;
+  pendingFees: number;
+  income: number;
+  openPqrs: number;
+  budgetApproved: number;
+  expenses: number;
+}
+
+export async function getPortfolioMetrics(): Promise<PortfolioMetric> {
+  return fetchApi("/portfolio/metrics");
+}
+
+export async function getComplexMetrics(): Promise<ComplexMetric[]> {
+  return fetchApi("/portfolio/complex-metrics");
+}
