@@ -63,7 +63,7 @@ export default function ResidentSidebar({
     {
       icon: <BarChart2 className="w-6 h-6" />,
       label: language === "Español" ? "Dashboard" : "Dashboard",
-      path: "/resident/dashboard",
+      path: "/resident-portal/dashboard",
     },
     {
       icon: <Home className="w-6 h-6" />,
@@ -74,19 +74,19 @@ export default function ResidentSidebar({
             language === "Español"
               ? "Información General"
               : "General Information",
-          path: "/resident/property",
+          path: "/resident-portal/property",
         },
         {
           label: language === "Español" ? "Familia" : "Family",
-          path: "/resident/property/family",
+          path: "/resident-portal/property/family",
         },
         {
           label: language === "Español" ? "Vehículos" : "Vehicles",
-          path: "/resident/property/vehicles",
+          path: "/resident-portal/property/vehicles",
         },
         {
           label: language === "Español" ? "Mascotas" : "Pets",
-          path: "/resident/property/pets",
+          path: "/resident-portal/property/pets",
         },
       ],
     },
@@ -96,20 +96,20 @@ export default function ResidentSidebar({
       subitems: [
         {
           label: language === "Español" ? "Estado de Cuenta" : "Account Status",
-          path: "/resident/payments/status",
+          path: "/resident-portal/payments/status",
         },
         {
           label:
             language === "Español" ? "Historial de Pagos" : "Payment History",
-          path: "/resident/payments/history",
+          path: "/resident-portal/payments/history",
         },
         {
           label: language === "Español" ? "Realizar Pago" : "Make Payment",
-          path: "/resident/financial",
+          path: "/resident-portal/financial",
         },
         {
           label: language === "Español" ? "Presupuesto Familiar" : "Family Budget",
-          path: "/resident/personal-finances",
+          path: "/resident-portal/personal-finances",
         },
       ],
     },
@@ -122,22 +122,22 @@ export default function ResidentSidebar({
       subitems: [
         {
           label: language === "Español" ? "Disponibilidad" : "Availability",
-          path: "/resident/services",
+          path: "/resident-portal/services",
         },
         {
           label: language === "Español" ? "Mis Reservas" : "My Reservations",
-          path: "/resident/services/my-reservations",
+          path: "/resident-portal/services/my-reservations",
         },
         {
           label: language === "Español" ? "Nueva Reserva" : "New Reservation",
-          path: "/resident/services/new-reservation",
+          path: "/resident-portal/services/new-reservation",
         },
       ],
     },
     {
       icon: <Calendar className="w-6 h-6" />,
       label: language === "Español" ? "Asambleas" : "Assemblies",
-      path: "/resident/assemblies",
+      path: "/resident-portal/assemblies",
     },
     {
       icon: <AlertCircle className="w-6 h-6" />,
@@ -145,11 +145,11 @@ export default function ResidentSidebar({
       subitems: [
         {
           label: language === "Español" ? "Mis Solicitudes" : "My Requests",
-          path: "/resident/pqr",
+          path: "/resident-portal/pqr",
         },
         {
           label: language === "Español" ? "Nueva Solicitud" : "New Request",
-          path: "/resident/pqr/new",
+          path: "/resident-portal/pqr/new",
         },
       ],
     },
@@ -159,22 +159,22 @@ export default function ResidentSidebar({
       subitems: [
         {
           label: language === "Español" ? "Anuncios" : "Announcements",
-          path: "/resident/communications",
+          path: "/resident-portal/communications",
         },
         {
           label: language === "Español" ? "Mensajes" : "Messages",
-          path: "/resident/communications/messages",
+          path: "/resident-portal/communications/messages",
         },
         {
           label: language === "Español" ? "Contactos" : "Contacts",
-          path: "/resident/communications/contacts",
+          path: "/resident-portal/communications/contacts",
         },
       ],
     },
     {
       icon: <User className="w-6 h-6" />,
       label: language === "Español" ? "Mi Perfil" : "My Profile",
-      path: "/resident/profile",
+      path: "/resident-portal/profile",
     },
   ];
 

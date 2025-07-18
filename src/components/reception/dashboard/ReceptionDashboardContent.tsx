@@ -328,7 +328,7 @@ export function ReceptionDashboardContent() {
               ))}
             </div>
             <div className="mt-4 pt-4 border-t">
-              <Link href="/reception/activity">
+              <Link href="/reception-portal/activity">
                 <Button variant="outline" size="sm" className="w-full">
                   Ver toda la actividad
                 </Button>
@@ -343,7 +343,7 @@ export function ReceptionDashboardContent() {
             <CardTitle>Acciones Rápidas</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Link href="/reception/visitors/register">
+            <Link href="/reception-portal/visitors/register">
               <Button
                 variant="outline"
                 size="sm"
@@ -353,7 +353,7 @@ export function ReceptionDashboardContent() {
                 Registrar Visitante
               </Button>
             </Link>
-            <Link href="/reception/packages/register">
+            <Link href="/reception-portal/packages/register">
               <Button
                 variant="outline"
                 size="sm"
@@ -363,7 +363,7 @@ export function ReceptionDashboardContent() {
                 Registrar Paquete
               </Button>
             </Link>
-            <Link href="/reception/incidents/create">
+            <Link href="/reception-portal/incidents/create">
               <Button
                 variant="outline"
                 size="sm"
@@ -373,7 +373,7 @@ export function ReceptionDashboardContent() {
                 Reportar Incidente
               </Button>
             </Link>
-            <Link href="/reception/intercom">
+            <Link href="/reception-portal/intercom">
               <Button
                 variant="outline"
                 size="sm"
@@ -383,7 +383,7 @@ export function ReceptionDashboardContent() {
                 Citofonía Virtual
               </Button>
             </Link>
-            <Link href="/reception/minuta">
+            <Link href="/reception-portal/minuta">
               <Button
                 variant="outline"
                 size="sm"
