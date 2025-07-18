@@ -1,4 +1,5 @@
 import { fetchApi } from "@/lib/api";
+import { PaymentGatewayConfigDto, CreatePaymentGatewayDto, UpdatePaymentGatewayDto } from "../../armonia-backend/src/common/dto/payment-gateways.dto";
 
 interface FinanceSummary {
   totalIngresos: number;
@@ -7,16 +8,18 @@ interface FinanceSummary {
   cuotasPendientes: number;
 }
 
-interface FinancialTransaction {
+// Updated FinancialTransaction interface to match PaymentDto
+export interface FinancialTransaction {
   id: number;
   amount: number;
   date: string;
   method: string;
   reference: string;
-  receiptNumber: string;
-  feeId: number;
+  receiptNumber?: string; // Optional as it might not always be present
+  feeId?: number; // Optional
   propertyId: number;
   createdBy: number;
+  // Add any other fields from PaymentDto if necessary
 }
 
 interface ReconciliationSuggestion {
@@ -200,6 +203,54 @@ export async function approveReconciliation(suggestion: ReconciliationSuggestion
     return response;
   } catch (error) {
     console.error("Error approving reconciliation:", error);
+    throw error;
+  }
+}
+
+// Functions for Payment Gateway Management
+export async function getPaymentGatewaysConfig(): Promise<PaymentGatewayConfigDto[]> {
+  try {
+    const response = await fetchApi("/payment-gateways");
+    return response;
+  } catch (error) {
+    console.error("Error fetching payment gateways config:", error);
+    throw error;
+  }
+}
+
+export async function createPaymentGatewayConfig(config: CreatePaymentGatewayDto): Promise<PaymentGatewayConfigDto> {
+  try {
+    const response = await fetchApi("/payment-gateways", {
+      method: "POST",
+      body: JSON.stringify(config),
+    });
+    return response;
+  } catch (error) {
+    console.error("Error creating payment gateway config:", error);
+    throw error;
+  }
+}
+
+export async function updatePaymentGatewayConfig(id: number, config: UpdatePaymentGatewayDto): Promise<PaymentGatewayConfigDto> {
+  try {
+    const response = await fetchApi(`/payment-gateways/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(config),
+    });
+    return response;
+  } catch (error) {
+    console.error("Error updating payment gateway config:", error);
+    throw error;
+  }
+}
+
+export async function deletePaymentGatewayConfig(id: number): Promise<void> {
+  try {
+    await fetchApi(`/payment-gateways/${id}`, {
+      method: "DELETE",
+    });
+  } catch (error) {
+    console.error("Error deleting payment gateway config:", error);
     throw error;
   }
 }

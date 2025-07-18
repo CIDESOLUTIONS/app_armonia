@@ -10,12 +10,28 @@ import {
   CreateVoteDto,
   SubmitVoteDto,
 } from '../common/dto/assembly.dto';
+import { ServerLogger } from '../common/logging/server-logger'; // Adjusted path
+import { ActivityLogger } from '../common/logging/activity-logger'; // Adjusted path
+import { WebSocketService } from '../communications/websocket.service'; // Adjusted path
+import { DigitalSignatureService } from '../common/services/digital-signature.service'; // Adjusted path
+import {
+  notifyAssemblyConvocation,
+  notifyQuorumReached,
+  notifyVotingOpened,
+  notifyVotingClosed,
+  notifyAssemblyEnded,
+  notifyMinutesAvailable,
+} from '../communications/integrations/assembly-notifications'; // Adjusted path
+import { generatePdf } from '../common/services/pdf.service'; // Adjusted path
 
 @Injectable()
 export class AssemblyService {
   constructor(
     private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
+    private activityLogger: ActivityLogger,
+    private wsService: WebSocketService,
+    private signatureService: DigitalSignatureService,
   ) {}
 
   private getTenantPrismaClient(schemaName: string) {
@@ -25,11 +41,44 @@ export class AssemblyService {
   async createAssembly(
     schemaName: string,
     data: CreateAssemblyDto,
+    userId: number,
   ): Promise<AssemblyDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    return prisma.assembly.create({
-      data: { ...data, status: AssemblyStatus.SCHEDULED },
-    });
+    try {
+      const realtimeChannel = `assembly-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+      const assembly = await prisma.assembly.create({
+        data: {
+          ...data,
+          status: AssemblyStatus.SCHEDULED,
+          realtimeChannel,
+          createdBy: userId,
+        },
+      });
+
+      await this.activityLogger.logActivity({
+        userId,
+        action: "CREATE_ASSEMBLY",
+        resourceType: "ASSEMBLY",
+        resourceId: assembly.id,
+        details: {
+          title: assembly.title,
+          date: assembly.scheduledDate,
+        },
+      });
+
+      await notifyAssemblyConvocation(
+        assembly.id,
+        assembly.title,
+        assembly.scheduledDate,
+        assembly.location,
+      );
+
+      return assembly;
+    } catch (error) {
+      ServerLogger.error("Error al crear asamblea avanzada:", error);
+      throw error;
+    }
   }
 
   async getAssemblies(schemaName: string): Promise<AssemblyDto[]> {
@@ -64,172 +113,655 @@ export class AssemblyService {
     schemaName: string,
     assemblyId: number,
     userId: number,
-    present: boolean,
+    unitId: number,
+    options: any = {},
   ): Promise<any> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    // Register attendance
-    await prisma.attendance.upsert({
-      where: { userId_assemblyId: { userId, assemblyId } },
-      update: { present },
-      create: { userId, assemblyId, present },
-    });
-
-    // Update current attendance count
-    const currentAttendance = await prisma.attendance.count({
-      where: { assemblyId, present: true },
-    });
-
-    // Assuming Assembly model has a field like `totalRegisteredAttendees` for quorum calculation
-    const assembly = await prisma.assembly.findUnique({
-      where: { id: assemblyId },
-    });
-    if (!assembly) {
-      throw new NotFoundException(
-        `Asamblea con ID ${assemblyId} no encontrada.`,
-      );
-    }
-
-    const quorumMet = this.calculateQuorum(
-      currentAttendance,
-      assembly.totalRegisteredAttendees,
-    ); // Assuming totalRegisteredAttendees exists
-
-    await prisma.assembly.update({
-      where: { id: assemblyId },
-      data: { currentAttendance, quorumMet },
-    });
-
-    console.log(
-      `Usuario ${userId} ${present ? 'presente' : 'ausente'} en asamblea ${assemblyId}. Quórum: ${quorumMet}`,
-    );
-    return { message: 'Asistencia registrada', currentAttendance, quorumMet };
-  }
-
-  private calculateQuorum(
-    currentAttendance: number,
-    totalRegisteredAttendees: number,
-  ): boolean {
-    // Example quorum logic: 50% + 1 of total registered attendees
-    const requiredQuorum = Math.floor(totalRegisteredAttendees / 2) + 1;
-    return currentAttendance >= requiredQuorum;
-  }
-
-  // Lógica de votaciones (placeholder)
-  async createVote(schemaName: string, data: CreateVoteDto): Promise<any> {
-    const prisma = this.getTenantPrismaClient(schemaName);
-    const vote = await prisma.vote.create({
-      data: {
-        assemblyId: data.assemblyId,
-        question: data.question,
-        isWeighted: data.isWeighted,
-        options: {
-          create: data.options.map(optionText => ({ value: optionText }))
-        },
-        isActive: true,
-      },
-    });
-    return vote;
-  }
-
-  async submitVote(schemaName: string, data: SubmitVoteDto): Promise<any> {
-    const prisma = this.getTenantPrismaClient(schemaName);
-    // Aquí se registraría el voto del usuario con su ponderación
-    return prisma.userVote.create({
-      data: {
-        voteId: data.voteId,
-        optionId: data.optionId,
-        userId: data.userId,
-        weight: data.weight,
-      },
-    });
-  }
-
-  async getVoteResults(schemaName: string, voteId: number): Promise<any> {
-    const prisma = this.getTenantPrismaClient(schemaName);
-    const vote = await prisma.vote.findUnique({
-      where: { id: voteId },
-      include: {
-        options: true,
-        userVotes: true,
-      },
-    });
-
-    if (!vote) {
-      throw new NotFoundException(`Votación con ID ${voteId} no encontrada.`);
-    }
-
-    const results: { [optionId: number]: { value: string; totalWeight: number } } = {};
-    vote.options.forEach(option => {
-      results[option.id] = { value: option.value, totalWeight: 0 };
-    });
-
-    vote.userVotes.forEach(userVote => {
-      if (results[userVote.optionId]) {
-        results[userVote.optionId].totalWeight += userVote.weight;
+    try {
+      if (!assemblyId || !userId || !unitId) {
+        throw new Error(
+          "Se requieren ID de asamblea, usuario y unidad para registrar asistencia",
+        );
       }
-    });
 
-    return { voteId, question: vote.question, results: Object.values(results) };
+      const assembly = await prisma.assembly.findUnique({
+        where: { id: assemblyId },
+      });
+
+      if (!assembly) {
+        ServerLogger.warn(`Asamblea no encontrada: ${assemblyId}`);
+        throw new NotFoundException("Asamblea no encontrada");
+      }
+
+      if (assembly.status !== AssemblyStatus.IN_PROGRESS && assembly.status !== AssemblyStatus.SCHEDULED) {
+        ServerLogger.warn(
+          `Intento de registro en asamblea no activa: ${assemblyId} (estado: ${assembly.status})`,
+        );
+        throw new Error(
+          `La asamblea no está en progreso (estado actual: ${assembly.status})`,
+        );
+      }
+
+      const unit = await prisma.unit.findUnique({
+        where: { id: unitId },
+        include: {
+          owners: true,
+          delegates: true,
+        },
+      });
+
+      if (!unit) {
+        ServerLogger.warn(`Unidad no encontrada: ${unitId}`);
+        throw new NotFoundException("Unidad no encontrada");
+      }
+
+      const isOwner = unit.owners.some((owner: any) => owner.id === userId);
+      const isDelegate = unit.delegates.some(
+        (delegate: any) => delegate.id === userId,
+      );
+
+      if (!isOwner && !isDelegate && !options.override) {
+        ServerLogger.warn(
+          `Usuario ${userId} no autorizado para asistir por unidad ${unitId}`,
+        );
+        throw new Error("Usuario no autorizado para asistir por esta unidad");
+      }
+
+      const existingAttendance = await prisma.assemblyAttendance.findFirst(
+        {
+          where: {
+            assemblyId,
+            unitId,
+          },
+        },
+      );
+
+      if (existingAttendance) {
+        ServerLogger.warn(
+          `Ya existe registro de asistencia para unidad ${unitId} en asamblea ${assemblyId}`,
+        );
+
+        if (existingAttendance.userId !== userId || options.updateExisting) {
+          const updatedAttendance = await prisma.assemblyAttendance.update(
+            {
+              where: { id: existingAttendance.id },
+              data: {
+                userId,
+                checkInTime: options.checkInTime || new Date(),
+                notes: existingAttendance.notes,
+                updatedAt: new Date(),
+              },
+            },
+          );
+
+          ServerLogger.info(
+            `Registro de asistencia actualizado para unidad ${unitId} en asamblea ${assemblyId}`,
+          );
+
+          // this.notifyAttendanceChange(assembly, updatedAttendance, "updated");
+
+          return updatedAttendance;
+        }
+
+        return existingAttendance;
+      }
+
+      const attendance = await prisma.assemblyAttendance.create({
+        data: {
+          assemblyId,
+          userId,
+          unitId,
+          checkInTime: options.checkInTime || new Date(),
+          notes: options.notes || "",
+          proxyName: options.proxyName || null,
+          proxyDocument: options.proxyDocument || null,
+          isDelegate: isDelegate,
+          isOwner: isOwner,
+        },
+      });
+
+      ServerLogger.info(
+        `Registrada asistencia para unidad ${unitId} en asamblea ${assemblyId}`,
+      );
+
+      // this.notifyAttendanceChange(assembly, attendance, "registered");
+
+      const quorum = await this.calculateQuorum(schemaName, assemblyId);
+
+      // this.broadcastQuorumUpdate(assemblyId, quorum);
+
+      return attendance;
+    } catch (error: any) {
+      ServerLogger.error(`Error al registrar asistencia: ${error.message}`);
+      throw error;
+    }
   }
 
-  // Lógica de actas (placeholder)
+  async calculateQuorum(schemaName: string, assemblyId: number): Promise<any> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    try {
+      if (!assemblyId) {
+        throw new Error("Se requiere un ID de asamblea para calcular quórum");
+      }
+
+      const assembly = await prisma.assembly.findUnique({
+        where: { id: assemblyId },
+        include: {
+          attendees: true,
+          property: {
+            include: {
+              units: true,
+            },
+          },
+        },
+      });
+
+      if (!assembly) {
+        ServerLogger.warn(`Asamblea no encontrada: ${assemblyId}`);
+        return null;
+      }
+
+      const totalCoefficients = assembly.property.units.reduce(
+        (sum: number, unit: any) => sum + (unit.coefficient || 0),
+        0,
+      );
+
+      const presentCoefficients = assembly.attendees.reduce(
+        (sum: number, attendee: any) => {
+          const unit = assembly.property.units.find(
+            (u: any) => u.id === attendee.unitId,
+          );
+          return sum + (unit ? unit.coefficient || 0 : 0);
+        },
+        0,
+      );
+
+      const quorumPercentage =
+        totalCoefficients > 0
+          ? (presentCoefficients / totalCoefficients) * 100
+          : 0;
+
+      const requiredQuorum = assembly.requiredQuorum || 50;
+      const quorumReached = quorumPercentage >= requiredQuorum;
+
+      const result = {
+        assemblyId,
+        totalUnits: assembly.property.units.length,
+        presentUnits: assembly.attendees.length,
+        totalCoefficients,
+        presentCoefficients,
+        quorumPercentage,
+        requiredQuorum,
+        quorumReached,
+        timestamp: new Date().toISOString(),
+      };
+
+      ServerLogger.info(
+        `Quórum calculado para asamblea ${assemblyId}: ${quorumPercentage.toFixed(2)}% (requerido: ${requiredQuorum}%)`,
+      );
+      return result;
+    } catch (error: any) {
+      ServerLogger.error(
+        `Error al calcular quórum para asamblea ${assemblyId}: ${error.message}`,
+      );
+      throw error;
+    }
+  }
+
+  async createVote(
+    schemaName: string,
+    assemblyId: number,
+    voteData: any,
+  ): Promise<any> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    try {
+      if (!assemblyId) {
+        throw new Error("Se requiere un ID de asamblea para crear votación");
+      }
+
+      if (!voteData || !voteData.title || !voteData.description) {
+        throw new Error("Datos de votación incompletos");
+      }
+
+      const assembly = await prisma.assembly.findUnique({
+        where: { id: assemblyId },
+      });
+
+      if (!assembly) {
+        ServerLogger.warn(`Asamblea no encontrada: ${assemblyId}`);
+        throw new NotFoundException("Asamblea no encontrada");
+      }
+
+      if (assembly.status !== AssemblyStatus.IN_PROGRESS) {
+        ServerLogger.warn(
+          `Intento de crear votación en asamblea no activa: ${assemblyId} (estado: ${assembly.status})`,
+        );
+        throw new Error(
+          `La asamblea no está en progreso (estado actual: ${assembly.status})`,
+        );
+      }
+
+      const vote = await prisma.assemblyVote.create({
+        data: {
+          assemblyId,
+          title: voteData.title,
+          description: voteData.description,
+          options: voteData.options || ["A favor", "En contra", "Abstención"],
+          startTime: voteData.startTime || new Date(),
+          endTime: voteData.endTime || null,
+          status: "ACTIVE",
+          weightedVoting:
+            voteData.weightedVoting !== undefined
+              ? voteData.weightedVoting
+              : true,
+          createdBy: voteData.createdBy || "system",
+        },
+      });
+
+      ServerLogger.info(`Creada votación ${vote.id} para asamblea ${assemblyId}`);
+
+      // this.broadcastVoteCreation(vote, assembly);
+
+      return vote;
+    } catch (error: any) {
+      ServerLogger.error(`Error al crear votación: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async castVote(
+    schemaName: string,
+    voteId: number,
+    userId: number,
+    unitId: number,
+    option: string,
+  ): Promise<any> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    try {
+      if (!voteId || !userId || !unitId || !option) {
+        throw new Error(
+          "Se requieren ID de votación, usuario, unidad y opción para registrar voto",
+        );
+      }
+
+      const vote = await prisma.assemblyVote.findUnique({
+        where: { id: voteId },
+        include: {
+          assembly: true,
+        },
+      });
+
+      if (!vote) {
+        ServerLogger.warn(`Votación no encontrada: ${voteId}`);
+        throw new NotFoundException("Votación no encontrada");
+      }
+
+      if (vote.status !== "ACTIVE") {
+        ServerLogger.warn(
+          `Intento de votar en votación no activa: ${voteId} (estado: ${vote.status})`,
+        );
+        throw new Error(
+          `La votación no está activa (estado actual: ${vote.status})`,
+        );
+      }
+
+      if (!vote.options.includes(option)) {
+        ServerLogger.warn(`Opción de voto inválida: ${option}`);
+        throw new Error("Opción de voto inválida");
+      }
+
+      const attendance = await prisma.assemblyAttendance.findFirst({
+        where: {
+          assemblyId: vote.assemblyId,
+          unitId,
+          userId,
+        },
+      });
+
+      if (!attendance) {
+        ServerLogger.warn(
+          `Usuario ${userId} no registrado como asistente para unidad ${unitId}`,
+        );
+        throw new Error(
+          "Usuario no registrado como asistente para esta unidad",
+        );
+      }
+
+      const existingVote = await prisma.assemblyVoteRecord.findFirst({
+        where: {
+          voteId,
+          unitId,
+        },
+      });
+
+      if (existingVote) {
+        ServerLogger.warn(
+          `Ya existe un voto para unidad ${unitId} en votación ${voteId}`,
+        );
+
+        const updatedVote = await prisma.assemblyVoteRecord.update({
+          where: { id: existingVote.id },
+          data: {
+            userId,
+            option,
+            updatedAt: new Date(),
+          },
+        });
+
+        ServerLogger.info(
+          `Voto actualizado para unidad ${unitId} en votación ${voteId}`,
+        );
+
+        // this.notifyVoteChange(vote, updatedVote, "updated");
+
+        return updatedVote;
+      }
+
+      let coefficient = 1;
+
+      if (vote.weightedVoting) {
+        const unit = await prisma.unit.findUnique({
+          where: { id: unitId },
+        });
+
+        coefficient = unit ? unit.coefficient || 1 : 1;
+      }
+
+      const voteRecord = await prisma.assemblyVoteRecord.create({
+        data: {
+          voteId,
+          userId,
+          unitId,
+          option,
+          coefficient,
+          timestamp: new Date(),
+        },
+      });
+
+      ServerLogger.info(
+        `Registrado voto para unidad ${unitId} en votación ${voteId}`,
+      );
+
+      // this.notifyVoteChange(vote, voteRecord, "cast");
+
+      const results = await this.calculateVoteResults(schemaName, voteId);
+
+      // this.broadcastVoteResults(voteId, results);
+
+      return voteRecord;
+    } catch (error: any) {
+      ServerLogger.error(`Error al registrar voto: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async calculateVoteResults(
+    schemaName: string,
+    voteId: number,
+  ): Promise<any> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    try {
+      if (!voteId) {
+        throw new Error(
+          "Se requiere un ID de votación para calcular resultados",
+        );
+      }
+
+      const vote = await prisma.assemblyVote.findUnique({
+        where: { id: voteId },
+      });
+
+      if (!vote) {
+        ServerLogger.warn(`Votación no encontrada: ${voteId}`);
+        return null;
+      }
+
+      const voteRecords = await prisma.assemblyVoteRecord.findMany({
+        where: { voteId },
+      });
+
+      const results: any = {
+        voteId,
+        title: vote.title,
+        totalVotes: voteRecords.length,
+        totalWeight: 0,
+        options: {},
+        timestamp: new Date().toISOString(),
+      };
+
+      vote.options.forEach((option: string) => {
+        results.options[option] = {
+          count: 0,
+          weight: 0,
+          percentage: 0,
+        };
+      });
+
+      voteRecords.forEach((record: any) => {
+        const option = record.option;
+        if (results.options[option]) {
+          results.options[option].count++;
+          results.options[option].weight += record.coefficient || 1;
+          results.totalWeight += record.coefficient || 1;
+        }
+      });
+
+      if (results.totalWeight > 0) {
+        Object.keys(results.options).forEach((option: string) => {
+          results.options[option].percentage =
+            (results.options[option].weight / results.totalWeight) * 100;
+        });
+      }
+
+      ServerLogger.info(`Resultados calculados para votación ${voteId}`);
+      return results;
+    } catch (error: any) {
+      ServerLogger.error(
+        `Error al calcular resultados de votación ${voteId}: ${error.message}`,
+      );
+      throw error;
+    }
+  }
+
+  async endVote(
+    schemaName: string,
+    voteId: number,
+  ): Promise<any> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    try {
+      if (!voteId) {
+        throw new Error("Se requiere un ID de votación para finalizar");
+      }
+
+      const vote = await prisma.assemblyVote.findUnique({
+        where: { id: voteId },
+      });
+
+      if (!vote) {
+        ServerLogger.warn(`Votación no encontrada: ${voteId}`);
+        throw new NotFoundException("Votación no encontrada");
+      }
+
+      if (vote.status !== "ACTIVE") {
+        ServerLogger.warn(
+          `Intento de finalizar votación no activa: ${voteId} (estado: ${vote.status})`,
+        );
+        throw new Error(
+          `La votación no está activa (estado actual: ${vote.status})`,
+        );
+      }
+
+      const updatedVote = await prisma.assemblyVote.update({
+        where: { id: voteId },
+        data: {
+          status: "COMPLETED",
+          endTime: new Date(),
+        },
+      });
+
+      ServerLogger.info(`Finalizada votación ${voteId}`);
+
+      const results = await this.calculateVoteResults(schemaName, voteId);
+
+      await prisma.assemblyVote.update({
+        where: { id: voteId },
+        data: {
+          results: results,
+        },
+      });
+
+      // this.broadcastVoteEnd(updatedVote, results);
+
+      return {
+        vote: updatedVote,
+        results,
+      };
+    } catch (error: any) {
+      ServerLogger.error(`Error al finalizar votación ${voteId}: ${error.message}`);
+      throw error;
+    }
+  }
+
   async generateMeetingMinutes(
     schemaName: string,
     assemblyId: number,
   ): Promise<Buffer> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    const assembly = await prisma.assembly.findUnique({
-      where: { id: assemblyId },
-      include: {
-        votes: { include: { options: true, userVotes: true } },
-        attendances: { include: { user: true } },
-      },
-    });
+    try {
+      if (!assemblyId) {
+        throw new Error("Se requiere un ID de asamblea para generar acta");
+      }
 
-    if (!assembly) {
-      throw new NotFoundException(`Asamblea con ID ${assemblyId} no encontrada.`);
-    }
+      const assembly = await prisma.assembly.findUnique({
+        where: { id: assemblyId },
+        include: {
+          property: true,
+          attendees: {
+            include: {
+              user: true,
+              unit: true,
+            },
+          },
+          votes: {
+            include: {
+              voteRecords: true,
+            },
+          },
+          topics: true,
+        },
+      });
 
-    const doc = new PDFDocument();
-    const buffers: Buffer[] = [];
-    doc.on('data', buffers.push.bind(buffers));
-    doc.on('end', () => resolve(Buffer.concat(buffers)));
+      if (!assembly) {
+        ServerLogger.warn(`Asamblea no encontrada: ${assemblyId}`);
+        throw new NotFoundException("Asamblea no encontrada");
+      }
 
-    doc.fontSize(20).text(`Acta de Asamblea: ${assembly.title}`, { align: 'center' });
-    doc.fontSize(12).text(`Fecha: ${assembly.scheduledDate.toLocaleDateString()}`, { align: 'center' });
-    doc.fontSize(12).text(`Lugar: ${assembly.location}`, { align: 'center' });
-    doc.moveDown();
+      const quorum = await this.calculateQuorum(schemaName, assemblyId);
 
-    doc.fontSize(16).text('Descripción:');
-    doc.fontSize(12).text(assembly.description);
-    doc.moveDown();
+      const minutesData = {
+        assemblyId,
+        title: `Acta de Asamblea: ${assembly.title}`,
+        date: assembly.scheduledDate,
+        location: assembly.location,
+        property: assembly.property.name,
+        quorum: quorum,
+        attendees: assembly.attendees.map((a: any) => ({
+          name: `${a.user.firstName} ${a.user.lastName}`,
+          unit: a.unit.name,
+          coefficient: a.unit.coefficient || 0,
+          checkInTime: a.checkInTime,
+        })),
+        topics: assembly.topics.map((t: any) => ({
+          title: t.title,
+          description: t.description,
+          decisions: t.decisions || "Sin decisiones registradas",
+        })),
+        votes: assembly.votes.map((v: any) => {
+          const results: any = {};
+          v.options.forEach((option: string) => {
+            results[option] = {
+              count: 0,
+              weight: 0,
+            };
+          });
 
-    doc.fontSize(16).text('Agenda:');
-    doc.fontSize(12).text(assembly.agenda);
-    doc.moveDown();
+          v.voteRecords.forEach((record: any) => {
+            if (results[record.option]) {
+              results[record.option].count++;
+              results[record.option].weight += record.coefficient || 1;
+            }
+          });
 
-    doc.fontSize(16).text('Asistencia:');
-    assembly.attendances.forEach(attendance => {
-      doc.fontSize(12).text(`- ${attendance.user.name}: ${attendance.present ? 'Presente' : 'Ausente'}`);
-    });
-    doc.moveDown();
+          return {
+            title: v.title,
+            description: v.description,
+            options: v.options,
+            results,
+            startTime: v.startTime,
+            endTime: v.endTime || new Date(),
+          };
+        }),
+        conclusions: assembly.conclusions || "Sin conclusiones registradas",
+        generatedAt: new Date().toISOString(),
+      };
 
-    doc.fontSize(16).text('Resultados de Votaciones:');
-    for (const vote of assembly.votes) {
-      doc.fontSize(14).text(`Pregunta: ${vote.question}`);
-      const results = await this.getVoteResults(schemaName, vote.id);
-      results.results.forEach((result: any) => {
-        doc.fontSize(12).text(`  - ${result.value}: ${result.totalWeight} votos`);
+      const minutes = await prisma.assemblyMinutes.create({
+        data: {
+          assemblyId,
+          content: minutesData,
+          generatedBy: "system",
+          status: "DRAFT",
+        },
+      });
+
+      ServerLogger.info(`Acta generada para asamblea ${assemblyId}: ${minutes.id}`);
+
+      const doc = new PDFDocument();
+      const buffers: Buffer[] = [];
+      doc.on('data', buffers.push.bind(buffers));
+      doc.on('end', () => resolve(Buffer.concat(buffers)));
+
+      doc.fontSize(20).text(`Acta de Asamblea: ${assembly.title}`, { align: 'center' });
+      doc.fontSize(12).text(`Fecha: ${assembly.scheduledDate.toLocaleDateString()}`, { align: 'center' });
+      doc.fontSize(12).text(`Lugar: ${assembly.location}`, { align: 'center' });
+      doc.moveDown();
+
+      doc.fontSize(16).text('Descripción:');
+      doc.fontSize(12).text(assembly.description);
+      doc.moveDown();
+
+      doc.fontSize(16).text('Agenda:');
+      doc.fontSize(12).text(assembly.agenda);
+      doc.moveDown();
+
+      doc.fontSize(16).text('Asistencia:');
+      assembly.attendees.forEach(attendance => {
+        doc.fontSize(12).text(`- ${attendance.user.firstName} ${attendance.user.lastName}: ${attendance.unit.name} (Coef: ${attendance.unit.coefficient || 0})`);
       });
       doc.moveDown();
+
+      doc.fontSize(16).text('Resultados de Votaciones:');
+      for (const vote of assembly.votes) {
+        doc.fontSize(14).text(`Pregunta: ${vote.title}`);
+        const results = await this.calculateVoteResults(schemaName, vote.id);
+        results.options.forEach((result: any) => {
+          doc.fontSize(12).text(`  - ${result.option}: ${result.weight} votos (${result.percentage.toFixed(2)}%)`);
+        });
+        doc.moveDown();
+      }
+
+      doc.end();
+
+      return new Promise<Buffer>((resolve, reject) => {
+        doc.on('end', () => resolve(Buffer.concat(buffers)));
+        doc.on('error', reject);
+      });
+    } catch (error: any) {
+      ServerLogger.error(
+        `Error al generar acta para asamblea ${assemblyId}: ${error.message}`,
+      );
+      throw error;
     }
-
-    doc.end();
-
-    return new Promise((resolve, reject) => {
-      doc.on('end', () => resolve(Buffer.concat(buffers)));
-      doc.on('error', reject);
-    });
   }
 
   async getAssemblyQuorumStatus(
@@ -250,10 +782,8 @@ export class AssemblyService {
       where: { assemblyId, present: true },
     });
 
-    const quorumMet = this.calculateQuorum(
-      currentAttendance,
-      assembly.totalRegisteredAttendees,
-    );
+    const quorum = await this.calculateQuorum(schemaName, assemblyId);
+    const quorumMet = quorum.quorumReached;
 
     return { currentAttendance, quorumMet };
   }

@@ -6,6 +6,7 @@ import {
   DocumentDto,
   DocumentFilterParamsDto,
 } from '../common/dto/documents.dto';
+import { uploadFileToS3, deleteFileFromS3 } from '../lib/storage/s3-upload';
 
 @Injectable()
 export class DocumentsService {
@@ -21,12 +22,11 @@ export class DocumentsService {
   async uploadDocument(
     schemaName: string,
     userId: number,
-    file: any, // Cambiado a any
+    file: any,
     createDocumentDto: CreateDocumentDto,
   ): Promise<DocumentDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    // TODO: Implement actual file upload to S3 or other storage
-    const fileUrl = `https://your-s3-bucket.s3.amazonaws.com/${schemaName}/${file.originalname}`;
+    const fileUrl = await uploadFileToS3(file);
 
     const document = await prisma.document.create({
       data: {
@@ -35,8 +35,6 @@ export class DocumentsService {
         url: fileUrl,
         type: createDocumentDto.type,
         uploadedBy: userId,
-        // Assuming a relation to User model to get uploadedByName
-        // uploadedByName: user.name,
       },
     });
 
@@ -74,10 +72,9 @@ export class DocumentsService {
 
     return prisma.document.findMany({
       where,
-      skip: ((filters.page ?? 1) - 1) * (filters.limit ?? 10), // Usar ??
-      take: filters.limit ?? 10, // Usar ??
+      skip: ((filters.page ?? 1) - 1) * (filters.limit ?? 10),
+      take: filters.limit ?? 10,
       orderBy: { uploadedAt: 'desc' },
-      // include: { uploadedBy: { select: { name: true } } }, // Uncomment if User relation exists
     });
   }
 
@@ -85,7 +82,6 @@ export class DocumentsService {
     const prisma = this.getTenantPrismaClient(schemaName);
     const document = await prisma.document.findUnique({
       where: { id },
-      // include: { uploadedBy: { select: { name: true } } }, // Uncomment if User relation exists
     });
 
     if (!document) {
@@ -96,7 +92,13 @@ export class DocumentsService {
 
   async deleteDocument(schemaName: string, id: number): Promise<void> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    // TODO: Implement actual file deletion from S3 or other storage
-    await prisma.document.delete({ where: { id } });
+    const document = await prisma.document.findUnique({ where: { id } });
+
+    if (!document) {
+      throw new NotFoundException(`Documento con ID ${id} no encontrado.`);
+    }
+
+    await deleteFileFromS3(document.url); // Delete from S3
+    await prisma.document.delete({ where: { id } }); // Delete from database
   }
 }

@@ -7,9 +7,6 @@ import {
   UpdateReservationDto,
   ReservationDto,
   ReservationFilterParamsDto,
-  CreateCommonAreaDto,
-  UpdateCommonAreaDto,
-  CommonAreaDto,
   ReservationStatus,
 } from '../../common/dto/reservations.dto';
 
@@ -17,45 +14,6 @@ import {
 @Controller('reservations')
 export class ReservationsController {
   constructor(private readonly reservationsService: ReservationsService) {}
-
-  // Common Area Endpoints
-  @Post('common-areas')
-  async createCommonArea(
-    @GetUser() user: any,
-    @Body() createCommonAreaDto: CreateCommonAreaDto,
-  ): Promise<CommonAreaDto> {
-    return this.reservationsService.createCommonArea(user.schemaName, createCommonAreaDto);
-  }
-
-  @Get('common-areas')
-  async getCommonAreas(@GetUser() user: any): Promise<CommonAreaDto[]> {
-    return this.reservationsService.getCommonAreas(user.schemaName);
-  }
-
-  @Get('common-areas/:id')
-  async getCommonAreaById(
-    @GetUser() user: any,
-    @Param('id') id: string,
-  ): Promise<CommonAreaDto> {
-    return this.reservationsService.getCommonAreaById(user.schemaName, +id);
-  }
-
-  @Put('common-areas/:id')
-  async updateCommonArea(
-    @GetUser() user: any,
-    @Param('id') id: string,
-    @Body() updateCommonAreaDto: UpdateCommonAreaDto,
-  ): Promise<CommonAreaDto> {
-    return this.reservationsService.updateCommonArea(user.schemaName, +id, updateCommonAreaDto);
-  }
-
-  @Delete('common-areas/:id')
-  async deleteCommonArea(
-    @GetUser() user: any,
-    @Param('id') id: string,
-  ): Promise<void> {
-    return this.reservationsService.deleteCommonArea(user.schemaName, +id);
-  }
 
   // Reservation Endpoints
   @Post()
@@ -106,5 +64,22 @@ export class ReservationsController {
     @Param('id') id: string,
   ): Promise<void> {
     return this.reservationsService.deleteReservation(user.schemaName, +id);
+  }
+
+  @Post(':id/approve')
+  async approveReservation(
+    @GetUser() user: any,
+    @Param('id') id: string,
+  ): Promise<ReservationDto> {
+    return this.reservationsService.approveReservation(user.schemaName, +id, user.userId);
+  }
+
+  @Post(':id/reject')
+  async rejectReservation(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body('reason') reason: string,
+  ): Promise<ReservationDto> {
+    return this.reservationsService.rejectReservation(user.schemaName, +id, user.userId, reason);
   }
 }

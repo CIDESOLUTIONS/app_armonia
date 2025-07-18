@@ -1,0 +1,37 @@
+enum ParkingSpotType {
+  COVERED
+  UNCOVERED
+  VISITOR
+  DISABLED
+}
+
+enum ParkingSpotStatus {
+  AVAILABLE
+  OCCUPIED
+  RESERVED
+  MAINTENANCE
+}
+
+model ParkingSpot {
+  id            Int             @id @default(autoincrement())
+  number        String          @unique
+  type          ParkingSpotType
+  status        ParkingSpotStatus @default(AVAILABLE)
+  propertyId    Int?
+  property      Property?       @relation(fields: [propertyId], references: [id])
+  residentId    Int?
+  resident      Resident?       @relation(fields: [residentId], references: [id])
+  complexId     Int
+  complex       ResidentialComplex @relation(fields: [complexId], references: [id])
+  notes         String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@unique([complexId, number])
+  @@index([complexId])
+  @@index([propertyId])
+  @@index([residentId])
+  @@index([status])
+
+  @@schema("tenant")
+}

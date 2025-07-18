@@ -29,7 +29,7 @@ export class DocumentsController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadDocument(
     @GetUser() user: any,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: any,
     @Body() createDocumentDto: CreateDocumentDto,
   ): Promise<DocumentDto> {
     return this.documentsService.uploadDocument(

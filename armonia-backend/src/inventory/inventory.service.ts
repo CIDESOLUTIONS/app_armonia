@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
@@ -10,6 +10,13 @@ import {
   CreatePetDto,
   CreateVehicleDto,
   UpdateResidentDto,
+  CreateResidentDto,
+  CreateCommonAreaDto,
+  UpdateCommonAreaDto,
+  CommonAreaDto,
+  CreateParkingSpotDto,
+  UpdateParkingSpotDto,
+  ParkingSpotDto,
 } from '../common/dto/inventory.dto';
 
 @Injectable()
@@ -460,5 +467,81 @@ export class InventoryService {
       );
       throw new Error('Error obteniendo estadísticas de inventario');
     }
+  }
+
+  // Common Area Management
+  async createCommonArea(schemaName: string, data: CreateCommonAreaDto): Promise<CommonAreaDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    return prisma.commonArea.create({ data });
+  }
+
+  async getCommonAreas(schemaName: string): Promise<CommonAreaDto[]> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    return prisma.commonArea.findMany();
+  }
+
+  async getCommonAreaById(schemaName: string, id: number): Promise<CommonAreaDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const commonArea = await prisma.commonArea.findUnique({ where: { id } });
+    if (!commonArea) {
+      throw new NotFoundException(`Área común con ID ${id} no encontrada.`);
+    }
+    return commonArea;
+  }
+
+  async updateCommonArea(schemaName: string, id: number, data: UpdateCommonAreaDto): Promise<CommonAreaDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const commonArea = await prisma.commonArea.findUnique({ where: { id } });
+    if (!commonArea) {
+      throw new NotFoundException(`Área común con ID ${id} no encontrada.`);
+    }
+    return prisma.commonArea.update({ where: { id }, data });
+  }
+
+  async deleteCommonArea(schemaName: string, id: number): Promise<void> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const commonArea = await prisma.commonArea.findUnique({ where: { id } });
+    if (!commonArea) {
+      throw new NotFoundException(`Área común con ID ${id} no encontrada.`);
+    }
+    await prisma.commonArea.delete({ where: { id } });
+  }
+
+  // Parking Spot Management
+  async createParkingSpot(schemaName: string, data: CreateParkingSpotDto): Promise<ParkingSpotDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    return prisma.parkingSpot.create({ data });
+  }
+
+  async getParkingSpots(schemaName: string, complexId: number): Promise<ParkingSpotDto[]> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    return prisma.parkingSpot.findMany({ where: { complexId } });
+  }
+
+  async getParkingSpotById(schemaName: string, id: number): Promise<ParkingSpotDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const parkingSpot = await prisma.parkingSpot.findUnique({ where: { id } });
+    if (!parkingSpot) {
+      throw new NotFoundException(`Espacio de estacionamiento con ID ${id} no encontrado.`);
+    }
+    return parkingSpot;
+  }
+
+  async updateParkingSpot(schemaName: string, id: number, data: UpdateParkingSpotDto): Promise<ParkingSpotDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const parkingSpot = await prisma.parkingSpot.findUnique({ where: { id } });
+    if (!parkingSpot) {
+      throw new NotFoundException(`Espacio de estacionamiento con ID ${id} no encontrado.`);
+    }
+    return prisma.parkingSpot.update({ where: { id }, data });
+  }
+
+  async deleteParkingSpot(schemaName: string, id: number): Promise<void> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const parkingSpot = await prisma.parkingSpot.findUnique({ where: { id } });
+    if (!parkingSpot) {
+      throw new NotFoundException(`Espacio de estacionamiento con ID ${id} no encontrado.`);
+    }
+    await prisma.parkingSpot.delete({ where: { id } });
   }
 }

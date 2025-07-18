@@ -1,5 +1,6 @@
 import { fetchApi } from "@/lib/api";
 
+// DTOs y Enums del Backend (armonia-backend/src/common/dto/assembly.dto.ts)
 export enum AssemblyType {
   ORDINARY = 'ORDINARY',
   EXTRAORDINARY = 'EXTRAORDINARY',
@@ -12,70 +13,158 @@ export enum AssemblyStatus {
   CANCELLED = 'CANCELLED',
 }
 
-export interface Assembly {
-  id: number;
+export class CreateAssemblyDto {
   title: string;
   description: string;
   scheduledDate: string;
+  location: string;
+  type: AssemblyType;
+  agenda: string;
+}
+
+export class UpdateAssemblyDto extends CreateAssemblyDto {
+  status?: AssemblyStatus;
+}
+
+export class AssemblyDto {
+  id: number;
+  title: string;
+  description: string;
+  scheduledDate: Date;
   location: string;
   type: AssemblyType;
   status: AssemblyStatus;
   agenda: string;
-  createdAt: string;
-  updatedAt: string;
-  currentAttendance?: number;
-  quorumMet?: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export interface CreateAssemblyDto {
-  title: string;
-  description: string;
-  scheduledDate: string;
-  location: string;
-  type: AssemblyType;
-  agenda: string;
+export class RegisterAttendanceDto {
+  assemblyId: number;
+  userId: number;
+  present?: boolean;
 }
 
-export interface UpdateAssemblyDto extends Partial<CreateAssemblyDto> {
-  status?: AssemblyStatus;
-}
-
-export interface CreateVoteDto {
+export class CreateVoteDto {
   assemblyId: number;
   question: string;
-  options: string[];
+  options: string[]; // Array of option texts
   isWeighted: boolean;
 }
 
-export interface SubmitVoteDto {
+export class SubmitVoteDto {
   voteId: number;
-  optionId: number;
+  optionId: number; // Use option ID instead of index
   userId: number;
   weight: number;
 }
 
-export interface VoteOption {
-  id: number;
-  value: string;
+// Interfaces adicionales del Frontend (src/services/assembly-service-client.ts)
+export enum VotingStatus {
+  PENDING = "PENDING",
+  ACTIVE = "ACTIVE",
+  CLOSED = "CLOSED",
+  CANCELLED = "CANCELLED",
+}
+
+export enum VotingType {
+  SIMPLE_MAJORITY = "SIMPLE_MAJORITY",
+  QUALIFIED_MAJORITY = "QUALIFIED_MAJORITY",
+  UNANIMOUS = "UNANIMOUS",
+}
+
+export interface Assembly extends AssemblyDto {
+  currentAttendance?: number;
+  quorumMet?: boolean;
+  minutes?: string;
+  attachments?: string[];
 }
 
 export interface Vote {
   id: number;
+  votingId: number;
+  propertyId: number;
+  userId: number;
+  value: string;
+  coefficient: number;
+  comments?: string;
+  createdAt: string;
+}
+
+export interface Voting {
+  id: number;
   assemblyId: number;
-  question: string;
-  isWeighted: boolean;
-  isActive: boolean;
-  options: VoteOption[];
+  title: string;
+  description: string;
+  type: VotingType;
+  status: VotingStatus;
+  startTime?: string;
+  endTime?: string;
+  options: string[];
+  result?: Record<string, number>;
+  createdAt: string;
+  updatedAt: string;
+  votes: Vote[];
 }
 
-export interface VoteResult {
-  voteId: number;
-  question: string;
-  results: { value: string; totalWeight: number }[];
+export interface Attendance {
+  id: number;
+  assemblyId: number;
+  propertyId: number;
+  userId: number;
+  propertyUnit: string;
+  coefficient: number;
+  userName: string;
+  attendanceType: "PRESENT" | "PROXY" | "VIRTUAL";
+  proxyName?: string;
+  checkInTime: string;
+  checkOutTime?: string;
 }
 
-export async function getAssemblies(): Promise<Assembly[]> {
-  return fetchApi("/assembly");
+export interface AssemblyListResponse {
+  assemblies: Assembly[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface CreateVotingDto {
+  assemblyId: number;
+  title: string;
+  description: string;
+  type: VotingType;
+  options: string[];
+}
+
+export interface CastVoteDto {
+  votingId: number;
+  propertyId: number;
+  value: string;
+  comments?: string;
+}
+
+export interface AssemblyFilterParams {
+  page?: number;
+  limit?: number;
+  status?: AssemblyStatus;
+  type?: AssemblyType;
+  startDate?: string;
+  endDate?: string;
+  search?: string;
+}
+
+// Funciones del Servicio
+export async function getAssemblies(filters?: AssemblyFilterParams): Promise<AssemblyListResponse> {
+  const queryParams = new URLSearchParams();
+  if (filters) {
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        queryParams.append(key, String(value));
+      }
+    });
+  }
+  const query = queryParams.toString();
+  return fetchApi(`/assembly${query ? `?${query}` : ""}`);
 }
 
 export async function getAssemblyById(id: number): Promise<Assembly> {
@@ -102,10 +191,10 @@ export async function deleteAssembly(id: number): Promise<void> {
   });
 }
 
-export async function registerAttendance(assemblyId: number, userId: number, present: boolean): Promise<any> {
-  return fetchApi(`/assembly/${assemblyId}/attendance`, {
+export async function registerAttendance(data: RegisterAttendanceDto): Promise<Attendance> {
+  return fetchApi("/assembly/attendance", {
     method: "POST",
-    body: JSON.stringify({ userId, present }),
+    body: JSON.stringify(data),
   });
 }
 
@@ -113,22 +202,36 @@ export async function getAssemblyQuorumStatus(assemblyId: number): Promise<{ cur
   return fetchApi(`/assembly/${assemblyId}/quorum`);
 }
 
-export async function createVote(data: CreateVoteDto): Promise<Vote> {
+export async function createVoting(data: CreateVotingDto): Promise<Voting> {
+  return fetchApi("/assembly/voting", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function getVotings(assemblyId: number): Promise<Voting[]> {
+  return fetchApi(`/assembly/${assemblyId}/votings`);
+}
+
+export async function startVoting(id: number): Promise<Voting> {
+  return fetchApi(`/assembly/voting/${id}/start`, {
+    method: "PUT",
+    body: JSON.stringify({}),
+  });
+}
+
+export async function closeVoting(id: number): Promise<Voting> {
+  return fetchApi(`/assembly/voting/${id}/close`, {
+    method: "PUT",
+    body: JSON.stringify({}),
+  });
+}
+
+export async function castVote(data: CastVoteDto): Promise<Vote> {
   return fetchApi("/assembly/vote", {
     method: "POST",
     body: JSON.stringify(data),
   });
-}
-
-export async function submitVote(data: SubmitVoteDto): Promise<any> {
-  return fetchApi("/assembly/vote/submit", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-}
-
-export async function getVoteResults(voteId: number): Promise<VoteResult> {
-  return fetchApi(`/assembly/vote/${voteId}/results`);
 }
 
 export async function generateMeetingMinutes(assemblyId: number): Promise<Blob> {

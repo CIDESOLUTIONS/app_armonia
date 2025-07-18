@@ -8,6 +8,7 @@ import {
   ListingDto,
   ListingFilterParamsDto,
   ListingStatus,
+  ListingCategory,
 } from '../common/dto/marketplace.dto';
 
 @Injectable()
@@ -21,7 +22,7 @@ export class MarketplaceService {
     return this.prismaClientManager.getClient(schemaName);
   }
 
-  async uploadImage(file: Express.Multer.File): Promise<{ url: string }> {
+  async uploadImage(file: any): Promise<{ url: string }> {
     const fileUrl = await uploadFileToS3(file);
     return { url: fileUrl };
   }
@@ -212,5 +213,9 @@ export class MarketplaceService {
       },
       orderBy: { createdAt: 'asc' },
     });
+  }
+
+  getListingCategories(): string[] {
+    return Object.values(ListingCategory);
   }
 }

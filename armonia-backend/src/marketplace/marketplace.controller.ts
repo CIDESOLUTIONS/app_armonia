@@ -141,4 +141,9 @@ export class MarketplaceController {
       resolveReportDto.action,
     );
   }
+
+  @Get('categories')
+  async getCategories() {
+    return this.marketplaceService.getListingCategories();
+  }
 }

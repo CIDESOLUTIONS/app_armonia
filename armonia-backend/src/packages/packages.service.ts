@@ -64,8 +64,8 @@ export class PackagesService {
 
     return prisma.package.findMany({
       where,
-      skip: (filters.page - 1) * filters.limit || 0,
-      take: filters.limit || 10,
+      skip: ((filters.page ?? 1) - 1) * (filters.limit ?? 10),
+      take: filters.limit ?? 10,
       orderBy: { registrationDate: 'desc' },
     });
   }
@@ -98,7 +98,7 @@ export class PackagesService {
     // Notificar al residente
     if (pkg.recipientId) {
       // Obtener el ID del usuario asociado al residente
-      const residentUser = await this.prisma.user.findFirst({
+      const residentUser = await prisma.user.findFirst({
         where: { resident: { some: { id: pkg.recipientId } } },
         select: { id: true },
       });
@@ -110,7 +110,7 @@ export class PackagesService {
           message: `Tu paquete con número de seguimiento ${pkg.trackingNumber || 'N/A'} ha sido entregado.`, // Usar el trackingNumber del paquete
           link: `/resident/packages/${pkg.id}`, // Enlace a la página de detalles del paquete
           sourceType: NotificationSourceType.PACKAGE,
-          sourceId: pkg.id.toString(),
+          sourceId: pkg.id.toString(), // Convertir a string
         });
       }
     }

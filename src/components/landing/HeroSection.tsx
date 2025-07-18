@@ -42,8 +42,8 @@ export function HeroSection() {
             <div className="lg:w-1/2 flex justify-center lg:justify-end">
               <div className="relative w-full max-w-lg">
                 <Image
-                  src="/images/landing-hero.png"
-                  alt="Dashboard Preview"
+                  src="/images/landing-hero1.png"
+                  alt="Amenidades del Conjunto Residencial"
                   width={800}
                   height={600}
                   className="rounded-lg shadow-xl border border-gray-200"

@@ -10,13 +10,13 @@ import { ConfigModule } from '@nestjs/config';
 import { TenantModule } from './tenant/tenant.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { CommunicationsModule } from './communications/communications.module';
-import { FinancesModule } from './finances/finances.module';
-import { PqrModule } from './pqr/pqr.module';
+import { FinancesModule }mport { PqrModule } from './pqr/pqr.module';
 import { ProjectsModule } from './projects/projects.module';
 import { SecurityModule } from './security/security.module';
 import { PlansModule } from './plans/plans.module';
 import { BankReconciliationModule } from './bank-reconciliation/bank-reconciliation.module';
 import { DocumentsModule } from './documents/documents.module';
+import { PaymentGatewaysModule } from './payment-gateways/payment-gateways.module';
 
 import { FintechModule } from './fintech/fintech.module';
 
@@ -48,6 +48,7 @@ import { FintechModule } from './fintech/fintech.module';
     PanicModule,
     ReservationsModule,
     PersonalFinancesModule,
+    PaymentGatewaysModule,
   ],
   controllers: [AppController],
   providers: [AppService],
