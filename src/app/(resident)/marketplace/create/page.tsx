@@ -17,15 +17,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
+import { fetchApi } from "@/lib/api";
+import { createListing, uploadListingImage } from "@/services/marketplaceService";
+import { useAuthStore } from "@/store/authStore";
 
-// Placeholder for image upload service
 const uploadImage = async (file: File): Promise<string> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      console.log("Uploading file:", file.name);
-      resolve(`https://example.com/images/${file.name}`);
-    }, 1000);
-  });
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await uploadListingImage(formData);
+  return response.url;
 };
 
 const categories = [

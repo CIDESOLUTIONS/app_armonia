@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuthStore } from "@/store/authStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,39 +20,110 @@ import {
   DollarSign,
   CalendarDays,
 } from "lucide-react";
-
-interface Transaction {
-  id: number;
-  type: "income" | "expense";
-  description: string;
-  amount: number;
-  date: string;
-}
+import { getPersonalTransactions, createPersonalTransaction, updatePersonalTransaction, deletePersonalTransaction, PersonalTransaction, CreatePersonalTransactionDto, PersonalTransactionType } from "@/services/personalFinanceService";
 
 export default function PersonalFinancesPage() {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [newTransaction, setNewTransaction] = useState({
-    type: "expense", // default to expense
+  const { user } = useAuthStore();
+  const [transactions, setTransactions] = useState<PersonalTransaction[]>([]);
+  const [newTransaction, setNewTransaction] = useState<CreatePersonalTransactionDto>({
+    type: PersonalTransactionType.EXPENSE,
     description: "",
-    amount: "",
+    amount: 0,
     date: new Date().toISOString().split("T")[0],
   });
   const { toast } = useToast();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<PersonalTransaction | null>(null);
+  const [editTransactionForm, setEditTransactionForm] = useState<UpdatePersonalTransactionDto>({
+    type: PersonalTransactionType.EXPENSE,
+    description: "",
+    amount: 0,
+    date: new Date().toISOString().split("T")[0],
+  });
+
+  const handleEditTransaction = (transaction: PersonalTransaction) => {
+    setSelectedTransaction(transaction);
+    setEditTransactionForm({
+      type: transaction.type,
+      description: transaction.description,
+      amount: transaction.amount,
+      date: transaction.date.split("T")[0],
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateTransaction = async () => {
+    if (!selectedTransaction) return;
+    try {
+      await updatePersonalTransaction(selectedTransaction.id, editTransactionForm);
+      toast({
+        title: "Éxito",
+        description: "Transacción actualizada correctamente.",
+      });
+      setIsEditDialogOpen(false);
+      const updatedTransactions = await getPersonalTransactions();
+      setTransactions(updatedTransactions);
+    } catch (error) {
+      console.error("Error updating transaction:", error);
+      toast({
+        title: "Error",
+        description: "Error al actualizar la transacción.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteTransaction = async (id: number) => {
+    if (!confirm("¿Estás seguro de que quieres eliminar esta transacción?")) return;
+    try {
+      await deletePersonalTransaction(id);
+      toast({
+        title: "Éxito",
+        description: "Transacción eliminada correctamente.",
+      });
+      const updatedTransactions = await getPersonalTransactions();
+      setTransactions(updatedTransactions);
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+      toast({
+        title: "Error",
+        description: "Error al eliminar la transacción.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      if (!user) return;
+      try {
+        const data = await getPersonalTransactions();
+        setTransactions(data);
+      } catch (error) {
+        console.error("Error fetching personal transactions:", error);
+        toast({
+          title: "Error",
+          description: "No se pudieron cargar las transacciones personales.",
+          variant: "destructive",
+        });
+      }
+    };
+    fetchTransactions();
+  }, [user, toast]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    setNewTransaction((prev) => ({ ...prev, [name]: value }));
+    setNewTransaction((prev) => ({ ...prev, [name]: name === "amount" ? parseFloat(value) : value }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setNewTransaction((prev) => ({ ...prev, [name]: value }));
+    setNewTransaction((prev) => ({ ...prev, [name]: value as PersonalTransactionType }));
   };
 
-  const addTransaction = () => {
-    const amount = parseFloat(newTransaction.amount);
-    if (!newTransaction.description || isNaN(amount) || amount <= 0) {
+  const addTransaction = async () => {
+    if (!newTransaction.description || newTransaction.amount <= 0) {
       toast({
         title: "Error",
         description:
@@ -61,33 +133,37 @@ export default function PersonalFinancesPage() {
       return;
     }
 
-    const transactionToAdd: Transaction = {
-      id: Date.now(), // Simple unique ID
-      type: newTransaction.type as "income" | "expense",
-      description: newTransaction.description,
-      amount: amount,
-      date: newTransaction.date,
-    };
-
-    setTransactions((prev) => [...prev, transactionToAdd]);
-    setNewTransaction({
-      type: "expense",
-      description: "",
-      amount: "",
-      date: new Date().toISOString().split("T")[0],
-    });
-    toast({
-      title: "Transacción Añadida",
-      description: "La transacción ha sido registrada exitosamente.",
-    });
+    try {
+      await createPersonalTransaction(newTransaction);
+      toast({
+        title: "Éxito",
+        description: "Transacción añadida correctamente.",
+      });
+      setNewTransaction({
+        type: PersonalTransactionType.EXPENSE,
+        description: "",
+        amount: 0,
+        date: new Date().toISOString().split("T")[0],
+      });
+      // Re-fetch transactions to update the list
+      const updatedTransactions = await getPersonalTransactions();
+      setTransactions(updatedTransactions);
+    } catch (error) {
+      console.error("Error adding transaction:", error);
+      toast({
+        title: "Error",
+        description: "Error al añadir la transacción.",
+        variant: "destructive",
+      });
+    }
   };
 
   const calculateSummary = () => {
     const totalIncome = transactions
-      .filter((t) => t.type === "income")
+      .filter((t) => t.type === PersonalTransactionType.INCOME)
       .reduce((sum, t) => sum + t.amount, 0);
     const totalExpenses = transactions
-      .filter((t) => t.type === "expense")
+      .filter((t) => t.type === PersonalTransactionType.EXPENSE)
       .reduce((sum, t) => sum + t.amount, 0);
     const balance = totalIncome - totalExpenses;
     return { totalIncome, totalExpenses, balance };
@@ -228,13 +304,16 @@ export default function PersonalFinancesPage() {
                     <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       Fecha
                     </th>
+                    <th className="px-6 py-3 border-b-2 border-gray-300 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Acciones
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {transactions.map((t) => (
                     <tr key={t.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {t.type === "income" ? (
+                        {t.type === PersonalTransactionType.INCOME ? (
                           <span className="text-green-600">Ingreso</span>
                         ) : (
                           <span className="text-red-600">Gasto</span>
@@ -249,12 +328,85 @@ export default function PersonalFinancesPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {t.date}
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <Button variant="ghost" size="sm" onClick={() => handleEditTransaction(t)}>
+                          Editar
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDeleteTransaction(t.id)}>
+                          Eliminar
+                        </Button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Edit Transaction Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Transacción</DialogTitle>
+          </DialogHeader>
+          {selectedTransaction && (
+            <div className="space-y-4 py-4">
+              <div>
+                <Label htmlFor="editType">Tipo</Label>
+                <Select
+                  name="editType"
+                  value={editTransactionForm.type}
+                  onValueChange={(value) => setEditTransactionForm({ ...editTransactionForm, type: value as PersonalTransactionType })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={PersonalTransactionType.INCOME}>Ingreso</SelectItem>
+                    <SelectItem value={PersonalTransactionType.EXPENSE}>Gasto</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="editDescription">Descripción</Label>
+                <Input
+                  type="text"
+                  id="editDescription"
+                  name="description"
+                  value={editTransactionForm.description}
+                  onChange={(e) => setEditTransactionForm({ ...editTransactionForm, description: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="editAmount">Monto</Label>
+                <Input
+                  type="number"
+                  id="editAmount"
+                  name="amount"
+                  value={editTransactionForm.amount}
+                  onChange={(e) => setEditTransactionForm({ ...editTransactionForm, amount: parseFloat(e.target.value) })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="editDate">Fecha</Label>
+                <Input
+                  type="date"
+                  id="editDate"
+                  name="date"
+                  value={editTransactionForm.date}
+                  onChange={(e) => setEditTransactionForm({ ...editTransactionForm, date: e.target.value })}
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancelar</Button>
+            <Button onClick={handleUpdateTransaction}>Guardar Cambios</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
         </CardContent>
       </Card>
     </div>

@@ -98,7 +98,7 @@ export function ListingCard({ listing }: ListingCardProps) {
         <span className="text-xs text-gray-500">
           Publicado por: {listing.author.name}
         </span>
-        <Link href={`/resident/resident/marketplace/${listing.id}`}>
+        <Link href={`/resident/marketplace/${listing.id}`}>
           <Button variant="outline" size="sm">
             Ver Detalles
           </Button>

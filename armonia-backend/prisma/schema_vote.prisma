@@ -13,3 +13,17 @@ model Vote {
   @@index([assemblyId])
   @@index([isActive])
 }
+
+model VoteOption {
+  id      Int      @id @default(autoincrement())
+  voteId  Int
+  vote    Vote     @relation(fields: [voteId], references: [id])
+  value   String
+  userVotes UserVote[]
+
+  @@unique([voteId, value])
+  @@index([voteId])
+
+  @@index([assemblyId])
+  @@index([isActive])
+}

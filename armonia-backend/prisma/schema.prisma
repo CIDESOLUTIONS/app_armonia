@@ -31,6 +31,7 @@ generator client {
 /// @prisma.schema ./schema_monitoring.prisma
 /// @prisma.schema ./schema_option.prisma
 /// @prisma.schema ./schema_package.prisma
+/// @prisma.schema ./schema_personal_finance.prisma
 /// @prisma.schema ./schema_payment_attempt.prisma
 /// @prisma.schema ./schema_payment.prisma
 /// @prisma.schema ./schema_payments.prisma
@@ -39,6 +40,7 @@ generator client {
 /// @prisma.schema ./schema_question.prisma
 /// @prisma.schema ./schema_report.prisma
 /// @prisma.schema ./schema_reported_listing.prisma
+/// @prisma.schema ./schema_reservations.prisma
 /// @prisma.schema ./schema_reservations.prisma
 /// @prisma.schema ./schema_review.prisma
 /// @prisma.schema ./schema_security.prisma

@@ -8,12 +8,15 @@ import {
   PackageFilterParamsDto,
   PackageStatus,
 } from '../common/dto/packages.dto';
+import { CommunicationsService } from '../communications/communications.service';
+import { NotificationType, NotificationSourceType } from '../common/dto/communications.dto';
 
 @Injectable()
 export class PackagesService {
   constructor(
     private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
+    private communicationsService: CommunicationsService,
   ) {}
 
   private getTenantPrismaClient(schemaName: string) {
@@ -91,6 +94,26 @@ export class PackagesService {
         deliveryDate: new Date().toISOString(),
       },
     });
+
+    // Notificar al residente
+    if (pkg.recipientId) {
+      // Obtener el ID del usuario asociado al residente
+      const residentUser = await this.prisma.user.findFirst({
+        where: { resident: { some: { id: pkg.recipientId } } },
+        select: { id: true },
+      });
+
+      if (residentUser) {
+        await this.communicationsService.notifyUser(schemaName, residentUser.id, {
+          type: NotificationType.INFO,
+          title: 'Paquete Entregado',
+          message: `Tu paquete con número de seguimiento ${pkg.trackingNumber || 'N/A'} ha sido entregado.`, // Usar el trackingNumber del paquete
+          link: `/resident/packages/${pkg.id}`, // Enlace a la página de detalles del paquete
+          sourceType: NotificationSourceType.PACKAGE,
+          sourceId: pkg.id.toString(),
+        });
+      }
+    }
   }
 
   async updatePackage(

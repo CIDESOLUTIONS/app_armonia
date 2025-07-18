@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, Trash2, CheckCircle, XCircle, Eye } from "lucide-react";
+import { Loader2, Trash2, CheckCircle, XCircle, Eye, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
@@ -11,33 +11,9 @@ import {
   getReservations,
   updateReservationStatus,
   deleteReservation,
+  Reservation,
 } from "@/services/reservationService";
-
-interface Reservation {
-  id: number;
-  commonAreaId: number;
-  commonAreaName: string; // Para mostrar en la tabla
-  userId: number;
-  userName: string; // Para mostrar en la tabla
-  propertyId: number;
-  unitNumber: string; // Para mostrar en la tabla
-  title: string;
-  description?: string;
-  startDateTime: string;
-  endDateTime: string;
-  status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "COMPLETED";
-  attendees: number;
-  requiresPayment: boolean;
-  paymentAmount?: number;
-  paymentStatus?: string;
-  rejectionReason?: string;
-  approvedById?: number;
-  approvedAt?: string;
-  cancellationReason?: string;
-  cancelledAt?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function ReservationsPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -138,6 +114,30 @@ export default function ReservationsPage() {
         Gestión de Reservas
       </h1>
 
+      <div className="flex justify-between items-center mb-4">
+        <Link href="/admin/amenities">
+          <Button variant="outline">
+            <CalendarDays className="mr-2 h-4 w-4" /> Gestionar Áreas Comunes
+          </Button>
+        </Link>
+        <Button>
+          <PlusCircle className="mr-2 h-4 w-4" /> Crear Nueva Reserva
+        </Button>
+      </div>
+
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Calendario de Reservas (Placeholder)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-64 bg-gray-100 flex items-center justify-center rounded-md text-gray-500">
+            Aquí irá el calendario de reservas
+          </div>
+        </CardContent>
+      </Card>
+
+      <h2 className="text-2xl font-bold text-gray-900 mb-4">Reservas Pendientes y Activas</h2>
+
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="min-w-full leading-normal">
           <thead>
@@ -147,9 +147,6 @@ export default function ReservationsPage() {
               </th>
               <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Usuario
-              </th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Propiedad
               </th>
               <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Título
@@ -170,13 +167,10 @@ export default function ReservationsPage() {
             {reservations.map((reservation) => (
               <tr key={reservation.id}>
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                  {reservation.commonAreaName}
+                  {reservation.commonArea.name}
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                  {reservation.userName}
-                </td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                  {reservation.unitNumber}
+                  {reservation.user.name}
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                   {reservation.title}
@@ -202,7 +196,7 @@ export default function ReservationsPage() {
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right">
                   <Link
-                    href={`/admin/services/reservations/${reservation.id}/view`}
+                    href={`/admin/reservations/${reservation.id}`}
                   >
                     <Button variant="ghost" size="sm" className="mr-2">
                       <Eye className="h-4 w-4" />
@@ -241,17 +235,17 @@ export default function ReservationsPage() {
                   </Button>
                 </td>
               </tr>
-            ))}
-            {reservations.length === 0 && (
-              <tr>
-                <td
-                  colSpan={8}
-                  className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
-                >
-                  No hay reservas registradas.
-                </td>
-              </tr>
-            )}
+            ))
+          ) : (
+            <TableRow>
+              <td
+                colSpan={8}
+                className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
+              >
+                No hay reservas registradas.
+              </td>
+            </TableRow>
+          )}
           </tbody>
         </table>
       </div>

@@ -1,3 +1,5 @@
+import { PersonalFinancesModule } from './personal-finances/personal-finances.module';
+import { ReservationsModule } from './reservations/reservations.module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -44,6 +46,8 @@ import { FintechModule } from './fintech/fintech.module';
     MarketplaceModule,
     AssemblyModule,
     PanicModule,
+    ReservationsModule,
+    PersonalFinancesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

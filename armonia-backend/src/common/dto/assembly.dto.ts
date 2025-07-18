@@ -81,7 +81,7 @@ export class CreateVoteDto {
 
   @IsArray()
   @IsString({ each: true })
-  options: string[];
+  options: string[]; // Array of option texts
 
   @IsBoolean()
   isWeighted: boolean;
@@ -92,7 +92,7 @@ export class SubmitVoteDto {
   voteId: number;
 
   @IsNumber()
-  optionIndex: number;
+  optionId: number; // Use option ID instead of index
 
   @IsNumber()
   userId: number;

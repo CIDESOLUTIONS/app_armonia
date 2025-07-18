@@ -43,13 +43,19 @@ interface Transaction {
 }
 
 // Placeholder Components for missing functionalities
-<FeeGenerationForm />
+          <FeeGenerationSection />
+        </TabsContent>
 
-<FineManagementForm />
+        <TabsContent value="fines" className="mt-6">
+          <FineManagementSection />
+        </TabsContent>
 
-<PaymentGatewayConfig />
+        <TabsContent value="payments" className="mt-6">
+          <PaymentGatewaySection />
+        </TabsContent>
 
-<FinancialReportsGenerator />
+        <TabsContent value="reports" className="mt-6">
+          <FinancialReportsGenerator />
 
 export default function FinancesPage() {
   const { user } = useAuthStore();

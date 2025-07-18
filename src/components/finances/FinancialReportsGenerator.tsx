@@ -1,99 +1,122 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { useToast } from '@/components/ui/use-toast';
-import { Loader2, Download } from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { generateFinancialReport } from '@/services/financeService';
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { CalendarIcon, Download } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function FinancialReportsGenerator() {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const [reportType, setReportType] = useState('summary');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [reportType, setReportType] = useState("");
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const report = await generateFinancialReport(startDate, endDate, reportType);
-      // In a real application, you would likely trigger a download or display the report
-      console.log('Generated Report:', report);
+  const handleGenerateReport = () => {
+    if (!reportType) {
       toast({
-        title: 'Éxito',
-        description: 'Reporte generado correctamente. Revisa la consola para los datos.',
+        title: "Error",
+        description: "Por favor, seleccione un tipo de informe.",
+        variant: "destructive",
       });
-    } catch (error) {
-      console.error('Error generating report:', error);
-      toast({
-        title: 'Error',
-        description: 'No se pudo generar el reporte.',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
+      return;
     }
+    if (!startDate || !endDate) {
+      toast({
+        title: "Error",
+        description: "Por favor, seleccione un rango de fechas.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Simulate report generation and download
+    console.log(`Generando informe de tipo: ${reportType} desde ${format(startDate, "yyyy-MM-dd")} hasta ${format(endDate, "yyyy-MM-dd")}`);
+    toast({
+      title: "Informe Generado",
+      description: `El informe de ${reportType} para el rango seleccionado ha sido generado y descargado. (Simulado)`, 
+    });
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Informes Financieros</CardTitle>
-        <CardDescription>
-          Genere diversos informes financieros para su complejo.
-        </CardDescription>
+        <CardTitle>Generador de Informes Financieros</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <Label htmlFor="reportType">Tipo de Reporte</Label>
+            <Label htmlFor="reportType">Tipo de Informe</Label>
             <Select value={reportType} onValueChange={setReportType}>
-              <SelectTrigger>
-                <SelectValue placeholder="Seleccione tipo de reporte" />
+              <SelectTrigger id="reportType">
+                <SelectValue placeholder="Seleccione un tipo de informe" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="summary">Resumen General</SelectItem>
-                <SelectItem value="income">Ingresos</SelectItem>
-                <SelectItem value="expenses">Gastos</SelectItem>
-                <SelectItem value="fees">Cuotas</SelectItem>
-                <SelectItem value="payments">Pagos</SelectItem>
+                <SelectItem value="estado_cartera">Estado de Cartera</SelectItem>
+                <SelectItem value="paz_salvos">Paz y Salvos</SelectItem>
+                <SelectItem value="informe_pagos">Informe de Pagos</SelectItem>
+                <SelectItem value="presupuesto_anual">Presupuesto Anual</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          <div>
-            <Label htmlFor="startDate">Fecha de Inicio</Label>
-            <Input
-              id="startDate"
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              required
-            />
+          <div className="flex flex-col space-y-2">
+            <Label htmlFor="dateRange">Rango de Fechas</Label>
+            <div className="flex space-x-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[240px] justify-start text-left font-normal",
+                      !startDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {startDate ? format(startDate, "PPP") : <span>Fecha Inicio</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={startDate}
+                    onSelect={setStartDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[240px] justify-start text-left font-normal",
+                      !endDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {endDate ? format(endDate, "PPP") : <span>Fecha Fin</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={endDate}
+                    onSelect={setEndDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
-          <div>
-            <Label htmlFor="endDate">Fecha de Fin</Label>
-            <Input
-              id="endDate"
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              required
-            />
-          </div>
-          <Button type="submit" disabled={loading}>
-            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            <Download className="mr-2 h-4 w-4" /> Generar Reporte
-          </Button>
-        </form>
+        </div>
+        <Button onClick={handleGenerateReport} className="mt-4">
+          <Download className="mr-2 h-4 w-4" /> Generar y Descargar Informe
+        </Button>
       </CardContent>
     </Card>
   );

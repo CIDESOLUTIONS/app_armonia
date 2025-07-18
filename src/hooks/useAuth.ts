@@ -37,7 +37,7 @@ export function useAuth() {
           router.push("/admin/complex-admin/admin-dashboard");
           break;
         case "RESIDENT":
-          router.push("/resident/resident/resident-dashboard");
+          router.push("/resident/resident-dashboard");
           break;
         case "RECEPTION":
           router.push("/reception/reception/reception-dashboard");

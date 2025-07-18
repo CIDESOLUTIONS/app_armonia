@@ -1,0 +1,19 @@
+enum PersonalTransactionType {
+  income
+  expense
+}
+
+model PersonalTransaction {
+  id          Int                 @id @default(autoincrement())
+  userId      Int
+  user        User                @relation(fields: [userId], references: [id])
+  type        PersonalTransactionType
+  description String
+  amount      Float
+  date        DateTime
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@index([userId])
+  @@index([date])
+}
