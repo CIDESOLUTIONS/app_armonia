@@ -1,58 +1,48 @@
+import { Test, TestingModule } from '@nestjs/testing';
 import { SurveyService } from './survey.service';
-import { vi } from 'vitest';
+import { PrismaClientManager } from '../prisma/prisma-client-manager';
+import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
+import { SurveyStatus, QuestionType } from '../common/dto/surveys.dto';
 
 // Mock dependencies
 const mockPrismaClient = {
   survey: {
-    create: vi.fn(),
-    findMany: vi.fn(),
-    findUnique: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
+    create: jest.fn(),
+    findMany: jest.fn(),
+    findUnique: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
   },
   question: {
-    create: vi.fn(),
-    findMany: vi.fn(),
-    findUnique: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-  },
-  option: {
-    create: vi.fn(),
-    findMany: vi.fn(),
-    findUnique: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-  },
-  userVote: {
-    create: vi.fn(),
-    findMany: vi.fn(),
+    create: jest.fn(),
+    createMany: jest.fn(),
+    deleteMany: jest.fn(),
+    findMany: jest.fn(),
+    findUnique: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
   },
   answer: {
-    deleteMany: vi.fn(),
+    create: jest.fn(),
+    findMany: jest.fn(),
+    deleteMany: jest.fn(),
   },
 };
 
 const mockPrismaClientManager = {
-  getClient: vi.fn(() => mockPrismaClient),
-};
-
-const mockPrismaService = {
-  // Mock global PrismaService methods if needed
+  getClient: jest.fn(() => mockPrismaClient),
 };
 
 describe('SurveyService', () => {
   let service: SurveyService;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
     service = new SurveyService(
       mockPrismaClientManager as any,
-      mockPrismaService as any,
+      // new PrismaService(), // Removed as it's not needed for this mock setup
     );
-    (service as any).prismaClientManager = mockPrismaClientManager;
-    (service as any).prisma = mockPrismaService;
   });
 
   it('should be defined', () => {
@@ -60,34 +50,82 @@ describe('SurveyService', () => {
   });
 
   describe('createSurvey', () => {
-    it('should create a new survey', async () => {
-      const mockSurvey = { id: 1, title: 'Test Survey', description: 'Desc', status: 'DRAFT' };
+    it('should create a new survey with questions', async () => {
+      const mockSurvey = {
+        id: 1,
+        title: 'Test Survey',
+        description: 'Desc',
+        complexId: 123,
+        createdBy: 1,
+        status: SurveyStatus.DRAFT,
+        startDate: new Date(),
+        endDate: new Date(),
+        questions: [],
+      };
       mockPrismaClient.survey.create.mockResolvedValue(mockSurvey);
 
-      const result = await service.createSurvey('test_schema', { title: 'Test Survey', description: 'Desc', questions: [] });
+      const createSurveyDto = {
+        title: 'Test Survey',
+        description: 'Desc',
+        startDate: new Date().toISOString(),
+        endDate: new Date().toISOString(),
+        questions: [
+          {
+            text: 'Q1',
+            type: QuestionType.SINGLE_CHOICE,
+            options: ['A', 'B'],
+            order: 0,
+          },
+        ],
+      };
+
+      const result = await service.createSurvey(
+        'test_schema',
+        1,
+        123,
+        createSurveyDto,
+      );
 
       expect(result).toEqual(mockSurvey);
       expect(mockPrismaClient.survey.create).toHaveBeenCalledWith({
-        data: { title: 'Test Survey', description: 'Desc', questions: { create: [] } },
+        data: {
+          title: 'Test Survey',
+          description: 'Desc',
+          complexId: 123,
+          createdBy: 1,
+          status: SurveyStatus.DRAFT,
+          startDate: expect.any(Date),
+          endDate: expect.any(Date),
+          questions: {
+            create: [
+              {
+                text: 'Q1',
+                type: QuestionType.SINGLE_CHOICE,
+                options: ['A', 'B'],
+                order: 0,
+              },
+            ],
+          },
+        },
+        include: { questions: true },
       });
     });
   });
 
   describe('getSurveys', () => {
-    it('should return a list of surveys', async () => {
+    it('should return a list of surveys for a complex', async () => {
       const mockSurveys = [
-        { id: 1, title: 'Survey 1' },
-        { id: 2, title: 'Survey 2' },
+        { id: 1, title: 'Survey 1', complexId: 123, questions: [] },
+        { id: 2, title: 'Survey 2', complexId: 123, questions: [] },
       ];
       mockPrismaClient.survey.findMany.mockResolvedValue(mockSurveys);
 
-      const result = await service.getSurveys('test_schema', {});
+      const result = await service.getSurveys('test_schema', 123);
 
       expect(result).toEqual(mockSurveys);
       expect(mockPrismaClient.survey.findMany).toHaveBeenCalledWith({
-        where: {},
-        skip: 0,
-        take: 10,
+        where: { complexId: 123 },
+        include: { questions: true },
         orderBy: { createdAt: 'desc' },
       });
     });
@@ -95,42 +133,103 @@ describe('SurveyService', () => {
 
   describe('getSurveyById', () => {
     it('should return a single survey by ID', async () => {
-      const mockSurvey = { id: 1, title: 'Test Survey' };
+      const mockSurvey = { id: 1, title: 'Test Survey', questions: [] };
       mockPrismaClient.survey.findUnique.mockResolvedValue(mockSurvey);
 
       const result = await service.getSurveyById('test_schema', 1);
 
       expect(result).toEqual(mockSurvey);
-      expect(mockPrismaClient.survey.findUnique).toHaveBeenCalledWith({ where: { id: 1 } });
-    });
-
-    it('should throw NotFoundException if survey not found', async () => {
-      mockPrismaClient.survey.findUnique.mockResolvedValue(null);
-
-      await expect(service.getSurveyById('test_schema', 999)).rejects.toThrow(new NotFoundException(`Encuesta con ID 999 no encontrada.`));
-    });
-  });
-
-  describe('updateSurvey', () => {
-    it('should update an existing survey', async () => {
-      const existingSurvey = { id: 1, title: 'Old Title' };
-      const updatedSurvey = { ...existingSurvey, title: 'New Title' };
-      mockPrismaClient.survey.findUnique.mockResolvedValue(existingSurvey);
-      mockPrismaClient.survey.update.mockResolvedValue(updatedSurvey);
-
-      const result = await service.updateSurvey('test_schema', 1, { title: 'New Title' });
-
-      expect(result).toEqual(updatedSurvey);
-      expect(mockPrismaClient.survey.update).toHaveBeenCalledWith({
+      expect(mockPrismaClient.survey.findUnique).toHaveBeenCalledWith({
         where: { id: 1 },
-        data: { title: 'New Title' },
+        include: { questions: true },
       });
     });
 
     it('should throw NotFoundException if survey not found', async () => {
       mockPrismaClient.survey.findUnique.mockResolvedValue(null);
 
-      await expect(service.updateSurvey('test_schema', 999, { title: 'New Title' })).rejects.toThrow(NotFoundException);
+      await expect(service.getSurveyById('test_schema', 999)).rejects.toThrow(
+        new NotFoundException(`Encuesta con ID 999 no encontrada.`),
+      );
+    });
+  });
+
+  describe('updateSurvey', () => {
+    it('should update an existing survey and its questions', async () => {
+      const existingSurvey = {
+        id: 1,
+        title: 'Old Title',
+        description: 'Old Desc',
+        startDate: new Date(),
+        endDate: new Date(),
+        questions: [
+          { id: 10, text: 'Old Q', type: QuestionType.TEXT, options: [], order: 0 },
+        ],
+      };
+      const updatedSurvey = {
+        ...existingSurvey,
+        title: 'New Title',
+        description: 'New Desc',
+        questions: [
+          { id: 11, text: 'New Q', type: QuestionType.TEXT, options: [], order: 0 },
+        ],
+      };
+
+      mockPrismaClient.survey.findUnique.mockResolvedValue(existingSurvey);
+      mockPrismaClient.survey.update.mockResolvedValue(updatedSurvey);
+      mockPrismaClient.question.deleteMany.mockResolvedValue({ count: 1 });
+      mockPrismaClient.question.createMany.mockResolvedValue({ count: 1 });
+
+      const updateSurveyDto = {
+        title: 'New Title',
+        description: 'New Desc',
+        startDate: new Date().toISOString(),
+        endDate: new Date().toISOString(),
+        questions: [
+          { text: 'New Q', type: QuestionType.TEXT, options: [], order: 0 },
+        ],
+      };
+
+      const result = await service.updateSurvey(
+        'test_schema',
+        1,
+        updateSurveyDto,
+      );
+
+      expect(result).toEqual(updatedSurvey);
+      expect(mockPrismaClient.survey.update).toHaveBeenCalledWith({
+        where: { id: 1 },
+        data: {
+          title: 'New Title',
+          description: 'New Desc',
+          startDate: expect.any(Date),
+          endDate: expect.any(Date),
+          // questions are handled separately, so they should not be in the data object for survey update
+        },
+        include: { questions: true },
+      });
+      expect(mockPrismaClient.question.deleteMany).toHaveBeenCalledWith({
+        where: { surveyId: 1 },
+      });
+      expect(mockPrismaClient.question.createMany).toHaveBeenCalledWith({
+        data: [
+          {
+            surveyId: 1,
+            text: 'New Q',
+            type: QuestionType.TEXT,
+            options: [],
+            order: 0,
+          },
+        ],
+      });
+    });
+
+    it('should throw NotFoundException if survey not found', async () => {
+      mockPrismaClient.survey.findUnique.mockResolvedValue(null);
+
+      await expect(
+        service.updateSurvey('test_schema', 999, { title: 'New Title' }),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -139,167 +238,172 @@ describe('SurveyService', () => {
       const existingSurvey = { id: 1 };
       mockPrismaClient.survey.findUnique.mockResolvedValue(existingSurvey);
       mockPrismaClient.survey.delete.mockResolvedValue(existingSurvey);
+      mockPrismaClient.answer.deleteMany.mockResolvedValue({ count: 0 });
+      mockPrismaClient.question.deleteMany.mockResolvedValue({ count: 0 });
 
       await service.deleteSurvey('test_schema', 1);
 
-      expect(mockPrismaClient.survey.delete).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(mockPrismaClient.answer.deleteMany).toHaveBeenCalledWith({
+        where: { question: { surveyId: 1 } },
+      });
+      expect(mockPrismaClient.question.deleteMany).toHaveBeenCalledWith({
+        where: { surveyId: 1 },
+      });
+      expect(mockPrismaClient.survey.delete).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
     });
 
     it('should throw NotFoundException if survey not found', async () => {
       mockPrismaClient.survey.findUnique.mockResolvedValue(null);
 
-      await expect(service.deleteSurvey('test_schema', 999)).rejects.toThrow(NotFoundException);
+      await expect(service.deleteSurvey('test_schema', 999)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
-  describe('createQuestion', () => {
-    it('should create a new question for a survey', async () => {
-      const mockQuestion = { id: 1, surveyId: 1, text: 'Question 1' };
-      mockPrismaClient.question.create.mockResolvedValue(mockQuestion);
+  describe('submitAnswer', () => {
+    it('should submit an answer to a survey question', async () => {
+      const mockSurvey = {
+        id: 1,
+        status: SurveyStatus.PUBLISHED,
+        questions: [
+          { id: 10, text: 'Q1', type: QuestionType.SINGLE_CHOICE, options: ['A', 'B'] },
+        ],
+      };
+      const mockAnswer = { id: 100, questionId: 10, userId: 1, selectedOptions: ['A'] };
 
-      const result = await service.createQuestion('test_schema', 1, { text: 'Question 1' });
+      mockPrismaClient.survey.findUnique.mockResolvedValue(mockSurvey);
+      mockPrismaClient.answer.create.mockResolvedValue(mockAnswer);
 
-      expect(result).toEqual(mockQuestion);
-      expect(mockPrismaClient.question.create).toHaveBeenCalledWith({
-        data: { surveyId: 1, text: 'Question 1' },
-      });
-    });
-  });
+      const createAnswerDto = {
+        questionId: 10,
+        selectedOptions: ['A'],
+      };
 
-  describe('updateQuestion', () => {
-    it('should update an existing question', async () => {
-      const existingQuestion = { id: 1, surveyId: 1, text: 'Old Question' };
-      const updatedQuestion = { ...existingQuestion, text: 'New Question' };
-      mockPrismaClient.question.findUnique.mockResolvedValue(existingQuestion);
-      mockPrismaClient.question.update.mockResolvedValue(updatedQuestion);
+      const result = await service.submitAnswer('test_schema', 1, 1, createAnswerDto);
 
-      const result = await service.updateQuestion('test_schema', 1, { text: 'New Question' });
-
-      expect(result).toEqual(updatedQuestion);
-      expect(mockPrismaClient.question.update).toHaveBeenCalledWith({
-        where: { id: 1 },
-        data: { text: 'New Question' },
-      });
-    });
-
-    it('should throw NotFoundException if question not found', async () => {
-      mockPrismaClient.question.findUnique.mockResolvedValue(null);
-
-      await expect(service.updateQuestion('test_schema', 999, { text: 'New Question' })).rejects.toThrow(NotFoundException);
-    });
-  });
-
-  describe('deleteQuestion', () => {
-    it('should delete an existing question', async () => {
-      const existingQuestion = { id: 1 };
-      mockPrismaClient.question.findUnique.mockResolvedValue(existingQuestion);
-      mockPrismaClient.question.delete.mockResolvedValue(existingQuestion);
-
-      await service.deleteQuestion('test_schema', 1);
-
-      expect(mockPrismaClient.question.delete).toHaveBeenCalledWith({ where: { id: 1 } });
-    });
-
-    it('should throw NotFoundException if question not found', async () => {
-      mockPrismaClient.question.findUnique.mockResolvedValue(null);
-
-      await expect(service.deleteQuestion('test_schema', 999)).rejects.toThrow(NotFoundException);
-    });
-  });
-
-  describe('createOption', () => {
-    it('should create a new option for a question', async () => {
-      const mockOption = { id: 1, questionId: 1, text: 'Option 1' };
-      mockPrismaClient.option.create.mockResolvedValue(mockOption);
-
-      const result = await service.createOption('test_schema', 1, { text: 'Option 1' });
-
-      expect(result).toEqual(mockOption);
-      expect(mockPrismaClient.option.create).toHaveBeenCalledWith({
-        data: { questionId: 1, text: 'Option 1' },
-      });
-    });
-  });
-
-  describe('updateOption', () => {
-    it('should update an existing option', async () => {
-      const existingOption = { id: 1, questionId: 1, text: 'Old Option' };
-      const updatedOption = { ...existingOption, text: 'New Option' };
-      mockPrismaClient.option.findUnique.mockResolvedValue(existingOption);
-      mockPrismaClient.option.update.mockResolvedValue(updatedOption);
-
-      const result = await service.updateOption('test_schema', 1, { text: 'New Option' });
-
-      expect(result).toEqual(updatedOption);
-      expect(mockPrismaClient.option.update).toHaveBeenCalledWith({
-        where: { id: 1 },
-        data: { text: 'New Option' },
+      expect(result).toEqual(mockAnswer);
+      expect(mockPrismaClient.answer.create).toHaveBeenCalledWith({
+        data: {
+          questionId: 10,
+          userId: 1,
+          textAnswer: undefined,
+          selectedOptions: ['A'],
+          rating: undefined,
+          answeredAt: expect.any(Date),
+        },
       });
     });
 
-    it('should throw NotFoundException if option not found', async () => {
-      mockPrismaClient.option.findUnique.mockResolvedValue(null);
+    it('should throw NotFoundException if survey not found', async () => {
+      mockPrismaClient.survey.findUnique.mockResolvedValue(null);
 
-      await expect(service.updateOption('test_schema', 999, { text: 'New Option' })).rejects.toThrow(NotFoundException);
-    });
-  });
-
-  describe('deleteOption', () => {
-    it('should delete an existing option', async () => {
-      const existingOption = { id: 1 };
-      mockPrismaClient.option.findUnique.mockResolvedValue(existingOption);
-      mockPrismaClient.option.delete.mockResolvedValue(existingOption);
-
-      await service.deleteOption('test_schema', 1);
-
-      expect(mockPrismaClient.option.delete).toHaveBeenCalledWith({ where: { id: 1 } });
+      await expect(
+        service.submitAnswer('test_schema', 999, 1, { questionId: 1, selectedOptions: ['A'] }),
+      ).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw NotFoundException if option not found', async () => {
-      mockPrismaClient.option.findUnique.mockResolvedValue(null);
+    it('should throw error if survey not published', async () => {
+      const mockSurvey = { id: 1, status: SurveyStatus.DRAFT, questions: [] };
+      mockPrismaClient.survey.findUnique.mockResolvedValue(mockSurvey);
 
-      await expect(service.deleteOption('test_schema', 999)).rejects.toThrow(NotFoundException);
+      await expect(
+        service.submitAnswer('test_schema', 1, 1, { questionId: 1, selectedOptions: ['A'] }),
+      ).rejects.toThrow("La encuesta no está publicada o ya ha finalizado.");
     });
-  });
 
-  describe('submitVote', () => {
-    it('should submit a user vote', async () => {
-      const mockVote = { id: 1, userId: 1, optionId: 1 };
-      mockPrismaClient.userVote.create.mockResolvedValue(mockVote);
+    it('should throw NotFoundException if question not found in survey', async () => {
+      const mockSurvey = { id: 1, status: SurveyStatus.PUBLISHED, questions: [] };
+      mockPrismaClient.survey.findUnique.mockResolvedValue(mockSurvey);
 
-      const result = await service.submitVote('test_schema', 1, 1);
+      await expect(
+        service.submitAnswer('test_schema', 1, 1, { questionId: 999, selectedOptions: ['A'] }),
+      ).rejects.toThrow(NotFoundException);
+    });
 
-      expect(result).toEqual(mockVote);
-      expect(mockPrismaClient.userVote.create).toHaveBeenCalledWith({
-        data: { userId: 1, optionId: 1 },
-      });
+    it('should throw error for invalid option', async () => {
+      const mockSurvey = {
+        id: 1,
+        status: SurveyStatus.PUBLISHED,
+        questions: [
+          { id: 10, text: 'Q1', type: QuestionType.SINGLE_CHOICE, options: ['A', 'B'] },
+        ],
+      };
+      mockPrismaClient.survey.findUnique.mockResolvedValue(mockSurvey);
+
+      await expect(
+        service.submitAnswer('test_schema', 1, 1, { questionId: 10, selectedOptions: ['C'] }),
+      ).rejects.toThrow("Opción 'C' no válida para la pregunta.");
     });
   });
 
   describe('getSurveyResults', () => {
     it('should return survey results', async () => {
-      const mockSurvey = { id: 1, title: 'Test Survey', questions: [{ id: 1, text: 'Q1', options: [{ id: 10, text: 'OptA' }] }] };
-      const mockVotes = [{ id: 1, optionId: 10 }];
+      const mockSurvey = {
+        id: 1,
+        title: 'Test Survey',
+        description: 'Desc',
+        status: SurveyStatus.PUBLISHED,
+        startDate: new Date(),
+        endDate: new Date(),
+        questions: [
+          { id: 10, text: 'Q1', type: QuestionType.SINGLE_CHOICE, options: ['A', 'B'], answers: [] },
+          { id: 11, text: 'Q2', type: QuestionType.TEXT, options: [], answers: [] },
+        ],
+      };
+      const mockAnswers = [
+        { id: 100, questionId: 10, userId: 1, selectedOptions: ['A'] },
+        { id: 101, questionId: 10, userId: 2, selectedOptions: ['A'] },
+        { id: 102, questionId: 11, userId: 1, textAnswer: 'Text Answer' },
+      ];
+
       mockPrismaClient.survey.findUnique.mockResolvedValue(mockSurvey);
-      mockPrismaClient.userVote.findMany.mockResolvedValue(mockVotes);
+      mockPrismaClient.answer.findMany.mockResolvedValue(mockAnswers);
 
       const result = await service.getSurveyResults('test_schema', 1);
 
       expect(result).toEqual({
-        survey: mockSurvey,
-        results: { '1': { '10': 1 } },
+        surveyId: 1,
+        title: 'Test Survey',
+        description: 'Desc',
+        status: SurveyStatus.PUBLISHED,
+        startDate: expect.any(Date),
+        endDate: expect.any(Date),
+        totalResponses: 2,
+        questions: [
+          {
+            questionId: 10,
+            text: 'Q1',
+            type: QuestionType.SINGLE_CHOICE,
+            totalAnswers: 2,
+            optionCounts: { A: 2, B: 0 },
+          },
+          {
+            questionId: 11,
+            text: 'Q2',
+            type: QuestionType.TEXT,
+            totalAnswers: 1,
+            textAnswers: ['Text Answer'],
+          },
+        ],
       });
       expect(mockPrismaClient.survey.findUnique).toHaveBeenCalledWith({
         where: { id: 1 },
-        include: { questions: { include: { options: true } } },
+        include: { questions: { include: { answers: true } } },
       });
-      expect(mockPrismaClient.userVote.findMany).toHaveBeenCalledWith({ where: { optionId: { in: [10] } } });
+      expect(mockPrismaClient.answer.findMany).toHaveBeenCalledWith({
+        where: { question: { surveyId: 1 } },
+      });
     });
 
     it('should throw NotFoundException if survey not found', async () => {
       mockPrismaClient.survey.findUnique.mockResolvedValue(null);
 
-      await expect(service.getSurveyResults('test_schema', 999)).rejects.toThrow(NotFoundException);
+      await expect(service.getSurveyResults('test_schema', 999)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

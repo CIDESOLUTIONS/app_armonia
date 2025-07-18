@@ -1,6 +1,5 @@
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { vi } from 'vitest';
 
 describe('AppController', () => {
   let appController: AppController;
@@ -8,7 +7,7 @@ describe('AppController', () => {
 
   beforeEach(() => {
     appService = {
-      getHello: vi.fn().mockReturnValue('Hello World!'),
+      getHello: jest.fn().mockReturnValue('Hello World!'),
     } as any; // Cast to any to bypass type checking for manual mock
     appController = new AppController(appService);
   });

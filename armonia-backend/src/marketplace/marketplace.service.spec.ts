@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MarketplaceService } from './marketplace.service';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
-import { vi } from 'vitest';
 import { NotFoundException } from '@nestjs/common';
+import { ListingCategory, ListingStatus, CreateListingDto, UpdateListingDto } from '../common/dto/marketplace.dto';
 
 describe('MarketplaceService', () => {
   let service: MarketplaceService;
@@ -12,21 +12,21 @@ describe('MarketplaceService', () => {
 
   const mockPrismaClient = {
     listing: {
-      create: vi.fn(),
-      findMany: vi.fn(),
-      findUnique: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
+      create: jest.fn(),
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
     },
     reportedListing: {
-      create: vi.fn(),
-      findMany: vi.fn(),
-      findUnique: vi.fn(),
-      update: vi.fn(),
+      create: jest.fn(),
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
     },
     message: {
-      create: vi.fn(),
-      findMany: vi.fn(),
+      create: jest.fn(),
+      findMany: jest.fn(),
     },
   };
 
@@ -37,7 +37,7 @@ describe('MarketplaceService', () => {
         {
           provide: PrismaClientManager,
           useValue: {
-            getClient: vi.fn(() => mockPrismaClient),
+            getClient: jest.fn(() => mockPrismaClient),
           },
         },
         {
@@ -64,14 +64,15 @@ describe('MarketplaceService', () => {
 
   describe('createListing', () => {
     it('should create a new listing', async () => {
-      const mockListing = { id: 1, title: 'Test Listing', description: 'Test Desc', price: 100, category: 'OTHER', authorId: 1, status: 'ACTIVE' };
+      const mockListing = { id: 1, title: 'Test Listing', description: 'Test Desc', price: 100, category: ListingCategory.HOME, authorId: 1, status: ListingStatus.ACTIVE };
       mockPrismaClient.listing.create.mockResolvedValue(mockListing);
 
-      const result = await service.createListing('test_schema', 1, { title: 'Test Listing', description: 'Test Desc', price: 100, category: 'OTHER' });
+      const createListingDto: CreateListingDto = { title: 'Test Listing', description: 'Test Desc', price: 100, category: ListingCategory.HOME };
+      const result = await service.createListing('test_schema', 1, createListingDto);
 
       expect(result).toEqual(mockListing);
       expect(mockPrismaClient.listing.create).toHaveBeenCalledWith({
-        data: { title: 'Test Listing', description: 'Test Desc', price: 100, category: 'OTHER', authorId: 1, status: 'ACTIVE' },
+        data: { ...createListingDto, authorId: 1, status: ListingStatus.ACTIVE },
       });
     });
   });
@@ -79,8 +80,8 @@ describe('MarketplaceService', () => {
   describe('getListings', () => {
     it('should return a list of listings', async () => {
       const mockListings = [
-        { id: 1, title: 'Listing 1', status: 'ACTIVE' },
-        { id: 2, title: 'Listing 2', status: 'ACTIVE' },
+        { id: 1, title: 'Listing 1', status: ListingStatus.ACTIVE },
+        { id: 2, title: 'Listing 2', status: ListingStatus.ACTIVE },
       ];
       mockPrismaClient.listing.findMany.mockResolvedValue(mockListings);
 
@@ -88,7 +89,7 @@ describe('MarketplaceService', () => {
 
       expect(result).toEqual(mockListings);
       expect(mockPrismaClient.listing.findMany).toHaveBeenCalledWith({
-        where: { status: 'ACTIVE' },
+        where: { status: ListingStatus.ACTIVE },
         skip: 0,
         take: 10,
         orderBy: { createdAt: 'desc' },
@@ -117,24 +118,26 @@ describe('MarketplaceService', () => {
 
   describe('updateListing', () => {
     it('should update an existing listing', async () => {
-      const existingListing = { id: 1, title: 'Old Title', authorId: 1, status: 'ACTIVE' };
-      const updatedListing = { ...existingListing, title: 'New Title' };
+      const existingListing = { id: 1, title: 'Old Title', description: 'Old Desc', price: 100, category: ListingCategory.HOME, authorId: 1, status: ListingStatus.ACTIVE };
+      const updatedListing = { ...existingListing, title: 'New Title', description: 'New Desc', price: 200, category: ListingCategory.TECHNOLOGY };
       mockPrismaClient.listing.findUnique.mockResolvedValue(existingListing);
       mockPrismaClient.listing.update.mockResolvedValue(updatedListing);
 
-      const result = await service.updateListing('test_schema', 1, 1, { title: 'New Title' });
+      const updateListingDto: UpdateListingDto = { title: 'New Title', description: 'New Desc', price: 200, category: ListingCategory.TECHNOLOGY };
+      const result = await service.updateListing('test_schema', 1, 1, updateListingDto);
 
       expect(result).toEqual(updatedListing);
       expect(mockPrismaClient.listing.update).toHaveBeenCalledWith({
         where: { id: 1 },
-        data: { title: 'New Title' },
+        data: updateListingDto,
       });
     });
 
     it('should throw NotFoundException if listing not found or unauthorized', async () => {
       mockPrismaClient.listing.findUnique.mockResolvedValue(null);
 
-      await expect(service.updateListing('test_schema', 999, 1, { title: 'New Title' })).rejects.toThrow(NotFoundException);
+      const updateListingDto: UpdateListingDto = { title: 'New Title', description: 'New Description', price: 200, category: ListingCategory.HOME };
+      await expect(service.updateListing('test_schema', 999, 1, updateListingDto)).rejects.toThrow(NotFoundException);
     });
   });
 

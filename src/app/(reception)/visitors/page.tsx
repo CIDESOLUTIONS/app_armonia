@@ -612,7 +612,7 @@ export default function ReceptionVisitorsPage() {
             <div className="text-center py-8 text-gray-500">
               <IdCard className="h-12 w-12 mx-auto mb-4 text-gray-400" />
               <h3 className="text-lg font-medium mb-2">
-                No se encontraron visitantes pre-registrados
+                No hay visitantes pre-registrados
               </h3>
               <p>
                 Los residentes pueden pre-registrar visitantes desde su portal.

@@ -5,8 +5,128 @@ import {
   IsBoolean,
   IsArray,
   IsDateString,
+  IsEnum,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+
+export enum CommonAreaType {
+  SALON = 'SALON',
+  BBQ = 'BBQ',
+  COURT = 'COURT',
+  POOL = 'POOL',
+  GYM = 'GYM',
+  OTHER = 'OTHER',
+}
+
+export class CreateCommonAreaDto {
+  @IsString()
+  name: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsEnum(CommonAreaType)
+  type: CommonAreaType;
+
+  @IsNumber()
+  @IsOptional()
+  capacity?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  requiresApproval?: boolean;
+
+  @IsNumber()
+  @IsOptional()
+  hourlyRate?: number;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  availableDays?: string[]; // e.g., ["MONDAY", "TUESDAY"]
+
+  @IsString()
+  @IsOptional()
+  openingTime?: string; // e.g., "08:00"
+
+  @IsString()
+  @IsOptional()
+  closingTime?: string; // e.g., "22:00"
+}
+
+export class UpdateCommonAreaDto extends Partial(CreateCommonAreaDto) {}
+
+export class CommonAreaDto {
+  id: number;
+  name: string;
+  description?: string;
+  type: CommonAreaType;
+  capacity?: number;
+  requiresApproval?: boolean;
+  hourlyRate?: number;
+  availableDays?: string[];
+  openingTime?: string;
+  closingTime?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export enum ParkingSpotType {
+  COVERED = 'COVERED',
+  UNCOVERED = 'UNCOVERED',
+  VISITOR = 'VISITOR',
+  DISABLED = 'DISABLED',
+}
+
+export enum ParkingSpotStatus {
+  AVAILABLE = 'AVAILABLE',
+  OCCUPIED = 'OCCUPIED',
+  RESERVED = 'RESERVED',
+  MAINTENANCE = 'MAINTENANCE',
+}
+
+export class CreateParkingSpotDto {
+  @IsString()
+  number: string;
+
+  @IsEnum(ParkingSpotType)
+  type: ParkingSpotType;
+
+  @IsEnum(ParkingSpotStatus)
+  @IsOptional()
+  status?: ParkingSpotStatus;
+
+  @IsNumber()
+  @IsOptional()
+  propertyId?: number;
+
+  @IsNumber()
+  @IsOptional()
+  residentId?: number;
+
+  @IsNumber()
+  complexId: number;
+
+  @IsString()
+  @IsOptional()
+  notes?: string;
+}
+
+export class UpdateParkingSpotDto extends Partial(CreateParkingSpotDto) {}
+
+export class ParkingSpotDto {
+  id: number;
+  number: string;
+  type: ParkingSpotType;
+  status: ParkingSpotStatus;
+  propertyId?: number;
+  residentId?: number;
+  complexId: number;
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export class PropertyWithDetailsDto {
   @IsNumber()
@@ -146,15 +266,6 @@ export class VehicleWithDetailsDto {
 
   @IsNumber()
   residentId: number;
-
-  @IsString()
-  unitNumber: string;
-
-  @IsString()
-  residentName: string;
-
-  @IsDateString()
-  createdAt: Date;
 }
 
 export class CreatePropertyDto {
@@ -246,40 +357,6 @@ export class CreatePetDto {
   @IsOptional()
   @IsDateString()
   vaccineExpiryDate?: Date;
-
-  @IsOptional()
-  @IsString()
-  notes?: string;
-
-  @IsNumber()
-  propertyId: number;
-
-  @IsNumber()
-  residentId: number;
-}
-
-export class CreateVehicleDto {
-  @IsString()
-  licensePlate: string;
-
-  @IsString()
-  brand: string;
-
-  @IsString()
-  model: string;
-
-  @IsNumber()
-  year: number;
-
-  @IsString()
-  color: string;
-
-  @IsString()
-  type: string;
-
-  @IsOptional()
-  @IsString()
-  parkingSpot?: string;
 
   @IsOptional()
   @IsString()

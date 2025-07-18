@@ -20,7 +20,7 @@ import {
 } from '../common/dto/finances.dto';
 import { ServerLogger } from 'C:/Users/videc/Documents/app_armonia/armonia-backend/src/lib/logging/server-logger';
 import { encrypt, decrypt } from 'C:/Users/videc/Documents/app_armonia/armonia-backend/src/lib/security/encryption-service';
-import { ActivityLogger } from 'C:/Users/videc/Documents/app_armonia/armonia-backend/src/lib/logging/activity-logger';
+import { ActivityLogger } from '../lib/logging/activity-logger';
 import { CommunicationService } from '../communications/communications.service';
 import { PdfService } from '../common/services/pdf.service';
 
@@ -687,8 +687,8 @@ export class FinancesService {
     return paymentGatewayResponse;
   }
 
-  async handlePaymentCallback(data: PaymentGatewayCallbackDto): Promise<any> {
-    const prisma = this.prisma.client;
+  async handlePaymentCallback(schemaName: string, data: PaymentGatewayCallbackDto): Promise<any> {
+    const prisma = this.getTenantPrismaClient(schemaName);
     ServerLogger.info(
       `Callback de pago recibido para transacción ${data.transactionId} con estado ${data.status}`,
     );

@@ -21,6 +21,13 @@ import {
   CreatePetDto,
   CreateVehicleDto,
   UpdateResidentDto,
+  CreateResidentDto,
+  CreateCommonAreaDto,
+  UpdateCommonAreaDto,
+  CommonAreaDto,
+  CreateParkingSpotDto,
+  UpdateParkingSpotDto,
+  ParkingSpotDto,
 } from '../common/dto/inventory.dto';
 
 @UseGuards(JwtAuthGuard)
@@ -28,6 +35,91 @@ import {
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
 
+  // Common Area Endpoints
+  @Post('common-areas')
+  async createCommonArea(
+    @GetUser() user: any,
+    @Body() createCommonAreaDto: CreateCommonAreaDto,
+  ): Promise<CommonAreaDto> {
+    return this.inventoryService.createCommonArea(user.schemaName, {
+      ...createCommonAreaDto,
+      complexId: user.complexId,
+    });
+  }
+
+  @Get('common-areas')
+  async getCommonAreas(@GetUser() user: any): Promise<CommonAreaDto[]> {
+    return this.inventoryService.getCommonAreas(user.schemaName);
+  }
+
+  @Get('common-areas/:id')
+  async getCommonAreaById(
+    @GetUser() user: any,
+    @Param('id') id: string,
+  ): Promise<CommonAreaDto> {
+    return this.inventoryService.getCommonAreaById(user.schemaName, +id);
+  }
+
+  @Put('common-areas/:id')
+  async updateCommonArea(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() updateCommonAreaDto: UpdateCommonAreaDto,
+  ): Promise<CommonAreaDto> {
+    return this.inventoryService.updateCommonArea(user.schemaName, +id, updateCommonAreaDto);
+  }
+
+  @Delete('common-areas/:id')
+  async deleteCommonArea(
+    @GetUser() user: any,
+    @Param('id') id: string,
+  ): Promise<void> {
+    return this.inventoryService.deleteCommonArea(user.schemaName, +id);
+  }
+
+  // Parking Spot Endpoints
+  @Post('parking-spots')
+  async createParkingSpot(
+    @GetUser() user: any,
+    @Body() createParkingSpotDto: CreateParkingSpotDto,
+  ): Promise<ParkingSpotDto> {
+    return this.inventoryService.createParkingSpot(user.schemaName, {
+      ...createParkingSpotDto,
+      complexId: user.complexId,
+    });
+  }
+
+  @Get('parking-spots')
+  async getParkingSpots(@GetUser() user: any): Promise<ParkingSpotDto[]> {
+    return this.inventoryService.getParkingSpots(user.schemaName, user.complexId);
+  }
+
+  @Get('parking-spots/:id')
+  async getParkingSpotById(
+    @GetUser() user: any,
+    @Param('id') id: string,
+  ): Promise<ParkingSpotDto> {
+    return this.inventoryService.getParkingSpotById(user.schemaName, +id);
+  }
+
+  @Put('parking-spots/:id')
+  async updateParkingSpot(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() updateParkingSpotDto: UpdateParkingSpotDto,
+  ): Promise<ParkingSpotDto> {
+    return this.inventoryService.updateParkingSpot(user.schemaName, +id, updateParkingSpotDto);
+  }
+
+  @Delete('parking-spots/:id')
+  async deleteParkingSpot(
+    @GetUser() user: any,
+    @Param('id') id: string,
+  ): Promise<void> {
+    return this.inventoryService.deleteParkingSpot(user.schemaName, +id);
+  }
+
+  // PROPIEDADES
   @Get('properties')
   async getProperties(@GetUser() user: any): Promise<PropertyWithDetailsDto[]> {
     return this.inventoryService.getProperties(user.schemaName, user.complexId);

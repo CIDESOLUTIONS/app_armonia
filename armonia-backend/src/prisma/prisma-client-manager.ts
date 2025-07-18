@@ -1,39 +1,25 @@
-import { PrismaClient } from '@prisma/client';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { PrismaService } from './prisma.service';
 
 @Injectable()
 export class PrismaClientManager {
-  private clients: Map<string, PrismaClient> = new Map();
+  constructor(private prismaService: PrismaService) {}
 
-  getClient(schemaName: string): PrismaClient {
-    if (!this.clients.has(schemaName)) {
-      const databaseUrl = process.env.DATABASE_URL;
-      if (!databaseUrl) {
-        throw new InternalServerErrorException(
-          'DATABASE_URL environment variable is not set.',
-        );
-      }
-      const prisma = new PrismaClient({
-        datasources: {
-          db: { url: `${databaseUrl}?schema=${schemaName}` },
-        },
-      });
-      this.clients.set(schemaName, prisma);
-    }
-    const client = this.clients.get(schemaName);
-    if (!client) {
-      // Esto no debería ocurrir si el has(schemaName) es verdadero, pero es una salvaguarda
-      throw new InternalServerErrorException(
-        `PrismaClient for schema ${schemaName} could not be retrieved.`,
-      );
-    }
-    return client;
+  getClient(schemaName: string): PrismaService {
+    // In a multi-schema setup within a single database, the global PrismaClient
+    // instance (PrismaService) already has access to all schemas defined in schema.prisma
+    // via the @@schema("tenant") directive. The schemaName parameter can be used
+    // for logging or validation, but the same PrismaService instance is returned.
+    // For actual schema switching in queries, you would typically use Prisma's
+    // `$extends` or pass the schema name in the query options if supported by the connector.
+    // However, for this project's current multi-schema approach, the generated client
+    // handles schema selection based on the model's @@schema directive.
+    return this.prismaService;
   }
 
   async disconnectAll() {
-    for (const client of this.clients.values()) {
-      await client.$disconnect();
-    }
-    this.clients.clear();
+    // The global PrismaService handles its own disconnection.
+    // This method can be kept for consistency if needed, but it won't manage multiple clients.
+    console.warn('disconnectAll in PrismaClientManager is deprecated in this multi-schema setup. PrismaService handles global disconnection.');
   }
 }

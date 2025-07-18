@@ -112,7 +112,7 @@ export class ServiceProvidersService {
         userId,
         rating: data.rating,
         comment: data.comment,
-        userName: 'Placeholder User', // TODO: Fetch actual user name
+        userName: (await prisma.user.findUnique({ where: { id: userId } }))?.name || 'Unknown User',
       },
     });
 

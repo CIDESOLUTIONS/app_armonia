@@ -123,7 +123,7 @@ export class IotService {
       });
 
       if (!rate) {
-        ServerLogger.warn(`No se encontró tarifa para el tipo ${consumptionData.type} y unidad ${consumptionData.unit} en el complejo ${data.complexId}.`);
+        // ServerLogger.warn(`No se encontró tarifa para el tipo ${consumptionData.type} y unidad ${consumptionData.unit} en el complejo ${data.complexId}.`);
         continue; // Skip if no rate found
       }
 

@@ -10,16 +10,82 @@ import {
   NotificationPriority,
   NotificationSourceType,
 } from '../common/dto/communications.dto';
+import { ConfigService } from '@nestjs/config';
+import twilio from 'twilio';
+import * as admin from 'firebase-admin';
 
 @Injectable()
 export class CommunicationsService {
+  private twilioClient: any;
+  private twilioPhoneNumber: string;
+
   constructor(
     private prismaClientManager: PrismaClientManager,
-    private prisma: PrismaService, // Inyectar PrismaService global
-  ) {}
+    private prisma: PrismaService,
+    private configService: ConfigService,
+  ) {
+    const accountSid = this.configService.get<string>('TWILIO_ACCOUNT_SID');
+    const authToken = this.configService.get<string>('TWILIO_AUTH_TOKEN');
+    this.twilioPhoneNumber = this.configService.get<string>('TWILIO_PHONE_NUMBER');
+
+    if (accountSid && authToken) {
+      this.twilioClient = twilio(accountSid, authToken);
+    } else {
+      console.warn('Twilio credentials not found. SMS functionality will be disabled.');
+    }
+
+    // Initialize Firebase Admin SDK
+    if (!admin.apps.length) {
+      const firebaseConfig = this.configService.get<string>('FIREBASE_SERVICE_ACCOUNT_KEY');
+      if (firebaseConfig) {
+        admin.initializeApp({
+          credential: admin.credential.cert(JSON.parse(firebaseConfig)),
+        });
+      } else {
+        console.warn('Firebase service account key not found. Push notification functionality will be disabled.');
+      }
+    }
+  }
 
   private getTenantPrismaClient(schemaName: string) {
     return this.prismaClientManager.getClient(schemaName);
+  }
+
+  private async sendSms(to: string, message: string): Promise<void> {
+    if (!this.twilioClient || !this.twilioPhoneNumber) {
+      console.warn('Twilio is not configured. SMS not sent.');
+      return;
+    }
+    try {
+      await this.twilioClient.messages.create({
+        body: message,
+        from: this.twilioPhoneNumber,
+        to: to,
+      });
+      console.log(`SMS sent to ${to}: ${message}`);
+    } catch (error) {
+      console.error(`Error sending SMS to ${to}:`, error);
+    }
+  }
+
+  private async sendPushNotification(token: string, title: string, body: string, data?: { [key: string]: string }): Promise<void> {
+    if (!admin.apps.length) {
+      console.warn('Firebase Admin SDK is not initialized. Push notification not sent.');
+      return;
+    }
+    try {
+      await admin.messaging().send({
+        token: token,
+        notification: {
+          title: title,
+          body: body,
+        },
+        data: data,
+      });
+      console.log(`Push notification sent to token: ${token}`);
+    } catch (error) {
+      console.error(`Error sending push notification to token ${token}:`, error);
+    }
   }
 
   // NOTIFICACIONES (Modelos de tenant)
@@ -30,12 +96,22 @@ export class CommunicationsService {
   ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
-      // Usar this.prisma para acceder al modelo User global
-      const user = await this.prisma.user.findUnique({ where: { id: userId } });
+      const user = await prisma.user.findUnique({ where: { id: userId } });
       if (!user) {
         throw new Error(`Usuario con ID ${userId} no encontrado`);
       }
-      // Usar prisma (tenant-specific) para acceder al modelo Notification
+
+      // Send SMS if notification type is SMS and user has a phone number
+      if (notification.type === NotificationType.SMS && user.phoneNumber) {
+        await this.sendSms(user.phoneNumber, notification.message);
+      }
+
+      // Send Push Notification if notification type is PUSH and user has a device token
+      if (notification.type === NotificationType.PUSH && user.deviceToken) {
+        await this.sendPushNotification(user.deviceToken, notification.title, notification.message, notification.data);
+      }
+
+      // Create database notification
       const dbNotification = await prisma.notification.create({
         data: {
           recipientId: userId,
@@ -63,7 +139,7 @@ export class CommunicationsService {
     userIds: number[],
     notification: NotificationDataDto,
   ) {
-    const results = [];
+    const results: any[] = [];
     for (const userId of userIds) {
       try {
         const result = await this.notifyUser(schemaName, userId, notification);
@@ -83,10 +159,10 @@ export class CommunicationsService {
     role: string,
     notification: NotificationDataDto,
   ) {
-    // Usar this.prisma para acceder al modelo User global
-    const users = await this.prisma.user.findMany({
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const users = await prisma.user.findMany({
       where: { role },
-      select: { id: true },
+      select: { id: true, phoneNumber: true, deviceToken: true }, // Select phoneNumber and deviceToken
     });
     const userIds = users.map((user) => user.id);
     return await this.notifyUsers(schemaName, userIds, notification);
@@ -98,7 +174,6 @@ export class CommunicationsService {
     filters: any = {},
   ) {
     const prisma = this.getTenantPrismaClient(schemaName);
-    // Usar prisma (tenant-specific) para acceder al modelo Notification
     const { read, type, sourceType, priority, limit } = filters;
     return await prisma.notification.findMany({
       where: {
@@ -121,7 +196,6 @@ export class CommunicationsService {
     userId: number,
   ) {
     const prisma = this.getTenantPrismaClient(schemaName);
-    // Usar prisma (tenant-specific) para acceder al modelo Notification
     const notification = await prisma.notification.findFirst({
       where: {
         id: notificationId,
@@ -142,7 +216,6 @@ export class CommunicationsService {
 
   async markAllNotificationsAsRead(schemaName: string, userId: number) {
     const prisma = this.getTenantPrismaClient(schemaName);
-    // Usar prisma (tenant-specific) para acceder al modelo Notification
     return await prisma.notification.updateMany({
       where: {
         recipientId: userId,
@@ -161,7 +234,6 @@ export class CommunicationsService {
     userId: number,
   ) {
     const prisma = this.getTenantPrismaClient(schemaName);
-    // Usar prisma (tenant-specific) para acceder al modelo Notification
     const notification = await prisma.notification.findFirst({
       where: {
         id: notificationId,
@@ -174,7 +246,6 @@ export class CommunicationsService {
         'Notificación no encontrada, no pertenece al usuario o no requiere confirmación',
       );
     }
-    // Asumiendo que NotificationConfirmation es un modelo de tenant
     await prisma.notificationConfirmation.create({
       data: {
         notificationId,
@@ -252,8 +323,8 @@ export class CommunicationsService {
         size: attachment.size,
       })),
       readBy: announcement.readBy,
-      requireConfirmation: announcement.requireConfirmation, // Corregido
       isRead: announcement.readBy.length > 0,
+      requireConfirmation: announcement.requireConfirmation, // Corregido
     }));
   }
 
@@ -296,19 +367,47 @@ export class CommunicationsService {
     });
     let targetUserIds: number[] = [];
     if (completeAnnouncement.visibility === 'public') {
-      // Usar this.prisma para acceder al modelo User global
-      const users = await this.prisma.user.findMany({ select: { id: true } });
+      const users = await prisma.user.findMany({ select: { id: true, phoneNumber: true, deviceToken: true } });
       targetUserIds = users.map((user) => user.id);
+      if (completeAnnouncement.type === 'emergency') {
+        for (const user of users) {
+          if (user.phoneNumber) {
+            await this.sendSms(user.phoneNumber, `Alerta de emergencia: ${completeAnnouncement.title}. ${completeAnnouncement.content.substring(0, 100)}...`);
+          }
+        }
+      }
+      // Send push notifications for emergency announcements
+      if (completeAnnouncement.type === 'emergency') {
+        for (const user of users) {
+          if (user.deviceToken) {
+            await this.sendPushNotification(user.deviceToken, `Alerta de emergencia: ${completeAnnouncement.title}`, completeAnnouncement.content);
+          }
+        }
+      }
     } else if (
       completeAnnouncement.visibility === 'role-based' &&
       completeAnnouncement.targetRoles.length > 0
     ) {
-      // Usar this.prisma para acceder al modelo User global
-      const users = await this.prisma.user.findMany({
+      const users = await prisma.user.findMany({
         where: { role: { in: completeAnnouncement.targetRoles } },
-        select: { id: true },
+        select: { id: true, phoneNumber: true, deviceToken: true },
       });
       targetUserIds = users.map((user) => user.id);
+      if (completeAnnouncement.type === 'emergency') {
+        for (const user of users) {
+          if (user.phoneNumber) {
+            await this.sendSms(user.phoneNumber, `Alerta de emergencia: ${completeAnnouncement.title}. ${completeAnnouncement.content.substring(0, 100)}...`);
+          }
+        }
+      }
+      // Send push notifications for emergency announcements to targeted roles
+      if (completeAnnouncement.type === 'emergency') {
+        for (const user of users) {
+          if (user.deviceToken) {
+            await this.sendPushNotification(user.deviceToken, `Alerta de emergencia: ${completeAnnouncement.title}`, completeAnnouncement.content);
+          }
+        }
+      }
     }
     if (targetUserIds.length > 0) {
       await this.notifyUsers(schemaName, targetUserIds, {
@@ -322,15 +421,13 @@ export class CommunicationsService {
         message: `Nuevo anuncio: ${completeAnnouncement.title}`,
         link: `/announcements/${completeAnnouncement.id}`,
         sourceType: NotificationSourceType.SYSTEM,
-        sourceId: completeAnnouncement.id,
+        sourceId: completeAnnouncement.id.toString(),
         priority:
           completeAnnouncement.type === 'emergency'
             ? NotificationPriority.URGENT
             : completeAnnouncement.type === 'important'
               ? NotificationPriority.HIGH
               : NotificationPriority.MEDIUM,
-        requireConfirmation: completeAnnouncement.requireConfirmation, // Corregido
-        expiresAt: completeAnnouncement.expiresAt,
       });
     }
     return completeAnnouncement;
@@ -351,7 +448,7 @@ export class CommunicationsService {
           type: data.type,
           visibility: data.visibility,
           targetRoles: data.targetRoles,
-          requireConfirmation: data.requireConfirmation, // Corregido
+          requireConfirmation: data.requireConfirmation,
           expiresAt: data.expiresAt,
         },
       });
@@ -379,7 +476,6 @@ export class CommunicationsService {
     userId: number,
   ) {
     const prisma = this.getTenantPrismaClient(schemaName);
-    // Usar prisma (tenant-specific) para acceder al modelo AnnouncementRead
     const existingRead = await prisma.announcementRead.findUnique({
       where: {
         announcementId_userId: { announcementId, userId },
@@ -400,7 +496,6 @@ export class CommunicationsService {
     userId2: number,
   ) {
     const prisma = this.getTenantPrismaClient(schemaName);
-    // Usar prisma (tenant-specific) para acceder a los modelos Conversation y ConversationParticipant
     const existingConversation = await prisma.conversation.findFirst({
       where: {
         type: 'direct',
@@ -439,7 +534,6 @@ export class CommunicationsService {
     data: MessageDataDto,
   ) {
     const prisma = this.getTenantPrismaClient(schemaName);
-    // Usar prisma (tenant-specific) para acceder a los modelos ConversationParticipant y Message
     const participant = await prisma.conversationParticipant.findFirst({
       where: { conversationId, userId: senderId },
     });
@@ -474,7 +568,7 @@ export class CommunicationsService {
         message: `${message.sender.name}: ${data.content.substring(0, 50)}${data.content.length > 50 ? '...' : ''}`,
         link: `/messages/${conversationId}`,
         sourceType: NotificationSourceType.MESSAGE,
-        sourceId: message.id.toString(), // Convertir a string
+        sourceId: message.id.toString(),
         priority: NotificationPriority.MEDIUM,
       });
     }
@@ -488,7 +582,6 @@ export class CommunicationsService {
     options: any = {},
   ) {
     const prisma = this.getTenantPrismaClient(schemaName);
-    // Usar prisma (tenant-specific) para acceder a los modelos ConversationParticipant y Message
     const participant = await prisma.conversationParticipant.findFirst({
       where: { conversationId, userId },
     });
@@ -522,16 +615,14 @@ export class CommunicationsService {
     }
     return messages;
   }
-
   async markMessageAsRead(
     schemaName: string,
     messageId: string,
     userId: number,
   ) {
     const prisma = this.getTenantPrismaClient(schemaName);
-    // Usar prisma (tenant-specific) para acceder a los modelos Message y MessageRead
     const message = await prisma.message.findUnique({
-      where: { id: parseInt(messageId) }, // Convertir a number
+      where: { id: parseInt(messageId) },
       include: {
         conversation: { include: { participants: { where: { userId } } } },
       },
@@ -562,7 +653,7 @@ export class CommunicationsService {
     });
     if (allReads.length >= allParticipants.length) {
       await prisma.message.update({
-        where: { id: +messageId }, // Convertir a number
+        where: { id: +messageId },
         data: { status: 'read' },
       });
     }
@@ -609,35 +700,75 @@ export class CommunicationsService {
     });
     let targetUserIds: number[] = [];
     if (completeEvent.visibility === 'public') {
-      // Usar this.prisma para acceder al modelo User global
-      const users = await this.prisma.user.findMany({ select: { id: true } });
+      const users = await prisma.user.findMany({ select: { id: true, phoneNumber: true, deviceToken: true } });
       targetUserIds = users.map((user) => user.id);
+      if (completeEvent.type === 'emergency') {
+        for (const user of users) {
+          if (user.phoneNumber) {
+            await this.sendSms(user.phoneNumber, `Alerta de emergencia: ${completeEvent.title}. ${completeEvent.content.substring(0, 100)}...`);
+          }
+        }
+      }
+      if (completeEvent.type === 'emergency') {
+        for (const user of users) {
+          if (user.deviceToken) {
+            await this.sendPushNotification(user.deviceToken, `Alerta de emergencia: ${completeEvent.title}`, completeEvent.content);
+          }
+        }
+      }
     } else if (
       completeEvent.visibility === 'role-based' &&
       completeEvent.targetRoles.length > 0
     ) {
-      // Usar this.prisma para acceder al modelo User global
-      const users = await this.prisma.user.findMany({
+      const users = await prisma.user.findMany({
         where: { role: { in: completeEvent.targetRoles } },
-        select: { id: true },
+        select: { id: true, phoneNumber: true, deviceToken: true },
       });
       targetUserIds = users.map((user) => user.id);
+      if (completeEvent.type === 'emergency') {
+        for (const user of users) {
+          if (user.phoneNumber) {
+            await this.sendSms(user.phoneNumber, `Alerta de emergencia: ${completeEvent.title}. ${completeEvent.content.substring(0, 100)}...`);
+          }
+        }
+      }
+      if (completeEvent.type === 'emergency') {
+        for (const user of users) {
+          if (user.deviceToken) {
+            await this.sendPushNotification(user.deviceToken, `Alerta de emergencia: ${completeEvent.title}`, completeEvent.content);
+          }
+        }
+      }
     }
     if (targetUserIds.length > 0) {
       await this.notifyUsers(schemaName, targetUserIds, {
-        type: NotificationType.INFO,
-        title: 'Nuevo evento',
-        message: `${completeEvent.title} - ${new Date(completeEvent.startDateTime).toLocaleDateString()}`,
+        type:
+          completeEvent.type === 'emergency'
+            ? NotificationType.ERROR
+            : completeEvent.type === 'important'
+              ? NotificationType.WARNING
+              : NotificationType.INFO,
+        title: completeEvent.title,
+        message: `Nuevo evento: ${completeEvent.title}`,
         link: `/events/${completeEvent.id}`,
         sourceType: NotificationSourceType.SYSTEM,
-        sourceId: completeEvent.id.toString(), // Convertir a string
-        priority: NotificationPriority.MEDIUM,
+        sourceId: completeEvent.id.toString(),
+        priority:
+          completeEvent.type === 'emergency'
+            ? NotificationPriority.URGENT
+            : completeEvent.type === 'important'
+              ? NotificationPriority.HIGH
+              : NotificationPriority.MEDIUM,
       });
     }
     return completeEvent;
   }
 
-  async updateEvent(schemaName: string, id: number, data: EventDataDto) {
+  async updateEvent(
+    schemaName: string,
+    id: number,
+    data: EventDataDto,
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       const event = await prisma.communityEvent.update({
@@ -779,7 +910,6 @@ export class CommunicationsService {
   async cleanupExpiredItems(schemaName: string) {
     const prismaTenant = this.getTenantPrismaClient(schemaName);
     const now = new Date();
-    // Usar prisma (tenant-specific) para acceder al modelo Notification
     const deletedNotifications = await prismaTenant.notification.deleteMany({
       where: { expiresAt: { lt: now } },
     });
@@ -794,9 +924,9 @@ export class CommunicationsService {
   }
 
   async migrateReservationNotifications(schemaName: string) {
-    // Usar this.prisma para acceder al modelo ReservationNotification global
+    const prisma = this.getTenantPrismaClient(schemaName);
     const reservationNotifications =
-      await this.prisma.reservationNotification.findMany({
+      await prisma.reservationNotification.findMany({
         where: { migrated: false },
         include: { reservation: true },
       });
@@ -808,7 +938,6 @@ export class CommunicationsService {
         if (oldNotification.type === 'cancellation')
           type = NotificationType.WARNING;
         const prisma = this.getTenantPrismaClient(schemaName);
-        // Usar prisma (tenant-specific) para acceder al modelo Notification
         await prisma.notification.create({
           data: {
             recipientId: oldNotification.userId,

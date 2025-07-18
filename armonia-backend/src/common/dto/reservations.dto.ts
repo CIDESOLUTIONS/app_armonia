@@ -9,69 +9,6 @@ export enum ReservationStatus {
   COMPLETED = 'COMPLETED',
 }
 
-export enum CommonAreaType {
-  SALON = 'SALON',
-  BBQ = 'BBQ',
-  COURT = 'COURT',
-  POOL = 'POOL',
-  GYM = 'GYM',
-  OTHER = 'OTHER',
-}
-
-export class CreateCommonAreaDto {
-  @IsString()
-  name: string;
-
-  @IsString()
-  @IsOptional()
-  description?: string;
-
-  @IsEnum(CommonAreaType)
-  type: CommonAreaType;
-
-  @IsNumber()
-  @IsOptional()
-  capacity?: number;
-
-  @IsBoolean()
-  @IsOptional()
-  requiresApproval?: boolean;
-
-  @IsNumber()
-  @IsOptional()
-  hourlyRate?: number;
-
-  @IsArray()
-  @IsString({ each: true })
-  @IsOptional()
-  availableDays?: string[]; // e.g., ["MONDAY", "TUESDAY"]
-
-  @IsString()
-  @IsOptional()
-  openingTime?: string; // e.g., "08:00"
-
-  @IsString()
-  @IsOptional()
-  closingTime?: string; // e.g., "22:00"
-}
-
-export class UpdateCommonAreaDto extends Partial<CreateCommonAreaDto> {}
-
-export class CommonAreaDto {
-  id: number;
-  name: string;
-  description?: string;
-  type: CommonAreaType;
-  capacity?: number;
-  requiresApproval?: boolean;
-  hourlyRate?: number;
-  availableDays?: string[];
-  openingTime?: string;
-  closingTime?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export class CreateReservationDto {
   @IsNumber()
   commonAreaId: number;
@@ -105,7 +42,7 @@ export class CreateReservationDto {
   paymentAmount?: number;
 }
 
-export class UpdateReservationDto extends Partial<CreateReservationDto> {
+export class UpdateReservationDto extends Partial(CreateReservationDto) {
   @IsOptional()
   @IsEnum(ReservationStatus)
   status?: ReservationStatus;
@@ -122,7 +59,7 @@ export class UpdateReservationDto extends Partial<CreateReservationDto> {
 export class ReservationDto {
   id: number;
   commonAreaId: number;
-  commonArea: CommonAreaDto; // Populated relation
+  commonArea: any; // Will be CommonAreaDto from inventory module
   userId: number;
   user: any; // Populated relation (UserDto)
   title: string;
