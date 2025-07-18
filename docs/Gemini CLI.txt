@@ -138,9 +138,57 @@ Próximos pasos (para usted):
        * Elimine manualmente las carpetas node_modules en la raíz del proyecto y en armonia-backend.
        * Elimine los archivos package-lock.json en ambos directorios.
        * Ejecute npm install en la raíz del proyecto y luego npm install dentro de armonia-backend.
-   4. Considere problemas específicos de Windows: A veces, los módulos nativos pueden tener problemas de compilación en Windows. Asegúrese de
-      tener las herramientas de compilación necesarias (como Visual C++ Build Tools).
+   4. Considere problemas específicos de Windows: A veces, los módulos nativos pueden tener problemas de compilación en Windows. Asegúrese de tener las herramientas de compilación necesarias (como Visual C++ Build Tools).
 
-  Una vez que haya resuelto el problema de rollup y las pruebas puedan ejecutarse, podré continuar con el plan de trabajo. Por favor,
-  avíseme cuando esté listo para que intente ejecutar las pruebas de nuevo.
+  Una vez que haya resuelto el problema de rollup y las pruebas puedan ejecutarse, podré continuar con el plan de trabajo. Por favor, avíseme cuando esté listo para que intente ejecutar las pruebas de nuevo.
+
+PS C:\Users\meciz\Documents\app_armonia\armonia-backend> node -v
+v24.4.1
+PS C:\Users\meciz\Documents\app_armonia\armonia-backend> cd ..
+PS C:\Users\meciz\Documents\app_armonia> npm install
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated npmlog@5.0.1: This package is no longer supported.
+npm warn deprecated har-validator@5.1.5: this library is no longer supported
+npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+npm warn deprecated are-we-there-yet@2.0.0: This package is no longer supported.
+npm warn deprecated text-encoding@0.7.0: no longer maintained
+npm warn deprecated gauge@3.0.2: This package is no longer supported.
+npm warn deprecated uuid@3.4.0: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
+npm warn deprecated request@2.88.2: request has been deprecated, see https://github.com/request/request/issues/3142
+
+added 1269 packages, and audited 1270 packages in 5m
+
+225 packages are looking for funding
+  run `npm fund` for details
+
+6 vulnerabilities (5 moderate, 1 high)
+
+To address all issues possible (including breaking changes), run:
+  npm audit fix --force
+
+Some issues need review, and may require choosing
+a different dependency.
+
+Run `npm audit` for details.
+PS C:\Users\meciz\Documents\app_armonia> cd armonia-backend
+PS C:\Users\meciz\Documents\app_armonia\armonia-backend> npm install
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+
+added 916 packages, and audited 917 packages in 2m
+
+170 packages are looking for funding
+  run `npm fund` for details
+
+1 high severity vulnerability
+
+Some issues need review, and may require choosing
+a different dependency.
+
+Run `npm audit` for details.
+PS C:\Users\meciz\Documents\app_armonia\armonia-backend>
  
