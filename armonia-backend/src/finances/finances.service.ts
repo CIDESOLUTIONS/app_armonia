@@ -19,9 +19,9 @@ import {
   PaymentGatewayCallbackDto,
 } from '../common/dto/finances.dto';
 import { ServerLogger } from 'C:/Users/videc/Documents/app_armonia/armonia-backend/src/lib/logging/server-logger';
-import { encrypt, decrypt } from 'C:/Users/videc/Documents/app_armonia/armonia-backend/src/lib/security/encryption-service';
+
 import { ActivityLogger } from '../lib/logging/activity-logger';
-import { CommunicationService } from '../communications/communications.service';
+import { CommunicationsService } from '../communications/communications.service';
 import { PdfService } from '../common/services/pdf.service';
 
 // Interfaces para adaptadores de pasarelas de pago
@@ -194,7 +194,7 @@ export class FinancesService {
   constructor(
     private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
-    private communicationService: CommunicationService,
+    private communicationsService: CommunicationsService,
     private pdfService: PdfService, // Inyectar PdfService
   ) {}
 
@@ -206,7 +206,7 @@ export class FinancesService {
     schemaName: string,
     filters: FeeFilterParamsDto = {},
   ): Promise<FeeListResponseDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     try {
       const where: any = {};
       if (filters.status) where.status = filters.status;
@@ -244,7 +244,7 @@ export class FinancesService {
   }
 
   async getFee(schemaName: string, id: number): Promise<FeeDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     try {
       return await prisma.fee.findUnique({ where: { id } });
     } catch (error) {
@@ -254,7 +254,7 @@ export class FinancesService {
   }
 
   async createFee(schemaName: string, data: CreateFeeDto): Promise<FeeDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     try {
       return await prisma.fee.create({ data });
     } catch (error) {
@@ -268,7 +268,7 @@ export class FinancesService {
     id: number,
     data: UpdateFeeDto,
   ): Promise<FeeDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     try {
       return await prisma.fee.update({ where: { id }, data });
     } catch (error) {
@@ -278,7 +278,7 @@ export class FinancesService {
   }
 
   async deleteFee(schemaName: string, id: number): Promise<void> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     try {
       await prisma.fee.delete({ where: { id } });
     } catch (error) {
@@ -291,7 +291,7 @@ export class FinancesService {
     schemaName: string,
     data: CreatePaymentDto,
   ): Promise<PaymentDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     try {
       return await prisma.payment.create({ data });
     } catch (error) {
@@ -304,7 +304,7 @@ export class FinancesService {
     schemaName: string,
     propertyId: number,
   ): Promise<PaymentDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     try {
       return await prisma.payment.findMany({ where: { propertyId } });
     } catch (error) {
@@ -317,7 +317,7 @@ export class FinancesService {
   }
 
   async getPropertyBalance(schemaName: string, propertyId: number) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     try {
       const totalFees = await prisma.fee.aggregate({
         _sum: { amount: true },
@@ -347,7 +347,7 @@ export class FinancesService {
     description: string,
     propertyIds?: number[],
   ) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     try {
       const properties = await prisma.property.findMany({
         where: propertyIds ? { id: { in: propertyIds } } : undefined,
@@ -373,7 +373,7 @@ export class FinancesService {
     schemaName: string,
     data: CreateBudgetDto,
   ): Promise<BudgetDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     try {
       const { items, ...budgetData } = data;
       const budget = await prisma.budget.create({
@@ -394,7 +394,7 @@ export class FinancesService {
     schemaName: string,
     year: number,
   ): Promise<BudgetDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     try {
       return await prisma.budget.findMany({
         where: { year },
@@ -410,7 +410,7 @@ export class FinancesService {
   }
 
   async approveBudget(schemaName: string, id: number, userId: number): Promise<BudgetDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     try {
       const budget = await prisma.budget.findUnique({
         where: { id },
@@ -439,7 +439,7 @@ export class FinancesService {
   }
 
   async getFinancialStats(schemaName: string) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     try {
       const totalIncome = await prisma.payment.aggregate({
         _sum: { amount: true },
@@ -473,7 +473,7 @@ export class FinancesService {
     type: 'INCOME' | 'EXPENSE' | 'BALANCE' | 'DEBTORS' | 'PAYMENTS_REPORT' | 'PEACE_AND_SAFE',
     format: 'JSON' | 'PDF' = 'JSON',
   ): Promise<FinancialReportResponseDto | Buffer> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const start = new Date(startDate);
     const end = new Date(endDate);
 
@@ -599,7 +599,7 @@ export class FinancesService {
     schemaName: string,
     file: any,
   ): Promise<any[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     ServerLogger.info(
       `Procesando extracto bancario para ${schemaName}: ${file.originalname}`,
     );
@@ -641,7 +641,7 @@ export class FinancesService {
     userId: number,
     data: InitiatePaymentDto,
   ): Promise<any> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     ServerLogger.info(
       `Iniciando pago para la cuota ${data.feeId} a través de ${data.paymentMethod}`,
     );
@@ -655,10 +655,10 @@ export class FinancesService {
     }
 
     // Obtener pasarela y método de pago dinámicamente
-    const gateway = await this.prisma.paymentGateway.findFirst({
+    const gateway = await (this.prisma as any).paymentGateway.findFirst({
       where: { isActive: true, supportedMethods: { has: data.paymentMethod } },
     });
-    const method = await this.prisma.paymentMethod.findFirst({
+    const method = await (this.prisma as any).paymentMethod.findFirst({
       where: { isActive: true, code: data.paymentMethod },
     });
 
@@ -688,7 +688,7 @@ export class FinancesService {
   }
 
   async handlePaymentCallback(schemaName: string, data: PaymentGatewayCallbackDto): Promise<any> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     ServerLogger.info(
       `Callback de pago recibido para transacción ${data.transactionId} con estado ${data.status}`,
     );
@@ -729,9 +729,9 @@ export class FinancesService {
       });
 
       // Notify user about successful payment
-      const user = await prisma.user.findUnique({ where: { id: paymentAttempt.userId } });
+      const user = await (prisma as any).user.findUnique({ where: { id: paymentAttempt.userId } });
       if (user && user.email) {
-        await this.communicationService.notifyUser('global', user.id, {
+        await this.communicationsService.notifyUser('global', user.id, {
           type: 'success',
           title: 'Pago Confirmado',
           message: `Tu pago de ${paymentAttempt.amount} ha sido procesado exitosamente.`,
@@ -745,7 +745,7 @@ export class FinancesService {
   }
 
   async approveReconciliation(schemaName: string, suggestion: any): Promise<any> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     ServerLogger.info(`Aprobando conciliación para ${schemaName}:`, suggestion);
 
     if (suggestion.payment && suggestion.payment.id) {

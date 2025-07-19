@@ -23,7 +23,7 @@ export class SurveyService {
     complexId: number,
     data: CreateSurveyDto,
   ): Promise<SurveyDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const { questions, ...surveyData } = data;
     const survey = await prisma.survey.create({
       data: {
@@ -49,7 +49,7 @@ export class SurveyService {
     schemaName: string,
     complexId: number,
   ): Promise<SurveyDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     return prisma.survey.findMany({
       where: { complexId },
       include: { questions: true },
@@ -58,7 +58,7 @@ export class SurveyService {
   }
 
   async getSurveyById(schemaName: string, id: number): Promise<SurveyDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const survey = await prisma.survey.findUnique({
       where: { id },
       include: { questions: true },
@@ -74,7 +74,7 @@ export class SurveyService {
     id: number,
     data: UpdateSurveyDto,
   ): Promise<SurveyDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const { questions, ...surveyData } = data;
 
     const survey = await prisma.survey.findUnique({ where: { id } });
@@ -105,7 +105,7 @@ export class SurveyService {
   }
 
   async deleteSurvey(schemaName: string, id: number): Promise<void> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const survey = await prisma.survey.findUnique({ where: { id } });
     if (!survey) {
       throw new NotFoundException(`Encuesta con ID ${id} no encontrada.`);
@@ -121,7 +121,7 @@ export class SurveyService {
     userId: number,
     data: CreateAnswerDto,
   ): Promise<any> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const survey = await prisma.survey.findUnique({
       where: { id: surveyId },
       include: { questions: true },
@@ -173,7 +173,7 @@ export class SurveyService {
   }
 
   async getSurveyResults(schemaName: string, surveyId: number): Promise<any> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const survey = await prisma.survey.findUnique({
       where: { id: surveyId },
       include: {

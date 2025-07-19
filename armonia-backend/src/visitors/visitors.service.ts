@@ -29,7 +29,7 @@ export class VisitorsService {
     schemaName: string,
     data: CreateVisitorDto,
   ): Promise<VisitorDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     return prisma.visitor.create({
       data: {
         ...data,
@@ -43,7 +43,7 @@ export class VisitorsService {
     schemaName: string,
     filters: VisitorFilterParamsDto,
   ): Promise<VisitorDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const where: any = {};
 
     if (filters.search) {
@@ -83,7 +83,7 @@ export class VisitorsService {
   }
 
   async getVisitorById(schemaName: string, id: number): Promise<VisitorDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const visitor = await prisma.visitor.findUnique({ where: { id } });
     if (!visitor) {
       throw new NotFoundException(`Visitante con ID ${id} no encontrado.`);
@@ -96,7 +96,7 @@ export class VisitorsService {
     id: number,
     data: UpdateVisitorDto,
   ): Promise<VisitorDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const visitor = await prisma.visitor.findUnique({ where: { id } });
 
     if (!visitor) {
@@ -110,12 +110,12 @@ export class VisitorsService {
   }
 
   async deleteVisitor(schemaName: string, id: number): Promise<void> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     await prisma.visitor.delete({ where: { id } });
   }
 
   async scanQrCode(schemaName: string, qrCode: string): Promise<VisitorDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const now = new Date();
 
     // Try to find a pre-registered visitor
@@ -201,7 +201,7 @@ export class VisitorsService {
   }
 
   async getPreRegisteredVisitors(schemaName: string): Promise<VisitorDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const now = new Date();
     const preRegistered = await prisma.preRegisteredVisitor.findMany({
       where: {

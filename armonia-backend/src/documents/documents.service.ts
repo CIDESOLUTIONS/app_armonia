@@ -25,7 +25,7 @@ export class DocumentsService {
     file: any,
     createDocumentDto: CreateDocumentDto,
   ): Promise<DocumentDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const fileUrl = await uploadFileToS3(file);
 
     const document = await prisma.document.create({
@@ -45,7 +45,7 @@ export class DocumentsService {
     schemaName: string,
     filters: DocumentFilterParamsDto,
   ): Promise<DocumentDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const where: any = {};
 
     if (filters.search) {
@@ -79,7 +79,7 @@ export class DocumentsService {
   }
 
   async getDocumentById(schemaName: string, id: number): Promise<DocumentDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const document = await prisma.document.findUnique({
       where: { id },
     });
@@ -91,7 +91,7 @@ export class DocumentsService {
   }
 
   async deleteDocument(schemaName: string, id: number): Promise<void> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const document = await prisma.document.findUnique({ where: { id } });
 
     if (!document) {

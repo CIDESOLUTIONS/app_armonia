@@ -19,6 +19,13 @@ export enum VisitorStatus {
   DEPARTED = 'departed',
 }
 
+export enum PreRegistrationStatus {
+  ACTIVE = 'active',
+  USED = 'used',
+  EXPIRED = 'expired',
+  CANCELLED = 'cancelled',
+}
+
 export class CreateVisitorDto {
   @IsString()
   name: string;
