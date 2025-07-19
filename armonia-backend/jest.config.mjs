@@ -26,9 +26,13 @@ const config = {
   ],
   coverageDirectory: '../coverage',
   testEnvironment: 'node',
-  roots: ['.'],
+  roots: ['<rootDir>'],
   modulePaths: [compilerOptions.baseUrl],
-  
+  moduleNameMapper: {
+    "^src/(.*)$": "<rootDir>/src/$1",
+    "^lib/logging/activity-logger$": "<rootDir>/src/lib/logging/activity-logger.ts",
+    ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
+  },
 };
 
 export default config;

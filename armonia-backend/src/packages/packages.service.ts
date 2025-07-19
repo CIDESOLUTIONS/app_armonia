@@ -27,7 +27,7 @@ export class PackagesService {
     schemaName: string,
     data: RegisterPackageDto,
   ): Promise<PackageDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     return prisma.package.create({
       data: {
         ...data,
@@ -41,7 +41,7 @@ export class PackagesService {
     schemaName: string,
     filters: PackageFilterParamsDto,
   ): Promise<PackageDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const where: any = {};
 
     if (filters.search) {
@@ -71,7 +71,7 @@ export class PackagesService {
   }
 
   async getPackageById(schemaName: string, id: number): Promise<PackageDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const pkg = await prisma.package.findUnique({ where: { id } });
     if (!pkg) {
       throw new NotFoundException(`Paquete con ID ${id} no encontrado.`);
@@ -80,7 +80,7 @@ export class PackagesService {
   }
 
   async deliverPackage(schemaName: string, id: number): Promise<PackageDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const pkg = await prisma.package.findUnique({ where: { id } });
 
     if (!pkg) {
@@ -121,7 +121,7 @@ export class PackagesService {
     id: number,
     data: UpdatePackageDto,
   ): Promise<PackageDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const pkg = await prisma.package.findUnique({ where: { id } });
 
     if (!pkg) {

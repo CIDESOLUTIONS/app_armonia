@@ -32,7 +32,7 @@ export class MarketplaceService {
     userId: number,
     data: CreateListingDto,
   ): Promise<ListingDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     return prisma.listing.create({
       data: { ...data, authorId: userId, status: ListingStatus.ACTIVE },
     });
@@ -42,7 +42,7 @@ export class MarketplaceService {
     schemaName: string,
     filters: ListingFilterParamsDto,
   ): Promise<ListingDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const where: any = { status: ListingStatus.ACTIVE };
 
     if (filters.search) {
@@ -71,7 +71,7 @@ export class MarketplaceService {
   }
 
   async getListingById(schemaName: string, id: number): Promise<ListingDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const listing = await prisma.listing.findUnique({
       where: { id },
       include: { author: { select: { name: true } } },
@@ -88,7 +88,7 @@ export class MarketplaceService {
     userId: number,
     data: UpdateListingDto,
   ): Promise<ListingDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const listing = await prisma.listing.findUnique({ where: { id } });
 
     if (!listing || listing.authorId !== userId) {
@@ -108,7 +108,7 @@ export class MarketplaceService {
     id: number,
     userId: number,
   ): Promise<void> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const listing = await prisma.listing.findUnique({ where: { id } });
 
     if (!listing || listing.authorId !== userId) {
@@ -126,7 +126,7 @@ export class MarketplaceService {
     reporterId: number,
     reason: string,
   ): Promise<any> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     return prisma.reportedListing.create({
       data: {
         listingId,
@@ -138,7 +138,7 @@ export class MarketplaceService {
   }
 
   async getReportedListings(schemaName: string): Promise<any[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     return prisma.reportedListing.findMany({
       where: { status: 'PENDING' },
       include: {
@@ -153,7 +153,7 @@ export class MarketplaceService {
     reportId: number,
     action: 'APPROVE' | 'REJECT',
   ): Promise<any> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     const report = await prisma.reportedListing.findUnique({
       where: { id: reportId },
     });
@@ -189,7 +189,7 @@ export class MarketplaceService {
       content: string;
     },
   ): Promise<any> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     return prisma.message.create({
       data: {
         listingId: data.listingId,
@@ -205,7 +205,7 @@ export class MarketplaceService {
     listingId: number,
     userId: number,
   ): Promise<any[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.getTenantPrismaClient(schemaName);
     return prisma.message.findMany({
       where: {
         listingId: listingId,
