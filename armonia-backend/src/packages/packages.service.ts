@@ -9,7 +9,10 @@ import {
   PackageStatus,
 } from '../common/dto/packages.dto';
 import { CommunicationsService } from '../communications/communications.service';
-import { NotificationType, NotificationSourceType } from '../common/dto/communications.dto';
+import {
+  NotificationType,
+  NotificationSourceType,
+} from '../common/dto/communications.dto';
 
 @Injectable()
 export class PackagesService {
@@ -104,14 +107,18 @@ export class PackagesService {
       });
 
       if (residentUser) {
-        await this.communicationsService.notifyUser(schemaName, residentUser.id, {
-          type: NotificationType.INFO,
-          title: 'Paquete Entregado',
-          message: `Tu paquete con número de seguimiento ${pkg.trackingNumber || 'N/A'} ha sido entregado.`, // Usar el trackingNumber del paquete
-          link: `/resident/packages/${pkg.id}`, // Enlace a la página de detalles del paquete
-          sourceType: NotificationSourceType.PACKAGE,
-          sourceId: pkg.id.toString(), // Convertir a string
-        });
+        await this.communicationsService.notifyUser(
+          schemaName,
+          residentUser.id,
+          {
+            type: NotificationType.INFO,
+            title: 'Paquete Entregado',
+            message: `Tu paquete con número de seguimiento ${pkg.trackingNumber || 'N/A'} ha sido entregado.`, // Usar el trackingNumber del paquete
+            link: `/resident/packages/${pkg.id}`, // Enlace a la página de detalles del paquete
+            sourceType: NotificationSourceType.PACKAGE,
+            sourceId: pkg.id.toString(), // Convertir a string
+          },
+        );
       }
     }
   }

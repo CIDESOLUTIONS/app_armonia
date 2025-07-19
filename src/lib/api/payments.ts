@@ -15,9 +15,12 @@ export async function createTransaction(data: any): Promise<any> {
 
 export async function processTransaction(transactionId: string): Promise<any> {
   try {
-    const response = await fetchApi(`/finances/payments/verify/${transactionId}`, {
-      method: "POST",
-    });
+    const response = await fetchApi(
+      `/finances/payments/verify/${transactionId}`,
+      {
+        method: "POST",
+      },
+    );
     return response;
   } catch (error) {
     console.error("Error processing transaction:", error);

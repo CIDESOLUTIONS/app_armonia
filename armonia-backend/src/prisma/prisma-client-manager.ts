@@ -20,6 +20,8 @@ export class PrismaClientManager {
   async disconnectAll() {
     // The global PrismaService handles its own disconnection.
     // This method can be kept for consistency if needed, but it won't manage multiple clients.
-    console.warn('disconnectAll in PrismaClientManager is deprecated in this multi-schema setup. PrismaService handles global disconnection.');
+    console.warn(
+      'disconnectAll in PrismaClientManager is deprecated in this multi-schema setup. PrismaService handles global disconnection.',
+    );
   }
 }

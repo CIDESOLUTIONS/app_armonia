@@ -124,10 +124,13 @@ export function ListingCard({ listing }: ListingCardProps) {
               onChange={(e) => setReportReason(e.target.value)}
             />
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsReportModalOpen(false)}>Cancelar</Button>
-              <Button onClick={handleReport}>
-                Reportar
+              <Button
+                variant="outline"
+                onClick={() => setIsReportModalOpen(false)}
+              >
+                Cancelar
               </Button>
+              <Button onClick={handleReport}>Reportar</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

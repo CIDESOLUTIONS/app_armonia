@@ -3,7 +3,7 @@ name: Daily Backup
 on:
   schedule:
     # Ejecutar todos los días a las 23:00 UTC
-    - cron: '0 23 * * *'
+    - cron: "0 23 * * *"
   # Permitir ejecución manual desde la interfaz de GitHub Actions
   workflow_dispatch:
 
@@ -15,18 +15,18 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      
+
       - name: Configure Git
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-      
+
       - name: Set remote repository
         run: |
           # Verificar si el remoto ya está configurado correctamente
           CURRENT_REMOTE=$(git remote get-url origin 2>/dev/null || echo "")
           TARGET_REMOTE="https://github.com/CIDESOLUTIONS/Armonia.git"
-          
+
           if [[ "$CURRENT_REMOTE" != "$TARGET_REMOTE" ]]; then
             echo "Configurando remoto al repositorio oficial..."
             git remote remove origin || true
@@ -34,7 +34,7 @@ jobs:
           else
             echo "Remoto ya configurado correctamente."
           fi
-      
+
       - name: Check for changes and commit
         run: |
           if [[ -n $(git status -s) ]]; then

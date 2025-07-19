@@ -48,7 +48,14 @@ import {
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import Image from "next/image";
-import { getPackages, registerPackage, deliverPackage, returnPackage, PackageItem, PackageFilterParams } from "@/services/packageService";
+import {
+  getPackages,
+  registerPackage,
+  deliverPackage,
+  returnPackage,
+  PackageItem,
+  PackageFilterParams,
+} from "@/services/packageService";
 
 export default function ReceptionPackagesPage() {
   const { isLoggedIn, token: _token, schemaName } = useAuthStore();
@@ -56,11 +63,17 @@ export default function ReceptionPackagesPage() {
   const [loading, setLoading] = useState(true);
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [error, _setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<PackageItem["status"] | "all">("pending");
-  const [typeFilter, setTypeFilter] = useState<PackageItem["type"] | "all">("all");
+  const [statusFilter, setStatusFilter] = useState<
+    PackageItem["status"] | "all"
+  >("pending");
+  const [typeFilter, setTypeFilter] = useState<PackageItem["type"] | "all">(
+    "all",
+  );
   const [isRegisterDialogOpen, setIsRegisterDialogOpen] = useState(false);
   const [isDeliverDialogOpen, setIsDeliverDialogOpen] = useState(false);
-  const [selectedPackage, setSelectedPackage] = useState<PackageItem | null>(null);
+  const [selectedPackage, setSelectedPackage] = useState<PackageItem | null>(
+    null,
+  );
   const [newPackageForm, setNewPackageForm] = useState({
     type: "package",
     trackingNumber: "",
@@ -246,7 +259,10 @@ export default function ReceptionPackagesPage() {
       });
     } catch (err: any) {
       console.error("[ReceptionPackages] Error:", err);
-      _setError(err.message || "Error al registrar el paquete. Por favor, inténtelo de nuevo.");
+      _setError(
+        err.message ||
+          "Error al registrar el paquete. Por favor, inténtelo de nuevo.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -272,7 +288,10 @@ export default function ReceptionPackagesPage() {
     setIsSubmitting(true);
 
     try {
-      const updatedPackage = await deliverPackage(selectedPackage.id, deliveryForm);
+      const updatedPackage = await deliverPackage(
+        selectedPackage.id,
+        deliveryForm,
+      );
       setPackages((prev) =>
         prev.map((pkg) =>
           pkg.id === updatedPackage.id ? updatedPackage : pkg,
@@ -282,7 +301,10 @@ export default function ReceptionPackagesPage() {
       setIsDeliverDialogOpen(false);
     } catch (err: any) {
       console.error("[ReceptionPackages] Error:", err);
-      _setError(err.message || "Error al registrar la entrega. Por favor, inténtelo de nuevo.");
+      _setError(
+        err.message ||
+          "Error al registrar la entrega. Por favor, inténtelo de nuevo.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -309,7 +331,8 @@ export default function ReceptionPackagesPage() {
     } catch (err: any) {
       console.error("[ReceptionPackages] Error:", err);
       _setError(
-        err.message || "Error al marcar el paquete como devuelto. Por favor, inténtelo de nuevo.",
+        err.message ||
+          "Error al marcar el paquete como devuelto. Por favor, inténtelo de nuevo.",
       );
     } finally {
       setIsSubmitting(false);

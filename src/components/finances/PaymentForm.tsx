@@ -5,17 +5,38 @@ import * as z from "zod";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
-import { CreditCard, Banknote, Receipt, Lock, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import {
+  CreditCard,
+  Banknote,
+  Receipt,
+  Lock,
+  CheckCircle,
+  XCircle,
+  Loader2,
+} from "lucide-react";
 
 // Shadcn UI Components
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 // Servicios y utilidades
 import { createTransaction, processTransaction } from "@/lib/api/payments";
@@ -29,7 +50,10 @@ const paymentSchema = z.object({
   ),
   description: z
     .string()
-    .min(3, "La descripción es obligatoria y debe tener al menos 3 caracteres."),
+    .min(
+      3,
+      "La descripción es obligatoria y debe tener al menos 3 caracteres.",
+    ),
   paymentMethodId: z.number().int().positive("Seleccione un método de pago."),
   invoiceId: z.number().optional(),
   savePaymentMethod: z.boolean().optional(),
@@ -79,7 +103,12 @@ const PaymentForm = ({
     },
   });
 
-  const { control, handleSubmit, watch, formState: { errors } } = form;
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = form;
 
   // Observar método de pago seleccionado
   const selectedMethodId = watch("paymentMethodId");
@@ -158,12 +187,8 @@ const PaymentForm = ({
     return (
       <div className="text-center py-4">
         {config.icon}
-        <h3 className="text-lg font-semibold mt-2">
-          {config.title}
-        </h3>
-        <p className="text-sm text-gray-500">
-          {config.description}
-        </p>
+        <h3 className="text-lg font-semibold mt-2">{config.title}</h3>
+        <p className="text-sm text-gray-500">{config.description}</p>
       </div>
     );
   };
@@ -241,14 +266,19 @@ const PaymentForm = ({
               <FormLabel>Seleccione un método de pago</FormLabel>
               <FormControl>
                 <RadioGroup
-                  onValueChange={(value) => form.setValue("paymentMethodId", parseInt(value))}
+                  onValueChange={(value) =>
+                    form.setValue("paymentMethodId", parseInt(value))
+                  }
                   value={String(watch("paymentMethodId"))}
                   className="grid grid-cols-1 md:grid-cols-3 gap-4"
                 >
                   {paymentMethods.map((method) => (
                     <FormItem key={method.id}>
                       <FormLabel className="[&:has([data-state=checked])]:border-primary flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground">
-                        <RadioGroupItem value={String(method.id)} className="sr-only" />
+                        <RadioGroupItem
+                          value={String(method.id)}
+                          className="sr-only"
+                        />
                         {method.icon}
                         <span className="block text-sm font-medium mt-2">
                           {method.name}
@@ -275,7 +305,9 @@ const PaymentForm = ({
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none">
-                      <FormLabel>Guardar esta tarjeta para pagos futuros</FormLabel>
+                      <FormLabel>
+                        Guardar esta tarjeta para pagos futuros
+                      </FormLabel>
                     </div>
                   </FormItem>
                 )}
@@ -285,22 +317,26 @@ const PaymentForm = ({
             {/* Información adicional según método de pago */}
             {selectedMethod?.type === "PSE" && (
               <Card className="p-4 bg-blue-50 border-blue-200 text-blue-800">
-                <CardTitle className="text-base">Información importante</CardTitle>
+                <CardTitle className="text-base">
+                  Información importante
+                </CardTitle>
                 <CardDescription className="text-sm">
-                  Al seleccionar PSE, será redirigido a su banco para
-                  completar la transacción. Asegúrese de tener habilitado su
-                  servicio de banca en línea.
+                  Al seleccionar PSE, será redirigido a su banco para completar
+                  la transacción. Asegúrese de tener habilitado su servicio de
+                  banca en línea.
                 </CardDescription>
               </Card>
             )}
 
             {selectedMethod?.type === "CASH" && (
               <Card className="p-4 bg-yellow-50 border-yellow-200 text-yellow-800">
-                <CardTitle className="text-base">Información importante</CardTitle>
+                <CardTitle className="text-base">
+                  Información importante
+                </CardTitle>
                 <CardDescription className="text-sm">
-                  Al seleccionar pago en efectivo, recibirá un código que
-                  deberá presentar en los puntos de pago autorizados para
-                  completar la transacción.
+                  Al seleccionar pago en efectivo, recibirá un código que deberá
+                  presentar en los puntos de pago autorizados para completar la
+                  transacción.
                 </CardDescription>
               </Card>
             )}
@@ -316,17 +352,10 @@ const PaymentForm = ({
 
             {/* Botones de acción */}
             <div className="flex justify-end space-x-2">
-              <Button
-                variant="outline"
-                onClick={onCancel}
-                disabled={loading}
-              >
+              <Button variant="outline" onClick={onCancel} disabled={loading}>
                 Cancelar
               </Button>
-              <Button
-                type="submit"
-                disabled={loading}
-              >
+              <Button type="submit" disabled={loading}>
                 {loading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : null}{" "}

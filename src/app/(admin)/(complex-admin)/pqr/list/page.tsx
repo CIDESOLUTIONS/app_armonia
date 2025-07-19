@@ -283,10 +283,13 @@ export default function PQRListPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>Cancelar</Button>
-            <Button onClick={confirmDeletePQR}>
-              Eliminar
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+            >
+              Cancelar
             </Button>
+            <Button onClick={confirmDeletePQR}>Eliminar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

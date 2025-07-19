@@ -132,7 +132,10 @@ export class BillingEngine {
   /**
    * Persiste las facturas generadas en la base de datos
    */
-  static async saveBills(bills: GeneratedBill[], complexId: number): Promise<void> {
+  static async saveBills(
+    bills: GeneratedBill[],
+    complexId: number,
+  ): Promise<void> {
     const schemaName = `tenant_${complexId}`;
     const prisma = getTenantPrismaClient(schemaName);
 

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
@@ -134,7 +138,8 @@ export class VisitorsService {
       const newVisitor = await prisma.visitor.create({
         data: {
           name: preRegisteredVisitor.name,
-          documentType: preRegisteredVisitor.documentType || VisitorDocumentType.OTHER,
+          documentType:
+            preRegisteredVisitor.documentType || VisitorDocumentType.OTHER,
           documentNumber: preRegisteredVisitor.documentNumber || 'N/A',
           complexId: preRegisteredVisitor.complexId,
           propertyId: preRegisteredVisitor.propertyId,
@@ -173,7 +178,8 @@ export class VisitorsService {
       const newVisitor = await prisma.visitor.create({
         data: {
           name: accessPass.preRegister?.name || 'Visitante con Pase',
-          documentType: accessPass.preRegister?.documentType || VisitorDocumentType.OTHER,
+          documentType:
+            accessPass.preRegister?.documentType || VisitorDocumentType.OTHER,
           documentNumber: accessPass.preRegister?.documentNumber || 'N/A',
           complexId: accessPass.preRegister?.complexId || 0, // Adjust as needed
           propertyId: accessPass.preRegister?.propertyId || 0, // Adjust as needed
@@ -197,7 +203,9 @@ export class VisitorsService {
       return newVisitor;
     }
 
-    throw new NotFoundException('QR Code inválido o visitante/pase no encontrado.');
+    throw new NotFoundException(
+      'QR Code inválido o visitante/pase no encontrado.',
+    );
   }
 
   async getPreRegisteredVisitors(schemaName: string): Promise<VisitorDto[]> {
@@ -211,7 +219,7 @@ export class VisitorsService {
       include: { resident: true, property: true },
     });
 
-    return preRegistered.map(pr => ({
+    return preRegistered.map((pr) => ({
       id: pr.id,
       name: pr.name,
       documentType: pr.documentType || VisitorDocumentType.OTHER,

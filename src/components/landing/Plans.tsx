@@ -5,7 +5,6 @@ import { ROUTES } from "@/constants/routes";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
-
 export function Plans() {
   const t = useTranslations("landing.pricing");
   const [currency, setCurrency] = useState("COP"); // Default currency
@@ -40,7 +39,11 @@ export function Plans() {
     },
     {
       name: "portfolio",
-      price: { COP: t("plans.portfolio.price"), USD: t("plans.portfolio.price"), BRL: t("plans.portfolio.price") },
+      price: {
+        COP: t("plans.portfolio.price"),
+        USD: t("plans.portfolio.price"),
+        BRL: t("plans.portfolio.price"),
+      },
       priceSuffix: "",
       description: t("plans.portfolio.description"),
       features: t.raw("plans.portfolio.features"),
@@ -48,12 +51,16 @@ export function Plans() {
       recommended: false,
     },
     {
-      name: "assembly",
-      price: { COP: t("plans.assembly.price"), USD: t("plans.assembly.price"), BRL: t("plans.assembly.price") },
+      name: "digital-democracy",
+      price: {
+        COP: t("plans.digital-democracy.price"),
+        USD: t("plans.digital-democracy.price"),
+        BRL: t("plans.digital-democracy.price"),
+      },
       priceSuffix: "",
-      description: t("plans.assembly.description"),
-      features: t.raw("plans.assembly.features"),
-      buttonText: t("plans.assembly.buttonText"),
+      description: t("plans.digital-democracy.description"),
+      features: t.raw("plans.digital-democracy.features"),
+      buttonText: t("plans.digital-democracy.buttonText"),
       recommended: false,
     },
   ];
@@ -71,39 +78,54 @@ export function Plans() {
         </div>
 
         <div className="text-center mb-12">
-            <div className="inline-flex rounded-md shadow-sm">
-              <button onClick={() => setCurrency('COP')} className={`px-4 py-2 text-sm font-medium ${currency === 'COP' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700'} border border-gray-200 rounded-l-lg hover:bg-gray-50`}>COP</button>
-              <button onClick={() => setCurrency('USD')} className={`px-4 py-2 text-sm font-medium ${currency === 'USD' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700'} border-t border-b border-gray-200 hover:bg-gray-50`}>USD</button>
-              <button onClick={() => setCurrency('BRL')} className={`px-4 py-2 text-sm font-medium ${currency === 'BRL' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700'} border border-gray-200 rounded-r-lg hover:bg-gray-50`}>BRL</button>
-            </div>
+          <div className="inline-flex rounded-md shadow-sm">
+            <button
+              onClick={() => setCurrency("COP")}
+              className={`px-4 py-2 text-sm font-medium ${currency === "COP" ? "bg-indigo-600 text-white" : "bg-white text-gray-700"} border border-gray-200 rounded-l-lg hover:bg-gray-50`}
+            >
+              COP
+            </button>
+            <button
+              onClick={() => setCurrency("USD")}
+              className={`px-4 py-2 text-sm font-medium ${currency === "USD" ? "bg-indigo-600 text-white" : "bg-white text-gray-700"} border-t border-b border-gray-200 hover:bg-gray-50`}
+            >
+              USD
+            </button>
+            <button
+              onClick={() => setCurrency("BRL")}
+              className={`px-4 py-2 text-sm font-medium ${currency === "BRL" ? "bg-indigo-600 text-white" : "bg-white text-gray-700"} border border-gray-200 rounded-r-lg hover:bg-gray-50`}
+            >
+              BRL
+            </button>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {plans.map((plan, index) => (
-              <div
-                key={index}
-                className={`p-8 rounded-lg border shadow-md hover:shadow-xl transition-all ${
-                  plan.recommended
-                    ? "border-2 border-indigo-500 dark:border-indigo-400 transform scale-105"
-                    : "border-gray-200 dark:border-gray-600"
-                } bg-white dark:bg-gray-700 relative`}
-              >
-                {plan.recommended && (
-                  <div className="absolute top-0 right-0 bg-indigo-500 text-white px-4 py-1 text-sm font-bold rounded-bl-lg rounded-tr-lg">
-                    {t("recommended")}
-                  </div>
-                )}
-                <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">
-                  {t(`plans.${plan.name}.name`)}
-                </h3>
-                <div className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
-                  {plan.price[currency]}
-                  {plan.priceSuffix && (
-                    <span className="text-base font-normal">
-                      {plan.priceSuffix}
-                    </span>
-                  )}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {plans.map((plan, index) => (
+            <div
+              key={index}
+              className={`p-8 rounded-lg border shadow-md hover:shadow-xl transition-all ${
+                plan.recommended
+                  ? "border-2 border-indigo-500 dark:border-indigo-400 transform scale-105"
+                  : "border-gray-200 dark:border-gray-600"
+              } bg-white dark:bg-gray-700 relative`}
+            >
+              {plan.recommended && (
+                <div className="absolute top-0 right-0 bg-indigo-500 text-white px-4 py-1 text-sm font-bold rounded-bl-lg rounded-tr-lg">
+                  {t("recommended")}
                 </div>
+              )}
+              <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">
+                {t(`plans.${plan.name}.name`)}
+              </h3>
+              <div className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
+                {plan.price[currency]}
+                {plan.priceSuffix && (
+                  <span className="text-base font-normal">
+                    {plan.priceSuffix}
+                  </span>
+                )}
+              </div>
               <p className="text-gray-600 dark:text-gray-300 mb-6">
                 {plan.description}
               </p>

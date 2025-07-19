@@ -19,7 +19,11 @@ export class PersonalFinancesService {
     return this.prismaClientManager.getClient(schemaName);
   }
 
-  async createTransaction(schemaName: string, userId: number, data: CreatePersonalTransactionDto): Promise<PersonalTransactionDto> {
+  async createTransaction(
+    schemaName: string,
+    userId: number,
+    data: CreatePersonalTransactionDto,
+  ): Promise<PersonalTransactionDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     return prisma.personalTransaction.create({
       data: {
@@ -29,7 +33,11 @@ export class PersonalFinancesService {
     });
   }
 
-  async getTransactions(schemaName: string, userId: number, filters: PersonalTransactionFilterParamsDto): Promise<PersonalTransactionDto[]> {
+  async getTransactions(
+    schemaName: string,
+    userId: number,
+    filters: PersonalTransactionFilterParamsDto,
+  ): Promise<PersonalTransactionDto[]> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const where: any = { userId };
 
@@ -52,11 +60,20 @@ export class PersonalFinancesService {
     });
   }
 
-  async updateTransaction(schemaName: string, userId: number, id: number, data: UpdatePersonalTransactionDto): Promise<PersonalTransactionDto> {
+  async updateTransaction(
+    schemaName: string,
+    userId: number,
+    id: number,
+    data: UpdatePersonalTransactionDto,
+  ): Promise<PersonalTransactionDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    const transaction = await prisma.personalTransaction.findFirst({ where: { id, userId } });
+    const transaction = await prisma.personalTransaction.findFirst({
+      where: { id, userId },
+    });
     if (!transaction) {
-      throw new NotFoundException(`Transacción con ID ${id} no encontrada o no pertenece al usuario.`);
+      throw new NotFoundException(
+        `Transacción con ID ${id} no encontrada o no pertenece al usuario.`,
+      );
     }
     return prisma.personalTransaction.update({
       where: { id },
@@ -64,11 +81,19 @@ export class PersonalFinancesService {
     });
   }
 
-  async deleteTransaction(schemaName: string, userId: number, id: number): Promise<void> {
+  async deleteTransaction(
+    schemaName: string,
+    userId: number,
+    id: number,
+  ): Promise<void> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    const transaction = await prisma.personalTransaction.findFirst({ where: { id, userId } });
+    const transaction = await prisma.personalTransaction.findFirst({
+      where: { id, userId },
+    });
     if (!transaction) {
-      throw new NotFoundException(`Transacción con ID ${id} no encontrada o no pertenece al usuario.`);
+      throw new NotFoundException(
+        `Transacción con ID ${id} no encontrada o no pertenece al usuario.`,
+      );
     }
     await prisma.personalTransaction.delete({ where: { id } });
   }

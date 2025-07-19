@@ -60,9 +60,7 @@
     "next-intl": "^4.3.4",
     "node-onvif": "^0.1.7",
     "node-rtsp-stream": "^0.0.9",
-    "node-telegram-bot-api": "^0.66.0",
     "nodemailer": "^6.10.0",
-    "pdf-lib": "^1.17.1",
     "pdfkit": "^0.17.1",
     "pg": "^8.14.1",
     "qrcode": "^1.5.4",
@@ -85,6 +83,8 @@
     "zustand": "^5.0.6"
   },
   "devDependencies": {
+    "@eslint/js": "^9.31.0",
+    "@next/eslint-plugin-next": "^15.4.2",
     "@types/node": "^20.17.24",
     "@types/pg": "^8.11.11",
     "@types/react": "^19.1.6",
@@ -95,6 +95,10 @@
     "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4",
     "autoprefixer": "^10.4.18",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.3",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^16.3.0",
     "monocart-reporter": "^2.9.21",
     "node-fetch": "^2.6.1",
     "postcss": "^8.4.35",
@@ -107,7 +111,7 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.36.0",
+    "typescript-eslint": "^8.37.0",
     "vitest": "^3.2.4",
     "whatwg-fetch": "^3.6.20"
   }

@@ -6,7 +6,9 @@ export const vehicleSchema = z.object({
   model: z.string().min(1, { message: "El modelo es requerido." }),
   year: z.number().min(1900, { message: "El año debe ser válido." }),
   color: z.string().min(1, { message: "El color es requerido." }),
-  type: z.enum(["CAR", "MOTORCYCLE", "BICYCLE", "OTHER"], { message: "El tipo de vehículo es requerido." }),
+  type: z.enum(["CAR", "MOTORCYCLE", "BICYCLE", "OTHER"], {
+    message: "El tipo de vehículo es requerido.",
+  }),
   parkingSpot: z.string().optional(),
   notes: z.string().optional(),
   propertyId: z

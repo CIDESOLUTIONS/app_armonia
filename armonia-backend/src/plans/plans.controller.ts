@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { PlansService } from './plans.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -34,7 +44,10 @@ export class PlansController {
 
   @Put('plan/:id')
   @Roles(UserRole.APP_ADMIN)
-  async updatePlan(@Param('id') id: string, @Body() updatePlanDto: UpdatePlanDto) {
+  async updatePlan(
+    @Param('id') id: string,
+    @Body() updatePlanDto: UpdatePlanDto,
+  ) {
     return this.plansService.updatePlan(+id, updatePlanDto);
   }
 
@@ -46,7 +59,9 @@ export class PlansController {
 
   @Post('subscription')
   @Roles(UserRole.APP_ADMIN, UserRole.COMPLEX_ADMIN)
-  async createSubscription(@Body() createSubscriptionDto: CreateSubscriptionDto) {
+  async createSubscription(
+    @Body() createSubscriptionDto: CreateSubscriptionDto,
+  ) {
     return this.plansService.createSubscription(createSubscriptionDto);
   }
 
@@ -64,7 +79,10 @@ export class PlansController {
 
   @Put('subscription/:id')
   @Roles(UserRole.APP_ADMIN, UserRole.COMPLEX_ADMIN)
-  async updateSubscription(@Param('id') id: string, @Body() updateSubscriptionDto: UpdateSubscriptionDto) {
+  async updateSubscription(
+    @Param('id') id: string,
+    @Body() updateSubscriptionDto: UpdateSubscriptionDto,
+  ) {
     return this.plansService.updateSubscription(+id, updateSubscriptionDto);
   }
 

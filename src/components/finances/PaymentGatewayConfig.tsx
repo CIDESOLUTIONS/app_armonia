@@ -1,17 +1,23 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { useToast } from '@/components/ui/use-toast';
-import { Loader2 } from 'lucide-react';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { useToast } from "@/components/ui/use-toast";
+import { Loader2 } from "lucide-react";
 
 // Placeholder for actual API calls to configure payment gateways
 // In a real application, these would interact with your backend to save/retrieve API keys, webhook URLs, etc.
 const savePaymentGatewayConfig = async (config: any) => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      console.log('Saving payment gateway config:', config);
+      console.log("Saving payment gateway config:", config);
       resolve({ success: true });
     }, 1000);
   });
@@ -20,12 +26,12 @@ const savePaymentGatewayConfig = async (config: any) => {
 const getPaymentGatewayConfig = async () => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      console.log('Fetching payment gateway config');
+      console.log("Fetching payment gateway config");
       // Simulate fetching existing config
       resolve({
-        stripePublicKey: 'pk_test_YOUR_STRIPE_PUBLIC_KEY',
-        stripeSecretKey: 'sk_test_YOUR_STRIPE_SECRET_KEY',
-        paypalClientId: 'YOUR_PAYPAL_CLIENT_ID',
+        stripePublicKey: "pk_test_YOUR_STRIPE_PUBLIC_KEY",
+        stripeSecretKey: "sk_test_YOUR_STRIPE_SECRET_KEY",
+        paypalClientId: "YOUR_PAYPAL_CLIENT_ID",
       });
     }, 1000);
   });
@@ -35,9 +41,9 @@ export function PaymentGatewayConfig() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [config, setConfig] = useState({
-    stripePublicKey: '',
-    stripeSecretKey: '',
-    paypalClientId: '',
+    stripePublicKey: "",
+    stripeSecretKey: "",
+    paypalClientId: "",
   });
 
   // Load existing config on component mount
@@ -48,11 +54,12 @@ export function PaymentGatewayConfig() {
         const fetchedConfig = await getPaymentGatewayConfig();
         setConfig(fetchedConfig as any);
       } catch (error) {
-        console.error('Error fetching config:', error);
+        console.error("Error fetching config:", error);
         toast({
-          title: 'Error',
-          description: 'No se pudo cargar la configuración de la pasarela de pago.',
-          variant: 'destructive',
+          title: "Error",
+          description:
+            "No se pudo cargar la configuración de la pasarela de pago.",
+          variant: "destructive",
         });
       } finally {
         setLoading(false);
@@ -72,15 +79,15 @@ export function PaymentGatewayConfig() {
     try {
       await savePaymentGatewayConfig(config);
       toast({
-        title: 'Éxito',
-        description: 'Configuración guardada correctamente.',
+        title: "Éxito",
+        description: "Configuración guardada correctamente.",
       });
     } catch (error) {
-      console.error('Error saving config:', error);
+      console.error("Error saving config:", error);
       toast({
-        title: 'Error',
-        description: 'No se pudo guardar la configuración.',
-        variant: 'destructive',
+        title: "Error",
+        description: "No se pudo guardar la configuración.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);

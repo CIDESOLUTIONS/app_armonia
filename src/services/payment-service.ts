@@ -297,7 +297,10 @@ export class PaymentService {
   private prisma: PrismaClient;
   private communicationService: CommunicationService;
 
-  constructor(prismaClient: PrismaClient, communicationService: CommunicationService) {
+  constructor(
+    prismaClient: PrismaClient,
+    communicationService: CommunicationService,
+  ) {
     this.prisma = prismaClient;
     this.communicationService = communicationService;
   }

@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 export const mockPrisma: Partial<PrismaClient> = {
   $queryRaw: jest.fn(),
@@ -69,21 +69,21 @@ export const mockPrisma: Partial<PrismaClient> = {
 };
 
 export enum PQRStatus {
-  OPEN = 'OPEN',
-  CATEGORIZED = 'CATEGORIZED',
-  ASSIGNED = 'ASSIGNED',
-  IN_PROGRESS = 'IN_PROGRESS',
-  WAITING = 'WAITING',
-  RESOLVED = 'RESOLVED',
-  CLOSED = 'CLOSED',
-  REOPENED = 'REOPENED',
-  CANCELLED = 'CANCELLED',
+  OPEN = "OPEN",
+  CATEGORIZED = "CATEGORIZED",
+  ASSIGNED = "ASSIGNED",
+  IN_PROGRESS = "IN_PROGRESS",
+  WAITING = "WAITING",
+  RESOLVED = "RESOLVED",
+  CLOSED = "CLOSED",
+  REOPENED = "REOPENED",
+  CANCELLED = "CANCELLED",
 }
 
 export enum NotificationChannel {
-  WHATSAPP = 'WHATSAPP',
-  TELEGRAM = 'TELEGRAM',
-  SMS = 'SMS',
-  EMAIL = 'EMAIL',
-  APP = 'APP',
+  WHATSAPP = "WHATSAPP",
+  TELEGRAM = "TELEGRAM",
+  SMS = "SMS",
+  EMAIL = "EMAIL",
+  APP = "APP",
 }

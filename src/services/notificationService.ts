@@ -17,7 +17,9 @@ interface SendNotificationData {
   recipientId?: string;
 }
 
-export async function sendNotification(data: SendNotificationData): Promise<Notification> {
+export async function sendNotification(
+  data: SendNotificationData,
+): Promise<Notification> {
   try {
     const response = await fetchApi("/communications/notifications/send", {
       method: "POST",

@@ -13,9 +13,21 @@ describe('PlansService', () => {
         {
           provide: PrismaService,
           useValue: {
-            plan: { create: jest.fn(), findMany: jest.fn(), findUnique: jest.fn(), update: jest.fn(), delete: jest.fn() },
+            plan: {
+              create: jest.fn(),
+              findMany: jest.fn(),
+              findUnique: jest.fn(),
+              update: jest.fn(),
+              delete: jest.fn(),
+            },
             feature: { create: jest.fn() },
-            subscription: { create: jest.fn(), findMany: jest.fn(), findUnique: jest.fn(), update: jest.fn(), delete: jest.fn() },
+            subscription: {
+              create: jest.fn(),
+              findMany: jest.fn(),
+              findUnique: jest.fn(),
+              update: jest.fn(),
+              delete: jest.fn(),
+            },
           },
         },
       ],

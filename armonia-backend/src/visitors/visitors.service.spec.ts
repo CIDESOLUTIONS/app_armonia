@@ -16,9 +16,27 @@ describe('VisitorsService', () => {
           provide: PrismaClientManager,
           useValue: {
             getClient: jest.fn().mockReturnValue({
-              visitor: { create: jest.fn(), findMany: jest.fn(), findUnique: jest.fn(), update: jest.fn(), delete: jest.fn() },
-              preRegisteredVisitor: { create: jest.fn(), findMany: jest.fn(), findUnique: jest.fn(), update: jest.fn(), delete: jest.fn() },
-              accessPass: { create: jest.fn(), findMany: jest.fn(), findUnique: jest.fn(), update: jest.fn(), delete: jest.fn() },
+              visitor: {
+                create: jest.fn(),
+                findMany: jest.fn(),
+                findUnique: jest.fn(),
+                update: jest.fn(),
+                delete: jest.fn(),
+              },
+              preRegisteredVisitor: {
+                create: jest.fn(),
+                findMany: jest.fn(),
+                findUnique: jest.fn(),
+                update: jest.fn(),
+                delete: jest.fn(),
+              },
+              accessPass: {
+                create: jest.fn(),
+                findMany: jest.fn(),
+                findUnique: jest.fn(),
+                update: jest.fn(),
+                delete: jest.fn(),
+              },
               accessLog: { create: jest.fn(), findMany: jest.fn() },
             }),
           },

@@ -59,7 +59,73 @@
   },
   "pricing": {
     "title": "Planes Diseñados para su Conjunto",
-    "description": "Elija el plan que mejor se adapte a las necesidades de su conjunto residencial."
+    "description": "Elija el plan que mejor se adapte a las necesidades de su conjunto residencial.",
+    "plans": {
+      "basic": {
+        "name": "Plan Básico",
+        "description": "Gestión esencial para conjuntos pequeños.",
+        "features": [
+          "Gestión de inventario (propiedades, residentes, vehículos, mascotas)",
+          "Sistema de PQR (Peticiones, Quejas, Reclamos)",
+          "Cartelera digital para anuncios oficiales",
+          "Módulo de encuestas y votaciones simples"
+        ],
+        "buttonText": "Comenzar Gratis"
+      },
+      "standard": {
+        "name": "Plan Estándar",
+        "priceSuffix": "/mes",
+        "description": "Solución completa para la administración diaria.",
+        "features": [
+          "Todo lo del Plan Básico",
+          "Módulo de Reservas de áreas comunes",
+          "Módulo Financiero (generación de cuotas, multas, intereses)",
+          "Integración con pasarelas de pago (PSE, Tarjeta de Crédito)",
+          "Gestión avanzada de visitantes con QR y paquetería"
+        ],
+        "buttonText": "Seleccionar Plan"
+      },
+      "premium": {
+        "name": "Plan Premium",
+        "priceSuffix": "/mes",
+        "description": "Máxima eficiencia y funcionalidades avanzadas.",
+        "features": [
+          "Todo lo del Plan Estándar",
+          "Conciliación Bancaria Automática",
+          "Acceso a API",
+          "Acceso al Marketplace Comunitario",
+          "Directorio de Servicios y Democracia Digital integrada"
+        ],
+        "buttonText": "Seleccionar Plan"
+      },
+      "portfolio": {
+        "name": "Plan Empresarial (Portafolio)",
+        "price": "Contactar Ventas",
+        "description": "Diseñado para empresas que gestionan múltiples propiedades.",
+        "features": [
+          "Todo lo del Plan Premium",
+          "Dashboard Multi-Propiedad",
+          "Gestión Centralizada de múltiples conjuntos",
+          "Informes Consolidados de portafolio",
+          "Personalización de Marca (White-Labeling)",
+          "Soporte prioritario"
+        ],
+        "buttonText": "Contactar Ventas"
+      },
+      "assembly": {
+        "name": "Módulo de Democracia Digital (Asambleas)",
+        "price": "Contactar Ventas",
+        "description": "Plataforma independiente para asambleas virtuales o híbridas.",
+        "features": [
+          "Registro de asistencia y cálculo de quórum en tiempo real",
+          "Sistema de votaciones ponderadas según coeficientes",
+          "Generación automática del borrador del acta",
+          "Puede ser contratado como servicio independiente"
+        ],
+        "buttonText": "Solicitar Demo"
+      }
+    },
+    "recommended": "Recomendado"
   },
   "contact": {
     "title": "¿Listo para Transformar su Conjunto?",

@@ -1,20 +1,20 @@
 import { fetchApi } from "@/lib/api";
 
 export enum ReservationStatus {
-  PENDING = 'PENDING',
-  APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED',
-  CANCELLED = 'CANCELLED',
-  COMPLETED = 'COMPLETED',
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+  CANCELLED = "CANCELLED",
+  COMPLETED = "COMPLETED",
 }
 
 export enum CommonAreaType {
-  SALON = 'SALON',
-  BBQ = 'BBQ',
-  COURT = 'COURT',
-  POOL = 'POOL',
-  GYM = 'GYM',
-  OTHER = 'OTHER',
+  SALON = "SALON",
+  BBQ = "BBQ",
+  COURT = "COURT",
+  POOL = "POOL",
+  GYM = "GYM",
+  OTHER = "OTHER",
 }
 
 export interface CommonArea {
@@ -103,14 +103,19 @@ export async function getCommonAreaById(id: number): Promise<CommonArea> {
   return fetchApi(`/reservations/common-areas/${id}`);
 }
 
-export async function createCommonArea(data: CreateCommonAreaDto): Promise<CommonArea> {
+export async function createCommonArea(
+  data: CreateCommonAreaDto,
+): Promise<CommonArea> {
   return fetchApi("/reservations/common-areas", {
     method: "POST",
     body: JSON.stringify(data),
   });
 }
 
-export async function updateCommonArea(id: number, data: UpdateCommonAreaDto): Promise<CommonArea> {
+export async function updateCommonArea(
+  id: number,
+  data: UpdateCommonAreaDto,
+): Promise<CommonArea> {
   return fetchApi(`/reservations/common-areas/${id}`, {
     method: "PUT",
     body: JSON.stringify(data),
@@ -124,12 +129,17 @@ export async function deleteCommonArea(id: number): Promise<void> {
 }
 
 // Reservation API calls
-export async function getReservations(filters?: ReservationFilterParams): Promise<Reservation[]> {
+export async function getReservations(
+  filters?: ReservationFilterParams,
+): Promise<Reservation[]> {
   const query = new URLSearchParams();
   if (filters) {
     for (const key in filters) {
       if (filters[key as keyof ReservationFilterParams]) {
-        query.append(key, filters[key as keyof ReservationFilterParams] as string);
+        query.append(
+          key,
+          filters[key as keyof ReservationFilterParams] as string,
+        );
       }
     }
   }
@@ -140,21 +150,29 @@ export async function getReservationById(id: number): Promise<Reservation> {
   return fetchApi(`/reservations/${id}`);
 }
 
-export async function createReservation(data: CreateReservationDto): Promise<Reservation> {
+export async function createReservation(
+  data: CreateReservationDto,
+): Promise<Reservation> {
   return fetchApi("/reservations", {
     method: "POST",
     body: JSON.stringify(data),
   });
 }
 
-export async function updateReservation(id: number, data: UpdateReservationDto): Promise<Reservation> {
+export async function updateReservation(
+  id: number,
+  data: UpdateReservationDto,
+): Promise<Reservation> {
   return fetchApi(`/reservations/${id}`, {
     method: "PUT",
     body: JSON.stringify(data),
   });
 }
 
-export async function updateReservationStatus(id: number, status: ReservationStatus): Promise<Reservation> {
+export async function updateReservationStatus(
+  id: number,
+  status: ReservationStatus,
+): Promise<Reservation> {
   return fetchApi(`/reservations/${id}/status`, {
     method: "PUT",
     body: JSON.stringify({ status }),

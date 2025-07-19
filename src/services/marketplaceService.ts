@@ -118,10 +118,14 @@ export async function uploadImage(file: File): Promise<{ url: string }> {
   try {
     const formData = new FormData();
     formData.append("file", file);
-    const response = await fetchApi("/marketplace/upload-image", {
-      method: "POST",
-      body: formData,
-    }, true); // The third parameter indicates that Content-Type should not be automatically added
+    const response = await fetchApi(
+      "/marketplace/upload-image",
+      {
+        method: "POST",
+        body: formData,
+      },
+      true,
+    ); // The third parameter indicates that Content-Type should not be automatically added
     return response;
   } catch (error) {
     console.error("Error uploading image:", error);

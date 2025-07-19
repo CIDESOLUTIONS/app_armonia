@@ -21,24 +21,32 @@ export interface CreateCommunityEventDto {
   isPublic: boolean;
 }
 
-export interface UpdateCommunityEventDto extends Partial<CreateCommunityEventDto> {}
+export interface UpdateCommunityEventDto
+  extends Partial<CreateCommunityEventDto> {}
 
 export async function getCommunityEvents(): Promise<CommunityEvent[]> {
   return fetchApi("/communications/events");
 }
 
-export async function getCommunityEventById(id: number): Promise<CommunityEvent> {
+export async function getCommunityEventById(
+  id: number,
+): Promise<CommunityEvent> {
   return fetchApi(`/communications/events/${id}`);
 }
 
-export async function createCommunityEvent(data: CreateCommunityEventDto): Promise<CommunityEvent> {
+export async function createCommunityEvent(
+  data: CreateCommunityEventDto,
+): Promise<CommunityEvent> {
   return fetchApi("/communications/events", {
     method: "POST",
     body: JSON.stringify(data),
   });
 }
 
-export async function updateCommunityEvent(id: number, data: UpdateCommunityEventDto): Promise<CommunityEvent> {
+export async function updateCommunityEvent(
+  id: number,
+  data: UpdateCommunityEventDto,
+): Promise<CommunityEvent> {
   return fetchApi(`/communications/events/${id}`, {
     method: "PUT",
     body: JSON.stringify(data),

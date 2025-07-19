@@ -1,4 +1,12 @@
-import { IsString, IsNumber, IsDateString, IsOptional, IsBoolean, IsEnum, IsArray } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsDateString,
+  IsOptional,
+  IsBoolean,
+  IsEnum,
+  IsArray,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export enum ReservationStatus {

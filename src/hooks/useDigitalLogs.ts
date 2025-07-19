@@ -2,7 +2,18 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { createDigitalLog, updateDigitalLog, deleteDigitalLog, getDigitalLog, searchDigitalLogs, reviewDigitalLog, DigitalLog, CreateDigitalLogData, SearchFilters, Pagination } from "@/services/digitalLogService";
+import {
+  createDigitalLog,
+  updateDigitalLog,
+  deleteDigitalLog,
+  getDigitalLog,
+  searchDigitalLogs,
+  reviewDigitalLog,
+  DigitalLog,
+  CreateDigitalLogData,
+  SearchFilters,
+  Pagination,
+} from "@/services/digitalLogService";
 
 export interface DigitalLog {
   id: number;

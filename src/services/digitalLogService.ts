@@ -146,7 +146,9 @@ export interface Pagination {
   hasPrevious: boolean;
 }
 
-export async function createDigitalLog(data: CreateDigitalLogData): Promise<{ success: boolean; digitalLog?: DigitalLog; message?: string }> {
+export async function createDigitalLog(
+  data: CreateDigitalLogData,
+): Promise<{ success: boolean; digitalLog?: DigitalLog; message?: string }> {
   try {
     const response = await fetchApi("/security/digital-logs", {
       method: "POST",
@@ -154,11 +156,17 @@ export async function createDigitalLog(data: CreateDigitalLogData): Promise<{ su
     });
     return response;
   } catch (error: any) {
-    return { success: false, message: error.message || "Error creando minuta digital" };
+    return {
+      success: false,
+      message: error.message || "Error creando minuta digital",
+    };
   }
 }
 
-export async function updateDigitalLog(id: number, updates: Partial<DigitalLog>): Promise<{ success: boolean; digitalLog?: DigitalLog; message?: string }> {
+export async function updateDigitalLog(
+  id: number,
+  updates: Partial<DigitalLog>,
+): Promise<{ success: boolean; digitalLog?: DigitalLog; message?: string }> {
   try {
     const response = await fetchApi(`/security/digital-logs/${id}`, {
       method: "PUT",
@@ -166,31 +174,49 @@ export async function updateDigitalLog(id: number, updates: Partial<DigitalLog>)
     });
     return response;
   } catch (error: any) {
-    return { success: false, message: error.message || "Error actualizando minuta" };
+    return {
+      success: false,
+      message: error.message || "Error actualizando minuta",
+    };
   }
 }
 
-export async function deleteDigitalLog(id: number): Promise<{ success: boolean; message?: string }> {
+export async function deleteDigitalLog(
+  id: number,
+): Promise<{ success: boolean; message?: string }> {
   try {
     const response = await fetchApi(`/security/digital-logs/${id}`, {
       method: "DELETE",
     });
     return response;
   } catch (error: any) {
-    return { success: false, message: error.message || "Error eliminando minuta" };
+    return {
+      success: false,
+      message: error.message || "Error eliminando minuta",
+    };
   }
 }
 
-export async function getDigitalLog(id: number): Promise<{ success: boolean; digitalLog?: DigitalLog; message?: string }> {
+export async function getDigitalLog(
+  id: number,
+): Promise<{ success: boolean; digitalLog?: DigitalLog; message?: string }> {
   try {
     const response = await fetchApi(`/security/digital-logs/${id}`);
     return response;
   } catch (error: any) {
-    return { success: false, message: error.message || "Error obteniendo minuta" };
+    return {
+      success: false,
+      message: error.message || "Error obteniendo minuta",
+    };
   }
 }
 
-export async function searchDigitalLogs(filters: SearchFilters): Promise<{ success: boolean; digitalLogs?: DigitalLog[]; pagination?: Pagination; message?: string }> {
+export async function searchDigitalLogs(filters: SearchFilters): Promise<{
+  success: boolean;
+  digitalLogs?: DigitalLog[];
+  pagination?: Pagination;
+  message?: string;
+}> {
   try {
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([key, value]) => {
@@ -198,14 +224,22 @@ export async function searchDigitalLogs(filters: SearchFilters): Promise<{ succe
         params.append(key, String(value));
       }
     });
-    const response = await fetchApi(`/security/digital-logs?${params.toString()}`);
+    const response = await fetchApi(
+      `/security/digital-logs?${params.toString()}`,
+    );
     return response;
   } catch (error: any) {
-    return { success: false, message: error.message || "Error buscando minutas" };
+    return {
+      success: false,
+      message: error.message || "Error buscando minutas",
+    };
   }
 }
 
-export async function reviewDigitalLog(id: number, reviewNotes?: string): Promise<{ success: boolean; digitalLog?: DigitalLog; message?: string }> {
+export async function reviewDigitalLog(
+  id: number,
+  reviewNotes?: string,
+): Promise<{ success: boolean; digitalLog?: DigitalLog; message?: string }> {
   try {
     const response = await updateDigitalLog(id, {
       supervisorReview: true,
@@ -214,6 +248,9 @@ export async function reviewDigitalLog(id: number, reviewNotes?: string): Promis
     });
     return response;
   } catch (error: any) {
-    return { success: false, message: error.message || "Error revisando minuta" };
+    return {
+      success: false,
+      message: error.message || "Error revisando minuta",
+    };
   }
 }

@@ -1,7 +1,12 @@
 import { fetchApi } from "@/lib/api";
-import { CreateMicroCreditApplicationDto, MicroCreditApplicationDto } from "@/common/dto/fintech.dto";
+import {
+  CreateMicroCreditApplicationDto,
+  MicroCreditApplicationDto,
+} from "@/common/dto/fintech.dto";
 
-export async function createMicroCreditApplication(data: CreateMicroCreditApplicationDto): Promise<MicroCreditApplicationDto> {
+export async function createMicroCreditApplication(
+  data: CreateMicroCreditApplicationDto,
+): Promise<MicroCreditApplicationDto> {
   try {
     const response = await fetchApi("/fintech/micro-credits", {
       method: "POST",
@@ -14,7 +19,9 @@ export async function createMicroCreditApplication(data: CreateMicroCreditApplic
   }
 }
 
-export async function getMicroCreditApplications(): Promise<MicroCreditApplicationDto[]> {
+export async function getMicroCreditApplications(): Promise<
+  MicroCreditApplicationDto[]
+> {
   try {
     const response = await fetchApi("/fintech/micro-credits");
     return response;

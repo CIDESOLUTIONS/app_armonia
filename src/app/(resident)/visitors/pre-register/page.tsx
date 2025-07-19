@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Loader2 } from "lucide-react";
 import { createPreRegisteredVisitor } from "@/services/visitorService";
+import { getUserProfile } from "@/services/userService"; // Importar getUserProfile
 import { useAuthStore } from "@/store/authStore";
 
 const formSchema = z.object({
@@ -36,6 +37,27 @@ export default function PreRegisterVisitorPage() {
   const { toast } = useToast();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [userUnitId, setUserUnitId] = useState<number | null>(null); // Estado para unitId
+
+  useEffect(() => {
+    const fetchUserUnitId = async () => {
+      if (user?.id) {
+        try {
+          const userProfile = await getUserProfile(user.id);
+          setUserUnitId(userProfile.unitId); // Asumiendo que unitId está en el perfil
+        } catch (error) {
+          console.error("Error fetching user unitId:", error);
+          toast({
+            title: "Error",
+            description:
+              "No se pudo obtener la información de la unidad del usuario.",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+    fetchUserUnitId();
+  }, [user?.id, toast]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -51,10 +73,10 @@ export default function PreRegisterVisitorPage() {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (!user?.id || !user?.complexId) {
+    if (!user?.id || !user?.complexId || userUnitId === null) {
       toast({
         title: "Error",
-        description: "Debes iniciar sesión como residente.",
+        description: "Información de usuario o unidad incompleta.",
       });
       return;
     }
@@ -64,7 +86,7 @@ export default function PreRegisterVisitorPage() {
       await createPreRegisteredVisitor({
         ...values,
         residentId: user.id,
-        unitId: user.unitId, // Asumiendo que el unitId está en el store del usuario
+        unitId: userUnitId, // Usar el unitId obtenido
         complexId: user.complexId,
       });
       toast({

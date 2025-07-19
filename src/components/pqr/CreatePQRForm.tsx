@@ -25,8 +25,6 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-
-
 enum PQRPriority {
   LOW = "LOW",
   MEDIUM = "MEDIUM",
@@ -168,8 +166,6 @@ export function CreatePQRForm({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          
-
           <div>
             <Label htmlFor="priority">Prioridad</Label>
             <Select

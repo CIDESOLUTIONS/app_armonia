@@ -24,7 +24,12 @@ interface AuthState {
   complexId: number | null;
   schemaName: string | null;
   token: string | null;
-  login: (email: string, password: string, complexId: number, schemaName: string) => Promise<void>;
+  login: (
+    email: string,
+    password: string,
+    complexId: number,
+    schemaName: string,
+  ) => Promise<void>;
   logout: () => Promise<void>;
   forceLogin: (userData: User, authToken: string) => void;
   changeUserRole: (newRole: string) => Promise<void>;
@@ -75,11 +80,14 @@ export const useAuthStore = create<AuthState>()(
           const { access_token, user: userData } = data;
 
           // Obtener las características del plan del usuario desde el backend
-          const featuresResponse = await fetch(`http://localhost:3000/plans/check-feature/${userData.complexId}`, {
-            headers: {
-              "Authorization": `Bearer ${access_token}`,
+          const featuresResponse = await fetch(
+            `http://localhost:3000/plans/check-feature/${userData.complexId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${access_token}`,
+              },
             },
-          });
+          );
           const featuresData = await featuresResponse.json();
 
           set({
@@ -87,7 +95,8 @@ export const useAuthStore = create<AuthState>()(
             isLoggedIn: true,
             adminName: userData.name || null,
             complexId: userData.complexId || null,
-            complexName: userData.complexName || `Conjunto ${userData.complexId}`,
+            complexName:
+              userData.complexName || `Conjunto ${userData.complexId}`,
             schemaName: userData.schemaName || null,
             token: access_token,
           });
@@ -145,14 +154,17 @@ export const useAuthStore = create<AuthState>()(
             throw new Error("No hay usuario o token para cambiar el rol.");
           }
 
-          const response = await fetch("http://localhost:3000/auth/change-role", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${currentToken}`,
+          const response = await fetch(
+            "http://localhost:3000/auth/change-role",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${currentToken}`,
+              },
+              body: JSON.stringify({ newRole, targetUserId: currentUser.id }),
             },
-            body: JSON.stringify({ newRole, targetUserId: currentUser.id }),
-          });
+          );
 
           if (!response.ok) {
             const errorData = await response.json();
@@ -194,6 +206,6 @@ export const useAuthStore = create<AuthState>()(
         schemaName: state.schemaName,
         token: state.token,
       }),
-    }
-  )
+    },
+  ),
 );

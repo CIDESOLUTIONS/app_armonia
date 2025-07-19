@@ -12,7 +12,9 @@ export class PlansService {
   constructor(private prisma: any) {}
 
   async createPlan(data: CreatePlanDto) {
-    return this.prisma.plan.create({ data: { ...data, features: { create: data.features } } });
+    return this.prisma.plan.create({
+      data: { ...data, features: { create: data.features } },
+    });
   }
 
   async getPlans(filters: any = {}) {

@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
@@ -642,7 +640,7 @@ export default function ReceptionIncidentsPage() {
       });
     } catch (err) {
       console.error("[ReceptionIncidents] Error:", err);
-      setError(
+      _setError(
         "Error al registrar el incidente. Por favor, inténtelo de nuevo.",
       );
     } finally {
@@ -732,7 +730,7 @@ export default function ReceptionIncidentsPage() {
       });
     } catch (err) {
       console.error("[ReceptionIncidents] Error:", err);
-      setError(
+      _setError(
         "Error al actualizar el incidente. Por favor, inténtelo de nuevo.",
       );
     } finally {

@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Put, Body, Param, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Body,
+  Param,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { PanicService } from './panic.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -18,8 +27,14 @@ export class PanicController {
 
   @Post('alert')
   @Roles(UserRole.RESIDENT)
-  async createPanicAlert(@GetUser() user: any, @Body() createPanicAlertDto: CreatePanicAlertDto) {
-    return this.panicService.createPanicAlert(user.schemaName, createPanicAlertDto);
+  async createPanicAlert(
+    @GetUser() user: any,
+    @Body() createPanicAlertDto: CreatePanicAlertDto,
+  ) {
+    return this.panicService.createPanicAlert(
+      user.schemaName,
+      createPanicAlertDto,
+    );
   }
 
   @Get('alert')
@@ -36,19 +51,36 @@ export class PanicController {
 
   @Put('alert/:id')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.STAFF)
-  async updatePanicAlert(@GetUser() user: any, @Param('id') id: string, @Body() updatePanicAlertDto: UpdatePanicAlertDto) {
-    return this.panicService.updatePanicAlert(user.schemaName, +id, updatePanicAlertDto);
+  async updatePanicAlert(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() updatePanicAlertDto: UpdatePanicAlertDto,
+  ) {
+    return this.panicService.updatePanicAlert(
+      user.schemaName,
+      +id,
+      updatePanicAlertDto,
+    );
   }
 
   @Post('response')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.STAFF)
-  async addPanicResponse(@GetUser() user: any, @Body() createPanicResponseDto: CreatePanicResponseDto) {
-    return this.panicService.addPanicResponse(user.schemaName, createPanicResponseDto);
+  async addPanicResponse(
+    @GetUser() user: any,
+    @Body() createPanicResponseDto: CreatePanicResponseDto,
+  ) {
+    return this.panicService.addPanicResponse(
+      user.schemaName,
+      createPanicResponseDto,
+    );
   }
 
   @Get('response/:alertId')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.STAFF)
-  async getPanicResponses(@GetUser() user: any, @Param('alertId') alertId: string) {
+  async getPanicResponses(
+    @GetUser() user: any,
+    @Param('alertId') alertId: string,
+  ) {
     return this.panicService.getPanicResponses(user.schemaName, +alertId);
   }
 }

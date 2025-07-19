@@ -45,12 +45,18 @@ export class PanicService {
       include: { user: true, complex: true, property: true, responses: true },
     });
     if (!alert) {
-      throw new NotFoundException(`Alerta de pánico con ID ${id} no encontrada.`);
+      throw new NotFoundException(
+        `Alerta de pánico con ID ${id} no encontrada.`,
+      );
     }
     return alert;
   }
 
-  async updatePanicAlert(schemaName: string, id: number, data: UpdatePanicAlertDto) {
+  async updatePanicAlert(
+    schemaName: string,
+    id: number,
+    data: UpdatePanicAlertDto,
+  ) {
     const prisma = this.getTenantPrismaClient(schemaName);
     return prisma.panicAlert.update({ where: { id }, data });
   }

@@ -85,7 +85,10 @@ export class FinancesController {
   }
 
   @Delete('fees/:id')
-  async deleteFee(@GetUser() user: any, @Param('id') id: string): Promise<void> {
+  async deleteFee(
+    @GetUser() user: any,
+    @Param('id') id: string,
+  ): Promise<void> {
     return this.financesService.deleteFee(user.schemaName, +id);
   }
 
@@ -187,10 +190,10 @@ export class FinancesController {
   }
 
   @Post('reconcile/approve')
-  async approveReconciliation(
-    @GetUser() user: any,
-    @Body() suggestion: any,
-  ) {
-    return this.financesService.approveReconciliation(user.schemaName, suggestion);
+  async approveReconciliation(@GetUser() user: any, @Body() suggestion: any) {
+    return this.financesService.approveReconciliation(
+      user.schemaName,
+      suggestion,
+    );
   }
 }

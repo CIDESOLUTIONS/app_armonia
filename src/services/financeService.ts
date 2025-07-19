@@ -1,5 +1,9 @@
 import { fetchApi } from "@/lib/api";
-import { PaymentGatewayConfigDto, CreatePaymentGatewayDto, UpdatePaymentGatewayDto } from "../../armonia-backend/src/common/dto/payment-gateways.dto";
+import {
+  PaymentGatewayConfigDto,
+  CreatePaymentGatewayDto,
+  UpdatePaymentGatewayDto,
+} from "../../armonia-backend/src/common/dto/payment-gateways.dto";
 
 interface FinanceSummary {
   totalIngresos: number;
@@ -81,7 +85,9 @@ export interface FeeListResponseDto {
   limit: number;
 }
 
-export async function getFinanceSummary(complexId: string): Promise<FinanceSummary> {
+export async function getFinanceSummary(
+  complexId: string,
+): Promise<FinanceSummary> {
   try {
     const response = await fetchApi(`/finances/stats?complexId=${complexId}`);
     return response;
@@ -91,9 +97,13 @@ export async function getFinanceSummary(complexId: string): Promise<FinanceSumma
   }
 }
 
-export async function getRecentTransactions(complexId: string): Promise<FinancialTransaction[]> {
+export async function getRecentTransactions(
+  complexId: string,
+): Promise<FinancialTransaction[]> {
   try {
-    const response = await fetchApi(`/finances/properties/${complexId}/payments`);
+    const response = await fetchApi(
+      `/finances/properties/${complexId}/payments`,
+    );
     return response;
   } catch (error) {
     console.error("Error fetching recent transactions:", error);
@@ -121,7 +131,9 @@ export async function uploadBankStatement(file: File): Promise<any> {
 }
 
 // New functions for Fee Management
-export async function getFees(filters?: FeeFilterParamsDto): Promise<FeeListResponseDto> {
+export async function getFees(
+  filters?: FeeFilterParamsDto,
+): Promise<FeeListResponseDto> {
   try {
     const query = new URLSearchParams();
     if (filters) {
@@ -152,7 +164,10 @@ export async function createFee(fee: CreateFeeDto): Promise<FeeDto> {
   }
 }
 
-export async function updateFee(id: number, fee: UpdateFeeDto): Promise<FeeDto> {
+export async function updateFee(
+  id: number,
+  fee: UpdateFeeDto,
+): Promise<FeeDto> {
   try {
     const response = await fetchApi(`/finances/fees/${id}`, {
       method: "PUT",
@@ -194,7 +209,9 @@ export async function generateOrdinaryFees(
   }
 }
 
-export async function approveReconciliation(suggestion: ReconciliationSuggestion): Promise<any> {
+export async function approveReconciliation(
+  suggestion: ReconciliationSuggestion,
+): Promise<any> {
   try {
     const response = await fetchApi("/finances/reconcile/approve", {
       method: "POST",
@@ -208,7 +225,9 @@ export async function approveReconciliation(suggestion: ReconciliationSuggestion
 }
 
 // Functions for Payment Gateway Management
-export async function getPaymentGatewaysConfig(): Promise<PaymentGatewayConfigDto[]> {
+export async function getPaymentGatewaysConfig(): Promise<
+  PaymentGatewayConfigDto[]
+> {
   try {
     const response = await fetchApi("/payment-gateways");
     return response;
@@ -218,7 +237,9 @@ export async function getPaymentGatewaysConfig(): Promise<PaymentGatewayConfigDt
   }
 }
 
-export async function createPaymentGatewayConfig(config: CreatePaymentGatewayDto): Promise<PaymentGatewayConfigDto> {
+export async function createPaymentGatewayConfig(
+  config: CreatePaymentGatewayDto,
+): Promise<PaymentGatewayConfigDto> {
   try {
     const response = await fetchApi("/payment-gateways", {
       method: "POST",
@@ -231,7 +252,10 @@ export async function createPaymentGatewayConfig(config: CreatePaymentGatewayDto
   }
 }
 
-export async function updatePaymentGatewayConfig(id: number, config: UpdatePaymentGatewayDto): Promise<PaymentGatewayConfigDto> {
+export async function updatePaymentGatewayConfig(
+  id: number,
+  config: UpdatePaymentGatewayDto,
+): Promise<PaymentGatewayConfigDto> {
   try {
     const response = await fetchApi(`/payment-gateways/${id}`, {
       method: "PUT",

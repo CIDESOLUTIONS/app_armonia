@@ -16,8 +16,18 @@ describe('ProjectsService', () => {
           provide: PrismaClientManager,
           useValue: {
             getClient: jest.fn().mockReturnValue({
-              project: { create: jest.fn(), findMany: jest.fn(), findUnique: jest.fn(), update: jest.fn(), delete: jest.fn() },
-              projectTask: { create: jest.fn(), update: jest.fn(), delete: jest.fn() },
+              project: {
+                create: jest.fn(),
+                findMany: jest.fn(),
+                findUnique: jest.fn(),
+                update: jest.fn(),
+                delete: jest.fn(),
+              },
+              projectTask: {
+                create: jest.fn(),
+                update: jest.fn(),
+                delete: jest.fn(),
+              },
               projectUpdate: { create: jest.fn(), findMany: jest.fn() },
             }),
           },
