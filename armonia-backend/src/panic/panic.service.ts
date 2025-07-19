@@ -6,12 +6,15 @@ import {
   UpdatePanicAlertDto,
   CreatePanicResponseDto,
 } from '../common/dto/panic.dto';
+import { PanicGateway } from './panic.gateway'; // Import PanicGateway
+import { NotificationType, NotificationSourceType } from '../common/dto/communications.dto';
 
 @Injectable()
 export class PanicService {
   constructor(
     private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
+    private panicGateway: PanicGateway, // Inject PanicGateway
   ) {}
 
   private getTenantPrismaClient(schemaName: string) {
@@ -20,7 +23,19 @@ export class PanicService {
 
   async createPanicAlert(schemaName: string, data: CreatePanicAlertDto) {
     const prisma = this.getTenantPrismaClient(schemaName);
-    return prisma.panicAlert.create({ data });
+    const newAlert = await prisma.panicAlert.create({ data });
+
+    // Emit real-time notification
+    this.panicGateway.sendNotificationToSchema(schemaName, {
+      id: newAlert.id.toString(),
+      title: '¡Alerta de Pánico!',
+      message: `Alerta de pánico activada en ${newAlert.location} por ${newAlert.userId}.`,
+      type: NotificationType.ERROR,
+      link: `/reception/panic/${newAlert.id}`,
+      createdAt: newAlert.alertTime.toISOString(),
+    });
+
+    return newAlert;
   }
 
   async getPanicAlerts(schemaName: string, filters: any = {}) {
@@ -58,7 +73,19 @@ export class PanicService {
     data: UpdatePanicAlertDto,
   ) {
     const prisma = this.getTenantPrismaClient(schemaName);
-    return prisma.panicAlert.update({ where: { id }, data });
+    const updatedAlert = await prisma.panicAlert.update({ where: { id }, data });
+
+    // Emit real-time notification for update
+    this.panicGateway.sendNotificationToSchema(schemaName, {
+      id: updatedAlert.id.toString(),
+      title: 'Alerta de Pánico Actualizada',
+      message: `La alerta de pánico en ${updatedAlert.location} ha sido actualizada a ${updatedAlert.status}.`,
+      type: NotificationType.INFO,
+      link: `/reception/panic/${updatedAlert.id}`,
+      createdAt: new Date().toISOString(),
+    });
+
+    return updatedAlert;
   }
 
   async addPanicResponse(schemaName: string, data: CreatePanicResponseDto) {

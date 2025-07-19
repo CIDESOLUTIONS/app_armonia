@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PackagesService } from './packages.service';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
+import { vi } from "vitest";
 
 describe('PackagesService', () => {
   let service: PackagesService;
@@ -15,16 +16,16 @@ describe('PackagesService', () => {
         {
           provide: PrismaClientManager,
           useValue: {
-            getClient: jest.fn().mockReturnValue({
+            getClient: vi.fn().mockReturnValue({
               package: {
-                create: jest.fn(),
-                findMany: jest.fn(),
-                findUnique: jest.fn(),
-                update: jest.fn(),
-                delete: jest.fn(),
+                create: vi.fn(),
+                findMany: vi.fn(),
+                findUnique: vi.fn(),
+                update: vi.fn(),
+                delete: vi.fn(),
               },
-              packageStatusHistory: { create: jest.fn() },
-              packageNotification: { create: jest.fn() },
+              packageStatusHistory: { create: vi.fn() },
+              packageNotification: { create: vi.fn() },
             }),
           },
         },

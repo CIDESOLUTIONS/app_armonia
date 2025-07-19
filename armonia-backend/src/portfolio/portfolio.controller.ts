@@ -1,8 +1,7 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards, Query } from '@nestjs/common';
 import { PortfolioService } from './portfolio.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '@prisma/client';
 import { GetUser } from '../common/decorators/user.decorator';
 
@@ -21,5 +20,17 @@ export class PortfolioController {
   @Roles(UserRole.APP_ADMIN)
   async getComplexMetrics(@GetUser() user: any) {
     return this.portfolioService.getComplexMetrics(user.userId);
+  }
+
+  @Get('reports/financial-summary')
+  @Roles(UserRole.APP_ADMIN)
+  async getConsolidatedFinancialReport(
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+  ) {
+    return this.portfolioService.generateConsolidatedFinancialReport(
+      startDate,
+      endDate,
+    );
   }
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2, PlusCircle, Edit, Trash2, DollarSign } from "lucide-react";
@@ -20,19 +22,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { useToast } from "@/components/ui/use-toast";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import {
-  getFines,
-  createFine,
-  updateFine,
-  deleteFine,
-} from "@/services/fineService"; // Assuming fineService exists
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { fineSchema, FineFormValues } from "@/validators/fine-schema"; // Assuming fine-schema exists
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -40,50 +29,38 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getResidents } from "@/services/residentService";
-import { getProperties } from "@/services/propertyService";
-
-interface Fine {
-  id: number;
-  residentId: number;
-  residentName: string;
-  propertyId: number;
-  unitNumber: string;
-  reason: string;
-  amount: number;
-  issuedDate: string;
-  paid: boolean;
-}
-
-interface ResidentOption {
-  id: number;
-  name: string;
-}
-
-interface PropertyOption {
-  id: number;
-  unitNumber: string;
-}
+import { useToast } from "@/components/ui/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  getFees,
+  createFee,
+  updateFee,
+  deleteFee,
+  FeeDto,
+} from "@/services/financeService";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { feeSchema, FeeFormValues } from "@/validators/fee-schema";
 
 export default function FinesPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
-  const [fines, setFines] = useState<Fine[]>([]);
+  const [fines, setFines] = useState<FeeDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentFine, setCurrentFine] = useState<Fine | null>(null);
-  const [residents, setResidents] = useState<ResidentOption[]>([]);
-  const [properties, setProperties] = useState<PropertyOption[]>([]);
+  const [currentFine, setCurrentFine] = useState<FeeDto | null>(null);
 
-  const form = useForm<FineFormValues>({
-    resolver: zodResolver(fineSchema),
+  const form = useForm<FeeFormValues>({
+    resolver: zodResolver(feeSchema),
     defaultValues: {
-      residentId: 0,
-      propertyId: 0,
-      reason: "",
+      title: "",
+      description: "",
       amount: 0,
-      issuedDate: "",
-      paid: false,
+      dueDate: "",
+      type: "FINE",
+      propertyId: undefined,
+      unitId: undefined,
+      residentId: undefined,
     },
   });
 
@@ -94,22 +71,16 @@ export default function FinesPage() {
     formState: { isSubmitting },
   } = form;
 
-  const fetchFinesAndRelatedData = useCallback(async () => {
+  const fetchFines = useCallback(async () => {
     setLoading(true);
     try {
-      const [finesData, residentsData, propertiesData] = await Promise.all([
-        getFines(),
-        getResidents(),
-        getProperties(),
-      ]);
-      setFines(finesData);
-      setResidents(residentsData.map((r: any) => ({ id: r.id, name: r.name })));
-      setProperties(propertiesData.map((p: any) => ({ id: p.id, unitNumber: p.unitNumber })));
+      const data = await getFees({ type: "FINE" });
+      setFines(data.data);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching fines:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar los datos.",
+        description: "No se pudieron cargar las multas.",
         variant: "destructive",
       });
     } finally {
@@ -119,53 +90,57 @@ export default function FinesPage() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      fetchFinesAndRelatedData();
+      fetchFines();
     }
-  }, [authLoading, user, fetchFinesAndRelatedData]);
+  }, [authLoading, user, fetchFines]);
 
   const handleAddFine = () => {
     setCurrentFine(null);
     reset({
-      residentId: 0,
-      propertyId: 0,
-      reason: "",
+      title: "",
+      description: "",
       amount: 0,
-      issuedDate: "",
-      paid: false,
+      dueDate: "",
+      type: "FINE",
+      propertyId: undefined,
+      unitId: undefined,
+      residentId: undefined,
     });
     setIsModalOpen(true);
   };
 
-  const handleEditFine = (fine: Fine) => {
+  const handleEditFine = (fine: FeeDto) => {
     setCurrentFine(fine);
     reset({
-      residentId: fine.residentId,
-      propertyId: fine.propertyId,
-      reason: fine.reason,
+      title: fine.title,
+      description: fine.description || "",
       amount: fine.amount,
-      issuedDate: fine.issuedDate,
-      paid: fine.paid,
+      dueDate: fine.dueDate.split("T")[0], // Assuming date only for input type="date"
+      type: fine.type,
+      propertyId: fine.propertyId,
+      unitId: fine.unitId || undefined,
+      residentId: fine.residentId || undefined,
     });
     setIsModalOpen(true);
   };
 
-  const onSubmit = async (data: FineFormValues) => {
+  const onSubmit = async (data: FeeFormValues) => {
     try {
       if (currentFine) {
-        await updateFine(currentFine.id, data);
+        await updateFee(currentFine.id, data);
         toast({
           title: "Éxito",
           description: "Multa actualizada correctamente.",
         });
       } else {
-        await createFine(data);
+        await createFee(data);
         toast({
           title: "Éxito",
           description: "Multa creada correctamente.",
         });
       }
       setIsModalOpen(false);
-      fetchFinesAndRelatedData();
+      fetchFines();
     } catch (error) {
       console.error("Error saving fine:", error);
       toast({
@@ -176,23 +151,15 @@ export default function FinesPage() {
     }
   };
 
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [fineToDelete, setFineToDelete] = useState<number | null>(null);
-
-  const handleDeleteFine = (id: number) => {
-    setFineToDelete(id);
-    setShowDeleteDialog(true);
-  };
-
-  const confirmDeleteFine = async () => {
-    if (fineToDelete === null) return;
+  const handleDeleteFine = async (id: number) => {
+    if (!confirm("¿Estás seguro de que quieres eliminar esta multa?")) return;
     try {
-      await deleteFine(fineToDelete);
+      await deleteFee(id);
       toast({
         title: "Éxito",
         description: "Multa eliminada correctamente.",
       });
-      fetchFinesAndRelatedData();
+      fetchFines();
     } catch (error) {
       console.error("Error deleting fine:", error);
       toast({
@@ -200,9 +167,6 @@ export default function FinesPage() {
         description: "Error al eliminar la multa.",
         variant: "destructive",
       });
-    } finally {
-      setShowDeleteDialog(false);
-      setFineToDelete(null);
     }
   };
 
@@ -227,12 +191,12 @@ export default function FinesPage() {
         </div>
       </div>
     );
-  }
+  };
 
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">
-        Gestión de Multas e Intereses por Mora
+        Gestión de Multas
       </h1>
 
       <div className="flex justify-end mb-4">
@@ -245,12 +209,13 @@ export default function FinesPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Residente</TableHead>
-              <TableHead>Propiedad</TableHead>
-              <TableHead>Razón</TableHead>
+              <TableHead>Título</TableHead>
               <TableHead>Monto</TableHead>
-              <TableHead>Fecha Emisión</TableHead>
-              <TableHead>Pagada</TableHead>
+              <TableHead>Fecha Vencimiento</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead>Propiedad</TableHead>
+              <TableHead>Unidad</TableHead>
+              <TableHead>Residente</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
@@ -258,18 +223,27 @@ export default function FinesPage() {
             {fines.length > 0 ? (
               fines.map((fine) => (
                 <TableRow key={fine.id}>
-                  <TableCell>{fine.residentName}</TableCell>
-                  <TableCell>{fine.unitNumber}</TableCell>
-                  <TableCell>{fine.reason}</TableCell>
-                  <TableCell>{fine.amount}</TableCell>
-                  <TableCell>{fine.issuedDate}</TableCell>
+                  <TableCell>{fine.title}</TableCell>
+                  <TableCell>${fine.amount.toFixed(2)}</TableCell>
                   <TableCell>
-                    {fine.paid ? (
-                      <Checkbox checked disabled />
-                    ) : (
-                      <Checkbox disabled />
-                    )}
+                    {new Date(fine.dueDate).toLocaleDateString()}
                   </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        fine.status === "PENDING"
+                          ? "destructive"
+                          : fine.status === "PAID"
+                            ? "default"
+                            : "secondary"
+                      }
+                    >
+                      {fine.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{fine.propertyId || "N/A"}</TableCell>
+                  <TableCell>{fine.unitId || "N/A"}</TableCell>
+                  <TableCell>{fine.residentId || "N/A"}</TableCell>
                   <TableCell className="text-right">
                     <Button
                       variant="ghost"
@@ -291,7 +265,7 @@ export default function FinesPage() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-5">
+                <TableCell colSpan={8} className="text-center py-5">
                   No hay multas registradas.
                 </TableCell>
               </TableRow>
@@ -311,72 +285,25 @@ export default function FinesPage() {
             <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
               <FormField
                 control={control}
-                name="residentId"
+                name="title"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Residente</FormLabel>
-                    <Select
-                      onValueChange={(value) => field.onChange(parseInt(value))}
-                      value={field.value ? String(field.value) : ""}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="col-span-3 p-2 border rounded-md">
-                          <SelectValue placeholder="Seleccionar Residente" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {residents.map((resident) => (
-                          <SelectItem
-                            key={resident.id}
-                            value={String(resident.id)}
-                          >
-                            {resident.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage className="col-span-full text-right" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name="propertyId"
-                render={({ field }) => (
-                  <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Propiedad</FormLabel>
-                    <Select
-                      onValueChange={(value) => field.onChange(parseInt(value))}
-                      value={field.value ? String(field.value) : ""}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="col-span-3 p-2 border rounded-md">
-                          <SelectValue placeholder="Seleccionar Propiedad" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {properties.map((property) => (
-                          <SelectItem
-                            key={property.id}
-                            value={String(property.id)}
-                          >
-                            {property.unitNumber}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage className="col-span-full text-right" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name="reason"
-                render={({ field }) => (
-                  <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Razón</FormLabel>
+                    <FormLabel className="text-right">Título</FormLabel>
                     <FormControl>
-                      <Textarea className="col-span-3" {...field} />
+                      <Input id="title" {...field} className="col-span-3" />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Descripción</FormLabel>
+                    <FormControl>
+                      <Textarea id="description" {...field} className="col-span-3" />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
@@ -390,12 +317,13 @@ export default function FinesPage() {
                     <FormLabel className="text-right">Monto</FormLabel>
                     <FormControl>
                       <Input
+                        id="amount"
                         type="number"
-                        className="col-span-3"
                         {...field}
                         onChange={(e) =>
                           field.onChange(parseFloat(e.target.value))
                         }
+                        className="col-span-3"
                       />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
@@ -404,12 +332,12 @@ export default function FinesPage() {
               />
               <FormField
                 control={control}
-                name="issuedDate"
+                name="dueDate"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Fecha Emisión</FormLabel>
+                    <FormLabel className="text-right">Fecha Vencimiento</FormLabel>
                     <FormControl>
-                      <Input type="date" className="col-span-3" {...field} />
+                      <Input id="dueDate" type="date" {...field} className="col-span-3" />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
@@ -417,19 +345,64 @@ export default function FinesPage() {
               />
               <FormField
                 control={control}
-                name="paid"
+                name="propertyId"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Propiedad ID</FormLabel>
                     <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
+                      <Input
+                        id="propertyId"
+                        type="number"
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
+                        className="col-span-3"
                       />
                     </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>Pagada</FormLabel>
-                    </div>
-                    <FormMessage />
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="unitId"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Unidad ID</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="unitId"
+                        type="number"
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
+                        className="col-span-3"
+                      />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="residentId"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Residente ID</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="residentId"
+                        type="number"
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
+                        className="col-span-3"
+                      />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
                   </FormItem>
                 )}
               />
@@ -443,27 +416,6 @@ export default function FinesPage() {
               </DialogFooter>
             </form>
           </Form>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirmar Eliminación</DialogTitle>
-            <DialogDescription>
-              ¿Estás seguro de que quieres eliminar esta multa? Esta acción no
-              se puede deshacer.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowDeleteDialog(false)}
-            >
-              Cancelar
-            </Button>
-            <Button onClick={confirmDeleteFine}>Eliminar</Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -1,31 +1,45 @@
+import { useComplexStore } from "@/store/complexStore";
+
 export async function fetchApi(
   url: string,
-  method: string = "GET",
-  body?: any,
-  token?: string,
+  options?: RequestInit,
+  skipContentType?: boolean, // New parameter
 ) {
+  const { selectedComplexId } = useComplexStore.getState(); // Get state outside of component
+
   const headers: HeadersInit = {
-    "Content-Type": "application/json",
+    ...(options?.headers || {}),
   };
+
+  if (!skipContentType) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  // Get token from localStorage or wherever it's stored
+  let token = null;
+  if (typeof window !== 'undefined') {
+    const authStore = JSON.parse(localStorage.getItem('auth-store') || '{}');
+    token = authStore.state?.token; // Adjust based on your actual auth store structure
+  }
 
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const options: RequestInit = {
-    method,
+  if (selectedComplexId) {
+    headers["X-Tenant-Schema"] = selectedComplexId; // Add tenant schema header
+  }
+
+  const finalOptions: RequestInit = {
+    ...options,
     headers,
   };
 
-  if (body) {
-    options.body = JSON.stringify(body);
-  }
-
   // Modificar la URL para apuntar al backend de NestJS
-  const nestJsBaseUrl = "http://localhost:3000"; // Usar directamente por ahora
+  const nestJsBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
   const fullUrl = `${nestJsBaseUrl}${url}`;
 
-  const response = await fetch(fullUrl, options);
+  const response = await fetch(fullUrl, finalOptions);
 
   if (!response.ok) {
     const errorData = await response

@@ -1,67 +1,50 @@
-import { useState, useEffect, useCallback } from "react";
+"use client";
+
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
-import { io } from "socket.io-client";
-import {
-  Loader2,
-  Calendar,
-  MapPin,
-  FileText,
-  Users,
-  CheckCircle,
-  XCircle,
-  Edit,
-  Clock,
-  Vote,
-} from "lucide-react";
+import { Loader2, CheckCircle, XCircle, UserPlus, Users, BarChart2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
+import { useToast } from "@/components/ui/use-toast";
 import {
   getAssemblyById,
+  updateAssembly,
   registerAttendance,
-  createVote,
-  submitVote,
-  getVoteResults,
+  getAssemblyQuorumStatus,
   generateMeetingMinutes,
 } from "@/services/assemblyService";
-import { useToast } from "@/components/ui/use-toast";
-
-const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"; // Ajusta esto a la URL de tu backend NestJS
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import Link from "next/link";
 
 interface Assembly {
   id: number;
   title: string;
-  description?: string;
+  description: string;
   scheduledDate: string;
   location: string;
-  type: "ORDINARY" | "EXTRAORDINARY";
-  agenda: string;
-  status: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
-  complexId: number;
+  status: "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+  realtimeChannel: string;
   createdBy: number;
-  votings?: Voting[]; // Added votings array
+  createdAt: string;
+  updatedAt: string;
+  attendees?: any[]; // Simplified for now
+  votes?: any[]; // Simplified for now
 }
 
-interface Voting {
-  id: number;
-  assemblyId: number;
-  question: string;
-  options: string[];
-  isWeighted: boolean;
-  status: "PENDING" | "ACTIVE" | "CLOSED" | "CANCELLED";
-  startTime?: string;
-  endTime?: string;
-  totalVotes: number;
-  totalCoefficientVoted: number;
-  userHasVoted?: boolean;
-}
-
-interface VoteResult {
-  option: string;
-  count: number;
-  coefficient: number;
+interface QuorumStatus {
+  currentAttendance: number;
+  quorumMet: boolean;
+  totalUnits: number;
+  presentUnits: number;
+  totalCoefficients: number;
+  presentCoefficients: number;
+  quorumPercentage: number;
+  requiredQuorum: number;
+  timestamp: string;
 }
 
 export default function ViewAssemblyPage() {
@@ -73,183 +56,58 @@ export default function ViewAssemblyPage() {
 
   const [assembly, setAssembly] = useState<Assembly | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentQuorum, setCurrentQuorum] = useState(0);
-  const [activeVote, setActiveVote] = useState<Voting | null>(null);
-  const [voteResults, setVoteResults] = useState<VoteResult[] | null>(null);
+  const [quorumStatus, setQuorumStatus] = useState<QuorumStatus | null>(null);
+  const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
+  const [unitIdToRegister, setUnitIdToRegister] = useState<number | null>(null);
 
   const fetchAssemblyData = useCallback(async () => {
     setLoading(true);
     try {
       if (!assemblyId) {
-        router.push("/admin/assemblies");
+        router.push("/complex-admin/assemblies");
         return;
       }
       const fetchedAssembly = await getAssemblyById(assemblyId);
-      if (fetchedAssembly) {
-        setAssembly(fetchedAssembly);
-        const activeVoting = fetchedAssembly.votings?.find(
-          (v: Voting) => v.status === "ACTIVE",
-        );
-        if (activeVoting) {
-          setActiveVote(activeVoting);
-          await fetchVotingResults(assemblyId, activeVoting.id);
-        }
-      } else {
-        toast({
-          title: "Error",
-          description: "Asamblea no encontrada.",
-          variant: "destructive",
-        });
-        router.push("/admin/assemblies");
-      }
+      setAssembly(fetchedAssembly);
+
+      const fetchedQuorumStatus = await getAssemblyQuorumStatus(assemblyId);
+      setQuorumStatus(fetchedQuorumStatus);
     } catch (error) {
-      console.error("Error fetching assembly:", error);
+      console.error("Error fetching assembly data:", error);
       toast({
         title: "Error",
         description: "No se pudo cargar la asamblea.",
         variant: "destructive",
       });
-      router.push("/admin/assemblies");
+      router.push("/complex-admin/assemblies");
     } finally {
       setLoading(false);
     }
   }, [assemblyId, router, toast]);
 
-  const fetchVotingResults = useCallback(
-    async (asmId: number, vtgId: number) => {
-      try {
-        const results = await getVoteResults(asmId, vtgId);
-        setVoteResults(results.results); // Assuming results has a 'results' property
-      } catch (error) {
-        console.error("Error fetching voting results:", error);
-        toast({
-          title: "Error",
-          description: "No se pudieron obtener los resultados de la votación.",
-          variant: "destructive",
-        });
-      }
-    },
-    [toast],
-  );
-
   useEffect(() => {
     if (!authLoading && user && assemblyId) {
       fetchAssemblyData();
-
-      const socket = io(`${SOCKET_URL}/assembly`, {
-        query: { assemblyId, schemaName: user.schemaName, userId: user.id },
-      });
-
-      socket.on("connect", () => {
-        console.log("Conectado al socket de asamblea");
-        socket.emit("joinAssembly", {
-          assemblyId,
-          schemaName: user.schemaName,
-          userId: user.id,
-        });
-      });
-
-      socket.on("quorumUpdate", (data: { currentQuorum: number }) => {
-        setCurrentQuorum(data.currentQuorum);
-      });
-
-      socket.on("newVote", (vote: Voting) => {
-        setActiveVote(vote);
-        setVoteResults(null); // Resetear resultados al iniciar nueva votación
-      });
-
-      socket.on("voteResultsUpdate", (results: VoteResult[]) => {
-        setVoteResults(results);
-      });
-
-      socket.on("disconnect", () => {
-        console.log("Desconectado del socket de asamblea");
-      });
-
-      return () => {
-        socket.disconnect();
-      };
     }
   }, [authLoading, user, assemblyId, fetchAssemblyData]);
 
   const handleRegisterAttendance = async () => {
-    if (!user || !assemblyId) return;
-    try {
-      await registerAttendance(assemblyId, {
-        assemblyId,
-        userId: user.id,
-        present: true,
-      });
-      toast({
-        title: "Asistencia Registrada",
-        description: "Tu asistencia ha sido registrada.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "No se pudo registrar la asistencia.",
-        variant: "destructive",
-      });
-    }
-  };
+    if (!assemblyId || !unitIdToRegister || !user?.id) return;
 
-  const handleCreateVote = async () => {
-    if (!assemblyId) return;
     try {
-      const newVote = await createVote(assemblyId, {
-        assemblyId,
-        question: "¿Aprueba el presupuesto 2025?",
-        options: ["Sí", "No", "Abstención"],
-        isWeighted: true,
-      });
-      setActiveVote(newVote);
+      await registerAttendance(assemblyId, unitIdToRegister, true); // Assuming 'true' for present
       toast({
-        title: "Votación Iniciada",
-        description: "Se ha iniciado una nueva votación.",
+        title: "Éxito",
+        description: `Asistencia registrada para la unidad ${unitIdToRegister}.`,
       });
+      setIsAttendanceModalOpen(false);
+      setUnitIdToRegister(null);
+      fetchAssemblyData(); // Refresh data
     } catch (error) {
+      console.error("Error registering attendance:", error);
       toast({
         title: "Error",
-        description: "No se pudo iniciar la votación.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleSubmitVote = async (optionIndex: number) => {
-    if (!activeVote || !user) return;
-    try {
-      await submitVote(activeVote.id, {
-        voteId: activeVote.id,
-        optionIndex,
-        userId: user.id,
-      });
-      toast({
-        title: "Voto Registrado",
-        description: "Tu voto ha sido registrado.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Error al registrar el voto.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleGetVoteResults = async () => {
-    if (!activeVote) return;
-    try {
-      const results = await getVoteResults(activeVote.id);
-      setVoteResults(results);
-      toast({
-        title: "Resultados Obtenidos",
-        description: "Resultados de la votación actualizados.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "No se pudieron obtener los resultados.",
+        description: "Error al registrar asistencia.",
         variant: "destructive",
       });
     }
@@ -258,16 +116,24 @@ export default function ViewAssemblyPage() {
   const handleGenerateMinutes = async () => {
     if (!assemblyId) return;
     try {
-      const result = await generateMeetingMinutes(assemblyId);
+      const pdfBlob = await generateMeetingMinutes(assemblyId);
+      const url = window.URL.createObjectURL(pdfBlob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `acta_asamblea_${assemblyId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
       toast({
-        title: "Acta Generada",
-        description: "El borrador del acta ha sido generado.",
+        title: "Éxito",
+        description: "Acta generada y descargada correctamente.",
       });
-      // Aquí podrías redirigir o mostrar un enlace al acta
     } catch (error) {
+      console.error("Error generating minutes:", error);
       toast({
         title: "Error",
-        description: "No se pudo generar el acta.",
+        description: "Error al generar el acta.",
         variant: "destructive",
       });
     }
@@ -281,12 +147,7 @@ export default function ViewAssemblyPage() {
     );
   }
 
-  if (
-    !user ||
-    (user.role !== "ADMIN" &&
-      user.role !== "COMPLEX_ADMIN" &&
-      user.role !== "RESIDENT")
-  ) {
+  if (!user || (user.role !== "ADMIN" && user.role !== "COMPLEX_ADMIN")) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -309,175 +170,119 @@ export default function ViewAssemblyPage() {
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">
-          Detalles de la Asamblea
+          Detalles de Asamblea: {assembly.title}
         </h1>
-        <Link href={`/admin/assemblies/${assembly.id}/edit`}>
-          <Button variant="outline">
-            <Edit className="mr-2 h-4 w-4" /> Editar Asamblea
+        <div className="flex space-x-2">
+          <Button onClick={() => setIsAttendanceModalOpen(true)}>
+            <UserPlus className="mr-2 h-4 w-4" /> Registrar Asistencia
           </Button>
-        </Link>
+          <Button onClick={handleGenerateMinutes}>
+            <FileText className="mr-2 h-4 w-4" /> Generar Acta
+          </Button>
+        </div>
       </div>
 
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Información de la Asamblea</CardTitle>
+          <CardTitle>Información General</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <div className="flex items-center">
-            <Calendar className="mr-2 h-5 w-5 text-gray-600" />
-            <span>
-              Fecha: {new Date(assembly.scheduledDate).toLocaleDateString()}
-            </span>
-          </div>
-          <div className="flex items-center">
-            <Clock className="mr-2 h-5 w-5 text-gray-600" />
-            <span>
-              Hora:{" "}
-              {new Date(assembly.scheduledDate).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </span>
-          </div>
-          <div className="flex items-center">
-            <MapPin className="mr-2 h-5 w-5 text-gray-600" />
-            <span>Ubicación: {assembly.location}</span>
-          </div>
-          <div className="flex items-center">
-            <FileText className="mr-2 h-5 w-5 text-gray-600" />
-            <span>
-              Tipo:{" "}
-              {assembly.type === "ORDINARY" ? "Ordinaria" : "Extraordinaria"}
-            </span>
-          </div>
-          <div className="flex items-center">
-            {assembly.status === "COMPLETED" ? (
-              <CheckCircle className="mr-2 h-5 w-5 text-green-600" />
-            ) : assembly.status === "CANCELLED" ? (
-              <XCircle className="mr-2 h-5 w-5 text-red-600" />
-            ) : (
-              <Clock className="mr-2 h-5 w-5 text-yellow-600" />
-            )}
-            <span>
-              Estado: <Badge>{assembly.status}</Badge>
-            </span>
-          </div>
-          <div>
-            <h3 className="font-semibold mt-4 mb-2">Descripción:</h3>
-            <p>{assembly.description || "No hay descripción disponible."}</p>
-          </div>
-          <div>
-            <h3 className="font-semibold mt-4 mb-2">Agenda:</h3>
-            <div className="whitespace-pre-wrap border p-4 rounded-md bg-gray-50">
-              {assembly.agenda}
-            </div>
-          </div>
+          <p>
+            <strong>Descripción:</strong> {assembly.description}
+          </p>
+          <p>
+            <strong>Fecha Programada:</strong>{" "}
+            {new Date(assembly.scheduledDate).toLocaleString()}
+          </p>
+          <p>
+            <strong>Ubicación:</strong> {assembly.location}
+          </p>
+          <p>
+            <strong>Estado:</strong> <Badge>{assembly.status}</Badge>
+          </p>
         </CardContent>
       </Card>
 
-      {/* Sección de Quórum y Asistencia */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Users className="mr-2 h-5 w-5" /> Quórum y Asistencia
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-600 mb-4">
-            Quórum Actual: <span className="font-bold">{currentQuorum}%</span>
-          </p>
-          <Button
-            onClick={handleRegisterAttendance}
-            disabled={!user || assembly.status !== "IN_PROGRESS"}
-          >
-            Registrar mi Asistencia
-          </Button>
-        </CardContent>
-      </Card>
+      {quorumStatus && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Users className="mr-2 h-5 w-5" /> Estado del Quórum
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <p>
+              <strong>Unidades Presentes:</strong> {quorumStatus.presentUnits} de{" "}
+              {quorumStatus.totalUnits}
+            </p>
+            <p>
+              <strong>Coeficiente Presente:</strong>{" "}
+              {quorumStatus.presentCoefficients.toFixed(2)} de{" "}
+              {quorumStatus.totalCoefficients.toFixed(2)}
+            </p>
+            <p>
+              <strong>Porcentaje de Quórum:</strong>{" "}
+              {quorumStatus.quorumPercentage.toFixed(2)}% (Requerido:{" "}
+              {quorumStatus.requiredQuorum}%)
+            </p>
+            <p>
+              <strong>Quórum Alcanzado:</strong>{" "}
+              {quorumStatus.quorumMet ? (
+                <Badge variant="default">Sí</Badge>
+              ) : (
+                <Badge variant="destructive">No</Badge>
+              )}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Sección de Votaciones */}
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="flex items-center">
-            <Vote className="mr-2 h-5 w-5" /> Votaciones
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {activeVote ? (
-            <div>
-              <h3 className="text-lg font-semibold mb-2">
-                {activeVote.question}
-              </h3>
-              <div className="space-y-2">
-                {activeVote.options.map((option: string, index: number) => (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    className="w-full justify-start"
-                    onClick={() => handleSubmitVote(index)}
-                  >
-                    {option}
-                  </Button>
-                ))}
-              </div>
-              {voteResults && (
-                <div className="mt-4 p-4 border rounded-md bg-gray-50">
-                  <h4 className="font-semibold mb-2">Resultados:</h4>
-                  {voteResults.map((result: VoteResult, index: number) => (
-                    <p key={index}>
-                      {result.option}: {result.count} votos (
-                      {result.coefficient.toFixed(2)}% coeficiente)
-                    </p>
-                  ))}
-                </div>
-              )}
-              {user?.role === "COMPLEX_ADMIN" && (
-                <Button onClick={handleGetVoteResults} className="mt-4">
-                  Ver Resultados
-                </Button>
-              )}
-            </div>
-          ) : (
-            <p className="text-gray-600 mb-4">
-              No hay votaciones activas en este momento.
-            </p>
-          )}
-          {user?.role === "COMPLEX_ADMIN" && (
-            <Button
-              onClick={handleCreateVote}
-              disabled={assembly.status !== "IN_PROGRESS"}
-            >
-              Iniciar Nueva Votación
-            </Button>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Sección de Actas y Documentos */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <FileText className="mr-2 h-5 w-5" /> Actas y Documentos
+            <BarChart2 className="mr-2 h-5 w-5" /> Votaciones
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-gray-600 mb-4">
-            Aquí se mostrarán las actas de la asamblea y otros documentos
-            relevantes.
+            Gestiona las votaciones de esta asamblea.
           </p>
-          {user?.role === "COMPLEX_ADMIN" && (
-            <Button
-              onClick={handleGenerateMinutes}
-              disabled={assembly.status !== "COMPLETED"}
-            >
-              Generar Borrador de Acta
+          <Link href={`/complex-admin/assemblies/${assembly.id}/votes`}>
+            <Button variant="outline">
+              Gestionar Votaciones
             </Button>
-          )}
-          <Button variant="outline" className="mt-4">
-            Ver Actas Anteriores
-          </Button>
+          </Link>
         </CardContent>
       </Card>
+
+      <Dialog open={isAttendanceModalOpen} onOpenChange={setIsAttendanceModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Registrar Asistencia</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="unitId" className="text-right">Unidad ID</Label>
+              <Input
+                id="unitId"
+                type="number"
+                value={unitIdToRegister || ""}
+                onChange={(e) => setUnitIdToRegister(parseInt(e.target.value))}
+                className="col-span-3"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAttendanceModalOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleRegisterAttendance} disabled={!unitIdToRegister}>
+              Registrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

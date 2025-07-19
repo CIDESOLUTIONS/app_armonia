@@ -5,6 +5,7 @@ import {
   PortfolioMetricDto,
   ComplexMetricDto,
 } from '../common/dto/portfolio.dto';
+import { format } from 'date-fns';
 
 @Injectable()
 export class PortfolioService {
@@ -134,5 +135,62 @@ export class PortfolioService {
     }
 
     return complexMetrics;
+  }
+
+  async generateConsolidatedFinancialReport(
+    startDate: string,
+    endDate: string,
+  ): Promise<any> {
+    const complexes = await this.prisma.residentialComplex.findMany({
+      select: { schemaName: true, name: true },
+    });
+
+    const reportData: any = [];
+    let totalIncomeAllComplexes = 0;
+    let totalExpensesAllComplexes = 0;
+
+    for (const complex of complexes) {
+      const tenantPrisma = this.prismaClientManager.getClient(
+        complex.schemaName,
+      );
+
+      const income = await tenantPrisma.payment.aggregate({
+        _sum: { amount: true },
+        where: {
+          date: { gte: new Date(startDate), lte: new Date(endDate) },
+          status: 'COMPLETED',
+        },
+      });
+
+      const expenses = await tenantPrisma.expense.aggregate({
+        _sum: { amount: true },
+        where: {
+          date: { gte: new Date(startDate), lte: new Date(endDate) },
+          status: 'PAID',
+        },
+      });
+
+      const complexIncome = income._sum.amount || 0;
+      const complexExpenses = expenses._sum.amount || 0;
+
+      reportData.push({
+        complexName: complex.name,
+        income: complexIncome,
+        expenses: complexExpenses,
+        netBalance: complexIncome - complexExpenses,
+      });
+
+      totalIncomeAllComplexes += complexIncome;
+      totalExpensesAllComplexes += complexExpenses;
+    }
+
+    return {
+      startDate,
+      endDate,
+      totalIncomeAllComplexes,
+      totalExpensesAllComplexes,
+      netBalanceAllComplexes: totalIncomeAllComplexes - totalExpensesAllComplexes,
+      complexReports: reportData,
+    };
   }
 }

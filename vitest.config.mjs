@@ -9,6 +9,7 @@ export default defineConfig({
     globals: true,
     tsconfig: "./tsconfig.json",
     include: ["**/*.test.ts", "**/*.spec.ts"],
+    exclude: ["e2e/**", "**/node_modules/**"], // Exclude e2e tests and node_modules
     mock: {
       imports: {
         "@backend/lib/logging/server-logger": {

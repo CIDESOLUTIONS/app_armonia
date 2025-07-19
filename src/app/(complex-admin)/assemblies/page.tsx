@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2, PlusCircle, Edit, Trash2, Eye, Download } from "lucide-react";
@@ -11,22 +13,40 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Link from "next/link";
 import { useToast } from "@/components/ui/use-toast";
 import {
   getAssemblies,
   deleteAssembly,
-  Assembly,
   generateMeetingMinutes,
 } from "@/services/assemblyService";
-import Link from "next/link";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
-export default function AdminAssembliesPage() {
-  const { user } = useAuthStore();
+interface Assembly {
+  id: number;
+  title: string;
+  description: string;
+  scheduledDate: string;
+  location: string;
+  status: "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+}
+
+export default function AssembliesPage() {
+  const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
   const [assemblies, setAssemblies] = useState<Assembly[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [assemblyToDelete, setAssemblyToDelete] = useState<number | null>(null);
 
-  const fetchAssemblies = async () => {
+  const fetchAssemblies = React.useCallback(async () => {
     setLoading(true);
     try {
       const data = await getAssemblies();
@@ -41,17 +61,23 @@ export default function AdminAssembliesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
-    fetchAssemblies();
-  }, []);
+    if (!authLoading && user) {
+      fetchAssemblies();
+    }
+  }, [authLoading, user, fetchAssemblies]);
 
-  const handleDeleteAssembly = async (id: number) => {
-    if (!confirm("¿Estás seguro de que quieres eliminar esta asamblea?"))
-      return;
+  const handleDeleteAssembly = (id: number) => {
+    setAssemblyToDelete(id);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteAssembly = async () => {
+    if (assemblyToDelete === null) return;
     try {
-      await deleteAssembly(id);
+      await deleteAssembly(assemblyToDelete);
       toast({
         title: "Éxito",
         description: "Asamblea eliminada correctamente.",
@@ -61,19 +87,22 @@ export default function AdminAssembliesPage() {
       console.error("Error deleting assembly:", error);
       toast({
         title: "Error",
-        description: "Error al eliminar asamblea.",
+        description: "Error al eliminar la asamblea.",
         variant: "destructive",
       });
+    } finally {
+      setShowDeleteDialog(false);
+      setAssemblyToDelete(null);
     }
   };
 
-  const handleGenerateMinutes = async (assemblyId: number, title: string) => {
+  const handleGenerateMinutes = async (assemblyId: number) => {
     try {
       const pdfBlob = await generateMeetingMinutes(assemblyId);
       const url = window.URL.createObjectURL(pdfBlob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `Acta_Asamblea_${title.replace(/\s/g, "_")}.pdf`;
+      a.download = `acta_asamblea_${assemblyId}.pdf`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -83,16 +112,16 @@ export default function AdminAssembliesPage() {
         description: "Acta generada y descargada correctamente.",
       });
     } catch (error) {
-      console.error("Error generating meeting minutes:", error);
+      console.error("Error generating minutes:", error);
       toast({
         title: "Error",
-        description: "Error al generar el acta de la asamblea.",
+        description: "Error al generar el acta.",
         variant: "destructive",
       });
     }
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -100,82 +129,126 @@ export default function AdminAssembliesPage() {
     );
   }
 
+  if (!user || (user.role !== "ADMIN" && user.role !== "COMPLEX_ADMIN")) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Acceso Denegado
+          </h1>
+          <p className="text-gray-600">
+            No tienes permisos para acceder a esta página.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">
-        Gestión de Asambleas
-      </h1>
-
-      <div className="flex justify-end mb-4">
-        <Link href="/admin/assemblies/create">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">
+          Gestión de Asambleas
+        </h1>
+        <Link href="/complex-admin/assemblies/create">
           <Button>
             <PlusCircle className="mr-2 h-4 w-4" /> Crear Nueva Asamblea
           </Button>
         </Link>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Título</TableHead>
-            <TableHead>Fecha</TableHead>
-            <TableHead>Tipo</TableHead>
-            <TableHead>Estado</TableHead>
-            <TableHead>Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {assemblies.length > 0 ? (
-            assemblies.map((assembly) => (
-              <TableRow key={assembly.id}>
-                <TableCell>{assembly.title}</TableCell>
-                <TableCell>
-                  {new Date(assembly.scheduledDate).toLocaleDateString()}
-                </TableCell>
-                <TableCell>{assembly.type}</TableCell>
-                <TableCell>
-                  <Badge>{assembly.status}</Badge>
-                </TableCell>
-                <TableCell>
-                  <Link href={`/admin/assemblies/${assembly.id}`}>
-                    <Button variant="ghost" size="sm" className="mr-2">
-                      <Eye className="h-4 w-4" />
+      <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Título</TableHead>
+              <TableHead>Fecha Programada</TableHead>
+              <TableHead>Ubicación</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {assemblies.length > 0 ? (
+              assemblies.map((assembly) => (
+                <TableRow key={assembly.id}>
+                  <TableCell>{assembly.title}</TableCell>
+                  <TableCell>
+                    {new Date(assembly.scheduledDate).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>{assembly.location}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        assembly.status === "SCHEDULED"
+                          ? "default"
+                          : assembly.status === "IN_PROGRESS"
+                            ? "secondary"
+                            : "outline"
+                      }
+                    >
+                      {assembly.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Link href={`/complex-admin/assemblies/${assembly.id}/view`}>
+                      <Button variant="ghost" size="sm" className="mr-2">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                    <Link href={`/complex-admin/assemblies/${assembly.id}/edit`}>
+                      <Button variant="ghost" size="sm" className="mr-2">
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteAssembly(assembly.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
                     </Button>
-                  </Link>
-                  <Link href={`/admin/assemblies/${assembly.id}/edit`}>
-                    <Button variant="ghost" size="sm" className="mr-2">
-                      <Edit className="h-4 w-4" />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleGenerateMinutes(assembly.id)}
+                    >
+                      <Download className="h-4 w-4" />
                     </Button>
-                  </Link>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteAssembly(assembly.id)}
-                    className="mr-2"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      handleGenerateMinutes(assembly.id, assembly.title)
-                    }
-                  >
-                    <Download className="h-4 w-4" />
-                  </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-5">
+                  No hay asambleas registradas.
                 </TableCell>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center">
-                No hay asambleas registradas.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Eliminación</DialogTitle>
+            <DialogDescription>
+              ¿Estás seguro de que quieres eliminar esta asamblea? Esta acción
+              no se puede deshacer.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+            >
+              Cancelar
+            </Button>
+            <Button onClick={confirmDeleteAssembly}>Eliminar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

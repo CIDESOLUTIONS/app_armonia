@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -23,20 +25,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { createAssembly, AssemblyType } from "@/services/assemblyService";
 import { Loader2 } from "lucide-react";
+import { createAssembly } from "@/services/assemblyService";
 
 const formSchema = z.object({
   title: z.string().min(5, "El título debe tener al menos 5 caracteres."),
   description: z
     .string()
     .min(20, "La descripción debe tener al menos 20 caracteres."),
-  scheduledDate: z.string().min(1, "La fecha es requerida."),
+  scheduledDate: z.string().min(1, "La fecha programada es requerida."),
   location: z.string().min(1, "La ubicación es requerida."),
-  type: z.nativeEnum(AssemblyType, {
-    errorMap: () => ({ message: "El tipo de asamblea es requerido." }),
-  }),
-  agenda: z.string().min(10, "La agenda debe tener al menos 10 caracteres."),
+  status: z.enum(["SCHEDULED", "IN_PROGRESS", "COMPLETED", "CANCELLED"]),
 });
 
 export default function CreateAssemblyPage() {
@@ -51,10 +50,15 @@ export default function CreateAssemblyPage() {
       description: "",
       scheduledDate: "",
       location: "",
-      type: AssemblyType.ORDINARY,
-      agenda: "",
+      status: "SCHEDULED",
     },
   });
+
+  const {
+    handleSubmit,
+    control,
+    formState: { isSubmitting },
+  } = form;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
@@ -64,7 +68,7 @@ export default function CreateAssemblyPage() {
         title: "Éxito",
         description: "Asamblea creada correctamente.",
       });
-      router.push("/admin/assemblies");
+      router.push("/complex-admin/assemblies");
     } catch (error) {
       console.error("Error creating assembly:", error);
       toast({
@@ -83,9 +87,9 @@ export default function CreateAssemblyPage() {
         Crear Nueva Asamblea
       </h1>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <FormField
-            control={form.control}
+            control={control}
             name="title"
             render={({ field }) => (
               <FormItem>
@@ -98,7 +102,7 @@ export default function CreateAssemblyPage() {
             )}
           />
           <FormField
-            control={form.control}
+            control={control}
             name="description"
             render={({ field }) => (
               <FormItem>
@@ -115,11 +119,11 @@ export default function CreateAssemblyPage() {
             )}
           />
           <FormField
-            control={form.control}
+            control={control}
             name="scheduledDate"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Fecha y Hora</FormLabel>
+                <FormLabel>Fecha y Hora Programada</FormLabel>
                 <FormControl>
                   <Input type="datetime-local" {...field} />
                 </FormControl>
@@ -128,7 +132,7 @@ export default function CreateAssemblyPage() {
             )}
           />
           <FormField
-            control={form.control}
+            control={control}
             name="location"
             render={({ field }) => (
               <FormItem>
@@ -141,46 +145,27 @@ export default function CreateAssemblyPage() {
             )}
           />
           <FormField
-            control={form.control}
-            name="type"
+            control={control}
+            name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Tipo de Asamblea</FormLabel>
+                <FormLabel>Estado</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecciona el tipo" />
+                      <SelectValue placeholder="Seleccionar estado" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value={AssemblyType.ORDINARY}>
-                      Ordinaria
-                    </SelectItem>
-                    <SelectItem value={AssemblyType.EXTRAORDINARY}>
-                      Extraordinaria
-                    </SelectItem>
+                    <SelectItem value="SCHEDULED">Programada</SelectItem>
+                    <SelectItem value="IN_PROGRESS">En Progreso</SelectItem>
+                    <SelectItem value="COMPLETED">Completada</SelectItem>
+                    <SelectItem value="CANCELLED">Cancelada</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={control}
-            name="agenda"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Agenda</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Puntos a tratar en la asamblea"
-                    {...field}
-                    rows={7}
-                  />
-                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

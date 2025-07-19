@@ -7,7 +7,7 @@ describe('AppController', () => {
 
   beforeEach(() => {
     appService = {
-      getHello: jest.fn().mockReturnValue('Hello World!'),
+      getHello: vi.fn().mockReturnValue('Hello World!'),
     } as any; // Cast to any to bypass type checking for manual mock
     appController = new AppController(appService);
   });

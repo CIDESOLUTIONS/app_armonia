@@ -25,6 +25,12 @@ vi.mock("@/lib/prisma", () => ({
   getPublicPrismaClient: vi.fn(() => mockPrisma),
 }));
 
+// Mock @/lib/api
+vi.mock("@/lib/api", () => ({
+  __esModule: true,
+  fetchApi: vi.fn(),
+}));
+
 // Mock Date.now() if needed for consistent test results
 // For example, if you use Date.now() in your code and need it to return a fixed value
 // vi.spyOn(Date, 'now').mockReturnValue(new Date('2025-01-01T00:00:00Z').getTime());

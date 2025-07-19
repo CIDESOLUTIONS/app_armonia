@@ -66,14 +66,20 @@ export class AssemblyController {
   async registerAttendance(
     @GetUser() user: any,
     @Param('id') assemblyId: string,
-    @Body() body: { present: boolean },
+    @Body() body: { unitId: number; present: boolean }, // Added unitId to body
   ) {
     return this.assemblyService.registerAttendance(
       user.schemaName,
       +assemblyId,
       user.userId,
-      body.present,
+      body.unitId,
+      { present: body.present },
     );
+  }
+
+  @Get(':id/quorum-status') // New endpoint for quorum status
+  async getQuorumStatus(@GetUser() user: any, @Param('id') assemblyId: string) {
+    return this.assemblyService.getAssemblyQuorumStatus(user.schemaName, +assemblyId);
   }
 
   @Post(':id/votes')
@@ -94,7 +100,7 @@ export class AssemblyController {
     @Param('voteId') voteId: string,
     @Body() submitVoteDto: SubmitVoteDto,
   ) {
-    return this.assemblyService.submitVote(user.schemaName, {
+    return this.assemblyService.castVote(user.schemaName, {
       ...submitVoteDto,
       voteId: +voteId,
       userId: user.userId,
@@ -103,7 +109,7 @@ export class AssemblyController {
 
   @Get(':voteId/results')
   async getVoteResults(@GetUser() user: any, @Param('voteId') voteId: string) {
-    return this.assemblyService.getVoteResults(user.schemaName, +voteId);
+    return this.assemblyService.calculateVoteResults(user.schemaName, +voteId);
   }
 
   @Post(':id/generate-minutes')

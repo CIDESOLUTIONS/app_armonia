@@ -5,27 +5,28 @@
 
 // Importar mocks de enums y constantes
 import { PQRCategory, PQRStatus, PQRPriority, PQRType } from "./pqr-constants";
+import { vi } from "vitest"; // Import vi
 
 // Configurar mocks globales para módulos externos
-jest.mock("@prisma/client", () => {
+vi.mock("@prisma/client", () => {
   return {
-    PrismaClient: jest.fn().mockImplementation(() => ({
-      $connect: jest.fn().mockResolvedValue({}),
-      $disconnect: jest.fn().mockResolvedValue({}),
-      $queryRaw: jest.fn().mockResolvedValue([]),
+    PrismaClient: vi.fn().mockImplementation(() => ({
+      $connect: vi.fn().mockResolvedValue({}),
+      $disconnect: vi.fn().mockResolvedValue({}),
+      $queryRaw: vi.fn().mockResolvedValue([]),
       pQR: {
-        findUnique: jest.fn().mockResolvedValue(null),
-        findMany: jest.fn().mockResolvedValue([]),
-        create: jest.fn().mockResolvedValue({}),
-        update: jest.fn().mockResolvedValue({}),
-        delete: jest.fn().mockResolvedValue({}),
+        findUnique: vi.fn().mockResolvedValue(null),
+        findMany: vi.fn().mockResolvedValue([]),
+        create: vi.fn().mockResolvedValue({}),
+        update: vi.fn().mockResolvedValue({}),
+        delete: vi.fn().mockResolvedValue({}),
       },
       user: {
-        findUnique: jest.fn().mockResolvedValue(null),
-        findMany: jest.fn().mockResolvedValue([]),
+        findUnique: vi.fn().mockResolvedValue(null),
+        findMany: vi.fn().mockResolvedValue([]),
       },
       pQRNotification: {
-        create: jest.fn().mockResolvedValue({}),
+        create: vi.fn().mockResolvedValue({}),
       },
     })),
     // Exportar enums para que sean accesibles como si vinieran de @prisma/client
@@ -37,44 +38,44 @@ jest.mock("@prisma/client", () => {
 });
 
 // Mock de módulos de comunicación
-jest.mock("../../lib/communications/email-service", () => ({
-  sendEmail: jest.fn().mockResolvedValue({ success: true }),
+vi.mock("../../lib/communications/email-service", () => ({
+  sendEmail: vi.fn().mockResolvedValue({ success: true }),
 }));
 
-jest.mock("../../lib/communications/push-notification-service", () => ({
-  sendPushNotification: jest.fn().mockResolvedValue({ success: true }),
+vi.mock("../../lib/communications/push-notification-service", () => ({
+  sendPushNotification: vi.fn().mockResolvedValue({ success: true }),
 }));
 
-jest.mock("../../lib/communications/sms-service", () => ({
-  sendSMS: jest.fn().mockResolvedValue({ success: true }),
+vi.mock("../../lib/communications/sms-service", () => ({
+  sendSMS: vi.fn().mockResolvedValue({ success: true }),
 }));
 
 // Mock de utilidades
-jest.mock("../../lib/prisma", () => ({
-  getSchemaFromRequest: jest.fn().mockReturnValue({
-    $connect: jest.fn().mockResolvedValue({}),
-    $disconnect: jest.fn().mockResolvedValue({}),
-    $queryRaw: jest.fn().mockResolvedValue([]),
+vi.mock("../../lib/prisma", () => ({
+  getSchemaFromRequest: vi.fn().mockReturnValue({
+    $connect: vi.fn().mockResolvedValue({}),
+    $disconnect: vi.fn().mockResolvedValue({}),
+    $queryRaw: vi.fn().mockResolvedValue([]),
     pQR: {
-      findUnique: jest.fn().mockResolvedValue(null),
-      findMany: jest.fn().mockResolvedValue([]),
-      create: jest.fn().mockResolvedValue({}),
-      update: jest.fn().mockResolvedValue({}),
-      delete: jest.fn().mockResolvedValue({}),
+      findUnique: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
+      create: vi.fn().mockResolvedValue({}),
+      update: vi.fn().mockResolvedValue({}),
+      delete: vi.fn().mockResolvedValue({}),
     },
     user: {
-      findUnique: jest.fn().mockResolvedValue(null),
-      findMany: jest.fn().mockResolvedValue([]),
+      findUnique: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
     },
     pQRNotification: {
-      create: jest.fn().mockResolvedValue({}),
+      create: vi.fn().mockResolvedValue({}),
     },
   }),
 }));
 
 // Configuración global para pruebas
 global.beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 });
 
 // Exportar enums y constantes para uso en pruebas
