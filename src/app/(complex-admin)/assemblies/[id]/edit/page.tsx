@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
@@ -5,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -12,26 +15,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  getAssemblyById,
-  updateAssembly,
-  AssemblyType,
-} from "@/services/assemblyService";
-
-interface Assembly {
-  id: number;
-  title: string;
-  description?: string;
-  scheduledDate: string;
-  location: string;
-  type: "ORDINARY" | "EXTRAORDINARY";
-  agenda: string;
-  status: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
-  complexId: number;
-  createdBy: number;
-}
+import { getAssemblyById, updateAssembly } from "@/services/assemblyService";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { assemblySchema, AssemblyFormValues } from "@/validators/assembly-schema";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 export default function EditAssemblyPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -40,32 +29,42 @@ export default function EditAssemblyPage() {
   const params = useParams();
   const assemblyId = params.id ? parseInt(params.id as string) : null;
 
-  const [formData, setFormData] = useState<Partial<Assembly>>({
-    title: "",
-    description: "",
-    scheduledDate: "",
-    location: "",
-    type: "ORDINARY",
-    agenda: "",
-    status: "PLANNED",
-  });
+  const [assembly, setAssembly] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  const form = useForm<AssemblyFormValues>({
+    resolver: zodResolver(assemblySchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      scheduledDate: "",
+      location: "",
+      status: "SCHEDULED",
+    },
+  });
+
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { isSubmitting },
+  } = form;
+
   const fetchAssembly = useCallback(async () => {
-    setLoading(true);
     try {
-      const assembly = await getAssemblyById(assemblyId);
-      if (assembly) {
-        setFormData({
-          title: assembly.title,
-          description: assembly.description || "",
-          scheduledDate: new Date(assembly.scheduledDate)
-            .toISOString()
-            .slice(0, 16), // Format for datetime-local
-          location: assembly.location,
-          type: assembly.type,
-          agenda: assembly.agenda,
-          status: assembly.status,
+      if (!assemblyId) {
+        router.push("/complex-admin/assemblies");
+        return;
+      }
+      const fetchedAssembly = await getAssemblyById(assemblyId);
+      if (fetchedAssembly) {
+        setAssembly(fetchedAssembly);
+        reset({
+          title: fetchedAssembly.title,
+          description: fetchedAssembly.description,
+          scheduledDate: fetchedAssembly.scheduledDate.slice(0, 16),
+          location: fetchedAssembly.location,
+          status: fetchedAssembly.status,
         });
       } else {
         toast({
@@ -73,7 +72,7 @@ export default function EditAssemblyPage() {
           description: "Asamblea no encontrada.",
           variant: "destructive",
         });
-        router.push("/admin/assemblies");
+        router.push("/complex-admin/assemblies");
       }
     } catch (error) {
       console.error("Error fetching assembly:", error);
@@ -82,11 +81,11 @@ export default function EditAssemblyPage() {
         description: "No se pudo cargar la asamblea.",
         variant: "destructive",
       });
-      router.push("/admin/assemblies");
+      router.push("/complex-admin/assemblies");
     } finally {
       setLoading(false);
     }
-  }, [assemblyId, router, toast]);
+  }, [assemblyId, router, toast, reset]);
 
   useEffect(() => {
     if (!authLoading && user && assemblyId) {
@@ -94,35 +93,17 @@ export default function EditAssemblyPage() {
     }
   }, [authLoading, user, assemblyId, fetchAssembly]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: AssemblyFormValues) => {
     setLoading(true);
     if (!assemblyId) return;
 
     try {
-      await updateAssembly({ id: assemblyId, ...formData });
+      await updateAssembly(assemblyId, data);
       toast({
         title: "Éxito",
         description: "Asamblea actualizada correctamente.",
       });
-      router.push("/admin/assemblies");
+      router.push("/complex-admin/assemblies");
     } catch (error) {
       console.error("Error updating assembly:", error);
       toast({
@@ -163,103 +144,98 @@ export default function EditAssemblyPage() {
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Editar Asamblea</h1>
 
       {assemblyId && (
-        <form onSubmit={handleSubmit} className="grid gap-6 md:grid-cols-2">
-          <div className="grid gap-2">
-            <Label htmlFor="title">Título</Label>
-            <Input
-              id="title"
+        <Form {...form}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={control}
               name="title"
-              value={formData.title}
-              onChange={handleInputChange}
-              required
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Título</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Título de la asamblea" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="scheduledDate">Fecha y Hora</Label>
-            <Input
-              id="scheduledDate"
-              name="scheduledDate"
-              type="datetime-local"
-              value={formData.scheduledDate}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="location">Ubicación</Label>
-            <Input
-              id="location"
-              name="location"
-              value={formData.location}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="type">Tipo de Asamblea</Label>
-            <Select
-              name="type"
-              value={formData.type}
-              onValueChange={(value) => handleSelectChange("type", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Seleccionar tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ORDINARY">Ordinaria</SelectItem>
-                <SelectItem value="EXTRAORDINARY">Extraordinaria</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="status">Estado</Label>
-            <Select
-              name="status"
-              value={formData.status}
-              onValueChange={(value) => handleSelectChange("status", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Seleccionar estado" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="PLANNED">Planificada</SelectItem>
-                <SelectItem value="IN_PROGRESS">En Progreso</SelectItem>
-                <SelectItem value="COMPLETED">Completada</SelectItem>
-                <SelectItem value="CANCELLED">Cancelada</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid gap-2 col-span-full">
-            <Label htmlFor="description">Descripción</Label>
-            <Textarea
-              id="description"
+            <FormField
+              control={control}
               name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              rows={3}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Descripción</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Descripción detallada de la asamblea"
+                      {...field}
+                      rows={5}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid gap-2 col-span-full">
-            <Label htmlFor="agenda">Agenda</Label>
-            <Textarea
-              id="agenda"
-              name="agenda"
-              value={formData.agenda}
-              onChange={handleInputChange}
-              rows={5}
-              required
+            <FormField
+              control={control}
+              name="scheduledDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Fecha y Hora Programada</FormLabel>
+                  <FormControl>
+                    <Input type="datetime-local" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-
-          <div className="col-span-full flex justify-end">
-            <Button type="submit" disabled={loading}>
-              {loading ? (
+            <FormField
+              control={control}
+              name="location"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ubicación</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ubicación de la asamblea" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Estado</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar estado" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="SCHEDULED">Programada</SelectItem>
+                      <SelectItem value="IN_PROGRESS">En Progreso</SelectItem>
+                      <SelectItem value="COMPLETED">Completada</SelectItem>
+                      <SelectItem value="CANCELLED">Cancelada</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : null}{" "}
               Guardar Cambios
             </Button>
-          </div>
-        </form>
+          </form>
+        </Form>
       )}
     </div>
   );

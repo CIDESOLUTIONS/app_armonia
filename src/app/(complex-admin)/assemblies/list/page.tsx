@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2, PlusCircle, Edit, Trash2, Eye } from "lucide-react";
@@ -12,8 +14,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
-import { getAssemblies, deleteAssembly } from "@/services/assemblyService";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  getAssemblies,
+  deleteAssembly,
+} from "@/services/assemblyService";
 import {
   Dialog,
   DialogContent,
@@ -22,19 +27,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface Assembly {
   id: number;
   title: string;
-  description?: string;
+  description: string;
   scheduledDate: string;
   location: string;
-  type: "ORDINARY" | "EXTRAORDINARY";
-  agenda: string;
-  status: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
-  complexId: number;
-  createdBy: number;
+  status: "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
 }
 
 export default function AssembliesPage() {
@@ -48,8 +48,8 @@ export default function AssembliesPage() {
   const fetchAssemblies = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await getAssemblies();
-      setAssemblies(response.data);
+      const data = await getAssemblies();
+      setAssemblies(data);
     } catch (error) {
       console.error("Error fetching assemblies:", error);
       toast({
@@ -124,9 +124,9 @@ export default function AssembliesPage() {
         <h1 className="text-3xl font-bold text-gray-900">
           Gestión de Asambleas
         </h1>
-        <Link href="/admin/assemblies/create">
+        <Link href="/complex-admin/assemblies/create">
           <Button>
-            <PlusCircle className="mr-2 h-4 w-4" /> Nueva Asamblea
+            <PlusCircle className="mr-2 h-4 w-4" /> Crear Nueva Asamblea
           </Button>
         </Link>
       </div>
@@ -136,9 +136,8 @@ export default function AssembliesPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Título</TableHead>
-              <TableHead>Fecha</TableHead>
+              <TableHead>Fecha Programada</TableHead>
               <TableHead>Ubicación</TableHead>
-              <TableHead>Tipo</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead></TableHead>
             </TableRow>
@@ -153,17 +152,12 @@ export default function AssembliesPage() {
                   </TableCell>
                   <TableCell>{assembly.location}</TableCell>
                   <TableCell>
-                    {assembly.type === "ORDINARY"
-                      ? "Ordinaria"
-                      : "Extraordinaria"}
-                  </TableCell>
-                  <TableCell>
                     <Badge
                       variant={
-                        assembly.status === "PLANNED"
-                          ? "secondary"
-                          : assembly.status === "COMPLETED"
-                            ? "default"
+                        assembly.status === "SCHEDULED"
+                          ? "default"
+                          : assembly.status === "IN_PROGRESS"
+                            ? "secondary"
                             : "outline"
                       }
                     >
@@ -171,12 +165,12 @@ export default function AssembliesPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Link href={`/admin/assemblies/${assembly.id}/view`}>
+                    <Link href={`/complex-admin/assemblies/${assembly.id}/view`}>
                       <Button variant="ghost" size="sm" className="mr-2">
                         <Eye className="h-4 w-4" />
                       </Button>
                     </Link>
-                    <Link href={`/admin/assemblies/${assembly.id}/edit`}>
+                    <Link href={`/complex-admin/assemblies/${assembly.id}/edit`}>
                       <Button variant="ghost" size="sm" className="mr-2">
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -193,7 +187,7 @@ export default function AssembliesPage() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-5">
+                <TableCell colSpan={5} className="text-center py-5">
                   No hay asambleas registradas.
                 </TableCell>
               </TableRow>

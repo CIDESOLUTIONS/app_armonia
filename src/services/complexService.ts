@@ -1,4 +1,6 @@
-interface ComplexInfo {
+import { fetchApi } from "@/lib/api";
+
+export interface ComplexInfo {
   id: number;
   name: string;
   schemaName: string;
@@ -36,4 +38,14 @@ export async function updateComplexInfo(
 ): Promise<ComplexInfo> {
   console.log(`Simulating update for complex ${id} with data:`, data);
   return Promise.resolve({ ...data, id } as ComplexInfo);
+}
+
+export async function getAllComplexes(): Promise<ComplexInfo[]> {
+  try {
+    const response = await fetchApi("/complexes"); // Assuming a backend endpoint /complexes
+    return response.data; // Assuming the API returns { data: ComplexInfo[] }
+  } catch (error) {
+    console.error("Error fetching all complexes:", error);
+    throw error;
+  }
 }

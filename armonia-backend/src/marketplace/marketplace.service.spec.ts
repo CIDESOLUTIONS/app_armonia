@@ -9,6 +9,7 @@ import {
   CreateListingDto,
   UpdateListingDto,
 } from '../common/dto/marketplace.dto';
+import { vi } from "vitest";
 
 describe('MarketplaceService', () => {
   let service: MarketplaceService;
@@ -17,21 +18,21 @@ describe('MarketplaceService', () => {
 
   const mockPrismaClient = {
     listing: {
-      create: jest.fn(),
-      findMany: jest.fn(),
-      findUnique: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
+      create: vi.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
     },
     reportedListing: {
-      create: jest.fn(),
-      findMany: jest.fn(),
-      findUnique: jest.fn(),
-      update: jest.fn(),
+      create: vi.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
     },
     message: {
-      create: jest.fn(),
-      findMany: jest.fn(),
+      create: vi.fn(),
+      findMany: vi.fn(),
     },
   };
 
@@ -42,7 +43,7 @@ describe('MarketplaceService', () => {
         {
           provide: PrismaClientManager,
           useValue: {
-            getClient: jest.fn(() => mockPrismaClient),
+            getClient: vi.fn(() => mockPrismaClient),
           },
         },
         {

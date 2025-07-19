@@ -7,6 +7,16 @@ import {
 import { Server } from 'socket.io';
 import { PanicService } from './panic.service';
 import { CreatePanicAlertDto } from '../common/dto/panic.dto';
+import { NotificationType, NotificationSourceType } from '../common/dto/communications.dto';
+
+interface NotificationPayload {
+  id: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  link?: string;
+  createdAt: string;
+}
 
 @WebSocketGateway({ namespace: '/panic', cors: { origin: '*' } })
 export class PanicGateway {
@@ -47,5 +57,10 @@ export class PanicGateway {
     this.server
       .to(`security-${data.schemaName}`)
       .emit('panicAlertUpdated', updatedAlert);
+  }
+
+  // New method to send notifications to a specific schema
+  sendNotificationToSchema(schemaName: string, notification: NotificationPayload) {
+    this.server.to(`notifications-${schemaName}`).emit('receiveNotification', notification);
   }
 }

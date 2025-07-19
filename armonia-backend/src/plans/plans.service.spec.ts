@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlansService } from './plans.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { vi } from "vitest";
 
 describe('PlansService', () => {
   let service: PlansService;
@@ -14,19 +15,19 @@ describe('PlansService', () => {
           provide: PrismaService,
           useValue: {
             plan: {
-              create: jest.fn(),
-              findMany: jest.fn(),
-              findUnique: jest.fn(),
-              update: jest.fn(),
-              delete: jest.fn(),
+              create: vi.fn(),
+              findMany: vi.fn(),
+              findUnique: vi.fn(),
+              update: vi.fn(),
+              delete: vi.fn(),
             },
-            feature: { create: jest.fn() },
+            feature: { create: vi.fn() },
             subscription: {
-              create: jest.fn(),
-              findMany: jest.fn(),
-              findUnique: jest.fn(),
-              update: jest.fn(),
-              delete: jest.fn(),
+              create: vi.fn(),
+              findMany: vi.fn(),
+              findUnique: vi.fn(),
+              update: vi.fn(),
+              delete: vi.fn(),
             },
           },
         },

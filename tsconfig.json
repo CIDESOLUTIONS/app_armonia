@@ -35,7 +35,9 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/types/**/*.d.ts",
-    "types/**/*.d.ts"
+    "types/**/*.d.ts",
+    "src/validators/**/*.ts",
+    "src/services/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

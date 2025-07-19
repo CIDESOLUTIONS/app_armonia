@@ -1,7 +1,7 @@
 // src/components/layout/header.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import {
   Globe,
@@ -12,10 +12,13 @@ import {
   LogOut,
   Menu,
   ChevronDown,
+  Building,
 } from "lucide-react";
 import Link from "next/link";
 import { ROUTES } from "@/constants/routes";
 import { useAuthStore } from "@/store/authStore";
+import { useComplexStore } from "@/store/complexStore";
+import { getAllComplexes, ComplexInfo } from "@/services/complexService";
 
 // Traducciones para el header
 const headerTexts = {
@@ -26,6 +29,7 @@ const headerTexts = {
     login: "Iniciar Sesión",
     logout: "Cerrar Sesión",
     roleSelector: "Seleccionar Rol",
+    selectComplex: "Seleccionar Conjunto",
   },
   en: {
     features: "Features",
@@ -34,6 +38,7 @@ const headerTexts = {
     login: "Login",
     logout: "Logout",
     roleSelector: "Select Role",
+    selectComplex: "Select Complex",
   },
 };
 
@@ -60,10 +65,29 @@ export function Header({
   const pathname = usePathname();
   const locale = useLocale();
   const t = useTranslations("Header");
-  const { user, changeUserRole } = useAuthStore(); // Obtener el usuario y la función changeUserRole
+  const { user, changeUserRole } = useAuthStore();
+  const { selectedComplexId, selectedComplexName, setSelectedComplex } = useComplexStore();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState(user?.role || "");
+  const [complexes, setComplexes] = useState<ComplexInfo[]>([]);
+
+  useEffect(() => {
+    const fetchComplexes = async () => {
+      if (user?.isGlobalAdmin) {
+        try {
+          const fetchedComplexes = await getAllComplexes();
+          setComplexes(fetchedComplexes);
+          if (fetchedComplexes.length > 0 && !selectedComplexId) {
+            setSelectedComplex(fetchedComplexes[0].schemaName, fetchedComplexes[0].name);
+          }
+        } catch (error) {
+          console.error("Error fetching complexes:", error);
+        }
+      }
+    };
+    fetchComplexes();
+  }, [user?.isGlobalAdmin, selectedComplexId, setSelectedComplex]);
 
   const toggleLanguage = () => {
     const nextLocale = locale === "es" ? "en" : "es";
@@ -72,7 +96,6 @@ export function Header({
 
   const toggleTheme = () => {
     setTheme(theme === "Claro" ? "Oscuro" : "Claro");
-    // Aplicar el tema en el body
     if (typeof document !== "undefined") {
       document.body.classList.toggle("dark-mode", theme === "Claro");
     }
@@ -105,9 +128,16 @@ export function Header({
         await changeUserRole(newRole);
       } catch (error) {
         console.error("Error al cambiar el rol desde el Header:", error);
-        // Revertir el rol seleccionado en caso de error
         setSelectedRole(user.role);
       }
+    }
+  };
+
+  const handleComplexChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedSchemaName = event.target.value;
+    const selected = complexes.find(c => c.schemaName === selectedSchemaName);
+    if (selected) {
+      setSelectedComplex(selected.schemaName, selected.name);
     }
   };
 
@@ -121,8 +151,8 @@ export function Header({
           <h1 className="text-2xl sm:text-3xl font-extrabold italic text-white">
             Armonía
           </h1>
-          {isLoggedIn && complexName && (
-            <p className="text-sm text-white opacity-75 ml-2">{complexName}</p>
+          {isLoggedIn && selectedComplexName && (
+            <p className="text-sm text-white opacity-75 ml-2">{selectedComplexName}</p>
           )}
         </div>
 
@@ -155,7 +185,7 @@ export function Header({
               onClick={toggleLanguage}
               className="text-white hover:text-indigo-200 focus:outline-none flex items-center gap-1"
               title={
-                langlanguage === "Español"
+                locale === "es"
                   ? "Cambiar a Inglés"
                   : "Switch to Spanish"
               }
@@ -190,6 +220,23 @@ export function Header({
           </div>
           {isLoggedIn ? (
             <div className="relative flex items-center gap-4">
+              {user && user.isGlobalAdmin && (
+                <div className="relative flex items-center gap-2">
+                  <Building className="w-5 h-5 text-white" />
+                  <select
+                    value={selectedComplexId || ""}
+                    onChange={handleComplexChange}
+                    className="bg-indigo-700 text-white text-sm py-1 px-2 rounded-md appearance-none pr-8 cursor-pointer"
+                  >
+                    {complexes.map((complex) => (
+                      <option key={complex.schemaName} value={complex.schemaName}>
+                        {complex.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-white pointer-events-none" />
+                </div>
+              )}
               {user && user.isGlobalAdmin && (
                 <div className="relative">
                   <select
@@ -304,6 +351,22 @@ export function Header({
                 <span className="text-xs">{currency.substring(0, 1)}</span>
               </button>
             </div>
+            {user && user.isGlobalAdmin && ( // Mobile complex selector
+              <div className="relative px-4 mt-2">
+                <select
+                  value={selectedComplexId || ""}
+                  onChange={handleComplexChange}
+                  className="bg-indigo-700 text-white text-sm py-1 px-2 rounded-md appearance-none pr-8 cursor-pointer w-full"
+                >
+                  {complexes.map((complex) => (
+                    <option key={complex.schemaName} value={complex.schemaName}>
+                      {complex.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white pointer-events-none" />
+              </div>
+            )}
             <div className="flex flex-col space-y-2 px-4">
               <Link
                 href={ROUTES.PORTAL_SELECTOR}

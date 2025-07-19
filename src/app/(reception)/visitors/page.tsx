@@ -51,7 +51,7 @@ import {
   X,
   QrCode,
   Scan,
-  Package,
+  Package as PackageIcon,
   Truck,
   Loader2,
 } from "lucide-react";
@@ -65,10 +65,14 @@ import {
   deliverPackage,
   createPreRegisteredVisitor,
   uploadVisitorImage,
+  getPackages,
+  Package,
+  uploadPackageImage,
 } from "@/services/visitorService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { visitorSchema, VisitorFormValues } from "@/validators/visitor-schema";
+import { packageSchema, PackageFormValues } from "@/validators/package-schema";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 interface Visitor {
@@ -110,6 +114,7 @@ export default function ReceptionVisitorsPage() {
   const [preRegisteredVisitors, setPreRegisteredVisitors] = useState<
     PreRegisteredVisitor[]
   >([]);
+  const [packages, setPackages] = useState<Package[]>([]); // New state for packages
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<
     "active" | "departed" | "all"
@@ -121,16 +126,12 @@ export default function ReceptionVisitorsPage() {
   const [qrScanResult, setQrScanResult] = useState<any>(null);
   const [isPackageRegisterDialogOpen, setIsPackageRegisterDialogOpen] =
     useState(false);
-  const [newPackageForm, setNewPackageForm] = useState({
-    trackingNumber: "",
-    recipientUnit: "",
-    sender: "",
-    description: "",
-  });
-  const [isPackageDeliverDialogOpen, setIsPackageDeliverDialogOpen] =
-    useState(false);
   const [deliverPackageTrackingNumber, setDeliverPackageTrackingNumber] =
     useState("");
+  const [packageStatusFilter, setPackageStatusFilter] = useState<
+    "REGISTERED" | "DELIVERED" | "RETURNED" | "all"
+  >("all");
+  const [packageSearchTerm, setPackageSearchTerm] = useState("");
 
   const newVisitorForm = useForm<VisitorFormValues>({
     resolver: zodResolver(visitorSchema),
@@ -152,6 +153,24 @@ export default function ReceptionVisitorsPage() {
     reset: resetNewVisitorForm,
     formState: { isSubmitting: isNewVisitorSubmitting },
   } = newVisitorForm;
+
+  const newPackageForm = useForm<PackageFormValues>({
+    resolver: zodResolver(packageSchema),
+    defaultValues: {
+      trackingNumber: "",
+      recipientUnit: "",
+      sender: "",
+      description: "",
+      photoUrl: "",
+    },
+  });
+
+  const {
+    handleSubmit: handleNewPackageSubmit,
+    control: newPackageFormControl,
+    reset: resetNewPackageForm,
+    formState: { isSubmitting: isNewPackageSubmitting },
+  } = newPackageForm;
 
   // Datos de ejemplo para desarrollo y pruebas
   const mockVisitors: Visitor[] = useMemo(
@@ -198,9 +217,9 @@ export default function ReceptionVisitorsPage() {
       setError(null);
 
       // En un entorno real, esto sería una llamada a la API
-      // const response = await fetch("/api/visitors");
+      // const response = await fetch('/api/visitors');
       // const result = await response.json();
-      // if (!response.ok) throw new Error(result.message || "Error al cargar datos");
+      // if (!response.ok) throw new Error(result.message || 'Error al cargar datos');
       // setVisitors(result.visitors);
 
       // Simulamos un retraso en la carga de datos
@@ -210,13 +229,16 @@ export default function ReceptionVisitorsPage() {
 
       const preRegistered = await getPreRegisteredVisitors();
       setPreRegisteredVisitors(preRegistered);
+
+      const fetchedPackages = await getPackages(); // Fetch packages
+      setPackages(fetchedPackages);
     } catch (err: any) {
       console.error("[ReceptionVisitors] Error:", err);
       setError(err.message || "Error al cargar datos de visitantes");
     } finally {
       setLoading(false);
     }
-  }, [mockVisitors, setError, setVisitors, setPreRegisteredVisitors]);
+  }, [mockVisitors, setError, setVisitors, setPreRegisteredVisitors, getPackages]);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -280,8 +302,33 @@ export default function ReceptionVisitorsPage() {
     return filtered;
   };
 
+  // Filtrar paquetes según los filtros aplicados
+  const getFilteredPackages = () => {
+    if (!packages) return [];
+
+    let filtered = packages;
+
+    // Filtrar por estado
+    if (packageStatusFilter !== "all") {
+      filtered = filtered.filter((pkg) => pkg.status === packageStatusFilter);
+    }
+
+    // Filtrar por término de búsqueda
+    if (packageSearchTerm) {
+      filtered = filtered.filter(
+        (pkg) =>
+          pkg.trackingNumber.toLowerCase().includes(packageSearchTerm.toLowerCase()) ||
+          pkg.recipientUnit.toLowerCase().includes(packageSearchTerm.toLowerCase()) ||
+          (pkg.sender && pkg.sender.toLowerCase().includes(packageSearchTerm.toLowerCase())) ||
+          (pkg.description && pkg.description.toLowerCase().includes(packageSearchTerm.toLowerCase())),
+      );
+    }
+
+    return filtered;
+  };
+
   // Función para registrar un nuevo visitante
-  const handleNewVisitorFormSubmit = async (values: VisitorFormValues) => {
+  const handleNewVisitorFormSubmitLogic = async (values: VisitorFormValues) => {
     if (!user?.complexId) {
       setError("Información del complejo incompleta.");
       return;
@@ -382,53 +429,41 @@ export default function ReceptionVisitorsPage() {
     }
   };
 
-  const handlePackageFormChange = (field: string, value: unknown) => {
-    setNewPackageForm((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  const handleSubmitNewPackage = async () => {
-    if (!newPackageForm.trackingNumber || !newPackageForm.recipientUnit) {
-      setError(
-        "Número de seguimiento y unidad de destinatario son requeridos.",
-      );
-      return;
+  const handleSubmitNewPackage = async (values: PackageFormValues) => {
+    let photoUrl: string | undefined;
+    if (values.photoUrl instanceof File) {
+      try {
+        const uploadedImage = await uploadPackageImage(values.photoUrl);
+        photoUrl = uploadedImage.url;
+      } catch (uploadError) {
+        console.error("Error uploading package image:", uploadError);
+        setError("Error al subir la foto del paquete.");
+        return;
+      }
     }
-    // setIsSubmitting(true);
+
     try {
-      await registerPackage(newPackageForm);
+      await registerPackage({ ...values, photoUrl });
       setSuccessMessage("Paquete registrado exitosamente.");
       setIsPackageRegisterDialogOpen(false);
-      setNewPackageForm({
-        trackingNumber: "",
-        recipientUnit: "",
-        sender: "",
-        description: "",
-      });
+      resetNewPackageForm();
+      fetchData(); // Refresh packages list
     } catch (err: any) {
       setError(err.message || "Error al registrar el paquete.");
-    } finally {
-      // setIsSubmitting(false);
     }
   };
 
-  const handleDeliverPackage = async () => {
-    if (!deliverPackageTrackingNumber) {
-      setError("El número de seguimiento es requerido para la entrega.");
+  const handleDeliverPackage = async (packageId: number) => {
+    if (!packageId) {
+      setError("El ID del paquete es requerido para la entrega.");
       return;
     }
-    // setIsSubmitting(true);
     try {
-      await deliverPackage(deliverPackageTrackingNumber);
+      await deliverPackage(packageId);
       setSuccessMessage("Paquete entregado exitosamente.");
-      setIsPackageDeliverDialogOpen(false);
-      setDeliverPackageTrackingNumber("");
+      fetchData(); // Refresh packages list
     } catch (err: any) {
       setError(err.message || "Error al entregar el paquete.");
-    } finally {
-      // setIsSubmitting(false);
     }
   };
 
@@ -459,6 +494,7 @@ export default function ReceptionVisitorsPage() {
   }
 
   const filteredVisitors = getFilteredVisitors();
+  const filteredPackages = getFilteredPackages();
 
   return (
     <div className="container mx-auto p-6">
@@ -590,75 +626,99 @@ export default function ReceptionVisitorsPage() {
             {/* Registrar Paquete */}
             <Card className="border-dashed border-2 p-4">
               <CardTitle className="text-lg mb-4 flex items-center">
-                <Package className="mr-2 h-5 w-5" /> Registrar Paquete
+                <PackageIcon className="mr-2 h-5 w-5" /> Registrar Paquete
               </CardTitle>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="trackingNumber">Número de Seguimiento</Label>
-                  <Input
-                    id="trackingNumber"
-                    placeholder="Ej: ABC123XYZ"
-                    value={newPackageForm.trackingNumber}
-                    onChange={(e) =>
-                      setNewPackageForm({
-                        ...newPackageForm,
-                        trackingNumber: e.target.value,
-                      })
-                    }
+              <Form {...newPackageForm}>
+                <form onSubmit={handleNewPackageSubmit(handleSubmitNewPackage)} className="space-y-4">
+                  <FormField
+                    control={newPackageFormControl}
+                    name="trackingNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Número de Seguimiento</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ej: ABC123XYZ" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="recipientUnit">Unidad Destinataria</Label>
-                  <Input
-                    id="recipientUnit"
-                    placeholder="Ej: Apto 101"
-                    value={newPackageForm.recipientUnit}
-                    onChange={(e) =>
-                      setNewPackageForm({
-                        ...newPackageForm,
-                        recipientUnit: e.target.value,
-                      })
-                    }
+                  <FormField
+                    control={newPackageFormControl}
+                    name="recipientUnit"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Unidad Destinataria</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ej: Apto 101" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="sender">Remitente (Opcional)</Label>
-                  <Input
-                    id="sender"
-                    placeholder="Nombre del remitente"
-                    value={newPackageForm.sender}
-                    onChange={(e) =>
-                      setNewPackageForm({
-                        ...newPackageForm,
-                        sender: e.target.value,
-                      })
-                    }
+                  <FormField
+                    control={newPackageFormControl}
+                    name="sender"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Remitente (Opcional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nombre del remitente" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="description">Descripción (Opcional)</Label>
-                  <Input
-                    id="description"
-                    placeholder="Contenido del paquete"
-                    value={newPackageForm.description}
-                    onChange={(e) =>
-                      setNewPackageForm({
-                        ...newPackageForm,
-                        description: e.target.value,
-                      })
-                    }
+                  <FormField
+                    control={newPackageFormControl}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Descripción (Opcional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Contenido del paquete" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <Button
-                  onClick={handleSubmitNewPackage}
-                  disabled={isNewVisitorSubmitting}
-                >
-                  {isNewVisitorSubmitting && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  Registrar Paquete
-                </Button>
-              </div>
+                  <FormField
+                    control={newPackageFormControl}
+                    name="photoUrl"
+                    render={({ field: { value, onChange, ...fieldProps } }) => (
+                      <FormItem>
+                        <FormLabel>Foto del Paquete (Opcional)</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...fieldProps}
+                            type="file"
+                            accept="image/*"
+                            onChange={(event) => {
+                              onChange(event.target.files && event.target.files[0]);
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                        {value instanceof File && (
+                          <div className="mt-2">
+                            <img
+                              src={URL.createObjectURL(value)}
+                              alt="Vista previa de la foto"
+                              className="w-32 h-32 object-cover rounded-md"
+                            />
+                          </div>
+                        )}
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" disabled={isNewPackageSubmitting}>
+                    {isNewPackageSubmitting && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Registrar Paquete
+                  </Button>
+                </form>
+              </Form>
             </Card>
 
             {/* Entregar Paquete */}
@@ -680,8 +740,8 @@ export default function ReceptionVisitorsPage() {
                     }
                   />
                 </div>
-                <Button onClick={handleDeliverPackage} disabled={isNewVisitorSubmitting}>
-                  {isNewVisitorSubmitting && (
+                <Button onClick={() => handleDeliverPackage(parseInt(deliverPackageTrackingNumber))} disabled={isNewPackageSubmitting || !deliverPackageTrackingNumber}>
+                  {isNewPackageSubmitting && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
                   Marcar como Entregado
@@ -692,7 +752,117 @@ export default function ReceptionVisitorsPage() {
         </CardContent>
       </Card>
 
-      {/* Filtros y búsqueda */}
+      {/* Filtros y búsqueda de Paquetes */}
+      <Card className="mb-6">
+        <CardContent className="p-4 flex flex-col md:flex-row gap-4">
+          <div className="relative flex-grow">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Buscar por número de seguimiento, unidad, remitente..."
+              className="pl-10"
+              value={packageSearchTerm}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setPackageSearchTerm(e.target.value)
+              }
+            />
+          </div>
+          <Select
+            value={packageStatusFilter}
+            onValueChange={(value) =>
+              setPackageStatusFilter(value as "REGISTERED" | "DELIVERED" | "RETURNED" | "all")
+            }
+          >
+            <SelectTrigger className="w-full md:w-48">
+              <SelectValue placeholder="Filtrar por estado" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="REGISTERED">Registrados</SelectItem>
+              <SelectItem value="DELIVERED">Entregados</SelectItem>
+              <SelectItem value="RETURNED">Devueltos</SelectItem>
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
+
+      {/* Tabla de Paquetes */}
+      <Card>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Número de Seguimiento</TableHead>
+                <TableHead>Unidad Destinataria</TableHead>
+                <TableHead>Remitente</TableHead>
+                <TableHead>Descripción</TableHead>
+                <TableHead>Fecha Registro</TableHead>
+                <TableHead>Fecha Entrega</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead className="text-right">Acciones</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredPackages.length > 0 ? (
+                filteredPackages.map((pkg) => (
+                  <TableRow key={pkg.id}>
+                    <TableCell className="font-medium">
+                      {pkg.trackingNumber}
+                    </TableCell>
+                    <TableCell>{pkg.recipientUnit}</TableCell>
+                    <TableCell>{pkg.sender || "N/A"}</TableCell>
+                    <TableCell>{pkg.description || "N/A"}</TableCell>
+                    <TableCell>{formatDate(pkg.registrationDate)}</TableCell>
+                    <TableCell>{pkg.deliveryDate ? formatDate(pkg.deliveryDate) : "N/A"}</TableCell>
+                    <TableCell>
+                      <Badge
+                        className={
+                          pkg.status === "DELIVERED"
+                            ? "bg-green-100 text-green-800"
+                            : pkg.status === "REGISTERED"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-gray-100 text-gray-800"
+                        }
+                      >
+                        {pkg.status === "REGISTERED" ? "Registrado" : pkg.status === "DELIVERED" ? "Entregado" : "Devuelto"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {pkg.status === "REGISTERED" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDeliverPackage(pkg.id)}
+                        >
+                          <Truck className="mr-1 h-4 w-4" />
+                          Marcar Entregado
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={8}
+                    className="text-center py-12 text-gray-500"
+                  >
+                    <PackageIcon className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                    <h3 className="text-lg font-medium mb-2">
+                      No se encontraron paquetes
+                    </h3>
+                    <p>
+                      No hay paquetes que coincidan con los filtros
+                      seleccionados
+                    </p>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Filtros y búsqueda de Visitantes */}
       <Card className="mb-6">
         <CardContent className="p-4 flex flex-col md:flex-row gap-4">
           <div className="relative flex-grow">
@@ -837,7 +1007,7 @@ export default function ReceptionVisitorsPage() {
             </DialogDescription>
           </DialogHeader>
           <Form {...newVisitorForm}>
-            <form onSubmit={handleNewVisitorSubmit(handleNewVisitorFormSubmit)} className="space-y-4 py-4">
+            <form onSubmit={handleNewVisitorSubmit(handleNewVisitorFormSubmitLogic)} className="space-y-4 py-4">
               <FormField
                 control={newVisitorFormControl}
                 name="name"
@@ -997,75 +1167,97 @@ export default function ReceptionVisitorsPage() {
               Complete la información del paquete para registrar su ingreso.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="packageTrackingNumber">
-                Número de Seguimiento
-              </Label>
-              <Input
-                id="packageTrackingNumber"
-                placeholder="Ej: ABC123XYZ"
-                value={newPackageForm.trackingNumber}
-                onChange={(e) =>
-                  setNewPackageForm({
-                    ...newPackageForm,
-                    trackingNumber: e.target.value,
-                  })
-                }
+          <Form {...newPackageForm}>
+            <form onSubmit={handleNewPackageSubmit(handleSubmitNewPackage)} className="space-y-4 py-4">
+              <FormField
+                control={newPackageFormControl}
+                name="trackingNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Número de Seguimiento</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ej: ABC123XYZ" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="packageRecipientUnit">Unidad Destinataria</Label>
-              <Input
-                id="packageRecipientUnit"
-                placeholder="Ej: Apto 101"
-                value={newPackageForm.recipientUnit}
-                onChange={(e) =>
-                  setNewPackageForm({
-                    ...newPackageForm,
-                    recipientUnit: e.target.value,
-                  })
-                }
+              <FormField
+                control={newPackageFormControl}
+                name="recipientUnit"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Unidad Destinataria</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ej: Apto 101" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="packageSender">Remitente (Opcional)</Label>
-              <Input
-                id="packageSender"
-                placeholder="Nombre del remitente"
-                value={newPackageForm.sender}
-                onChange={(e) =>
-                  setNewPackageForm({
-                    ...newPackageForm,
-                    sender: e.target.value,
-                  })
-                }
+              <FormField
+                control={newPackageFormControl}
+                name="sender"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Remitente (Opcional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nombre del remitente" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="packageDescription">Descripción (Opcional)</Label>
-              <Input
-                id="packageDescription"
-                placeholder="Contenido del paquete"
-                value={newPackageForm.description}
-                onChange={(e) =>
-                  setNewPackageForm({
-                    ...newPackageForm,
-                    description: e.target.value,
-                  })
-                }
+              <FormField
+                control={newPackageFormControl}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descripción (Opcional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Contenido del paquete" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <Button
-              onClick={handleSubmitNewPackage}
-              disabled={isNewVisitorSubmitting}
-            >
-              {isNewVisitorSubmitting && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              Registrar Paquete
-            </Button>
-          </div>
+              <FormField
+                control={newPackageFormControl}
+                name="photoUrl"
+                render={({ field: { value, onChange, ...fieldProps } }) => (
+                  <FormItem>
+                    <FormLabel>Foto del Paquete (Opcional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...fieldProps}
+                        type="file"
+                        accept="image/*"
+                        onChange={(event) => {
+                          onChange(event.target.files && event.target.files[0]);
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                    {value instanceof File && (
+                      <div className="mt-2">
+                        <img
+                          src={URL.createObjectURL(value)}
+                          alt="Vista previa de la foto"
+                          className="w-32 h-32 object-cover rounded-md"
+                        />
+                      </div>
+                    )}
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" disabled={isNewPackageSubmitting}>
+                {isNewPackageSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Registrar Paquete
+              </Button>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 
@@ -1088,15 +1280,15 @@ export default function ReceptionVisitorsPage() {
               </Label>
               <Input
                 id="deliverTrackingNumber"
-                placeholder="Número de seguimiento"
+                placeholder="Número de seguimiento del paquete a entregar"
                 value={deliverPackageTrackingNumber}
                 onChange={(e) =>
                   setDeliverPackageTrackingNumber(e.target.value)
                 }
               />
             </div>
-            <Button onClick={handleDeliverPackage} disabled={isNewVisitorSubmitting}>
-              {isNewVisitorSubmitting && (
+            <Button onClick={() => handleDeliverPackage(parseInt(deliverPackageTrackingNumber))} disabled={isNewPackageSubmitting || !deliverPackageTrackingNumber}>
+              {isNewPackageSubmitting && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
               Marcar como Entregado

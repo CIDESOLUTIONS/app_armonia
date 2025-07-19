@@ -1,78 +1,79 @@
 import { FinancesService } from './finances.service';
 import { PaymentStatus } from '../common/dto/finances.dto';
+import { vi } from "vitest";
 
 // Mock dependencies
 const mockPrismaClient = {
   fee: {
-    findMany: jest.fn(),
-    count: jest.fn(),
-    findUnique: jest.fn(),
+    findMany: vi.fn(),
+    count: vi.fn(),
+    findUnique: vi.fn(),
   },
   payment: {
-    findMany: jest.fn(),
-    create: jest.fn(),
+    findMany: vi.fn(),
+    create: vi.fn(),
   },
   budget: {
-    create: jest.fn(),
-    findMany: jest.fn(),
-    update: jest.fn(),
+    create: vi.fn(),
+    findMany: vi.fn(),
+    update: vi.fn(),
   },
   bill: {
-    findUnique: jest.fn(),
+    findUnique: vi.fn(),
   },
   paymentAttempt: {
-    create: jest.fn(),
-    findUnique: jest.fn(),
-    update: jest.fn(),
+    create: vi.fn(),
+    findUnique: vi.fn(),
+    update: vi.fn(),
   },
   property: {
-    findMany: jest.fn(),
+    findMany: vi.fn(),
   },
   user: {
-    findUnique: jest.fn(),
+    findUnique: vi.fn(),
   },
   paymentGateway: {
-    findFirst: jest.fn(),
+    findFirst: vi.fn(),
   },
   paymentMethod: {
-    findFirst: jest.fn(),
+    findFirst: vi.fn(),
   },
 };
 
 const mockPrismaClientManager = {
-  getClient: jest.fn(() => mockPrismaClient),
+  getClient: vi.fn(() => mockPrismaClient),
 };
 
 const mockPrismaService = {
   client: {
     user: {
-      findUnique: jest.fn(),
+      findUnique: vi.fn(),
     },
     residentialComplex: {
-      findMany: jest.fn(),
+      findMany: vi.fn(),
     },
   },
 };
 
 const mockCommunicationService = {
-  notifyUser: jest.fn(),
+  notifyUser: vi.fn(),
 };
 
 const mockPdfService = {
-  generateFinancialReportPdf: jest.fn(),
+  generateFinancialReportPdf: vi.fn(),
 };
 
-jest.mock('../lib/logging/server-logger', () => ({
+vi.mock('../lib/logging/server-logger', () => ({
   ServerLogger: {
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
-jest.mock('../lib/logging/activity-logger', () => ({
+vi.mock('../lib/logging/activity-logger', () => ({
   ActivityLogger: {
-    log: jest.fn(),
+    log: vi.fn(),
   },
 }));
 
@@ -80,7 +81,7 @@ describe('FinancesService', () => {
   let service: FinancesService;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     service = new FinancesService(
       mockPrismaClientManager as any,
       mockPrismaService as any,

@@ -30,6 +30,32 @@ export interface CreatePreRegisteredVisitorDto {
   photoUrl?: string; // URL de la foto del visitante
 }
 
+export interface Package {
+  id: number;
+  trackingNumber: string;
+  recipientUnit: string;
+  sender?: string;
+  description?: string;
+  status: "REGISTERED" | "DELIVERED" | "RETURNED";
+  registrationDate: string;
+  deliveryDate?: string;
+  photoUrl?: string; // Added photoUrl for packages
+}
+
+export interface RegisterPackageDto {
+  trackingNumber: string;
+  recipientUnit: string;
+  sender?: string;
+  description?: string;
+  photoUrl?: string; // Added photoUrl for packages
+}
+
+export interface PackageFilterParams {
+  status?: "REGISTERED" | "DELIVERED" | "RETURNED";
+  recipientUnit?: string;
+  search?: string;
+}
+
 export async function createPreRegisteredVisitor(
   data: CreatePreRegisteredVisitorDto,
 ): Promise<PreRegisteredVisitor> {
@@ -57,8 +83,6 @@ export async function getPreRegisteredVisitors(): Promise<PreRegisteredVisitor[]
 
 export async function scanQrCode(qrCode: string): Promise<any> {
   try {
-    // Placeholder for API call to validate QR code and get visitor info
-    console.log("Scanning QR Code:", qrCode);
     const response = await fetchApi("/visitors/scan-qr", {
       method: "POST",
       body: JSON.stringify({ qrCode }),
@@ -70,9 +94,9 @@ export async function scanQrCode(qrCode: string): Promise<any> {
   }
 }
 
-export async function registerPackage(data: any): Promise<any> {
+export async function registerPackage(data: RegisterPackageDto): Promise<Package> {
   try {
-    const response = await fetchApi("/packages/register", {
+    const response = await fetchApi("/packages", {
       method: "POST",
       body: JSON.stringify(data),
     });
@@ -83,10 +107,10 @@ export async function registerPackage(data: any): Promise<any> {
   }
 }
 
-export async function deliverPackage(packageId: string): Promise<any> {
+export async function deliverPackage(packageId: number): Promise<Package> {
   try {
     const response = await fetchApi(`/packages/${packageId}/deliver`, {
-      method: "POST",
+      method: "PUT", // Changed to PUT as per common REST practices for updates
     });
     return response.data;
   } catch (error) {
@@ -110,6 +134,53 @@ export async function uploadVisitorImage(file: File): Promise<{ url: string }> {
     return response.data; // Assuming the API returns { data: { url: string } }
   } catch (error) {
     console.error("Error uploading visitor image:", error);
+    throw error;
+  }
+}
+
+export async function uploadPackageImage(file: File): Promise<{ url: string }> {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await fetchApi(
+      "/packages/upload-image",
+      {
+        method: "POST",
+        body: formData,
+      },
+      true,
+    ); // The third parameter indicates that Content-Type should not be automatically added
+    return response.data; // Assuming the API returns { data: { url: string } }
+  } catch (error) {
+    console.error("Error uploading package image:", error);
+    throw error;
+  }
+}
+
+export async function getPackages(filters?: PackageFilterParams): Promise<Package[]> {
+  try {
+    const query = new URLSearchParams();
+    if (filters) {
+      for (const key in filters) {
+        if (filters[key as keyof PackageFilterParams]) {
+          query.append(key, filters[key as keyof PackageFilterParams] as string);
+        }
+      }
+    }
+    const response = await fetchApi(`/packages?${query.toString()}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching packages:", error);
+    throw error;
+  }
+}
+
+export async function getPackageById(id: number): Promise<Package> {
+  try {
+    const response = await fetchApi(`/packages/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching package with ID ${id}:`, error);
     throw error;
   }
 }

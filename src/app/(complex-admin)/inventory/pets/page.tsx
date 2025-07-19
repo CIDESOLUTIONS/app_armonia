@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/store/authStore";
@@ -550,6 +551,24 @@ export default function PetsPage() {
                       </SelectContent>
                     </Select>
                     <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="isActive"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Activo</FormLabel>
+                    </div>
+                    <FormMessage />
                   </FormItem>
                 )}
               />

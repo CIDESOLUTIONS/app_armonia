@@ -29,8 +29,7 @@ import {
   PaymentGatewayConfigDto,
   CreatePaymentGatewayDto,
   UpdatePaymentGatewayDto,
-  PaymentGatewayType,
-} from "../../armonia-backend/src/common/dto/payment-gateways.dto";
+} from "@/common/dto/payment-gateways.dto";
 
 export function PaymentGatewaySection() {
   const { toast } = useToast();

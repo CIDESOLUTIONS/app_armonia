@@ -217,6 +217,18 @@ export default function VehiclesPage() {
         description: "Vehículo eliminado correctamente.",
       });
       fetchVehiclesAndRelatedData();
+    } catch (error) {
+      console.error("Error deleting vehicle:", error);
+      toast({
+        title: "Error",
+        description: "Error al eliminar el vehículo.",
+        variant: "destructive",
+      });
+    } finally {
+      setShowDeleteDialog(false);
+      setVehicleToDelete(null);
+    }
+  };
 
   if (authLoading || loading) {
     return (

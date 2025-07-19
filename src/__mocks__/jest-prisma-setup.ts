@@ -12,14 +12,15 @@ import {
   VisitType,
 } from "./prisma-client-extended";
 import { getPrisma } from "@/lib/prisma";
+import { vi } from "vitest"; // Import vi
 
 // Crear una instancia global del mock
 const prismaClientMock = getPrisma();
 
 // Mockear el módulo @prisma/client para todos los tests
-jest.mock("@prisma/client", () => {
+vi.mock("@prisma/client", () => {
   return {
-    PrismaClient: jest.fn().mockImplementation(() => prismaClientMock),
+    PrismaClient: vi.fn().mockImplementation(() => prismaClientMock),
     // Exportar enums para que sean accesibles como si vinieran de @prisma/client
     PQRCategory,
     PQRStatus,
@@ -30,10 +31,10 @@ jest.mock("@prisma/client", () => {
 });
 
 // Mockear el módulo de prisma local para todos los tests
-jest.mock("../../lib/prisma", () => ({
-  getSchemaFromRequest: jest.fn().mockReturnValue(prismaClientMock),
-  getPrismaClient: jest.fn().mockReturnValue(prismaClientMock),
-  getTenantPrismaClient: jest.fn().mockReturnValue(prismaClientMock),
+vi.mock("../../lib/prisma", () => ({
+  getSchemaFromRequest: vi.fn().mockReturnValue(prismaClientMock),
+  getPrismaClient: vi.fn().mockReturnValue(prismaClientMock),
+  getTenantPrismaClient: vi.fn().mockReturnValue(prismaClientMock),
 }));
 
 // Exportar la instancia del mock para uso directo en tests
