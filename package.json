@@ -58,6 +58,7 @@
     "next": "^15.3.5",
     "next-auth": "^5.0.0-beta.29",
     "next-intl": "^4.3.4",
+    "next-transpile-modules": "^10.0.1",
     "node-onvif": "^0.1.7",
     "node-rtsp-stream": "^0.0.9",
     "nodemailer": "^6.10.0",
