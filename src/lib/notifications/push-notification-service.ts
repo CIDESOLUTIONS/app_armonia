@@ -78,41 +78,13 @@ export class PushNotificationService {
   /**
    * Inicializa el servicio FCM
    */
+  // La inicialización real se manejará en el backend.
   async initialize(): Promise<void> {
-    try {
-      // Verificar si las credenciales de Firebase están configuradas
-      if (
-        !process.env.FIREBASE_PROJECT_ID ||
-        !process.env.FIREBASE_PRIVATE_KEY ||
-        !process.env.FIREBASE_CLIENT_EMAIL
-      ) {
-        console.warn(
-          "[PUSH] Firebase no configurado - funcionando en modo simulación",
-        );
-        this.fcmEnabled = false;
-        this.isInitialized = true;
-        return;
-      }
-
-      // En producción aquí iría la inicialización real de Firebase Admin SDK
-      if (!admin.apps.length) {
-        admin.initializeApp({
-          credential: admin.credential.cert({
-            projectId: process.env.FIREBASE_PROJECT_ID,
-            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-          }),
-        });
-      }
-
-      this.fcmEnabled = true;
-      this.isInitialized = true;
-      console.log("[PUSH] Servicio de notificaciones inicializado");
-    } catch (error) {
-      console.error("[PUSH] Error inicializando servicio:", error);
-      this.fcmEnabled = false;
-      this.isInitialized = true; // Continuar en modo simulación
-    }
+    console.log(
+      "[PUSH] Servicio de notificaciones inicializado en modo cliente (simulación).",
+    );
+    this.fcmEnabled = false; // Siempre en modo simulación en el cliente
+    this.isInitialized = true;
   }
 
   /**
@@ -172,72 +144,27 @@ export class PushNotificationService {
     request: SendNotificationRequest,
     tokens: string[],
   ): Promise<NotificationResponse> {
-    if (!this.fcmEnabled) {
-      // Modo simulación para desarrollo
-      console.log("[PUSH SIMULACIÓN] Enviando notificación:", {
-        title: request.payload.title,
-        body: request.payload.body,
-        targets: tokens.length,
-        complexId: request.complexId,
-      });
+    // El envío real se delega al backend. El frontend solo simula.
+    console.log("[PUSH SIMULACIÓN] Enviando notificación:", {
+      title: request.payload.title,
+      body: request.payload.body,
+      targets: tokens.length,
+      complexId: request.complexId,
+    });
 
-      // Registrar en base de datos
-      await this.logNotification(request, tokens, "simulated");
+    // En una implementación real, aquí se haría una llamada a la API del backend:
+    // await fetch('/api/notifications/send', {
+    //   method: 'POST',
+    //   body: JSON.stringify({ request, tokens })
+    // });
 
-      return {
-        success: true,
-        messageId: `sim_${Date.now()}`,
-        successCount: tokens.length,
-        failureCount: 0,
-      };
-    }
-
-    // En producción, aquí iría el envío real con Firebase Admin SDK
-    const messaging = admin.messaging();
-
-    const message = {
-      notification: {
-        title: request.payload.title,
-        body: request.payload.body,
-        icon: request.payload.icon,
-        image: request.payload.image,
-      },
-      data: request.payload.data || {},
-      tokens: tokens,
-      android: {
-        priority: request.options?.priority || "normal",
-        ttl: request.options?.timeToLive || 3600000, // 1 hora por defecto
-      },
-      webpush: {
-        notification: {
-          icon: request.payload.icon,
-          badge: request.payload.badge,
-          actions: request.payload.actions,
-          requireInteraction: request.options?.requireInteraction,
-          silent: request.options?.silent,
-          tag: request.options?.tag,
-        },
-        fcmOptions: {
-          link: request.options?.clickAction,
-        },
-      },
-    };
-
-    const response = await messaging.sendEachForMulticast(message);
-
-    await this.logNotification(request, tokens, "sent");
+    await this.logNotification(request, tokens, "simulated");
 
     return {
       success: true,
-      messageId: `fcm_${Date.now()}`,
-      successCount: response.successCount,
-      failureCount: response.failureCount,
-      errors: response.responses
-        .filter((res) => !res.success)
-        .map((res) => ({
-          token: res.multicastMessageId || "", // Fallback if token not available
-          error: res.error?.message || "Unknown error",
-        })),
+      messageId: `sim_${Date.now()}`,
+      successCount: tokens.length,
+      failureCount: 0,
     };
   }
 

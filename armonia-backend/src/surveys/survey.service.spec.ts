@@ -163,7 +163,13 @@ describe('SurveyService', () => {
         startDate: new Date(),
         endDate: new Date(),
         questions: [
-          { id: 10, text: 'Old Q', type: QuestionType.TEXT, options: [], order: 0 },
+          {
+            id: 10,
+            text: 'Old Q',
+            type: QuestionType.TEXT,
+            options: [],
+            order: 0,
+          },
         ],
       };
       const updatedSurvey = {
@@ -171,7 +177,13 @@ describe('SurveyService', () => {
         title: 'New Title',
         description: 'New Desc',
         questions: [
-          { id: 11, text: 'New Q', type: QuestionType.TEXT, options: [], order: 0 },
+          {
+            id: 11,
+            text: 'New Q',
+            type: QuestionType.TEXT,
+            options: [],
+            order: 0,
+          },
         ],
       };
 
@@ -269,10 +281,20 @@ describe('SurveyService', () => {
         id: 1,
         status: SurveyStatus.PUBLISHED,
         questions: [
-          { id: 10, text: 'Q1', type: QuestionType.SINGLE_CHOICE, options: ['A', 'B'] },
+          {
+            id: 10,
+            text: 'Q1',
+            type: QuestionType.SINGLE_CHOICE,
+            options: ['A', 'B'],
+          },
         ],
       };
-      const mockAnswer = { id: 100, questionId: 10, userId: 1, selectedOptions: ['A'] };
+      const mockAnswer = {
+        id: 100,
+        questionId: 10,
+        userId: 1,
+        selectedOptions: ['A'],
+      };
 
       mockPrismaClient.survey.findUnique.mockResolvedValue(mockSurvey);
       mockPrismaClient.answer.create.mockResolvedValue(mockAnswer);
@@ -282,7 +304,12 @@ describe('SurveyService', () => {
         selectedOptions: ['A'],
       };
 
-      const result = await service.submitAnswer('test_schema', 1, 1, createAnswerDto);
+      const result = await service.submitAnswer(
+        'test_schema',
+        1,
+        1,
+        createAnswerDto,
+      );
 
       expect(result).toEqual(mockAnswer);
       expect(mockPrismaClient.answer.create).toHaveBeenCalledWith({
@@ -301,7 +328,10 @@ describe('SurveyService', () => {
       mockPrismaClient.survey.findUnique.mockResolvedValue(null);
 
       await expect(
-        service.submitAnswer('test_schema', 999, 1, { questionId: 1, selectedOptions: ['A'] }),
+        service.submitAnswer('test_schema', 999, 1, {
+          questionId: 1,
+          selectedOptions: ['A'],
+        }),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -310,16 +340,26 @@ describe('SurveyService', () => {
       mockPrismaClient.survey.findUnique.mockResolvedValue(mockSurvey);
 
       await expect(
-        service.submitAnswer('test_schema', 1, 1, { questionId: 1, selectedOptions: ['A'] }),
-      ).rejects.toThrow("La encuesta no está publicada o ya ha finalizado.");
+        service.submitAnswer('test_schema', 1, 1, {
+          questionId: 1,
+          selectedOptions: ['A'],
+        }),
+      ).rejects.toThrow('La encuesta no está publicada o ya ha finalizado.');
     });
 
     it('should throw NotFoundException if question not found in survey', async () => {
-      const mockSurvey = { id: 1, status: SurveyStatus.PUBLISHED, questions: [] };
+      const mockSurvey = {
+        id: 1,
+        status: SurveyStatus.PUBLISHED,
+        questions: [],
+      };
       mockPrismaClient.survey.findUnique.mockResolvedValue(mockSurvey);
 
       await expect(
-        service.submitAnswer('test_schema', 1, 1, { questionId: 999, selectedOptions: ['A'] }),
+        service.submitAnswer('test_schema', 1, 1, {
+          questionId: 999,
+          selectedOptions: ['A'],
+        }),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -328,13 +368,21 @@ describe('SurveyService', () => {
         id: 1,
         status: SurveyStatus.PUBLISHED,
         questions: [
-          { id: 10, text: 'Q1', type: QuestionType.SINGLE_CHOICE, options: ['A', 'B'] },
+          {
+            id: 10,
+            text: 'Q1',
+            type: QuestionType.SINGLE_CHOICE,
+            options: ['A', 'B'],
+          },
         ],
       };
       mockPrismaClient.survey.findUnique.mockResolvedValue(mockSurvey);
 
       await expect(
-        service.submitAnswer('test_schema', 1, 1, { questionId: 10, selectedOptions: ['C'] }),
+        service.submitAnswer('test_schema', 1, 1, {
+          questionId: 10,
+          selectedOptions: ['C'],
+        }),
       ).rejects.toThrow("Opción 'C' no válida para la pregunta.");
     });
   });
@@ -349,8 +397,20 @@ describe('SurveyService', () => {
         startDate: new Date(),
         endDate: new Date(),
         questions: [
-          { id: 10, text: 'Q1', type: QuestionType.SINGLE_CHOICE, options: ['A', 'B'], answers: [] },
-          { id: 11, text: 'Q2', type: QuestionType.TEXT, options: [], answers: [] },
+          {
+            id: 10,
+            text: 'Q1',
+            type: QuestionType.SINGLE_CHOICE,
+            options: ['A', 'B'],
+            answers: [],
+          },
+          {
+            id: 11,
+            text: 'Q2',
+            type: QuestionType.TEXT,
+            options: [],
+            answers: [],
+          },
         ],
       };
       const mockAnswers = [
@@ -401,9 +461,9 @@ describe('SurveyService', () => {
     it('should throw NotFoundException if survey not found', async () => {
       mockPrismaClient.survey.findUnique.mockResolvedValue(null);
 
-      await expect(service.getSurveyResults('test_schema', 999)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.getSurveyResults('test_schema', 999),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });

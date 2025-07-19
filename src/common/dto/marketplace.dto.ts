@@ -1,18 +1,16 @@
-
-
 export enum ListingCategory {
-  HOME = 'HOME',
-  TECHNOLOGY = 'TECHNOLOGY',
-  SERVICES = 'SERVICES',
-  CLASSES = 'CLASSES',
-  OTHER = 'OTHER',
+  HOME = "HOME",
+  TECHNOLOGY = "TECHNOLOGY",
+  SERVICES = "SERVICES",
+  CLASSES = "CLASSES",
+  OTHER = "OTHER",
 }
 
 export enum ListingStatus {
-  ACTIVE = 'ACTIVE',
-  SOLD = 'SOLD',
-  REPORTED = 'REPORTED',
-  DELETED = 'DELETED',
+  ACTIVE = "ACTIVE",
+  SOLD = "SOLD",
+  REPORTED = "REPORTED",
+  DELETED = "DELETED",
 }
 
 export class CreateListingDto {
@@ -63,8 +61,8 @@ export class ResolveReportDto {
   @IsNumber()
   reportId: number;
 
-  @IsEnum(['APPROVE', 'REJECT'])
-  action: 'APPROVE' | 'REJECT';
+  @IsEnum(["APPROVE", "REJECT"])
+  action: "APPROVE" | "REJECT";
 }
 
 export class CreateMessageDto {

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/store/authStore";
 import {
   Card,
   CardContent,
@@ -41,6 +40,7 @@ import {
 import NotificationCenterThemed from "@/components/communications/NotificationCenterThemed";
 import { getReceptionDashboardData } from "@/services/receptionDashboardService";
 import { Language, ThemeMode } from "@/lib/communications/theme-config";
+import Link from "next/link"; // Importar Link
 
 interface Visitor {
   id: string;
@@ -404,17 +404,18 @@ export default function ReceptionDashboard() {
                     ? "Visitantes Activos"
                     : "Active Visitors"}
                 </CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => router.push("/reception/visitors/check-in")}
-                  className="dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
-                >
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  {language === "Español"
-                    ? "Registrar Visitante"
-                    : "Register Visitor"}
-                </Button>
+                <Link href="/reception/visitors/check-in">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
+                  >
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    {language === "Español"
+                      ? "Registrar Visitante"
+                      : "Register Visitor"}
+                  </Button>
+                </Link>
               </div>
               <CardDescription>
                 {language === "Español"
@@ -498,19 +499,20 @@ export default function ReceptionDashboard() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
-                            onClick={() =>
-                          router.push(`/reception/visitors/check-out?id=${visitor.id}`),
-                        }
+                          <Link
+                            href={`/reception/visitors/check-out?id=${visitor.id}`}
                           >
-                            <LogOut className="mr-2 h-4 w-4" />
-                            {language === "Español"
-                              ? "Registrar Salida"
-                              : "Check Out"}
-                          </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+                            >
+                              <LogOut className="mr-2 h-4 w-4" />
+                              {language === "Español"
+                                ? "Registrar Salida"
+                                : "Check Out"}
+                            </Button>
+                          </Link>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -562,16 +564,15 @@ export default function ReceptionDashboard() {
                           {formatDateTime(pkg.receivedAt)}
                         </p>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
-                        onClick={() =>
-                          router.push(`/reception/packages?id=${pkg.id}`)
-                        }
-                      >
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
+                      <Link href={`/reception/packages?id=${pkg.id}`}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+                        >
+                          <ArrowRight className="h-4 w-4" />
+                        </Button>
+                      </Link>
                     </div>
                   ))}
                 </div>
@@ -587,16 +588,17 @@ export default function ReceptionDashboard() {
               )}
             </CardContent>
             <CardFooter>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
-                onClick={() => router.push("/reception/packages")}
-              >
-                {language === "Español"
-                  ? "Ver Todos los Paquetes"
-                  : "View All Packages"}
-              </Button>
+              <Link href="/reception/packages">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
+                >
+                  {language === "Español"
+                    ? "Ver Todos los Paquetes"
+                    : "View All Packages"}
+                </Button>
+              </Link>
             </CardFooter>
           </Card>
 
@@ -633,16 +635,15 @@ export default function ReceptionDashboard() {
                           {formatDateTime(incident.reportedAt)}
                         </p>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
-                        onClick={() =>
-                          router.push(`/reception/incidents?id=${incident.id}`)
-                        }
-                      >
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
+                      <Link href={`/reception/incidents?id=${incident.id}`}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+                        >
+                          <ArrowRight className="h-4 w-4" />
+                        </Button>
+                      </Link>
                     </div>
                   ))}
                 </div>
@@ -658,16 +659,17 @@ export default function ReceptionDashboard() {
               )}
             </CardContent>
             <CardFooter>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
-                onClick={() => router.push("/reception/incidents")}
-              >
-                {language === "Español"
-                  ? "Ver Todos los Incidentes"
-                  : "View All Incidents"}
-              </Button>
+              <Link href="/reception/incidents">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
+                >
+                  {language === "Español"
+                    ? "Ver Todos los Incidentes"
+                    : "View All Incidents"}
+                </Button>
+              </Link>
             </CardFooter>
           </Card>
         </div>

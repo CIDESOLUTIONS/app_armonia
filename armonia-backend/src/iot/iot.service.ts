@@ -28,11 +28,15 @@ export class IotService {
     });
 
     if (!device) {
-      throw new NotFoundException(`Dispositivo de medidor inteligente con ID ${data.meterId} no encontrado.`);
+      throw new NotFoundException(
+        `Dispositivo de medidor inteligente con ID ${data.meterId} no encontrado.`,
+      );
     }
 
     if (device.propertyId !== data.propertyId) {
-      throw new Error(`El medidor ${data.meterId} no está asociado a la propiedad ${data.propertyId}.`);
+      throw new Error(
+        `El medidor ${data.meterId} no está asociado a la propiedad ${data.propertyId}.`,
+      );
     }
 
     return prisma.smartMeterReading.create({
@@ -75,7 +79,9 @@ export class IotService {
     const prisma = this.getTenantPrismaClient(schemaName);
 
     if (!data.billingPeriodStart || !data.billingPeriodEnd) {
-      throw new Error('Las fechas de inicio y fin del período de facturación son obligatorias.');
+      throw new Error(
+        'Las fechas de inicio y fin del período de facturación son obligatorias.',
+      );
     }
 
     const billingPeriodStart = new Date(data.billingPeriodStart);
@@ -92,7 +98,14 @@ export class IotService {
     });
 
     // Group readings by propertyId and calculate consumption
-    const consumptionByProperty: { [propertyId: number]: { minReading: number; maxReading: number; unit: string; type: string } } = {};
+    const consumptionByProperty: {
+      [propertyId: number]: {
+        minReading: number;
+        maxReading: number;
+        unit: string;
+        type: string;
+      };
+    } = {};
 
     for (const reading of readings) {
       const device = await prisma.smartMeterDevice.findUnique({
@@ -101,16 +114,29 @@ export class IotService {
       if (!device) continue; // Skip if device not found
 
       if (!consumptionByProperty[reading.propertyId]) {
-        consumptionByProperty[reading.propertyId] = { minReading: reading.reading, maxReading: reading.reading, unit: reading.unit, type: device.type };
+        consumptionByProperty[reading.propertyId] = {
+          minReading: reading.reading,
+          maxReading: reading.reading,
+          unit: reading.unit,
+          type: device.type,
+        };
       } else {
-        consumptionByProperty[reading.propertyId].minReading = Math.min(consumptionByProperty[reading.propertyId].minReading, reading.reading);
-        consumptionByProperty[reading.propertyId].maxReading = Math.max(consumptionByProperty[reading.propertyId].maxReading, reading.reading);
+        consumptionByProperty[reading.propertyId].minReading = Math.min(
+          consumptionByProperty[reading.propertyId].minReading,
+          reading.reading,
+        );
+        consumptionByProperty[reading.propertyId].maxReading = Math.max(
+          consumptionByProperty[reading.propertyId].maxReading,
+          reading.reading,
+        );
       }
     }
 
     const feesToCreate = [];
 
-    for (const [propertyId, consumptionData] of Object.entries(consumptionByProperty)) {
+    for (const [propertyId, consumptionData] of Object.entries(
+      consumptionByProperty,
+    )) {
       const rate = await prisma.utilityRate.findFirst({
         where: {
           complexId: data.complexId, // Assuming complexId is passed in AutomatedBillingDto
@@ -127,7 +153,8 @@ export class IotService {
         continue; // Skip if no rate found
       }
 
-      const consumedAmount = consumptionData.maxReading - consumptionData.minReading;
+      const consumedAmount =
+        consumptionData.maxReading - consumptionData.minReading;
       const calculatedAmount = consumedAmount * rate.rate.toNumber();
 
       feesToCreate.push({
@@ -135,7 +162,9 @@ export class IotService {
         description: `Consumo de ${consumedAmount} ${consumptionData.unit}`,
         amount: calculatedAmount,
         type: FeeType.UTILITY,
-        dueDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(),
+        dueDate: new Date(
+          new Date().setMonth(new Date().getMonth() + 1),
+        ).toISOString(),
         propertyId: parseInt(propertyId),
       });
     }

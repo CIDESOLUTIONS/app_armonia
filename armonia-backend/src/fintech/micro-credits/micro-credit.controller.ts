@@ -1,4 +1,12 @@
-import { Controller, Post, Get, Put, Body, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Body,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { GetUser } from '../../common/decorators/user.decorator';
 import { MicroCreditService } from './micro-credit.service';
@@ -26,7 +34,10 @@ export class MicroCreditController {
 
   @Get()
   async getApplications(@GetUser() user: any) {
-    return this.microCreditService.getApplications(user.schemaName, user.userId);
+    return this.microCreditService.getApplications(
+      user.schemaName,
+      user.userId,
+    );
   }
 
   @Put(':id')

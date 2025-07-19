@@ -36,11 +36,16 @@ export interface PackageFilterParams {
   search?: string;
 }
 
-export async function getPackages(filters?: PackageFilterParams): Promise<PackageItem[]> {
+export async function getPackages(
+  filters?: PackageFilterParams,
+): Promise<PackageItem[]> {
   const query = new URLSearchParams();
   if (filters) {
     for (const key in filters) {
-      if (filters[key as keyof PackageFilterParams] && filters[key as keyof PackageFilterParams] !== "all") {
+      if (
+        filters[key as keyof PackageFilterParams] &&
+        filters[key as keyof PackageFilterParams] !== "all"
+      ) {
         query.append(key, filters[key as keyof PackageFilterParams] as string);
       }
     }
@@ -49,24 +54,34 @@ export async function getPackages(filters?: PackageFilterParams): Promise<Packag
   return response;
 }
 
-export async function registerPackage(data: RegisterPackageDto): Promise<PackageItem> {
+export async function registerPackage(
+  data: RegisterPackageDto,
+): Promise<PackageItem> {
   const formData = new FormData();
   formData.append("type", data.type);
   formData.append("destination", data.destination);
   formData.append("residentName", data.residentName);
-  if (data.trackingNumber) formData.append("trackingNumber", data.trackingNumber);
+  if (data.trackingNumber)
+    formData.append("trackingNumber", data.trackingNumber);
   if (data.courier) formData.append("courier", data.courier);
   if (data.notes) formData.append("notes", data.notes);
   if (data.photo) formData.append("photo", data.photo);
 
-  const response = await fetchApi("/packages", {
-    method: "POST",
-    body: formData,
-  }, true); // El tercer parámetro indica que no se debe añadir Content-Type automáticamente
+  const response = await fetchApi(
+    "/packages",
+    {
+      method: "POST",
+      body: formData,
+    },
+    true,
+  ); // El tercer parámetro indica que no se debe añadir Content-Type automáticamente
   return response;
 }
 
-export async function deliverPackage(id: string, data: DeliverPackageDto): Promise<PackageItem> {
+export async function deliverPackage(
+  id: string,
+  data: DeliverPackageDto,
+): Promise<PackageItem> {
   const response = await fetchApi(`/packages/${id}/deliver`, {
     method: "PUT",
     body: JSON.stringify(data),

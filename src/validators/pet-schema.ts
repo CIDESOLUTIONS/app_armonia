@@ -2,10 +2,18 @@ import { z } from "zod";
 
 export const petSchema = z.object({
   name: z.string().min(1, { message: "El nombre es requerido." }),
-  type: z.enum(["DOG", "CAT", "BIRD", "OTHER"], { message: "El tipo de mascota es requerido." }),
+  type: z.enum(["DOG", "CAT", "BIRD", "OTHER"], {
+    message: "El tipo de mascota es requerido.",
+  }),
   breed: z.string().optional(),
-  age: z.number().min(0, { message: "La edad debe ser un número positivo." }).optional(),
-  weight: z.number().min(0, { message: "El peso debe ser un número positivo." }).optional(),
+  age: z
+    .number()
+    .min(0, { message: "La edad debe ser un número positivo." })
+    .optional(),
+  weight: z
+    .number()
+    .min(0, { message: "El peso debe ser un número positivo." })
+    .optional(),
   color: z.string().optional(),
   vaccinated: z.boolean(),
   vaccineExpiryDate: z.string().optional(),

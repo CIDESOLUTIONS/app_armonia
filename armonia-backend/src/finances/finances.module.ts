@@ -7,7 +7,13 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CommunicationService } from '../communications/communications.service';
 
 @Module({
-  providers: [FinancesService, ReconciliationService, PrismaClientManager, PrismaService, CommunicationService],
+  providers: [
+    FinancesService,
+    ReconciliationService,
+    PrismaClientManager,
+    PrismaService,
+    CommunicationService,
+  ],
   controllers: [FinancesController],
 })
 export class FinancesModule {}

@@ -11,11 +11,33 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { generateOrdinaryFees, createFee, FeeDto, CreateFeeDto, FeeFilterParamsDto, getFees, updateFee, deleteFee } from "@/services/financeService";
+import {
+  generateOrdinaryFees,
+  createFee,
+  FeeDto,
+  CreateFeeDto,
+  FeeFilterParamsDto,
+  getFees,
+  updateFee,
+  deleteFee,
+} from "@/services/financeService";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2, PlusCircle, Edit, Trash2 } from "lucide-react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export function FeeGenerationSection() {
   const { user } = useAuthStore();
@@ -58,7 +80,8 @@ export function FeeGenerationSection() {
     if (!amount || !dueDate || !title) {
       toast({
         title: "Error",
-        description: "Por favor, complete todos los campos para generar cuotas.",
+        description:
+          "Por favor, complete todos los campos para generar cuotas.",
         variant: "destructive",
       });
       return;
@@ -87,11 +110,23 @@ export function FeeGenerationSection() {
 
   const handleCreateFee = async () => {
     if (!user || !user.complexId) {
-      toast({ title: "Error", description: "Usuario no autenticado o complexId no disponible." });
+      toast({
+        title: "Error",
+        description: "Usuario no autenticado o complexId no disponible.",
+      });
       return;
     }
-    if (!newFeeForm.title || !newFeeForm.amount || !newFeeForm.dueDate || !newFeeForm.type) {
-      toast({ title: "Error", description: "Por favor, complete todos los campos obligatorios para crear una cuota." });
+    if (
+      !newFeeForm.title ||
+      !newFeeForm.amount ||
+      !newFeeForm.dueDate ||
+      !newFeeForm.type
+    ) {
+      toast({
+        title: "Error",
+        description:
+          "Por favor, complete todos los campos obligatorios para crear una cuota.",
+      });
       return;
     }
     try {
@@ -102,17 +137,34 @@ export function FeeGenerationSection() {
       await createFee(feeToCreate);
       toast({ title: "Éxito", description: "Cuota creada correctamente." });
       setIsCreateDialogOpen(false);
-      setNewFeeForm({ title: "", description: "", amount: 0, dueDate: "", type: "ORDINARY" });
+      setNewFeeForm({
+        title: "",
+        description: "",
+        amount: 0,
+        dueDate: "",
+        type: "ORDINARY",
+      });
       fetchFees();
     } catch (error) {
       console.error("Error creating fee:", error);
-      toast({ title: "Error", description: "Error al crear cuota.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Error al crear cuota.",
+        variant: "destructive",
+      });
     }
   };
 
   const handleEditFee = (fee: FeeDto) => {
     setCurrentFee(fee);
-    setEditFeeForm({ title: fee.title, description: fee.description, amount: fee.amount, dueDate: fee.dueDate.split('T')[0], type: fee.type, status: fee.status });
+    setEditFeeForm({
+      title: fee.title,
+      description: fee.description,
+      amount: fee.amount,
+      dueDate: fee.dueDate.split("T")[0],
+      type: fee.type,
+      status: fee.status,
+    });
     setIsEditDialogOpen(true);
   };
 
@@ -120,12 +172,19 @@ export function FeeGenerationSection() {
     if (!currentFee) return;
     try {
       await updateFee(currentFee.id, editFeeForm);
-      toast({ title: "Éxito", description: "Cuota actualizada correctamente." });
+      toast({
+        title: "Éxito",
+        description: "Cuota actualizada correctamente.",
+      });
       setIsEditDialogOpen(false);
       fetchFees();
     } catch (error) {
       console.error("Error updating fee:", error);
-      toast({ title: "Error", description: "Error al actualizar cuota.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Error al actualizar cuota.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -137,7 +196,11 @@ export function FeeGenerationSection() {
       fetchFees();
     } catch (error) {
       console.error("Error deleting fee:", error);
-      toast({ title: "Error", description: "Error al eliminar cuota.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Error al eliminar cuota.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -238,14 +301,24 @@ export function FeeGenerationSection() {
                   <TableRow key={fee.id}>
                     <TableCell>{fee.title}</TableCell>
                     <TableCell>{fee.amount}</TableCell>
-                    <TableCell>{new Date(fee.dueDate).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      {new Date(fee.dueDate).toLocaleDateString()}
+                    </TableCell>
                     <TableCell>{fee.type}</TableCell>
                     <TableCell>{fee.status}</TableCell>
                     <TableCell>
-                      <Button variant="ghost" size="sm" onClick={() => handleEditFee(fee)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEditFee(fee)}
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDeleteFee(fee.id)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteFee(fee.id)}
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </TableCell>
@@ -272,23 +345,60 @@ export function FeeGenerationSection() {
           <div className="grid gap-4 py-4">
             <div>
               <Label htmlFor="newTitle">Título</Label>
-              <Input id="newTitle" value={newFeeForm.title} onChange={(e) => setNewFeeForm({ ...newFeeForm, title: e.target.value })} />
+              <Input
+                id="newTitle"
+                value={newFeeForm.title}
+                onChange={(e) =>
+                  setNewFeeForm({ ...newFeeForm, title: e.target.value })
+                }
+              />
             </div>
             <div>
               <Label htmlFor="newDescription">Descripción</Label>
-              <Input id="newDescription" value={newFeeForm.description} onChange={(e) => setNewFeeForm({ ...newFeeForm, description: e.target.value })} />
+              <Input
+                id="newDescription"
+                value={newFeeForm.description}
+                onChange={(e) =>
+                  setNewFeeForm({ ...newFeeForm, description: e.target.value })
+                }
+              />
             </div>
             <div>
               <Label htmlFor="newAmount">Monto</Label>
-              <Input id="newAmount" type="number" value={newFeeForm.amount} onChange={(e) => setNewFeeForm({ ...newFeeForm, amount: parseFloat(e.target.value) })} />
+              <Input
+                id="newAmount"
+                type="number"
+                value={newFeeForm.amount}
+                onChange={(e) =>
+                  setNewFeeForm({
+                    ...newFeeForm,
+                    amount: parseFloat(e.target.value),
+                  })
+                }
+              />
             </div>
             <div>
               <Label htmlFor="newDueDate">Fecha de Vencimiento</Label>
-              <Input id="newDueDate" type="date" value={newFeeForm.dueDate} onChange={(e) => setNewFeeForm({ ...newFeeForm, dueDate: e.target.value })} />
+              <Input
+                id="newDueDate"
+                type="date"
+                value={newFeeForm.dueDate}
+                onChange={(e) =>
+                  setNewFeeForm({ ...newFeeForm, dueDate: e.target.value })
+                }
+              />
             </div>
             <div>
               <Label htmlFor="newType">Tipo</Label>
-              <Select value={newFeeForm.type} onValueChange={(value) => setNewFeeForm({ ...newFeeForm, type: value as "ORDINARY" | "EXTRAORDINARY" | "FINE" })}>
+              <Select
+                value={newFeeForm.type}
+                onValueChange={(value) =>
+                  setNewFeeForm({
+                    ...newFeeForm,
+                    type: value as "ORDINARY" | "EXTRAORDINARY" | "FINE",
+                  })
+                }
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccionar Tipo" />
                 </SelectTrigger>
@@ -301,7 +411,12 @@ export function FeeGenerationSection() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>Cancelar</Button>
+            <Button
+              variant="outline"
+              onClick={() => setIsCreateDialogOpen(false)}
+            >
+              Cancelar
+            </Button>
             <Button onClick={handleCreateFee}>Crear Cuota</Button>
           </DialogFooter>
         </DialogContent>
@@ -317,36 +432,86 @@ export function FeeGenerationSection() {
             <div className="grid gap-4 py-4">
               <div>
                 <Label htmlFor="editTitle">Título</Label>
-                <Input id="editTitle" value={editFeeForm.title} onChange={(e) => setEditFeeForm({ ...editFeeForm, title: e.target.value })} />
+                <Input
+                  id="editTitle"
+                  value={editFeeForm.title}
+                  onChange={(e) =>
+                    setEditFeeForm({ ...editFeeForm, title: e.target.value })
+                  }
+                />
               </div>
               <div>
                 <Label htmlFor="editDescription">Descripción</Label>
-                <Input id="editDescription" value={editFeeForm.description} onChange={(e) => setEditFeeForm({ ...editFeeForm, description: e.target.value })} />
+                <Input
+                  id="editDescription"
+                  value={editFeeForm.description}
+                  onChange={(e) =>
+                    setEditFeeForm({
+                      ...editFeeForm,
+                      description: e.target.value,
+                    })
+                  }
+                />
               </div>
               <div>
                 <Label htmlFor="editAmount">Monto</Label>
-                <Input id="editAmount" type="number" value={editFeeForm.amount} onChange={(e) => setEditFeeForm({ ...editFeeForm, amount: parseFloat(e.target.value) })} />
+                <Input
+                  id="editAmount"
+                  type="number"
+                  value={editFeeForm.amount}
+                  onChange={(e) =>
+                    setEditFeeForm({
+                      ...editFeeForm,
+                      amount: parseFloat(e.target.value),
+                    })
+                  }
+                />
               </div>
               <div>
                 <Label htmlFor="editDueDate">Fecha de Vencimiento</Label>
-                <Input id="editDueDate" type="date" value={editFeeForm.dueDate} onChange={(e) => setEditFeeForm({ ...editFeeForm, dueDate: e.target.value })} />
+                <Input
+                  id="editDueDate"
+                  type="date"
+                  value={editFeeForm.dueDate}
+                  onChange={(e) =>
+                    setEditFeeForm({ ...editFeeForm, dueDate: e.target.value })
+                  }
+                />
               </div>
               <div>
                 <Label htmlFor="editType">Tipo</Label>
-                <Select value={editFeeForm.type} onValueChange={(value) => setEditFeeForm({ ...editFeeForm, type: value as "ORDINARY" | "EXTRAORDINARY" | "FINE" })}>
+                <Select
+                  value={editFeeForm.type}
+                  onValueChange={(value) =>
+                    setEditFeeForm({
+                      ...editFeeForm,
+                      type: value as "ORDINARY" | "EXTRAORDINARY" | "FINE",
+                    })
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar Tipo" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ORDINARY">Ordinaria</SelectItem>
-                    <SelectItem value="EXTRAORDINARY">Extraordinaria</SelectItem>
+                    <SelectItem value="EXTRAORDINARY">
+                      Extraordinaria
+                    </SelectItem>
                     <SelectItem value="FINE">Multa</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
                 <Label htmlFor="editStatus">Estado</Label>
-                <Select value={editFeeForm.status} onValueChange={(value) => setEditFeeForm({ ...editFeeForm, status: value as "PENDING" | "PAID" | "OVERDUE" })}>
+                <Select
+                  value={editFeeForm.status}
+                  onValueChange={(value) =>
+                    setEditFeeForm({
+                      ...editFeeForm,
+                      status: value as "PENDING" | "PAID" | "OVERDUE",
+                    })
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar Estado" />
                   </SelectTrigger>
@@ -360,7 +525,12 @@ export function FeeGenerationSection() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancelar</Button>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditDialogOpen(false)}
+            >
+              Cancelar
+            </Button>
             <Button onClick={handleUpdateFee}>Guardar Cambios</Button>
           </DialogFooter>
         </DialogContent>

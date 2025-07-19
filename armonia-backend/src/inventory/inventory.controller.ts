@@ -66,7 +66,11 @@ export class InventoryController {
     @Param('id') id: string,
     @Body() updateCommonAreaDto: UpdateCommonAreaDto,
   ): Promise<CommonAreaDto> {
-    return this.inventoryService.updateCommonArea(user.schemaName, +id, updateCommonAreaDto);
+    return this.inventoryService.updateCommonArea(
+      user.schemaName,
+      +id,
+      updateCommonAreaDto,
+    );
   }
 
   @Delete('common-areas/:id')
@@ -91,7 +95,10 @@ export class InventoryController {
 
   @Get('parking-spots')
   async getParkingSpots(@GetUser() user: any): Promise<ParkingSpotDto[]> {
-    return this.inventoryService.getParkingSpots(user.schemaName, user.complexId);
+    return this.inventoryService.getParkingSpots(
+      user.schemaName,
+      user.complexId,
+    );
   }
 
   @Get('parking-spots/:id')
@@ -108,7 +115,11 @@ export class InventoryController {
     @Param('id') id: string,
     @Body() updateParkingSpotDto: UpdateParkingSpotDto,
   ): Promise<ParkingSpotDto> {
-    return this.inventoryService.updateParkingSpot(user.schemaName, +id, updateParkingSpotDto);
+    return this.inventoryService.updateParkingSpot(
+      user.schemaName,
+      +id,
+      updateParkingSpotDto,
+    );
   }
 
   @Delete('parking-spots/:id')
@@ -208,10 +219,7 @@ export class InventoryController {
   }
 
   @Delete('residents/:id')
-  async deleteResident(
-    @GetUser() user: any,
-    @Param('id') id: string,
-  ) {
+  async deleteResident(@GetUser() user: any, @Param('id') id: string) {
     return this.inventoryService.deleteResident(user.schemaName, +id);
   }
 

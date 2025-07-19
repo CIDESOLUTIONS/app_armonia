@@ -1,4 +1,11 @@
-import { IsString, IsOptional, IsNumber, IsBoolean, IsDateString, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsBoolean,
+  IsDateString,
+  IsEnum,
+} from 'class-validator';
 import { SecurityEventType } from '@prisma/client';
 
 export class CreateSecurityLogDto {

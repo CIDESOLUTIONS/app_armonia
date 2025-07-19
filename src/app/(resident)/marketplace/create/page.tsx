@@ -15,11 +15,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Textarea }n "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
-import { createListing, uploadImage, getMarketplaceCategories } from "@/services/marketplaceService"; // Import real uploadImage and getMarketplaceCategories
+import {
+  createListing,
+  uploadImage,
+  getMarketplaceCategories,
+} from "@/services/marketplaceService"; // Import real uploadImage and getMarketplaceCategories
 
 const formSchema = z.object({
   title: z.string().min(5, "El título debe tener al menos 5 caracteres."),
@@ -33,7 +44,10 @@ const formSchema = z.object({
   category: z.string({
     errorMap: () => ({ message: "La categoría es requerida." }),
   }),
-  images: z.array(z.instanceof(File)).max(5, "Solo se permiten hasta 5 imágenes.").optional(), // Added max(5) validation
+  images: z
+    .array(z.instanceof(File))
+    .max(5, "Solo se permiten hasta 5 imágenes.")
+    .optional(), // Added max(5) validation
 });
 
 export default function CreateListingPage() {
@@ -87,7 +101,7 @@ export default function CreateListingPage() {
           variant: "destructive",
         });
         // Clear selected files and previews
-        event.target.value = '';
+        event.target.value = "";
         form.setValue("images", []);
         setImagePreviews([]);
         return;

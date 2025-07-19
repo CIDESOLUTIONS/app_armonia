@@ -32,9 +32,7 @@ export class MarketplaceController {
 
   @Post('upload-image')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadImage(
-    @UploadedFile() file: Express.Multer.File,
-  ) {
+  async uploadImage(@UploadedFile() file: Express.Multer.File) {
     return this.marketplaceService.uploadImage(file);
   }
 

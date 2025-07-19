@@ -101,7 +101,9 @@ export class PayUAdapter implements PaymentGatewayAdapter {
     // TODO: Implement real webhook signature validation (e.g., HMAC-SHA256)
     // For now, a simple check for a shared secret in the payload or header
     // In a real scenario, this would involve cryptographic verification.
-    ServerLogger.warn('Webhook validation is simplified. Implement real signature verification.');
+    ServerLogger.warn(
+      'Webhook validation is simplified. Implement real signature verification.',
+    );
     return true; // Placeholder: Critical security vulnerability if not properly implemented
   }
 }
@@ -169,7 +171,9 @@ export class WompiAdapter implements PaymentGatewayAdapter {
     // TODO: Implement real webhook signature validation (e.g., HMAC-SHA256)
     // For now, a simple check for a shared secret in the payload or header
     // In a real scenario, this would involve cryptographic verification.
-    ServerLogger.warn('Webhook validation is simplified. Implement real signature verification.');
+    ServerLogger.warn(
+      'Webhook validation is simplified. Implement real signature verification.',
+    );
     return true; // Placeholder: Critical security vulnerability if not properly implemented
   }
 }
@@ -409,7 +413,11 @@ export class FinancesService {
     }
   }
 
-  async approveBudget(schemaName: string, id: number, userId: number): Promise<BudgetDto> {
+  async approveBudget(
+    schemaName: string,
+    id: number,
+    userId: number,
+  ): Promise<BudgetDto> {
     const prisma: any = this.getTenantPrismaClient(schemaName);
     try {
       const budget = await prisma.budget.findUnique({
@@ -421,7 +429,9 @@ export class FinancesService {
       }
 
       if (budget.status !== BudgetStatus.DRAFT) {
-        throw new Error(`El presupuesto con ID ${id} no puede ser aprobado porque su estado actual es ${budget.status}. Solo los presupuestos en estado DRAFT pueden ser aprobados.`);
+        throw new Error(
+          `El presupuesto con ID ${id} no puede ser aprobado porque su estado actual es ${budget.status}. Solo los presupuestos en estado DRAFT pueden ser aprobados.`,
+        );
       }
 
       return await prisma.budget.update({
@@ -470,7 +480,13 @@ export class FinancesService {
     schemaName: string,
     startDate: string,
     endDate: string,
-    type: 'INCOME' | 'EXPENSE' | 'BALANCE' | 'DEBTORS' | 'PAYMENTS_REPORT' | 'PEACE_AND_SAFE',
+    type:
+      | 'INCOME'
+      | 'EXPENSE'
+      | 'BALANCE'
+      | 'DEBTORS'
+      | 'PAYMENTS_REPORT'
+      | 'PEACE_AND_SAFE',
     format: 'JSON' | 'PDF' = 'JSON',
   ): Promise<FinancialReportResponseDto | Buffer> {
     const prisma: any = this.getTenantPrismaClient(schemaName);
@@ -565,13 +581,19 @@ export class FinancesService {
           include: { fees: true, residents: true },
         });
 
-        peaceAndSafes = allProperties.filter(property => {
-          const hasPendingFees = property.fees.some(fee => fee.status === PaymentStatus.PENDING && fee.dueDate <= new Date());
-          return !hasPendingFees;
-        }).map(property => ({
-          property,
-          certificateDate: new Date(),
-        }));
+        peaceAndSafes = allProperties
+          .filter((property) => {
+            const hasPendingFees = property.fees.some(
+              (fee) =>
+                fee.status === PaymentStatus.PENDING &&
+                fee.dueDate <= new Date(),
+            );
+            return !hasPendingFees;
+          })
+          .map((property) => ({
+            property,
+            certificateDate: new Date(),
+          }));
         break;
       default:
         break;
@@ -595,10 +617,7 @@ export class FinancesService {
     }
   }
 
-  async processBankStatement(
-    schemaName: string,
-    file: any,
-  ): Promise<any[]> {
+  async processBankStatement(schemaName: string, file: any): Promise<any[]> {
     const prisma: any = this.getTenantPrismaClient(schemaName);
     ServerLogger.info(
       `Procesando extracto bancario para ${schemaName}: ${file.originalname}`,
@@ -651,7 +670,9 @@ export class FinancesService {
     });
 
     if (!bill) {
-      throw new NotFoundException(`Factura con ID ${data.feeId} no encontrada.`);
+      throw new NotFoundException(
+        `Factura con ID ${data.feeId} no encontrada.`,
+      );
     }
 
     // Obtener pasarela y método de pago dinámicamente
@@ -687,7 +708,10 @@ export class FinancesService {
     return paymentGatewayResponse;
   }
 
-  async handlePaymentCallback(schemaName: string, data: PaymentGatewayCallbackDto): Promise<any> {
+  async handlePaymentCallback(
+    schemaName: string,
+    data: PaymentGatewayCallbackDto,
+  ): Promise<any> {
     const prisma: any = this.getTenantPrismaClient(schemaName);
     ServerLogger.info(
       `Callback de pago recibido para transacción ${data.transactionId} con estado ${data.status}`,
@@ -729,7 +753,9 @@ export class FinancesService {
       });
 
       // Notify user about successful payment
-      const user = await (prisma as any).user.findUnique({ where: { id: paymentAttempt.userId } });
+      const user = await (prisma as any).user.findUnique({
+        where: { id: paymentAttempt.userId },
+      });
       if (user && user.email) {
         await this.communicationsService.notifyUser('global', user.id, {
           type: 'success',
@@ -744,7 +770,10 @@ export class FinancesService {
     return { message: `Callback de pago procesado para ${data.transactionId}` };
   }
 
-  async approveReconciliation(schemaName: string, suggestion: any): Promise<any> {
+  async approveReconciliation(
+    schemaName: string,
+    suggestion: any,
+  ): Promise<any> {
     const prisma: any = this.getTenantPrismaClient(schemaName);
     ServerLogger.info(`Aprobando conciliación para ${schemaName}:`, suggestion);
 

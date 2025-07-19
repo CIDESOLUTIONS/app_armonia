@@ -33,6 +33,15 @@ export default function CreateResidentPQRPage() {
   const { toast } = useToast();
   const router = useRouter();
 
+  const pqrCategories = [
+    "Mantenimiento",
+    "Seguridad",
+    "Administración",
+    "Convivencia",
+    "Financiero",
+    "Otro",
+  ];
+
   const form = useForm<PqrFormValues>({
     resolver: zodResolver(pqrSchema),
     defaultValues: {
@@ -107,9 +116,23 @@ export default function CreateResidentPQRPage() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Categoría</FormLabel>
-                <FormControl>
-                  <Input placeholder="Ej: Mantenimiento" {...field} />
-                </FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar categoría" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {pqrCategories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}

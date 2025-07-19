@@ -4,9 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { format } from "date-fns";
 import { CalendarIcon, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -36,10 +46,12 @@ export function FinancialReportsGenerator() {
     }
 
     // Simulate report generation and download
-    console.log(`Generando informe de tipo: ${reportType} desde ${format(startDate, "yyyy-MM-dd")} hasta ${format(endDate, "yyyy-MM-dd")}`);
+    console.log(
+      `Generando informe de tipo: ${reportType} desde ${format(startDate, "yyyy-MM-dd")} hasta ${format(endDate, "yyyy-MM-dd")}`,
+    );
     toast({
       title: "Informe Generado",
-      description: `El informe de ${reportType} para el rango seleccionado ha sido generado y descargado. (Simulado)`, 
+      description: `El informe de ${reportType} para el rango seleccionado ha sido generado y descargado. (Simulado)`,
     });
   };
 
@@ -57,10 +69,14 @@ export function FinancialReportsGenerator() {
                 <SelectValue placeholder="Seleccione un tipo de informe" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="estado_cartera">Estado de Cartera</SelectItem>
+                <SelectItem value="estado_cartera">
+                  Estado de Cartera
+                </SelectItem>
                 <SelectItem value="paz_salvos">Paz y Salvos</SelectItem>
                 <SelectItem value="informe_pagos">Informe de Pagos</SelectItem>
-                <SelectItem value="presupuesto_anual">Presupuesto Anual</SelectItem>
+                <SelectItem value="presupuesto_anual">
+                  Presupuesto Anual
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -73,11 +89,15 @@ export function FinancialReportsGenerator() {
                     variant={"outline"}
                     className={cn(
                       "w-[240px] justify-start text-left font-normal",
-                      !startDate && "text-muted-foreground"
+                      !startDate && "text-muted-foreground",
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {startDate ? format(startDate, "PPP") : <span>Fecha Inicio</span>}
+                    {startDate ? (
+                      format(startDate, "PPP")
+                    ) : (
+                      <span>Fecha Inicio</span>
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -95,7 +115,7 @@ export function FinancialReportsGenerator() {
                     variant={"outline"}
                     className={cn(
                       "w-[240px] justify-start text-left font-normal",
-                      !endDate && "text-muted-foreground"
+                      !endDate && "text-muted-foreground",
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />

@@ -34,7 +34,9 @@ export class PdfService {
       doc.fontSize(20).text('Reporte Financiero', { align: 'center' });
       doc.moveDown();
 
-      doc.fontSize(12).text(`Fecha del Reporte: ${new Date().toLocaleDateString()}`);
+      doc
+        .fontSize(12)
+        .text(`Fecha del Reporte: ${new Date().toLocaleDateString()}`);
       doc.moveDown();
 
       doc.fontSize(14).text('Resumen:');
@@ -54,7 +56,9 @@ export class PdfService {
       if (reportData.debtors && reportData.debtors.length > 0) {
         doc.fontSize(14).text('Deudores:');
         reportData.debtors.forEach((debtor: any) => {
-          doc.text(`  - Propiedad: ${debtor.property.address}, Monto Pendiente: ${debtor.outstandingAmount}`);
+          doc.text(
+            `  - Propiedad: ${debtor.property.address}, Monto Pendiente: ${debtor.outstandingAmount}`,
+          );
         });
         doc.moveDown();
       }
@@ -62,7 +66,9 @@ export class PdfService {
       if (reportData.peaceAndSafes && reportData.peaceAndSafes.length > 0) {
         doc.fontSize(14).text('Paz y Salvos Emitidos:');
         reportData.peaceAndSafes.forEach((ps: any) => {
-          doc.text(`  - Propiedad: ${ps.property.address}, Fecha: ${ps.certificateDate.toLocaleDateString()}`);
+          doc.text(
+            `  - Propiedad: ${ps.property.address}, Fecha: ${ps.certificateDate.toLocaleDateString()}`,
+          );
         });
         doc.moveDown();
       }

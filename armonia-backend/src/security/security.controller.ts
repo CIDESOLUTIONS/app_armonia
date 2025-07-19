@@ -17,8 +17,14 @@ export class SecurityController {
 
   @Post('log')
   @Roles(UserRole.ADMIN, UserRole.COMPLEX_ADMIN, UserRole.STAFF)
-  async createSecurityLog(@GetUser() user: any, @Body() createSecurityLogDto: CreateSecurityLogDto) {
-    return this.securityService.createSecurityLog(user.schemaName, createSecurityLogDto);
+  async createSecurityLog(
+    @GetUser() user: any,
+    @Body() createSecurityLogDto: CreateSecurityLogDto,
+  ) {
+    return this.securityService.createSecurityLog(
+      user.schemaName,
+      createSecurityLogDto,
+    );
   }
 
   @Get('log')
@@ -28,7 +34,9 @@ export class SecurityController {
   }
 
   @Post('access-attempt')
-  async createAccessAttempt(@Body() createAccessAttemptDto: CreateAccessAttemptDto) {
+  async createAccessAttempt(
+    @Body() createAccessAttemptDto: CreateAccessAttemptDto,
+  ) {
     return this.securityService.createAccessAttempt(createAccessAttemptDto);
   }
 

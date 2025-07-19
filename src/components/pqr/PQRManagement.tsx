@@ -1,7 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, PlusCircle, Eye, Edit, Trash2, MessageSquare, User } from "lucide-react";
+import {
+  Loader2,
+  PlusCircle,
+  Eye,
+  Edit,
+  Trash2,
+  MessageSquare,
+  User,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,12 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -104,11 +107,20 @@ export default function PQRManagement() {
       });
       toast({ title: "Éxito", description: "PQR creada correctamente." });
       setIsCreateDialogOpen(false);
-      setNewPQRForm({ subject: "", description: "", category: "", priority: "MEDIUM" });
+      setNewPQRForm({
+        subject: "",
+        description: "",
+        category: "",
+        priority: "MEDIUM",
+      });
       fetchPQRs();
     } catch (error) {
       console.error("Error creating PQR:", error);
-      toast({ title: "Error", description: "Error al crear PQR.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Error al crear PQR.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -119,13 +131,23 @@ export default function PQRManagement() {
       setIsViewDialogOpen(true);
     } catch (error) {
       console.error("Error fetching PQR details:", error);
-      toast({ title: "Error", description: "No se pudo cargar el detalle de la PQR.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "No se pudo cargar el detalle de la PQR.",
+        variant: "destructive",
+      });
     }
   };
 
   const handleEditPQR = (pqr: PQR) => {
     setSelectedPQR(pqr);
-    setEditPQRForm({ subject: pqr.subject, description: pqr.description, category: pqr.category, priority: pqr.priority, status: pqr.status });
+    setEditPQRForm({
+      subject: pqr.subject,
+      description: pqr.description,
+      category: pqr.category,
+      priority: pqr.priority,
+      status: pqr.status,
+    });
     setIsEditDialogOpen(true);
   };
 
@@ -138,7 +160,11 @@ export default function PQRManagement() {
       fetchPQRs();
     } catch (error) {
       console.error("Error updating PQR:", error);
-      toast({ title: "Error", description: "Error al actualizar PQR.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Error al actualizar PQR.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -150,7 +176,11 @@ export default function PQRManagement() {
       fetchPQRs();
     } catch (error) {
       console.error("Error deleting PQR:", error);
-      toast({ title: "Error", description: "Error al eliminar PQR.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Error al eliminar PQR.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -159,12 +189,19 @@ export default function PQRManagement() {
     try {
       await addPQRComment(selectedPQR.id, newComment);
       setNewComment("");
-      toast({ title: "Éxito", description: "Comentario añadido correctamente." });
+      toast({
+        title: "Éxito",
+        description: "Comentario añadido correctamente.",
+      });
       // Re-fetch PQR to show new comment
       handleViewPQR(selectedPQR.id);
     } catch (error) {
       console.error("Error adding comment:", error);
-      toast({ title: "Error", description: "Error al añadir comentario.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Error al añadir comentario.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -178,26 +215,39 @@ export default function PQRManagement() {
       fetchPQRs();
     } catch (error) {
       console.error("Error assigning PQR:", error);
-      toast({ title: "Error", description: "Error al asignar PQR.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Error al asignar PQR.",
+        variant: "destructive",
+      });
     }
   };
 
-  const getStatusColor = (status: PQR['status']) => {
+  const getStatusColor = (status: PQR["status"]) => {
     switch (status) {
-      case "OPEN": return "bg-blue-100 text-blue-800";
-      case "IN_PROGRESS": return "bg-yellow-100 text-yellow-800";
-      case "CLOSED": return "bg-green-100 text-green-800";
-      case "REJECTED": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "OPEN":
+        return "bg-blue-100 text-blue-800";
+      case "IN_PROGRESS":
+        return "bg-yellow-100 text-yellow-800";
+      case "CLOSED":
+        return "bg-green-100 text-green-800";
+      case "REJECTED":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
-  const getPriorityColor = (priority: PQR['priority']) => {
+  const getPriorityColor = (priority: PQR["priority"]) => {
     switch (priority) {
-      case "LOW": return "bg-green-100 text-green-800";
-      case "MEDIUM": return "bg-yellow-100 text-yellow-800";
-      case "HIGH": return "bg-orange-100 text-orange-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "LOW":
+        return "bg-green-100 text-green-800";
+      case "MEDIUM":
+        return "bg-yellow-100 text-yellow-800";
+      case "HIGH":
+        return "bg-orange-100 text-orange-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -239,21 +289,45 @@ export default function PQRManagement() {
               <TableRow key={pqr.id}>
                 <TableCell>{pqr.subject}</TableCell>
                 <TableCell>{pqr.category}</TableCell>
-                <TableCell><Badge className={getPriorityColor(pqr.priority)}>{pqr.priority}</Badge></TableCell>
-                <TableCell><Badge className={getStatusColor(pqr.status)}>{pqr.status}</Badge></TableCell>
+                <TableCell>
+                  <Badge className={getPriorityColor(pqr.priority)}>
+                    {pqr.priority}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge className={getStatusColor(pqr.status)}>
+                    {pqr.status}
+                  </Badge>
+                </TableCell>
                 <TableCell>{pqr.reportedByName}</TableCell>
                 <TableCell>{pqr.assignedToName || "N/A"}</TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="sm" onClick={() => handleViewPQR(pqr.id)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleViewPQR(pqr.id)}
+                  >
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => handleEditPQR(pqr)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEditPQR(pqr)}
+                  >
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setIsAssignDialogOpen(true)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsAssignDialogOpen(true)}
+                  >
                     <User className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => handleDeletePQR(pqr.id)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDeletePQR(pqr.id)}
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </TableCell>
@@ -268,24 +342,52 @@ export default function PQRManagement() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Crear Nueva PQR</DialogTitle>
-            <DialogDescription>Complete los detalles de la nueva PQR.</DialogDescription>
+            <DialogDescription>
+              Complete los detalles de la nueva PQR.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
               <Label htmlFor="subject">Asunto</Label>
-              <Input id="subject" value={newPQRForm.subject} onChange={(e) => setNewPQRForm({ ...newPQRForm, subject: e.target.value })} />
+              <Input
+                id="subject"
+                value={newPQRForm.subject}
+                onChange={(e) =>
+                  setNewPQRForm({ ...newPQRForm, subject: e.target.value })
+                }
+              />
             </div>
             <div>
               <Label htmlFor="description">Descripción</Label>
-              <Textarea id="description" value={newPQRForm.description} onChange={(e) => setNewPQRForm({ ...newPQRForm, description: e.target.value })} />
+              <Textarea
+                id="description"
+                value={newPQRForm.description}
+                onChange={(e) =>
+                  setNewPQRForm({ ...newPQRForm, description: e.target.value })
+                }
+              />
             </div>
             <div>
               <Label htmlFor="category">Categoría</Label>
-              <Input id="category" value={newPQRForm.category} onChange={(e) => setNewPQRForm({ ...newPQRForm, category: e.target.value })} />
+              <Input
+                id="category"
+                value={newPQRForm.category}
+                onChange={(e) =>
+                  setNewPQRForm({ ...newPQRForm, category: e.target.value })
+                }
+              />
             </div>
             <div>
               <Label htmlFor="priority">Prioridad</Label>
-              <Select value={newPQRForm.priority} onValueChange={(value) => setNewPQRForm({ ...newPQRForm, priority: value as PQR['priority'] })}>
+              <Select
+                value={newPQRForm.priority}
+                onValueChange={(value) =>
+                  setNewPQRForm({
+                    ...newPQRForm,
+                    priority: value as PQR["priority"],
+                  })
+                }
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccionar Prioridad" />
                 </SelectTrigger>
@@ -298,7 +400,12 @@ export default function PQRManagement() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>Cancelar</Button>
+            <Button
+              variant="outline"
+              onClick={() => setIsCreateDialogOpen(false)}
+            >
+              Cancelar
+            </Button>
             <Button onClick={handleCreatePQR}>Crear PQR</Button>
           </DialogFooter>
         </DialogContent>
@@ -309,25 +416,57 @@ export default function PQRManagement() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Detalles de PQR: {selectedPQR?.subject}</DialogTitle>
-            <DialogDescription>Información completa de la PQR.</DialogDescription>
+            <DialogDescription>
+              Información completa de la PQR.
+            </DialogDescription>
           </DialogHeader>
           {selectedPQR && (
             <div className="space-y-4 py-4">
-              <p><strong>Descripción:</strong> {selectedPQR.description}</p>
-              <p><strong>Categoría:</strong> {selectedPQR.category}</p>
-              <p><strong>Prioridad:</strong> <Badge className={getPriorityColor(selectedPQR.priority)}>{selectedPQR.priority}</Badge></p>
-              <p><strong>Estado:</strong> <Badge className={getStatusColor(selectedPQR.status)}>{selectedPQR.status}</Badge></p>
-              <p><strong>Reportado por:</strong> {selectedPQR.reportedByName}</p>
-              <p><strong>Asignado a:</strong> {selectedPQR.assignedToName || "N/A"}</p>
-              <p><strong>Fecha de Creación:</strong> {new Date(selectedPQR.createdAt).toLocaleString()}</p>
-              <p><strong>Última Actualización:</strong> {new Date(selectedPQR.updatedAt).toLocaleString()}</p>
+              <p>
+                <strong>Descripción:</strong> {selectedPQR.description}
+              </p>
+              <p>
+                <strong>Categoría:</strong> {selectedPQR.category}
+              </p>
+              <p>
+                <strong>Prioridad:</strong>{" "}
+                <Badge className={getPriorityColor(selectedPQR.priority)}>
+                  {selectedPQR.priority}
+                </Badge>
+              </p>
+              <p>
+                <strong>Estado:</strong>{" "}
+                <Badge className={getStatusColor(selectedPQR.status)}>
+                  {selectedPQR.status}
+                </Badge>
+              </p>
+              <p>
+                <strong>Reportado por:</strong> {selectedPQR.reportedByName}
+              </p>
+              <p>
+                <strong>Asignado a:</strong>{" "}
+                {selectedPQR.assignedToName || "N/A"}
+              </p>
+              <p>
+                <strong>Fecha de Creación:</strong>{" "}
+                {new Date(selectedPQR.createdAt).toLocaleString()}
+              </p>
+              <p>
+                <strong>Última Actualización:</strong>{" "}
+                {new Date(selectedPQR.updatedAt).toLocaleString()}
+              </p>
 
               <h3 className="text-lg font-semibold mt-4">Comentarios</h3>
               <div className="space-y-2">
                 {selectedPQR.comments.length > 0 ? (
-                  selectedPQR.comments.map(comment => (
+                  selectedPQR.comments.map((comment) => (
                     <div key={comment.id} className="border-b pb-2">
-                      <p className="text-sm font-semibold">{comment.authorName} <span className="text-gray-500 text-xs">({new Date(comment.createdAt).toLocaleString()})</span></p>
+                      <p className="text-sm font-semibold">
+                        {comment.authorName}{" "}
+                        <span className="text-gray-500 text-xs">
+                          ({new Date(comment.createdAt).toLocaleString()})
+                        </span>
+                      </p>
                       <p className="text-gray-700">{comment.comment}</p>
                     </div>
                   ))
@@ -336,13 +475,28 @@ export default function PQRManagement() {
                 )}
               </div>
               <div className="flex flex-col gap-2">
-                <Textarea placeholder="Añadir un comentario..." value={newComment} onChange={(e) => setNewComment(e.target.value)} rows={3} />
-                <Button onClick={handleAddComment} disabled={!newComment.trim()}>Añadir Comentario</Button>
+                <Textarea
+                  placeholder="Añadir un comentario..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  rows={3}
+                />
+                <Button
+                  onClick={handleAddComment}
+                  disabled={!newComment.trim()}
+                >
+                  Añadir Comentario
+                </Button>
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>Cerrar</Button>
+            <Button
+              variant="outline"
+              onClick={() => setIsViewDialogOpen(false)}
+            >
+              Cerrar
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -352,25 +506,56 @@ export default function PQRManagement() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Editar PQR: {selectedPQR?.subject}</DialogTitle>
-            <DialogDescription>Modifique los detalles de la PQR.</DialogDescription>
+            <DialogDescription>
+              Modifique los detalles de la PQR.
+            </DialogDescription>
           </DialogHeader>
           {selectedPQR && (
             <div className="space-y-4 py-4">
               <div>
                 <Label htmlFor="editSubject">Asunto</Label>
-                <Input id="editSubject" value={editPQRForm.subject} onChange={(e) => setEditPQRForm({ ...editPQRForm, subject: e.target.value })} />
+                <Input
+                  id="editSubject"
+                  value={editPQRForm.subject}
+                  onChange={(e) =>
+                    setEditPQRForm({ ...editPQRForm, subject: e.target.value })
+                  }
+                />
               </div>
               <div>
                 <Label htmlFor="editDescription">Descripción</Label>
-                <Textarea id="editDescription" value={editPQRForm.description} onChange={(e) => setEditPQRForm({ ...editPQRForm, description: e.target.value })} />
+                <Textarea
+                  id="editDescription"
+                  value={editPQRForm.description}
+                  onChange={(e) =>
+                    setEditPQRForm({
+                      ...editPQRForm,
+                      description: e.target.value,
+                    })
+                  }
+                />
               </div>
               <div>
                 <Label htmlFor="editCategory">Categoría</Label>
-                <Input id="editCategory" value={editPQRForm.category} onChange={(e) => setEditPQRForm({ ...editPQRForm, category: e.target.value })} />
+                <Input
+                  id="editCategory"
+                  value={editPQRForm.category}
+                  onChange={(e) =>
+                    setEditPQRForm({ ...editPQRForm, category: e.target.value })
+                  }
+                />
               </div>
               <div>
                 <Label htmlFor="editPriority">Prioridad</Label>
-                <Select value={editPQRForm.priority} onValueChange={(value) => setEditPQRForm({ ...editPQRForm, priority: value as PQR['priority'] })}>
+                <Select
+                  value={editPQRForm.priority}
+                  onValueChange={(value) =>
+                    setEditPQRForm({
+                      ...editPQRForm,
+                      priority: value as PQR["priority"],
+                    })
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar Prioridad" />
                   </SelectTrigger>
@@ -383,7 +568,15 @@ export default function PQRManagement() {
               </div>
               <div>
                 <Label htmlFor="editStatus">Estado</Label>
-                <Select value={editPQRForm.status} onValueChange={(value) => setEditPQRForm({ ...editPQRForm, status: value as PQR['status'] })}>
+                <Select
+                  value={editPQRForm.status}
+                  onValueChange={(value) =>
+                    setEditPQRForm({
+                      ...editPQRForm,
+                      status: value as PQR["status"],
+                    })
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar Estado" />
                   </SelectTrigger>
@@ -398,7 +591,12 @@ export default function PQRManagement() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancelar</Button>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditDialogOpen(false)}
+            >
+              Cancelar
+            </Button>
             <Button onClick={handleUpdatePQR}>Guardar Cambios</Button>
           </DialogFooter>
         </DialogContent>
@@ -414,11 +612,21 @@ export default function PQRManagement() {
           <div className="space-y-4 py-4">
             <div>
               <Label htmlFor="assignedToUser">ID de Usuario a Asignar</Label>
-              <Input id="assignedToUser" value={assignedToUser} onChange={(e) => setAssignedToUser(e.target.value)} placeholder="Ej: 123" />
+              <Input
+                id="assignedToUser"
+                value={assignedToUser}
+                onChange={(e) => setAssignedToUser(e.target.value)}
+                placeholder="Ej: 123"
+              />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAssignDialogOpen(false)}>Cancelar</Button>
+            <Button
+              variant="outline"
+              onClick={() => setIsAssignDialogOpen(false)}
+            >
+              Cancelar
+            </Button>
             <Button onClick={handleAssignPQR}>Asignar</Button>
           </DialogFooter>
         </DialogContent>

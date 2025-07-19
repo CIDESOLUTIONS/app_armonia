@@ -2,13 +2,13 @@ import { fetchApi } from "@/lib/api";
 
 interface Project {
   id: number;
-  name: string;
+  title: string; // Changed from name to title
   description?: string;
-  status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
   startDate: string;
   endDate?: string;
-  assignedToId?: number;
-  assignedToName?: string;
+  status: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED"; // Consistent with schema
+  budget: number; // Added
+  collectedFunds: number; // Added
   createdBy: number;
   createdByName: string;
   createdAt: string;
@@ -16,26 +16,30 @@ interface Project {
 }
 
 interface GetProjectsParams {
-  status?: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+  status?: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED"; // Consistent with schema
   search?: string;
 }
 
 interface CreateProjectData {
-  name: string;
+  title: string; // Changed from name to title
   description?: string;
-  status?: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+  status?: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED"; // Consistent with schema
   startDate: string;
   endDate?: string;
+  budget: number; // Added
+  collectedFunds: number; // Added
   assignedToId?: number;
 }
 
 interface UpdateProjectData {
   id: number;
-  name?: string;
+  title?: string; // Changed from name to title
   description?: string;
-  status?: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+  status?: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED"; // Consistent with schema
   startDate?: string;
   endDate?: string;
+  budget?: number; // Added
+  collectedFunds?: number; // Added
   assignedToId?: number;
 }
 
@@ -48,9 +52,19 @@ export async function getProjects(
     if (params?.search) query.append("search", params.search);
 
     const response = await fetchApi(`/projects?${query.toString()}`);
-    return response;
+    return response.data; // Assuming the API returns { data: Project[] }
   } catch (error) {
     console.error("Error fetching projects:", error);
+    throw error;
+  }
+}
+
+export async function getProjectById(id: number): Promise<Project> {
+  try {
+    const response = await fetchApi(`/projects/${id}`);
+    return response.data; // Assuming the API returns { data: Project }
+  } catch (error) {
+    console.error(`Error fetching project ${id}:`, error);
     throw error;
   }
 }
@@ -61,20 +75,20 @@ export async function createProject(data: CreateProjectData): Promise<Project> {
       method: "POST",
       body: JSON.stringify(data),
     });
-    return response;
+    return response.data; // Assuming the API returns { data: Project }
   } catch (error) {
     console.error("Error creating project:", error);
     throw error;
   }
 }
 
-export async function updateProject(data: UpdateProjectData): Promise<Project> {
+export async function updateProject(id: number, data: UpdateProjectData): Promise<Project> {
   try {
-    const response = await fetchApi(`/projects/${data.id}`, {
+    const response = await fetchApi(`/projects/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     });
-    return response;
+    return response.data; // Assuming the API returns { data: Project }
   } catch (error) {
     console.error("Error updating project:", error);
     throw error;
@@ -88,6 +102,16 @@ export async function deleteProject(id: number): Promise<void> {
     });
   } catch (error) {
     console.error("Error deleting project:", error);
+    throw error;
+  }
+}
+
+export async function getResidentProjects(residentId: number): Promise<Project[]> {
+  try {
+    const response = await fetchApi(`/projects/resident/${residentId}`);
+    return response.data; // Assuming the API returns { data: Project[] }
+  } catch (error) {
+    console.error(`Error fetching projects for resident ${residentId}:`, error);
     throw error;
   }
 }

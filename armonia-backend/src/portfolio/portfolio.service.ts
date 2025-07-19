@@ -28,7 +28,9 @@ export class PortfolioService {
     let totalExpenses = 0;
 
     for (const complex of complexes) {
-      const tenantPrisma = this.prismaClientManager.getClient(complex.schemaName);
+      const tenantPrisma = this.prismaClientManager.getClient(
+        complex.schemaName,
+      );
       // Obtener métricas de cada tenant
       const propertiesCount = await tenantPrisma.property.count();
       totalProperties += propertiesCount;
@@ -68,7 +70,15 @@ export class PortfolioService {
       totalExpenses += expenses._sum.amount || 0;
     }
 
-    return { totalProperties, totalResidents, totalPendingFees, totalIncome, totalOpenPqrs, totalBudgetsApproved, totalExpenses };
+    return {
+      totalProperties,
+      totalResidents,
+      totalPendingFees,
+      totalIncome,
+      totalOpenPqrs,
+      totalBudgetsApproved,
+      totalExpenses,
+    };
   }
 
   async getComplexMetrics(userId: number): Promise<ComplexMetricDto[]> {
@@ -79,7 +89,9 @@ export class PortfolioService {
     const complexMetrics: ComplexMetricDto[] = [];
 
     for (const complex of complexes) {
-      const tenantPrisma = this.prismaClientManager.getClient(complex.schemaName);
+      const tenantPrisma = this.prismaClientManager.getClient(
+        complex.schemaName,
+      );
 
       const residents = await tenantPrisma.user.count({
         where: { role: 'RESIDENT' },

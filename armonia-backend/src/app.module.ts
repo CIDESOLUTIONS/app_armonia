@@ -10,7 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TenantModule } from './tenant/tenant.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { CommunicationsModule } from './communications/communications.module';
-import { FinancesModule }mport { PqrModule } from './pqr/pqr.module';
+import { FinancesModule } from './finances/finances.module';
 import { ProjectsModule } from './projects/projects.module';
 import { SecurityModule } from './security/security.module';
 import { PlansModule } from './plans/plans.module';

@@ -13,7 +13,13 @@ describe('TenantService', () => {
         {
           provide: PrismaService,
           useValue: {
-            residentialComplex: { create: jest.fn(), findMany: jest.fn(), findUnique: jest.fn(), update: jest.fn(), delete: jest.fn() },
+            residentialComplex: {
+              create: jest.fn(),
+              findMany: jest.fn(),
+              findUnique: jest.fn(),
+              update: jest.fn(),
+              delete: jest.fn(),
+            },
           },
         },
       ],

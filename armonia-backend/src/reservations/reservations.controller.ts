@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { GetUser } from '../../common/decorators/user.decorator';
 import { ReservationsService } from './reservations.service';
@@ -21,7 +31,10 @@ export class ReservationsController {
     @GetUser() user: any,
     @Body() createReservationDto: CreateReservationDto,
   ): Promise<ReservationDto> {
-    return this.reservationsService.createReservation(user.schemaName, createReservationDto);
+    return this.reservationsService.createReservation(
+      user.schemaName,
+      createReservationDto,
+    );
   }
 
   @Get()
@@ -46,7 +59,11 @@ export class ReservationsController {
     @Param('id') id: string,
     @Body() updateReservationDto: UpdateReservationDto,
   ): Promise<ReservationDto> {
-    return this.reservationsService.updateReservation(user.schemaName, +id, updateReservationDto);
+    return this.reservationsService.updateReservation(
+      user.schemaName,
+      +id,
+      updateReservationDto,
+    );
   }
 
   @Put(':id/status')
@@ -55,7 +72,11 @@ export class ReservationsController {
     @Param('id') id: string,
     @Body('status') status: ReservationStatus,
   ): Promise<ReservationDto> {
-    return this.reservationsService.updateReservationStatus(user.schemaName, +id, status);
+    return this.reservationsService.updateReservationStatus(
+      user.schemaName,
+      +id,
+      status,
+    );
   }
 
   @Delete(':id')
@@ -71,7 +92,11 @@ export class ReservationsController {
     @GetUser() user: any,
     @Param('id') id: string,
   ): Promise<ReservationDto> {
-    return this.reservationsService.approveReservation(user.schemaName, +id, user.userId);
+    return this.reservationsService.approveReservation(
+      user.schemaName,
+      +id,
+      user.userId,
+    );
   }
 
   @Post(':id/reject')
@@ -80,6 +105,11 @@ export class ReservationsController {
     @Param('id') id: string,
     @Body('reason') reason: string,
   ): Promise<ReservationDto> {
-    return this.reservationsService.rejectReservation(user.schemaName, +id, user.userId, reason);
+    return this.reservationsService.rejectReservation(
+      user.schemaName,
+      +id,
+      user.userId,
+      reason,
+    );
   }
 }

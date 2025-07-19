@@ -11,26 +11,21 @@ const tsConfig = JSON.parse(fs.readFileSync(tsConfigPath, 'utf8'));
 const { compilerOptions } = tsConfig;
 
 const config = {
-  moduleFileExtensions: [
-    'js',
-    'json',
-    'ts',
-  ],
+  moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: '.',
   testRegex: '.*\\.spec\\.ts$',
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
-  collectCoverageFrom: [
-    '**/*.(t|j)s',
-  ],
+  collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: '../coverage',
   testEnvironment: 'node',
   roots: ['<rootDir>'],
   modulePaths: [compilerOptions.baseUrl],
   moduleNameMapper: {
-    "^src/(.*)$": "<rootDir>/src/$1",
-    "^lib/logging/activity-logger$": "<rootDir>/src/lib/logging/activity-logger.ts",
+    '^src/(.*)$': '<rootDir>/src/$1',
+    '^lib/logging/activity-logger$':
+      '<rootDir>/src/lib/logging/activity-logger.ts',
     ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
   },
 };

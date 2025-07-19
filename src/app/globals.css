@@ -7,22 +7,22 @@
   :root {
     --color-background: #ffffff;
     --color-foreground: rgb(17, 24, 39);
-    
+
     --color-primary: rgb(67, 56, 202);
     --color-primary-foreground: #ffffff;
-    
+
     --color-secondary: rgb(229, 231, 235);
     --color-secondary-foreground: rgb(17, 24, 39);
-    
+
     --color-muted: rgb(229, 231, 235);
     --color-muted-foreground: rgb(107, 114, 128);
-    
+
     --color-accent: rgb(243, 244, 246);
     --color-accent-foreground: rgb(17, 24, 39);
-    
+
     --color-destructive: rgb(239, 68, 68);
     --color-destructive-foreground: #ffffff;
-    
+
     --color-border: rgb(229, 231, 235);
     --radius: 0.5rem;
 
@@ -39,22 +39,22 @@
   .dark {
     --color-background: rgb(17, 24, 39);
     --color-foreground: #ffffff;
-    
+
     --color-primary: rgb(99, 102, 241);
     --color-primary-foreground: #ffffff;
-    
+
     --color-secondary: rgb(31, 41, 55);
     --color-secondary-foreground: #ffffff;
-    
+
     --color-muted: rgb(31, 41, 55);
     --color-muted-foreground: rgb(156, 163, 175);
-    
+
     --color-accent: rgb(31, 41, 55);
     --color-accent-foreground: #ffffff;
-    
+
     --color-destructive: rgb(239, 68, 68);
     --color-destructive-foreground: #ffffff;
-    
+
     --color-border: rgb(31, 41, 55);
 
     /* Colores específicos de la landing page para modo oscuro */
@@ -73,7 +73,7 @@
   * {
     @apply border-border;
   }
-  
+
   body {
     @apply bg-background text-foreground antialiased;
   }

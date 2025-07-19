@@ -1,3 +1,4 @@
+/*
 import TelegramBot from "node-telegram-bot-api";
 import { ServerLogger } from "../logging/server-logger";
 
@@ -31,3 +32,4 @@ export const sendTelegramMessage = async (message: string) => {
     return { success: false, error: error.message };
   }
 };
+*/

@@ -2,15 +2,15 @@ import { fetchApi } from "@/lib/api";
 
 // DTOs y Enums del Backend (armonia-backend/src/common/dto/assembly.dto.ts)
 export enum AssemblyType {
-  ORDINARY = 'ORDINARY',
-  EXTRAORDINARY = 'EXTRAORDINARY',
+  ORDINARY = "ORDINARY",
+  EXTRAORDINARY = "EXTRAORDINARY",
 }
 
 export enum AssemblyStatus {
-  SCHEDULED = 'SCHEDULED',
-  IN_PROGRESS = 'IN_PROGRESS',
-  COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED',
+  SCHEDULED = "SCHEDULED",
+  IN_PROGRESS = "IN_PROGRESS",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED",
 }
 
 export class CreateAssemblyDto {
@@ -30,7 +30,7 @@ export class AssemblyDto {
   id: number;
   title: string;
   description: string;
-  scheduledDate: Date;
+  scheduledDate: string; // Changed to string for consistency
   location: string;
   type: AssemblyType;
   status: AssemblyStatus;
@@ -78,6 +78,7 @@ export interface Assembly extends AssemblyDto {
   quorumMet?: boolean;
   minutes?: string;
   attachments?: string[];
+  votings?: Voting[]; // Added votings array
 }
 
 export interface Vote {
@@ -154,7 +155,9 @@ export interface AssemblyFilterParams {
 }
 
 // Funciones del Servicio
-export async function getAssemblies(filters?: AssemblyFilterParams): Promise<AssemblyListResponse> {
+export async function getAssemblies(
+  filters?: AssemblyFilterParams,
+): Promise<AssemblyListResponse> {
   const queryParams = new URLSearchParams();
   if (filters) {
     Object.entries(filters).forEach(([key, value]) => {
@@ -164,79 +167,113 @@ export async function getAssemblies(filters?: AssemblyFilterParams): Promise<Ass
     });
   }
   const query = queryParams.toString();
-  return fetchApi(`/assembly${query ? `?${query}` : ""}`);
+  const response = await fetchApi(`/assembly${query ? `?${query}` : ""}`);
+  return response.data; // Assuming the API returns { data: { assemblies: [...] } }
 }
 
 export async function getAssemblyById(id: number): Promise<Assembly> {
-  return fetchApi(`/assembly/${id}`);
+  const response = await fetchApi(`/assembly/${id}`);
+  return response.data; // Assuming the API returns { data: Assembly }
 }
 
-export async function createAssembly(data: CreateAssemblyDto): Promise<Assembly> {
-  return fetchApi("/assembly", {
+export async function createAssembly(
+  data: CreateAssemblyDto,
+): Promise<Assembly> {
+  const response = await fetchApi("/assembly", {
     method: "POST",
     body: JSON.stringify(data),
   });
+  return response.data; // Assuming the API returns { data: Assembly }
 }
 
-export async function updateAssembly(id: number, data: UpdateAssemblyDto): Promise<Assembly> {
-  return fetchApi(`/assembly/${id}`, {
+export async function updateAssembly(
+  id: number,
+  data: UpdateAssemblyDto,
+): Promise<Assembly> {
+  const response = await fetchApi(`/assembly/${id}`, {
     method: "PUT",
     body: JSON.stringify(data),
   });
+  return response.data; // Assuming the API returns { data: Assembly }
 }
 
 export async function deleteAssembly(id: number): Promise<void> {
-  return fetchApi(`/assembly/${id}`, {
+  await fetchApi(`/assembly/${id}`, {
     method: "DELETE",
   });
 }
 
-export async function registerAttendance(data: RegisterAttendanceDto): Promise<Attendance> {
-  return fetchApi("/assembly/attendance", {
+export async function registerAttendance(
+  data: RegisterAttendanceDto,
+): Promise<Attendance> {
+  const response = await fetchApi("/assembly/attendance", {
     method: "POST",
     body: JSON.stringify(data),
   });
+  return response.data; // Assuming the API returns { data: Attendance }
 }
 
-export async function getAssemblyQuorumStatus(assemblyId: number): Promise<{ currentAttendance: number; quorumMet: boolean }> {
-  return fetchApi(`/assembly/${assemblyId}/quorum`);
+export async function getAssemblyQuorumStatus(
+  assemblyId: number,
+): Promise<{ currentAttendance: number; quorumMet: boolean }> {
+  const response = await fetchApi(`/assembly/${assemblyId}/quorum`);
+  return response.data; // Assuming the API returns { data: { currentAttendance, quorumMet } }
 }
 
-export async function createVoting(data: CreateVotingDto): Promise<Voting> {
-  return fetchApi("/assembly/voting", {
+export async function createVote(data: CreateVoteDto): Promise<Voting> {
+  const response = await fetchApi("/assembly/voting", {
     method: "POST",
     body: JSON.stringify(data),
   });
+  return response.data; // Assuming the API returns { data: Voting }
 }
 
 export async function getVotings(assemblyId: number): Promise<Voting[]> {
-  return fetchApi(`/assembly/${assemblyId}/votings`);
+  const response = await fetchApi(`/assembly/${assemblyId}/votings`);
+  return response.data; // Assuming the API returns { data: Voting[] }
 }
 
 export async function startVoting(id: number): Promise<Voting> {
-  return fetchApi(`/assembly/voting/${id}/start`, {
+  const response = await fetchApi(`/assembly/voting/${id}/start`, {
     method: "PUT",
     body: JSON.stringify({}),
   });
+  return response.data; // Assuming the API returns { data: Voting }
 }
 
 export async function closeVoting(id: number): Promise<Voting> {
-  return fetchApi(`/assembly/voting/${id}/close`, {
+  const response = await fetchApi(`/assembly/voting/${id}/close`, {
     method: "PUT",
     body: JSON.stringify({}),
   });
+  return response.data; // Assuming the API returns { data: Voting }
 }
 
 export async function castVote(data: CastVoteDto): Promise<Vote> {
-  return fetchApi("/assembly/vote", {
+  const response = await fetchApi("/assembly/vote", {
     method: "POST",
     body: JSON.stringify(data),
   });
+  return response.data; // Assuming the API returns { data: Vote }
 }
 
-export async function generateMeetingMinutes(assemblyId: number): Promise<Blob> {
+export async function getVotingResults(
+  assemblyId: number,
+  votingId: number,
+): Promise<{
+  results: { [key: string]: { count: number; coefficient: number } };
+}> {
+  const response = await fetchApi(
+    `/assembly/${assemblyId}/voting/${votingId}/results`,
+  );
+  return response.data; // Assuming the API returns { data: { results: { ... } } }
+}
+
+export async function generateMeetingMinutes(
+  assemblyId: number,
+): Promise<Blob> {
   const response = await fetchApi(`/assembly/${assemblyId}/meeting-minutes`, {
-    responseType: 'blob', // Important for handling binary data
+    responseType: "blob", // Important for handling binary data
   });
   return response;
 }

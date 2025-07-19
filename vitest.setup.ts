@@ -1,28 +1,28 @@
-import '@testing-library/jest-dom';
-import 'whatwg-fetch';
-import 'text-encoding';
-import { vi } from 'vitest';
+import "@testing-library/jest-dom";
+import "whatwg-fetch";
+import "text-encoding";
+import { vi } from "vitest";
+import {
+  mockPrisma,
+  PQRStatus,
+  NotificationChannel,
+} from "./src/__mocks__/prisma";
 
 // Mock PrismaClient
 vi.mock("@prisma/client", () => {
-  const mockPrisma = {
-    // Add your Prisma client mock methods here
-    // Example: user: { findMany: vi.fn() },
-  };
   return {
     __esModule: true,
     PrismaClient: vi.fn(() => mockPrisma),
-    // Mock any enums you use, e.g.:
-    // PQRStatus: { OPEN: 'OPEN', CLOSED: 'CLOSED' },
-    // NotificationChannel: { EMAIL: 'EMAIL', SMS: 'SMS' },
+    PQRStatus: PQRStatus,
+    NotificationChannel: NotificationChannel,
   };
 });
 
 // Mock Prisma client functions from @/lib/prisma
 vi.mock("@/lib/prisma", () => ({
   __esModule: true,
-  getTenantPrismaClient: vi.fn(() => require('./src/__mocks__/prisma').mockPrisma),
-  getPublicPrismaClient: vi.fn(() => require('./src/__mocks__/prisma').mockPrisma),
+  getTenantPrismaClient: vi.fn(() => mockPrisma),
+  getPublicPrismaClient: vi.fn(() => mockPrisma),
 }));
 
 // Mock Date.now() if needed for consistent test results

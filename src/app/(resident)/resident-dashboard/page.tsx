@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import {
   Card,
@@ -23,6 +21,7 @@ import {
   DollarSign,
   Clock,
   Loader2,
+  Construction,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -38,6 +37,7 @@ import { getResidentDashboardStats } from "@/services/residentDashboardService";
 import { createPanicAlert } from "@/services/panicService";
 import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/components/ui/use-toast";
+import { getResidentProjects } from "@/services/projectService";
 
 interface PendingFee {
   id: number;
@@ -55,6 +55,17 @@ interface Reservation {
   status: string;
   commonArea?: { name: string };
   userId: number;
+}
+
+interface Project {
+  id: number;
+  title: string;
+  description?: string;
+  startDate: string;
+  endDate?: string;
+  status: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+  budget: number;
+  collectedFunds: number;
 }
 
 interface ResidentDashboardStats {
@@ -79,12 +90,14 @@ export default function ResidentDashboard() {
   const [monthlyExpensesTrend, setMonthlyExpensesTrend] = useState<
     MonthlyExpenseData[]
   >([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
     if (!authLoading && user) {
       fetchDashboardData();
+      fetchProjectsData();
     }
   }, [authLoading, user]);
 
@@ -104,6 +117,16 @@ export default function ResidentDashboard() {
     }
   };
 
+  const fetchProjectsData = async () => {
+    if (!user?.id) return;
+    try {
+      const fetchedProjects = await getResidentProjects(user.id);
+      setProjects(fetchedProjects);
+    } catch (error) {
+      console.error("Error fetching resident projects:", error);
+    }
+  };
+
   const handlePanicTrigger = async () => {
     if (!user || !user.propertyId) {
       toast({
@@ -119,7 +142,7 @@ export default function ResidentDashboard() {
       await createPanicAlert({
         userId: user.id,
         propertyId: user.propertyId,
-        location: "Ubicación del residente (ej. Apto 101)", // Esto debería ser dinámico
+        location: user.property?.unitNumber || "Ubicación desconocida", // Dinámico
         message: "Alerta de pánico activada por el residente.",
       });
       toast({
@@ -282,7 +305,7 @@ export default function ResidentDashboard() {
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-green-600">
+                <div className="text-2xl font-bold">
                   {formatCurrency(stats.annualPaymentsSummary)}
                 </div>
               </CardContent>
@@ -338,7 +361,7 @@ export default function ResidentDashboard() {
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Clock className="h-5 w-5 mr-2" />
+                <DollarSign className="h-5 w-5 mr-2" />
                 Cuotas Pendientes
               </CardTitle>
             </CardHeader>
@@ -360,6 +383,16 @@ export default function ResidentDashboard() {
                     <Badge variant="destructive">
                       {formatCurrency(fee.totalAmount)}
                     </Badge>
+                    <Button
+                      size="sm"
+                      onClick={() => handlePayFee(fee.id)}
+                      disabled={isPaying}
+                    >
+                      {isPaying ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : null}{" "}
+                      Pagar
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -406,6 +439,40 @@ export default function ResidentDashboard() {
               <div className="mt-4 text-right">
                 <Link href="/resident/reservations">
                   <Button variant="outline">Ver todas mis reservas</Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Projects in Progress */}
+        {projects.length > 0 && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Construction className="mr-2 h-5 w-5" /> Proyectos en Curso
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {projects.map((project) => (
+                  <div
+                    key={project.id}
+                    className="flex items-center justify-between p-3 border rounded-lg bg-yellow-50"
+                  >
+                    <div>
+                      <p className="font-medium">{project.title}</p>
+                      <p className="text-sm text-gray-600">
+                        Estado: {project.status}
+                      </p>
+                    </div>
+                    <Badge variant="outline">{project.collectedFunds} / {project.budget}</Badge>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 text-right">
+                <Link href="/resident/projects">
+                  <Button variant="outline">Ver todos los proyectos</Button>
                 </Link>
               </div>
             </CardContent>

@@ -16,7 +16,7 @@ export class ActivityLogger {
    */
   static async log(data: any): Promise<void> {
     // En pruebas, simplemente simulamos el registro
-    console.log("Mock ActivityLogger.log called with:", data);
+    console.log('Mock ActivityLogger.log called with:', data);
     return Promise.resolve();
   }
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -9,6 +9,20 @@ import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
   const t = useTranslations("landing");
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const images = [
+    "/images/landing-hero1.png",
+    "/images/landing-hero2.png",
+    "/images/landing-hero3.png",
+    "/images/landing-hero4.png",
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 5000); // Cambia la imagen cada 5 segundos
+    return () => clearInterval(interval);
+  }, [images.length]);
 
   return (
     <FadeIn>
@@ -42,11 +56,11 @@ export function HeroSection() {
             <div className="lg:w-1/2 flex justify-center lg:justify-end">
               <div className="relative w-full max-w-lg">
                 <Image
-                  src="/images/landing-hero1.png"
+                  src={images[currentImageIndex]}
                   alt="Amenidades del Conjunto Residencial"
                   width={800}
                   height={600}
-                  className="rounded-lg shadow-xl border border-gray-200"
+                  className="rounded-lg shadow-xl border border-gray-200 transition-opacity duration-1000 ease-in-out"
                 />
                 <div className="absolute -bottom-4 -right-4 bg-white p-3 rounded-lg shadow-md flex items-center space-x-2">
                   <Check className="text-green-500" size={20} />

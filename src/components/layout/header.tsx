@@ -37,7 +37,6 @@ const headerTexts = {
   },
 };
 
-
 import { useLocale, useTranslations } from "next-intl";
 
 interface HeaderProps {

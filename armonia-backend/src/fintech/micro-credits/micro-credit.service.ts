@@ -64,7 +64,8 @@ export class MicroCreditService {
       where: { id },
       data: {
         status: data.status,
-        approvalDate: data.status === MicroCreditStatus.APPROVED ? new Date() : undefined,
+        approvalDate:
+          data.status === MicroCreditStatus.APPROVED ? new Date() : undefined,
       },
     });
     return updatedApplication;

@@ -470,7 +470,10 @@ export class InventoryService {
   }
 
   // Common Area Management
-  async createCommonArea(schemaName: string, data: CreateCommonAreaDto): Promise<CommonAreaDto> {
+  async createCommonArea(
+    schemaName: string,
+    data: CreateCommonAreaDto,
+  ): Promise<CommonAreaDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     return prisma.commonArea.create({ data });
   }
@@ -480,7 +483,10 @@ export class InventoryService {
     return prisma.commonArea.findMany();
   }
 
-  async getCommonAreaById(schemaName: string, id: number): Promise<CommonAreaDto> {
+  async getCommonAreaById(
+    schemaName: string,
+    id: number,
+  ): Promise<CommonAreaDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const commonArea = await prisma.commonArea.findUnique({ where: { id } });
     if (!commonArea) {
@@ -489,7 +495,11 @@ export class InventoryService {
     return commonArea;
   }
 
-  async updateCommonArea(schemaName: string, id: number, data: UpdateCommonAreaDto): Promise<CommonAreaDto> {
+  async updateCommonArea(
+    schemaName: string,
+    id: number,
+    data: UpdateCommonAreaDto,
+  ): Promise<CommonAreaDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const commonArea = await prisma.commonArea.findUnique({ where: { id } });
     if (!commonArea) {
@@ -508,30 +518,47 @@ export class InventoryService {
   }
 
   // Parking Spot Management
-  async createParkingSpot(schemaName: string, data: CreateParkingSpotDto): Promise<ParkingSpotDto> {
+  async createParkingSpot(
+    schemaName: string,
+    data: CreateParkingSpotDto,
+  ): Promise<ParkingSpotDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     return prisma.parkingSpot.create({ data });
   }
 
-  async getParkingSpots(schemaName: string, complexId: number): Promise<ParkingSpotDto[]> {
+  async getParkingSpots(
+    schemaName: string,
+    complexId: number,
+  ): Promise<ParkingSpotDto[]> {
     const prisma = this.getTenantPrismaClient(schemaName);
     return prisma.parkingSpot.findMany({ where: { complexId } });
   }
 
-  async getParkingSpotById(schemaName: string, id: number): Promise<ParkingSpotDto> {
+  async getParkingSpotById(
+    schemaName: string,
+    id: number,
+  ): Promise<ParkingSpotDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const parkingSpot = await prisma.parkingSpot.findUnique({ where: { id } });
     if (!parkingSpot) {
-      throw new NotFoundException(`Espacio de estacionamiento con ID ${id} no encontrado.`);
+      throw new NotFoundException(
+        `Espacio de estacionamiento con ID ${id} no encontrado.`,
+      );
     }
     return parkingSpot;
   }
 
-  async updateParkingSpot(schemaName: string, id: number, data: UpdateParkingSpotDto): Promise<ParkingSpotDto> {
+  async updateParkingSpot(
+    schemaName: string,
+    id: number,
+    data: UpdateParkingSpotDto,
+  ): Promise<ParkingSpotDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const parkingSpot = await prisma.parkingSpot.findUnique({ where: { id } });
     if (!parkingSpot) {
-      throw new NotFoundException(`Espacio de estacionamiento con ID ${id} no encontrado.`);
+      throw new NotFoundException(
+        `Espacio de estacionamiento con ID ${id} no encontrado.`,
+      );
     }
     return prisma.parkingSpot.update({ where: { id }, data });
   }
@@ -540,7 +567,9 @@ export class InventoryService {
     const prisma = this.getTenantPrismaClient(schemaName);
     const parkingSpot = await prisma.parkingSpot.findUnique({ where: { id } });
     if (!parkingSpot) {
-      throw new NotFoundException(`Espacio de estacionamiento con ID ${id} no encontrado.`);
+      throw new NotFoundException(
+        `Espacio de estacionamiento con ID ${id} no encontrado.`,
+      );
     }
     await prisma.parkingSpot.delete({ where: { id } });
   }

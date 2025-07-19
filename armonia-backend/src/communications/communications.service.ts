@@ -26,23 +26,31 @@ export class CommunicationsService {
   ) {
     const accountSid = this.configService.get<string>('TWILIO_ACCOUNT_SID');
     const authToken = this.configService.get<string>('TWILIO_AUTH_TOKEN');
-    this.twilioPhoneNumber = this.configService.get<string>('TWILIO_PHONE_NUMBER');
+    this.twilioPhoneNumber = this.configService.get<string>(
+      'TWILIO_PHONE_NUMBER',
+    );
 
     if (accountSid && authToken) {
       this.twilioClient = twilio(accountSid, authToken);
     } else {
-      console.warn('Twilio credentials not found. SMS functionality will be disabled.');
+      console.warn(
+        'Twilio credentials not found. SMS functionality will be disabled.',
+      );
     }
 
     // Initialize Firebase Admin SDK
     if (!admin.apps.length) {
-      const firebaseConfig = this.configService.get<string>('FIREBASE_SERVICE_ACCOUNT_KEY');
+      const firebaseConfig = this.configService.get<string>(
+        'FIREBASE_SERVICE_ACCOUNT_KEY',
+      );
       if (firebaseConfig) {
         admin.initializeApp({
           credential: admin.credential.cert(JSON.parse(firebaseConfig)),
         });
       } else {
-        console.warn('Firebase service account key not found. Push notification functionality will be disabled.');
+        console.warn(
+          'Firebase service account key not found. Push notification functionality will be disabled.',
+        );
       }
     }
   }
@@ -68,9 +76,16 @@ export class CommunicationsService {
     }
   }
 
-  private async sendPushNotification(token: string, title: string, body: string, data?: { [key: string]: string }): Promise<void> {
+  private async sendPushNotification(
+    token: string,
+    title: string,
+    body: string,
+    data?: { [key: string]: string },
+  ): Promise<void> {
     if (!admin.apps.length) {
-      console.warn('Firebase Admin SDK is not initialized. Push notification not sent.');
+      console.warn(
+        'Firebase Admin SDK is not initialized. Push notification not sent.',
+      );
       return;
     }
     try {
@@ -84,7 +99,10 @@ export class CommunicationsService {
       });
       console.log(`Push notification sent to token: ${token}`);
     } catch (error) {
-      console.error(`Error sending push notification to token ${token}:`, error);
+      console.error(
+        `Error sending push notification to token ${token}:`,
+        error,
+      );
     }
   }
 
@@ -108,7 +126,12 @@ export class CommunicationsService {
 
       // Send Push Notification if notification type is PUSH and user has a device token
       if (notification.type === NotificationType.PUSH && user.deviceToken) {
-        await this.sendPushNotification(user.deviceToken, notification.title, notification.message, notification.data);
+        await this.sendPushNotification(
+          user.deviceToken,
+          notification.title,
+          notification.message,
+          notification.data,
+        );
       }
 
       // Create database notification
@@ -367,12 +390,17 @@ export class CommunicationsService {
     });
     let targetUserIds: number[] = [];
     if (completeAnnouncement.visibility === 'public') {
-      const users = await prisma.user.findMany({ select: { id: true, phoneNumber: true, deviceToken: true } });
+      const users = await prisma.user.findMany({
+        select: { id: true, phoneNumber: true, deviceToken: true },
+      });
       targetUserIds = users.map((user) => user.id);
       if (completeAnnouncement.type === 'emergency') {
         for (const user of users) {
           if (user.phoneNumber) {
-            await this.sendSms(user.phoneNumber, `Alerta de emergencia: ${completeAnnouncement.title}. ${completeAnnouncement.content.substring(0, 100)}...`);
+            await this.sendSms(
+              user.phoneNumber,
+              `Alerta de emergencia: ${completeAnnouncement.title}. ${completeAnnouncement.content.substring(0, 100)}...`,
+            );
           }
         }
       }
@@ -380,7 +408,11 @@ export class CommunicationsService {
       if (completeAnnouncement.type === 'emergency') {
         for (const user of users) {
           if (user.deviceToken) {
-            await this.sendPushNotification(user.deviceToken, `Alerta de emergencia: ${completeAnnouncement.title}`, completeAnnouncement.content);
+            await this.sendPushNotification(
+              user.deviceToken,
+              `Alerta de emergencia: ${completeAnnouncement.title}`,
+              completeAnnouncement.content,
+            );
           }
         }
       }
@@ -396,7 +428,10 @@ export class CommunicationsService {
       if (completeAnnouncement.type === 'emergency') {
         for (const user of users) {
           if (user.phoneNumber) {
-            await this.sendSms(user.phoneNumber, `Alerta de emergencia: ${completeAnnouncement.title}. ${completeAnnouncement.content.substring(0, 100)}...`);
+            await this.sendSms(
+              user.phoneNumber,
+              `Alerta de emergencia: ${completeAnnouncement.title}. ${completeAnnouncement.content.substring(0, 100)}...`,
+            );
           }
         }
       }
@@ -404,7 +439,11 @@ export class CommunicationsService {
       if (completeAnnouncement.type === 'emergency') {
         for (const user of users) {
           if (user.deviceToken) {
-            await this.sendPushNotification(user.deviceToken, `Alerta de emergencia: ${completeAnnouncement.title}`, completeAnnouncement.content);
+            await this.sendPushNotification(
+              user.deviceToken,
+              `Alerta de emergencia: ${completeAnnouncement.title}`,
+              completeAnnouncement.content,
+            );
           }
         }
       }
@@ -700,19 +739,28 @@ export class CommunicationsService {
     });
     let targetUserIds: number[] = [];
     if (completeEvent.visibility === 'public') {
-      const users = await prisma.user.findMany({ select: { id: true, phoneNumber: true, deviceToken: true } });
+      const users = await prisma.user.findMany({
+        select: { id: true, phoneNumber: true, deviceToken: true },
+      });
       targetUserIds = users.map((user) => user.id);
       if (completeEvent.type === 'emergency') {
         for (const user of users) {
           if (user.phoneNumber) {
-            await this.sendSms(user.phoneNumber, `Alerta de emergencia: ${completeEvent.title}. ${completeEvent.content.substring(0, 100)}...`);
+            await this.sendSms(
+              user.phoneNumber,
+              `Alerta de emergencia: ${completeEvent.title}. ${completeEvent.content.substring(0, 100)}...`,
+            );
           }
         }
       }
       if (completeEvent.type === 'emergency') {
         for (const user of users) {
           if (user.deviceToken) {
-            await this.sendPushNotification(user.deviceToken, `Alerta de emergencia: ${completeEvent.title}`, completeEvent.content);
+            await this.sendPushNotification(
+              user.deviceToken,
+              `Alerta de emergencia: ${completeEvent.title}`,
+              completeEvent.content,
+            );
           }
         }
       }
@@ -728,14 +776,21 @@ export class CommunicationsService {
       if (completeEvent.type === 'emergency') {
         for (const user of users) {
           if (user.phoneNumber) {
-            await this.sendSms(user.phoneNumber, `Alerta de emergencia: ${completeEvent.title}. ${completeEvent.content.substring(0, 100)}...`);
+            await this.sendSms(
+              user.phoneNumber,
+              `Alerta de emergencia: ${completeEvent.title}. ${completeEvent.content.substring(0, 100)}...`,
+            );
           }
         }
       }
       if (completeEvent.type === 'emergency') {
         for (const user of users) {
           if (user.deviceToken) {
-            await this.sendPushNotification(user.deviceToken, `Alerta de emergencia: ${completeEvent.title}`, completeEvent.content);
+            await this.sendPushNotification(
+              user.deviceToken,
+              `Alerta de emergencia: ${completeEvent.title}`,
+              completeEvent.content,
+            );
           }
         }
       }
@@ -764,11 +819,7 @@ export class CommunicationsService {
     return completeEvent;
   }
 
-  async updateEvent(
-    schemaName: string,
-    id: number,
-    data: EventDataDto,
-  ) {
+  async updateEvent(schemaName: string, id: number, data: EventDataDto) {
     const prisma: any = this.getTenantPrismaClient(schemaName);
     try {
       const event = await prisma.communityEvent.update({

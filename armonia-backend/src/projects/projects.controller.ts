@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -20,8 +30,14 @@ export class ProjectsController {
 
   @Post()
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
-  async createProject(@GetUser() user: any, @Body() createProjectDto: CreateProjectDto) {
-    return this.projectsService.createProject(user.schemaName, createProjectDto);
+  async createProject(
+    @GetUser() user: any,
+    @Body() createProjectDto: CreateProjectDto,
+  ) {
+    return this.projectsService.createProject(
+      user.schemaName,
+      createProjectDto,
+    );
   }
 
   @Get()
@@ -38,8 +54,16 @@ export class ProjectsController {
 
   @Put(':id')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
-  async updateProject(@GetUser() user: any, @Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
-    return this.projectsService.updateProject(user.schemaName, +id, updateProjectDto);
+  async updateProject(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() updateProjectDto: UpdateProjectDto,
+  ) {
+    return this.projectsService.updateProject(
+      user.schemaName,
+      +id,
+      updateProjectDto,
+    );
   }
 
   @Delete(':id')
@@ -50,13 +74,20 @@ export class ProjectsController {
 
   @Post('tasks')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
-  async createTask(@GetUser() user: any, @Body() createTaskDto: CreateProjectTaskDto) {
+  async createTask(
+    @GetUser() user: any,
+    @Body() createTaskDto: CreateProjectTaskDto,
+  ) {
     return this.projectsService.createTask(user.schemaName, createTaskDto);
   }
 
   @Put('tasks/:id')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
-  async updateTask(@GetUser() user: any, @Param('id') id: string, @Body() updateTaskDto: UpdateProjectTaskDto) {
+  async updateTask(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() updateTaskDto: UpdateProjectTaskDto,
+  ) {
     return this.projectsService.updateTask(user.schemaName, +id, updateTaskDto);
   }
 
@@ -68,13 +99,22 @@ export class ProjectsController {
 
   @Post('updates')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
-  async addProjectUpdate(@GetUser() user: any, @Body() createProjectUpdateDto: CreateProjectUpdateDto) {
-    return this.projectsService.addProjectUpdate(user.schemaName, createProjectUpdateDto);
+  async addProjectUpdate(
+    @GetUser() user: any,
+    @Body() createProjectUpdateDto: CreateProjectUpdateDto,
+  ) {
+    return this.projectsService.addProjectUpdate(
+      user.schemaName,
+      createProjectUpdateDto,
+    );
   }
 
   @Get(':projectId/updates')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RESIDENT)
-  async getProjectUpdates(@GetUser() user: any, @Param('projectId') projectId: string) {
+  async getProjectUpdates(
+    @GetUser() user: any,
+    @Param('projectId') projectId: string,
+  ) {
     return this.projectsService.getProjectUpdates(user.schemaName, +projectId);
   }
 }

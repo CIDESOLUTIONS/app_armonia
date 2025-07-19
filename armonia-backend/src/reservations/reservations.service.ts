@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
@@ -9,7 +13,10 @@ import {
   ReservationStatus,
 } from '../common/dto/reservations.dto';
 import { CommunicationsService } from '../communications/communications.service';
-import { NotificationType, NotificationSourceType } from '../common/dto/communications.dto';
+import {
+  NotificationType,
+  NotificationSourceType,
+} from '../common/dto/communications.dto';
 import { InventoryService } from '../inventory/inventory.service'; // Import InventoryService
 import { CommonAreaDto } from '../common/dto/inventory.dto'; // Import CommonAreaDto
 
@@ -27,12 +34,20 @@ export class ReservationsService {
   }
 
   // Reservation Management
-  async createReservation(schemaName: string, data: CreateReservationDto): Promise<ReservationDto> {
+  async createReservation(
+    schemaName: string,
+    data: CreateReservationDto,
+  ): Promise<ReservationDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    const commonArea = await this.inventoryService.getCommonAreaById(schemaName, data.commonAreaId); // Use InventoryService
+    const commonArea = await this.inventoryService.getCommonAreaById(
+      schemaName,
+      data.commonAreaId,
+    ); // Use InventoryService
 
     if (!commonArea) {
-      throw new NotFoundException(`Área común con ID ${data.commonAreaId} no encontrada.`);
+      throw new NotFoundException(
+        `Área común con ID ${data.commonAreaId} no encontrada.`,
+      );
     }
 
     const start = new Date(data.startDateTime);
@@ -40,15 +55,27 @@ export class ReservationsService {
     const now = new Date();
 
     // 1. Validate against common area's available days
-    const dayOfWeek = start.toLocaleString('en-us', { weekday: 'long' }).toUpperCase();
-    if (commonArea.availableDays && commonArea.availableDays.length > 0 && !commonArea.availableDays.includes(dayOfWeek)) {
-      throw new BadRequestException(`El área común no está disponible los ${dayOfWeek}s.`);
+    const dayOfWeek = start
+      .toLocaleString('en-us', { weekday: 'long' })
+      .toUpperCase();
+    if (
+      commonArea.availableDays &&
+      commonArea.availableDays.length > 0 &&
+      !commonArea.availableDays.includes(dayOfWeek)
+    ) {
+      throw new BadRequestException(
+        `El área común no está disponible los ${dayOfWeek}s.`,
+      );
     }
 
     // 2. Validate against common area's opening and closing times
     if (commonArea.openingTime && commonArea.closingTime) {
-      const [openHour, openMinute] = commonArea.openingTime.split(':').map(Number);
-      const [closeHour, closeMinute] = commonArea.closingTime.split(':').map(Number);
+      const [openHour, openMinute] = commonArea.openingTime
+        .split(':')
+        .map(Number);
+      const [closeHour, closeMinute] = commonArea.closingTime
+        .split(':')
+        .map(Number);
 
       const openingTimeToday = new Date(start);
       openingTimeToday.setHours(openHour, openMinute, 0, 0);
@@ -57,13 +84,21 @@ export class ReservationsService {
       closingTimeToday.setHours(closeHour, closeMinute, 0, 0);
 
       if (start < openingTimeToday || end > closingTimeToday) {
-        throw new BadRequestException(`La reserva debe estar dentro del horario de ${commonArea.openingTime} a ${commonArea.closingTime}.`);
+        throw new BadRequestException(
+          `La reserva debe estar dentro del horario de ${commonArea.openingTime} a ${commonArea.closingTime}.`,
+        );
       }
     }
 
     // 3. Validate capacity
-    if (commonArea.capacity && data.attendees && data.attendees > commonArea.capacity) {
-      throw new BadRequestException(`El número de asistentes excede la capacidad máxima (${commonArea.capacity}).`);
+    if (
+      commonArea.capacity &&
+      data.attendees &&
+      data.attendees > commonArea.capacity
+    ) {
+      throw new BadRequestException(
+        `El número de asistentes excede la capacidad máxima (${commonArea.capacity}).`,
+      );
     }
 
     // 4. Check for overlapping reservations
@@ -74,19 +109,30 @@ export class ReservationsService {
         OR: [
           { startDateTime: { lt: end, gte: start } },
           { endDateTime: { lte: end, gt: start } },
-          { AND: [{ startDateTime: { lte: start } }, { endDateTime: { gte: end } }] },
+          {
+            AND: [
+              { startDateTime: { lte: start } },
+              { endDateTime: { gte: end } },
+            ],
+          },
         ],
       },
     });
 
     if (overlappingReservations.length > 0) {
-      throw new BadRequestException('Ya existe una reserva que se solapa con el horario solicitado.');
+      throw new BadRequestException(
+        'Ya existe una reserva que se solapa con el horario solicitado.',
+      );
     }
 
     // Set initial status based on common area configuration
-    const status = commonArea.requiresApproval ? ReservationStatus.PENDING : ReservationStatus.APPROVED;
+    const status = commonArea.requiresApproval
+      ? ReservationStatus.PENDING
+      : ReservationStatus.APPROVED;
 
-    const reservation = await prisma.reservation.create({ data: { ...data, status } });
+    const reservation = await prisma.reservation.create({
+      data: { ...data, status },
+    });
 
     // Notify user about reservation status
     const user = await prisma.user.findUnique({ where: { id: data.userId } });
@@ -104,7 +150,10 @@ export class ReservationsService {
     return reservation;
   }
 
-  async getReservations(schemaName: string, filters: ReservationFilterParamsDto): Promise<ReservationDto[]> {
+  async getReservations(
+    schemaName: string,
+    filters: ReservationFilterParamsDto,
+  ): Promise<ReservationDto[]> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const where: any = {};
 
@@ -131,16 +180,26 @@ export class ReservationsService {
     });
   }
 
-  async getReservationById(schemaName: string, id: number): Promise<ReservationDto> {
+  async getReservationById(
+    schemaName: string,
+    id: number,
+  ): Promise<ReservationDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    const reservation = await prisma.reservation.findUnique({ where: { id }, include: { commonArea: true, user: true } });
+    const reservation = await prisma.reservation.findUnique({
+      where: { id },
+      include: { commonArea: true, user: true },
+    });
     if (!reservation) {
       throw new NotFoundException(`Reserva con ID ${id} no encontrada.`);
     }
     return reservation;
   }
 
-  async updateReservation(schemaName: string, id: number, data: UpdateReservationDto): Promise<ReservationDto> {
+  async updateReservation(
+    schemaName: string,
+    id: number,
+    data: UpdateReservationDto,
+  ): Promise<ReservationDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const reservation = await prisma.reservation.findUnique({ where: { id } });
     if (!reservation) {
@@ -150,7 +209,11 @@ export class ReservationsService {
     return prisma.reservation.update({ where: { id }, data });
   }
 
-  async updateReservationStatus(schemaName: string, id: number, status: ReservationStatus): Promise<ReservationDto> {
+  async updateReservationStatus(
+    schemaName: string,
+    id: number,
+    status: ReservationStatus,
+  ): Promise<ReservationDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const reservation = await prisma.reservation.findUnique({ where: { id } });
     if (!reservation) {
@@ -168,15 +231,25 @@ export class ReservationsService {
     await prisma.reservation.delete({ where: { id } });
   }
 
-  async approveReservation(schemaName: string, reservationId: number, userId: number): Promise<ReservationDto> {
+  async approveReservation(
+    schemaName: string,
+    reservationId: number,
+    userId: number,
+  ): Promise<ReservationDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    const reservation = await prisma.reservation.findUnique({ where: { id: reservationId } });
+    const reservation = await prisma.reservation.findUnique({
+      where: { id: reservationId },
+    });
 
     if (!reservation) {
-      throw new NotFoundException(`Reserva con ID ${reservationId} no encontrada.`);
+      throw new NotFoundException(
+        `Reserva con ID ${reservationId} no encontrada.`,
+      );
     }
     if (reservation.status !== ReservationStatus.PENDING) {
-      throw new BadRequestException(`La reserva no está en estado PENDIENTE y no puede ser aprobada.`);
+      throw new BadRequestException(
+        `La reserva no está en estado PENDIENTE y no puede ser aprobada.`,
+      );
     }
 
     const updatedReservation = await prisma.reservation.update({
@@ -188,7 +261,9 @@ export class ReservationsService {
       },
     });
 
-    const user = await prisma.user.findUnique({ where: { id: updatedReservation.userId } });
+    const user = await prisma.user.findUnique({
+      where: { id: updatedReservation.userId },
+    });
     if (user) {
       await this.communicationsService.notifyUser(schemaName, user.id, {
         type: NotificationType.INFO,
@@ -203,15 +278,26 @@ export class ReservationsService {
     return updatedReservation;
   }
 
-  async rejectReservation(schemaName: string, reservationId: number, userId: number, reason: string): Promise<ReservationDto> {
+  async rejectReservation(
+    schemaName: string,
+    reservationId: number,
+    userId: number,
+    reason: string,
+  ): Promise<ReservationDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    const reservation = await prisma.reservation.findUnique({ where: { id: reservationId } });
+    const reservation = await prisma.reservation.findUnique({
+      where: { id: reservationId },
+    });
 
     if (!reservation) {
-      throw new NotFoundException(`Reserva con ID ${reservationId} no encontrada.`);
+      throw new NotFoundException(
+        `Reserva con ID ${reservationId} no encontrada.`,
+      );
     }
     if (reservation.status !== ReservationStatus.PENDING) {
-      throw new BadRequestException(`La reserva no está en estado PENDIENTE y no puede ser rechazada.`);
+      throw new BadRequestException(
+        `La reserva no está en estado PENDIENTE y no puede ser rechazada.`,
+      );
     }
 
     const updatedReservation = await prisma.reservation.update({
@@ -224,7 +310,9 @@ export class ReservationsService {
       },
     });
 
-    const user = await prisma.user.findUnique({ where: { id: updatedReservation.userId } });
+    const user = await prisma.user.findUnique({
+      where: { id: updatedReservation.userId },
+    });
     if (user) {
       await this.communicationsService.notifyUser(schemaName, user.id, {
         type: NotificationType.ERROR,

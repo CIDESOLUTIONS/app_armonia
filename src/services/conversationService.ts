@@ -35,9 +35,13 @@ export async function getConversations(): Promise<Conversation[]> {
   }
 }
 
-export async function getConversationMessages(conversationId: string): Promise<Message[]> {
+export async function getConversationMessages(
+  conversationId: string,
+): Promise<Message[]> {
   try {
-    const response = await fetchApi(`/communications/conversations/${conversationId}/messages`);
+    const response = await fetchApi(
+      `/communications/conversations/${conversationId}/messages`,
+    );
     return response;
   } catch (error) {
     console.error("Error fetching conversation messages:", error);
@@ -45,12 +49,18 @@ export async function getConversationMessages(conversationId: string): Promise<M
   }
 }
 
-export async function sendMessage(conversationId: string, data: CreateMessageData): Promise<Message> {
+export async function sendMessage(
+  conversationId: string,
+  data: CreateMessageData,
+): Promise<Message> {
   try {
-    const response = await fetchApi(`/communications/conversations/${conversationId}/messages`, {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
+    const response = await fetchApi(
+      `/communications/conversations/${conversationId}/messages`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+      },
+    );
     return response;
   } catch (error) {
     console.error("Error sending message:", error);
@@ -58,11 +68,17 @@ export async function sendMessage(conversationId: string, data: CreateMessageDat
   }
 }
 
-export async function markMessageAsRead(conversationId: string, messageId: string): Promise<void> {
+export async function markMessageAsRead(
+  conversationId: string,
+  messageId: string,
+): Promise<void> {
   try {
-    await fetchApi(`/communications/conversations/${conversationId}/messages/${messageId}/read`, {
-      method: "POST",
-    });
+    await fetchApi(
+      `/communications/conversations/${conversationId}/messages/${messageId}/read`,
+      {
+        method: "POST",
+      },
+    );
   } catch (error) {
     console.error("Error marking message as read:", error);
     throw error;

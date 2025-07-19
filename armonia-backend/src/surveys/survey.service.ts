@@ -131,18 +131,23 @@ export class SurveyService {
       throw new NotFoundException(`Encuesta con ID ${surveyId} no encontrada.`);
     }
     if (survey.status !== SurveyStatus.PUBLISHED) {
-      throw new Error("La encuesta no está publicada o ya ha finalizado.");
+      throw new Error('La encuesta no está publicada o ya ha finalizado.');
     }
 
     const question = survey.questions.find((q) => q.id === data.questionId);
     if (!question) {
-      throw new NotFoundException(`Pregunta con ID ${data.questionId} no encontrada en esta encuesta.`);
+      throw new NotFoundException(
+        `Pregunta con ID ${data.questionId} no encontrada en esta encuesta.`,
+      );
     }
 
     // Basic validation based on question type
-    if (question.type === QuestionType.SINGLE_CHOICE || question.type === QuestionType.MULTIPLE_CHOICE) {
+    if (
+      question.type === QuestionType.SINGLE_CHOICE ||
+      question.type === QuestionType.MULTIPLE_CHOICE
+    ) {
       if (!data.selectedOptions || data.selectedOptions.length === 0) {
-        throw new Error("Debe seleccionar al menos una opción.");
+        throw new Error('Debe seleccionar al menos una opción.');
       }
       for (const option of data.selectedOptions) {
         if (!question.options.includes(option)) {
@@ -151,11 +156,11 @@ export class SurveyService {
       }
     } else if (question.type === QuestionType.TEXT) {
       if (!data.textAnswer || data.textAnswer.trim() === '') {
-        throw new Error("La respuesta de texto no puede estar vacía.");
+        throw new Error('La respuesta de texto no puede estar vacía.');
       }
     } else if (question.type === QuestionType.RATING) {
       if (data.rating === undefined || data.rating < 1 || data.rating > 5) {
-        throw new Error("La calificación debe ser un número entre 1 y 5.");
+        throw new Error('La calificación debe ser un número entre 1 y 5.');
       }
     }
 
@@ -201,7 +206,7 @@ export class SurveyService {
     const allAnswers = await prisma.answer.findMany({
       where: { question: { surveyId: surveyId } },
     });
-    results.totalResponses = new Set(allAnswers.map(a => a.userId)).size; // Unique users who answered
+    results.totalResponses = new Set(allAnswers.map((a) => a.userId)).size; // Unique users who answered
 
     for (const question of survey.questions) {
       const questionResults: any = {
@@ -211,11 +216,14 @@ export class SurveyService {
         totalAnswers: question.answers.length,
       };
 
-      if (question.type === QuestionType.SINGLE_CHOICE || question.type === QuestionType.MULTIPLE_CHOICE) {
+      if (
+        question.type === QuestionType.SINGLE_CHOICE ||
+        question.type === QuestionType.MULTIPLE_CHOICE
+      ) {
         const optionCounts: { [key: string]: number } = {};
-        question.options.forEach(option => optionCounts[option] = 0);
-        question.answers.forEach(answer => {
-          answer.selectedOptions?.forEach(option => {
+        question.options.forEach((option) => (optionCounts[option] = 0));
+        question.answers.forEach((answer) => {
+          answer.selectedOptions?.forEach((option) => {
             if (optionCounts[option] !== undefined) {
               optionCounts[option]++;
             }
@@ -223,10 +231,18 @@ export class SurveyService {
         });
         questionResults.optionCounts = optionCounts;
       } else if (question.type === QuestionType.RATING) {
-        const totalRating = question.answers.reduce((sum, answer) => sum + (answer.rating || 0), 0);
-        questionResults.averageRating = question.answers.length > 0 ? totalRating / question.answers.length : 0;
+        const totalRating = question.answers.reduce(
+          (sum, answer) => sum + (answer.rating || 0),
+          0,
+        );
+        questionResults.averageRating =
+          question.answers.length > 0
+            ? totalRating / question.answers.length
+            : 0;
       } else if (question.type === QuestionType.TEXT) {
-        questionResults.textAnswers = question.answers.map(answer => answer.textAnswer);
+        questionResults.textAnswers = question.answers.map(
+          (answer) => answer.textAnswer,
+        );
       }
       results.questions.push(questionResults);
     }

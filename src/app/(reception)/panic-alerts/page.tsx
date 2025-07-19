@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
@@ -18,10 +16,20 @@ import {
   updatePanicAlertStatus,
 } from "@/services/panicService";
 
+interface PanicAlert {
+  id: number;
+  userId: number;
+  user?: { name: string }; // Assuming user object is nested
+  location: string;
+  message?: string;
+  createdAt: string;
+  status: "ACTIVE" | "RESOLVED" | "DISMISSED";
+}
+
 export default function PanicAlertsPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
-  const [alerts, setAlerts] = useState<any[]>([]);
+  const [alerts, setAlerts] = useState<PanicAlert[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

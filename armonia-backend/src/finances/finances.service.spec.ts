@@ -4,10 +4,10 @@ import { PaymentStatus } from '../common/dto/finances.dto';
 // Mock dependencies
 const mockPrismaClient = {
   fee: {
-      findMany: jest.fn(),
-      count: jest.fn(),
-      findUnique: jest.fn(),
-    },
+    findMany: jest.fn(),
+    count: jest.fn(),
+    findUnique: jest.fn(),
+  },
   payment: {
     findMany: jest.fn(),
     create: jest.fn(),
@@ -115,11 +115,15 @@ describe('FinancesService', () => {
     });
 
     it('should filter fees by status', async () => {
-      const mockFees = [{ id: 1, amount: 100, title: 'Fee 1', status: 'PENDING' }];
+      const mockFees = [
+        { id: 1, amount: 100, title: 'Fee 1', status: 'PENDING' },
+      ];
       mockPrismaClient.fee.findMany.mockResolvedValue(mockFees);
       mockPrismaClient.fee.count.mockResolvedValue(mockFees.length);
 
-      const result = await service.getFees('test_schema', { status: PaymentStatus.PENDING });
+      const result = await service.getFees('test_schema', {
+        status: PaymentStatus.PENDING,
+      });
 
       expect(result.fees).toEqual(mockFees);
       expect(mockPrismaClient.fee.findMany).toHaveBeenCalledWith({
@@ -131,9 +135,13 @@ describe('FinancesService', () => {
     });
 
     it('should handle errors when fetching fees', async () => {
-      mockPrismaClient.fee.findMany.mockRejectedValue(new Error('Database error'));
+      mockPrismaClient.fee.findMany.mockRejectedValue(
+        new Error('Database error'),
+      );
 
-      await expect(service.getFees('test_schema', {})).rejects.toThrow('Error al obtener cuotas');
+      await expect(service.getFees('test_schema', {})).rejects.toThrow(
+        'Error al obtener cuotas',
+      );
     });
   });
 
@@ -145,7 +153,9 @@ describe('FinancesService', () => {
       const result = await service.getFee('test_schema', 1);
 
       expect(result).toEqual(mockFee);
-      expect(mockPrismaClient.fee.findUnique).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(mockPrismaClient.fee.findUnique).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
     });
 
     it('should return null if fee not found', async () => {
@@ -157,9 +167,13 @@ describe('FinancesService', () => {
     });
 
     it('should handle errors when fetching a single fee', async () => {
-      mockPrismaClient.fee.findUnique.mockRejectedValue(new Error('Database error'));
+      mockPrismaClient.fee.findUnique.mockRejectedValue(
+        new Error('Database error'),
+      );
 
-      await expect(service.getFee('test_schema', 1)).rejects.toThrow('Error al obtener cuota');
+      await expect(service.getFee('test_schema', 1)).rejects.toThrow(
+        'Error al obtener cuota',
+      );
     });
   });
 });

@@ -16,7 +16,13 @@ describe('PqrService', () => {
           provide: PrismaClientManager,
           useValue: {
             getClient: jest.fn().mockReturnValue({
-              pQR: { create: jest.fn(), findMany: jest.fn(), findUnique: jest.fn(), update: jest.fn(), delete: jest.fn() },
+              pQR: {
+                create: jest.fn(),
+                findMany: jest.fn(),
+                findUnique: jest.fn(),
+                update: jest.fn(),
+                delete: jest.fn(),
+              },
               pQRStatusHistory: { create: jest.fn() },
               pQRComment: { create: jest.fn() },
               pQRAttachment: { create: jest.fn() },

@@ -364,7 +364,9 @@ export default function ReceptionPackagesPage() {
       });
     } catch (err) {
       console.error("[ReceptionPackages] Error:", err);
-      setError("Error al registrar el paquete. Por favor, inténtelo de nuevo.");
+      _setError(
+        "Error al registrar el paquete. Por favor, inténtelo de nuevo.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -423,7 +425,9 @@ export default function ReceptionPackagesPage() {
       setIsDeliverDialogOpen(false);
     } catch (err) {
       console.error("[ReceptionPackages] Error:", err);
-      setError("Error al registrar la entrega. Por favor, inténtelo de nuevo.");
+      _setError(
+        "Error al registrar la entrega. Por favor, inténtelo de nuevo.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -458,7 +462,7 @@ export default function ReceptionPackagesPage() {
       setSuccessMessage("Paquete marcado como devuelto.");
     } catch (err) {
       console.error("[ReceptionPackages] Error:", err);
-      setError(
+      _setError(
         "Error al marcar el paquete como devuelto. Por favor, inténtelo de nuevo.",
       );
     }
@@ -830,7 +834,7 @@ export default function ReceptionPackagesPage() {
                     id="trackingNumber"
                     placeholder="Número de seguimiento"
                     value={newPackageForm.trackingNumber}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    onChange={(e) =>
                       handleNewPackageFormChange(
                         "trackingNumber",
                         e.target.value,
@@ -847,7 +851,7 @@ export default function ReceptionPackagesPage() {
                     id="courier"
                     placeholder="Nombre de la empresa"
                     value={newPackageForm.courier}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    onChange={(e) =>
                       handleNewPackageFormChange("courier", e.target.value)
                     }
                   />
@@ -861,7 +865,7 @@ export default function ReceptionPackagesPage() {
                 id="notes"
                 placeholder="Información adicional sobre el paquete"
                 value={newPackageForm.notes}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onChange={(e) =>
                   handleNewPackageFormChange("notes", e.target.value)
                 }
               />
@@ -940,74 +944,28 @@ export default function ReceptionPackagesPage() {
 
       {/* Diálogo para registrar entrega */}
       <Dialog open={isDeliverDialogOpen} onOpenChange={setIsDeliverDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Registrar Entrega de Paquete</DialogTitle>
+            <DialogTitle>Entregar Paquete</DialogTitle>
             <DialogDescription>
-              Complete la información para registrar la entrega del paquete
+              Introduce el número de seguimiento del paquete a entregar.
             </DialogDescription>
           </DialogHeader>
-
-          {selectedPackage && (
-            <div className="space-y-4 py-4">
-              <div className="bg-gray-50 p-4 rounded-md mb-4">
-                <div className="flex items-center mb-2">
-                  {selectedPackage.type === "package" ? (
-                    <Package className="h-5 w-5 mr-2 text-indigo-600" />
-                  ) : selectedPackage.type === "mail" ? (
-                    <Mail className="h-5 w-5 mr-2 text-blue-600" />
-                  ) : (
-                    <FileText className="h-5 w-5 mr-2 text-green-600" />
-                  )}
-                  <span className="font-medium">
-                    {getPackageTypeText(selectedPackage.type)}
-                  </span>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="text-gray-500">Destino:</div>
-                  <div>{selectedPackage.destination}</div>
-
-                  <div className="text-gray-500">Residente:</div>
-                  <div>{selectedPackage.residentName}</div>
-
-                  <div className="text-gray-500">Recibido el:</div>
-                  <div>{formatDate(selectedPackage.receivedAt)}</div>
-
-                  {selectedPackage.trackingNumber && (
-                    <>
-                      <div className="text-gray-500">Seguimiento:</div>
-                      <div>{selectedPackage.trackingNumber}</div>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="receivedBy">Recibido por</Label>
-                <Input
-                  id="receivedBy"
-                  placeholder="Nombre de quien recibe"
-                  value={deliveryForm.receivedBy}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    handleDeliveryFormChange("receivedBy", e.target.value)
-                  }
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="deliveryNotes">Notas (Opcional)</Label>
-                <Textarea
-                  id="deliveryNotes"
-                  placeholder="Información adicional sobre la entrega"
-                  value={deliveryForm.notes}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    handleDeliveryFormChange("notes", e.target.value)
-                  }
-                />
-              </div>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="deliverTrackingNumber">
+                Número de Seguimiento
+              </Label>
+              <Input
+                id="deliverTrackingNumber"
+                placeholder="Número de seguimiento"
+                value={deliverPackageTrackingNumber}
+                onChange={(e) =>
+                  setDeliverPackageTrackingNumber(e.target.value)
+                }
+              />
             </div>
-          )}
-
+          </div>
           <DialogFooter>
             <Button
               variant="outline"
@@ -1017,9 +975,9 @@ export default function ReceptionPackagesPage() {
             </Button>
             <Button
               onClick={handleDeliverPackage}
-              disabled={isSubmitting || !deliveryForm.receivedBy}
+              disabled={isSubmitting || !deliverPackageTrackingNumber}
             >
-              {isSubmitting ? "Registrando..." : "Confirmar Entrega"}
+              {isSubmitting ? "Entregando..." : "Marcar como Entregado"}
             </Button>
           </DialogFooter>
         </DialogContent>

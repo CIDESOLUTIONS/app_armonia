@@ -16,7 +16,13 @@ describe('PackagesService', () => {
           provide: PrismaClientManager,
           useValue: {
             getClient: jest.fn().mockReturnValue({
-              package: { create: jest.fn(), findMany: jest.fn(), findUnique: jest.fn(), update: jest.fn(), delete: jest.fn() },
+              package: {
+                create: jest.fn(),
+                findMany: jest.fn(),
+                findUnique: jest.fn(),
+                update: jest.fn(),
+                delete: jest.fn(),
+              },
               packageStatusHistory: { create: jest.fn() },
               packageNotification: { create: jest.fn() },
             }),

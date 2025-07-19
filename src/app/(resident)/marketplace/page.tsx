@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, PlusCircle, Search } from "lucide-react";
-import { getListings } from "@/services/marketplaceService";
+import { getListings, Listing } from "@/services/marketplaceService"; // Importar Listing
 import { ListingCard } from "@/components/marketplace/ListingCard";
 import Link from "next/link";
 import {
@@ -17,7 +17,7 @@ import {
 import { ListingCategory } from "@/common/dto/marketplace.dto";
 
 export default function MarketplacePage() {
-  const [listings, setListings] = useState<any[]>([]);
+  const [listings, setListings] = useState<Listing[]>([]); // Usar Listing[]
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<
