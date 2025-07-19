@@ -1,10 +1,10 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
+import { useTranslations } from "next-intl";
 import { Building, Users, DollarSign } from "lucide-react";
 import { FadeIn } from "@/components/animations/FadeIn";
 
 export function FeaturesOverview() {
-  const { t } = useTranslation("landing");
+  const t = useTranslations("landing");
 
   return (
     <FadeIn delay={0.2}>

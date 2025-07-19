@@ -596,7 +596,6 @@ export default function ReceptionIncidentsPage() {
                 </SelectContent>
               </Select>
             </div>
-          </div>
         </CardContent>
       </Card>
 

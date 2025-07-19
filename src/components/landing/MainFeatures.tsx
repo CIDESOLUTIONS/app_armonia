@@ -1,11 +1,11 @@
 import React from "react";
 import Image from "next/image";
-import { useTranslation } from "next-i18next";
+import { useTranslations } from "next-intl";
 import { Check } from "lucide-react";
 import { FadeIn } from "@/components/animations/FadeIn";
 
 export function MainFeatures() {
-  const { t } = useTranslation("landing");
+  const t = useTranslations("landing");
 
   return (
     <FadeIn delay={0.4}>
