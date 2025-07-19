@@ -8,36 +8,51 @@ import {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 
+interface Listing {
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  category: string;
+  images: string[];
+  author: {
+    id: number;
+    name: string;
+  };
+  status: "ACTIVE" | "SOLD" | "PAUSED"; // Added status field
+  createdAt: string;
+}
+
 export async function getListings(
   filters?: ListingFilterParamsDto & { authorId?: number },
-): Promise<any[]> {
+): Promise<Listing[]> {
   try {
     const query = filters ? new URLSearchParams(filters as any).toString() : "";
     const response = await fetchApi(`/marketplace/listings?${query}`);
-    return response;
+    return response.data; // Assuming the API returns { data: Listing[] }
   } catch (error) {
     console.error("Error fetching listings:", error);
     throw error;
   }
 }
 
-export async function createListing(data: CreateListingDto): Promise<any> {
+export async function createListing(data: CreateListingDto): Promise<Listing> {
   try {
     const response = await fetchApi("/marketplace/listings", {
       method: "POST",
       body: JSON.stringify(data),
     });
-    return response;
+    return response.data; // Assuming the API returns { data: Listing }
   } catch (error) {
     console.error("Error creating listing:", error);
     throw error;
   }
 }
 
-export async function getListingById(id: number): Promise<any> {
+export async function getListingById(id: number): Promise<Listing> {
   try {
     const response = await fetchApi(`/marketplace/listings/${id}`);
-    return response;
+    return response.data; // Assuming the API returns { data: Listing }
   } catch (error) {
     console.error("Error fetching listing by ID:", error);
     throw error;
@@ -47,25 +62,24 @@ export async function getListingById(id: number): Promise<any> {
 export async function updateListing(
   id: number,
   data: UpdateListingDto,
-): Promise<any> {
+): Promise<Listing> {
   try {
     const response = await fetchApi(`/marketplace/listings/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     });
-    return response;
+    return response.data; // Assuming the API returns { data: Listing }
   } catch (error) {
     console.error("Error updating listing:", error);
     throw error;
   }
 }
 
-export async function deleteListing(id: number): Promise<any> {
+export async function deleteListing(id: number): Promise<void> {
   try {
-    const response = await fetchApi(`/marketplace/listings/${id}`, {
+    await fetchApi(`/marketplace/listings/${id}`, {
       method: "DELETE",
     });
-    return response;
   } catch (error) {
     console.error("Error deleting listing:", error);
     throw error;
@@ -78,7 +92,7 @@ export async function reportListing(data: ReportListingDto): Promise<any> {
       method: "POST",
       body: JSON.stringify(data),
     });
-    return response;
+    return response.data; // Assuming the API returns { data: any }
   } catch (error) {
     console.error("Error reporting listing:", error);
     throw error;
@@ -88,7 +102,7 @@ export async function reportListing(data: ReportListingDto): Promise<any> {
 export async function getReportedListings(): Promise<any[]> {
   try {
     const response = await fetchApi("/marketplace/moderation/reports");
-    return response;
+    return response.data; // Assuming the API returns { data: any[] }
   } catch (error) {
     console.error("Error fetching reported listings:", error);
     throw error;
@@ -107,7 +121,7 @@ export async function resolveReport(
         body: JSON.stringify({ action }),
       },
     );
-    return response;
+    return response.data; // Assuming the API returns { data: any }
   } catch (error) {
     console.error("Error resolving report:", error);
     throw error;
@@ -126,7 +140,7 @@ export async function uploadImage(file: File): Promise<{ url: string }> {
       },
       true,
     ); // The third parameter indicates that Content-Type should not be automatically added
-    return response;
+    return response.data; // Assuming the API returns { data: { url: string } }
   } catch (error) {
     console.error("Error uploading image:", error);
     throw error;
@@ -136,7 +150,7 @@ export async function uploadImage(file: File): Promise<{ url: string }> {
 export async function getMarketplaceCategories(): Promise<string[]> {
   try {
     const response = await fetchApi("/marketplace/categories");
-    return response;
+    return response.data; // Assuming the API returns { data: string[] }
   } catch (error) {
     console.error("Error fetching marketplace categories:", error);
     throw error;

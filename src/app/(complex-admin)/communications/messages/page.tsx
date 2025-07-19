@@ -14,6 +14,10 @@ import {
   sendMessage,
 } from "@/services/conversationService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { messageSchema, MessageFormValues } from "@/validators/message-schema";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 interface Conversation {
   id: string;
@@ -42,9 +46,22 @@ export default function MessagesPage() {
   const [selectedConversation, setSelectedConversation] =
     useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessageContent, setNewMessageContent] = useState("");
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const form = useForm<MessageFormValues>({
+    resolver: zodResolver(messageSchema),
+    defaultValues: {
+      content: "",
+    },
+  });
+
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { isSubmitting },
+  } = form;
 
   const fetchConversations = useCallback(async () => {
     setLoading(true);
@@ -98,16 +115,13 @@ export default function MessagesPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSendMessage = async () => {
-    if (!newMessageContent.trim() || !selectedConversation || !user) return;
+  const onSubmit = async (data: MessageFormValues) => {
+    if (!selectedConversation || !user) return;
 
-    setLoading(true);
     try {
-      const sentMessage = await sendMessage(selectedConversation.id, {
-        content: newMessageContent,
-      });
+      const sentMessage = await sendMessage(selectedConversation.id, data);
       setMessages((prev) => [...prev, sentMessage]);
-      setNewMessageContent("");
+      reset();
     } catch (error) {
       console.error("Error sending message:", error);
       toast({
@@ -115,8 +129,6 @@ export default function MessagesPage() {
         description: "Error al enviar el mensaje.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -214,20 +226,35 @@ export default function MessagesPage() {
               <div ref={messagesEndRef} />
             </div>
             <div className="mt-4 flex space-x-2">
-              <Input
-                placeholder="Escribe tu mensaje..."
-                value={newMessageContent}
-                onChange={(e) => setNewMessageContent(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") handleSendMessage();
-                }}
-              />
-              <Button
-                onClick={handleSendMessage}
-                disabled={newMessageContent.trim() === ""}
-              >
-                <Send className="h-5 w-5" />
-              </Button>
+              <Form {...form}>
+                <form onSubmit={handleSubmit(onSubmit)} className="flex space-x-2 w-full">
+                  <FormField
+                    control={control}
+                    name="content"
+                    render={({ field }) => (
+                      <FormItem className="flex-grow">
+                        <FormControl>
+                          <Input
+                            placeholder="Escribe tu mensaje..."
+                            {...field}
+                            onKeyPress={(e) => {
+                              if (e.key === "Enter") handleSubmit(onSubmit)();
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" disabled={isSubmitting || !form.formState.isValid}>
+                    {isSubmitting ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-5 w-5" />
+                    )}
+                  </Button>
+                </form>
+              </Form>
             </div>
           </>
         ) : (

@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Flag } from "lucide-react";
+import { Flag, MessageSquare } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -18,11 +18,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { reportListing } from "@/services/marketplaceService";
+import { createConversation } from "@/services/conversationService";
+import { useAuthStore } from "@/store/authStore";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { reportListingSchema, ReportListingFormValues } from "@/validators/report-listing-schema";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 interface ListingCardProps {
   listing: {
@@ -33,27 +40,81 @@ interface ListingCardProps {
     category: string;
     images: string[];
     author: {
+      id: number;
       name: string;
     };
   };
 }
 
 export function ListingCard({ listing }: ListingCardProps) {
-  const [reportReason, setReportReason] = useState("");
   const { toast } = useToast();
+  const { user } = useAuthStore();
+  const router = useRouter();
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
-  const handleReport = async () => {
+  const form = useForm<ReportListingFormValues>({
+    resolver: zodResolver(reportListingSchema),
+    defaultValues: {
+      reason: "",
+    },
+  });
+
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { isSubmitting },
+  } = form;
+
+  const handleReport = async (data: ReportListingFormValues) => {
     try {
-      await reportListing({ listingId: listing.id, reason: reportReason });
+      await reportListing({ listingId: listing.id, reason: data.reason });
       toast({
         title: "Anuncio Reportado",
         description: "Gracias por tu reporte. Lo revisaremos pronto.",
       });
+      setIsReportModalOpen(false);
+      reset();
     } catch (error) {
       console.error("Error reporting listing:", error);
       toast({
         title: "Error",
         description: "No se pudo reportar el anuncio.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleContactSeller = async () => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "Debes iniciar sesión para contactar al vendedor.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (user.id === listing.author.id) {
+      toast({
+        title: "Información",
+        description: "No puedes contactarte a ti mismo.",
+        variant: "info",
+      });
+      return;
+    }
+
+    try {
+      const conversation = await createConversation({
+        participantIds: [user.id, listing.author.id],
+        type: "direct",
+      });
+      router.push(`/resident/marketplace/chat/${conversation.id}`);
+    } catch (error) {
+      console.error("Error creating/fetching conversation:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo iniciar la conversación con el vendedor.",
         variant: "destructive",
       });
     }
@@ -96,44 +157,70 @@ export function ListingCard({ listing }: ListingCardProps) {
         <span className="text-xs text-gray-500">
           Publicado por: {listing.author.name}
         </span>
-        <Link href={`/resident-portal/marketplace/${listing.id}`}>
-          <Button variant="outline" size="sm">
-            Ver Detalles
+        <div className="flex items-center space-x-2">
+          <Button variant="outline" size="sm" onClick={handleContactSeller}>
+            <MessageSquare className="h-4 w-4 mr-1" /> Contactar
           </Button>
-        </Link>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-red-500 hover:text-red-600"
-            >
-              <Flag className="h-4 w-4" />
+          <Link href={`/resident/marketplace/${listing.id}`}>
+            <Button variant="outline" size="sm">
+              Ver Detalles
             </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Reportar Anuncio</DialogTitle>
-              <DialogDescription>
-                Por favor, describe por qué estás reportando este anuncio.
-              </DialogDescription>
-            </DialogHeader>
-            <Textarea
-              placeholder="Razón del reporte..."
-              value={reportReason}
-              onChange={(e) => setReportReason(e.target.value)}
-            />
-            <DialogFooter>
+          </Link>
+          <Dialog open={isReportModalOpen} onOpenChange={setIsReportModalOpen}>
+            <DialogTrigger asChild>
               <Button
-                variant="outline"
-                onClick={() => setIsReportModalOpen(false)}
+                variant="ghost"
+                size="sm"
+                className="text-red-500 hover:text-red-600"
               >
-                Cancelar
+                <Flag className="h-4 w-4" />
               </Button>
-              <Button onClick={handleReport}>Reportar</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Reportar Anuncio</DialogTitle>
+                <DialogDescription>
+                  Por favor, describe por qué estás reportando este anuncio.
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...form}>
+                <form onSubmit={handleSubmit(handleReport)} className="space-y-4">
+                  <FormField
+                    control={control}
+                    name="reason"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Razón del reporte..."
+                            {...field}
+                            rows={5}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsReportModalOpen(false)}
+                      type="button"
+                    >
+                      Cancelar
+                    </Button>
+                    <Button type="submit" disabled={isSubmitting}>
+                      {isSubmitting ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : null}{" "}
+                      Reportar
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </CardFooter>
     </Card>
   );

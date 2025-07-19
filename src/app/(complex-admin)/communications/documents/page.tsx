@@ -16,6 +16,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { documentUploadSchema, DocumentUploadFormValues } from "@/validators/document-upload-schema";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  getDocuments,
+  uploadDocument,
+  deleteDocument,
+} from "@/services/documentService";
 
 interface Document {
   id: string;
@@ -30,8 +39,17 @@ export default function DocumentsPage() {
   const { toast } = useToast();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const form = useForm<DocumentUploadFormValues>({
+    resolver: zodResolver(documentUploadSchema),
+  });
+
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { isSubmitting },
+  } = form;
 
   const fetchDocuments = useCallback(async () => {
     setLoading(true);
@@ -72,34 +90,14 @@ export default function DocumentsPage() {
     }
   }, [user, fetchDocuments]);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setSelectedFile(event.target.files[0]);
-    } else {
-      setSelectedFile(null);
-    }
-  };
-
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      toast({
-        title: "Advertencia",
-        description: "Por favor, selecciona un archivo para subir.",
-      });
-      return;
-    }
-
-    setUploading(true);
+  const onSubmit = async (data: DocumentUploadFormValues) => {
     try {
-      const formData = new FormData();
-      formData.append("file", selectedFile);
-      // TODO: Call backend API to upload document
-      console.log("Uploading file:", selectedFile.name);
+      await uploadDocument(data.file);
       toast({
         title: "Éxito",
         description: "Documento subido correctamente.",
       });
-      setSelectedFile(null);
+      reset();
       fetchDocuments(); // Refresh list
     } catch (error) {
       console.error("Error uploading document:", error);
@@ -108,8 +106,6 @@ export default function DocumentsPage() {
         description: "Error al subir el documento.",
         variant: "destructive",
       });
-    } finally {
-      setUploading(false);
     }
   };
 
@@ -118,8 +114,7 @@ export default function DocumentsPage() {
       return;
     }
     try {
-      // TODO: Call backend API to delete document
-      console.log("Deleting document:", id);
+      await deleteDocument(id);
       toast({
         title: "Éxito",
         description: "Documento eliminado correctamente.",
@@ -169,14 +164,39 @@ export default function DocumentsPage() {
           <CardTitle>Subir Nuevo Documento</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col space-y-4">
-          <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="document">Documento</Label>
-            <Input id="document" type="file" onChange={handleFileChange} />
-          </div>
-          <Button onClick={handleUpload} disabled={!selectedFile || uploading}>
-            {uploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            <Upload className="mr-2 h-4 w-4" /> Subir Documento
-          </Button>
+          <Form {...form}>
+            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+              <FormField
+                control={control}
+                name="file"
+                render={({ field: { value, onChange, ...fieldProps } }) => (
+                  <FormItem className="grid w-full max-w-sm items-center gap-1.5">
+                    <FormLabel htmlFor="document">Documento</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...fieldProps}
+                        id="document"
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"
+                        onChange={(event) => {
+                          onChange(event.target.files && event.target.files[0]);
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" disabled={isSubmitting || !form.formState.isValid}>
+                {isSubmitting ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="mr-2 h-4 w-4" />
+                )}
+                Subir Documento
+              </Button>
+            </form>
+          </Form>
         </CardContent>
       </Card>
 
@@ -193,10 +213,12 @@ export default function DocumentsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead>Subido Por</TableHead>
+                  <TableHead>Título</TableHead>
+                  <TableHead>Nombre de Archivo</TableHead>
+                  <TableHead>Tipo</TableHead>
+                  <TableHead>Tamaño</TableHead>
                   <TableHead>Fecha de Subida</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
+                  <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -205,7 +227,9 @@ export default function DocumentsPage() {
                     <TableCell className="font-medium flex items-center">
                       <FileText className="mr-2 h-4 w-4" /> {doc.name}
                     </TableCell>
-                    <TableCell>{doc.uploadedBy}</TableCell>
+                    <TableCell>{doc.fileName}</TableCell>
+                    <TableCell>{doc.fileType}</TableCell>
+                    <TableCell>{(doc.fileSize / 1024).toFixed(2)} KB</TableCell>
                     <TableCell>
                       {new Date(doc.uploadedAt).toLocaleDateString()}
                     </TableCell>
