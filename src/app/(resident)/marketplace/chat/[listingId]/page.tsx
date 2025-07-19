@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/components/ui/use-toast";
@@ -8,55 +8,85 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2, Send, Flag } from "lucide-react";
 import { getListingById, reportListing } from "@/services/marketplaceService";
-import { getMessages, sendMessage } from "@/services/messageService";
+import {
+  getMarketplaceMessages,
+  sendMarketplaceMessage,
+  createConversation,
+  Conversation,
+  Message as ConversationMessage,
+} from "@/services/conversationService"; // Usar funciones de conversationService
 import io from "socket.io-client";
 import { usePathname } from "next/navigation";
 
+const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 let socket: any;
+
+interface Listing {
+  id: number;
+  title: string;
+  author: { id: number; name: string };
+  // ... otras propiedades del listado
+}
 
 export default function ChatPage() {
   const { listingId } = useParams();
   const { user } = useAuthStore();
   const { toast } = useToast();
-  const [listing, setListing] = useState<any>(null);
-  const [messages, setMessages] = useState<any[]>([]);
+  const [listing, setListing] = useState<Listing | null>(null);
+  const [conversation, setConversation] = useState<Conversation | null>(null);
+  const [messages, setMessages] = useState<ConversationMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
+  const fetchListingAndMessages = useCallback(async () => {
+    setLoading(true);
+    try {
+      const fetchedListing = await getListingById(Number(listingId));
+      setListing(fetchedListing);
+
+      if (!user || !fetchedListing.author.id) {
+        toast({ title: "Error", description: "Información de usuario o listado incompleta." });
+        setLoading(false);
+        return;
+      }
+
+      // Crear o obtener la conversación
+      const participantIds = [user.id, fetchedListing.author.id];
+      const existingConversation = await createConversation({ participantIds, type: "direct" });
+      setConversation(existingConversation);
+
+      const fetchedMessages = await getMarketplaceMessages(Number(listingId), user.id);
+      setMessages(fetchedMessages);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast({ title: "Error", description: "No se pudo cargar el chat." });
+    } finally {
+      setLoading(false);
+    }
+  }, [listingId, user, toast]);
+
   useEffect(() => {
     if (!user) return;
-
-    const fetchListingAndMessages = async () => {
-      try {
-        const fetchedListing = await getListingById(Number(listingId));
-        setListing(fetchedListing);
-
-        const fetchedMessages = await getMessages(Number(listingId), user.id);
-        setMessages(fetchedMessages);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        toast({ title: "Error", description: "No se pudo cargar el chat." });
-      } finally {
-        setLoading(false);
-      }
-    };
 
     fetchListingAndMessages();
 
     // Configurar Socket.IO
-    socket = io(); // Conecta al servidor de Socket.IO
+    socket = io(`${SOCKET_URL}/marketplace-chat`, {
+      query: { userId: user.id, listingId: Number(listingId) },
+    });
 
     socket.on("connect", () => {
       console.log("Conectado a Socket.IO");
-      socket.emit("joinChat", {
+      socket.emit("joinListingChat", {
         listingId: Number(listingId),
         userId: user.id,
       });
     });
 
-    socket.on("receiveMessage", (message: any) => {
+    socket.on("receiveMarketplaceMessage", (message: ConversationMessage) => {
       setMessages((prevMessages) => [...prevMessages, message]);
       // Show toast notification if not on the current chat page
       if (
@@ -77,25 +107,24 @@ export default function ChatPage() {
     return () => {
       socket.disconnect();
     };
-  }, [listingId, user, toast, pathname]);
+  }, [listingId, user, toast, pathname, fetchListingAndMessages]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const handleSendMessage = async () => {
-    if (newMessage.trim() === "" || !user || !listing) return;
+    if (newMessage.trim() === "" || !user || !listing || !conversation) return;
 
     try {
       const messageData = {
         listingId: Number(listingId),
         senderId: user.id,
-        receiverId:
-          user.id === listing.authorId ? listing.buyerId : listing.authorId, // Lógica para determinar el receptor
+        receiverId: listing.author.id === user.id ? listing.buyerId : listing.author.id, // Lógica para determinar el receptor
         content: newMessage,
       };
-      await sendMessage(messageData);
-      socket.emit("sendMessage", messageData);
+      await sendMarketplaceMessage(messageData);
+      socket.emit("sendMarketplaceMessage", messageData);
       setNewMessage("");
     } catch (error) {
       console.error("Error sending message:", error);
@@ -149,7 +178,7 @@ export default function ChatPage() {
     <div className="container mx-auto p-6 flex flex-col h-[calc(100vh-100px)]">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Chat sobre: {listing.title}</h1>
-        {user && listing.authorId !== user.id && (
+        {user && listing.author.id !== user.id && (
           <Button variant="outline" onClick={handleReportListing}>
             <Flag className="mr-2 h-4 w-4" /> Reportar Anuncio
           </Button>

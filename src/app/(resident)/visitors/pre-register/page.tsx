@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,10 +17,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Loader2 } from "lucide-react";
-import { createPreRegisteredVisitor } from "@/services/visitorService";
-import { getUserProfile } from "@/services/userService"; // Importar getUserProfile
+import { Loader2, Download, Camera } from "lucide-react";
+import { createPreRegisteredVisitor, uploadVisitorImage } from "@/services/visitorService";
+import { getUserProfile } from "@/services/userService";
 import { useAuthStore } from "@/store/authStore";
+import QRCode from "qrcode";
 
 const formSchema = z.object({
   name: z.string().min(3, "El nombre es requerido."),
@@ -30,6 +31,7 @@ const formSchema = z.object({
   validFrom: z.string().min(1, "La fecha de inicio de validez es requerida."),
   validUntil: z.string().min(1, "La fecha de fin de validez es requerida."),
   purpose: z.string().optional(),
+  photo: z.any().optional(), // Para el archivo de imagen
 });
 
 export default function PreRegisterVisitorPage() {
@@ -37,7 +39,10 @@ export default function PreRegisterVisitorPage() {
   const { toast } = useToast();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [userUnitId, setUserUnitId] = useState<number | null>(null); // Estado para unitId
+  const [userUnitId, setUserUnitId] = useState<number | null>(null);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
+  const [visitorId, setVisitorId] = useState<number | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUserUnitId = async () => {
@@ -69,8 +74,24 @@ export default function PreRegisterVisitorPage() {
       validFrom: "",
       validUntil: "",
       purpose: "",
+      photo: undefined,
     },
   });
+
+  const generateQrCode = async (visitorData: any) => {
+    try {
+      const qrData = JSON.stringify(visitorData);
+      const url = await QRCode.toDataURL(qrData);
+      setQrCodeDataUrl(url);
+    } catch (err) {
+      console.error("Error generating QR code:", err);
+      toast({
+        title: "Error",
+        description: "No se pudo generar el código QR.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!user?.id || !user?.complexId || userUnitId === null) {
@@ -82,18 +103,35 @@ export default function PreRegisterVisitorPage() {
     }
 
     setLoading(true);
+    let photoUrl: string | undefined;
+
     try {
-      await createPreRegisteredVisitor({
+      if (values.photo) {
+        const uploadedImage = await uploadVisitorImage(values.photo);
+        photoUrl = uploadedImage.url;
+      }
+
+      const newVisitor = await createPreRegisteredVisitor({
         ...values,
         residentId: user.id,
-        unitId: userUnitId, // Usar el unitId obtenido
+        unitId: userUnitId,
+        complexId: user.complexId,
+        photoUrl: photoUrl, // Add photo URL to the visitor data
+      });
+      setVisitorId(newVisitor.id);
+      generateQrCode({
+        visitorId: newVisitor.id,
+        validFrom: values.validFrom,
+        validUntil: values.validUntil,
+        unitId: userUnitId,
         complexId: user.complexId,
       });
       toast({
         title: "Éxito",
-        description: "Visitante pre-registrado correctamente.",
+        description: "Visitante pre-registrado correctamente. Código QR generado.",
       });
-      router.push("/resident/resident/visitors");
+      // Optionally, clear the form after successful submission and QR generation
+      // form.reset();
     } catch (error) {
       console.error("Error pre-registering visitor:", error);
       toast({
@@ -103,6 +141,28 @@ export default function PreRegisterVisitorPage() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDownloadQrCode = () => {
+    if (qrCodeDataUrl) {
+      const link = document.createElement("a");
+      link.href = qrCodeDataUrl;
+      link.download = `qr_visitante_${visitorId}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      form.setValue("photo", file);
+      setImagePreview(URL.createObjectURL(file));
+    } else {
+      form.setValue("photo", undefined);
+      setImagePreview(null);
     }
   };
 
@@ -207,12 +267,48 @@ export default function PreRegisterVisitorPage() {
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="photo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Foto del Visitante (Opcional)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoChange}
+                  />
+                </FormControl>
+                <FormMessage />
+                {imagePreview && (
+                  <div className="mt-2">
+                    <img
+                      src={imagePreview}
+                      alt="Vista previa de la foto"
+                      className="w-32 h-32 object-cover rounded-md"
+                    />
+                  </div>
+                )}
+              </FormItem>
+            )}
+          />
           <Button type="submit" className="w-full" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Pre-registrar Visitante
           </Button>
         </form>
       </Form>
+
+      {qrCodeDataUrl && (
+        <div className="mt-8 text-center">
+          <h2 className="text-2xl font-bold mb-4">Código QR para el Visitante</h2>
+          <img src={qrCodeDataUrl} alt="Código QR del visitante" className="mx-auto border p-2" />
+          <Button onClick={handleDownloadQrCode} className="mt-4">
+            <Download className="mr-2 h-4 w-4" /> Descargar QR
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

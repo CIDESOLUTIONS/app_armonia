@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
@@ -51,6 +53,7 @@ import {
   Scan,
   Package,
   Truck,
+  Loader2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -60,7 +63,13 @@ import {
   scanQrCode,
   registerPackage,
   deliverPackage,
+  createPreRegisteredVisitor,
+  uploadVisitorImage,
 } from "@/services/visitorService";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { visitorSchema, VisitorFormValues } from "@/validators/visitor-schema";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 interface Visitor {
   id: string;
@@ -94,8 +103,8 @@ interface PreRegisteredVisitor {
 }
 
 export default function ReceptionVisitorsPage() {
-  const { isLoggedIn, schemaName, _token } = useAuthStore();
-  const _router = useRouter();
+  const { user, loading: authLoading } = useAuthStore();
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [preRegisteredVisitors, setPreRegisteredVisitors] = useState<
@@ -107,16 +116,6 @@ export default function ReceptionVisitorsPage() {
   >("active");
   const [searchTerm, setSearchTerm] = useState("");
   const [isRegisterDialogOpen, setIsRegisterDialogOpen] = useState(false);
-  const [newVisitorForm, setNewVisitorForm] = useState({
-    name: "",
-    documentType: "cc",
-    documentNumber: "",
-    destination: "",
-    residentName: "",
-    plate: "",
-    photo: null as File | null,
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [qrCodeInput, setQrCodeInput] = useState("");
   const [qrScanResult, setQrScanResult] = useState<any>(null);
@@ -132,6 +131,27 @@ export default function ReceptionVisitorsPage() {
     useState(false);
   const [deliverPackageTrackingNumber, setDeliverPackageTrackingNumber] =
     useState("");
+
+  const newVisitorForm = useForm<VisitorFormValues>({
+    resolver: zodResolver(visitorSchema),
+    defaultValues: {
+      name: "",
+      documentType: "cc",
+      documentNumber: "",
+      unitId: 0, // This will be set dynamically or selected
+      entryTime: new Date().toISOString().slice(0, 16),
+      exitTime: "",
+      purpose: "",
+      photoUrl: "",
+    },
+  });
+
+  const {
+    handleSubmit: handleNewVisitorSubmit,
+    control: newVisitorFormControl,
+    reset: resetNewVisitorForm,
+    formState: { isSubmitting: isNewVisitorSubmitting },
+  } = newVisitorForm;
 
   // Datos de ejemplo para desarrollo y pruebas
   const mockVisitors: Visitor[] = useMemo(
@@ -178,9 +198,9 @@ export default function ReceptionVisitorsPage() {
       setError(null);
 
       // En un entorno real, esto sería una llamada a la API
-      // const response = await fetch('/api/visitors');
+      // const response = await fetch("/api/visitors");
       // const result = await response.json();
-      // if (!response.ok) throw new Error(result.message || 'Error al cargar datos');
+      // if (!response.ok) throw new Error(result.message || "Error al cargar datos");
       // setVisitors(result.visitors);
 
       // Simulamos un retraso en la carga de datos
@@ -199,13 +219,10 @@ export default function ReceptionVisitorsPage() {
   }, [mockVisitors, setError, setVisitors, setPreRegisteredVisitors]);
 
   useEffect(() => {
-    if (!isLoggedIn || !_token || !schemaName) {
-      _router.push("/login");
-      return;
+    if (!authLoading && user) {
+      fetchData();
     }
-
-    fetchData();
-  }, [isLoggedIn, _token, schemaName, _router, fetchData]);
+  }, [authLoading, user, fetchData]);
 
   // Función para formatear fechas
   const formatDate = (dateString: string | undefined) => {
@@ -263,97 +280,51 @@ export default function ReceptionVisitorsPage() {
     return filtered;
   };
 
-  // Función para manejar cambios en el formulario de registro
-  const handleNewVisitorFormChange = (field: string, value: unknown) => {
-    setNewVisitorForm((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  // Función para manejar la captura de foto (simulada)
-  const handleTakePhoto = () => {
-    // En un entorno real, esto activaría la cámara
-    alert("Funcionalidad de cámara no implementada en esta demo");
-  };
-
-  // Función para manejar la subida de foto
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      handleNewVisitorFormChange("photo", e.target.files[0]);
-    }
-  };
-
   // Función para registrar un nuevo visitante
-  const handleSubmitNewVisitor = async () => {
-    if (
-      !newVisitorForm.name ||
-      !newVisitorForm.documentNumber ||
-      !newVisitorForm.destination
-    ) {
-      alert("Por favor complete todos los campos obligatorios");
+  const handleNewVisitorFormSubmit = async (values: VisitorFormValues) => {
+    if (!user?.complexId) {
+      setError("Información del complejo incompleta.");
       return;
     }
 
-    setIsSubmitting(true);
+    let photoUrl: string | undefined;
+    if (values.photoUrl instanceof File) {
+      try {
+        const uploadedImage = await uploadVisitorImage(values.photoUrl);
+        photoUrl = uploadedImage.url;
+      } catch (uploadError) {
+        console.error("Error uploading visitor image:", uploadError);
+        setError("Error al subir la foto del visitante.");
+        return;
+      }
+    }
 
     try {
-      // En un entorno real, esto sería una llamada a la API
-      // const formData = new FormData();
-      // formData.append('name', newVisitorForm.name);
-      // formData.append('documentType', newVisitorForm.documentType);
-      // formData.append('documentNumber', newVisitorForm.documentNumber);
-      // formData.append('destination', newVisitorForm.destination);
-      // if (newVisitorForm.residentName) formData.append('residentName', newVisitorForm.residentName);
-      // if (newVisitorForm.plate) formData.append('plate', newVisitorForm.plate);
-      // if (newVisitorForm.photo) formData.append('photo', newVisitorForm.photo);
-
-      // // Variable response eliminada por lint
-
-      // if (!response.ok) {
-      //   throw new Error('Error al registrar visitante');
-      // }
-
-      // Simulamos un retraso en el envío
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Simulamos una respuesta exitosa
+      // Aquí se debería llamar a la API real para registrar el visitante
+      // Por ahora, simulamos la creación y añadimos al estado local
       const newVisitor: Visitor = {
         id: `vis${Date.now()}`,
-        name: newVisitorForm.name,
-        documentType: newVisitorForm.documentType as Visitor["documentType"],
-        documentNumber: newVisitorForm.documentNumber,
-        destination: newVisitorForm.destination,
-        residentName: newVisitorForm.residentName,
-        entryTime: new Date().toISOString(),
-        plate: newVisitorForm.plate,
-        photoUrl: newVisitorForm.photo
-          ? URL.createObjectURL(newVisitorForm.photo)
-          : undefined,
+        name: values.name,
+        documentType: values.documentType as Visitor["documentType"],
+        documentNumber: values.documentNumber,
+        destination: `Unidad ${values.unitId}`, // Asumiendo que unitId se mapea a destino
+        entryTime: values.entryTime,
+        exitTime: null,
+        purpose: values.purpose,
+        photoUrl: photoUrl,
         status: "active",
       };
+
+      // En un entorno real, la API devolvería el objeto de visitante creado
+      // await createPreRegisteredVisitor({ ...values, photoUrl }); // Si se usa la misma API
 
       setVisitors((prev) => [newVisitor, ...prev]);
       setSuccessMessage("Visitante registrado exitosamente.");
       setIsRegisterDialogOpen(false);
-
-      // Resetear formulario
-      setNewVisitorForm({
-        name: "",
-        documentType: "cc",
-        documentNumber: "",
-        destination: "",
-        residentName: "",
-        plate: "",
-        photo: null,
-      });
-    } catch (err) {
+      resetNewVisitorForm();
+    } catch (err: any) {
       console.error("[ReceptionVisitors] Error:", err);
-      setError(
-        "Error al registrar el visitante. Por favor, inténtelo de nuevo.",
-      );
-    } finally {
-      setIsSubmitting(false);
+      setError("Error al registrar el visitante. Por favor, inténtelo de nuevo.");
     }
   };
 
@@ -369,11 +340,7 @@ export default function ReceptionVisitorsPage() {
 
     try {
       // En un entorno real, esto sería una llamada a la API
-      // // Variable response eliminada por lint
-
-      // if (!response.ok) {
-      //   throw new Error('Error al registrar salida');
-      // }
+      // await updateVisitorStatus(visitorId, "departed");
 
       // Simulamos un retraso
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -429,7 +396,7 @@ export default function ReceptionVisitorsPage() {
       );
       return;
     }
-    setIsSubmitting(true);
+    // setIsSubmitting(true);
     try {
       await registerPackage(newPackageForm);
       setSuccessMessage("Paquete registrado exitosamente.");
@@ -443,7 +410,7 @@ export default function ReceptionVisitorsPage() {
     } catch (err: any) {
       setError(err.message || "Error al registrar el paquete.");
     } finally {
-      setIsSubmitting(false);
+      // setIsSubmitting(false);
     }
   };
 
@@ -452,7 +419,7 @@ export default function ReceptionVisitorsPage() {
       setError("El número de seguimiento es requerido para la entrega.");
       return;
     }
-    setIsSubmitting(true);
+    // setIsSubmitting(true);
     try {
       await deliverPackage(deliverPackageTrackingNumber);
       setSuccessMessage("Paquete entregado exitosamente.");
@@ -461,12 +428,11 @@ export default function ReceptionVisitorsPage() {
     } catch (err: any) {
       setError(err.message || "Error al entregar el paquete.");
     } finally {
-      setIsSubmitting(false);
+      // setIsSubmitting(false);
     }
   };
 
-  // Renderizado de estado de carga
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="container mx-auto p-6">
         <div className="flex items-center justify-between mb-6">
@@ -487,20 +453,9 @@ export default function ReceptionVisitorsPage() {
     );
   }
 
-  // Renderizado de estado de error
-  if (error) {
-    return (
-      <div className="container mx-auto p-6">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-        <Button className="mt-4" onClick={() => window.location.reload()}>
-          Reintentar
-        </Button>
-      </div>
-    );
+  if (!user) {
+    router.push("/login");
+    return null;
   }
 
   const filteredVisitors = getFilteredVisitors();
@@ -673,6 +628,413 @@ export default function ReceptionVisitorsPage() {
                     placeholder="Nombre del remitente"
                     value={newPackageForm.sender}
                     onChange={(e) =>
+                      setNewPackageForm({
+                        ...newPackageForm,
+                        sender: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Descripción (Opcional)</Label>
+                  <Input
+                    id="description"
+                    placeholder="Contenido del paquete"
+                    value={newPackageForm.description}
+                    onChange={(e) =>
+                      setNewPackageForm({
+                        ...newPackageForm,
+                        description: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <Button
+                  onClick={handleSubmitNewPackage}
+                  disabled={isNewVisitorSubmitting}
+                >
+                  {isNewVisitorSubmitting && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Registrar Paquete
+                </Button>
+              </div>
+            </Card>
+
+            {/* Entregar Paquete */}
+            <Card className="border-dashed border-2 p-4">
+              <CardTitle className="text-lg mb-4 flex items-center">
+                <Truck className="mr-2 h-5 w-5" /> Entregar Paquete
+              </CardTitle>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="deliverTrackingNumber">
+                    Número de Seguimiento
+                  </Label>
+                  <Input
+                    id="deliverTrackingNumber"
+                    placeholder="Número de seguimiento del paquete a entregar"
+                    value={deliverPackageTrackingNumber}
+                    onChange={(e) =>
+                      setDeliverPackageTrackingNumber(e.target.value)
+                    }
+                  />
+                </div>
+                <Button onClick={handleDeliverPackage} disabled={isNewVisitorSubmitting}>
+                  {isNewVisitorSubmitting && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Marcar como Entregado
+                </Button>
+              </div>
+            </Card>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Filtros y búsqueda */}
+      <Card className="mb-6">
+        <CardContent className="p-4 flex flex-col md:flex-row gap-4">
+          <div className="relative flex-grow">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Buscar por nombre, documento, destino, residente o placa..."
+              className="pl-10"
+              value={searchTerm}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setSearchTerm(e.target.value)
+              }
+            />
+          </div>
+          <Select
+            value={statusFilter}
+            onValueChange={(value) =>
+              setStatusFilter(value as Visitor["status"] | "all")
+            }
+          >
+            <SelectTrigger className="w-full md:w-48">
+              <SelectValue placeholder="Filtrar por estado" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="active">Activos</SelectItem>
+              <SelectItem value="departed">Salió</SelectItem>
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
+
+      {/* Tabla de visitantes */}
+      <Card>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Foto</TableHead>
+                <TableHead>Nombre</TableHead>
+                <TableHead>Documento</TableHead>
+                <TableHead>Destino</TableHead>
+                <TableHead>Residente</TableHead>
+                <TableHead>Placa</TableHead>
+                <TableHead>Hora Entrada</TableHead>
+                <TableHead>Hora Salida</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead className="text-right">Acciones</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredVisitors.length > 0 ? (
+                filteredVisitors.map((visitor) => (
+                  <TableRow key={visitor.id}>
+                    <TableCell>
+                      {visitor.photoUrl ? (
+                        <Image
+                          src={visitor.photoUrl}
+                          alt={visitor.name}
+                          width={40}
+                          height={40}
+                          className="rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                          <User className="h-5 w-5 text-gray-500" />
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {visitor.name}
+                    </TableCell>
+                    <TableCell>
+                      <span className="block text-sm">
+                        {getDocumentTypeText(visitor.documentType)}
+                      </span>
+                      <span className="block text-xs text-gray-500">
+                        {visitor.documentNumber}
+                      </span>
+                    </TableCell>
+                    <TableCell>{visitor.destination}</TableCell>
+                    <TableCell>{visitor.residentName || "N/A"}</TableCell>
+                    <TableCell>{visitor.plate || "N/A"}</TableCell>
+                    <TableCell>{formatDate(visitor.entryTime)}</TableCell>
+                    <TableCell>{formatDate(visitor.exitTime)}</TableCell>
+                    <TableCell>
+                      <Badge
+                        className={
+                          visitor.status === "active"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-gray-100 text-gray-800"
+                        }
+                      >
+                        {visitor.status === "active" ? "Activo" : "Salió"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {visitor.status === "active" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleRegisterExit(visitor.id)}
+                        >
+                          <LogOut className="mr-1 h-4 w-4" />
+                          Registrar Salida
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={10}
+                    className="text-center py-12 text-gray-500"
+                  >
+                    <IdCard className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                    <h3 className="text-lg font-medium mb-2">
+                      No se encontraron visitantes
+                    </h3>
+                    <p>
+                      No hay visitantes que coincidan con los filtros
+                      seleccionados
+                    </p>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Diálogo para registrar nuevo visitante */}
+      <Dialog
+        open={isRegisterDialogOpen}
+        onOpenChange={setIsRegisterDialogOpen}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Registrar Nuevo Visitante</DialogTitle>
+            <DialogDescription>
+              Complete la información del visitante para registrar su ingreso
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...newVisitorForm}>
+            <form onSubmit={handleNewVisitorSubmit(handleNewVisitorFormSubmit)} className="space-y-4 py-4">
+              <FormField
+                control={newVisitorFormControl}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre Completo</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nombre completo del visitante" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={newVisitorFormControl}
+                  name="documentType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tipo de Documento</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccione tipo" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="cc">Cédula de Ciudadanía</SelectItem>
+                          <SelectItem value="ce">Cédula de Extranjería</SelectItem>
+                          <SelectItem value="passport">Pasaporte</SelectItem>
+                          <SelectItem value="other">Otro</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={newVisitorFormControl}
+                  name="documentNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Número de Documento</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Número de identificación" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <FormField
+                control={newVisitorFormControl}
+                name="unitId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Unidad Destino</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="Ej: 101"
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={newVisitorFormControl}
+                name="entryTime"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Hora de Entrada</FormLabel>
+                    <FormControl>
+                      <Input type="datetime-local" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={newVisitorFormControl}
+                name="purpose"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Propósito de la Visita (Opcional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ej: Visita familiar" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={newVisitorFormControl}
+                name="photoUrl"
+                render={({ field: { value, onChange, ...fieldProps } }) => (
+                  <FormItem>
+                    <FormLabel>Foto del Visitante (Opcional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...fieldProps}
+                        type="file"
+                        accept="image/*"
+                        onChange={(event) => {
+                          onChange(event.target.files && event.target.files[0]);
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                    {value instanceof File && (
+                      <div className="mt-2">
+                        <img
+                          src={URL.createObjectURL(value)}
+                          alt="Vista previa de la foto"
+                          className="w-32 h-32 object-cover rounded-md"
+                        />
+                      </div>
+                    )}
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsRegisterDialogOpen(false)}
+                  type="button"
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit" disabled={isNewVisitorSubmitting}>
+                  {isNewVisitorSubmitting ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : null}{" "}
+                  Registrar Ingreso
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Diálogo para registrar nuevo paquete */}
+      <Dialog
+        open={isPackageRegisterDialogOpen}
+        onOpenChange={setIsPackageRegisterDialogOpen}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Registrar Nuevo Paquete</DialogTitle>
+            <DialogDescription>
+              Complete la información del paquete para registrar su ingreso.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="packageTrackingNumber">
+                Número de Seguimiento
+              </Label>
+              <Input
+                id="packageTrackingNumber"
+                placeholder="Ej: ABC123XYZ"
+                value={newPackageForm.trackingNumber}
+                onChange={(e) =>
+                  setNewPackageForm({
+                    ...newPackageForm,
+                    trackingNumber: e.target.value,
+                  })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="packageRecipientUnit">Unidad Destinataria</Label>
+              <Input
+                id="packageRecipientUnit"
+                placeholder="Ej: Apto 101"
+                value={newPackageForm.recipientUnit}
+                onChange={(e) =>
+                  setNewPackageForm({
+                    ...newPackageForm,
+                    recipientUnit: e.target.value,
+                  })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="packageSender">Remitente (Opcional)</Label>
+              <Input
+                id="packageSender"
+                placeholder="Nombre del remitente"
+                value={newPackageForm.sender}
+                onChange={(e) =>
                   setNewPackageForm({
                     ...newPackageForm,
                     sender: e.target.value,
@@ -681,9 +1043,9 @@ export default function ReceptionVisitorsPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Descripción (Opcional)</Label>
+              <Label htmlFor="packageDescription">Descripción (Opcional)</Label>
               <Input
-                id="description"
+                id="packageDescription"
                 placeholder="Contenido del paquete"
                 value={newPackageForm.description}
                 onChange={(e) =>
@@ -696,468 +1058,52 @@ export default function ReceptionVisitorsPage() {
             </div>
             <Button
               onClick={handleSubmitNewPackage}
-              disabled={isSubmitting}
+              disabled={isNewVisitorSubmitting}
             >
-              {isSubmitting && (
+              {isNewVisitorSubmitting && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
               Registrar Paquete
             </Button>
           </div>
-        </Card>
+        </DialogContent>
+      </Dialog>
 
-        {/* Entregar Paquete */}
-        <Card className="border-dashed border-2 p-4">
-          <CardTitle className="text-lg mb-4 flex items-center">
-            <Truck className="mr-2 h-5 w-5" /> Entregar Paquete
-          </CardTitle>
-          <div className="space-y-4">
+      {/* Diálogo para entregar paquete */}
+      <Dialog
+        open={isPackageDeliverDialogOpen}
+        onOpenChange={setIsPackageDeliverDialogOpen}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Entregar Paquete</DialogTitle>
+            <DialogDescription>
+              Introduce el número de seguimiento del paquete a entregar.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="deliverTrackingNumber">
                 Número de Seguimiento
               </Label>
               <Input
                 id="deliverTrackingNumber"
-                placeholder="Número de seguimiento del paquete a entregar"
+                placeholder="Número de seguimiento"
                 value={deliverPackageTrackingNumber}
                 onChange={(e) =>
                   setDeliverPackageTrackingNumber(e.target.value)
                 }
               />
             </div>
-            <Button onClick={handleDeliverPackage} disabled={isSubmitting}>
-              {isSubmitting && (
+            <Button onClick={handleDeliverPackage} disabled={isNewVisitorSubmitting}>
+              {isNewVisitorSubmitting && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
               Marcar como Entregado
             </Button>
           </div>
-        </Card>
-      </div>
-    </CardContent>
-  </Card>
-
-  {/* Filtros y búsqueda */}
-  <Card className="mb-6">
-    <CardContent className="p-4 flex flex-col md:flex-row gap-4">
-      <div className="relative flex-grow">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-        <Input
-          placeholder="Buscar por nombre, documento, destino, residente o placa..."
-          className="pl-10"
-          value={searchTerm}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setSearchTerm(e.target.value)
-          }
-        />
-      </div>
-      <Select
-        value={statusFilter}
-        onValueChange={(value) =>
-          setStatusFilter(value as Visitor["status"] | "all")
-        }
-      >
-        <SelectTrigger className="w-full md:w-48">
-          <SelectValue placeholder="Filtrar por estado" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">Todos</SelectItem>
-          <SelectItem value="active">Activos</SelectItem>
-          <SelectItem value="departed">Salieron</SelectItem>
-        </SelectContent>
-      </Select>
-    </CardContent>
-  </Card>
-
-  {/* Tabla de visitantes */}
-  <Card>
-    <CardContent className="p-0">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Foto</TableHead>
-            <TableHead>Nombre</TableHead>
-            <TableHead>Documento</TableHead>
-            <TableHead>Destino</TableHead>
-            <TableHead>Residente</TableHead>
-            <TableHead>Placa</TableHead>
-            <TableHead>Hora Entrada</TableHead>
-            <TableHead>Hora Salida</TableHead>
-            <TableHead>Estado</TableHead>
-            <TableHead className="text-right">Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredVisitors.length > 0 ? (
-            filteredVisitors.map((visitor) => (
-              <TableRow key={visitor.id}>
-                <TableCell>
-                  {visitor.photoUrl ? (
-                    <Image
-                      src={visitor.photoUrl}
-                      alt={visitor.name}
-                      width={40}
-                      height={40}
-                      className="rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                      <User className="h-5 w-5 text-gray-500" />
-                    </div>
-                  )}
-                </TableCell>
-                <TableCell className="font-medium">
-                  {visitor.name}
-                </TableCell>
-                <TableCell>
-                  <span className="block text-sm">
-                    {getDocumentTypeText(visitor.documentType)}
-                  </span>
-                  <span className="block text-xs text-gray-500">
-                    {visitor.documentNumber}
-                  </span>
-                </TableCell>
-                <TableCell>{visitor.destination}</TableCell>
-                <TableCell>{visitor.residentName || "N/A"}</TableCell>
-                <TableCell>{visitor.plate || "N/A"}</TableCell>
-                <TableCell>{formatDate(visitor.entryTime)}</TableCell>
-                <TableCell>{formatDate(visitor.exitTime)}</TableCell>
-                <TableCell>
-                  <Badge
-                    className={
-                      visitor.status === "active"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-gray-100 text-gray-800"
-                    }
-                  >
-                    {visitor.status === "active" ? "Activo" : "Salió"}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  {visitor.status === "active" && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleRegisterExit(visitor.id)}
-                    >
-                      <LogOut className="mr-1 h-4 w-4" />
-                      Registrar Salida
-                    </Button>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell
-                colSpan={10}
-                className="text-center py-12 text-gray-500"
-              >
-                <IdCard className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                <h3 className="text-lg font-medium mb-2">
-                  No se encontraron visitantes
-                </h3>
-                <p>
-                  No hay visitantes que coincidan con los filtros
-                  seleccionados
-                </p>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </CardContent>
-  </Card>
-
-  {/* Diálogo para registrar nuevo visitante */}
-  <Dialog
-    open={isRegisterDialogOpen}
-    onOpenChange={setIsRegisterDialogOpen}
-  >
-    <DialogContent className="sm:max-w-lg">
-      <DialogHeader>
-        <DialogTitle>Registrar Nuevo Visitante</DialogTitle>
-        <DialogDescription>
-          Complete la información del visitante para registrar su ingreso
-        </DialogDescription>
-      </DialogHeader>
-
-      <div className="space-y-4 py-4">
-        <div className="space-y-2">
-          <Label htmlFor="name">Nombre Completo</Label>
-          <Input
-            id="name"
-            placeholder="Nombre completo del visitante"
-            value={newVisitorForm.name}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              handleNewVisitorFormChange("name", e.target.value)
-            }
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="documentType">Tipo de Documento</Label>
-            <Select
-              value={newVisitorForm.documentType}
-              onValueChange={(value) =>
-                handleNewVisitorFormChange("documentType", value)
-              }
-            >
-              <SelectTrigger id="documentType">
-                <SelectValue placeholder="Seleccione tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="cc">Cédula de Ciudadanía</SelectItem>
-                <SelectItem value="ce">Cédula de Extranjería</SelectItem>
-                <SelectItem value="passport">Pasaporte</SelectItem>
-                <SelectItem value="other">Otro</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="documentNumber">Número de Documento</Label>
-            <Input
-              id="documentNumber"
-              placeholder="Número de identificación"
-              value={newVisitorForm.documentNumber}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleNewVisitorFormChange("documentNumber", e.target.value)
-              }
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="destination">Destino</Label>
-            <Input
-              id="destination"
-              placeholder="Ej: Apto 101, Oficina 203"
-              value={newVisitorForm.destination}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleNewVisitorFormChange("destination", e.target.value)
-              }
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="residentName">
-              Residente que autoriza (Opcional)
-            </Label>
-            <Input
-              id="residentName"
-              placeholder="Nombre del residente"
-              value={newVisitorForm.residentName}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleNewVisitorFormChange("residentName", e.target.value)
-              }
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="plate">Placa del Vehículo (Opcional)</Label>
-          <Input
-            id="plate"
-            placeholder="Placa del vehículo si aplica"
-            value={newVisitorForm.plate}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              handleNewVisitorFormChange("plate", e.target.value)
-            }
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label>Foto del Visitante (Opcional)</Label>
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" onClick={handleTakePhoto}>
-              <Camera className="mr-2 h-4 w-4" />
-              Tomar Foto
-            </Button>
-            <div className="text-sm text-gray-500">o</div>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              id="photo-upload"
-              onChange={handlePhotoUpload}
-            />
-            <label htmlFor="photo-upload">
-              <Button
-                variant="outline"
-                type="button"
-                className="cursor-pointer"
-              >
-                Subir Foto
-              </Button>
-            </label>
-          </div>
-          {newVisitorForm.photo && (
-            <div className="mt-2 flex items-center bg-gray-50 p-2 rounded-md">
-              <Image
-                src={URL.createObjectURL(newVisitorForm.photo)}
-                alt="Preview"
-                width={40}
-                height={40}
-                className="h-10 w-10 rounded-md object-cover mr-3"
-              />
-              <span className="text-sm truncate flex-grow">
-                {newVisitorForm.photo.name}
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 text-gray-500"
-                onClick={() => handleNewVisitorFormChange("photo", null)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <DialogFooter>
-        <Button
-          variant="outline"
-          onClick={() => setIsRegisterDialogOpen(false)}
-        >
-          Cancelar
-        </Button>
-        <Button
-          onClick={handleSubmitNewVisitor}
-          disabled={
-            isSubmitting ||
-            !newVisitorForm.name ||
-            !newVisitorForm.documentNumber ||
-            !newVisitorForm.destination
-          }
-        >
-          {isSubmitting ? "Registrando..." : "Registrar Ingreso"}
-        </Button>
-      </DialogFooter>
-    </DialogContent>
-  </Dialog>
-
-  {/* Diálogo para registrar nuevo paquete */}
-  <Dialog
-    open={isPackageRegisterDialogOpen}
-    onOpenChange={setIsPackageRegisterDialogOpen}
-  >
-    <DialogContent className="sm:max-w-lg">
-      <DialogHeader>
-        <DialogTitle>Registrar Nuevo Paquete</DialogTitle>
-        <DialogDescription>
-          Complete la información del paquete para registrar su ingreso.
-        </DialogDescription>
-      </DialogHeader>
-      <div className="space-y-4 py-4">
-        <div className="space-y-2">
-          <Label htmlFor="packageTrackingNumber">
-            Número de Seguimiento
-          </Label>
-          <Input
-            id="packageTrackingNumber"
-            placeholder="Ej: ABC123XYZ"
-            value={newPackageForm.trackingNumber}
-            onChange={(e) =>
-              setNewPackageForm({
-                ...newPackageForm,
-                trackingNumber: e.target.value,
-              })
-            }
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="packageRecipientUnit">Unidad Destinataria</Label>
-          <Input
-            id="packageRecipientUnit"
-            placeholder="Ej: Apto 101"
-            value={newPackageForm.recipientUnit}
-            onChange={(e) =>
-              setNewPackageForm({
-                ...newPackageForm,
-                recipientUnit: e.target.value,
-              })
-            }
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="packageSender">Remitente (Opcional)</Label>
-          <Input
-            id="packageSender"
-            placeholder="Nombre del remitente"
-            value={newPackageForm.sender}
-            onChange={(e) =>
-              setNewPackageForm({
-                ...newPackageForm,
-                sender: e.target.value,
-              })
-            }
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="packageDescription">Descripción (Opcional)</Label>
-          <Input
-            id="packageDescription"
-            placeholder="Contenido del paquete"
-            value={newPackageForm.description}
-            onChange={(e) =>
-              setNewPackageForm({
-                ...newPackageForm,
-                description: e.target.value,
-              })
-            }
-          />
-        </div>
-        <Button
-          onClick={handleSubmitNewPackage}
-          disabled={isSubmitting}
-        >
-          {isSubmitting && (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          )}
-          Registrar Paquete
-        </Button>
-      </div>
-    </DialogContent>
-  </Dialog>
-
-  {/* Diálogo para entregar paquete */}
-  <Dialog
-    open={isPackageDeliverDialogOpen}
-    onOpenChange={setIsPackageDeliverDialogOpen}
-  >
-    <DialogContent className="sm:max-w-lg">
-      <DialogHeader>
-        <DialogTitle>Entregar Paquete</DialogTitle>
-        <DialogDescription>
-          Introduce el número de seguimiento del paquete a entregar.
-        </DialogDescription>
-      </DialogHeader>
-      <div className="space-y-4 py-4">
-        <div className="space-y-2">
-          <Label htmlFor="deliverTrackingNumber">
-            Número de Seguimiento
-          </Label>
-          <Input
-            id="deliverTrackingNumber"
-            placeholder="Número de seguimiento"
-            value={deliverPackageTrackingNumber}
-            onChange={(e) =>
-              setDeliverPackageTrackingNumber(e.target.value)
-            }
-          />
-        </div>
-        <Button onClick={handleDeliverPackage} disabled={isSubmitting}>
-          {isSubmitting && (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          )}
-          Marcar como Entregado
-        </Button>
-      </div>
-    </DialogContent>
-  </Dialog>
-</div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

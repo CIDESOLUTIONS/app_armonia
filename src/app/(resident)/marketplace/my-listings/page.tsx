@@ -1,35 +1,49 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
 import { useAuthStore } from "@/store/authStore";
-import { useToast } from "@/components/ui/use-toast";
+import { Loader2, Edit, Trash2, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Loader2, MessageSquare, Edit, Trash2 } from "lucide-react";
-import { getListings, deleteListing } from "@/services/marketplaceService";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import Link from "next/link";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  getListings,
+  updateListing,
+  deleteListing,
+  Listing,
+} from "@/services/marketplaceService";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function MyListingsPage() {
-  const { user } = useAuthStore();
+  const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
-  const [listings, setListings] = useState<any[]>([]);
+  const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [listingToDelete, setListingToDelete] = useState<number | null>(null);
 
   const fetchMyListings = useCallback(async () => {
-    if (!user?.id) return;
-
     setLoading(true);
     try {
-      // Assuming getListings can filter by authorId or we need a new service function
-      const userListings = await getListings({ authorId: user.id });
-      setListings(userListings);
+      if (!user?.id) return; // Ensure user ID is available
+      const data = await getListings({ authorId: user.id });
+      setListings(data);
     } catch (error) {
       console.error("Error fetching my listings:", error);
       toast({
@@ -40,110 +54,185 @@ export default function MyListingsPage() {
     } finally {
       setLoading(false);
     }
-  }, [user, toast]);
+  }, [toast, user?.id]);
 
   useEffect(() => {
-    if (user) {
+    if (!authLoading && user) {
       fetchMyListings();
     }
-  }, [user, fetchMyListings]);
+  }, [authLoading, user, fetchMyListings]);
 
-  const handleDeleteListing = async (listingId: number) => {
-    if (!confirm("¿Estás seguro de que quieres eliminar este anuncio?")) {
+  const handleMarkAsSold = async (id: number) => {
+    if (!confirm("¿Estás seguro de que quieres marcar este anuncio como vendido?"))
       return;
-    }
     try {
-      await deleteListing(listingId);
+      await updateListing(id, { status: "SOLD" }); // Assuming a 'status' field and 'SOLD' value
       toast({
         title: "Éxito",
-        description: "Anuncio eliminado correctamente.",
+        description: "Anuncio marcado como vendido correctamente.",
       });
-      fetchMyListings(); // Refresh the list
+      fetchMyListings();
     } catch (error) {
-      console.error("Error deleting listing:", error);
+      console.error("Error marking listing as sold:", error);
       toast({
         title: "Error",
-        description: "No se pudo eliminar el anuncio.",
+        description: "No se pudo marcar el anuncio como vendido.",
         variant: "destructive",
       });
     }
   };
 
-  if (loading) {
+  const handleDeleteListing = (id: number) => {
+    setListingToDelete(id);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteListing = async () => {
+    if (listingToDelete === null) return;
+    try {
+      await deleteListing(listingToDelete);
+      toast({
+        title: "Éxito",
+        description: "Anuncio eliminado correctamente.",
+      });
+      fetchMyListings();
+    } catch (error) {
+      console.error("Error deleting listing:", error);
+      toast({
+        title: "Error",
+        description: "Error al eliminar el anuncio.",
+        variant: "destructive",
+      });
+    } finally {
+      setShowDeleteDialog(false);
+      setListingToDelete(null);
+    }
+  };
+
+  if (authLoading || loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }
 
   if (!user) {
-    return (
-      <div className="container mx-auto p-6 text-center">
-        <h1 className="text-2xl font-bold">Acceso Denegado</h1>
-        <p>Debes iniciar sesión para ver tus anuncios.</p>
-      </div>
-    );
+    return null; // Redirect handled by AuthLayout
   }
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">
-        Mis Anuncios en el Marketplace
-      </h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">
+          Mis Anuncios Publicados
+        </h1>
+        <Link href="/resident/marketplace/create">
+          <Button>
+            <PlusCircle className="mr-2 h-4 w-4" /> Publicar Nuevo Anuncio
+          </Button>
+        </Link>
+      </div>
 
-      {listings.length === 0 ? (
-        <p className="text-center text-gray-500">
-          No tienes anuncios publicados.
-        </p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {listings.map((listing) => (
-            <Card key={listing.id}>
-              <CardHeader>
-                <CardTitle>{listing.title}</CardTitle>
-                <CardDescription>{listing.category}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-lg font-semibold mb-2">${listing.price}</p>
-                <p className="text-sm text-gray-600 line-clamp-3">
-                  {listing.description}
-                </p>
-                {listing.images && listing.images.length > 0 && (
-                  <div className="mt-4">
-                    <img
-                      src={listing.images[0]}
-                      alt={listing.title}
-                      className="w-full h-32 object-cover rounded-md"
-                    />
-                  </div>
-                )}
-              </CardContent>
-              <CardFooter className="flex justify-between items-center">
-                <Link href={`/resident/marketplace/chat/${listing.id}`}>
-                  <Button variant="outline" size="sm">
-                    <MessageSquare className="mr-2 h-4 w-4" /> Chat
-                  </Button>
-                </Link>
-                <div className="flex space-x-2">
-                  <Link href={`/resident/marketplace/edit/${listing.id}`}>
-                    <Button variant="outline" size="sm">
-                      <Edit className="h-4 w-4" />
+      <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Título</TableHead>
+              <TableHead>Categoría</TableHead>
+              <TableHead>Precio</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead>Fecha Publicación</TableHead>
+              <TableHead className="text-right">Acciones</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {listings.length > 0 ? (
+              listings.map((listing) => (
+                <TableRow key={listing.id}>
+                  <TableCell>{listing.title}</TableCell>
+                  <TableCell>{listing.category}</TableCell>
+                  <TableCell>${listing.price.toFixed(2)}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        listing.status === "ACTIVE"
+                          ? "default"
+                          : listing.status === "SOLD"
+                            ? "secondary"
+                            : "destructive"
+                      }
+                    >
+                      {listing.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {new Date(listing.createdAt).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Link href={`/resident/marketplace/${listing.id}`}>
+                      <Button variant="ghost" size="sm" className="mr-2">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                    {listing.status === "ACTIVE" && (
+                      <Link href={`/resident/marketplace/edit/${listing.id}`}>
+                        <Button variant="ghost" size="sm" className="mr-2">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </Link>
+                    )}
+                    {listing.status === "ACTIVE" && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleMarkAsSold(listing.id)}
+                        className="mr-2"
+                      >
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteListing(listing.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
                     </Button>
-                  </Link>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDeleteListing(listing.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      )}
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-5">
+                  No has publicado ningún anuncio.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Eliminación</DialogTitle>
+            <DialogDescription>
+              ¿Estás seguro de que quieres eliminar este anuncio? Esta acción
+              no se puede deshacer.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+            >
+              Cancelar
+            </Button>
+            <Button onClick={confirmDeleteListing}>Eliminar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,39 +1,57 @@
-export async function createPreRegisteredVisitor(data: any) {
+import { fetchApi } from "@/lib/api";
+
+export interface PreRegisteredVisitor {
+  id: number;
+  name: string;
+  documentType: string;
+  documentNumber: string;
+  expectedDate: string;
+  validFrom: string;
+  validUntil: string;
+  purpose?: string;
+  residentId: number;
+  unitId: number;
+  complexId: string;
+  qrCodeUrl?: string; // URL del QR generado
+  photoUrl?: string; // URL de la foto del visitante
+}
+
+export interface CreatePreRegisteredVisitorDto {
+  name: string;
+  documentType: string;
+  documentNumber: string;
+  expectedDate: string;
+  validFrom: string;
+  validUntil: string;
+  purpose?: string;
+  residentId: number;
+  unitId: number;
+  complexId: string;
+  photoUrl?: string; // URL de la foto del visitante
+}
+
+export async function createPreRegisteredVisitor(
+  data: CreatePreRegisteredVisitorDto,
+): Promise<PreRegisteredVisitor> {
   try {
-    const response = await fetch("/api/visitors/pre-register", {
+    const response = await fetchApi("/visitors/pre-register", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify(data),
     });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.message || "Error al pre-registrar el visitante.",
-      );
-    }
-
-    const result = await response.json();
-    return result;
+    return response.data; // Assuming the API returns { data: PreRegisteredVisitor }
   } catch (error) {
     console.error("Error creating pre-registered visitor:", error);
-    throw new Error("No se pudo pre-registrar al visitante.");
+    throw error;
   }
 }
 
-export async function getPreRegisteredVisitors() {
+export async function getPreRegisteredVisitors(): Promise<PreRegisteredVisitor[]> {
   try {
-    const response = await fetch("/api/visitors/pre-registered");
-    if (!response.ok) {
-      throw new Error("Error al obtener visitantes pre-registrados.");
-    }
-    const data = await response.json();
-    return data;
+    const response = await fetchApi("/visitors/pre-registered");
+    return response.data; // Assuming the API returns { data: PreRegisteredVisitor[] }
   } catch (error) {
     console.error("Error fetching pre-registered visitors:", error);
-    throw new Error("No se pudieron obtener los visitantes pre-registrados.");
+    throw error;
   }
 }
 
@@ -41,60 +59,57 @@ export async function scanQrCode(qrCode: string): Promise<any> {
   try {
     // Placeholder for API call to validate QR code and get visitor info
     console.log("Scanning QR Code:", qrCode);
-    // Simulate API response
-    const response = await new Promise((resolve) =>
-      setTimeout(() => {
-        if (qrCode === "VALID_QR_CODE") {
-          resolve({
-            success: true,
-            visitor: {
-              id: "qr_vis_1",
-              name: "Visitante QR",
-              documentNumber: "12345",
-              destination: "Apto 101",
-              status: "active",
-            },
-          });
-        } else {
-          resolve({ success: false, message: "QR Code inválido." });
-        }
-      }, 1000),
-    );
-    return response;
+    const response = await fetchApi("/visitors/scan-qr", {
+      method: "POST",
+      body: JSON.stringify({ qrCode }),
+    });
+    return response.data;
   } catch (error) {
     console.error("Error scanning QR code:", error);
-    throw new Error("Error al escanear el código QR.");
+    throw error;
   }
 }
 
 export async function registerPackage(data: any): Promise<any> {
   try {
-    // Placeholder for API call to register a package
-    console.log("Registering package:", data);
-    const response = await new Promise((resolve) =>
-      setTimeout(() => {
-        resolve({ success: true, packageId: `pkg_${Date.now()}` });
-      }, 1000),
-    );
-    return response;
+    const response = await fetchApi("/packages/register", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    return response.data;
   } catch (error) {
     console.error("Error registering package:", error);
-    throw new Error("Error al registrar el paquete.");
+    throw error;
   }
 }
 
 export async function deliverPackage(packageId: string): Promise<any> {
   try {
-    // Placeholder for API call to mark package as delivered
-    console.log("Delivering package:", packageId);
-    const response = await new Promise((resolve) =>
-      setTimeout(() => {
-        resolve({ success: true, message: "Paquete entregado." });
-      }, 1000),
-    );
-    return response;
+    const response = await fetchApi(`/packages/${packageId}/deliver`, {
+      method: "POST",
+    });
+    return response.data;
   } catch (error) {
     console.error("Error delivering package:", error);
-    throw new Error("Error al entregar el paquete.");
+    throw error;
+  }
+}
+
+export async function uploadVisitorImage(file: File): Promise<{ url: string }> {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await fetchApi(
+      "/visitors/upload-image",
+      {
+        method: "POST",
+        body: formData,
+      },
+      true,
+    ); // The third parameter indicates that Content-Type should not be automatically added
+    return response.data; // Assuming the API returns { data: { url: string } }
+  } catch (error) {
+    console.error("Error uploading visitor image:", error);
+    throw error;
   }
 }

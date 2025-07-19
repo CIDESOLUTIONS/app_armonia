@@ -25,10 +25,16 @@ interface CreateMessageData {
   attachments?: any[];
 }
 
+interface CreateConversationData {
+  participantIds: number[];
+  type: "direct" | "group";
+  name?: string; // For group chats
+}
+
 export async function getConversations(): Promise<Conversation[]> {
   try {
     const response = await fetchApi("/communications/conversations");
-    return response;
+    return response.data; // Assuming the API returns { data: Conversation[] }
   } catch (error) {
     console.error("Error fetching conversations:", error);
     throw error;
@@ -42,7 +48,7 @@ export async function getConversationMessages(
     const response = await fetchApi(
       `/communications/conversations/${conversationId}/messages`,
     );
-    return response;
+    return response.data; // Assuming the API returns { data: Message[] }
   } catch (error) {
     console.error("Error fetching conversation messages:", error);
     throw error;
@@ -61,7 +67,7 @@ export async function sendMessage(
         body: JSON.stringify(data),
       },
     );
-    return response;
+    return response.data; // Assuming the API returns { data: Message }
   } catch (error) {
     console.error("Error sending message:", error);
     throw error;
@@ -81,6 +87,63 @@ export async function markMessageAsRead(
     );
   } catch (error) {
     console.error("Error marking message as read:", error);
+    throw error;
+  }
+}
+
+export async function createConversation(data: CreateConversationData): Promise<Conversation> {
+  try {
+    const response = await fetchApi("/communications/conversations", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    return response.data; // Assuming the API returns { data: Conversation }
+  } catch (error) {
+    console.error("Error creating conversation:", error);
+    throw error;
+  }
+}
+
+// Funciones movidas de messageService.ts
+interface MarketplaceMessageData {
+  listingId: number;
+  senderId: number;
+  receiverId: number;
+  content: string;
+}
+
+interface MarketplaceMessage {
+  id: number;
+  listingId: number;
+  senderId: number;
+  receiverId: number;
+  content: string;
+  createdAt: string;
+}
+
+export async function sendMarketplaceMessage(data: MarketplaceMessageData): Promise<void> {
+  try {
+    await fetchApi("/marketplace/messages", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  } catch (error) {
+    console.error("Error sending marketplace message:", error);
+    throw error;
+  }
+}
+
+export async function getMarketplaceMessages(
+  listingId: number,
+  userId: number,
+): Promise<MarketplaceMessage[]> {
+  try {
+    const response = await fetchApi(
+      `/marketplace/messages/${listingId}/${userId}`,
+    );
+    return response.data; // Assuming the API returns { data: MarketplaceMessage[] }
+  } catch (error) {
+    console.error("Error fetching marketplace messages:", error);
     throw error;
   }
 }

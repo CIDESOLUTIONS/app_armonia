@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams } => "next/navigation";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, MessageSquare } from "lucide-react";
+import { Loader2, MessageSquare, Paperclip, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +26,7 @@ interface PQR {
   createdAt: string;
   updatedAt: string;
   comments: PQRComment[];
+  attachments?: PQRAttachment[]; // Added attachments field
 }
 
 interface PQRComment {
@@ -35,6 +36,15 @@ interface PQRComment {
   authorName: string;
   comment: string;
   createdAt: string;
+}
+
+interface PQRAttachment {
+  id: number;
+  pqrId: number;
+  url: string;
+  fileName: string;
+  fileType: string;
+  uploadedAt: string;
 }
 
 export default function ViewResidentPQRPage() {
@@ -98,7 +108,7 @@ export default function ViewResidentPQRPage() {
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
-  }
+  };
 
   if (!user) {
     return null; // Redirect handled by AuthLayout
@@ -171,6 +181,35 @@ export default function ViewResidentPQRPage() {
           </p>
         </CardContent>
       </Card>
+
+      {pqr.attachments && pqr.attachments.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Paperclip className="mr-2 h-5 w-5" /> Adjuntos
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {pqr.attachments.map((attachment) => (
+                <div key={attachment.id} className="border rounded-md p-3 flex items-center justify-between">
+                  <div className="flex items-center">
+                    <FileText className="mr-2 h-5 w-5 text-gray-500" />
+                    <span className="text-sm font-medium truncate">
+                      {attachment.fileName}
+                    </span>
+                  </div>
+                  <a href={attachment.url} target="_blank" rel="noopener noreferrer" download>
+                    <Button variant="ghost" size="sm">
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  </a>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Comentarios */}
       <Card className="mb-6">

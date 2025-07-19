@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Providers } from "@/components/providers";
+import { RealTimeNotificationProvider } from "@/context/RealTimeNotificationContext"; // Importar el proveedor
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,7 +16,9 @@ export default async function RootLayout({
   return (
     <html lang="es">
       <body className="font-sans">
-        <Providers>{children}</Providers>
+        <RealTimeNotificationProvider> {/* Envolver con el proveedor */}
+          <Providers>{children}</Providers>
+        </RealTimeNotificationProvider>
       </body>
     </html>
   );

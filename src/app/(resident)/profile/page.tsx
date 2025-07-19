@@ -8,6 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { getProfileInfo, updateProfileInfo } from "@/services/profileService";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { userProfileSchema, UserProfileFormValues } from "@/validators/user-profile-schema";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 interface UserProfile {
   id: number;
@@ -22,14 +26,35 @@ export default function ProfilePage() {
   const { toast } = useToast();
   const [profileInfo, setProfileInfo] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState<Partial<UserProfile>>({});
+
+  const form = useForm<UserProfileFormValues>({
+    resolver: zodResolver(userProfileSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+    },
+  });
+
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { isSubmitting },
+  } = form;
 
   const fetchProfileInfo = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getProfileInfo();
       setProfileInfo(data);
-      setFormData(data);
+      reset({
+        name: data.name,
+        email: data.email,
+        phone: data.phone || "",
+        address: data.address || "",
+      });
     } catch (error) {
       console.error("Error fetching profile info:", error);
       toast({
@@ -40,7 +65,7 @@ export default function ProfilePage() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, reset]);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -48,23 +73,12 @@ export default function ProfilePage() {
     }
   }, [authLoading, user, fetchProfileInfo]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: UserProfileFormValues) => {
     if (!profileInfo?.id) return;
 
     setLoading(true);
     try {
-      await updateProfileInfo(formData);
+      await updateProfileInfo(data);
       toast({
         title: "Éxito",
         description: "Información del perfil actualizada correctamente.",
@@ -99,56 +113,71 @@ export default function ProfilePage() {
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Mi Perfil</h1>
 
       {profileInfo && (
-        <form onSubmit={handleSubmit} className="grid gap-6 md:grid-cols-2">
-          <div className="grid gap-2">
-            <Label htmlFor="name">Nombre</Label>
-            <Input
-              id="name"
+        <Form {...form}>
+          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-6 md:grid-cols-2">
+            <FormField
+              control={control}
               name="name"
-              value={formData.name || ""}
-              onChange={handleInputChange}
-              required
+              render={({ field }) => (
+                <FormItem className="grid gap-2">
+                  <FormLabel htmlFor="name">Nombre</FormLabel>
+                  <FormControl>
+                    <Input id="name" {...field} required />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
+            <FormField
+              control={control}
               name="email"
-              type="email"
-              value={formData.email || ""}
-              onChange={handleInputChange}
-              disabled // Email usually not editable directly
+              render={({ field }) => (
+                <FormItem className="grid gap-2">
+                  <FormLabel htmlFor="email">Email</FormLabel>
+                  <FormControl>
+                    <Input id="email" type="email" {...field} disabled />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="phone">Teléfono</Label>
-            <Input
-              id="phone"
+            <FormField
+              control={control}
               name="phone"
-              value={formData.phone || ""}
-              onChange={handleInputChange}
+              render={({ field }) => (
+                <FormItem className="grid gap-2">
+                  <FormLabel htmlFor="phone">Teléfono</FormLabel>
+                  <FormControl>
+                    <Input id="phone" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="address">Dirección</Label>
-            <Input
-              id="address"
+            <FormField
+              control={control}
               name="address"
-              value={formData.address || ""}
-              onChange={handleInputChange}
+              render={({ field }) => (
+                <FormItem className="grid gap-2">
+                  <FormLabel htmlFor="address">Dirección</FormLabel>
+                  <FormControl>
+                    <Input id="address" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div className="col-span-full flex justify-end">
-            <Button type="submit" disabled={loading}>
-              {loading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : null}{" "}
-              Guardar Cambios
-            </Button>
-          </div>
-        </form>
+            <div className="col-span-full flex justify-end">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}{" "}
+                Guardar Cambios
+              </Button>
+            </div>
+          </form>
+        </Form>
       )}
     </div>
   );

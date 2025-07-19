@@ -28,6 +28,7 @@ export interface CommonArea {
   availableDays?: string[];
   openingTime?: string;
   closingTime?: string;
+  rulesOfUse?: string; // Added rulesOfUse field
 }
 
 export interface CreateCommonAreaDto {
@@ -40,6 +41,7 @@ export interface CreateCommonAreaDto {
   availableDays?: string[];
   openingTime?: string;
   closingTime?: string;
+  rulesOfUse?: string; // Added rulesOfUse field
 }
 
 export interface UpdateCommonAreaDto extends Partial<CreateCommonAreaDto> {}
@@ -183,4 +185,20 @@ export async function deleteReservation(id: number): Promise<void> {
   return fetchApi(`/reservations/${id}`, {
     method: "DELETE",
   });
+}
+
+export async function checkAvailability(
+  commonAreaId: number,
+  startDateTime: string,
+  endDateTime: string,
+): Promise<{ available: boolean; message?: string }> {
+  try {
+    const response = await fetchApi(
+      `/reservations/common-areas/${commonAreaId}/check-availability?start=${startDateTime}&end=${endDateTime}`,
+    );
+    return response.data; // Assuming the API returns { data: { available: boolean, message?: string } }
+  } catch (error) {
+    console.error("Error checking availability:", error);
+    throw error;
+  }
 }

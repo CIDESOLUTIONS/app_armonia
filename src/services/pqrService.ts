@@ -14,6 +14,7 @@ interface PQR {
   createdAt: string;
   updatedAt: string;
   comments: PQRComment[];
+  attachments?: PQRAttachment[]; // Added attachments field
 }
 
 interface PQRComment {
@@ -23,6 +24,15 @@ interface PQRComment {
   authorName: string;
   comment: string;
   createdAt: string;
+}
+
+interface PQRAttachment {
+  id: number;
+  pqrId: number;
+  url: string;
+  fileName: string;
+  fileType: string;
+  uploadedAt: string;
 }
 
 interface GetPQRParams {
@@ -37,6 +47,7 @@ interface CreatePQRData {
   category: string;
   priority?: "LOW" | "MEDIUM" | "HIGH";
   reportedById: number;
+  attachments?: string[]; // URLs de los adjuntos
 }
 
 interface UpdatePQRData {
@@ -47,6 +58,7 @@ interface UpdatePQRData {
   priority?: "LOW" | "MEDIUM" | "HIGH";
   category?: string;
   assignedToId?: number;
+  attachments?: string[]; // URLs de los adjuntos
 }
 
 export async function getPQRs(params?: GetPQRParams): Promise<PQR[]> {
@@ -57,7 +69,7 @@ export async function getPQRs(params?: GetPQRParams): Promise<PQR[]> {
     if (params?.search) query.append("search", params.search);
 
     const response = await fetchApi(`/pqr?${query.toString()}`);
-    return response;
+    return response.data; // Assuming the API returns { data: PQR[] }
   } catch (error) {
     console.error("Error fetching PQRs:", error);
     throw error;
@@ -67,7 +79,7 @@ export async function getPQRs(params?: GetPQRParams): Promise<PQR[]> {
 export async function getPQRById(id: number): Promise<PQR> {
   try {
     const response = await fetchApi(`/pqr/${id}`);
-    return response; // Assuming the API returns a single PQR object
+    return response.data; // Assuming the API returns { data: PQR }
   } catch (error) {
     console.error(`Error fetching PQR with ID ${id}:`, error);
     throw error;
@@ -80,7 +92,7 @@ export async function createPQR(data: CreatePQRData): Promise<PQR> {
       method: "POST",
       body: JSON.stringify(data),
     });
-    return response;
+    return response.data; // Assuming the API returns { data: PQR }
   } catch (error) {
     console.error("Error creating PQR:", error);
     throw error;
@@ -96,7 +108,7 @@ export async function updatePQR(
       method: "PUT",
       body: JSON.stringify(data),
     });
-    return response;
+    return response.data; // Assuming the API returns { data: PQR }
   } catch (error) {
     console.error("Error updating PQR:", error);
     throw error;
@@ -123,7 +135,7 @@ export async function addPQRComment(
       method: "POST",
       body: JSON.stringify({ comment }),
     });
-    return response;
+    return response.data; // Assuming the API returns { data: PQRComment }
   } catch (error) {
     console.error("Error adding PQR comment:", error);
     throw error;
@@ -139,9 +151,28 @@ export async function assignPQR(
       method: "PUT",
       body: JSON.stringify({ assignedToId }),
     });
-    return response;
+    return response.data; // Assuming the API returns { data: PQR }
   } catch (error) {
     console.error("Error assigning PQR:", error);
+    throw error;
+  }
+}
+
+export async function uploadPQRAttachment(file: File): Promise<{ url: string }> {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await fetchApi(
+      "/pqr/upload-attachment",
+      {
+        method: "POST",
+        body: formData,
+      },
+      true,
+    ); // The third parameter indicates that Content-Type should not be automatically added
+    return response.data; // Assuming the API returns { data: { url: string } }
+  } catch (error) {
+    console.error("Error uploading PQR attachment:", error);
     throw error;
   }
 }
