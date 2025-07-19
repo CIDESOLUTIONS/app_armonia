@@ -1,29 +1,25 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  getActivePanicAlerts,
-  updatePanicAlertStatus,
-} from "@/services/panicService";
+import { getPanicAlerts, updatePanicAlertStatus } from "@/services/panicService";
 
 interface PanicAlert {
-  id: number;
-  userId: number;
-  user?: { name: string }; // Assuming user object is nested
+  id: string;
+  userId: string;
+  userName: string;
   location: string;
-  message?: string;
-  createdAt: string;
-  status: "ACTIVE" | "RESOLVED" | "DISMISSED";
+  status: "PENDING" | "RESOLVED" | "DISMISSED";
+  timestamp: string;
 }
 
 export default function PanicAlertsPage() {
@@ -32,16 +28,10 @@ export default function PanicAlertsPage() {
   const [alerts, setAlerts] = useState<PanicAlert[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchPanicAlerts();
-    }
-  }, [authLoading, user]);
-
-  const fetchPanicAlerts = async () => {
+  const fetchAlerts = async () => {
     setLoading(true);
     try {
-      const fetchedAlerts = await getActivePanicAlerts();
+      const fetchedAlerts = await getPanicAlerts();
       setAlerts(fetchedAlerts);
     } catch (error) {
       console.error("Error fetching panic alerts:", error);
@@ -55,25 +45,25 @@ export default function PanicAlertsPage() {
     }
   };
 
-  const handleResolveAlert = async (
-    alertId: number,
-    status: "RESOLVED" | "DISMISSED",
-  ) => {
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchAlerts();
+    }
+  }, [authLoading, user]);
+
+  const handleUpdateStatus = async (id: string, status: "RESOLVED" | "DISMISSED") => {
     try {
-      await updatePanicAlertStatus(alertId, {
-        status,
-        resolvedBy: user?.name || "Desconocido",
-      });
+      await updatePanicAlertStatus(id, status);
       toast({
-        title: "Alerta Actualizada",
-        description: `Alerta ${status === "RESOLVED" ? "resuelta" : "descartada"} correctamente.`,
+        title: "Éxito",
+        description: `Alerta marcada como ${status === "RESOLVED" ? "resuelta" : "descartada"}.`,
       });
-      fetchPanicAlerts(); // Refrescar la lista
+      fetchAlerts();
     } catch (error) {
-      console.error("Error resolving panic alert:", error);
+      console.error("Error updating panic alert status:", error);
       toast({
         title: "Error",
-        description: "No se pudo actualizar la alerta.",
+        description: "Error al actualizar el estado de la alerta.",
         variant: "destructive",
       });
     }
@@ -87,7 +77,7 @@ export default function PanicAlertsPage() {
     );
   }
 
-  if (!user || (user.role !== "RECEPTION" && user.role !== "ADMIN")) {
+  if (!user || (user.role !== "ADMIN" && user.role !== "COMPLEX_ADMIN" && user.role !== "STAFF")) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -105,61 +95,56 @@ export default function PanicAlertsPage() {
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">
-        Alertas de Pánico Activas
+        Alertas de Pánico
       </h1>
 
-      {alerts.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
-          <CheckCircle className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-          <h3 className="text-lg font-medium mb-2">
-            No hay alertas de pánico activas.
-          </h3>
-          <p>Todo está tranquilo en este momento.</p>
-        </div>
-      ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Usuario</TableHead>
-              <TableHead>Ubicación</TableHead>
-              <TableHead>Mensaje</TableHead>
-              <TableHead>Fecha/Hora</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {alerts.map((alert) => (
-              <TableRow key={alert.id} className="bg-red-50">
-                <TableCell>{alert.user?.name || "Desconocido"}</TableCell>
-                <TableCell>{alert.location}</TableCell>
-                <TableCell>{alert.message || "N/A"}</TableCell>
-                <TableCell>
-                  {new Date(alert.createdAt).toLocaleString()}
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mr-2"
-                    onClick={() => handleResolveAlert(alert.id, "RESOLVED")}
-                  >
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Resolver
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleResolveAlert(alert.id, "DISMISSED")}
-                  >
-                    <XCircle className="mr-2 h-4 w-4" />
-                    Descartar
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {alerts.length > 0 ? (
+          alerts.map((alert) => (
+            <Card key={alert.id}>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <AlertTriangle className="mr-2 h-5 w-5 text-red-500" />
+                  Alerta de Pánico de {alert.userName}
+                </CardTitle>
+                <CardContent className="text-sm text-gray-600">
+                  <p>Ubicación: {alert.location}</p>
+                  <p>Estado: {alert.status}</p>
+                  <p>Hora: {new Date(alert.timestamp).toLocaleString()}</p>
+                </CardContent>
+              </CardHeader>
+              <CardContent className="flex justify-end gap-2">
+                {alert.status === "PENDING" && (
+                  <>
+                    <Button
+                      variant="outline"
+                      onClick={() => handleUpdateStatus(alert.id, "RESOLVED")}
+                    >
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      Marcar como Resuelta
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleUpdateStatus(alert.id, "DISMISSED")}
+                    >
+                      <XCircle className="mr-2 h-4 w-4" />
+                      Descartar
+                    </Button>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <div className="col-span-full text-center py-12 text-gray-500">
+            <CheckCircle className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+            <h3 className="text-lg font-medium mb-2">
+              No hay alertas de pánico pendientes
+            </h3>
+            <p>Todo tranquilo por ahora.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

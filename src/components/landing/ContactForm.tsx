@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { MessageSquare, Calendar, Building } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -6,235 +8,105 @@ import { useState, FormEvent, ChangeEvent } from "react";
 import { Textarea } from "@/components/ui/textarea";
 
 interface ContactFormProps {
-  theme: string;
+  portalType?: "admin" | "resident" | "reception" | null;
 }
 
-export function ContactForm({ theme }: ContactFormProps) {
-  const _router = useRouter();
+export default function ContactForm({ portalType = null }: ContactFormProps) {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    phone: "",
-    complexName: "",
-    units: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState<string | null>(null);
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Aquí se enviaría el formulario a través de una API
-    alert("¡Gracias por tu interés! Te contactaremos pronto.");
-    router.push(ROUTES.REGISTER_COMPLEX);
+    setIsSubmitting(true);
+    setSubmitMessage(null);
+
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      setSubmitMessage("¡Mensaje enviado con éxito! Nos pondremos en contacto pronto.");
+      setFormData({ name: "", email: "", message: "" });
+    } catch (error) {
+      setSubmitMessage("Error al enviar el mensaje. Por favor, inténtalo de nuevo.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <section
-      id="contacto"
-      className={`py-20 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}
-    >
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-          <div>
-            <h2
-              className={`text-3xl md:text-4xl font-bold mb-6 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-            >
-              ¿Interesado en Armonía?
-            </h2>
-            <p
-              className={`text-lg mb-6 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
-            >
-              Complete el formulario y un representante se pondrá en contacto
-              con usted para ofrecerle una demostración personalizada.
-            </p>
-            <div className="space-y-4">
-              <div className="flex items-center">
-                <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mr-4">
-                  <MessageSquare className="h-5 w-5 text-indigo-600" />
-                </div>
-                <div>
-                  <h3
-                    className={`font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-                  >
-                    Soporte Premium
-                  </h3>
-                  <p
-                    className={`${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
-                  >
-                    Respuesta garantizada en menos de 24 horas.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mr-4">
-                  <Calendar className="h-5 w-5 text-indigo-600" />
-                </div>
-                <div>
-                  <h3
-                    className={`font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-                  >
-                    Capacitación Gratuita
-                  </h3>
-                  <p
-                    className={`${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
-                  >
-                    Sesiones de capacitación para administradores y residentes.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mr-4">
-                  <Building className="h-5 w-5 text-indigo-600" />
-                </div>
-                <div>
-                  <h3
-                    className={`font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-                  >
-                    Migración de Datos
-                  </h3>
-                  <p
-                    className={`${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
-                  >
-                    Le ayudamos a migrar los datos de su sistema actual.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <form
-              onSubmit={handleSubmit}
-              className={`p-8 rounded-lg shadow-lg ${theme === "dark" ? "bg-gray-800" : "bg-white border border-gray-200"}`}
-            >
-              <h3
-                className={`text-2xl font-bold mb-6 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-              >
-                Solicite más información
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="name"
-                    className={`block mb-2 text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                  >
-                    Nombre completo
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-2 border rounded-lg ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
-                    placeholder="Ingrese su nombre"
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="email"
-                    className={`block mb-2 text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                  >
-                    Correo electrónico
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-2 border rounded-lg ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
-                    placeholder="correo@ejemplo.com"
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="phone"
-                    className={`block mb-2 text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                  >
-                    Teléfono
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-2 border rounded-lg ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
-                    placeholder="(123) 456-7890"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="complexName"
-                    className={`block mb-2 text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                  >
-                    Nombre del conjunto
-                  </label>
-                  <input
-                    type="text"
-                    id="complexName"
-                    name="complexName"
-                    value={formData.complexName}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-2 border rounded-lg ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
-                    placeholder="Nombre del conjunto residencial"
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="units"
-                    className={`block mb-2 text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                  >
-                    Número de unidades
-                  </label>
-                  <input
-                    type="number"
-                    id="units"
-                    name="units"
-                    value={formData.units}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-2 border rounded-lg ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
-                    placeholder="Ej. 30"
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="message"
-                    className={`block mb-2 text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                  >
-                    Mensaje
-                  </label>
-                  <Textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-2 border rounded-lg ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
-                    placeholder="¿En qué podemos ayudarle?"
-                    rows={4}
-                  ></Textarea>
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full bg-indigo-600 hover:bg-indigo-700"
-                >
-                  Enviar Solicitud
-                </Button>
-              </div>
-            </form>
-          </div>
+    <div className="bg-white p-8 rounded-lg shadow-lg max-w-md mx-auto">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        Contáctanos
+      </h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <Label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            Nombre
+          </Label>
+          <Input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          />
         </div>
-      </div>
-    </section>
+        <div>
+          <Label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            Email
+          </Label>
+          <Input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          />
+        </div>
+        <div>
+          <Label htmlFor="message" className="block text-sm font-medium text-gray-700">
+            Mensaje
+          </Label>
+          <Textarea
+            id="message"
+            name="message"
+            value={formData.message}
+            onChange={handleChange}
+            required
+            rows={4}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          />
+        </div>
+        <Button
+          type="submit"
+          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Enviando..." : "Enviar Mensaje"}
+        </Button>
+      </form>
+      {submitMessage && (
+        <p className="mt-4 text-center text-sm text-gray-600">
+          {submitMessage}
+        </p>
+      )}
+    </div>
   );
 }

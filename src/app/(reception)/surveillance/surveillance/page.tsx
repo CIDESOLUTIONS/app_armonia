@@ -1,297 +1,158 @@
+"use client";
+
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Camera,
-  Monitor,
-  AlertTriangle,
-  CheckCircle,
-  RefreshCw,
-  Maximize,
-  Settings,
-} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
+import { Loader2, Video, Camera, Monitor, AlertTriangle } from "lucide-react";
 
 interface CameraFeed {
   id: string;
   name: string;
-  location: string;
-  status: "online" | "offline" | "maintenance";
-  lastUpdate: string;
-  streamUrl?: string;
+  url: string;
+  status: "online" | "offline" | "recording";
 }
 
 export default function SurveillancePage() {
-  const { user, loading } = useAuthStore();
+  const { user, loading: authLoading } = useAuthStore();
+  const { toast } = useToast();
   const router = useRouter();
-  const [cameras, setCameras] = useState<CameraFeed[]>([]);
-  const [selectedCamera, setSelectedCamera] = useState("all");
-  const [isLoading, setIsLoading] = useState(true);
+  const [cameraFeeds, setCameraFeeds] = useState<CameraFeed[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedFeed, setSelectedFeed] = useState<CameraFeed | null>(null);
 
-  // Datos de ejemplo para desarrollo
-  const mockCameras: CameraFeed[] = [
-    {
-      id: "cam1",
-      name: "Entrada Principal",
-      location: "Portería",
-      status: "online",
-      lastUpdate: "2025-07-05T01:30:00",
-    },
-    {
-      id: "cam2",
-      name: "Parqueadero Visitantes",
-      location: "Zona de parqueo",
-      status: "online",
-      lastUpdate: "2025-07-05T01:29:45",
-    },
-    {
-      id: "cam3",
-      name: "Zona Común",
-      location: "Salón comunal",
-      status: "offline",
-      lastUpdate: "2025-07-05T00:15:30",
-    },
-    {
-      id: "cam4",
-      name: "Piscina",
-      location: "Área recreativa",
-      status: "maintenance",
-      lastUpdate: "2025-07-04T22:00:00",
-    },
-  ];
-
-  const fetchData = useCallback(() => {
-    // Simular carga de datos
-    setTimeout(() => {
-      setCameras(mockCameras);
-      setIsLoading(false);
-    }, 1000);
-  }, [mockCameras]);
+  const fetchCameraFeeds = useCallback(async () => {
+    setLoading(true);
+    try {
+      // Simulate API call to fetch camera feeds
+      const mockFeeds: CameraFeed[] = [
+        {
+          id: "cam1",
+          name: "Cámara Principal Entrada",
+          url: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1", // Rick Astley for demo
+          status: "online",
+        },
+        {
+          id: "cam2",
+          name: "Cámara Parqueadero",
+          url: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1",
+          status: "recording",
+        },
+        {
+          id: "cam3",
+          name: "Cámara Piscina",
+          url: "", // Simulate offline
+          status: "offline",
+        },
+      ];
+      setCameraFeeds(mockFeeds);
+    } catch (error) {
+      console.error("Error fetching camera feeds:", error);
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar las cámaras de vigilancia.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login?portal=reception");
-      return;
+    if (!authLoading && user) {
+      fetchCameraFeeds();
     }
+  }, [authLoading, user, fetchCameraFeeds]);
 
-    if (user && user.role !== "reception" && user.role !== "admin") {
-      router.push("/unauthorized");
-      return;
-    }
-
-    fetchData();
-  }, [user, loading, router, fetchData]);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "online":
-        return "bg-green-100 text-green-800";
-      case "offline":
-        return "bg-red-100 text-red-800";
-      case "maintenance":
-        return "bg-yellow-100 text-yellow-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "online":
-        return <CheckCircle className="h-4 w-4" />;
-      case "offline":
-        return <AlertTriangle className="h-4 w-4" />;
-      case "maintenance":
-        return <Settings className="h-4 w-4" />;
-      default:
-        return <Camera className="h-4 w-4" />;
-    }
-  };
-
-  if (loading || isLoading) {
+  if (authLoading || loading) {
     return (
-      <div className="p-6 space-y-6">
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-64" />
-          <Skeleton className="h-4 w-96" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-64" />
-          ))}
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user || (user.role !== "ADMIN" && user.role !== "COMPLEX_ADMIN" && user.role !== "STAFF")) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Acceso Denegado
+          </h1>
+          <p className="text-gray-600">
+            No tienes permisos para acceder a esta página.
+          </p>
         </div>
       </div>
     );
   }
 
-  const filteredCameras =
-    selectedCamera === "all"
-      ? cameras
-      : cameras.filter((camera) => camera.status === selectedCamera);
-
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Sistema de Vigilancia
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Monitoreo en tiempo real de las cámaras de seguridad
-          </p>
-        </div>
-        <Button onClick={() => window.location.reload()}>
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Actualizar
-        </Button>
-      </div>
+    <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        Centro de Vigilancia
+      </h1>
 
-      {/* Filtros */}
-      <div className="flex gap-4">
-        <Select value={selectedCamera} onValueChange={setSelectedCamera}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Filtrar por estado" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todas las cámaras</SelectItem>
-            <SelectItem value="online">En línea</SelectItem>
-            <SelectItem value="offline">Fuera de línea</SelectItem>
-            <SelectItem value="maintenance">En mantenimiento</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Estadísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Total Cámaras</p>
-                <p className="text-2xl font-bold">{cameras.length}</p>
-              </div>
-              <Camera className="h-8 w-8 text-blue-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">En Línea</p>
-                <p className="text-2xl font-bold text-green-600">
-                  {cameras.filter((c) => c.status === "online").length}
-                </p>
-              </div>
-              <CheckCircle className="h-8 w-8 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Fuera de Línea</p>
-                <p className="text-2xl font-bold text-red-600">
-                  {cameras.filter((c) => c.status === "offline").length}
-                </p>
-              </div>
-              <AlertTriangle className="h-8 w-8 text-red-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Mantenimiento</p>
-                <p className="text-2xl font-bold text-yellow-600">
-                  {cameras.filter((c) => c.status === "maintenance").length}
-                </p>
-              </div>
-              <Settings className="h-8 w-8 text-yellow-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Grid de Cámaras */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCameras.map((camera) => (
-          <Card key={camera.id} className="overflow-hidden">
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="text-lg">{camera.name}</CardTitle>
-                  <CardDescription>{camera.location}</CardDescription>
-                </div>
-                <Badge className={getStatusColor(camera.status)}>
-                  {getStatusIcon(camera.status)}
-                  <span className="ml-1 capitalize">{camera.status}</span>
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              {/* Placeholder para video feed */}
-              <div className="aspect-video bg-gray-900 flex items-center justify-center relative group">
-                {camera.status === "online" ? (
-                  <>
-                    <div className="text-white text-center">
-                      <Monitor className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm opacity-75">Feed en vivo</p>
-                    </div>
-                    <Button
-                      size="sm"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Maximize className="h-4 w-4" />
-                    </Button>
-                  </>
+        {cameraFeeds.length > 0 ? (
+          cameraFeeds.map((feed) => (
+            <Card key={feed.id} className="flex flex-col">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  {feed.status === "online" ? (
+                    <Video className="mr-2 h-5 w-5 text-green-500" />
+                  ) : feed.status === "recording" ? (
+                    <Camera className="mr-2 h-5 w-5 text-red-500" />
+                  ) : (
+                    <Monitor className="mr-2 h-5 w-5 text-gray-500" />
+                  )}
+                  {feed.name}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                {feed.url ? (
+                  <div className="aspect-video w-full bg-gray-200 rounded-md overflow-hidden">
+                    <iframe
+                      width="100%"
+                      height="100%"
+                      src={feed.url}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title={feed.name}
+                    ></iframe>
+                  </div>
                 ) : (
-                  <div className="text-gray-400 text-center">
-                    <AlertTriangle className="h-12 w-12 mx-auto mb-2" />
-                    <p className="text-sm">Cámara no disponible</p>
+                  <div className="aspect-video w-full bg-gray-200 rounded-md flex items-center justify-center text-gray-500">
+                    <AlertTriangle className="h-8 w-8 mr-2" />
+                    Cámara {feed.status === "offline" ? "desconectada" : "sin señal"}
                   </div>
                 )}
-              </div>
-              <div className="p-4">
-                <p className="text-xs text-gray-500">
-                  Última actualización:{" "}
-                  {new Date(camera.lastUpdate).toLocaleString("es-ES")}
+                <p className="text-sm text-gray-600 mt-2">
+                  Estado: {feed.status}
                 </p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <div className="col-span-full text-center py-12 text-gray-500">
+            <Monitor className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+            <h3 className="text-lg font-medium mb-2">
+              No hay cámaras de vigilancia configuradas
+            </h3>
+            <p>Contacta al administrador para configurar las cámaras.</p>
+          </div>
+        )}
       </div>
-
-      {filteredCameras.length === 0 && (
-        <Alert>
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>No hay cámaras disponibles</AlertTitle>
-          <AlertDescription>
-            No se encontraron cámaras que coincidan con el filtro seleccionado.
-          </AlertDescription>
-        </Alert>
-      )}
     </div>
   );
 }
