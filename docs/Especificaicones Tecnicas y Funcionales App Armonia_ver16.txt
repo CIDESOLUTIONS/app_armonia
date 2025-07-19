@@ -177,6 +177,7 @@ Vista general con KPIs: estado de cartera, PQR pendientes, reservas del día, ú
 3.2.5. Módulo de Reservas
 Gestión de áreas comunes y amenidades (salón social, BBQ, canchas) con calendario, reglas de uso y sistema de aprobación.
 3.2.6. Módulo de manejo de proyectos y obras del conjunto (desde la aprobación en asamblea, presupuestos, recolección de cuotas extras, planeación, ejecución y entrega). debe tener visibilidad de avance para dashboard de residente.
+3.2.7 Modulo de gestión de usuarios y roles (recepcionistas, vigilantes, conserjes y otras labores). (diferentes a residentes y propietarios). 
 
 3.3. Portal de Residentes (App Móvil y Web)
 * Acceso a comunicados, cartelera y documentos.

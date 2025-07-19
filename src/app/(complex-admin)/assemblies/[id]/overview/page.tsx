@@ -10,6 +10,8 @@ import {
   UserPlus,
   BarChart2,
   FileText,
+  PlusCircle,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -103,7 +105,7 @@ export default function AssemblyDetailPage() {
   const handleRegisterAttendance = async (userId: number, present: boolean) => {
     if (!assemblyId) return;
     try {
-      await registerAttendance(assemblyId, userId, present);
+      await registerAttendance(assemblyId, userId, true, 1); // Assuming unitId 1 for now
       toast({
         title: "Éxito",
         description: "Asistencia registrada correctamente.",
@@ -158,6 +160,25 @@ export default function AssemblyDetailPage() {
       toast({
         title: "Error",
         description: "Error al cargar resultados de votación.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSubmitVote = async (voteId: number, option: string, weight: number) => {
+    if (!user?.id) return;
+    try {
+      await submitVote({ voteId, option, userId: user.id, unitId: 1, weight }); // Assuming unitId 1 for now
+      toast({
+        title: "Éxito",
+        description: "Voto registrado correctamente.",
+      });
+      handleGetVoteResults(voteId); // Refresh results after voting
+    } catch (error) {
+      console.error("Error submitting vote:", error);
+      toast({
+        title: "Error",
+        description: "Error al registrar el voto.",
         variant: "destructive",
       });
     }
@@ -289,16 +310,10 @@ export default function AssemblyDetailPage() {
                       variant="outline"
                       className="mr-2 mb-2"
                       onClick={() =>
-                        submitVote({
-                          voteId: vote.id,
-                          optionId: option.id,
-                          userId: user?.id || 0,
-                          weight: 1,
-                        })
+                        handleSubmitVote(vote.id, option.value, 1) // Assuming weight 1 for now
                       }
                     >
                       {" "}
-                      {/* Simplified weight for now */}
                       {option.value}
                     </Button>
                   ))}

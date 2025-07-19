@@ -1,47 +1,27 @@
 import { fetchApi } from "@/lib/api";
-import {
-  PaymentGatewayConfigDto,
-  CreatePaymentGatewayDto,
-  UpdatePaymentGatewayDto,
-} from "../../armonia-backend/src/common/dto/payment-gateways.dto";
 
-interface FinanceSummary {
-  totalIngresos: number;
-  totalEgresos: number;
-  saldoActual: number;
-  cuotasPendientes: number;
+export enum FeeStatus {
+  PENDING = "PENDING",
+  PAID = "PAID",
+  OVERDUE = "OVERDUE",
+  CANCELLED = "CANCELLED",
 }
 
-// Updated FinancialTransaction interface to match PaymentDto
-export interface FinancialTransaction {
-  id: number;
-  amount: number;
-  date: string;
-  method: string;
-  reference: string;
-  receiptNumber?: string; // Optional as it might not always be present
-  feeId?: number; // Optional
-  propertyId: number;
-  createdBy: number;
-  // Add any other fields from PaymentDto if necessary
+export enum FeeType {
+  ORDINARY = "ORDINARY",
+  EXTRAORDINARY = "EXTRAORDINARY",
+  FINE = "FINE",
 }
 
-interface ReconciliationSuggestion {
-  statementEntry: any;
-  payment: any;
-  status: string;
-}
-
-// New DTOs for Fee Management
 export interface FeeDto {
   id: number;
   title: string;
   description?: string;
   amount: number;
   dueDate: string;
-  status: "PENDING" | "PAID" | "OVERDUE";
-  type: "ORDINARY" | "EXTRAORDINARY" | "FINE"; // Added FINE type
-  propertyId: number;
+  status: FeeStatus;
+  type: FeeType;
+  propertyId?: number;
   unitId?: number;
   residentId?: number;
   createdAt: string;
@@ -53,8 +33,8 @@ export interface CreateFeeDto {
   description?: string;
   amount: number;
   dueDate: string;
-  type: "ORDINARY" | "EXTRAORDINARY" | "FINE";
-  propertyId: number;
+  type: FeeType;
+  propertyId?: number;
   unitId?: number;
   residentId?: number;
 }
@@ -64,116 +44,221 @@ export interface UpdateFeeDto {
   description?: string;
   amount?: number;
   dueDate?: string;
-  status?: "PENDING" | "PAID" | "OVERDUE";
-  type?: "ORDINARY" | "EXTRAORDINARY" | "FINE";
-}
-
-export interface FeeFilterParamsDto {
-  status?: "PENDING" | "PAID" | "OVERDUE";
-  type?: "ORDINARY" | "EXTRAORDINARY" | "FINE";
+  status?: FeeStatus;
+  type?: FeeType;
   propertyId?: number;
   unitId?: number;
   residentId?: number;
-  startDate?: string;
-  endDate?: string;
 }
 
-export interface FeeListResponseDto {
-  data: FeeDto[];
-  total: number;
-  page: number;
-  limit: number;
+export interface FeeFilterParamsDto {
+  status?: FeeStatus;
+  type?: FeeType;
+  propertyId?: number;
+  residentId?: number;
+  skip?: number;
+  take?: number;
 }
 
-export async function getFinanceSummary(
-  complexId: string,
-): Promise<FinanceSummary> {
+export enum PaymentStatus {
+  PENDING = "PENDING",
+  COMPLETED = "COMPLETED",
+  FAILED = "FAILED",
+  REFUNDED = "REFUNDED",
+}
+
+export interface PaymentDto {
+  id: number;
+  feeId: number;
+  userId: number;
+  amount: number;
+  paymentDate: string;
+  status: PaymentStatus;
+  transactionId?: string;
+  paymentMethod?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreatePaymentDto {
+  feeId: number;
+  userId: number;
+  amount: number;
+  paymentDate?: string;
+  status?: PaymentStatus;
+  transactionId?: string;
+  paymentMethod?: string;
+}
+
+export interface UpdatePaymentDto {
+  feeId?: number;
+  userId?: number;
+  amount?: number;
+  paymentDate?: string;
+  status?: PaymentStatus;
+  transactionId?: string;
+  paymentMethod?: string;
+}
+
+export interface PaymentFilterParamsDto {
+  status?: PaymentStatus;
+  feeId?: number;
+  userId?: number;
+  skip?: number;
+  take?: number;
+}
+
+export enum BudgetStatus {
+  DRAFT = "DRAFT",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+}
+
+export interface BudgetItemDto {
+  id: number;
+  budgetId: number;
+  description: string;
+  amount: number;
+  type: "INCOME" | "EXPENSE";
+}
+
+export interface BudgetDto {
+  id: number;
+  year: number;
+  title: string;
+  description?: string;
+  totalAmount: number;
+  status: BudgetStatus;
+  approvedById?: number;
+  approvedAt?: string;
+  items: BudgetItemDto[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateBudgetDto {
+  year: number;
+  title: string;
+  description?: string;
+  items: { description: string; amount: number; type: "INCOME" | "EXPENSE" }[];
+}
+
+export interface UpdateBudgetDto {
+  year?: number;
+  title?: string;
+  description?: string;
+  items?: { description: string; amount: number; type: "INCOME" | "EXPENSE" }[];
+  status?: BudgetStatus;
+}
+
+export interface BudgetFilterParamsDto {
+  year?: number;
+  status?: BudgetStatus;
+  skip?: number;
+  take?: number;
+}
+
+export enum ExpenseStatus {
+  PENDING = "PENDING",
+  PAID = "PAID",
+  OVERDUE = "OVERDUE",
+}
+
+export interface ExpenseDto {
+  id: number;
+  title: string;
+  description?: string;
+  amount: number;
+  date: string;
+  status: ExpenseStatus;
+  categoryId?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateExpenseDto {
+  title: string;
+  description?: string;
+  amount: number;
+  date: string;
+  status?: ExpenseStatus;
+  categoryId?: number;
+}
+
+export interface UpdateExpenseDto {
+  title?: string;
+  description?: string;
+  amount?: number;
+  date?: string;
+  status?: ExpenseStatus;
+  categoryId?: number;
+}
+
+export interface ExpenseFilterParamsDto {
+  status?: ExpenseStatus;
+  categoryId?: number;
+  skip?: number;
+  take?: number;
+}
+
+export async function getFinancialSummary(): Promise<any> {
   try {
-    const response = await fetchApi(`/finances/stats?complexId=${complexId}`);
-    return response;
+    const response = await fetchApi("/finances/summary");
+    return response.data;
   } catch (error) {
-    console.error("Error fetching finance summary:", error);
+    console.error("Error fetching financial summary:", error);
     throw error;
   }
 }
 
-export async function getRecentTransactions(
-  complexId: string,
-): Promise<FinancialTransaction[]> {
+export async function getRecentTransactions(): Promise<any[]> {
   try {
-    const response = await fetchApi(
-      `/finances/properties/${complexId}/payments`,
-    );
-    return response;
+    const response = await fetchApi("/finances/transactions/recent");
+    return response.data;
   } catch (error) {
     console.error("Error fetching recent transactions:", error);
     throw error;
   }
 }
 
-export async function uploadBankStatement(file: File): Promise<any> {
-  try {
-    const formData = new FormData();
-    formData.append("file", file);
-    const response = await fetchApi(
-      "/finances/upload-statement",
-      {
-        method: "POST",
-        body: formData,
-      },
-      true,
-    ); // El tercer parámetro indica que no se debe añadir Content-Type automáticamente
-    return response;
-  } catch (error) {
-    console.error("Error uploading bank statement:", error);
-    throw error;
-  }
-}
-
-// New functions for Fee Management
-export async function getFees(
-  filters?: FeeFilterParamsDto,
-): Promise<FeeListResponseDto> {
+export async function getFees(filters?: FeeFilterParamsDto): Promise<{ data: FeeDto[]; total: number }> {
   try {
     const query = new URLSearchParams();
-    if (filters) {
-      for (const key in filters) {
-        if (filters[key as keyof FeeFilterParamsDto] !== undefined) {
-          query.append(key, String(filters[key as keyof FeeFilterParamsDto]));
-        }
-      }
-    }
+    if (filters?.status) query.append("status", filters.status);
+    if (filters?.type) query.append("type", filters.type);
+    if (filters?.propertyId) query.append("propertyId", filters.propertyId.toString());
+    if (filters?.residentId) query.append("residentId", filters.residentId.toString());
+    if (filters?.skip) query.append("skip", filters.skip.toString());
+    if (filters?.take) query.append("take", filters.take.toString());
+
     const response = await fetchApi(`/finances/fees?${query.toString()}`);
-    return response;
+    return response.data;
   } catch (error) {
     console.error("Error fetching fees:", error);
     throw error;
   }
 }
 
-export async function createFee(fee: CreateFeeDto): Promise<FeeDto> {
+export async function createFee(data: CreateFeeDto): Promise<FeeDto> {
   try {
     const response = await fetchApi("/finances/fees", {
       method: "POST",
-      body: JSON.stringify(fee),
+      body: JSON.stringify(data),
     });
-    return response;
+    return response.data;
   } catch (error) {
     console.error("Error creating fee:", error);
     throw error;
   }
 }
 
-export async function updateFee(
-  id: number,
-  fee: UpdateFeeDto,
-): Promise<FeeDto> {
+export async function updateFee(id: number, data: UpdateFeeDto): Promise<FeeDto> {
   try {
     const response = await fetchApi(`/finances/fees/${id}`, {
       method: "PUT",
-      body: JSON.stringify(fee),
+      body: JSON.stringify(data),
     });
-    return response;
+    return response.data;
   } catch (error) {
     console.error("Error updating fee:", error);
     throw error;
@@ -191,90 +276,188 @@ export async function deleteFee(id: number): Promise<void> {
   }
 }
 
-export async function generateOrdinaryFees(
-  amount: number,
-  dueDate: string,
-  title: string,
-  description?: string,
-): Promise<any> {
+export async function getPayments(filters?: PaymentFilterParamsDto): Promise<{ data: PaymentDto[]; total: number }> {
   try {
-    const response = await fetchApi("/finances/generate-ordinary-fees", {
+    const query = new URLSearchParams();
+    if (filters?.status) query.append("status", filters.status);
+    if (filters?.feeId) query.append("feeId", filters.feeId.toString());
+    if (filters?.userId) query.append("userId", filters.userId.toString());
+    if (filters?.skip) query.append("skip", filters.skip.toString());
+    if (filters?.take) query.append("take", filters.take.toString());
+
+    const response = await fetchApi(`/finances/payments?${query.toString()}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching payments:", error);
+    throw error;
+  }
+}
+
+export async function createPayment(data: CreatePaymentDto): Promise<PaymentDto> {
+  try {
+    const response = await fetchApi("/finances/payments", {
       method: "POST",
-      body: JSON.stringify({ amount, dueDate, title, description }),
+      body: JSON.stringify(data),
     });
-    return response;
+    return response.data;
   } catch (error) {
-    console.error("Error generating ordinary fees:", error);
+    console.error("Error creating payment:", error);
     throw error;
   }
 }
 
-export async function approveReconciliation(
-  suggestion: ReconciliationSuggestion,
-): Promise<any> {
+export async function updatePayment(id: number, data: UpdatePaymentDto): Promise<PaymentDto> {
   try {
-    const response = await fetchApi("/finances/reconcile/approve", {
-      method: "POST",
-      body: JSON.stringify(suggestion),
-    });
-    return response;
-  } catch (error) {
-    console.error("Error approving reconciliation:", error);
-    throw error;
-  }
-}
-
-// Functions for Payment Gateway Management
-export async function getPaymentGatewaysConfig(): Promise<
-  PaymentGatewayConfigDto[]
-> {
-  try {
-    const response = await fetchApi("/payment-gateways");
-    return response;
-  } catch (error) {
-    console.error("Error fetching payment gateways config:", error);
-    throw error;
-  }
-}
-
-export async function createPaymentGatewayConfig(
-  config: CreatePaymentGatewayDto,
-): Promise<PaymentGatewayConfigDto> {
-  try {
-    const response = await fetchApi("/payment-gateways", {
-      method: "POST",
-      body: JSON.stringify(config),
-    });
-    return response;
-  } catch (error) {
-    console.error("Error creating payment gateway config:", error);
-    throw error;
-  }
-}
-
-export async function updatePaymentGatewayConfig(
-  id: number,
-  config: UpdatePaymentGatewayDto,
-): Promise<PaymentGatewayConfigDto> {
-  try {
-    const response = await fetchApi(`/payment-gateways/${id}`, {
+    const response = await fetchApi(`/finances/payments/${id}`, {
       method: "PUT",
-      body: JSON.stringify(config),
+      body: JSON.stringify(data),
     });
-    return response;
+    return response.data;
   } catch (error) {
-    console.error("Error updating payment gateway config:", error);
+    console.error("Error updating payment:", error);
     throw error;
   }
 }
 
-export async function deletePaymentGatewayConfig(id: number): Promise<void> {
+export async function deletePayment(id: number): Promise<void> {
   try {
-    await fetchApi(`/payment-gateways/${id}`, {
+    await fetchApi(`/finances/payments/${id}`, {
       method: "DELETE",
     });
   } catch (error) {
-    console.error("Error deleting payment gateway config:", error);
+    console.error("Error deleting payment:", error);
+    throw error;
+  }
+}
+
+export async function getBudgets(filters?: BudgetFilterParamsDto): Promise<{ data: BudgetDto[]; total: number }> {
+  try {
+    const query = new URLSearchParams();
+    if (filters?.year) query.append("year", filters.year.toString());
+    if (filters?.status) query.append("status", filters.status);
+    if (filters?.skip) query.append("skip", filters.skip.toString());
+    if (filters?.take) query.append("take", filters.take.toString());
+
+    const response = await fetchApi(`/finances/budgets?${query.toString()}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching budgets:", error);
+    throw error;
+  }
+}
+
+export async function createBudget(data: CreateBudgetDto): Promise<BudgetDto> {
+  try {
+    const response = await fetchApi("/finances/budgets", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error creating budget:", error);
+    throw error;
+  }
+}
+
+export async function updateBudget(id: number, data: UpdateBudgetDto): Promise<BudgetDto> {
+  try {
+    const response = await fetchApi(`/finances/budgets/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating budget:", error);
+    throw error;
+  }
+}
+
+export async function deleteBudget(id: number): Promise<void> {
+  try {
+    await fetchApi(`/finances/budgets/${id}`, {
+      method: "DELETE",
+    });
+  } catch (error) {
+    console.error("Error deleting budget:", error);
+    throw error;
+  }
+}
+
+export async function approveBudget(id: number, approvedById: number): Promise<BudgetDto> {
+  try {
+    const response = await fetchApi(`/finances/budgets/${id}/approve`, {
+      method: "POST",
+      body: JSON.stringify({ approvedById }),
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error approving budget:", error);
+    throw error;
+  }
+}
+
+export async function getExpenses(filters?: ExpenseFilterParamsDto): Promise<{ data: ExpenseDto[]; total: number }> {
+  try {
+    const query = new URLSearchParams();
+    if (filters?.status) query.append("status", filters.status);
+    if (filters?.categoryId) query.append("categoryId", filters.categoryId.toString());
+    if (filters?.skip) query.append("skip", filters.skip.toString());
+    if (filters?.take) query.append("take", filters.take.toString());
+
+    const response = await fetchApi(`/finances/expenses?${query.toString()}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching expenses:", error);
+    throw error;
+  }
+}
+
+export async function createExpense(data: CreateExpenseDto): Promise<ExpenseDto> {
+  try {
+    const response = await fetchApi("/finances/expenses", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error creating expense:", error);
+    throw error;
+  }
+}
+
+export async function updateExpense(id: number, data: UpdateExpenseDto): Promise<ExpenseDto> {
+  try {
+    const response = await fetchApi(`/finances/expenses/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating expense:", error);
+    throw error;
+  }
+}
+
+export async function deleteExpense(id: number): Promise<void> {
+  try {
+    await fetchApi(`/finances/expenses/${id}`, {
+      method: "DELETE",
+    });
+  } catch (error) {
+    console.error("Error deleting expense:", error);
+    throw error;
+  }
+}
+
+export async function initiatePayment(feeId: number): Promise<string> {
+  try {
+    const response = await fetchApi("/finances/payments/initiate", {
+      method: "POST",
+      body: JSON.stringify({ feeId }),
+    });
+    return response.data; // Assuming data contains the redirect URL
+  } catch (error) {
+    console.error("Error initiating payment:", error);
     throw error;
   }
 }

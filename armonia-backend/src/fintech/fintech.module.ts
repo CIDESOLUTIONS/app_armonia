@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
-import { FintechController } from './fintech.controller';
 import { FintechService } from './fintech.service';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
-import { PrismaService } from '../prisma/prisma.service';
+import { FintechController } from './fintech.controller';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
+  imports: [PrismaModule],
+  providers: [FintechService],
   controllers: [FintechController],
-  providers: [FintechService, PrismaClientManager, PrismaService],
+  exports: [FintechService],
 })
 export class FintechModule {}

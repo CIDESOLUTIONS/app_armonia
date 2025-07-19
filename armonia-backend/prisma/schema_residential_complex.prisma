@@ -10,6 +10,8 @@ model ResidentialComplex {
   contactEmail String
   contactPhone String
   logoUrl     String?
+  primaryColor String? // Nuevo campo para color primario
+  secondaryColor String? // Nuevo campo para color secundario
   planId      Int
   plan        Plan     @relation(fields: [planId], references: [id])
   isActive    Boolean  @default(true)

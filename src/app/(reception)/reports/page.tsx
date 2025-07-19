@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import {
@@ -21,16 +21,21 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, FileText, Download } from "lucide-react";
+import {
+  generateVisitorsReport,
+  generatePackagesReport,
+  generateIncidentsReport,
+} from "@/services/reportService";
 
 export default function ReceptionReportsPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [reportType, setReportType] = useState("daily-summary");
+  const [reportType, setReportType] = useState("visitor-log");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  const handleGenerateReport = async () => {
+  const handleGenerateReport = async (format: "pdf" | "excel") => {
     if (!reportType || !startDate || !endDate) {
       toast({
         title: "Advertencia",
@@ -42,12 +47,44 @@ export default function ReceptionReportsPage() {
 
     setLoading(true);
     try {
-      // Simulate API call for report generation
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      let blob: Blob;
+      let filename: string;
+
+      switch (reportType) {
+        case "visitor-log":
+          blob = await generateVisitorsReport(format, startDate, endDate);
+          filename = `reporte_visitantes.${format}`;
+          break;
+        case "package-log":
+          blob = await generatePackagesReport(format, startDate, endDate);
+          filename = `reporte_paquetes.${format}`;
+          break;
+        case "incident-log":
+          blob = await generateIncidentsReport(format, startDate, endDate);
+          filename = `reporte_incidentes.${format}`;
+          break;
+        default:
+          toast({
+            title: "Información",
+            description: "Este tipo de reporte aún no está implementado.",
+            variant: "info",
+          });
+          setLoading(false);
+          return;
+      }
+
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
 
       toast({
         title: "Éxito",
-        description: `Reporte de ${reportType} generado y descargado correctamente. (Simulado)`, 
+        description: `Reporte de ${reportType} generado y descargado correctamente.`, 
       });
     } catch (error) {
       console.error("Error generating report:", error);
@@ -69,7 +106,7 @@ export default function ReceptionReportsPage() {
     );
   }
 
-  if (!user || (user.role !== "ADMIN" && user.role !== "COMPLEX_ADMIN" && user.role !== "STAFF")) {
+  if (!user || (user.role !== "ADMIN" && user.role !== "COMPLEX_ADMIN" && user.role !== "STAFF" && user.role !== "RECEPTION")) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -98,7 +135,6 @@ export default function ReceptionReportsPage() {
               <SelectValue placeholder="Seleccionar tipo de reporte" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="daily-summary">Resumen Diario</SelectItem>
               <SelectItem value="visitor-log">Registro de Visitantes</SelectItem>
               <SelectItem value="package-log">Registro de Paquetes</SelectItem>
               <SelectItem value="incident-log">Registro de Incidentes</SelectItem>
@@ -125,14 +161,24 @@ export default function ReceptionReportsPage() {
         </div>
       </div>
 
-      <Button onClick={handleGenerateReport} disabled={loading}>
-        {loading ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <Download className="mr-2 h-4 w-4" />
-        )}
-        Generar y Descargar Reporte
-      </Button>
+      <div className="flex gap-4">
+        <Button onClick={() => handleGenerateReport("pdf")} disabled={loading}>
+          {loading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Download className="mr-2 h-4 w-4" />
+          )}
+          Generar PDF
+        </Button>
+        <Button onClick={() => handleGenerateReport("excel")} disabled={loading}>
+          {loading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Download className="mr-2 h-4 w-4" />
+          )}
+          Generar Excel
+        </Button>
+      </div>
     </div>
   );
 }

@@ -1,72 +1,24 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Body,
-  Param,
-  UseGuards,
-  Query,
-} from '@nestjs/common';
-import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
-import { GetUser } from '../../common/decorators/user.decorator';
+import { Controller, Post, Body, UseGuards, Req, Get, Param } from '@nestjs/common';
 import { FintechService } from './fintech.service';
-import {
-  CreateMicroCreditApplicationDto,
-  UpdateMicroCreditApplicationDto,
-  MicroCreditApplicationDto,
-  MicroCreditFilterParamsDto,
-} from '../../common/dto/fintech.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { UserRole } from '@prisma/client';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard(UserRole.RESIDENT, UserRole.COMPLEX_ADMIN, UserRole.ADMIN))
 @Controller('fintech')
 export class FintechController {
   constructor(private readonly fintechService: FintechService) {}
 
-  @Post('micro-credits')
-  async createMicroCreditApplication(
-    @GetUser() user: any,
-    @Body() createMicroCreditApplicationDto: CreateMicroCreditApplicationDto,
-  ): Promise<MicroCreditApplicationDto> {
-    return this.fintechService.createMicroCreditApplication(
-      user.schemaName,
-      user.userId,
-      createMicroCreditApplicationDto,
-    );
+  @Post('micro-credit/request')
+  @Roles(UserRole.RESIDENT)
+  async requestMicroCredit(@Req() req, @Body() data: any) {
+    return this.fintechService.requestMicroCredit(req.user.schemaName, data);
   }
 
-  @Get('micro-credits')
-  async getMicroCreditApplications(
-    @GetUser() user: any,
-    @Query() filters: MicroCreditFilterParamsDto,
-  ): Promise<MicroCreditApplicationDto[]> {
-    return this.fintechService.getMicroCreditApplications(
-      user.schemaName,
-      filters,
-    );
-  }
-
-  @Get('micro-credits/:id')
-  async getMicroCreditApplicationById(
-    @GetUser() user: any,
-    @Param('id') id: string,
-  ): Promise<MicroCreditApplicationDto> {
-    return this.fintechService.getMicroCreditApplicationById(
-      user.schemaName,
-      +id,
-    );
-  }
-
-  @Put('micro-credits/:id')
-  async updateMicroCreditApplication(
-    @GetUser() user: any,
-    @Param('id') id: string,
-    @Body() updateMicroCreditApplicationDto: UpdateMicroCreditApplicationDto,
-  ): Promise<MicroCreditApplicationDto> {
-    return this.fintechService.updateMicroCreditApplication(
-      user.schemaName,
-      +id,
-      updateMicroCreditApplicationDto,
-    );
+  @Get('credit-score/:userId')
+  @Roles(UserRole.RESIDENT, UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async getCreditScore(@Req() req, @Param('userId') userId: string) {
+    return this.fintechService.getCreditScore(req.user.schemaName, +userId);
   }
 }

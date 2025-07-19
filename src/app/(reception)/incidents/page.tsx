@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import {
@@ -102,6 +102,7 @@ export default function ReceptionIncidentsPage() {
   const [loading, setLoading] = useState(true);
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<
     "reported" | "in_progress" | "resolved" | "closed" | "all"
@@ -224,7 +225,7 @@ export default function ReceptionIncidentsPage() {
       case "critical":
         return "Crítica";
       default:
-        return "Desconocida";
+        return "Desconocido";
     }
   };
 
@@ -525,77 +526,77 @@ export default function ReceptionIncidentsPage() {
             />
           </div>
 
-            <div className="flex flex-wrap gap-2">
-              <Select
-                value={statusFilter}
-                onValueChange={(value) =>
-                  setStatusFilter(
-                    value as
-                      | "reported"
-                      | "in_progress"
-                      | "resolved"
-                      | "closed"
-                      | "all",
-                  )
-                }
-              >
-                <SelectTrigger className="w-full md:w-32">
-                  <SelectValue placeholder="Estado" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="reported">Reportados</SelectItem>
-                  <SelectItem value="in_progress">En proceso</SelectItem>
-                  <SelectItem value="resolved">Resueltos</SelectItem>
-                  <SelectItem value="closed">Cerrados</SelectItem>
-                </SelectContent>
-              </Select>
+          <div className="flex flex-wrap gap-2">
+            <Select
+              value={statusFilter}
+              onValueChange={(value) =>
+                setStatusFilter(
+                  value as
+                    | "reported"
+                    | "in_progress"
+                    | "resolved"
+                    | "closed"
+                    | "all",
+                )
+              }
+            >
+              <SelectTrigger className="w-full md:w-32">
+                <SelectValue placeholder="Estado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="reported">Reportados</SelectItem>
+                <SelectItem value="in_progress">En proceso</SelectItem>
+                <SelectItem value="resolved">Resueltos</SelectItem>
+                <SelectItem value="closed">Cerrados</SelectItem>
+              </SelectContent>
+            </Select>
 
-              <Select
-                value={categoryFilter}
-                onValueChange={(value) =>
-                  setCategoryFilter(
-                    value as
-                      | "security"
-                      | "maintenance"
-                      | "emergency"
-                      | "other"
-                      | "all",
-                  )
-                }
-              >
-                <SelectTrigger className="w-full md:w-36">
-                  <SelectValue placeholder="Categoría" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas</SelectItem>
-                  <SelectItem value="security">Seguridad</SelectItem>
-                  <SelectItem value="maintenance">Mantenimiento</SelectItem>
-                  <SelectItem value="emergency">Emergencia</SelectItem>
-                  <SelectItem value="other">Otro</SelectItem>
-                </SelectContent>
-              </Select>
+            <Select
+              value={categoryFilter}
+              onValueChange={(value) =>
+                setCategoryFilter(
+                  value as
+                    | "security"
+                    | "maintenance"
+                    | "emergency"
+                    | "other"
+                    | "all",
+                )
+              }
+            >
+              <SelectTrigger className="w-full md:w-36">
+                <SelectValue placeholder="Categoría" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas</SelectItem>
+                <SelectItem value="security">Seguridad</SelectItem>
+                <SelectItem value="maintenance">Mantenimiento</SelectItem>
+                <SelectItem value="emergency">Emergencia</SelectItem>
+                <SelectItem value="other">Otro</SelectItem>
+              </SelectContent>
+            </Select>
 
-              <Select
-                value={priorityFilter}
-                onValueChange={(value) =>
-                  setPriorityFilter(
-                    value as "low" | "medium" | "high" | "critical" | "all",
-                  )
-                }
-              >
-                <SelectTrigger className="w-full md:w-32">
-                  <SelectValue placeholder="Prioridad" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas</SelectItem>
-                  <SelectItem value="low">Baja</SelectItem>
-                  <SelectItem value="medium">Media</SelectItem>
-                  <SelectItem value="high">Alta</SelectItem>
-                  <SelectItem value="critical">Crítica</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <Select
+              value={priorityFilter}
+              onValueChange={(value) =>
+                setPriorityFilter(
+                  value as "low" | "medium" | "high" | "critical" | "all",
+                )
+              }
+            >
+              <SelectTrigger className="w-full md:w-32">
+                <SelectValue placeholder="Prioridad" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas</SelectItem>
+                <SelectItem value="low">Baja</SelectItem>
+                <SelectItem value="medium">Media</SelectItem>
+                <SelectItem value="high">Alta</SelectItem>
+                <SelectItem value="critical">Crítica</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </CardContent>
       </Card>
 
@@ -743,16 +744,6 @@ export default function ReceptionIncidentsPage() {
                   <p className="flex items-center">
                     <MapPin className="h-4 w-4 mr-1 text-gray-500" />
                     {selectedIncident.location}
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-1">
-                    Reportado por
-                  </h3>
-                  <p className="flex items-center">
-                    <User className="h-4 w-4 mr-1 text-gray-500" />
-                    {selectedIncident.reportedBy}
                   </p>
                 </div>
 
