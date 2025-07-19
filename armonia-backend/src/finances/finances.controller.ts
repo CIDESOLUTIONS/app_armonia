@@ -3,197 +3,250 @@ import {
   Get,
   Post,
   Put,
+  Delete,
   Body,
   Param,
   UseGuards,
   Query,
-  UseInterceptors,
-  UploadedFile,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { FinancesService } from './finances.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { UserRole } from '@prisma/client';
 import { GetUser } from '../common/decorators/user.decorator';
 import {
-  FeeDto,
-  FeeListResponseDto,
   CreateFeeDto,
   UpdateFeeDto,
-  CreatePaymentDto,
-  CreateBudgetDto,
   FeeFilterParamsDto,
-  PaymentDto,
-  BudgetDto,
-  InitiatePaymentDto,
-  PaymentGatewayCallbackDto,
-} from '../common/dto/finances.dto';
+} from '../common/dto/fees.dto';
+import {
+  CreatePaymentDto,
+  UpdatePaymentDto,
+  PaymentFilterParamsDto,
+  PaymentStatus,
+} from '../common/dto/payments.dto';
+import {
+  CreateBudgetDto,
+  UpdateBudgetDto,
+  BudgetFilterParamsDto,
+} from '../common/dto/budgets.dto';
+import {
+  CreateExpenseDto,
+  UpdateExpenseDto,
+  ExpenseFilterParamsDto,
+} from '../common/dto/expenses.dto';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard(UserRole.COMPLEX_ADMIN, UserRole.ADMIN))
 @Controller('finances')
 export class FinancesController {
   constructor(private readonly financesService: FinancesService) {}
 
-  @Post('payments/initiate')
-  async initiatePayment(
-    @GetUser() user: any,
-    @Body() initiatePaymentDto: InitiatePaymentDto,
-  ): Promise<any> {
-    return this.financesService.initiatePayment(
-      user.schemaName,
-      user.userId,
-      initiatePaymentDto,
-    );
-  }
-
-  @Post('payments/callback')
-  async handlePaymentCallback(
-    @Body() paymentCallbackDto: PaymentGatewayCallbackDto,
-  ): Promise<any> {
-    // This endpoint might not need @GetUser() if it's a public webhook from the payment gateway
-    // Security considerations: Verify webhook signature/IPs
-    return this.financesService.handlePaymentCallback(paymentCallbackDto);
+  // Fees
+  @Post('fees')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async createFee(@GetUser() user: any, @Body() createFeeDto: CreateFeeDto) {
+    return this.financesService.createFee(user.schemaName, createFeeDto);
   }
 
   @Get('fees')
-  async getFees(
-    @GetUser() user: any,
-    @Query() filters: FeeFilterParamsDto,
-  ): Promise<FeeListResponseDto> {
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RESIDENT)
+  async getFees(@GetUser() user: any, @Query() filters: FeeFilterParamsDto) {
     return this.financesService.getFees(user.schemaName, filters);
   }
 
   @Get('fees/:id')
-  async getFee(@GetUser() user: any, @Param('id') id: string): Promise<FeeDto> {
-    return this.financesService.getFee(user.schemaName, +id);
-  }
-
-  @Post('fees')
-  async createFee(
-    @GetUser() user: any,
-    @Body() createFeeDto: CreateFeeDto,
-  ): Promise<FeeDto> {
-    return this.financesService.createFee(user.schemaName, createFeeDto);
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RESIDENT)
+  async getFeeById(@GetUser() user: any, @Param('id') id: string) {
+    return this.financesService.getFeeById(user.schemaName, +id);
   }
 
   @Put('fees/:id')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
   async updateFee(
     @GetUser() user: any,
     @Param('id') id: string,
     @Body() updateFeeDto: UpdateFeeDto,
-  ): Promise<FeeDto> {
+  ) {
     return this.financesService.updateFee(user.schemaName, +id, updateFeeDto);
   }
 
   @Delete('fees/:id')
-  async deleteFee(
-    @GetUser() user: any,
-    @Param('id') id: string,
-  ): Promise<void> {
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async deleteFee(@GetUser() user: any, @Param('id') id: string) {
     return this.financesService.deleteFee(user.schemaName, +id);
   }
 
+  // Payments
   @Post('payments')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
   async createPayment(
     @GetUser() user: any,
     @Body() createPaymentDto: CreatePaymentDto,
-  ): Promise<PaymentDto> {
-    return this.financesService.createPayment(
-      user.schemaName,
-      createPaymentDto,
-    );
-  }
-
-  @Get('properties/:propertyId/payments')
-  async getPropertyPayments(
-    @GetUser() user: any,
-    @Param('propertyId') propertyId: string,
-  ): Promise<PaymentDto[]> {
-    return this.financesService.getPropertyPayments(
-      user.schemaName,
-      +propertyId,
-    );
-  }
-
-  @Get('properties/:propertyId/balance')
-  async getPropertyBalance(
-    @GetUser() user: any,
-    @Param('propertyId') propertyId: string,
   ) {
-    return this.financesService.getPropertyBalance(
-      user.schemaName,
-      +propertyId,
-    );
+    return this.financesService.createPayment(user.schemaName, createPaymentDto);
   }
 
-  @Post('generate-ordinary-fees')
-  async generateOrdinaryFees(
+  @Get('payments')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RESIDENT)
+  async getPayments(
     @GetUser() user: any,
-    @Body() generateFeesDto: any,
+    @Query() filters: PaymentFilterParamsDto,
   ) {
-    const { amount, dueDate, title, description } = generateFeesDto;
-    return this.financesService.generateOrdinaryFees(
+    return this.financesService.getPayments(user.schemaName, filters);
+  }
+
+  @Get('payments/:id')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RESIDENT)
+  async getPaymentById(@GetUser() user: any, @Param('id') id: string) {
+    return this.financesService.getPaymentById(user.schemaName, +id);
+  }
+
+  @Put('payments/:id')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async updatePayment(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() updatePaymentDto: UpdatePaymentDto,
+  ) {
+    return this.financesService.updatePayment(
       user.schemaName,
-      amount,
-      dueDate,
-      title,
-      description,
+      +id,
+      updatePaymentDto,
     );
   }
 
+  @Delete('payments/:id')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async deletePayment(@GetUser() user: any, @Param('id') id: string) {
+    return this.financesService.deletePayment(user.schemaName, +id);
+  }
+
+  // Budgets
   @Post('budgets')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
   async createBudget(
     @GetUser() user: any,
     @Body() createBudgetDto: CreateBudgetDto,
-  ): Promise<BudgetDto> {
+  ) {
     return this.financesService.createBudget(user.schemaName, createBudgetDto);
   }
 
   @Get('budgets')
-  async getBudgetsByYear(
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async getBudgets(
     @GetUser() user: any,
-    @Query('year') year: string,
-  ): Promise<BudgetDto[]> {
-    return this.financesService.getBudgetsByYear(user.schemaName, +year);
+    @Query() filters: BudgetFilterParamsDto,
+  ) {
+    return this.financesService.getBudgets(user.schemaName, filters);
   }
 
-  @Put('budgets/:id/approve')
+  @Get('budgets/:id')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async getBudgetById(@GetUser() user: any, @Param('id') id: string) {
+    return this.financesService.getBudgetById(user.schemaName, +id);
+  }
+
+  @Put('budgets/:id')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async updateBudget(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() updateBudgetDto: UpdateBudgetDto,
+  ) {
+    return this.financesService.updateBudget(
+      user.schemaName,
+      +id,
+      updateBudgetDto,
+    );
+  }
+
+  @Delete('budgets/:id')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async deleteBudget(@GetUser() user: any, @Param('id') id: string) {
+    return this.financesService.deleteBudget(user.schemaName, +id);
+  }
+
+  @Post('budgets/:id/approve')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
   async approveBudget(
     @GetUser() user: any,
     @Param('id') id: string,
-  ): Promise<BudgetDto> {
-    return this.financesService.approveBudget(user.schemaName, +id);
-  }
-
-  @Get('stats')
-  async getFinancialStats(@GetUser() user: any) {
-    return this.financesService.getFinancialStats(user.schemaName);
-  }
-
-  @Post('reports')
-  async generateFinancialReport(@GetUser() user: any, @Body() reportDto: any) {
-    const { startDate, endDate, type } = reportDto;
-    return this.financesService.generateFinancialReport(
-      user.schemaName,
-      startDate,
-      endDate,
-      type,
-    );
-  }
-
-  @Post('upload-statement')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadStatement(
-    @GetUser() user: any,
-    @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.financesService.processBankStatement(user.schemaName, file);
+    return this.financesService.approveBudget(user.schemaName, +id, user.userId);
   }
 
-  @Post('reconcile/approve')
-  async approveReconciliation(@GetUser() user: any, @Body() suggestion: any) {
-    return this.financesService.approveReconciliation(
+  // Expenses
+  @Post('expenses')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async createExpense(
+    @GetUser() user: any,
+    @Body() createExpenseDto: CreateExpenseDto,
+  ) {
+    return this.financesService.createExpense(user.schemaName, createExpenseDto);
+  }
+
+  @Get('expenses')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async getExpenses(
+    @GetUser() user: any,
+    @Query() filters: ExpenseFilterParamsDto,
+  ) {
+    return this.financesService.getExpenses(user.schemaName, filters);
+  }
+
+  @Get('expenses/:id')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async getExpenseById(@GetUser() user: any, @Param('id') id: string) {
+    return this.financesService.getExpenseById(user.schemaName, +id);
+  }
+
+  @Put('expenses/:id')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async updateExpense(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() updateExpenseDto: UpdateExpenseDto,
+  ) {
+    return this.financesService.updateExpense(
       user.schemaName,
-      suggestion,
+      +id,
+      updateExpenseDto,
     );
+  }
+
+  @Delete('expenses/:id')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async deleteExpense(@GetUser() user: any, @Param('id') id: string) {
+    return this.financesService.deleteExpense(user.schemaName, +id);
+  }
+
+  @Get('summary')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RESIDENT)
+  async getFinancialSummary(@GetUser() user: any) {
+    return this.financesService.getFinancialSummary(user.schemaName);
+  }
+
+  @Get('transactions/recent')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RESIDENT)
+  async getRecentTransactions(@GetUser() user: any) {
+    return this.financesService.getRecentTransactions(user.schemaName);
+  }
+
+  @Post('payments/initiate')
+  @Roles(UserRole.RESIDENT)
+  async initiatePayment(
+    @GetUser() user: any,
+    @Body('feeId') feeId: number,
+  ) {
+    return this.financesService.initiatePayment(user.schemaName, feeId, user.userId);
+  }
+
+  @Post('payments/webhook')
+  async handlePaymentWebhook(
+    @Body('transactionId') transactionId: string,
+    @Body('status') status: PaymentStatus,
+  ) {
+    return this.financesService.handlePaymentWebhook(transactionId, status);
   }
 }

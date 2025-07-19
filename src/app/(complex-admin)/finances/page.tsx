@@ -10,10 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  getFinanceSummary,
-  getRecentTransactions,
-} from "@/services/financeService";
+import { getFinanceSummary, getRecentTransactions } from "@/services/financeService";
 import { BankStatementUpload } from "@/components/finances/BankStatementUpload";
 import { FeeGenerationSection } from "@/components/finances/FeeGenerationSection";
 import { FineManagementSection } from "@/components/finances/FineManagementSection";

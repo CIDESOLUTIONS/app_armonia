@@ -1,82 +1,104 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, Palette, Upload } from "lucide-react";
+import { Loader2, Edit, Save, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  getResidentialComplexes,
+  updateResidentialComplex,
+  ResidentialComplex,
+} from "@/services/residentialComplexService";
 
-export default function BrandingSettingsPage() {
+export default function BrandingPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
+  const [complexes, setComplexes] = useState<ResidentialComplex[]>([]);
   const [loading, setLoading] = useState(true);
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [primaryColor, setPrimaryColor] = useState("#4F46E5"); // Default Indigo 600
-  const [secondaryColor, setSecondaryColor] = useState("#6366F1"); // Default Indigo 500
+  const [selectedComplex, setSelectedComplex] = useState<ResidentialComplex | null>(null);
+  const [formData, setFormData] = useState({
+    logoUrl: "",
+    primaryColor: "",
+    secondaryColor: "",
+  });
 
-  useEffect(() => {
-    // Simulate fetching existing branding settings
-    const fetchBrandingSettings = async () => {
-      setLoading(true);
-      try {
-        // In a real scenario, fetch from backend
-        // const settings = await getBrandingSettings();
-        // setLogoPreview(settings.logoUrl);
-        // setPrimaryColor(settings.primaryColor);
-        // setSecondaryColor(settings.secondaryColor);
-      } catch (err: any) {
-        toast({
-          title: "Error",
-          description: "No se pudieron cargar las configuraciones de marca.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (!authLoading && user && user.role === "APP_ADMIN") {
-      fetchBrandingSettings();
-    }
-  }, [authLoading, user, toast]);
-
-  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      setLogoFile(file);
-      setLogoPreview(URL.createObjectURL(file));
-    } else {
-      setLogoFile(null);
-      setLogoPreview(null);
-    }
-  };
-
-  const handleSaveBranding = async () => {
+  const fetchComplexes = useCallback(async () => {
     setLoading(true);
     try {
-      // Simulate uploading logo and saving settings
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // In a real scenario:
-      // if (logoFile) {
-      //   const uploadedLogo = await uploadLogo(logoFile);
-      //   // Save uploadedLogo.url along with colors
-      // }
-      // await saveBrandingSettings({ primaryColor, secondaryColor, logoUrl: uploadedLogo?.url });
-
-      toast({
-        title: "Éxito",
-        description: "Configuración de marca guardada correctamente. (Simulado)",
-      });
+      const data = await getResidentialComplexes();
+      setComplexes(data);
     } catch (error) {
-      console.error("Error saving branding settings:", error);
+      console.error("Error fetching complexes:", error);
       toast({
         title: "Error",
-        description: "Error al guardar la configuración de marca.",
+        description: "No se pudieron cargar los complejos residenciales.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    if (!authLoading && user && user.role === "ADMIN") {
+      fetchComplexes();
+    }
+  }, [authLoading, user, fetchComplexes]);
+
+  useEffect(() => {
+    if (selectedComplex) {
+      setFormData({
+        logoUrl: selectedComplex.logoUrl || "",
+        primaryColor: selectedComplex.primaryColor || "",
+        secondaryColor: selectedComplex.secondaryColor || "",
+      });
+    } else {
+      setFormData({
+        logoUrl: "",
+        primaryColor: "",
+        secondaryColor: "",
+      });
+    }
+  }, [selectedComplex]);
+
+  const handleComplexSelect = (complexId: string) => {
+    const complex = complexes.find((c) => c.id.toString() === complexId);
+    setSelectedComplex(complex || null);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedComplex) return;
+
+    setLoading(true);
+    try {
+      await updateResidentialComplex(selectedComplex.id, formData);
+      toast({
+        title: "Éxito",
+        description: "Configuración de marca actualizada correctamente.",
+      });
+      fetchComplexes(); // Refresh list to show updated data
+    } catch (error) {
+      console.error("Error updating branding:", error);
+      toast({
+        title: "Error",
+        description: "Error al actualizar la configuración de marca.",
         variant: "destructive",
       });
     } finally {
@@ -92,7 +114,7 @@ export default function BrandingSettingsPage() {
     );
   }
 
-  if (!user || user.role !== "APP_ADMIN") {
+  if (!user || user.role !== "ADMIN") {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -110,85 +132,74 @@ export default function BrandingSettingsPage() {
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">
-        Configuración de Marca (White-Labeling)
+        Personalización de Marca (White-Labeling)
       </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="logoUpload">Logo de la Aplicación</Label>
-            <Input
-              id="logoUpload"
-              type="file"
-              accept="image/*"
-              onChange={handleLogoChange}
-              className="mt-1"
-            />
-            {logoPreview && (
-              <div className="mt-4">
-                <img src={logoPreview} alt="Logo Preview" className="max-w-xs h-auto" />
-              </div>
-            )}
-          </div>
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Seleccionar Complejo Residencial</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Label htmlFor="complexSelect">Complejo:</Label>
+          <Select onValueChange={handleComplexSelect}>
+            <SelectTrigger id="complexSelect">
+              <SelectValue placeholder="Selecciona un complejo" />
+            </SelectTrigger>
+            <SelectContent>
+              {complexes.map((complex) => (
+                <SelectItem key={complex.id} value={complex.id.toString()}>
+                  {complex.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
 
-          <div>
-            <Label htmlFor="primaryColor">Color Primario</Label>
-            <Input
-              id="primaryColor"
-              type="color"
-              value={primaryColor}
-              onChange={(e) => setPrimaryColor(e.target.value)}
-              className="mt-1 h-10 w-full"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="secondaryColor">Color Secundario</Label>
-            <Input
-              id="secondaryColor"
-              type="color"
-              value={secondaryColor}
-              onChange={(e) => setSecondaryColor(e.target.value)}
-              className="mt-1 h-10 w-full"
-            />
-          </div>
-
-          <Button onClick={handleSaveBranding} disabled={loading}>
-            {loading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Upload className="mr-2 h-4 w-4" />
-            )}
-            Guardar Configuración de Marca
-          </Button>
-        </div>
-
+      {selectedComplex && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <Palette className="mr-2 h-5 w-5" /> Vista Previa
-            </CardTitle>
+            <CardTitle>Configurar Marca para {selectedComplex.name}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div
-              className="p-6 rounded-lg shadow-lg"
-              style={{ backgroundColor: primaryColor, color: secondaryColor }}
-            >
-              {logoPreview && (
-                <img src={logoPreview} alt="Preview Logo" className="h-12 mb-4" />
-              )}
-              <h3 className="text-xl font-bold mb-2">Título de Ejemplo</h3>
-              <p>Este es un texto de ejemplo para mostrar los colores.</p>
-              <Button
-                className="mt-4"
-                style={{ backgroundColor: secondaryColor, color: primaryColor }}
-              >
-                Botón de Ejemplo
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="logoUrl">URL del Logo</Label>
+                <Input
+                  id="logoUrl"
+                  name="logoUrl"
+                  value={formData.logoUrl}
+                  onChange={handleChange}
+                  placeholder="https://ejemplo.com/logo.png"
+                />
+              </div>
+              <div>
+                <Label htmlFor="primaryColor">Color Primario</Label>
+                <Input
+                  id="primaryColor"
+                  name="primaryColor"
+                  type="color"
+                  value={formData.primaryColor}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <Label htmlFor="secondaryColor">Color Secundario</Label>
+                <Input
+                  id="secondaryColor"
+                  name="secondaryColor"
+                  type="color"
+                  value={formData.secondaryColor}
+                  onChange={handleChange}
+                />
+              </div>
+              <Button type="submit" disabled={loading}>
+                <Save className="mr-2 h-4 w-4" /> Guardar Cambios
               </Button>
-            </div>
+            </form>
           </CardContent>
         </Card>
-      </div>
+      )}
     </div>
   );
 }

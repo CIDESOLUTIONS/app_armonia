@@ -1,7 +1,5 @@
 "use client";
 
-"use client";
-
 import React from "react";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";

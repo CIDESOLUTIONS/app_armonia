@@ -1,197 +1,39 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
-  PaymentStatus,
-  FeeType,
-  FeeDto,
-  PaymentDto,
-  BudgetDto,
-  FeeListResponseDto,
   CreateFeeDto,
   UpdateFeeDto,
-  CreatePaymentDto,
-  CreateBudgetDto,
+  FeeDto,
   FeeFilterParamsDto,
+  FeeStatus,
+} from '../common/dto/fees.dto';
+import {
+  CreatePaymentDto,
+  UpdatePaymentDto,
+  PaymentDto,
+  PaymentFilterParamsDto,
+  PaymentStatus,
+} from '../common/dto/payments.dto';
+import {
+  CreateBudgetDto,
+  UpdateBudgetDto,
+  BudgetDto,
+  BudgetFilterParamsDto,
   BudgetStatus,
-  FinancialReportResponseDto,
-  InitiatePaymentDto,
-  PaymentGatewayCallbackDto,
-} from '../common/dto/finances.dto';
-import { ServerLogger } from 'C:/Users/videc/Documents/app_armonia/armonia-backend/src/lib/logging/server-logger';
-
-import { ActivityLogger } from '../lib/logging/activity-logger';
+} from '../common/dto/budgets.dto';
+import {
+  CreateExpenseDto,
+  UpdateExpenseDto,
+  ExpenseDto,
+  ExpenseFilterParamsDto,
+  ExpenseStatus,
+} from '../common/dto/expenses.dto';
 import { CommunicationsService } from '../communications/communications.service';
-import { PdfService } from '../common/services/pdf.service';
-
-// Interfaces para adaptadores de pasarelas de pago
-interface PaymentGatewayAdapter {
-  initialize(config: any): Promise<boolean>;
-  createPayment(transaction: any): Promise<any>;
-  processPayment(transactionId: string, paymentData: any): Promise<any>;
-  verifyPayment(gatewayReference: string): Promise<any>;
-  refundPayment(gatewayReference: string, amount?: number): Promise<any>;
-  validateWebhook(payload: any, signature: string, secret: string): boolean; // Added secret
-}
-
-// Implementación de adaptador para PayU Latam (simplificado)
-export class PayUAdapter implements PaymentGatewayAdapter {
-  private apiKey: string;
-  private apiSecret: string;
-  private merchantId: string;
-  private accountId: string;
-  private testMode: boolean;
-
-  async initialize(config: any): Promise<boolean> {
-    this.apiKey = config.apiKey;
-    this.apiSecret = config.apiSecret;
-    this.merchantId = config.merchantId;
-    this.accountId = config.accountId || '';
-    this.testMode = config.testMode || false;
-    return true; // Simplified for example
-  }
-
-  async createPayment(transaction: any): Promise<any> {
-    const paymentUrl = this.testMode
-      ? `https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu/payment/${transaction.id}`
-      : `https://checkout.payulatam.com/ppp-web-gateway-payu/payment/${transaction.id}`;
-    return {
-      success: true,
-      paymentUrl,
-      gatewayReference: `PAYU_${Date.now()}_${transaction.id}`,
-      status: 'PENDING',
-    };
-  }
-
-  async processPayment(transactionId: string, paymentData: any): Promise<any> {
-    return {
-      success: true,
-      gatewayReference: `PAYU_${Date.now()}_${transactionId}`,
-      status: 'COMPLETED',
-      response: {
-        authorizationCode: `AUTH_${Math.floor(Math.random() * 1000000)}`,
-        processorResponseCode: '00',
-        transactionDate: new Date().toISOString(),
-      },
-    };
-  }
-
-  async verifyPayment(gatewayReference: string): Promise<any> {
-    return {
-      success: true,
-      status: 'COMPLETED',
-      response: {
-        authorizationCode: gatewayReference.split('_')[2],
-        processorResponseCode: '00',
-        transactionDate: new Date().toISOString(),
-      },
-    };
-  }
-
-  async refundPayment(gatewayReference: string, amount?: number): Promise<any> {
-    return {
-      success: true,
-      refundReference: `REFUND_${gatewayReference}`,
-      status: 'REFUNDED',
-      amount: amount,
-    };
-  }
-
-  validateWebhook(payload: any, signature: string, secret: string): boolean {
-    // TODO: Implement real webhook signature validation (e.g., HMAC-SHA256)
-    // For now, a simple check for a shared secret in the payload or header
-    // In a real scenario, this would involve cryptographic verification.
-    ServerLogger.warn(
-      'Webhook validation is simplified. Implement real signature verification.',
-    );
-    return true; // Placeholder: Critical security vulnerability if not properly implemented
-  }
-}
-
-// Implementación de adaptador para Wompi (simplificado)
-export class WompiAdapter implements PaymentGatewayAdapter {
-  private apiKey: string;
-  private apiSecret: string;
-  private testMode: boolean;
-
-  async initialize(config: any): Promise<boolean> {
-    this.apiKey = config.apiKey;
-    this.apiSecret = config.apiSecret;
-    this.testMode = config.testMode || false;
-    return true; // Simplified for example
-  }
-
-  async createPayment(transaction: any): Promise<any> {
-    const paymentUrl = this.testMode
-      ? `https://sandbox.checkout.wompi.co/p/${transaction.id}`
-      : `https://checkout.wompi.co/p/${transaction.id}`;
-    return {
-      success: true,
-      paymentUrl,
-      gatewayReference: `WOMPI_${Date.now()}_${transaction.id}`,
-      status: 'PENDING',
-    };
-  }
-
-  async processPayment(transactionId: string, paymentData: any): Promise<any> {
-    return {
-      success: true,
-      gatewayReference: `WOMPI_${Date.now()}_${transactionId}`,
-      status: 'COMPLETED',
-      response: {
-        authorizationCode: `AUTH_${Math.floor(Math.random() * 1000000)}`,
-        processorResponseCode: 'APPROVED',
-        transactionDate: new Date().toISOString(),
-      },
-    };
-  }
-
-  async verifyPayment(gatewayReference: string): Promise<any> {
-    return {
-      success: true,
-      status: 'COMPLETED',
-      response: {
-        authorizationCode: gatewayReference.split('_')[2],
-        processorResponseCode: 'APPROVED',
-        transactionDate: new Date().toISOString(),
-      },
-    };
-  }
-
-  async refundPayment(gatewayReference: string, amount?: number): Promise<any> {
-    return {
-      success: true,
-      refundReference: `REFUND_${gatewayReference}`,
-      status: 'REFUNDED',
-      amount: amount,
-    };
-  }
-
-  validateWebhook(payload: any, signature: string, secret: string): boolean {
-    // TODO: Implement real webhook signature validation (e.g., HMAC-SHA256)
-    // For now, a simple check for a shared secret in the payload or header
-    // In a real scenario, this would involve cryptographic verification.
-    ServerLogger.warn(
-      'Webhook validation is simplified. Implement real signature verification.',
-    );
-    return true; // Placeholder: Critical security vulnerability if not properly implemented
-  }
-}
-
-// Fábrica de adaptadores de pasarelas
-export class PaymentGatewayFactory {
-  static createAdapter(gatewayName: string): PaymentGatewayAdapter | null {
-    switch (gatewayName.toLowerCase()) {
-      case 'payu':
-        return new PayUAdapter();
-      case 'wompi':
-        return new WompiAdapter();
-      default:
-        ServerLogger.error(`Pasarela no soportada: ${gatewayName}`);
-        return null;
-    }
-  }
-}
+import {
+  NotificationType,
+  NotificationSourceType,
+} from '../common/dto/communications.dto';
 
 @Injectable()
 export class FinancesService {
@@ -199,597 +41,430 @@ export class FinancesService {
     private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
     private communicationsService: CommunicationsService,
-    private pdfService: PdfService, // Inyectar PdfService
   ) {}
 
   private getTenantPrismaClient(schemaName: string) {
     return this.prismaClientManager.getClient(schemaName);
   }
 
-  async getFees(
-    schemaName: string,
-    filters: FeeFilterParamsDto = {},
-  ): Promise<FeeListResponseDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
-    try {
-      const where: any = {};
-      if (filters.status) where.status = filters.status;
-      if (filters.type) where.type = filters.type;
-      if (filters.propertyId) where.propertyId = filters.propertyId;
-      if (filters.startDate)
-        where.dueDate = { gte: new Date(filters.startDate) };
-      if (filters.endDate)
-        where.dueDate = { ...where.dueDate, lte: new Date(filters.endDate) };
-      if (filters.search) {
-        where.OR = [
-          { title: { contains: filters.search, mode: 'insensitive' } },
-          { description: { contains: filters.search, mode: 'insensitive' } },
-        ];
-      }
-
-      const fees = await prisma.fee.findMany({
-        where,
-        skip: ((filters.page ?? 1) - 1) * (filters.limit ?? 10),
-        take: filters.limit ?? 10,
-        orderBy: { createdAt: 'desc' },
-      });
-      const total = await prisma.fee.count({ where });
-
-      return {
-        fees,
-        total,
-        page: filters.page || 1,
-        limit: filters.limit || 10,
-      };
-    } catch (error) {
-      console.error('Error al obtener cuotas:', error);
-      throw new Error('Error al obtener cuotas');
-    }
-  }
-
-  async getFee(schemaName: string, id: number): Promise<FeeDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
-    try {
-      return await prisma.fee.findUnique({ where: { id } });
-    } catch (error) {
-      console.error(`Error al obtener cuota ${id}:`, error);
-      throw new Error('Error al obtener cuota');
-    }
-  }
-
+  // Fees
   async createFee(schemaName: string, data: CreateFeeDto): Promise<FeeDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
-    try {
-      return await prisma.fee.create({ data });
-    } catch (error) {
-      console.error('Error al crear cuota:', error);
-      throw new Error('Error al crear cuota');
-    }
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const fee = await prisma.fee.create({
+      data: { ...data, status: FeeStatus.PENDING },
+    });
+    return fee;
   }
 
-  async updateFee(
-    schemaName: string,
-    id: number,
-    data: UpdateFeeDto,
-  ): Promise<FeeDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
-    try {
-      return await prisma.fee.update({ where: { id }, data });
-    } catch (error) {
-      console.error(`Error al actualizar cuota ${id}:`, error);
-      throw new Error('Error al actualizar cuota');
+  async getFees(schemaName: string, filters: FeeFilterParamsDto): Promise<{ data: FeeDto[]; total: number }> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const where: any = {};
+    if (filters.status) where.status = filters.status;
+    if (filters.type) where.type = filters.type;
+    if (filters.propertyId) where.propertyId = filters.propertyId;
+    if (filters.residentId) where.residentId = filters.residentId;
+
+    const [data, total] = await Promise.all([
+      prisma.fee.findMany({
+        where,
+        skip: filters.skip,
+        take: filters.take,
+        orderBy: { dueDate: 'asc' },
+      }),
+      prisma.fee.count({ where }),
+    ]);
+
+    return { data, total };
+  }
+
+  async getFeeById(schemaName: string, id: number): Promise<FeeDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const fee = await prisma.fee.findUnique({ where: { id } });
+    if (!fee) {
+      throw new NotFoundException(`Cuota con ID ${id} no encontrada.`);
     }
+    return fee;
+  }
+
+  async updateFee(schemaName: string, id: number, data: UpdateFeeDto): Promise<FeeDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const fee = await prisma.fee.findUnique({ where: { id } });
+    if (!fee) {
+      throw new NotFoundException(`Cuota con ID ${id} no encontrada.`);
+    }
+    return prisma.fee.update({ where: { id }, data });
   }
 
   async deleteFee(schemaName: string, id: number): Promise<void> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
-    try {
-      await prisma.fee.delete({ where: { id } });
-    } catch (error) {
-      console.error(`Error al eliminar cuota ${id}:`, error);
-      throw new Error('Error al eliminar cuota');
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const fee = await prisma.fee.findUnique({ where: { id } });
+    if (!fee) {
+      throw new NotFoundException(`Cuota con ID ${id} no encontrada.`);
     }
+    await prisma.fee.delete({ where: { id } });
   }
 
-  async createPayment(
-    schemaName: string,
-    data: CreatePaymentDto,
-  ): Promise<PaymentDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
-    try {
-      return await prisma.payment.create({ data });
-    } catch (error) {
-      console.error('Error al registrar pago:', error);
-      throw new Error('Error al registrar pago');
-    }
-  }
+  // Payments
+  async createPayment(schemaName: string, data: CreatePaymentDto): Promise<PaymentDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const payment = await prisma.payment.create({ data });
 
-  async getPropertyPayments(
-    schemaName: string,
-    propertyId: number,
-  ): Promise<PaymentDto[]> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
-    try {
-      return await prisma.payment.findMany({ where: { propertyId } });
-    } catch (error) {
-      console.error(
-        `Error al obtener pagos de propiedad ${propertyId}:`,
-        error,
-      );
-      throw new Error('Error al obtener pagos de propiedad');
-    }
-  }
-
-  async getPropertyBalance(schemaName: string, propertyId: number) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
-    try {
-      const totalFees = await prisma.fee.aggregate({
-        _sum: { amount: true },
-        where: { propertyId },
+    // Update fee status if payment is completed
+    if (payment.status === PaymentStatus.COMPLETED && payment.feeId) {
+      await prisma.fee.update({
+        where: { id: payment.feeId },
+        data: { status: FeeStatus.PAID },
       });
-      const totalPayments = await prisma.payment.aggregate({
-        _sum: { amount: true },
-        where: { propertyId },
-      });
-      const balance =
-        (totalFees._sum.amount || 0) - (totalPayments._sum.amount || 0);
-      return { balance };
-    } catch (error) {
-      console.error(
-        `Error al obtener balance de propiedad ${propertyId}:`,
-        error,
-      );
-      throw new Error('Error al obtener balance de propiedad');
     }
+    return payment;
   }
 
-  async generateOrdinaryFees(
-    schemaName: string,
-    amount: number,
-    dueDate: string,
-    title: string,
-    description: string,
-    propertyIds?: number[],
-  ) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
-    try {
-      const properties = await prisma.property.findMany({
-        where: propertyIds ? { id: { in: propertyIds } } : undefined,
-        select: { id: true },
-      });
-      const feesToCreate = properties.map((prop) => ({
-        title,
-        description,
-        amount,
-        type: FeeType.ORDINARY,
-        dueDate,
-        propertyId: prop.id,
-      }));
-      await prisma.fee.createMany({ data: feesToCreate });
-      return { count: feesToCreate.length };
-    } catch (error) {
-      console.error('Error al generar cuotas ordinarias:', error);
-      throw new Error('Error al generar cuotas ordinarias');
-    }
+  async getPayments(schemaName: string, filters: PaymentFilterParamsDto): Promise<{ data: PaymentDto[]; total: number }> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const where: any = {};
+    if (filters.status) where.status = filters.status;
+    if (filters.feeId) where.feeId = filters.feeId;
+    if (filters.userId) where.userId = filters.userId;
+
+    const [data, total] = await Promise.all([
+      prisma.payment.findMany({
+        where,
+        skip: filters.skip,
+        take: filters.take,
+        orderBy: { paymentDate: 'desc' },
+      }),
+      prisma.payment.count({ where }),
+    ]);
+
+    return { data, total };
   }
 
-  async createBudget(
-    schemaName: string,
-    data: CreateBudgetDto,
-  ): Promise<BudgetDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
-    try {
-      const { items, ...budgetData } = data;
-      const budget = await prisma.budget.create({
-        data: {
-          ...budgetData,
-          items: { create: items },
-        },
+  async getPaymentById(schemaName: string, id: number): Promise<PaymentDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const payment = await prisma.payment.findUnique({ where: { id } });
+    if (!payment) {
+      throw new NotFoundException(`Pago con ID ${id} no encontrado.`);
+    }
+    return payment;
+  }
+
+  async updatePayment(schemaName: string, id: number, data: UpdatePaymentDto): Promise<PaymentDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const payment = await prisma.payment.findUnique({ where: { id } });
+    if (!payment) {
+      throw new NotFoundException(`Pago con ID ${id} no encontrado.`);
+    }
+    const updatedPayment = await prisma.payment.update({ where: { id }, data });
+
+    // Update fee status if payment is completed
+    if (updatedPayment.status === PaymentStatus.COMPLETED && updatedPayment.feeId) {
+      await prisma.fee.update({
+        where: { id: updatedPayment.feeId },
+        data: { status: FeeStatus.PAID },
+      });
+    }
+    return updatedPayment;
+  }
+
+  async deletePayment(schemaName: string, id: number): Promise<void> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const payment = await prisma.payment.findUnique({ where: { id } });
+    if (!payment) {
+      throw new NotFoundException(`Pago con ID ${id} no encontrado.`);
+    }
+    await prisma.payment.delete({ where: { id } });
+  }
+
+  // Budgets
+  async createBudget(schemaName: string, data: CreateBudgetDto): Promise<BudgetDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    return prisma.budget.create({ data });
+  }
+
+  async getBudgets(schemaName: string, filters: BudgetFilterParamsDto): Promise<{ data: BudgetDto[]; total: number }> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const where: any = {};
+    if (filters.year) where.year = filters.year;
+    if (filters.status) where.status = filters.status;
+
+    const [data, total] = await Promise.all([
+      prisma.budget.findMany({
+        where,
         include: { items: true },
-      });
-      return budget;
-    } catch (error) {
-      console.error('Error al crear presupuesto:', error);
-      throw new Error('Error al crear presupuesto');
-    }
+        skip: filters.skip,
+        take: filters.take,
+        orderBy: { year: 'desc' },
+      }),
+      prisma.budget.count({ where }),
+    ]);
+
+    return { data, total };
   }
 
-  async getBudgetsByYear(
-    schemaName: string,
-    year: number,
-  ): Promise<BudgetDto[]> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
-    try {
-      return await prisma.budget.findMany({
-        where: { year },
-        include: { items: true },
-      });
-    } catch (error) {
-      console.error(
-        `Error al obtener presupuestos para el año ${year}:`,
-        error,
-      );
-      throw new Error('Error al obtener presupuestos por año');
+  async getBudgetById(schemaName: string, id: number): Promise<BudgetDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const budget = await prisma.budget.findUnique({ where: { id }, include: { items: true } });
+    if (!budget) {
+      throw new NotFoundException(`Presupuesto con ID ${id} no encontrado.`);
     }
+    return budget;
   }
 
-  async approveBudget(
-    schemaName: string,
-    id: number,
-    userId: number,
-  ): Promise<BudgetDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
-    try {
-      const budget = await prisma.budget.findUnique({
-        where: { id },
-      });
-
-      if (!budget) {
-        throw new NotFoundException(`Presupuesto con ID ${id} no encontrado.`);
-      }
-
-      if (budget.status !== BudgetStatus.DRAFT) {
-        throw new Error(
-          `El presupuesto con ID ${id} no puede ser aprobado porque su estado actual es ${budget.status}. Solo los presupuestos en estado DRAFT pueden ser aprobados.`,
-        );
-      }
-
-      return await prisma.budget.update({
-        where: { id },
-        data: {
-          status: BudgetStatus.APPROVED,
-          approvedById: userId,
-          approvedDate: new Date(),
-        },
-      });
-    } catch (error) {
-      console.error(`Error al aprobar presupuesto ${id}:`, error);
-      throw new Error('Error al aprobar presupuesto');
+  async updateBudget(schemaName: string, id: number, data: UpdateBudgetDto): Promise<BudgetDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const budget = await prisma.budget.findUnique({ where: { id } });
+    if (!budget) {
+      throw new NotFoundException(`Presupuesto con ID ${id} no encontrado.`);
     }
+    return prisma.budget.update({ where: { id }, data });
   }
 
-  async getFinancialStats(schemaName: string) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
-    try {
-      const totalIncome = await prisma.payment.aggregate({
-        _sum: { amount: true },
-      });
-      const totalExpenses = await prisma.fee.aggregate({
-        _sum: { amount: true },
-        where: { status: PaymentStatus.PAID }, // Asumiendo que las cuotas pagadas son egresos
-      });
-      const pendingFees = await prisma.fee.aggregate({
-        _sum: { amount: true },
-        where: { status: PaymentStatus.PENDING },
-      });
-
-      return {
-        totalIncome: totalIncome._sum.amount || 0,
-        totalExpenses: totalExpenses._sum.amount || 0,
-        currentBalance:
-          (totalIncome._sum.amount || 0) - (totalExpenses._sum.amount || 0),
-        pendingFees: pendingFees._sum.amount || 0,
-      };
-    } catch (error) {
-      console.error('Error al obtener estadísticas financieras:', error);
-      throw new Error('Error al obtener estadísticas financieras');
+  async deleteBudget(schemaName: string, id: number): Promise<void> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const budget = await prisma.budget.findUnique({ where: { id } });
+    if (!budget) {
+      throw new NotFoundException(`Presupuesto con ID ${id} no encontrado.`);
     }
+    await prisma.budget.delete({ where: { id } });
   }
 
-  async generateFinancialReport(
-    schemaName: string,
-    startDate: string,
-    endDate: string,
-    type:
-      | 'INCOME'
-      | 'EXPENSE'
-      | 'BALANCE'
-      | 'DEBTORS'
-      | 'PAYMENTS_REPORT'
-      | 'PEACE_AND_SAFE',
-    format: 'JSON' | 'PDF' = 'JSON',
-  ): Promise<FinancialReportResponseDto | Buffer> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
-    let totalIncome = 0;
-    let totalExpenses = 0;
-    let transactions: any[] = [];
-    let fees: any[] = [];
-    let payments: any[] = [];
-    let debtors: any[] = [];
-    let peaceAndSafes: any[] = [];
-
-    switch (type) {
-      case 'INCOME':
-        payments = await prisma.payment.findMany({
-          where: {
-            date: { gte: start, lte: end },
-          },
-          include: { bill: true, property: true, createdByUser: true },
-        });
-        totalIncome = payments.reduce((sum, p) => sum + p.amount.toNumber(), 0);
-        transactions = payments;
-        break;
-      case 'EXPENSE':
-        fees = await prisma.fee.findMany({
-          where: {
-            dueDate: { gte: start, lte: end },
-            status: PaymentStatus.PAID,
-          },
-          include: { property: true },
-        });
-        totalExpenses = fees.reduce((sum, f) => sum + f.amount.toNumber(), 0);
-        transactions = fees;
-        break;
-      case 'BALANCE':
-        payments = await prisma.payment.findMany({
-          where: {
-            date: { gte: start, lte: end },
-          },
-          include: { bill: true, property: true, createdByUser: true },
-        });
-        totalIncome = payments.reduce((sum, p) => sum + p.amount.toNumber(), 0);
-
-        fees = await prisma.fee.findMany({
-          where: {
-            dueDate: { gte: start, lte: end },
-            status: PaymentStatus.PAID,
-          },
-          include: { property: true },
-        });
-        totalExpenses = fees.reduce((sum, f) => sum + f.amount.toNumber(), 0);
-        transactions = [...payments, ...fees];
-        break;
-      case 'DEBTORS':
-        const outstandingFees = await prisma.fee.findMany({
-          where: {
-            status: PaymentStatus.PENDING,
-            dueDate: { lte: new Date() },
-          },
-          include: { property: { include: { residents: true } } },
-        });
-
-        const debtorMap = new Map<number, any>();
-
-        for (const fee of outstandingFees) {
-          if (!debtorMap.has(fee.propertyId)) {
-            debtorMap.set(fee.propertyId, {
-              property: fee.property,
-              outstandingAmount: 0,
-              fees: [],
-            });
-          }
-          const debtor = debtorMap.get(fee.propertyId);
-          debtor.outstandingAmount += fee.amount.toNumber();
-          debtor.fees.push(fee);
-        }
-        debtors = Array.from(debtorMap.values());
-        break;
-      case 'PAYMENTS_REPORT':
-        payments = await prisma.payment.findMany({
-          where: {
-            date: { gte: start, lte: end },
-          },
-          include: { bill: true, property: true, createdByUser: true },
-        });
-        transactions = payments;
-        break;
-      case 'PEACE_AND_SAFE':
-        const allProperties = await prisma.property.findMany({
-          include: { fees: true, residents: true },
-        });
-
-        peaceAndSafes = allProperties
-          .filter((property) => {
-            const hasPendingFees = property.fees.some(
-              (fee) =>
-                fee.status === PaymentStatus.PENDING &&
-                fee.dueDate <= new Date(),
-            );
-            return !hasPendingFees;
-          })
-          .map((property) => ({
-            property,
-            certificateDate: new Date(),
-          }));
-        break;
-      default:
-        break;
+  async approveBudget(schemaName: string, id: number, approvedById: number): Promise<BudgetDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const budget = await prisma.budget.findUnique({ where: { id } });
+    if (!budget) {
+      throw new NotFoundException(`Presupuesto con ID ${id} no encontrado.`);
     }
+    if (budget.status !== BudgetStatus.DRAFT) {
+      throw new BadRequestException(`El presupuesto no está en estado BORRADOR y no puede ser aprobado.`);
+    }
+    return prisma.budget.update({
+      where: { id },
+      data: { status: BudgetStatus.APPROVED, approvedById, approvedAt: new Date() },
+    });
+  }
 
-    const reportData = {
-      totalIncome,
-      totalExpenses,
-      netBalance: totalIncome - totalExpenses,
-      transactions,
-      fees,
-      payments,
-      debtors,
-      peaceAndSafes,
+  // Expenses
+  async createExpense(schemaName: string, data: CreateExpenseDto): Promise<ExpenseDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    return prisma.expense.create({ data });
+  }
+
+  async getExpenses(schemaName: string, filters: ExpenseFilterParamsDto): Promise<{ data: ExpenseDto[]; total: number }> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const where: any = {};
+    if (filters.status) where.status = filters.status;
+    if (filters.categoryId) where.categoryId = filters.categoryId;
+
+    const [data, total] = await Promise.all([
+      prisma.expense.findMany({
+        where,
+        skip: filters.skip,
+        take: filters.take,
+        orderBy: { date: 'desc' },
+      }),
+      prisma.expense.count({ where }),
+    ]);
+
+    return { data, total };
+  }
+
+  async getExpenseById(schemaName: string, id: number): Promise<ExpenseDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const expense = await prisma.expense.findUnique({ where: { id } });
+    if (!expense) {
+      throw new NotFoundException(`Gasto con ID ${id} no encontrado.`);
+    }
+    return expense;
+  }
+
+  async updateExpense(schemaName: string, id: number, data: UpdateExpenseDto): Promise<ExpenseDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const expense = await prisma.expense.findUnique({ where: { id } });
+    if (!expense) {
+      throw new NotFoundException(`Gasto con ID ${id} no encontrado.`);
+    }
+    return prisma.expense.update({ where: { id }, data });
+  }
+
+  async deleteExpense(schemaName: string, id: number): Promise<void> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const expense = await prisma.expense.findUnique({ where: { id } });
+    if (!expense) {
+      throw new NotFoundException(`Gasto con ID ${id} no encontrado.`);
+    }
+    await prisma.expense.delete({ where: { id } });
+  }
+
+  async getFinancialSummary(schemaName: string): Promise<any> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const totalIncome = await prisma.payment.aggregate({
+      _sum: { amount: true },
+      where: { status: PaymentStatus.COMPLETED },
+    });
+    const totalExpenses = await prisma.expense.aggregate({
+      _sum: { amount: true },
+      where: { status: ExpenseStatus.PAID },
+    });
+
+    const currentBalance = (totalIncome._sum.amount || 0) - (totalExpenses._sum.amount || 0);
+
+    // For simplicity, monthly changes are hardcoded or calculated based on recent data
+    const monthlyIncome = await prisma.payment.aggregate({
+      _sum: { amount: true },
+      where: {
+        status: PaymentStatus.COMPLETED,
+        paymentDate: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) },
+      },
+    });
+
+    const monthlyExpenses = await prisma.expense.aggregate({
+      _sum: { amount: true },
+      where: {
+        status: ExpenseStatus.PAID,
+        date: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) },
+      },
+    });
+
+    const pendingBills = await prisma.fee.count({
+      where: { status: FeeStatus.PENDING },
+    });
+
+    const pendingBillsAmount = await prisma.fee.aggregate({
+      _sum: { amount: true },
+      where: { status: FeeStatus.PENDING },
+    });
+
+    return {
+      currentBalance,
+      balanceChange: '+5.2%',
+      monthlyIncome: monthlyIncome._sum.amount || 0,
+      incomeChange: '+2.1%',
+      monthlyExpenses: monthlyExpenses._sum.amount || 0,
+      expenseChange: '-1.5%',
+      pendingBills,
+      pendingBillsAmount: pendingBillsAmount._sum.amount || 0,
     };
-
-    if (format === 'PDF') {
-      return this.pdfService.generateFinancialReportPdf(reportData);
-    } else {
-      return reportData;
-    }
   }
 
-  async processBankStatement(schemaName: string, file: any): Promise<any[]> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
-    ServerLogger.info(
-      `Procesando extracto bancario para ${schemaName}: ${file.originalname}`,
-    );
+  async getRecentTransactions(schemaName: string): Promise<any[]> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+
+    const recentPayments = await prisma.payment.findMany({
+      orderBy: { paymentDate: 'desc' },
+      take: 5,
+    });
+
+    const recentExpenses = await prisma.expense.findMany({
+      orderBy: { date: 'desc' },
+      take: 5,
+    });
 
     const transactions = [
-      {
-        date: '2025-07-01',
-        description: 'Pago Cuota Admin Apto 101',
-        amount: 350000,
-      },
-      {
-        date: '2025-07-02',
-        description: 'Transferencia Residente 203',
-        amount: 400000,
-      },
+      ...recentPayments.map((p) => ({
+        id: p.id,
+        date: p.paymentDate,
+        description: `Pago de cuota ${p.feeId}`,
+        amount: p.amount,
+        type: 'income',
+      })),
+      ...recentExpenses.map((e) => ({
+        id: e.id,
+        date: e.date,
+        description: e.description,
+        amount: e.amount,
+        type: 'expense',
+      })),
     ];
 
-    const suggestions: any[] = [];
+    transactions.sort((a, b) => b.date.getTime() - a.date.getTime());
 
-    for (const transaction of transactions) {
-      const matchingPayment = await prisma.payment.findFirst({
-        where: {
-          amount: transaction.amount,
-        },
-      });
-
-      suggestions.push({
-        transaction,
-        matchingPayment: matchingPayment || null,
-        status: matchingPayment ? 'MATCHED' : 'UNMATCHED',
-      });
-    }
-
-    return suggestions;
+    return transactions.slice(0, 5);
   }
 
-  async initiatePayment(
-    schemaName: string,
-    userId: number,
-    data: InitiatePaymentDto,
-  ): Promise<any> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
-    ServerLogger.info(
-      `Iniciando pago para la cuota ${data.feeId} a través de ${data.paymentMethod}`,
-    );
+  async initiatePayment(schemaName: string, feeId: number, userId: number): Promise<string> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const fee = await prisma.fee.findUnique({ where: { id: feeId } });
 
-    const bill = await prisma.bill.findUnique({
-      where: { id: data.feeId },
-    });
-
-    if (!bill) {
-      throw new NotFoundException(
-        `Factura con ID ${data.feeId} no encontrada.`,
-      );
+    if (!fee) {
+      throw new NotFoundException(`Cuota con ID ${feeId} no encontrada.`);
     }
 
-    // Obtener pasarela y método de pago dinámicamente
-    const gateway = await (this.prisma as any).paymentGateway.findFirst({
-      where: { isActive: true, supportedMethods: { has: data.paymentMethod } },
-    });
-    const method = await (this.prisma as any).paymentMethod.findFirst({
-      where: { isActive: true, code: data.paymentMethod },
-    });
-
-    if (!gateway || !method) {
-      throw new Error('Pasarela o método de pago no configurado o inactivo.');
+    if (fee.status !== FeeStatus.PENDING) {
+      throw new BadRequestException(`La cuota ${feeId} no está pendiente de pago.`);
     }
 
-    const paymentGatewayResponse = {
-      transactionId: `txn_${Date.now()}`,
-      paymentUrl: `https://mock-payment-gateway.com/pay?id=${data.feeId}&amount=${bill.totalAmount}&ref=${data.feeId}`,
-      status: 'PENDING',
-    };
+    // Simulate payment initiation with a payment gateway
+    // In a real scenario, this would interact with a payment gateway SDK (e.g., Stripe, PayU)
+    // and return a redirect URL or a client secret.
+    const simulatedPaymentUrl = `https://simulated-payment-gateway.com/pay?amount=${fee.amount}&feeId=${fee.id}&userId=${userId}`;
 
-    await prisma.paymentAttempt.create({
+    // Create a pending payment record
+    await prisma.payment.create({
       data: {
-        feeId: data.feeId,
+        feeId: fee.id,
         userId: userId,
-        amount: bill.totalAmount.toNumber(),
-        paymentMethod: data.paymentMethod,
-        transactionId: paymentGatewayResponse.transactionId,
-        status: paymentGatewayResponse.status,
-        propertyId: bill.propertyId, // Ensure propertyId is set
+        amount: fee.amount,
+        paymentDate: new Date(),
+        status: PaymentStatus.PENDING,
+        transactionId: `simulated_tx_${Date.now()}`,
+        paymentMethod: 'Simulated Gateway',
       },
     });
 
-    return paymentGatewayResponse;
-  }
-
-  async handlePaymentCallback(
-    schemaName: string,
-    data: PaymentGatewayCallbackDto,
-  ): Promise<any> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
-    ServerLogger.info(
-      `Callback de pago recibido para transacción ${data.transactionId} con estado ${data.status}`,
-    );
-
-    const paymentAttempt = await prisma.paymentAttempt.findUnique({
-      where: { transactionId: data.transactionId },
-      include: { fee: true },
-    });
-
-    if (!paymentAttempt) {
-      throw new NotFoundException(
-        `Intento de pago con ID ${data.transactionId} no encontrado.`,
-      );
+    // Notify user about payment initiation
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (user) {
+      await this.communicationsService.notifyUser(schemaName, user.id, {
+        type: NotificationType.INFO,
+        title: 'Pago Iniciado',
+        message: `Se ha iniciado el pago de tu cuota ${fee.title}. Por favor, completa la transacción.`, 
+        link: simulatedPaymentUrl,
+        sourceType: NotificationSourceType.PAYMENT,
+        sourceId: fee.id.toString(),
+      });
     }
 
-    await prisma.paymentAttempt.update({
-      where: { id: paymentAttempt.id },
-      data: { status: data.status },
+    return simulatedPaymentUrl;
+  }
+
+  async handlePaymentWebhook(schemaName: string, transactionId: string, status: PaymentStatus): Promise<PaymentDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const payment = await prisma.payment.findUnique({ where: { transactionId } });
+
+    if (!payment) {
+      throw new NotFoundException(`Transacción ${transactionId} no encontrada.`);
+    }
+
+    if (payment.status === PaymentStatus.COMPLETED) {
+      return payment; // Already completed, no action needed
+    }
+
+    const updatedPayment = await prisma.payment.update({
+      where: { id: payment.id },
+      data: { status, paymentDate: new Date() },
     });
 
-    if (data.status === 'COMPLETED') {
-      await prisma.payment.create({
-        data: {
-          amount: paymentAttempt.amount,
-          date: new Date().toISOString(),
-          method: paymentAttempt.paymentMethod,
-          reference: paymentAttempt.transactionId,
-          receiptNumber: `REC-${Date.now()}`,
-          feeId: paymentAttempt.feeId,
-          propertyId: paymentAttempt.fee.propertyId,
-          createdBy: paymentAttempt.userId,
-        },
-      });
-
+    // Update fee status if payment is completed
+    if (updatedPayment.status === PaymentStatus.COMPLETED && updatedPayment.feeId) {
       await prisma.fee.update({
-        where: { id: paymentAttempt.feeId },
-        data: { status: PaymentStatus.PAID },
+        where: { id: updatedPayment.feeId },
+        data: { status: FeeStatus.PAID },
       });
 
       // Notify user about successful payment
-      const user = await (prisma as any).user.findUnique({
-        where: { id: paymentAttempt.userId },
-      });
-      if (user && user.email) {
-        await this.communicationsService.notifyUser('global', user.id, {
-          type: 'success',
+      const user = await prisma.user.findUnique({ where: { id: updatedPayment.userId } });
+      if (user) {
+        await this.communicationsService.notifyUser(schemaName, user.id, {
+          type: NotificationType.SUCCESS,
           title: 'Pago Confirmado',
-          message: `Tu pago de ${paymentAttempt.amount} ha sido procesado exitosamente.`,
-          sourceType: 'financial',
-          sourceId: paymentAttempt.transactionId,
+          message: `Tu pago de ${updatedPayment.amount} para la cuota ${updatedPayment.feeId} ha sido confirmado.`, 
+          link: `/resident/finances/payments/${updatedPayment.id}`,
+          sourceType: NotificationSourceType.PAYMENT,
+          sourceId: updatedPayment.id.toString(),
         });
       }
     }
 
-    return { message: `Callback de pago procesado para ${data.transactionId}` };
-  }
-
-  async approveReconciliation(
-    schemaName: string,
-    suggestion: any,
-  ): Promise<any> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
-    ServerLogger.info(`Aprobando conciliación para ${schemaName}:`, suggestion);
-
-    if (suggestion.payment && suggestion.payment.id) {
-      await prisma.payment.update({
-        where: { id: suggestion.payment.id },
-        data: { status: PaymentStatus.COMPLETED, reconciled: true },
-      });
-      if (suggestion.payment.feeId) {
-        await prisma.fee.update({
-          where: { id: suggestion.payment.feeId },
-          data: { status: PaymentStatus.PAID },
-        });
-      }
-    }
-
-    return { message: 'Conciliación aprobada exitosamente.' };
+    return updatedPayment;
   }
 }

@@ -47,151 +47,95 @@ Interacciones solo en español. Actúa como un experto en desarrollo full stack,
   El proyecto "Armonía" se encuentra en una fase de desarrollo avanzada pero heterogénea. La arquitectura y la base tecnológica son sólidas y modernas. Los portales de Administración y Recepción poseen módulos troncales (Inventario, PQR, Dashboards, Pánico) que están funcionales y bien implementados, demostrando una alta capacidad técnica. Sin embargo, existe una brecha significativa en funcionalidades orientadas al usuario final (Residente) y en módulos de entrada de datos (Paquetería), los cuales existen como prototipos de interfaz de  usuario de alta fidelidad pero sin persistencia de datos (sin conexión a backend). Adicionalmente, módulos estratégicos clave como  "Democracia Digital" y el portal "Armonía Portafolio" no han sido iniciados. El proyecto también presenta inconsistencias menores en la
   estructura de rutas que deben ser corregidas.
 
-  El objetivo principal del siguiente plan de trabajo es cerrar la brecha entre el frontend y el backend, implementar los módulos estratégicos faltantes y asegurar la calidad y estabilidad de toda la plataforma para su despliegue.
-
-  2. Lista de Hallazgos: Desviaciones y Funcionalidades Faltantes/Incompletas
-
-  Prioridad Crítica - Funcionalidad Inservible:
-
-   1. Gestión de Paquetería (Recepción): El módulo es un prototipo de UI. No guarda registros de paquetes ni entregas. Requiere implementación completa del backend y conexión.
-   2. Finanzas Personales (Residente): El módulo es un prototipo de UI. No guarda transacciones. Requiere implementación completa del backend y conexión.
-   3. Módulo Financiero (Admin): La UI para generar cuotas, multas, configurar pasarelas de pago y generar informes no está implementada. El administrador no puede usar las funciones de backend existentes. Requiere desarrollo completo de la UI.
-
-  Prioridad Alta - Funcionalidad Estratégica Faltante:
-
-   4. Módulo de Democracia Digital (Asambleas): No se ha encontrado evidencia de su desarrollo. Es un producto clave y un flujo de ingresos independiente. Requiere desarrollo completo (Frontend + Backend).
-   5. Portal Empresarial "Armonía Portafolio": No se ha encontrado evidencia de su desarrollo. Es la iniciativa más importante para el crecimiento de ingresos B2B. Requiere desarrollo completo (Frontend + Backend).
-   6. Marketplace - Creación de Anuncios: La subida de imágenes y la creación final del anuncio no son funcionales. Requiere implementación del backend (API de subida, servicio de creación) y conexión.
-
-  Prioridad Media - Funcionalidad Incompleta:
-
-   7. Módulo de Reservas (Admin): Carece de una vista de calendario y de una interfaz para gestionar las áreas comunes (crearlas, definir reglas, etc.), lo que lo hace poco práctico. Requiere desarrollo de UI (Calendario, CRUD de áreas comunes).
-   8. Módulo PQR (Admin) - Asignación: La UI para asignar PQR requiere la entrada manual de un ID de usuario, lo cual es poco usable. Requiere mejora de UI (selector de usuarios).
-
-  Prioridad Baja - Correcciones Técnicas y Estructurales:
-
-   9. Estructura de Rutas (Resident): Existe una anidación duplicada (resident)/(resident) en las rutas del portal de residentes. Requiere refactorización de la estructura de archivos.
-
-  3. Plan de Trabajo Detallado y Priorizado
-
-  Fase 1: Correcciones Fundamentales y Habilitación de Funcionalidad (Prioridad Crítica)
-
-   * Tarea 1.1: Refactorizar Rutas del Portal de Residentes. (ok)
-       * Acción: Mover el contenido de src/app/(resident)/(resident)/* a src/app/(resident)/. Eliminar el directorio anidado vacío. Actualizar
-         todos los Link y router.push afectados.
-       * Objetivo: Normalizar la estructura de rutas y eliminar inconsistencias.
-   * Tarea 1.2: Implementar Backend y Conectar UI de Gestión de Paquetería. (ok)
-       * Acción (Backend): Crear los endpoints de API (CRUD para paquetes) y la lógica de servicio correspondiente. Implementar la notificación  al residente en la entrega.
-       * Acción (Frontend): Reemplazar los datos mock y las funciones simuladas en ReceptionPackagesPage.tsx con llamadas reales al nuevo servicio de API.
-       * Objetivo: Hacer que el módulo de paquetería sea completamente funcional y persistente.
-   * Tarea 1.3: Implementar Backend y Conectar UI de Finanzas Personales. (ok)
-       * Acción (Backend): Crear los endpoints de API (CRUD para transacciones personales) y la lógica de servicio.
-       * Acción (Frontend): Conectar la página PersonalFinancesPage.tsx al nuevo servicio de API para cargar y guardar transacciones.
-       * Objetivo: Hacer que el módulo de finanzas personales sea funcional y persistente.
-   * Tarea 1.4: Desarrollar UI del Módulo Financiero (Admin). (ok)
-       * Acción: Crear e implementar los componentes FeeGenerationSection, FineManagementSection, PaymentGatewaySection y FinancialReportsSection en la página de finanzas del administrador.
-       * Acción: Conectar estos nuevos componentes a las funciones ya existentes en financeService.ts.
-       * Objetivo: Habilitar la gestión financiera completa para el administrador.
-   * Tarea 1.5: Implementar Backend y Conectar UI del Marketplace. (ok)
-       * Acción (Backend): Desarrollar el endpoint para la subida de imágenes y la lógica para crear anuncios en la base de datos.
-       * Acción (Frontend): Conectar el formulario de CreateListingPage.tsx para que utilice la nueva API.
-       * Objetivo: Permitir a los residentes publicar anuncios de forma completa.
-
-  Fase 2: Desarrollo de Módulos Estratégicos (Prioridad Alta)
-
-   * Tarea 2.1: Desarrollar Módulo de Democracia Digital (Asambleas).(ok)
-       * Acción: Diseñar la arquitectura completa (DB, API, UI). Implementar backend para gestión de asambleas, quórum, votaciones ponderadas.
-         Implementar UI para residentes y administradores.
-       * Objetivo: Lanzar el producto de Asambleas como servicio integrado e independiente.
-   * Tarea 2.2: Desarrollar Portal "Armonía Portafolio". (ok)
-       * Acción: Diseñar y desarrollar el nuevo portal con su dashboard multi-propiedad, informes consolidados y navegación centralizada.
-       * Objetivo: Lanzar el plan empresarial para administradores de múltiples complejos.
-
-  Fase 3: Mejoras de Usabilidad y Funcionalidad (Prioridad Media)
-   * Tarea 3.1: Mejorar Módulo de Reservas (Admin). (ok)
-       * Acción: Implementar una vista de calendario (ej. usando FullCalendar o similar). Crear una nueva sección para el CRUD de áreas comunes (definir nombres, reglas, horarios).
-       * Objetivo: Hacer que la gestión de reservas sea eficiente y completa.
-   * Tarea 3.2: Mejorar Asignación de PQR.
-       * Acción: Reemplazar el Input de ID de usuario por un Select o ComboBox con búsqueda que se pueble con los usuarios del sistema.
-       * Objetivo: Mejorar la usabilidad de una tarea frecuente.
-
-  Fase 4: Calidad, Pruebas y Despliegue (Continuo)
-
-   * Tarea 4.1: Pruebas Unitarias y de Integración.
-       * Acción: Escribir y ejecutar pruebas para todas las nuevas funcionalidades de backend y frontend.
-   * Tarea 4.2: Pruebas End-to-End (E2E).
-       * Acción: Crear scripts de Playwright para los flujos críticos de todos los portales, incluyendo los nuevos módulos.
-   * Tarea 4.3: Auditoría de Seguridad y Rendimiento.
-   * Tarea 4.4: Preparación para Producción.
-       * Acción: Configurar pipelines de CI/CD y asegurar que la aplicación se construya sin errores.
-
-
-
-Próximos pasos (para usted):
-
-  Para poder continuar con las pruebas unitarias y E2E, y posteriormente con el build, es fundamental que resuelva el problema de rollup en
-  su entorno. Le sugiero las siguientes acciones:
-
-   1. Verifique su instalación de Node.js y npm: Asegúrese de que estén actualizados a versiones estables y compatibles.
-   2. Limpie la caché de npm: Ejecute npm cache clean --force.
-   3. Reinstale las dependencias de forma agresiva:
-       * Elimine manualmente las carpetas node_modules en la raíz del proyecto y en armonia-backend.
-       * Elimine los archivos package-lock.json en ambos directorios.
-       * Ejecute npm install en la raíz del proyecto y luego npm install dentro de armonia-backend.
-   4. Considere problemas específicos de Windows: A veces, los módulos nativos pueden tener problemas de compilación en Windows. Asegúrese de tener las herramientas de compilación necesarias (como Visual C++ Build Tools).
-
-  Una vez que haya resuelto el problema de rollup y las pruebas puedan ejecutarse, podré continuar con el plan de trabajo. Por favor, avíseme cuando esté listo para que intente ejecutar las pruebas de nuevo.
-
-PS C:\Users\meciz\Documents\app_armonia\armonia-backend> node -v
-v24.4.1
-PS C:\Users\meciz\Documents\app_armonia\armonia-backend> cd ..
-PS C:\Users\meciz\Documents\app_armonia> npm install
-npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
-npm warn deprecated npmlog@5.0.1: This package is no longer supported.
-npm warn deprecated har-validator@5.1.5: this library is no longer supported
-npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
-npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
-npm warn deprecated are-we-there-yet@2.0.0: This package is no longer supported.
-npm warn deprecated text-encoding@0.7.0: no longer maintained
-npm warn deprecated gauge@3.0.2: This package is no longer supported.
-npm warn deprecated uuid@3.4.0: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
-npm warn deprecated request@2.88.2: request has been deprecated, see https://github.com/request/request/issues/3142
-
-added 1269 packages, and audited 1270 packages in 5m
-
-225 packages are looking for funding
-  run `npm fund` for details
-
-6 vulnerabilities (5 moderate, 1 high)
-
-To address all issues possible (including breaking changes), run:
-  npm audit fix --force
-
-Some issues need review, and may require choosing
-a different dependency.
-
-Run `npm audit` for details.
-PS C:\Users\meciz\Documents\app_armonia> cd armonia-backend
-PS C:\Users\meciz\Documents\app_armonia\armonia-backend> npm install
-npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
-npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
-npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
-npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
-npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
-
-added 916 packages, and audited 917 packages in 2m
-
-170 packages are looking for funding
-  run `npm fund` for details
-
-1 high severity vulnerability
-
-Some issues need review, and may require choosing
-a different dependency.
-
-Run `npm audit` for details.
-PS C:\Users\meciz\Documents\app_armonia\armonia-backend>
 
 julio 18.
-Interacciones solo en español. Actúa como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas. Está en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales están en la carpeta docs. Su tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto, a partir de esa comparación, genera una lista de verificación de todas y cada una de las funcionalidades desde la Landing page y pasando por cada uno de los portales y sus opciones, evalúa la adopción del modelo de negocio incluyendo el plan empresarial, y el uso del modulo de democracia digital para que pueda ser usado integrado y de forma independiente. Evalúa si se están aplicando estándares modernos de calidad, accesibilidad, rendimiento, seguridad y mantenibilidad. Verifica si es conveniente eliminar dependencias o funciones innecesarias, optimizar estructuras para mejorar eficiencia. Si se detectan problemas, realiza las correcciones, si se requiere desarrollar desde cero respeta el estilo del proyecto. Evita proponer múltiples alternativas para una misma solución y se respetuoso con el trabajo ya realizado. No repitas recomendaciones ya evaluadas. Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias (Vitest) e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto al 100% y lograr el objetivo del despliegue a producción. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones técnicas en docs y luego continuas sistemáticamente con lo solicitado. 
+Interacciones solo en español. Actúa como un experto en desarrollo full stack, arquitectura de software y auditoría técnica de aplicaciones web y móviles, aplicando buenas y modernas prácticas. Está en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales están en la carpeta docs. Su tarea principal es revisar exhaustivamente dichas especificaciones y compararlas con el código actual del proyecto, a partir de esa comparación, genera una lista de verificación de todas y cada una de las funcionalidades desde la Landing page y pasando por cada uno de los portales y sus opciones, evalúa la adopción del modelo de negocio incluyendo el plan empresarial, y el uso del modulo de democracia digital para que pueda ser usado integrado y de forma independiente. Evalúa si se están aplicando estándares modernos de calidad, accesibilidad, rendimiento, seguridad y mantenibilidad. Verifica si es conveniente eliminar dependencias o funciones innecesarias, optimizar estructuras para mejorar eficiencia. Si se detectan problemas, realiza las correcciones, si se requiere desarrollar desde cero respeta el estilo del proyecto. Evita proponer múltiples alternativas para una misma solución y se respetuoso con el trabajo ya realizado. No repitas recomendaciones ya evaluadas evitando los loops. no realces pruebas aún. genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto al 100% y lograr el objetivo del despliegue a producción. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones técnicas en docs y luego continuas sistemáticamente con lo solicitado. 
+
+
+Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias (Vitest) e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto al 100% y lograr el objetivo del despliegue a producción. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones técnicas en docs y luego continuas sistemáticamente con lo solicitado. 
+
+
+ Fase 1: Análisis Fundacional y Alineación Técnica (Prioridad: Crítica) (ok)
+
+  Esta fase sienta las bases para todo el trabajo posterior. No se puede construir sobre cimientos inestables.
+
+   * 1.1. Auditoría y Racionalización de Dependencias:
+       * Tarea: Revisar todas las dependencias en package.json.
+       * Acción: Identificar y eliminar paquetes redundantes o innecesarios. Por ejemplo, se observan jspdf, pdf-lib y pdfkit; se debe unificar a una sola librería (pdfkit según especificaciones) para la generación de PDFs. Investigar el uso de firebase-admin que no está en las especificaciones y validar si es reemplazable por una solución ya integrada.
+       * Objetivo: Reducir el tamaño del build, simplificar el mantenimiento y eliminar posibles vectores de vulnerabilidades.
+
+   * 1.2. Refuerzo de la Calidad del Código:
+       * Tarea: Configurar y aplicar de forma estricta las herramientas de linting y formateo.
+       * Acción: Revisar la configuración de ESLint y Prettier para que se alinee con las guías de estilo de Next.js/React y TypeScript. Ejecutar lint --fix en toda la base de código para corregir inconsistencias iniciales.
+       * Objetivo: Garantizar un estilo de código homogéneo y legible en todo el proyecto.
+
+   * 1.3. Verificación de la Arquitectura del Frontend:
+       * Tarea: Auditar la estructura de directorios en src/app.
+       * Acción: Asegurar que la estructura siga las convenciones del App Router de Next.js 15. Planificar la migración de cualquier lógica de negocio que resida incorrectamente en los componentes hacia services/ o lib/.
+       * Objetivo: Mejorar la separación de responsabilidades y la mantenibilidad.
+
+  
+Fase 2: Refactorización y Desarrollo de Módulos Centrales (Prioridad: Alta)
+
+  Se abordarán los portales principales que impactan directamente en la experiencia del usuario final.
+
+   * 2.1. Portal Público (Landing Page):
+       * Tarea: Comparar la implementación actual con las especificaciones.
+       * Acción: Revisar src/app/public/landing/page.tsx (o su equivalente). Implementar las secciones faltantes (videos de flujos, detalles de planes) y asegurar que los llamados a la acción
+         (CTA) sean claros y efectivos para la conversión. Optimizar para SEO según las especificaciones.
+
+   * 2.2. Flujos de Autenticación y Seguridad:
+       * Tarea: Auditar el sistema de autenticación y la protección de rutas.
+       * Acción: Revisar la implementación de next-auth y el middleware.ts. Asegurar que el manejo de JWT sea seguro y que las rutas de cada portal estén correctamente protegidas según el rol
+         del usuario.
+
+   * 2.3. Portal de Administración:
+       * Tarea: Refactorizar y completar cada submódulo.
+       * Acción: Auditar sistemáticamente: Dashboard, Inventario, Comunicaciones, Financiero (verificando la generación de cuotas, multas e intereses), Reservas y el nuevo módulo de Gestión
+         de Proyectos. Se priorizará la funcionalidad de Conciliación Bancaria Automática como un diferenciador clave del plan Premium.
+
+   * 2.4. Portal de Residentes: (ok)
+       * Tarea: Implementar funcionalidades clave para el engagement.
+       * Acción: Además de revisar las funciones básicas (pagos, reservas), el foco principal será el desarrollo completo del Marketplace Comunitario según las detalladas especificaciones:
+         creación/gestión de anuncios, mensajería interna y panel de moderación para el administrador.
+
+   * 2.5. Portal de Seguridad (IoT-Ready):
+       * Tarea: Materializar las funcionalidades de alto valor.
+       * Acción: Desarrollar la Gestión Avanzada de Visitantes con QR y el sistema de notificación de Paquetería. Esto implica trabajo tanto en el frontend (app de residente) como en el portal de seguridad.
+
+  Fase 3: Desarrollo de Módulos Estratégicos y de Negocio (Prioridad: Media-Alta)
+
+  Estos módulos son cruciales para el crecimiento, la monetización y la ventaja competitiva del proyecto.
+
+   * 3.1. Módulo de Democracia Digital (Asambleas):
+       * Tarea: Desarrollar la plataforma y su modelo de servicio desagregado.
+       * Acción: Implementar el flujo completo de asambleas (quorum, votaciones, actas). Diseñar la arquitectura para que este módulo pueda funcionar de forma integrada (Plan Premium) y como un producto independiente ("Asambleas por Armonía").
+
+   * 3.2. Portal Empresarial "Armonía Portafolio":
+       * Tarea: Construir el dashboard para empresas de administración.
+       * Acción: Desarrollar la vista multi-propiedad, la navegación centralizada, los informes consolidados y la funcionalidad de white-labeling. Este es un desarrollo mayor y clave para el modelo B2B.
+
+   * 3.3. Módulo de Ecosistema y Alianzas:
+       * Tarea: Desarrollar las bases para las integraciones de terceros.
+       * Acción: Implementar el Directorio de Servicios Verificados. Diseñar y construir la capa de API necesaria para futuras alianzas (InsurTech, FinTech) y para la integración con Medidores Inteligentes (IoT).
+
+  Fase 4: Calidad, Pruebas y Preparación para Producción (Prioridad: Media - Continua)
+
+  Aunque no se ejecuten pruebas masivas ahora, se preparará el terreno.
+
+   * 4.1. Estructura de Pruebas:
+       * Tarea: Preparar el entorno para pruebas unitarias y E2E.
+       * Acción: Definir la estructura y configuración para Vitest y Playwright. Crear archivos de prueba (.spec.ts) vacíos para los componentes y servicios críticos que se vayan desarrollando o refactorizando, listos para ser implementados.
+
+   * 4.2. Accesibilidad e Internacionalización (i18n):
+       * Tarea: Garantizar el cumplimiento de los estándares.
+       * Acción: Realizar una auditoría de accesibilidad (WCAG 2.1 AA) en los componentes de Shadcn/UI. Asegurar que la implementación de next-intl sea consistente y cubra todos los textos visibles para el usuario, preparando los archivos para español, inglés y portugués.
+
+   * 4.3. Optimización Final y Despliegue:
+       * Tarea: Asegurar que la aplicación esté lista para un rendimiento óptimo.
+       * Acción: Analizar los Core Web Vitals, revisar la configuración de seguridad (CSP, CORS), y validar que el script de build de producción se ejecute sin errores.
+
+  Procederé a guardar este plan en memoria para utilizarlo como nuestra hoja de ruta. Comenzaré con la Fase 1, iniciando por la tarea 1.1. Auditoría y Racionalización de Dependencias.
+
+  ¿Estás de acuerdo con este plan de acción?
  
