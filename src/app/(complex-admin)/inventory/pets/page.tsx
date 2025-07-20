@@ -11,6 +11,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -22,14 +29,6 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import {
   getPets,
   createPet,
@@ -55,23 +54,11 @@ interface Pet {
   type: string;
   breed?: string;
   age?: number;
-  weight?: number;
-  color?: string;
-  vaccinated: boolean;
-  vaccineExpiryDate?: string;
-  notes?: string;
-  propertyId: number;
   residentId: number;
   isActive: boolean;
 }
 
-import { getProperties } from "@/services/propertyService";
 import { getResidents } from "@/services/residentService";
-
-interface PropertyOption {
-  id: number;
-  unitNumber: string;
-}
 
 interface ResidentOption {
   id: number;
@@ -82,7 +69,6 @@ export default function PetsPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
   const [pets, setPets] = useState<Pet[]>([]);
-  const [properties, setProperties] = useState<PropertyOption[]>([]);
   const [residents, setResidents] = useState<ResidentOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -93,14 +79,8 @@ export default function PetsPage() {
     defaultValues: {
       name: "",
       type: "DOG",
-      breed: undefined,
-      age: undefined,
-      weight: undefined,
-      color: undefined,
-      vaccinated: false,
-      vaccineExpiryDate: undefined,
-      notes: undefined,
-      propertyId: 0,
+      breed: "", // Default to empty string instead of undefined
+      age: 0, // Default to 0 instead of undefined
       residentId: 0,
       isActive: true,
     },
@@ -113,27 +93,20 @@ export default function PetsPage() {
     formState: { isSubmitting },
   } = form;
 
-  const fetchPetsAndRelatedData = useCallback(async () => {
+  const fetchPetsAndResidents = useCallback(async () => {
     setLoading(true);
     try {
-      const [petsData, propertiesData, residentsData] = await Promise.all([
+      const [petsData, residentsData] = await Promise.all([
         getPets(),
-        getProperties(),
         getResidents(),
       ]);
       setPets(petsData);
-      setProperties(
-        propertiesData.map((p: any) => ({
-          id: p.id,
-          unitNumber: p.unitNumber,
-        })),
-      );
-      setResidents(residentsData.map((r: any) => ({ id: r.id, name: r.name })));
-    } catch (error) {
+      setResidents(residentsData.map((r) => ({ id: r.id, name: r.name })));
+    } catch (error: Error) {
       console.error("Error fetching data:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las mascotas.",
+        description: "No se pudieron cargar los datos.",
         variant: "destructive",
       });
     } finally {
@@ -143,23 +116,17 @@ export default function PetsPage() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      fetchPetsAndRelatedData();
+      fetchPetsAndResidents();
     }
-  }, [authLoading, user, fetchPetsAndRelatedData]);
+  }, [authLoading, user, fetchPetsAndResidents]);
 
   const handleAddPet = () => {
     setCurrentPet(null);
     reset({
       name: "",
       type: "DOG",
-      breed: undefined,
-      age: undefined,
-      weight: undefined,
-      color: undefined,
-      vaccinated: false,
-      vaccineExpiryDate: undefined,
-      notes: undefined,
-      propertyId: 0,
+      breed: "",
+      age: 0,
       residentId: 0,
       isActive: true,
     });
@@ -171,14 +138,8 @@ export default function PetsPage() {
     reset({
       name: pet.name,
       type: pet.type,
-      breed: pet.breed,
-      age: pet.age,
-      weight: pet.weight,
-      color: pet.color,
-      vaccinated: pet.vaccinated,
-      vaccineExpiryDate: pet.vaccineExpiryDate,
-      notes: pet.notes,
-      propertyId: pet.propertyId,
+      breed: pet.breed || "",
+      age: pet.age || 0,
       residentId: pet.residentId,
       isActive: pet.isActive,
     });
@@ -201,8 +162,8 @@ export default function PetsPage() {
         });
       }
       setIsModalOpen(false);
-      fetchPetsAndRelatedData();
-    } catch (error) {
+      fetchPetsAndResidents();
+    } catch (error: Error) {
       console.error("Error saving pet:", error);
       toast({
         title: "Error",
@@ -228,8 +189,8 @@ export default function PetsPage() {
         title: "Éxito",
         description: "Mascota eliminada correctamente.",
       });
-      fetchPetsAndRelatedData();
-    } catch (error) {
+      fetchPetsAndResidents();
+    } catch (error: Error) {
       console.error("Error deleting pet:", error);
       toast({
         title: "Error",
@@ -285,10 +246,6 @@ export default function PetsPage() {
               <TableHead>Tipo</TableHead>
               <TableHead>Raza</TableHead>
               <TableHead>Edad</TableHead>
-              <TableHead>Peso</TableHead>
-              <TableHead>Color</TableHead>
-              <TableHead>Vacunado</TableHead>
-              <TableHead>Propiedad</TableHead>
               <TableHead>Residente</TableHead>
               <TableHead>Activa</TableHead>
               <TableHead></TableHead>
@@ -301,17 +258,9 @@ export default function PetsPage() {
                 <TableCell>{pet.type}</TableCell>
                 <TableCell>{pet.breed}</TableCell>
                 <TableCell>{pet.age}</TableCell>
-                <TableCell>{pet.weight}</TableCell>
-                <TableCell>{pet.color}</TableCell>
                 <TableCell>
-                  {pet.vaccinated ? (
-                    <Badge variant="default">Sí</Badge>
-                  ) : (
-                    <Badge variant="destructive">No</Badge>
-                  )}
+                  {residents.find((r) => r.id === pet.residentId)?.name || "N/A"}
                 </TableCell>
-                <TableCell>{pet.propertyId}</TableCell>
-                <TableCell>{pet.residentId}</TableCell>
                 <TableCell>
                   {pet.isActive ? (
                     <Badge variant="default">Sí</Badge>
@@ -382,7 +331,7 @@ export default function PetsPage() {
                       <SelectContent>
                         <SelectItem value="DOG">Perro</SelectItem>
                         <SelectItem value="CAT">Gato</SelectItem>
-                        <SelectItem value="BIRD">Pájaro</SelectItem>
+                        <SelectItem value="BIRD">Ave</SelectItem>
                         <SelectItem value="OTHER">Otro</SelectItem>
                       </SelectContent>
                     </Select>
@@ -419,115 +368,6 @@ export default function PetsPage() {
                         }
                       />
                     </FormControl>
-                    <FormMessage className="col-span-full text-right" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name="weight"
-                render={({ field }) => (
-                  <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Peso (kg)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        className="col-span-3"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value))
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage className="col-span-full text-right" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name="color"
-                render={({ field }) => (
-                  <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Color</FormLabel>
-                    <FormControl>
-                      <Input className="col-span-3" {...field} />
-                    </FormControl>
-                    <FormMessage className="col-span-full text-right" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name="vaccinated"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>Vacunado</FormLabel>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name="vaccineExpiryDate"
-                render={({ field }) => (
-                  <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">
-                      Fecha Vencimiento Vacuna
-                    </FormLabel>
-                    <FormControl>
-                      <Input type="date" className="col-span-3" {...field} />
-                    </FormControl>
-                    <FormMessage className="col-span-full text-right" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Notas</FormLabel>
-                    <FormControl>
-                      <Textarea className="col-span-3" {...field} />
-                    </FormControl>
-                    <FormMessage className="col-span-full text-right" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name="propertyId"
-                render={({ field }) => (
-                  <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Propiedad</FormLabel>
-                    <Select
-                      onValueChange={(value) => field.onChange(parseInt(value))}
-                      value={field.value ? String(field.value) : ""}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="col-span-3 p-2 border rounded-md">
-                          <SelectValue placeholder="Seleccionar Propiedad" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {properties.map((property) => (
-                          <SelectItem
-                            key={property.id}
-                            value={String(property.id)}
-                          >
-                            {property.unitNumber}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
                 )}
@@ -574,7 +414,7 @@ export default function PetsPage() {
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none">
-                      <FormLabel>Activo</FormLabel>
+                      <FormLabel>Activa</FormLabel>
                     </div>
                     <FormMessage />
                   </FormItem>
@@ -598,8 +438,8 @@ export default function PetsPage() {
           <DialogHeader>
             <DialogTitle>Confirmar Eliminación</DialogTitle>
             <DialogDescription>
-              ¿Estás seguro de que quieres eliminar esta mascota? Esta acción no
-              se puede deshacer.
+              ¿Estás seguro de que quieres eliminar esta mascota? Esta acción
+              no se puede deshacer.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

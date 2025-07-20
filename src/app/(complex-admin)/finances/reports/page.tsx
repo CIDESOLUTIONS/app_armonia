@@ -55,11 +55,11 @@ export default function FinancialReportsPage() {
         title: "Éxito",
         description: "Reporte generado y descargado correctamente.",
       });
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error generating financial report:", error);
       toast({
         title: "Error",
-        description: "Error al generar el reporte financiero.",
+        description: "Error al generar el reporte financiero: " + error.message,
         variant: "destructive",
       });
     } finally {

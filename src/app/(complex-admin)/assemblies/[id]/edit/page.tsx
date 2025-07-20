@@ -39,8 +39,8 @@ export default function EditAssemblyPage() {
   const params = useParams();
   const assemblyId = params.id ? parseInt(params.id as string) : null;
 
-  const [assembly, setAssembly] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [assembly, setAssembly] = useState<AssemblyFormValues | null>(null);
+  const [pageLoading, setPageLoading] = useState(true); // Renamed to avoid conflict
 
   const form = useForm<AssemblyFormValues>({
     resolver: zodResolver(assemblySchema),
@@ -61,6 +61,7 @@ export default function EditAssemblyPage() {
   } = form;
 
   const fetchAssembly = useCallback(async () => {
+    setPageLoading(true);
     try {
       if (!assemblyId) {
         router.push("/complex-admin/assemblies");
@@ -84,16 +85,16 @@ export default function EditAssemblyPage() {
         });
         router.push("/complex-admin/assemblies");
       }
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching assembly:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar la asamblea.",
+        description: "No se pudo cargar la asamblea: " + error.message,
         variant: "destructive",
       });
       router.push("/complex-admin/assemblies");
     } finally {
-      setLoading(false);
+      setPageLoading(false);
     }
   }, [assemblyId, router, toast, reset]);
 
@@ -104,7 +105,6 @@ export default function EditAssemblyPage() {
   }, [authLoading, user, assemblyId, fetchAssembly]);
 
   const onSubmit = async (data: AssemblyFormValues) => {
-    setLoading(true);
     if (!assemblyId) return;
 
     try {
@@ -114,19 +114,17 @@ export default function EditAssemblyPage() {
         description: "Asamblea actualizada correctamente.",
       });
       router.push("/complex-admin/assemblies");
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error updating assembly:", error);
       toast({
         title: "Error",
-        description: "Error al actualizar la asamblea.",
+        description: "Error al actualizar la asamblea: " + error.message,
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
-  if (authLoading || loading) {
+  if (authLoading || pageLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />

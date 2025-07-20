@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
@@ -65,11 +65,11 @@ export default function ResidentDashboardPage() {
             )
           : [];
         setProjects(relevantProjects);
-      } catch (error) {
+      } catch (error: Error) {
         console.error("Error fetching resident dashboard data:", error);
         toast({
           title: "Error",
-          description: "No se pudieron cargar los datos del dashboard.",
+          description: "No se pudieron cargar los datos del dashboard: " + error.message,
           variant: "destructive",
         });
       } finally {

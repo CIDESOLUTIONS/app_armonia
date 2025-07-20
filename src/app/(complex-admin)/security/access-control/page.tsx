@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2, Fingerprint, Lock, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,18 +15,18 @@ export default function AccessControlPage() {
     setLoading(true);
     try {
       // Placeholder for actual biometric enrollment logic
-      console.log("Initiating biometric enrollment...");
+      // console.log("Initiating biometric enrollment..."); // Removed console.log
       await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate API call
 
       toast({
         title: "Éxito",
         description: "Proceso de enrolamiento biométrico iniciado (simulado).",
       });
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error during biometric enrollment:", error);
       toast({
         title: "Error",
-        description: "Error al iniciar el enrolamiento biométrico.",
+        description: "Error al iniciar el enrolamiento biométrico: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -38,18 +38,18 @@ export default function AccessControlPage() {
     setLoading(true);
     try {
       // Placeholder for actual restricted zone creation logic
-      console.log("Adding restricted zone...");
+      // console.log("Adding restricted zone..."); // Removed console.log
       await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate API call
 
       toast({
         title: "Éxito",
         description: "Zona restringida añadida (simulado).",
       });
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error adding restricted zone:", error);
       toast({
         title: "Error",
-        description: "Error al añadir zona restringida.",
+        description: "Error al añadir zona restringida: " + error.message,
         variant: "destructive",
       });
     } finally {

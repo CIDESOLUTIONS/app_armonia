@@ -12,6 +12,12 @@ import {
   updateBrandingSettings,
 } from "@/services/brandingService";
 
+interface BrandingSettings {
+  logoUrl?: string;
+  primaryColor: string;
+  secondaryColor: string;
+}
+
 export default function BrandingSettingsPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
@@ -27,11 +33,11 @@ export default function BrandingSettingsPage() {
       setPrimaryColor(data.primaryColor);
       setSecondaryColor(data.secondaryColor);
       // No se carga el logoFile directamente, solo su URL si existe
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching branding settings:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar la configuración de marca.",
+        description: "No se pudo cargar la configuración de marca: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -68,11 +74,11 @@ export default function BrandingSettingsPage() {
         title: "Éxito",
         description: "Configuración de marca guardada correctamente.",
       });
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving branding settings:", error);
       toast({
         title: "Error",
-        description: "Error al guardar la configuración de marca.",
+        description: "Error al guardar la configuración de marca: " + error.message,
         variant: "destructive",
       });
     } finally {

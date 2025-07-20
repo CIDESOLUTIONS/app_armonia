@@ -39,11 +39,11 @@ export default function BrandingPage() {
     try {
       const data = await getResidentialComplexes();
       setComplexes(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching complexes:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar los complejos residenciales.",
+        description: "No se pudieron cargar los complejos residenciales: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -95,11 +95,11 @@ export default function BrandingPage() {
         description: "Configuración de marca actualizada correctamente.",
       });
       fetchComplexes(); // Refresh list to show updated data
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error updating branding:", error);
       toast({
         title: "Error",
-        description: "Error al actualizar la configuración de marca.",
+        description: "Error al actualizar la configuración de marca: " + error.message,
         variant: "destructive",
       });
     } finally {

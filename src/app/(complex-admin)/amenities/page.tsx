@@ -71,11 +71,11 @@ export default function CommonAreasPage() {
     try {
       const data = await getCommonAreas();
       setCommonAreas(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching common areas:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las áreas comunes.",
+        description: "No se pudieron cargar las áreas comunes: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -136,11 +136,11 @@ export default function CommonAreasPage() {
       }
       setIsModalOpen(false);
       fetchCommonAreas();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving common area:", error);
       toast({
         title: "Error",
-        description: "Error al guardar el área común.",
+        description: "Error al guardar el área común: " + error.message,
         variant: "destructive",
       });
     }
@@ -156,11 +156,11 @@ export default function CommonAreasPage() {
         description: "Área común eliminada correctamente.",
       });
       fetchCommonAreas();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error deleting common area:", error);
       toast({
         title: "Error",
-        description: "Error al eliminar el área común.",
+        description: "Error al eliminar el área común: " + error.message,
         variant: "destructive",
       });
     }
@@ -245,7 +245,7 @@ export default function CommonAreasPage() {
                 : "Añadir Nueva Área Común"}
             </DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <form onSubmit={handleSubmit} className="grid gap-4 py-4">
             <div>
               <Label htmlFor="name">Nombre</Label>
               <Input

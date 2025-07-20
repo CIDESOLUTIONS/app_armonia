@@ -18,10 +18,20 @@ import {
   updatePanicAlertsStatus,
 } from "@/services/panicService";
 
+interface PanicAlert {
+  id: number;
+  userId: number;
+  location: string;
+  message?: string;
+  createdAt: string;
+  status: "ACTIVE" | "RESOLVED" | "DISMISSED";
+  user?: { name: string }; // Assuming user object might be nested
+}
+
 export default function PanicAlertsPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
-  const [alerts, setAlerts] = useState<any[]>([]);
+  const [alerts, setAlerts] = useState<PanicAlert[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,11 +45,11 @@ export default function PanicAlertsPage() {
     try {
       const fetchedAlerts = await getActivePanicAlerts();
       setAlerts(fetchedAlerts);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching panic alerts:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las alertas de pánico.",
+        description: "No se pudieron cargar las alertas de pánico: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -61,11 +71,11 @@ export default function PanicAlertsPage() {
         description: `Alerta ${status === "RESOLVED" ? "resuelta" : "descartada"} correctamente.`,
       });
       fetchPanicAlerts(); // Refrescar la lista
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error resolving panic alert:", error);
       toast({
         title: "Error",
-        description: "No se pudo actualizar la alerta.",
+        description: "No se pudo actualizar la alerta: " + error.message,
         variant: "destructive",
       });
     }

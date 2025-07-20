@@ -154,11 +154,11 @@ export default function SurveysPage() {
         },
       ];
       setSurveys(fetchedSurveys);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching surveys:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las encuestas/votaciones.",
+        description: "No se pudieron cargar las encuestas/votaciones: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -206,11 +206,11 @@ export default function SurveysPage() {
       setIsFormDialogOpen(false);
       form.reset();
       fetchSurveys();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving survey:", error);
       toast({
         title: "Error",
-        description: "Error al guardar la encuesta/votación.",
+        description: "Error al guardar la encuesta/votación: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -246,11 +246,11 @@ export default function SurveysPage() {
         description: "Encuesta/Votación eliminada correctamente.",
       });
       fetchSurveys();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error deleting survey:", error);
       toast({
         title: "Error",
-        description: "Error al eliminar la encuesta/votación.",
+        description: "Error al eliminar la encuesta/votación: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -377,11 +377,11 @@ export default function SurveysPage() {
           </DialogHeader>
           <Form {...form}>
             <form
-              onSubmit={handleSubmit(handleSubmitSurvey)}
+              onSubmit={form.handleSubmit(handleSubmitSurvey)}
               className="space-y-4 py-4"
             >
               <FormField
-                control={control}
+                control={form.control}
                 name="title"
                 render={({ field }) => (
                   <FormItem>
@@ -398,7 +398,7 @@ export default function SurveysPage() {
                 )}
               />
               <FormField
-                control={control}
+                control={form.control}
                 name="description"
                 render={({ field }) => (
                   <FormItem>
@@ -416,7 +416,7 @@ export default function SurveysPage() {
               />
               <div className="grid grid-cols-2 gap-4">
                 <FormField
-                  control={control}
+                  control={form.control}
                   name="startDate"
                   render={({ field }) => (
                     <FormItem>
@@ -433,7 +433,7 @@ export default function SurveysPage() {
                   )}
                 />
                 <FormField
-                  control={control}
+                  control={form.control}
                   name="endDate"
                   render={({ field }) => (
                     <FormItem>
@@ -447,7 +447,7 @@ export default function SurveysPage() {
                 />
               </div>
               <FormField
-                control={control}
+                control={form.control}
                 name="status"
                 render={({ field }) => (
                   <FormItem>
@@ -536,8 +536,8 @@ export default function SurveysPage() {
                 >
                   Cancelar
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? (
+                <Button type="submit" disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : null}{" "}
                   {currentSurvey

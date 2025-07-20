@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { getDashboardStats } from "@/services/dashboardService";
 import Link from "next/link";
@@ -15,6 +15,7 @@ import {
   Home,
   Settings,
 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface DashboardStats {
   totalProperties: number;
@@ -26,23 +27,31 @@ interface DashboardStats {
 export default function InventoryPage() {
   const t = useTranslations("admin.inventory");
   const { user, loading: authLoading } = useAuthStore();
+  const { toast } = useToast();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loadingStats, setLoadingStats] = useState(true);
 
+  const fetchStats = useCallback(async () => {
+    try {
+      const fetchedStats = await getDashboardStats();
+      setStats(fetchedStats);
+    } catch (error: Error) {
+      console.error("Error fetching inventory stats:", error);
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar las estadísticas del inventario.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingStats(false);
+    }
+  }, [toast]);
+
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        // Assuming getDashboardStats is adapted for i18n or returns raw data
-        const fetchedStats = await getDashboardStats();
-        setStats(fetchedStats);
-      } catch (error) {
-        console.error("Error fetching inventory stats:", error);
-      } finally {
-        setLoadingStats(false);
-      }
-    };
-    fetchStats();
-  }, []);
+    if (!authLoading && user) {
+      fetchStats();
+    }
+  }, [authLoading, user, fetchStats]);
 
   if (authLoading || loadingStats) {
     return (

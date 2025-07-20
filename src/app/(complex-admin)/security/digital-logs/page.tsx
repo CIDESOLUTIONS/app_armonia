@@ -2,7 +2,12 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, PlusCircle, Edit, Trash2 } from "lucide-react";
+import {
+  Loader2,
+  PlusCircle,
+  Edit,
+  Trash2,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -25,6 +30,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import {
   getDigitalLogs,
+  createDigitalLog,
+  updateDigitalLog,
+  deleteDigitalLog,
 } from "@/services/digitalLogService";
 
 interface DigitalLog {
@@ -54,7 +62,7 @@ export default function DigitalLogsPage() {
     try {
       const data = await getDigitalLogs();
       setLogs(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching digital logs:", error);
       toast({
         title: "Error",
@@ -120,7 +128,7 @@ export default function DigitalLogsPage() {
       }
       setIsModalOpen(false);
       fetchLogs();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving digital log:", error);
       toast({
         title: "Error",
@@ -139,7 +147,7 @@ export default function DigitalLogsPage() {
           description: "Minuta digital eliminada correctamente.",
         });
         fetchLogs();
-      } catch (error) {
+      } catch (error: Error) {
         console.error("Error deleting digital log:", error);
         toast({
           title: "Error",

@@ -15,8 +15,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ListingCategory } from "@/common/dto/marketplace.dto";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function MarketplacePage() {
+  const { toast } = useToast();
   const [listings, setListings] = useState<Listing[]>([]); // Usar Listing[]
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -37,8 +39,13 @@ export default function MarketplacePage() {
       };
       const data = await getListings(filters);
       setListings(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching listings:", error);
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los anuncios: " + error.message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }

@@ -29,11 +29,11 @@ export default function ResidentDirectoryPage() {
       try {
         const data = await getResidents(term);
         setResidents(data);
-      } catch (error) {
+      } catch (error: Error) {
         console.error("Error fetching residents for directory:", error);
         toast({
           title: "Error",
-          description: "No se pudo cargar el directorio de residentes.",
+          description: "No se pudo cargar el directorio de residentes: " + error.message,
           variant: "destructive",
         });
       } finally {

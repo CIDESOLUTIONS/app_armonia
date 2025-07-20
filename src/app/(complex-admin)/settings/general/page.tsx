@@ -39,11 +39,11 @@ export default function GeneralSettingsPage() {
       const data = await getComplexInfo();
       setComplexInfo(data);
       setFormData(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching complex info:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar la información del conjunto.",
+        description: "No se pudo cargar la información del conjunto: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -79,11 +79,11 @@ export default function GeneralSettingsPage() {
           "Información general del conjunto actualizada correctamente.",
       });
       fetchComplexInfo();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving complex info:", error);
       toast({
         title: "Error",
-        description: "Error al guardar la información general del conjunto.",
+        description: "Error al guardar la información general del conjunto: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -174,7 +174,12 @@ export default function GeneralSettingsPage() {
               name="totalUnits"
               type="number"
               value={formData.totalUnits || 0}
-              onChange={handleInputChange}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  totalUnits: parseInt(e.target.value),
+                })
+              }
             />
           </div>
           <div className="grid gap-2">

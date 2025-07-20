@@ -56,7 +56,7 @@ export default function MicroCreditsPage() {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
+    defaultDefaults: {
       amount: 0,
       purpose: "",
     },
@@ -91,11 +91,11 @@ export default function MicroCreditsPage() {
         },
       ];
       setApplications(fetchedApplications);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching applications:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las solicitudes de micro-créditos.",
+        description: "No se pudieron cargar las solicitudes de micro-créditos: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -114,6 +114,7 @@ export default function MicroCreditsPage() {
       toast({
         title: "Error",
         description: "Debes iniciar sesión para solicitar un micro-crédito.",
+        variant: "destructive",
       });
       return;
     }
@@ -121,7 +122,7 @@ export default function MicroCreditsPage() {
     setLoading(true);
     try {
       // TODO: Call backend API to submit micro-credit application
-      console.log("Submitting application:", values);
+      // console.log("Submitting application:", values); // Removed console.log
       toast({
         title: "Solicitud Enviada",
         description:
@@ -129,11 +130,11 @@ export default function MicroCreditsPage() {
       });
       form.reset();
       fetchApplications(); // Refresh list
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error submitting application:", error);
       toast({
         title: "Error",
-        description: "Error al enviar la solicitud de micro-crédito.",
+        description: "Error al enviar la solicitud de micro-crédito: " + error.message,
         variant: "destructive",
       });
     } finally {

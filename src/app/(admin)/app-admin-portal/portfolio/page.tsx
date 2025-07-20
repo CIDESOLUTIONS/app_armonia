@@ -8,10 +8,27 @@ import {
   getComplexMetrics,
 } from "@/services/portfolioService";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+
+interface PortfolioMetrics {
+  totalIncome: number;
+  totalProperties: number;
+  totalResidents: number;
+  totalPendingFees: number;
+}
+
+interface ComplexMetric {
+  id: number;
+  name: string;
+  residents: number;
+  pendingFees: number;
+  income: number;
+}
 
 export default function PortfolioDashboardPage() {
-  const [portfolioMetrics, setPortfolioMetrics] = useState(null);
-  const [complexMetrics, setComplexMetrics] = useState([]);
+  const { toast } = useToast();
+  const [portfolioMetrics, setPortfolioMetrics] = useState<PortfolioMetrics | null>(null);
+  const [complexMetrics, setComplexMetrics] = useState<ComplexMetric[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,14 +38,19 @@ export default function PortfolioDashboardPage() {
         setPortfolioMetrics(metrics);
         const complexes = await getComplexMetrics();
         setComplexMetrics(complexes);
-      } catch (error) {
+      } catch (error: Error) {
         console.error("Error fetching portfolio data:", error);
+        toast({
+          title: "Error",
+          description: "No se pudieron cargar los datos del portafolio: " + error.message,
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, []);
+  }, [toast]);
 
   if (loading) {
     return (

@@ -91,7 +91,7 @@ export default function CommonAssetsPage() {
     try {
       const data = await getCommonAssets();
       setCommonAssets(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching common assets:", error);
       toast({
         title: "Error",
@@ -154,7 +154,7 @@ export default function CommonAssetsPage() {
       }
       setIsModalOpen(false);
       fetchCommonAssets();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving common asset:", error);
       toast({
         title: "Error",
@@ -183,7 +183,7 @@ export default function CommonAssetsPage() {
         description: "Bien común eliminado correctamente.",
       });
       fetchCommonAssets();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error deleting common asset:", error);
       toast({
         title: "Error",

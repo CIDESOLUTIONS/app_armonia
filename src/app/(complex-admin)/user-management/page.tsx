@@ -108,7 +108,7 @@ export default function UserManagementPage() {
     try {
       const data = await getAllUsers();
       setUsers(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching users:", error);
       toast({
         title: "Error",
@@ -174,7 +174,7 @@ export default function UserManagementPage() {
       }
       setIsModalOpen(false);
       fetchUsers();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving user:", error);
       toast({
         title: "Error",
@@ -193,7 +193,7 @@ export default function UserManagementPage() {
         description: "Usuario eliminado correctamente.",
       });
       fetchUsers();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error deleting user:", error);
       toast({
         title: "Error",

@@ -2,7 +2,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, PlusCircle, Edit, Trash2 } from "lucide-react";
+import {
+  Loader2,
+  PlusCircle,
+  Edit,
+  Trash2,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -89,7 +94,7 @@ export default function AmenitiesPage() {
     try {
       const data = await getAmenities();
       setAmenities(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching amenities:", error);
       toast({
         title: "Error",
@@ -154,7 +159,7 @@ export default function AmenitiesPage() {
       }
       setIsModalOpen(false);
       fetchAmenities();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving amenity:", error);
       toast({
         title: "Error",
@@ -181,7 +186,7 @@ export default function AmenitiesPage() {
         description: "Amenidad eliminada correctamente.",
       });
       fetchAmenities();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error deleting amenity:", error);
       toast({
         title: "Error",

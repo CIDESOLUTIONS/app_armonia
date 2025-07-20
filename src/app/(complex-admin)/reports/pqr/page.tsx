@@ -37,9 +37,9 @@ export default function PQRReportsPage() {
     setLoading(true);
     try {
       // Placeholder for actual API call to generate report
-      console.log(
-        `Generating PQR report of type ${reportType} from ${startDate} to ${endDate}`,
-      );
+      // console.log(
+      //   `Generating PQR report of type ${reportType} from ${startDate} to ${endDate}`,
+      // ); // Removed console.log
       await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
 
       toast({
@@ -60,11 +60,11 @@ export default function PQRReportsPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error generating PQR report:", error);
       toast({
         title: "Error",
-        description: "Error al generar el reporte de PQR.",
+        description: "Error al generar el reporte de PQR: " + error.message,
         variant: "destructive",
       });
     } finally {

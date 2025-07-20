@@ -39,30 +39,19 @@ import {
   MapPin,
   PlusCircle,
 } from "lucide-react";
-
-interface ServiceProvider {
-  id: string;
-  name: string;
-  category: string;
-  description: string;
-  contactPhone: string;
-  contactEmail: string;
-  address: string;
-  rating: number;
-  reviewCount: number;
-}
+import { getServiceProviders, ServiceProviderDto } from "@/services/serviceProviderService";
 
 export default function HomeServicesDirectoryPage() {
   const { user } = useAuthStore();
   const { toast } = useToast();
-  const [serviceProviders, setServiceProviders] = useState<ServiceProvider[]>(
+  const [serviceProviders, setServiceProviders] = useState<ServiceProviderDto[]>(
     [],
   );
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [selectedProvider, setSelectedProvider] =
-    useState<ServiceProvider | null>(null);
+    useState<ServiceProviderDto | null>(null);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const [reviewForm, setReviewForm] = useState({
     rating: 0,
@@ -72,39 +61,13 @@ export default function HomeServicesDirectoryPage() {
   const fetchServiceProviders = useCallback(async () => {
     setLoading(true);
     try {
-      // TODO: Call backend API to fetch service providers
-      const fetchedProviders: ServiceProvider[] = [
-        {
-          id: "1",
-          name: "Plomería Rápida",
-          category: "Plomería",
-          description:
-            "Servicio de plomería 24/7 para emergencias y mantenimiento.",
-          contactPhone: "+573001234567",
-          contactEmail: "info@plomeriarapida.com",
-          address: "Calle 10 # 20-30",
-          rating: 4.5,
-          reviewCount: 120,
-        },
-        {
-          id: "2",
-          name: "Electricistas Expertos",
-          category: "Electricidad",
-          description:
-            "Instalaciones eléctricas, reparaciones y certificaciones.",
-          contactPhone: "+573109876543",
-          contactEmail: "contacto@electricistasexpertos.com",
-          address: "Carrera 5 # 15-25",
-          rating: 4.8,
-          reviewCount: 85,
-        },
-      ];
+      const fetchedProviders = await getServiceProviders();
       setServiceProviders(fetchedProviders);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching service providers:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar los proveedores de servicios.",
+        description: "No se pudieron cargar los proveedores de servicios: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -118,12 +81,12 @@ export default function HomeServicesDirectoryPage() {
     }
   }, [user, fetchServiceProviders]);
 
-  const handleViewDetails = (provider: ServiceProvider) => {
+  const handleViewDetails = (provider: ServiceProviderDto) => {
     setSelectedProvider(provider);
     setIsDetailsDialogOpen(true);
   };
 
-  const handleReviewClick = (provider: ServiceProvider) => {
+  const handleReviewClick = (provider: ServiceProviderDto) => {
     setSelectedProvider(provider);
     setIsReviewDialogOpen(true);
   };
@@ -140,6 +103,7 @@ export default function HomeServicesDirectoryPage() {
       toast({
         title: "Advertencia",
         description: "Por favor, selecciona una calificación.",
+        variant: "warning",
       });
       return;
     }
@@ -149,16 +113,16 @@ export default function HomeServicesDirectoryPage() {
       console.log("Submitting review:", selectedProvider.id, reviewForm);
       toast({
         title: "Éxito",
-        description: "Reseña enviada correctamente.",
+        description: "Reseña enviada correctamente. (Funcionalidad simulada)",
       });
       setIsReviewDialogOpen(false);
       setReviewForm({ rating: 0, comment: "" });
       fetchServiceProviders(); // Refresh list to show updated ratings
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error submitting review:", error);
       toast({
         title: "Error",
-        description: "Error al enviar la reseña.",
+        description: "Error al enviar la reseña: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -240,13 +204,13 @@ export default function HomeServicesDirectoryPage() {
                 <div className="flex items-center text-sm text-gray-700 mb-1">
                   <Star className="h-4 w-4 text-yellow-400 mr-1 fill-yellow-400" />
                   <span>
-                    {provider.rating.toFixed(1)} ({provider.reviewCount}{" "}
+                    {provider.rating?.toFixed(1) || "N/A"} ({provider.reviewCount || 0}{" "}
                     reseñas)
                   </span>
                 </div>
                 <div className="flex items-center text-sm text-gray-700">
                   <Phone className="h-4 w-4 text-gray-500 mr-1" />
-                  <span>{provider.contactPhone}</span>
+                  <span>{provider.contact}</span>
                 </div>
               </CardContent>
               <CardFooter className="flex justify-between items-center">
@@ -278,17 +242,17 @@ export default function HomeServicesDirectoryPage() {
             <div className="flex items-center text-sm text-gray-700">
               <Star className="h-4 w-4 text-yellow-400 mr-1 fill-yellow-400" />
               <span>
-                {selectedProvider?.rating.toFixed(1)} (
-                {selectedProvider?.reviewCount} reseñas)
+                {selectedProvider?.rating?.toFixed(1) || "N/A"} (
+                {selectedProvider?.reviewCount || 0} reseñas)
               </span>
             </div>
             <div className="flex items-center text-sm text-gray-700">
               <Phone className="h-4 w-4 text-gray-500 mr-1" />
-              <span>{selectedProvider?.contactPhone}</span>
+              <span>{selectedProvider?.contact}</span>
             </div>
             <div className="flex items-center text-sm text-gray-700">
               <Mail className="h-4 w-4 text-gray-500 mr-1" />
-              <span>{selectedProvider?.contactEmail}</span>
+              <span>{selectedProvider?.contact}</span>
             </div>
             <div className="flex items-center text-sm text-gray-700">
               <MapPin className="h-4 w-4 text-gray-500 mr-1" />

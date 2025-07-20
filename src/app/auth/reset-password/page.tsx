@@ -46,21 +46,22 @@ export default function ResetPasswordPage() {
       toast({
         title: t("toast.errorTitle"),
         description: t("toast.invalidToken"),
+        variant: "destructive",
       });
       return;
     }
     setLoading(true);
     try {
       // Lógica para llamar a la API de reseteo de contraseña
-      console.log({ ...values, token });
+      // console.log({ ...values, token }); // Removed console.log
       toast({
         title: t("toast.passwordUpdatedTitle"),
         description: t("toast.passwordUpdatedDescription"),
       });
-    } catch (error) {
+    } catch (error: Error) {
       toast({
         title: t("toast.errorTitle"),
-        description: t("toast.updateErrorDescription"),
+        description: error.message || t("toast.updateErrorDescription"),
         variant: "destructive",
       });
     } finally {

@@ -8,7 +8,6 @@ import {
   Edit,
   Trash2,
   CheckCircle,
-  XCircle,
   DollarSign,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,14 +35,14 @@ import {
   getBudgetsByYear,
   createBudget,
   approveBudget,
-} from "@/services/budgetService"; // Assuming budgetService exists
+} from "@/services/budgetService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   budgetSchema,
   BudgetItemFormValues,
   BudgetFormValues,
-} from "@/validators/budget-schema"; // Assuming budget-schema exists
+} from "@/validators/budget-schema";
 import {
   Form,
   FormControl,
@@ -58,6 +57,14 @@ import {
   CardHeader,
   CardTitle as CardTitleShadcn,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface BudgetItem {
   id: number;
@@ -121,14 +128,12 @@ export default function BudgetsPage() {
     formState: { isSubmitting },
   } = form;
 
-  const isRecurring = watch("isRecurring");
-
   const fetchBudgets = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getBudgetsByYear(selectedYear);
       setBudgets(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching budgets:", error);
       toast({
         title: "Error",
@@ -185,7 +190,7 @@ export default function BudgetsPage() {
       }
       setIsModalOpen(false);
       fetchBudgets();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving budget:", error);
       toast({
         title: "Error",
@@ -204,7 +209,7 @@ export default function BudgetsPage() {
         description: "Presupuesto aprobado correctamente.",
       });
       fetchBudgets();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error approving budget:", error);
       toast({
         title: "Error",
@@ -249,7 +254,7 @@ export default function BudgetsPage() {
         Gestión de Presupuestos Anuales
       </h1>
 
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-end mb-4">
         <Button onClick={handleAddBudget}>
           <PlusCircle className="mr-2 h-4 w-4" /> Crear Nuevo Presupuesto
         </Button>
@@ -326,7 +331,7 @@ export default function BudgetsPage() {
                         onClick={() => handleApproveBudget(budget.id)}
                         className="mr-2"
                       >
-                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <CheckCircle className="h-4 w-4" />
                       </Button>
                     )}
                     <Button

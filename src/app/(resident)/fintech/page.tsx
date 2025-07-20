@@ -15,6 +15,7 @@ import {
   MicroCreditResponse,
   CreditScoreResponse,
 } from "@/services/fintechService";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function FintechPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -39,11 +40,11 @@ export default function FintechPage() {
         title: "Solicitud Enviada",
         description: `Solicitud de microcrédito ${result.applicationId} enviada con estado ${result.status}.`,
       });
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error requesting micro-credit:", error);
       toast({
         title: "Error",
-        description: "Error al solicitar el microcrédito.",
+        description: "Error al solicitar el microcrédito: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -68,11 +69,11 @@ export default function FintechPage() {
         title: "Puntaje de Crédito Obtenido",
         description: `Tu puntaje de crédito es: ${result.score}.`,
       });
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error getting credit score:", error);
       toast({
         title: "Error",
-        description: "Error al obtener el puntaje de crédito.",
+        description: "Error al obtener el puntaje de crédito: " + error.message,
         variant: "destructive",
       });
     } finally {

@@ -30,12 +30,12 @@ export default function ModulesPermissionsPage() {
     try {
       const data = await getModulePermissions();
       setModules(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching module permissions:", error);
       toast({
         title: "Error",
         description:
-          "No se pudo cargar la configuración de módulos y permisos.",
+          "No se pudo cargar la configuración de módulos y permisos: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -61,11 +61,11 @@ export default function ModulesPermissionsPage() {
         title: "Éxito",
         description: "Configuración de módulo actualizada correctamente.",
       });
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error toggling module:", error);
       toast({
         title: "Error",
-        description: "Error al actualizar el módulo.",
+        description: "Error al actualizar el módulo: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -97,11 +97,11 @@ export default function ModulesPermissionsPage() {
         title: "Éxito",
         description: "Permisos actualizados correctamente.",
       });
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error updating permissions:", error);
       toast({
         title: "Error",
-        description: "Error al actualizar permisos.",
+        description: "Error al actualizar permisos: " + error.message,
         variant: "destructive",
       });
     } finally {

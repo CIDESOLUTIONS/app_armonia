@@ -51,11 +51,11 @@ export default function ProjectsPage() {
     try {
       const data = await getProjects();
       setProjects(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching projects:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar los proyectos.",
+        description: "No se pudieron cargar los proyectos: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -83,11 +83,11 @@ export default function ProjectsPage() {
         description: "Proyecto eliminado correctamente.",
       });
       fetchProjects();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error deleting project:", error);
       toast({
         title: "Error",
-        description: "Error al eliminar el proyecto.",
+        description: "Error al eliminar el proyecto: " + error.message,
         variant: "destructive",
       });
     } finally {

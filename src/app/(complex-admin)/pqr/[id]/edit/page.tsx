@@ -36,7 +36,7 @@ export default function EditPQRPage() {
   const params = useParams();
   const pqrId = params.id ? parseInt(params.id as string) : null;
 
-  const [pqr, setPqr] = useState<any>(null);
+  const [pqr, setPqr] = useState<PQRFormValues | null>(null);
   const [loading, setLoading] = useState(true);
 
   const form = useForm<PQRFormValues>({
@@ -79,11 +79,11 @@ export default function EditPQRPage() {
         });
         router.push("/complex-admin/pqr");
       }
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching PQR:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar la PQR.",
+        description: "No se pudo cargar la PQR: " + error.message,
         variant: "destructive",
       });
       router.push("/complex-admin/pqr");
@@ -109,11 +109,11 @@ export default function EditPQRPage() {
         description: "PQR actualizada correctamente.",
       });
       router.push("/complex-admin/pqr");
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error updating PQR:", error);
       toast({
         title: "Error",
-        description: "Error al actualizar la PQR.",
+        description: "Error al actualizar la PQR: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -173,8 +173,8 @@ export default function EditPQRPage() {
                   <FormControl>
                     <Textarea
                       placeholder="Describe tu petición, queja o reclamo"
-                      {...field}
                       rows={5}
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -235,8 +235,10 @@ export default function EditPQRPage() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}{" "}
               Guardar Cambios
             </Button>
           </form>

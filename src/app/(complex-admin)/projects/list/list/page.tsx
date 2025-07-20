@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Filter, Loader2, PlusCircle, Eye, Edit, Trash2 } from "lucide-react";
 import {
@@ -49,11 +49,11 @@ export default function ProjectListPage() {
     try {
       const data = await getProjects(filters);
       setProjects(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching projects:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar los proyectos.",
+        description: "No se pudieron cargar los proyectos: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -86,11 +86,11 @@ export default function ProjectListPage() {
           description: "Proyecto eliminado correctamente.",
         });
         fetchProjects();
-      } catch (error) {
+      } catch (error: Error) {
         console.error("Error deleting project:", error);
         toast({
           title: "Error",
-          description: "Error al eliminar el proyecto.",
+          description: "Error al eliminar el proyecto: " + error.message,
           variant: "destructive",
         });
       }

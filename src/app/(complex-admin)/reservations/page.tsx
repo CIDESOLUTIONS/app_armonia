@@ -9,6 +9,7 @@ import {
   XCircle,
   Eye,
   CalendarDays,
+  PlusCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,7 +29,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { PlusCircle } from "lucide-react";
 
 export default function ReservationsPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -50,7 +50,7 @@ export default function ReservationsPage() {
     try {
       const data = await getReservations();
       setReservations(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching reservations:", error);
       toast({
         title: "Error",
@@ -79,7 +79,7 @@ export default function ReservationsPage() {
         description: `Reserva ${status === "APPROVED" ? "aprobada" : "rechazada"} correctamente.`,
       });
       fetchReservations();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error updating reservation status:", error);
       toast({
         title: "Error",
@@ -98,7 +98,7 @@ export default function ReservationsPage() {
           description: "Reserva eliminada correctamente.",
         });
         fetchReservations();
-      } catch (error) {
+      } catch (error: Error) {
         console.error("Error deleting reservation:", error);
         toast({
           title: "Error",

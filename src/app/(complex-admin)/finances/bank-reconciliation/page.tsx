@@ -27,6 +27,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface BankTransaction {
   date: string;
@@ -77,11 +78,11 @@ export default function BankReconciliationPage() {
         title: "Éxito",
         description: "Extracto procesado y sugerencias generadas.",
       });
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error processing bank statement:", error);
       toast({
         title: "Error",
-        description: "Error al procesar el extracto bancario.",
+        description: "Error al procesar el extracto bancario: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -107,11 +108,11 @@ export default function BankReconciliationPage() {
             : s,
         ),
       );
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error approving suggestion:", error);
       toast({
         title: "Error",
-        description: "Error al aprobar la sugerencia.",
+        description: "Error al aprobar la sugerencia: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -215,7 +216,7 @@ export default function BankReconciliationPage() {
                           suggestion.status === "MATCHED"
                             ? "default"
                             : suggestion.status === "APPROVED"
-                              ? "success"
+                              ? "outline" // Changed from 'success' to 'outline'
                               : "destructive"
                         }
                       >

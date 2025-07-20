@@ -52,7 +52,6 @@ import {
   QrCode,
   Scan,
   Package as PackageIcon,
-  Truck,
   Loader2,
 } from "lucide-react";
 import { format } from "date-fns";
@@ -61,14 +60,15 @@ import Image from "next/image";
 import {
   getPreRegisteredVisitors,
   scanQrCode,
-  registerPackage,
-  deliverPackage,
   createPreRegisteredVisitor,
   uploadVisitorImage,
+} from "@/services/visitorService";
+import {
+  registerPackage,
   getPackages,
   Package,
   uploadPackageImage,
-} from "@/services/visitorService";
+} from "@/services/packageService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { visitorSchema, VisitorFormValues } from "@/validators/visitor-schema";
@@ -133,8 +133,6 @@ export default function ReceptionVisitorsPage() {
   const [qrScanResult, setQrScanResult] = useState<any>(null);
   const [isPackageRegisterDialogOpen, setIsPackageRegisterDialogOpen] =
     useState(false);
-  const [deliverPackageTrackingNumber, setDeliverPackageTrackingNumber] =
-    useState("");
   const [packageStatusFilter, setPackageStatusFilter] = useState<
     "REGISTERED" | "DELIVERED" | "RETURNED" | "all"
   >("all");
@@ -239,9 +237,9 @@ export default function ReceptionVisitorsPage() {
 
       const fetchedPackages = await getPackages(); // Fetch packages
       setPackages(fetchedPackages);
-    } catch (err: any) {
-      console.error("[ReceptionVisitors] Error:", err);
-      setError(err.message || "Error al cargar datos de visitantes");
+    } catch (error: Error) {
+      console.error("[ReceptionVisitors] Error:", error);
+      setError(error.message || "Error al cargar datos de visitantes");
     } finally {
       setLoading(false);
     }
@@ -362,9 +360,9 @@ export default function ReceptionVisitorsPage() {
       try {
         const uploadedImage = await uploadVisitorImage(values.photoUrl);
         photoUrl = uploadedImage.url;
-      } catch (uploadError) {
-        console.error("Error uploading visitor image:", uploadError);
-        setError("Error al subir la foto del visitante.");
+      } catch (error: Error) {
+        console.error("Error uploading visitor image:", error);
+        setError("Error al subir la foto del visitante: " + error.message);
         return;
       }
     }
@@ -392,10 +390,10 @@ export default function ReceptionVisitorsPage() {
       setSuccessMessage("Visitante registrado exitosamente.");
       setIsRegisterDialogOpen(false);
       resetNewVisitorForm();
-    } catch (err: any) {
-      console.error("[ReceptionVisitors] Error:", err);
+    } catch (error: Error) {
+      console.error("[ReceptionVisitors] Error:", error);
       setError(
-        "Error al registrar el visitante. Por favor, inténtelo de nuevo.",
+        "Error al registrar el visitante. Por favor, inténtelo de nuevo: " + error.message,
       );
     }
   };
@@ -427,9 +425,9 @@ export default function ReceptionVisitorsPage() {
       );
 
       setSuccessMessage("Salida registrada exitosamente.");
-    } catch (err) {
-      console.error("[ReceptionVisitors] Error:", err);
-      setError("Error al registrar la salida. Por favor, inténtelo de nuevo.");
+    } catch (error: Error) {
+      console.error("[ReceptionVisitors] Error:", error);
+      setError("Error al registrar la salida. Por favor, inténtelo de nuevo: " + error.message);
     }
   };
 
@@ -447,8 +445,8 @@ export default function ReceptionVisitorsPage() {
       } else {
         setError(result.message || "QR Code inválido.");
       }
-    } catch (err: any) {
-      setError(err.message || "Error al escanear el código QR.");
+    } catch (error: Error) {
+      setError(error.message || "Error al escanear el código QR.");
     } finally {
       setLoading(false);
     }
@@ -460,9 +458,9 @@ export default function ReceptionVisitorsPage() {
       try {
         const uploadedImage = await uploadPackageImage(values.photoUrl);
         photoUrl = uploadedImage.url;
-      } catch (uploadError) {
-        console.error("Error uploading package image:", uploadError);
-        setError("Error al subir la foto del paquete.");
+      } catch (error: Error) {
+        console.error("Error uploading package image:", error);
+        setError("Error al subir la foto del paquete: " + error.message);
         return;
       }
     }
@@ -473,22 +471,8 @@ export default function ReceptionVisitorsPage() {
       setIsPackageRegisterDialogOpen(false);
       resetNewPackageForm();
       fetchData(); // Refresh packages list
-    } catch (err: any) {
-      setError(err.message || "Error al registrar el paquete.");
-    }
-  };
-
-  const handleDeliverPackage = async (packageId: number) => {
-    if (!packageId) {
-      setError("El ID del paquete es requerido para la entrega.");
-      return;
-    }
-    try {
-      await deliverPackage(packageId);
-      setSuccessMessage("Paquete entregado exitosamente.");
-      fetchData(); // Refresh packages list
-    } catch (err: any) {
-      setError(err.message || "Error al entregar el paquete.");
+    } catch (error: Error) {
+      setError(error.message || "Error al registrar el paquete.");
     }
   };
 
@@ -647,7 +631,7 @@ export default function ReceptionVisitorsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             {/* Registrar Paquete */}
             <Card className="border-dashed border-2 p-4">
               <CardTitle className="text-lg mb-4 flex items-center">
@@ -756,41 +740,6 @@ export default function ReceptionVisitorsPage() {
                 </form>
               </Form>
             </Card>
-
-            {/* Entregar Paquete */}
-            <Card className="border-dashed border-2 p-4">
-              <CardTitle className="text-lg mb-4 flex items-center">
-                <Truck className="mr-2 h-5 w-5" /> Entregar Paquete
-              </CardTitle>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="deliverTrackingNumber">
-                    Número de Seguimiento
-                  </Label>
-                  <Input
-                    id="deliverTrackingNumber"
-                    placeholder="Número de seguimiento del paquete a entregar"
-                    value={deliverPackageTrackingNumber}
-                    onChange={(e) =>
-                      setDeliverPackageTrackingNumber(e.target.value)
-                    }
-                  />
-                </div>
-                <Button
-                  onClick={() =>
-                    handleDeliverPackage(parseInt(deliverPackageTrackingNumber))
-                  }
-                  disabled={
-                    isNewPackageSubmitting || !deliverPackageTrackingNumber
-                  }
-                >
-                  {isNewPackageSubmitting && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  Marcar como Entregado
-                </Button>
-              </div>
-            </Card>
           </div>
         </CardContent>
       </Card>
@@ -878,16 +827,7 @@ export default function ReceptionVisitorsPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      {pkg.status === "REGISTERED" && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDeliverPackage(pkg.id)}
-                        >
-                          <Truck className="mr-1 h-4 w-4" />
-                          Marcar Entregado
-                        </Button>
-                      )}
+                      {/* Removed deliver package button from here */}
                     </TableCell>
                   </TableRow>
                 ))
@@ -1184,7 +1124,9 @@ export default function ReceptionVisitorsPage() {
                         type="file"
                         accept="image/*"
                         onChange={(event) => {
-                          onChange(event.target.files && event.target.files[0]);
+                          onChange(
+                            event.target.files && event.target.files[0],
+                          );
                         }}
                       />
                     </FormControl>
@@ -1218,156 +1160,6 @@ export default function ReceptionVisitorsPage() {
               </DialogFooter>
             </form>
           </Form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Diálogo para registrar nuevo paquete */}
-      <Dialog
-        open={isPackageRegisterDialogOpen}
-        onOpenChange={setIsPackageRegisterDialogOpen}
-      >
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Registrar Nuevo Paquete</DialogTitle>
-            <DialogDescription>
-              Complete la información del paquete para registrar su ingreso.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...newPackageForm}>
-            <form
-              onSubmit={handleNewPackageSubmit(handleSubmitNewPackage)}
-              className="space-y-4 py-4"
-            >
-              <FormField
-                control={newPackageFormControl}
-                name="trackingNumber"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Número de Seguimiento</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ej: ABC123XYZ" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={newPackageFormControl}
-                name="recipientUnit"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Unidad Destinataria</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ej: Apto 101" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={newPackageFormControl}
-                name="sender"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Remitente (Opcional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Nombre del remitente" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={newPackageFormControl}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Descripción (Opcional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Contenido del paquete" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={newPackageFormControl}
-                name="photoUrl"
-                render={({ field: { value, onChange, ...fieldProps } }) => (
-                  <FormItem>
-                    <FormLabel>Foto del Paquete (Opcional)</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...fieldProps}
-                        type="file"
-                        accept="image/*"
-                        onChange={(event) => {
-                          onChange(event.target.files && event.target.files[0]);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                    {value instanceof File && (
-                      <div className="mt-2">
-                        <img
-                          src={URL.createObjectURL(value)}
-                          alt="Vista previa de la foto"
-                          className="w-32 h-32 object-cover rounded-md"
-                        />
-                      </div>
-                    )}
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={isNewPackageSubmitting}>
-                {isNewPackageSubmitting && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Registrar Paquete
-              </Button>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Diálogo para entregar paquete */}
-      <Dialog
-        open={isPackageDeliverDialogOpen}
-        onOpenChange={setIsPackageDeliverDialogOpen}
-      >
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Entregar Paquete</DialogTitle>
-            <DialogDescription>
-              Introduce el número de seguimiento del paquete a entregar.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="deliverTrackingNumber">
-                Número de Seguimiento
-              </Label>
-              <Input
-                id="deliverTrackingNumber"
-                placeholder="Número de seguimiento del paquete a entregar"
-                value={deliverPackageTrackingNumber}
-                onChange={(e) =>
-                  setDeliverPackageTrackingNumber(e.target.value)
-                }
-              />
-            </div>
-            <Button
-              onClick={() =>
-                handleDeliverPackage(parseInt(deliverPackageTrackingNumber))
-              }
-              disabled={isNewPackageSubmitting || !deliverPackageTrackingNumber}
-            >
-              {isNewPackageSubmitting && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              Marcar como Entregado
-            </Button>
-          </div>
         </DialogContent>
       </Dialog>
     </div>

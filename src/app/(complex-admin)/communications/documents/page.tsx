@@ -82,11 +82,11 @@ export default function DocumentsPage() {
         },
       ];
       setDocuments(fetchedDocuments);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching documents:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar los documentos.",
+        description: "No se pudieron cargar los documentos: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -109,11 +109,11 @@ export default function DocumentsPage() {
       });
       reset();
       fetchDocuments(); // Refresh list
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error uploading document:", error);
       toast({
         title: "Error",
-        description: "Error al subir el documento.",
+        description: "Error al subir el documento: " + error.message,
         variant: "destructive",
       });
     }
@@ -130,11 +130,11 @@ export default function DocumentsPage() {
         description: "Documento eliminado correctamente.",
       });
       fetchDocuments(); // Refresh list
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error deleting document:", error);
       toast({
         title: "Error",
-        description: "Error al eliminar el documento.",
+        description: "Error al eliminar el documento: " + error.message,
         variant: "destructive",
       });
     }
@@ -227,9 +227,7 @@ export default function DocumentsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Título</TableHead>
-                  <TableHead>Nombre de Archivo</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Tamaño</TableHead>
+                  <TableHead>Subido Por</TableHead>
                   <TableHead>Fecha de Subida</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
@@ -240,9 +238,7 @@ export default function DocumentsPage() {
                     <TableCell className="font-medium flex items-center">
                       <FileText className="mr-2 h-4 w-4" /> {doc.name}
                     </TableCell>
-                    <TableCell>{doc.fileName}</TableCell>
-                    <TableCell>{doc.fileType}</TableCell>
-                    <TableCell>{(doc.fileSize / 1024).toFixed(2)} KB</TableCell>
+                    <TableCell>{doc.uploadedBy}</TableCell>
                     <TableCell>
                       {new Date(doc.uploadedAt).toLocaleDateString()}
                     </TableCell>

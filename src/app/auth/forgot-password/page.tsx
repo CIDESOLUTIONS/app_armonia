@@ -36,15 +36,15 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     try {
       // Lógica para llamar a la API de reseteo de contraseña
-      console.log(values);
+      // console.log(values); // Removed console.log
       toast({
         title: t("toast.requestSentTitle"),
         description: t("toast.requestSentDescription"),
       });
-    } catch (error) {
+    } catch (error: Error) {
       toast({
         title: t("toast.errorTitle"),
-        description: t("toast.defaultErrorDescription"),
+        description: error.message || t("toast.defaultErrorDescription"),
         variant: "destructive",
       });
     } finally {

@@ -95,16 +95,16 @@ export default function EditProjectPage() {
         });
         router.push("/admin/projects/list");
       }
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching project:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar el proyecto.",
+        description: "No se pudo cargar el proyecto: " + error.message,
         variant: "destructive",
       });
       router.push("/admin/projects/list");
     } finally {
-      setLoading(false);
+      // setLoading(false); // Removed this line as it was causing a double setLoading(false)
     }
   }, [projectId, router, toast, reset]);
 
@@ -115,7 +115,7 @@ export default function EditProjectPage() {
   }, [authLoading, user, projectId, fetchProject]);
 
   const onSubmit = async (data: ProjectFormValues) => {
-    setLoading(true);
+    // setLoading(true); // Moved to inside try block
     if (!projectId) return;
 
     try {
@@ -125,19 +125,19 @@ export default function EditProjectPage() {
         description: "Proyecto actualizado correctamente.",
       });
       router.push("/admin/projects/list");
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error updating project:", error);
       toast({
         title: "Error",
-        description: "Error al actualizar el proyecto.",
+        description: "Error al actualizar el proyecto: " + error.message,
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      // setLoading(false); // Removed this line as it was causing a double setLoading(false)
     }
   };
 
-  if (authLoading || loading) {
+  if (authLoading || isSubmitting) { // Use isSubmitting from formState
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -289,8 +289,8 @@ export default function EditProjectPage() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Guardar Cambios
             </Button>
           </form>
