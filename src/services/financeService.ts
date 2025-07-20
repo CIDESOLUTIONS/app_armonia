@@ -1,5 +1,23 @@
 import { getPrisma } from "@/lib/prisma";
 
+interface BankTransaction {
+  date: string;
+  description: string;
+  amount: number;
+}
+
+interface Payment {
+  id: number;
+  amount: number;
+  resident: { name: string };
+}
+
+export interface ReconciliationSuggestion {
+  transaction: BankTransaction;
+  matchingPayment: Payment | null;
+  status: "MATCHED" | "UNMATCHED" | "APPROVED";
+}
+
 export const getFinanceSummary = async (tenantId: string) => {
   const prisma = getPrisma(tenantId);
   // Placeholder logic
@@ -14,32 +32,40 @@ export const generateFinancialReport = async (tenantId: string) => {
   return { message: "Financial report generated successfully" };
 };
 
-export const processBankStatement = async (tenantId: string, file: File) => {
+export const processBankStatement = async (tenantId: string, file: File): Promise<ReconciliationSuggestion[]> => {
   const prisma = getPrisma(tenantId);
-  // Placeholder logic
   console.log("Processing bank statement for tenant:", tenantId, file.name);
-  return { message: "Bank statement processed successfully" };
+  // Simulated data for demonstration
+  return [
+    {
+      transaction: { date: "2024-07-01", description: "Pago de arriendo", amount: 500.00 },
+      matchingPayment: { id: 1, amount: 500.00, resident: { name: "Juan Perez" } },
+      status: "MATCHED",
+    },
+    {
+      transaction: { date: "2024-07-02", description: "Compra en supermercado", amount: 75.50 },
+      matchingPayment: null,
+      status: "UNMATCHED",
+    },
+  ];
 };
 
-export const approveReconciliation = async (
-  tenantId: string,
-  reconciliationId: number,
-) => {
+export const uploadBankStatement = async (tenantId: string, file: File): Promise<ReconciliationSuggestion[]> => {
   const prisma = getPrisma(tenantId);
-  // Placeholder logic
-  console.log(
-    "Approving reconciliation for tenant:",
-    tenantId,
-    reconciliationId,
-  );
-  return { message: "Reconciliation approved successfully" };
-};
-
-export const uploadBankStatement = async (tenantId: string, file: File) => {
-  const prisma = getPrisma(tenantId);
-  // Placeholder logic
   console.log("Uploading bank statement for tenant:", tenantId, file.name);
-  return { message: "Bank statement uploaded successfully" };
+  // Simulated data for demonstration
+  return [
+    {
+      transaction: { date: "2024-07-01", description: "Pago de arriendo", amount: 500.00 },
+      matchingPayment: { id: 1, amount: 500.00, resident: { name: "Juan Perez" } },
+      status: "MATCHED",
+    },
+    {
+      transaction: { date: "2024-07-02", description: "Compra en supermercado", amount: 75.50 },
+      matchingPayment: null,
+      status: "UNMATCHED",
+    },
+  ];
 };
 
 export const generateOrdinaryFees = async (tenantId: string) => {
@@ -92,11 +118,41 @@ export const deletePaymentGatewayConfig = async (
   return { message: "Payment gateway config deleted successfully" };
 };
 
-export const getRecentTransactions = async (tenantId: string) => {
+export interface Transaction {
+  id: number;
+  description: string;
+  amount: number;
+  date: string;
+  type: "INCOME" | "EXPENSE";
+}
+
+export const getRecentTransactions = async (tenantId: string): Promise<Transaction[]> => {
   const prisma = getPrisma(tenantId);
-  // Placeholder logic
   console.log("Getting recent transactions for tenant:", tenantId);
-  return { message: "Recent transactions retrieved successfully" };
+  // Simulated data for demonstration
+  return [
+    {
+      id: 1,
+      description: "Pago de cuota de administración",
+      amount: 150.00,
+      date: "2024-07-19T10:00:00Z",
+      type: "INCOME",
+    },
+    {
+      id: 2,
+      description: "Compra de insumos de limpieza",
+      amount: 45.75,
+      date: "2024-07-18T14:30:00Z",
+      type: "EXPENSE",
+    },
+    {
+      id: 3,
+      description: "Pago de multa por ruido",
+      amount: 25.00,
+      date: "2024-07-17T11:00:00Z",
+      type: "INCOME",
+    },
+  ];
 };
 
 export const initiatePayment = async (

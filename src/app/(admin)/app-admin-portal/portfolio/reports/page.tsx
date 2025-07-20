@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, FileText, Download } from "lucide-react";
+import { Loader2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
 import { getConsolidatedFinancialReport } from "@/services/portfolioService";
 
 export default function ConsolidatedReportsPage() {
@@ -39,7 +39,7 @@ export default function ConsolidatedReportsPage() {
     setLoading(true);
     try {
       if (reportType === "financial-summary") {
-        const reportData = await getConsolidatedFinancialReport(
+        await getConsolidatedFinancialReport(
           startDate,
           endDate,
         );

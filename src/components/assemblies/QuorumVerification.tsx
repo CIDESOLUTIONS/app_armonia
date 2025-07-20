@@ -59,9 +59,9 @@ export default function QuorumVerification({
       setStats(mockStats);
       setLastUpdate(new Date());
       _setError(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("[QuorumVerification] Error:", err);
-      _setError(err.message);
+      _setError((err as Error).message);
     } finally {
       setLoading(false);
     }

@@ -107,13 +107,7 @@ export default function ReservationRulesPage() {
     }));
   };
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: checked,
-    }));
-  };
+  
 
   const handleAddRule = () => {
     setCurrentRule(null);

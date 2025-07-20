@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState } => from "react";
 import {
   Dialog,
   DialogContent,
@@ -95,7 +95,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         title: "Pago creado",
         description: "Se ha generado el enlace de pago exitosamente",
       });
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error creando pago:", error);
       toast({
         title: "Error",
@@ -113,8 +113,8 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Detalles del Pago</DialogTitle>
+          <DialogDescription>Contenido del modal de pago</DialogDescription>
         </DialogHeader>
-        <p>Contenido del modal de pago</p>
         <DialogFooter>
           <Button onClick={onClose}>Cerrar</Button>
         </DialogFooter>

@@ -60,9 +60,9 @@ const RegisterAttendanceDialog = ({
 }: {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: any) => void;
-  propertyUnits: any[];
-  owners: any[];
+  onSubmit: (data: unknown) => void;
+  propertyUnits: unknown[];
+  owners: unknown[];
 }) => {
   // Configuración del formulario
   const {
@@ -94,11 +94,11 @@ const RegisterAttendanceDialog = ({
   };
 
   // Manejar envío del formulario
-  const handleFormSubmit = (data: any) => {
+  const handleFormSubmit = (data: unknown) => {
     // Agregar información del dispositivo para asistencia virtual
-    if (data.attendanceType === "VIRTUAL") {
-      data.ipAddress = window.location.hostname;
-      data.userAgent = navigator.userAgent;
+    if ((data as { attendanceType: string }).attendanceType === "VIRTUAL") {
+      (data as { ipAddress: string }).ipAddress = window.location.hostname;
+      (data as { userAgent: string }).userAgent = navigator.userAgent;
     }
 
     onSubmit(data);
@@ -110,8 +110,8 @@ const RegisterAttendanceDialog = ({
     (propertyUnitId: number) => {
       if (!propertyUnitId) return "";
 
-      const unit = propertyUnits.find((u: any) => u.id === propertyUnitId);
-      return unit ? unit.coefficient : "";
+      const unit = propertyUnits.find((u: unknown) => (u as { id: number }).id === propertyUnitId);
+      return unit ? (unit as { coefficient: number }).coefficient : "";
     },
     [propertyUnits],
   );
@@ -160,9 +160,9 @@ const RegisterAttendanceDialog = ({
                       <SelectValue placeholder="Seleccione una unidad" />
                     </SelectTrigger>
                     <SelectContent>
-                      {propertyUnits?.map((unit: any) => (
-                        <SelectItem key={unit.id} value={String(unit.id)}>
-                          {unit.number} - {unit.ownerName}
+                      {owners?.map((owner: unknown) => (
+                        <SelectItem key={(owner as { id: number }).id} value={String((owner as { id: number }).id)}>
+                          {(owner as { name: string }).name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -249,9 +249,9 @@ const RegisterAttendanceDialog = ({
                         <SelectValue placeholder="Seleccione propietario" />
                       </SelectTrigger>
                       <SelectContent>
-                        {owners?.map((owner: any) => (
-                          <SelectItem key={owner.id} value={String(owner.id)}>
-                            {owner.name}
+                        {owners?.map((owner: unknown) => (
+                          <SelectItem key={(owner as { id: number }).id} value={String((owner as { id: number }).id)}>
+                            {(owner as { name: string }).name}
                           </SelectItem>
                         ))}
                       </SelectContent>

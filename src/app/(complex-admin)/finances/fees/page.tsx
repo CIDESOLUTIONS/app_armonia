@@ -28,7 +28,7 @@ import {
   createFee,
   updateFee,
   deleteFee,
-  generateFees,
+  generateOrdinaryFees,
 } from "@/services/feeService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -105,7 +105,7 @@ export default function FeesPage() {
       console.error("Error fetching fees:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las cuotas.",
+        description: "No se pudieron cargar las cuotas: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -170,7 +170,7 @@ export default function FeesPage() {
       console.error("Error saving fee:", error);
       toast({
         title: "Error",
-        description: "Error al guardar la cuota.",
+        description: "Error al guardar la cuota: " + error.message,
         variant: "destructive",
       });
     }
@@ -197,19 +197,24 @@ export default function FeesPage() {
       console.error("Error deleting fee:", error);
       toast({
         title: "Error",
-        description: "Error al eliminar la cuota.",
+        description: "Error al eliminar la cuota: " + error.message,
         variant: "destructive",
       });
-    } finally {
-      setShowDeleteDialog(false);
-      setFeeToDelete(null);
     }
   };
 
   const handleGenerateFees = async () => {
     setIsGeneratingFees(true);
     try {
-      await generateFees();
+      if (!user?.complexId) {
+        toast({
+          title: "Error",
+          description: "ID de complejo no disponible para generar cuotas.",
+          variant: "destructive",
+        });
+        return;
+      }
+      await generateOrdinaryFees(user.complexId);
       toast({
         title: "Éxito",
         description: "Cuotas generadas para el próximo período.",
@@ -219,7 +224,7 @@ export default function FeesPage() {
       console.error("Error generating fees:", error);
       toast({
         title: "Error",
-        description: "Error al generar las cuotas.",
+        description: "Error al generar las cuotas: " + error.message,
         variant: "destructive",
       });
     } finally {

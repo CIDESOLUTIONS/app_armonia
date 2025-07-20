@@ -6,7 +6,7 @@ import { useAuthStore } from "@/store/authStore";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -39,7 +39,7 @@ export default function EditAssemblyPage() {
   const params = useParams();
   const assemblyId = params.id ? parseInt(params.id as string) : null;
 
-  const [assembly, setAssembly] = useState<AssemblyFormValues | null>(null);
+  
   const [pageLoading, setPageLoading] = useState(true); // Renamed to avoid conflict
 
   const form = useForm<AssemblyFormValues>({

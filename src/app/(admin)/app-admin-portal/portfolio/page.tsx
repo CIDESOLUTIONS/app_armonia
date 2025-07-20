@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, Users, BarChart, Building } from "lucide-react";
+import { DollarSign, Users, Building } from "lucide-react";
 import {
   getPortfolioMetrics,
   getComplexMetrics,

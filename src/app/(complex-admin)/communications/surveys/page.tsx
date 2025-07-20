@@ -38,10 +38,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   surveySchema,
   SurveyFormValues,
-  questionSchema,
-  QuestionFormValues,
-  optionSchema,
-  OptionFormValues,
 } from "@/validators/survey-schema";
 import {
   Form,

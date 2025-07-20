@@ -14,6 +14,18 @@ export const createBudget = async (
   return await prisma.budget.create({ data });
 };
 
+export const updateBudget = async (
+  budgetId: number,
+  data: BudgetFormValues,
+  tenantId: string,
+) => {
+  const prisma = getPrisma(tenantId);
+  return await prisma.budget.update({
+    where: { id: budgetId },
+    data,
+  });
+};
+
 export const approveBudget = async (
   budgetId: number,
   userId: number,

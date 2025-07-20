@@ -4,15 +4,12 @@ import {
   Button,
   Card,
   CardContent,
-  Checkbox,
   CircularProgress,
   Divider,
   FormControl,
   FormControlLabel,
   FormGroup,
-  FormHelperText,
   Grid,
-  InputLabel,
   MenuItem,
   Select,
   Snackbar,
@@ -118,13 +115,10 @@ const UserPreferences: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // En un caso real, estos datos vendrían de la API
-        const typesResponse = await fetch("/api/intercom/visitor-types");
-        const typesData = await typesResponse.json();
-        setVisitorTypes(typesData);
+        const typesResponse = await intercomService.getVisitorTypes();
+        setVisitorTypes(typesResponse);
 
-        // Cargar preferencias del usuario
-        const userId = 1; // En un caso real, esto vendría del contexto de autenticación
+        const userId = 1; // TODO: Get actual userId from auth context
         const preferences = await intercomService.getUserPreferences(userId);
 
         if (preferences) {
@@ -140,12 +134,10 @@ const UserPreferences: React.FC = () => {
           );
           setValue("autoApproveTypes", preferences.autoApproveTypes || []);
 
-          // Configurar horas de silencio
           if (preferences.quietHoursStart && preferences.quietHoursEnd) {
             setQuietHoursEnabled(true);
             setValue("quietHoursEnabled", true);
 
-            // Convertir strings HH:MM a objetos Date
             const [startHour, startMinute] = preferences.quietHoursStart
               .split(":")
               .map(Number);
@@ -175,34 +167,32 @@ const UserPreferences: React.FC = () => {
     };
 
     fetchData();
-  }, [setValue]);
+  }, [setValue, toast]);
 
-  // Manejar envío del formulario
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: unknown) => {
     setLoading(true);
     try {
-      // Formatear horas de silencio
+      const formattedData = { ...data as Record<string, any> };
+
       if (
-        data.quietHoursEnabled &&
-        data.quietHoursStart &&
-        data.quietHoursEnd
+        formattedData.quietHoursEnabled &&
+        formattedData.quietHoursStart &&
+        formattedData.quietHoursEnd
       ) {
         const formatTime = (date: Date) => {
           return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
         };
 
-        data.quietHoursStart = formatTime(data.quietHoursStart);
-        data.quietHoursEnd = formatTime(data.quietHoursEnd);
+        formattedData.quietHoursStart = formatTime(formattedData.quietHoursStart);
+        formattedData.quietHoursEnd = formatTime(formattedData.quietHoursEnd);
       } else {
-        data.quietHoursStart = null;
-        data.quietHoursEnd = null;
+        formattedData.quietHoursStart = null;
+        formattedData.quietHoursEnd = null;
       }
 
-      // Guardar preferencias
-      const userId = 1; // En un caso real, esto vendría del contexto de autenticación
-      await intercomService.updateUserPreferences(userId, data);
+      const userId = 1; // TODO: Get actual userId from auth context
+      await intercomService.updateUserPreferences(userId, formattedData);
 
-      // Mostrar notificación de éxito
       setNotification({
         open: true,
         message: "Preferencias guardadas correctamente",

@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, Upload, CheckCircle, XCircle, FileText } from "lucide-react";
+import { Loader2, Upload, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

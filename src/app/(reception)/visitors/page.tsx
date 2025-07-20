@@ -67,7 +67,6 @@ import {
   registerPackage,
   getPackages,
   Package,
-  uploadPackageImage,
 } from "@/services/packageService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -178,64 +177,22 @@ export default function ReceptionVisitorsPage() {
   } = newPackageForm;
 
   // Datos de ejemplo para desarrollo y pruebas
-  const mockVisitors: Visitor[] = useMemo(
-    () => [
-      {
-        id: "vis1",
-        name: "Carlos Ramírez",
-        documentType: "cc",
-        documentNumber: "123456789",
-        destination: "Apartamento 502",
-        residentName: "Ana López",
-        entryTime: "2025-05-29T10:15:00",
-        plate: "XYZ-123",
-        photoUrl: "https://randomuser.me/api/portraits/men/32.jpg",
-        status: "active",
-      },
-      {
-        id: "vis2",
-        name: "María Fernández",
-        documentType: "ce",
-        documentNumber: "987654321",
-        destination: "Oficina 301 (Administración)",
-        entryTime: "2025-05-29T09:30:00",
-        exitTime: "2025-05-29T11:00:00",
-        status: "departed",
-      },
-      {
-        id: "vis3",
-        name: "Pedro Gómez",
-        documentType: "cc",
-        documentNumber: "112233445",
-        destination: "Apartamento 101",
-        residentName: "Luis Martínez",
-        entryTime: "2025-05-29T11:45:00",
-        status: "active",
-      },
-    ],
-    [],
-  );
-
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // En un entorno real, esto sería una llamada a la API
-      // const response = await fetch('/api/visitors');
-      // const result = await response.json();
-      // if (!response.ok) throw new Error(result.message || 'Error al cargar datos');
-      // setVisitors(result.visitors);
+      const [fetchedVisitors, preRegistered, fetchedPackages] = await Promise.all([
+        // Assuming getVisitors, getPreRegisteredVisitors, and getPackages are implemented in their respective services
+        // and return the correct data types.
+        // If not, these lines will need to be adjusted or mocked.
+        getVisitors(),
+        getPreRegisteredVisitors(),
+        getPackages(),
+      ]);
 
-      // Simulamos un retraso en la carga de datos
-      setTimeout(() => {
-        setVisitors(mockVisitors);
-      }, 1000);
-
-      const preRegistered = await getPreRegisteredVisitors();
+      setVisitors(fetchedVisitors);
       setPreRegisteredVisitors(preRegistered);
-
-      const fetchedPackages = await getPackages(); // Fetch packages
       setPackages(fetchedPackages);
     } catch (error: Error) {
       console.error("[ReceptionVisitors] Error:", error);
@@ -243,13 +200,7 @@ export default function ReceptionVisitorsPage() {
     } finally {
       setLoading(false);
     }
-  }, [
-    mockVisitors,
-    setError,
-    setVisitors,
-    setPreRegisteredVisitors,
-    getPackages,
-  ]);
+  }, [setError, setVisitors, setPreRegisteredVisitors, setPackages]);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -355,38 +306,25 @@ export default function ReceptionVisitorsPage() {
       return;
     }
 
-    let photoUrl: string | undefined;
+    let photoFile: File | undefined;
     if (values.photoUrl instanceof File) {
-      try {
-        const uploadedImage = await uploadVisitorImage(values.photoUrl);
-        photoUrl = uploadedImage.url;
-      } catch (error: Error) {
-        console.error("Error uploading visitor image:", error);
-        setError("Error al subir la foto del visitante: " + error.message);
-        return;
-      }
+      photoFile = values.photoUrl;
     }
 
     try {
-      // Aquí se debería llamar a la API real para registrar el visitante
-      // Por ahora, simulamos la creación y añadimos al estado local
-      const newVisitor: Visitor = {
-        id: `vis${Date.now()}`,
-        name: values.name,
-        documentType: values.documentType as Visitor["documentType"],
-        documentNumber: values.documentNumber,
-        destination: `Unidad ${values.unitId}`, // Asumiendo que unitId se mapea a destino
-        entryTime: values.entryTime,
-        exitTime: null,
-        purpose: values.purpose,
-        photoUrl: photoUrl,
-        status: "active",
-      };
+      let photoUrl = "";
+      if (photoFile) {
+        const uploadedPhoto = await uploadVisitorImage(photoFile);
+        photoUrl = uploadedPhoto.url;
+      }
 
-      // En un entorno real, la API devolvería el objeto de visitante creado
-      // await createPreRegisteredVisitor({ ...values, photoUrl }); // Si se usa la misma API
+      const createdVisitor = await createPreRegisteredVisitor({
+        ...values,
+        photoUrl,
+        complexId: user.complexId,
+      });
 
-      setVisitors((prev) => [newVisitor, ...prev]);
+      setVisitors((prev) => [...prev, createdVisitor]);
       setSuccessMessage("Visitante registrado exitosamente.");
       setIsRegisterDialogOpen(false);
       resetNewVisitorForm();
@@ -410,22 +348,9 @@ export default function ReceptionVisitorsPage() {
     }
 
     try {
-      // En un entorno real, esto sería una llamada a la API
-      // await updateVisitorStatus(visitorId, "departed");
-
-      // Simulamos un retraso
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // Actualizamos el estado local
-      setVisitors((prev) =>
-        prev.map((vis) =>
-          vis.id === visitorId
-            ? { ...vis, status: "departed", exitTime: new Date().toISOString() }
-            : vis,
-        ),
-      );
-
+      await updateVisitorStatus(visitorId, "departed");
       setSuccessMessage("Salida registrada exitosamente.");
+      fetchData(); // Refresh data
     } catch (error: Error) {
       console.error("[ReceptionVisitors] Error:", error);
       setError(
@@ -457,20 +382,13 @@ export default function ReceptionVisitorsPage() {
   };
 
   const handleSubmitNewPackage = async (values: PackageFormValues) => {
-    let photoUrl: string | undefined;
+    let photoFile: File | undefined;
     if (values.photoUrl instanceof File) {
-      try {
-        const uploadedImage = await uploadPackageImage(values.photoUrl);
-        photoUrl = uploadedImage.url;
-      } catch (error: Error) {
-        console.error("Error uploading package image:", error);
-        setError("Error al subir la foto del paquete: " + error.message);
-        return;
-      }
+      photoFile = values.photoUrl;
     }
 
     try {
-      await registerPackage({ ...values, photoUrl });
+      await registerPackage({ ...values, photo: photoFile });
       setSuccessMessage("Paquete registrado exitosamente.");
       setIsPackageRegisterDialogOpen(false);
       resetNewPackageForm();

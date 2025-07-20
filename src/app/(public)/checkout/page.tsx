@@ -94,34 +94,11 @@ export default function Checkout() {
   const [currency, setCurrency] = useState("Pesos");
   const [theme, setTheme] = useState("Claro");
   const [paymentStep, setPaymentStep] = useState("form"); // form, processing, verifying, success, error
-  const [transactionId, setTransactionId] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Obtener los textos traducidos
   const t = language === "Español" ? texts.es : texts.en;
 
-  // Función para verificar el estado del pago usando la API
-  const verifyPayment = async (txId: string) => {
-    try {
-      // Simulación de verificación de pago
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Simulamos una respuesta exitosa
-      const response = { ok: true };
-
-      if (response && response.ok) {
-        localStorage.setItem("paymentCompleted", "true");
-        localStorage.setItem("transactionId", txId);
-        setPaymentStep("success");
-      } else {
-        setErrorMessage(t.errorMessage);
-        setPaymentStep("error");
-      }
-    } catch (error: unknown) {
-      setErrorMessage((error as Error).message || t.errorMessage);
-      setPaymentStep("error");
-    }
-  };
+  
 
   const handleCancel = () => {
     // Volver a la página de registro manteniendo el plan seleccionado

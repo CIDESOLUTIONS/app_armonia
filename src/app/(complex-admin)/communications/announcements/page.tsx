@@ -26,6 +26,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -89,11 +90,11 @@ export default function AnnouncementsPage() {
     try {
       const data = await getAnnouncements();
       setAnnouncements(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching announcements:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar los anuncios.",
+        description: "No se pudieron cargar los anuncios: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -154,15 +155,20 @@ export default function AnnouncementsPage() {
       }
       setIsModalOpen(false);
       fetchAnnouncements();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving announcement:", error);
       toast({
         title: "Error",
-        description: "Error al guardar el anuncio.",
+        description: "Error al guardar el anuncio: " + error.message,
         variant: "destructive",
       });
     }
   };
+
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [announcementToDelete, setAnnouncementToDelete] = useState<
+    number | null
+  >(null);
 
   const handleDeleteAnnouncement = (id: number) => {
     setAnnouncementToDelete(id);
@@ -178,11 +184,11 @@ export default function AnnouncementsPage() {
         description: "Anuncio eliminado correctamente.",
       });
       fetchAnnouncements();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error deleting announcement:", error);
       toast({
         title: "Error",
-        description: "Error al eliminar el anuncio.",
+        description: "Error al eliminar el anuncio: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -466,3 +472,4 @@ export default function AnnouncementsPage() {
     </div>
   );
 }
+

@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Flag, MessageSquare } from "lucide-react";
+import { Flag, MessageSquare, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -85,11 +85,11 @@ export function ListingCard({ listing }: ListingCardProps) {
       });
       setIsReportModalOpen(false);
       reset();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error reporting listing:", error);
       toast({
         title: "Error",
-        description: "No se pudo reportar el anuncio.",
+        description: "No se pudo reportar el anuncio: " + error.message,
         variant: "destructive",
       });
     }
@@ -120,11 +120,12 @@ export function ListingCard({ listing }: ListingCardProps) {
         type: "direct",
       });
       router.push(`/resident/marketplace/chat/${conversation.id}`);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error creating/fetching conversation:", error);
       toast({
         title: "Error",
-        description: "No se pudo iniciar la conversación con el vendedor.",
+        description: "No se pudo iniciar la conversación con el vendedor: " +
+          error.message,
         variant: "destructive",
       });
     }

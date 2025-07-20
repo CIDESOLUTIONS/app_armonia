@@ -9,7 +9,6 @@ import {
   CreditCard,
   Banknote,
   Receipt,
-  Lock,
   CheckCircle,
   XCircle,
   Loader2,

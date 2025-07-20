@@ -14,10 +14,9 @@ import { Loader2 } from "lucide-react";
 
 // Placeholder for actual API calls to configure payment gateways
 // In a real application, these would interact with your backend to save/retrieve API keys, webhook URLs, etc.
-const savePaymentGatewayConfig = async (config: any) => {
+const savePaymentGatewayConfig = async (config: unknown) => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      console.log("Saving payment gateway config:", config);
       resolve({ success: true });
     }, 1000);
   });

@@ -43,7 +43,7 @@ interface Message {
   content: string;
   createdAt: string;
   read: boolean;
-  attachments?: any[];
+  attachments?: unknown[];
 }
 
 export default function MessagesPage() {

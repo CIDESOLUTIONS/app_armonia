@@ -47,8 +47,20 @@ export const FinancialReportsSection = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     try {
-      // TODO: Call backend API to generate report
-      console.log("Generating report:", values);
+      // Call backend API to generate report
+      const response = await fetch(
+        `/api/finances/reports/${values.reportType}?startDate=${values.startDate}&endDate=${values.endDate}`,
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al generar el informe.");
+      }
+
+      const data = await response.json();
+      // Assuming the API returns a downloadable URL
+      window.open(data.downloadUrl, "_blank");
+
       toast({
         title: "Éxito",
         description: `Informe de ${values.reportType} generado correctamente.`,

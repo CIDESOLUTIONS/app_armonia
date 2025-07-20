@@ -6,7 +6,7 @@ import { useAuthStore } from "@/store/authStore";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -36,7 +36,6 @@ export default function EditPQRPage() {
   const params = useParams();
   const pqrId = params.id ? parseInt(params.id as string) : null;
 
-  const [pqr, setPqr] = useState<PQRFormValues | null>(null);
   const [loading, setLoading] = useState(true);
 
   const form = useForm<PQRFormValues>({
