@@ -50,7 +50,13 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 
 interface Survey {
@@ -158,7 +164,8 @@ export default function SurveysPage() {
       console.error("Error fetching surveys:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las encuestas/votaciones: " + error.message,
+        description:
+          "No se pudieron cargar las encuestas/votaciones: " + error.message,
         variant: "destructive",
       });
     } finally {

@@ -78,7 +78,8 @@ export default function MyListingsPage() {
       console.error("Error marking listing as sold:", error);
       toast({
         title: "Error",
-        description: "No se pudo marcar el anuncio como vendido: " + error.message,
+        description:
+          "No se pudo marcar el anuncio como vendido: " + error.message,
         variant: "destructive",
       });
     }

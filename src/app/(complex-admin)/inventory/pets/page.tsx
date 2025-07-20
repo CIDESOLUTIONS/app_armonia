@@ -259,7 +259,8 @@ export default function PetsPage() {
                 <TableCell>{pet.breed}</TableCell>
                 <TableCell>{pet.age}</TableCell>
                 <TableCell>
-                  {residents.find((r) => r.id === pet.residentId)?.name || "N/A"}
+                  {residents.find((r) => r.id === pet.residentId)?.name ||
+                    "N/A"}
                 </TableCell>
                 <TableCell>
                   {pet.isActive ? (
@@ -438,8 +439,8 @@ export default function PetsPage() {
           <DialogHeader>
             <DialogTitle>Confirmar Eliminación</DialogTitle>
             <DialogDescription>
-              ¿Estás seguro de que quieres eliminar esta mascota? Esta acción
-              no se puede deshacer.
+              ¿Estás seguro de que quieres eliminar esta mascota? Esta acción no
+              se puede deshacer.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

@@ -137,7 +137,8 @@ export default function EditProjectPage() {
     }
   };
 
-  if (authLoading || isSubmitting) { // Use isSubmitting from formState
+  if (authLoading || isSubmitting) {
+    // Use isSubmitting from formState
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -290,7 +291,9 @@ export default function EditProjectPage() {
               )}
             />
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isSubmitting && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
               Guardar Cambios
             </Button>
           </form>

@@ -43,7 +43,8 @@ export default function BrandingPage() {
       console.error("Error fetching complexes:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar los complejos residenciales: " + error.message,
+        description:
+          "No se pudieron cargar los complejos residenciales: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -99,7 +100,8 @@ export default function BrandingPage() {
       console.error("Error updating branding:", error);
       toast({
         title: "Error",
-        description: "Error al actualizar la configuración de marca: " + error.message,
+        description:
+          "Error al actualizar la configuración de marca: " + error.message,
         variant: "destructive",
       });
     } finally {

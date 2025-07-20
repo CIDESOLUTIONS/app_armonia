@@ -21,7 +21,9 @@ import { ReportedListing } from "@/interfaces/marketplace/reported-listing.inter
 
 export default function MarketplaceModerationPage() {
   const { toast } = useToast();
-  const [reportedListings, setReportedListings] = useState<ReportedListing[]>([]);
+  const [reportedListings, setReportedListings] = useState<ReportedListing[]>(
+    [],
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

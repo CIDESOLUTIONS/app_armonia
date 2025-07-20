@@ -33,7 +33,8 @@ export default function ResidentDirectoryPage() {
         console.error("Error fetching residents for directory:", error);
         toast({
           title: "Error",
-          description: "No se pudo cargar el directorio de residentes: " + error.message,
+          description:
+            "No se pudo cargar el directorio de residentes: " + error.message,
           variant: "destructive",
         });
       } finally {

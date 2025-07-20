@@ -40,12 +40,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";eFee,
-  FeeDto,
-} from "@/services/feeService";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { feeSchema, FeeFormValues } from "@/validators/fee-schema";
+} from "@/components/ui/form";
 
 export default function FinesPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -81,11 +76,11 @@ export default function FinesPage() {
     try {
       const data = await getFees({ type: "FINE" });
       setFines(data.data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching fines:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las multas.",
+        description: "No se pudieron cargar las multas: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -146,11 +141,11 @@ export default function FinesPage() {
       }
       setIsModalOpen(false);
       fetchFines();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving fine:", error);
       toast({
         title: "Error",
-        description: "Error al guardar la multa.",
+        description: "Error al guardar la multa: " + error.message,
         variant: "destructive",
       });
     }
@@ -165,11 +160,11 @@ export default function FinesPage() {
         description: "Multa eliminada correctamente.",
       });
       fetchFines();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error deleting fine:", error);
       toast({
         title: "Error",
-        description: "Error al eliminar la multa.",
+        description: "Error al eliminar la multa: " + error.message,
         variant: "destructive",
       });
     }

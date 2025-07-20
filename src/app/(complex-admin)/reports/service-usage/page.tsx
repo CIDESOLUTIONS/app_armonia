@@ -66,7 +66,8 @@ export default function ServiceUsageReportsPage() {
       console.error("Error generating service usage report:", error);
       toast({
         title: "Error",
-        description: "Error al generar el reporte de uso de servicios: " + error.message,
+        description:
+          "Error al generar el reporte de uso de servicios: " + error.message,
         variant: "destructive",
       });
     } finally {

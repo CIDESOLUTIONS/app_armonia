@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import createIntlMiddleware from "next-intl/middleware";
 
-
 const locales = ["en", "es"];
 const publicPages = ["/", "/login", "/register-complex"];
 

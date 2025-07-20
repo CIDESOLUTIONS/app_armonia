@@ -43,7 +43,8 @@ export default function GeneralSettingsPage() {
       console.error("Error fetching complex info:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar la información del conjunto: " + error.message,
+        description:
+          "No se pudo cargar la información del conjunto: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -83,7 +84,9 @@ export default function GeneralSettingsPage() {
       console.error("Error saving complex info:", error);
       toast({
         title: "Error",
-        description: "Error al guardar la información general del conjunto: " + error.message,
+        description:
+          "Error al guardar la información general del conjunto: " +
+          error.message,
         variant: "destructive",
       });
     } finally {

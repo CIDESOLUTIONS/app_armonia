@@ -82,7 +82,8 @@ export default function AuthLayout({
       console.error("[AuthLayout] Error en logout:", error);
       toast({
         title: "Error",
-        description: "Error en el proceso de cierre de sesión: " + error.message,
+        description:
+          "Error en el proceso de cierre de sesión: " + error.message,
         variant: "destructive",
       });
     }

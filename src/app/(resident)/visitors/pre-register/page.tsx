@@ -66,7 +66,8 @@ export default function PreRegisterVisitorPage() {
           toast({
             title: "Error",
             description:
-              "No se pudo obtener la información de la unidad del usuario: " + error.message,
+              "No se pudo obtener la información de la unidad del usuario: " +
+              error.message,
             variant: "destructive",
           });
         }
@@ -108,7 +109,8 @@ export default function PreRegisterVisitorPage() {
     if (!user?.id || !user?.complexId || userUnitId === null) {
       toast({
         title: "Error",
-        description: "Información de usuario o unidad incompleta. Por favor, asegúrese de que su perfil tenga una unidad asociada.",
+        description:
+          "Información de usuario o unidad incompleta. Por favor, asegúrese de que su perfil tenga una unidad asociada.",
         variant: "destructive",
       });
       return;

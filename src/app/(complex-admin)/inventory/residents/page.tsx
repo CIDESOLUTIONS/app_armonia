@@ -282,8 +282,8 @@ export default function ResidentsPage() {
                 <TableCell>{resident.email}</TableCell>
                 <TableCell>{resident.phone}</TableCell>
                 <TableCell>
-                  {properties.find((p) => p.id === resident.propertyId)?.unitNumber ||
-                    "N/A"}
+                  {properties.find((p) => p.id === resident.propertyId)
+                    ?.unitNumber || "N/A"}
                 </TableCell>
                 <TableCell>
                   {resident.isOwner ? (

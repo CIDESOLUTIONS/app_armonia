@@ -37,7 +37,8 @@ export default function FinancialSettingsPage() {
       console.error("Error fetching financial settings:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar la configuración financiera: " + error.message,
+        description:
+          "No se pudo cargar la configuración financiera: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -75,7 +76,8 @@ export default function FinancialSettingsPage() {
       console.error("Error saving financial settings:", error);
       toast({
         title: "Error",
-        description: "Error al guardar la configuración financiera: " + error.message,
+        description:
+          "Error al guardar la configuración financiera: " + error.message,
         variant: "destructive",
       });
     } finally {

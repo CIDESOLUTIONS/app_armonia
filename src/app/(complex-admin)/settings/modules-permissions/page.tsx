@@ -35,7 +35,8 @@ export default function ModulesPermissionsPage() {
       toast({
         title: "Error",
         description:
-          "No se pudo cargar la configuración de módulos y permisos: " + error.message,
+          "No se pudo cargar la configuración de módulos y permisos: " +
+          error.message,
         variant: "destructive",
       });
     } finally {

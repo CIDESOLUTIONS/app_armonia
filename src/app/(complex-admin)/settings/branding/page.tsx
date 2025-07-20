@@ -37,7 +37,8 @@ export default function BrandingSettingsPage() {
       console.error("Error fetching branding settings:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar la configuración de marca: " + error.message,
+        description:
+          "No se pudo cargar la configuración de marca: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -78,7 +79,8 @@ export default function BrandingSettingsPage() {
       console.error("Error saving branding settings:", error);
       toast({
         title: "Error",
-        description: "Error al guardar la configuración de marca: " + error.message,
+        description:
+          "Error al guardar la configuración de marca: " + error.message,
         variant: "destructive",
       });
     } finally {

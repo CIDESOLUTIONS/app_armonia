@@ -69,7 +69,8 @@ export default function ResidentDashboardPage() {
         console.error("Error fetching resident dashboard data:", error);
         toast({
           title: "Error",
-          description: "No se pudieron cargar los datos del dashboard: " + error.message,
+          description:
+            "No se pudieron cargar los datos del dashboard: " + error.message,
           variant: "destructive",
         });
       } finally {

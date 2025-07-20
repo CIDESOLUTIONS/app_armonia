@@ -48,7 +48,8 @@ export default function SmartMetersPage() {
       console.error("Error recording reading:", error);
       toast({
         title: "Error",
-        description: "Error al registrar la lectura del medidor: " + error.message,
+        description:
+          "Error al registrar la lectura del medidor: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -83,7 +84,8 @@ export default function SmartMetersPage() {
       console.error("Error triggering billing:", error);
       toast({
         title: "Error",
-        description: "Error al iniciar la facturación automatizada: " + error.message,
+        description:
+          "Error al iniciar la facturación automatizada: " + error.message,
         variant: "destructive",
       });
     } finally {

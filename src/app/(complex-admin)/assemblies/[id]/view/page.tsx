@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useAuthStore }n "@/store/authStore";
+import { useAuthStore } from "@/store/authStore";
 import {
   Loader2,
   CheckCircle,

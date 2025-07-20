@@ -95,7 +95,9 @@ export default function MicroCreditsPage() {
       console.error("Error fetching applications:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las solicitudes de micro-créditos: " + error.message,
+        description:
+          "No se pudieron cargar las solicitudes de micro-créditos: " +
+          error.message,
         variant: "destructive",
       });
     } finally {
@@ -134,7 +136,8 @@ export default function MicroCreditsPage() {
       console.error("Error submitting application:", error);
       toast({
         title: "Error",
-        description: "Error al enviar la solicitud de micro-crédito: " + error.message,
+        description:
+          "Error al enviar la solicitud de micro-crédito: " + error.message,
         variant: "destructive",
       });
     } finally {

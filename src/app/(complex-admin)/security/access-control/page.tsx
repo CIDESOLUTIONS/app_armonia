@@ -26,7 +26,8 @@ export default function AccessControlPage() {
       console.error("Error during biometric enrollment:", error);
       toast({
         title: "Error",
-        description: "Error al iniciar el enrolamiento biométrico: " + error.message,
+        description:
+          "Error al iniciar el enrolamiento biométrico: " + error.message,
         variant: "destructive",
       });
     } finally {

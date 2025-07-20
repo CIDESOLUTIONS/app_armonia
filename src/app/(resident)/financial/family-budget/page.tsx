@@ -97,7 +97,9 @@ export default function FamilyBudgetPage() {
       console.error("Error fetching budget entries:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las entradas del presupuesto: " + error.message,
+        description:
+          "No se pudieron cargar las entradas del presupuesto: " +
+          error.message,
         variant: "destructive",
       });
     } finally {
@@ -125,7 +127,8 @@ export default function FamilyBudgetPage() {
       console.error("Error creating budget entry:", error);
       toast({
         title: "Error",
-        description: "Error al crear la entrada de presupuesto: " + error.message,
+        description:
+          "Error al crear la entrada de presupuesto: " + error.message,
         variant: "destructive",
       });
     }
