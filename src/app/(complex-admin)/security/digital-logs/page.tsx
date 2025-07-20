@@ -25,9 +25,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import {
   getDigitalLogs,
-  createDigitalLog,
-  updateDigitalLog,
-  deleteDigitalLog,
 } from "@/services/digitalLogService";
 
 interface DigitalLog {

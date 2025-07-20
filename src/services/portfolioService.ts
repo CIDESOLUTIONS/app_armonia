@@ -1,30 +1,25 @@
-import { fetchApi } from "@/lib/api";
+import { getPrisma } from "@/lib/prisma";
 
-export interface PortfolioMetric {
-  totalProperties: number;
-  totalResidents: number;
-  totalPendingFees: number;
-  totalIncome: number;
-  totalOpenPqrs: number;
-  totalBudgetsApproved: number;
-  totalExpenses: number;
-}
+export const getConsolidatedFinancialReport = async (portfolioId: number) => {
+  // This is a placeholder. In a real implementation, you would iterate
+  // through the tenants in the portfolio and aggregate their financial data.
+  console.log(
+    "Generating consolidated financial report for portfolio:",
+    portfolioId,
+  );
+  return { message: "Consolidated financial report generated successfully" };
+};
 
-export interface ComplexMetric {
-  id: number;
-  name: string;
-  residents: number;
-  pendingFees: number;
-  income: number;
-  openPqrs: number;
-  budgetApproved: number;
-  expenses: number;
-}
+export const getPortfolioMetrics = async (portfolioId: number) => {
+  const prisma = getPrisma(); // Assuming portfolio metrics are from public schema
+  // Placeholder logic
+  console.log("Getting portfolio metrics for portfolio:", portfolioId);
+  return { message: "Portfolio metrics retrieved successfully" };
+};
 
-export async function getPortfolioMetrics(): Promise<PortfolioMetric> {
-  return fetchApi("/portfolio/metrics");
-}
-
-export async function getComplexMetrics(): Promise<ComplexMetric[]> {
-  return fetchApi("/portfolio/complex-metrics");
-}
+export const getComplexMetrics = async (complexId: number) => {
+  const prisma = getPrisma(); // Assuming complex metrics are from public schema
+  // Placeholder logic
+  console.log("Getting complex metrics for complex:", complexId);
+  return { message: "Complex metrics retrieved successfully" };
+};

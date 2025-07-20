@@ -8,4 +8,6 @@ export const familyBudgetEntrySchema = z.object({
   date: z.string().min(1, "La fecha es requerida."),
 });
 
-export type FamilyBudgetEntryFormValues = z.infer<typeof familyBudgetEntrySchema>;
+export type FamilyBudgetEntryFormValues = z.infer<
+  typeof familyBudgetEntrySchema
+>;

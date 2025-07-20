@@ -21,7 +21,9 @@ export interface CreditScoreResponse {
   provider: string;
 }
 
-export async function requestMicroCredit(data: MicroCreditRequest): Promise<MicroCreditResponse> {
+export async function requestMicroCredit(
+  data: MicroCreditRequest,
+): Promise<MicroCreditResponse> {
   try {
     const response = await fetchApi("/fintech/micro-credit/request", {
       method: "POST",
@@ -34,7 +36,9 @@ export async function requestMicroCredit(data: MicroCreditRequest): Promise<Micr
   }
 }
 
-export async function getCreditScore(userId: number): Promise<CreditScoreResponse> {
+export async function getCreditScore(
+  userId: number,
+): Promise<CreditScoreResponse> {
   try {
     const response = await fetchApi(`/fintech/credit-score/${userId}`);
     return response.data;

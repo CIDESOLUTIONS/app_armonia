@@ -73,7 +73,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { visitorSchema, VisitorFormValues } from "@/validators/visitor-schema";
 import { packageSchema, PackageFormValues } from "@/validators/package-schema";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 interface Visitor {
   id: string;
@@ -238,7 +245,13 @@ export default function ReceptionVisitorsPage() {
     } finally {
       setLoading(false);
     }
-  }, [mockVisitors, setError, setVisitors, setPreRegisteredVisitors, getPackages]);
+  }, [
+    mockVisitors,
+    setError,
+    setVisitors,
+    setPreRegisteredVisitors,
+    getPackages,
+  ]);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -317,10 +330,20 @@ export default function ReceptionVisitorsPage() {
     if (packageSearchTerm) {
       filtered = filtered.filter(
         (pkg) =>
-          pkg.trackingNumber.toLowerCase().includes(packageSearchTerm.toLowerCase()) ||
-          pkg.recipientUnit.toLowerCase().includes(packageSearchTerm.toLowerCase()) ||
-          (pkg.sender && pkg.sender.toLowerCase().includes(packageSearchTerm.toLowerCase())) ||
-          (pkg.description && pkg.description.toLowerCase().includes(packageSearchTerm.toLowerCase())),
+          pkg.trackingNumber
+            .toLowerCase()
+            .includes(packageSearchTerm.toLowerCase()) ||
+          pkg.recipientUnit
+            .toLowerCase()
+            .includes(packageSearchTerm.toLowerCase()) ||
+          (pkg.sender &&
+            pkg.sender
+              .toLowerCase()
+              .includes(packageSearchTerm.toLowerCase())) ||
+          (pkg.description &&
+            pkg.description
+              .toLowerCase()
+              .includes(packageSearchTerm.toLowerCase())),
       );
     }
 
@@ -371,7 +394,9 @@ export default function ReceptionVisitorsPage() {
       resetNewVisitorForm();
     } catch (err: any) {
       console.error("[ReceptionVisitors] Error:", err);
-      setError("Error al registrar el visitante. Por favor, inténtelo de nuevo.");
+      setError(
+        "Error al registrar el visitante. Por favor, inténtelo de nuevo.",
+      );
     }
   };
 
@@ -629,7 +654,10 @@ export default function ReceptionVisitorsPage() {
                 <PackageIcon className="mr-2 h-5 w-5" /> Registrar Paquete
               </CardTitle>
               <Form {...newPackageForm}>
-                <form onSubmit={handleNewPackageSubmit(handleSubmitNewPackage)} className="space-y-4">
+                <form
+                  onSubmit={handleNewPackageSubmit(handleSubmitNewPackage)}
+                  className="space-y-4"
+                >
                   <FormField
                     control={newPackageFormControl}
                     name="trackingNumber"
@@ -663,7 +691,10 @@ export default function ReceptionVisitorsPage() {
                       <FormItem>
                         <FormLabel>Remitente (Opcional)</FormLabel>
                         <FormControl>
-                          <Input placeholder="Nombre del remitente" {...field} />
+                          <Input
+                            placeholder="Nombre del remitente"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -676,7 +707,10 @@ export default function ReceptionVisitorsPage() {
                       <FormItem>
                         <FormLabel>Descripción (Opcional)</FormLabel>
                         <FormControl>
-                          <Input placeholder="Contenido del paquete" {...field} />
+                          <Input
+                            placeholder="Contenido del paquete"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -694,7 +728,9 @@ export default function ReceptionVisitorsPage() {
                             type="file"
                             accept="image/*"
                             onChange={(event) => {
-                              onChange(event.target.files && event.target.files[0]);
+                              onChange(
+                                event.target.files && event.target.files[0],
+                              );
                             }}
                           />
                         </FormControl>
@@ -740,7 +776,14 @@ export default function ReceptionVisitorsPage() {
                     }
                   />
                 </div>
-                <Button onClick={() => handleDeliverPackage(parseInt(deliverPackageTrackingNumber))} disabled={isNewPackageSubmitting || !deliverPackageTrackingNumber}>
+                <Button
+                  onClick={() =>
+                    handleDeliverPackage(parseInt(deliverPackageTrackingNumber))
+                  }
+                  disabled={
+                    isNewPackageSubmitting || !deliverPackageTrackingNumber
+                  }
+                >
                   {isNewPackageSubmitting && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
@@ -769,7 +812,9 @@ export default function ReceptionVisitorsPage() {
           <Select
             value={packageStatusFilter}
             onValueChange={(value) =>
-              setPackageStatusFilter(value as "REGISTERED" | "DELIVERED" | "RETURNED" | "all")
+              setPackageStatusFilter(
+                value as "REGISTERED" | "DELIVERED" | "RETURNED" | "all",
+              )
             }
           >
             <SelectTrigger className="w-full md:w-48">
@@ -812,7 +857,9 @@ export default function ReceptionVisitorsPage() {
                     <TableCell>{pkg.sender || "N/A"}</TableCell>
                     <TableCell>{pkg.description || "N/A"}</TableCell>
                     <TableCell>{formatDate(pkg.registrationDate)}</TableCell>
-                    <TableCell>{pkg.deliveryDate ? formatDate(pkg.deliveryDate) : "N/A"}</TableCell>
+                    <TableCell>
+                      {pkg.deliveryDate ? formatDate(pkg.deliveryDate) : "N/A"}
+                    </TableCell>
                     <TableCell>
                       <Badge
                         className={
@@ -823,7 +870,11 @@ export default function ReceptionVisitorsPage() {
                               : "bg-gray-100 text-gray-800"
                         }
                       >
-                        {pkg.status === "REGISTERED" ? "Registrado" : pkg.status === "DELIVERED" ? "Entregado" : "Devuelto"}
+                        {pkg.status === "REGISTERED"
+                          ? "Registrado"
+                          : pkg.status === "DELIVERED"
+                            ? "Entregado"
+                            : "Devuelto"}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -1007,7 +1058,10 @@ export default function ReceptionVisitorsPage() {
             </DialogDescription>
           </DialogHeader>
           <Form {...newVisitorForm}>
-            <form onSubmit={handleNewVisitorSubmit(handleNewVisitorFormSubmitLogic)} className="space-y-4 py-4">
+            <form
+              onSubmit={handleNewVisitorSubmit(handleNewVisitorFormSubmitLogic)}
+              className="space-y-4 py-4"
+            >
               <FormField
                 control={newVisitorFormControl}
                 name="name"
@@ -1015,7 +1069,10 @@ export default function ReceptionVisitorsPage() {
                   <FormItem>
                     <FormLabel>Nombre Completo</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nombre completo del visitante" {...field} />
+                      <Input
+                        placeholder="Nombre completo del visitante"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -1038,8 +1095,12 @@ export default function ReceptionVisitorsPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="cc">Cédula de Ciudadanía</SelectItem>
-                          <SelectItem value="ce">Cédula de Extranjería</SelectItem>
+                          <SelectItem value="cc">
+                            Cédula de Ciudadanía
+                          </SelectItem>
+                          <SelectItem value="ce">
+                            Cédula de Extranjería
+                          </SelectItem>
                           <SelectItem value="passport">Pasaporte</SelectItem>
                           <SelectItem value="other">Otro</SelectItem>
                         </SelectContent>
@@ -1055,7 +1116,10 @@ export default function ReceptionVisitorsPage() {
                     <FormItem>
                       <FormLabel>Número de Documento</FormLabel>
                       <FormControl>
-                        <Input placeholder="Número de identificación" {...field} />
+                        <Input
+                          placeholder="Número de identificación"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1073,7 +1137,9 @@ export default function ReceptionVisitorsPage() {
                         type="number"
                         placeholder="Ej: 101"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -1168,7 +1234,10 @@ export default function ReceptionVisitorsPage() {
             </DialogDescription>
           </DialogHeader>
           <Form {...newPackageForm}>
-            <form onSubmit={handleNewPackageSubmit(handleSubmitNewPackage)} className="space-y-4 py-4">
+            <form
+              onSubmit={handleNewPackageSubmit(handleSubmitNewPackage)}
+              className="space-y-4 py-4"
+            >
               <FormField
                 control={newPackageFormControl}
                 name="trackingNumber"
@@ -1287,7 +1356,12 @@ export default function ReceptionVisitorsPage() {
                 }
               />
             </div>
-            <Button onClick={() => handleDeliverPackage(parseInt(deliverPackageTrackingNumber))} disabled={isNewPackageSubmitting || !deliverPackageTrackingNumber}>
+            <Button
+              onClick={() =>
+                handleDeliverPackage(parseInt(deliverPackageTrackingNumber))
+              }
+              disabled={isNewPackageSubmitting || !deliverPackageTrackingNumber}
+            >
               {isNewPackageSubmitting && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}

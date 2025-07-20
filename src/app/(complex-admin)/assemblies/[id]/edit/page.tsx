@@ -19,8 +19,18 @@ import { useToast } from "@/components/ui/use-toast";
 import { getAssemblyById, updateAssembly } from "@/services/assemblyService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { assemblySchema, AssemblyFormValues } from "@/validators/assembly-schema";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  assemblySchema,
+  AssemblyFormValues,
+} from "@/validators/assembly-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 export default function EditAssemblyPage() {
   const { user, loading: authLoading } = useAuthStore();

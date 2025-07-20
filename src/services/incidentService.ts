@@ -68,7 +68,9 @@ export async function getIncidentById(id: string): Promise<Incident> {
   }
 }
 
-export async function createIncident(data: CreateIncidentDto): Promise<Incident> {
+export async function createIncident(
+  data: CreateIncidentDto,
+): Promise<Incident> {
   try {
     const response = await fetchApi("/incidents", {
       method: "POST",
@@ -97,10 +99,12 @@ export async function updateIncident(
   }
 }
 
-export async function uploadIncidentAttachments(files: File[]): Promise<{ urls: string[] }> {
+export async function uploadIncidentAttachments(
+  files: File[],
+): Promise<{ urls: string[] }> {
   try {
     const formData = new FormData();
-    files.forEach(file => {
+    files.forEach((file) => {
       formData.append("files", file); // 'files' is the field name for the array of files
     });
     const response = await fetchApi(

@@ -20,7 +20,7 @@ import Image from "next/image";
 
 export default function MarketplaceModerationPage() {
   const { toast } = useToast();
-  const [reportedListings, setReportedListings] = useState<any[]>([]);
+  const [reportedListings, setReportedListings] = useState<ReportedListing[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -19,6 +19,12 @@ export class ReconciliationService {
     return this.prismaClientManager.getClient(schemaName);
   }
 
+  private isSimilarDate(date1: Date, date2: Date) {
+    const diffTime = Math.abs(date2.getTime() - date1.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays <= 5; // Considerar fechas dentro de un rango de 5 días
+  }
+
   async reconcileBankStatement(
     schemaName: string,
     statementEntries: BankStatementEntry[],
@@ -32,7 +38,7 @@ export class ReconciliationService {
     const potentialMatch = pendingPayments.find(
       (payment) =>
         payment.amount === entry.amount &&
-        isSimilarDate(new Date(payment.date), new Date(entry.date)) &&
+        this.isSimilarDate(new Date(payment.date), new Date(entry.date)) &&
         (entry.description.includes(payment.reference) ||
           payment.reference.includes(entry.description)),
     );
@@ -53,10 +59,4 @@ export class ReconciliationService {
   });
 
   return suggestions;
-}
-
-function isSimilarDate(date1: Date, date2: Date) {
-  const diffTime = Math.abs(date2.getTime() - date1.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays <= 5; // Considerar fechas dentro de un rango de 5 días
 }

@@ -165,7 +165,11 @@ export default function AssemblyDetailPage() {
     }
   };
 
-  const handleSubmitVote = async (voteId: number, option: string, weight: number) => {
+  const handleSubmitVote = async (
+    voteId: number,
+    option: string,
+    weight: number,
+  ) => {
     if (!user?.id) return;
     try {
       await submitVote({ voteId, option, userId: user.id, unitId: 1, weight }); // Assuming unitId 1 for now
@@ -309,8 +313,8 @@ export default function AssemblyDetailPage() {
                       key={option.id}
                       variant="outline"
                       className="mr-2 mb-2"
-                      onClick={() =>
-                        handleSubmitVote(vote.id, option.value, 1) // Assuming weight 1 for now
+                      onClick={
+                        () => handleSubmitVote(vote.id, option.value, 1) // Assuming weight 1 for now
                       }
                     >
                       {" "}

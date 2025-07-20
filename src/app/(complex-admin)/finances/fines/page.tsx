@@ -5,7 +5,6 @@ import { useAuthStore } from "@/store/authStore";
 import { Loader2, PlusCircle, Edit, Trash2, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Table,
@@ -22,22 +21,28 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   getFees,
   createFee,
   updateFee,
   deleteFee,
   FeeDto,
-} from "@/services/financeService";
+} from "@/services/feeService";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { feeSchema, FeeFormValues } from "@/validators/fee-schema";
+import { Badge } from "@/components/ui/badge";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";eFee,
+  FeeDto,
+} from "@/services/feeService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { feeSchema, FeeFormValues } from "@/validators/fee-schema";
@@ -191,7 +196,7 @@ export default function FinesPage() {
         </div>
       </div>
     );
-  };
+  }
 
   return (
     <div className="container mx-auto p-6">
@@ -303,7 +308,11 @@ export default function FinesPage() {
                   <FormItem className="grid grid-cols-4 items-center gap-4">
                     <FormLabel className="text-right">Descripción</FormLabel>
                     <FormControl>
-                      <Textarea id="description" {...field} className="col-span-3" />
+                      <Textarea
+                        id="description"
+                        {...field}
+                        className="col-span-3"
+                      />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
@@ -335,9 +344,16 @@ export default function FinesPage() {
                 name="dueDate"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Fecha Vencimiento</FormLabel>
+                    <FormLabel className="text-right">
+                      Fecha Vencimiento
+                    </FormLabel>
                     <FormControl>
-                      <Input id="dueDate" type="date" {...field} className="col-span-3" />
+                      <Input
+                        id="dueDate"
+                        type="date"
+                        {...field}
+                        className="col-span-3"
+                      />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>

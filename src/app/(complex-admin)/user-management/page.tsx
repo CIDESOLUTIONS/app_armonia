@@ -2,10 +2,14 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, PlusCircle, Edit, Trash2, User as UserIcon } from "lucide-react";
+import {
+  Loader2,
+  PlusCircle,
+  Edit,
+  Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -29,7 +33,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   getAllUsers,
   createUser,
@@ -37,18 +40,40 @@ import {
   deleteUser,
   User,
   CreateUserDto,
-  UpdateUserDto,
 } from "@/services/userService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const userFormSchema = z.object({
   name: z.string().min(2, "El nombre es requerido."),
   email: z.string().email("Email inválido."),
-  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres.").optional().or(z.literal("")),
-  role: z.enum(["ADMIN", "COMPLEX_ADMIN", "RESIDENT", "STAFF", "RECEPTION", "SECURITY", "CONCIERGE"], { message: "Rol inválido." }),
+  password: z
+    .string()
+    .min(6, "La contraseña debe tener al menos 6 caracteres.")
+    .optional()
+    .or(z.literal("")),
+  role: z.enum(
+    [
+      "ADMIN",
+      "COMPLEX_ADMIN",
+      "RESIDENT",
+      "STAFF",
+      "RECEPTION",
+      "SECURITY",
+      "CONCIERGE",
+    ],
+    { message: "Rol inválido." },
+  ),
   active: z.boolean().default(true),
 });
 
@@ -119,7 +144,14 @@ export default function UserManagementPage() {
       name: user.name,
       email: user.email,
       password: "", // No precargar la contraseña por seguridad
-      role: user.role as "ADMIN" | "COMPLEX_ADMIN" | "RESIDENT" | "STAFF" | "RECEPTION" | "SECURITY" | "CONCIERGE",
+      role: user.role as
+        | "ADMIN"
+        | "COMPLEX_ADMIN"
+        | "RESIDENT"
+        | "STAFF"
+        | "RECEPTION"
+        | "SECURITY"
+        | "CONCIERGE",
       active: user.active,
     });
     setIsModalOpen(true);
@@ -179,7 +211,10 @@ export default function UserManagementPage() {
     );
   }
 
-  if (!currentUser || (currentUser.role !== "ADMIN" && currentUser.role !== "COMPLEX_ADMIN")) {
+  if (
+    !currentUser ||
+    (currentUser.role !== "ADMIN" && currentUser.role !== "COMPLEX_ADMIN")
+  ) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -220,9 +255,7 @@ export default function UserManagementPage() {
             {users.length > 0 ? (
               users.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell className="font-medium">
-                    {user.name}
-                  </TableCell>
+                  <TableCell className="font-medium">{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.role}</TableCell>
                   <TableCell>{user.active ? "Sí" : "No"}</TableCell>
@@ -330,7 +363,9 @@ export default function UserManagementPage() {
                         <SelectItem value="SECURITY">Seguridad</SelectItem>
                         <SelectItem value="CONCIERGE">Conserje</SelectItem>
                         <SelectItem value="RESIDENT">Residente</SelectItem>
-                        <SelectItem value="COMPLEX_ADMIN">Admin. Conjunto</SelectItem>
+                        <SelectItem value="COMPLEX_ADMIN">
+                          Admin. Conjunto
+                        </SelectItem>
                         <SelectItem value="ADMIN">Admin. Plataforma</SelectItem>
                       </SelectContent>
                     </Select>

@@ -15,10 +15,7 @@ import {
 } from "@/components/ui/table";
 import Link from "next/link";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  getProjects,
-  deleteProject,
-} from "@/services/projectService"; // Assuming projectService exists
+import { getProjects, deleteProject } from "@/services/projectService"; // Assuming projectService exists
 import {
   Dialog,
   DialogContent,
@@ -153,8 +150,12 @@ export default function ProjectsPage() {
               projects.map((project) => (
                 <TableRow key={project.id}>
                   <TableCell>{project.title}</TableCell>
-                  <TableCell>{new Date(project.startDate).toLocaleDateString()}</TableCell>
-                  <TableCell>{new Date(project.endDate).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    {new Date(project.startDate).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    {new Date(project.endDate).toLocaleDateString()}
+                  </TableCell>
                   <TableCell>
                     <Badge
                       variant={

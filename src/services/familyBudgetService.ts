@@ -19,7 +19,9 @@ interface CreateFamilyBudgetEntryData {
   date: string;
 }
 
-export async function getFamilyBudgetEntries(userId: number): Promise<FamilyBudgetEntry[]> {
+export async function getFamilyBudgetEntries(
+  userId: number,
+): Promise<FamilyBudgetEntry[]> {
   try {
     const response = await fetchApi(`/personal-finances/budget/${userId}`);
     return response.data; // Assuming the API returns { data: FamilyBudgetEntry[] }
@@ -29,7 +31,9 @@ export async function getFamilyBudgetEntries(userId: number): Promise<FamilyBudg
   }
 }
 
-export async function createFamilyBudgetEntry(data: CreateFamilyBudgetEntryData): Promise<FamilyBudgetEntry> {
+export async function createFamilyBudgetEntry(
+  data: CreateFamilyBudgetEntryData,
+): Promise<FamilyBudgetEntry> {
   try {
     const response = await fetchApi("/personal-finances/budget", {
       method: "POST",

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { getFinancialSummary } from "@/services/financeService"; // Asumiendo que existe
-import { getPQRSnapshots } => "@/services/pqrService"; // Asumiendo que existe
+import { getPQRSnapshots } from "@/services/pqrService"; // Asumiendo que existe
 
 export const useDashboardData = () => {
   const { user, loading: authLoading } = useAuthStore();

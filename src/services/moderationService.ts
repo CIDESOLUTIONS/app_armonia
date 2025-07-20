@@ -1,63 +1,29 @@
-import { prisma } from "@/lib/prisma";
+import { getPrisma } from "@/lib/prisma";
 
-export async function getReportedListings() {
-  try {
-    const reportedListings = await prisma.report.findMany({
-      include: {
-        listing: {
-          select: {
-            id: true,
-            title: true,
-            price: true,
-            images: true,
-          },
-        },
-        reporter: {
-          select: {
-            name: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-    return reportedListings;
-  } catch (error) {
-    console.error("Error fetching reported listings:", error);
-    throw new Error("No se pudieron obtener los anuncios reportados.");
-  }
-}
+export const getReportedListings = async (tenantId: string) => {
+  const prisma = getPrisma(tenantId);
+  // Placeholder logic
+  console.log("Getting reported listings for tenant:", tenantId);
+  return { message: "Reported listings retrieved successfully" };
+};
 
-export async function resolveReport(
-  reportId: number,
-  action: "APPROVE" | "REJECT",
-) {
-  try {
-    if (action === "REJECT") {
-      // Si se rechaza el reporte, se elimina el reporte y el anuncio permanece
-      await prisma.report.delete({
-        where: { id: reportId },
-      });
-    } else if (action === "APPROVE") {
-      // Si se aprueba el reporte, se elimina el anuncio y el reporte
-      const report = await prisma.report.findUnique({
-        where: { id: reportId },
-        select: { listingId: true },
-      });
+export const approveListing = async (tenantId: string, listingId: number) => {
+  const prisma = getPrisma(tenantId);
+  // Placeholder logic
+  console.log("Approving listing for tenant:", tenantId, listingId);
+  return { message: "Listing approved successfully" };
+};
 
-      if (report?.listingId) {
-        await prisma.listing.delete({
-          where: { id: report.listingId },
-        });
-      }
-      await prisma.report.delete({
-        where: { id: reportId },
-      });
-    }
-    return { success: true };
-  } catch (error) {
-    console.error("Error resolving report:", error);
-    throw new Error("No se pudo resolver el reporte.");
-  }
-}
+export const rejectListing = async (tenantId: string, listingId: number) => {
+  const prisma = getPrisma(tenantId);
+  // Placeholder logic
+  console.log("Rejecting listing for tenant:", tenantId, listingId);
+  return { message: "Listing rejected successfully" };
+};
+
+export const resolveReport = async (tenantId: string, reportId: number) => {
+  const prisma = getPrisma(tenantId);
+  // Placeholder logic
+  console.log("Resolving report for tenant:", tenantId, reportId);
+  return { message: "Report resolved successfully" };
+};

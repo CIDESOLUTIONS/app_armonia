@@ -17,7 +17,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { messageSchema, MessageFormValues } from "@/validators/message-schema";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 interface Conversation {
   id: string;
@@ -227,7 +234,10 @@ export default function MessagesPage() {
             </div>
             <div className="mt-4 flex space-x-2">
               <Form {...form}>
-                <form onSubmit={handleSubmit(onSubmit)} className="flex space-x-2 w-full">
+                <form
+                  onSubmit={handleSubmit(onSubmit)}
+                  className="flex space-x-2 w-full"
+                >
                   <FormField
                     control={control}
                     name="content"
@@ -246,7 +256,10 @@ export default function MessagesPage() {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" disabled={isSubmitting || !form.formState.isValid}>
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting || !form.formState.isValid}
+                  >
                     {isSubmitting ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : (

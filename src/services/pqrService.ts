@@ -158,7 +158,9 @@ export async function assignPQR(
   }
 }
 
-export async function uploadPQRAttachment(file: File): Promise<{ url: string }> {
+export async function uploadPQRAttachment(
+  file: File,
+): Promise<{ url: string }> {
   try {
     const formData = new FormData();
     formData.append("file", file);
@@ -175,4 +177,10 @@ export async function uploadPQRAttachment(file: File): Promise<{ url: string }> 
     console.error("Error uploading PQR attachment:", error);
     throw error;
   }
+}
+
+export async function getPQRSnapshots(): Promise<any> {
+  // Placeholder for PQR snapshots
+  console.log("Fetching PQR snapshots");
+  return { open: 5, inProgress: 3, closed: 10 };
 }

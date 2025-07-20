@@ -14,11 +14,15 @@ export const questionSchema = z.object({
 
 export const surveySchema = z.object({
   title: z.string().min(5, "El título debe tener al menos 5 caracteres."),
-  description: z.string().min(20, "La descripción debe tener al menos 20 caracteres."),
+  description: z
+    .string()
+    .min(20, "La descripción debe tener al menos 20 caracteres."),
   status: z.enum(["active", "completed", "draft"]),
   startDate: z.string().min(1, "La fecha de inicio es requerida."),
   endDate: z.string().min(1, "La fecha de fin es requerida."),
-  questions: z.array(questionSchema).min(1, "Al menos una pregunta es requerida."),
+  questions: z
+    .array(questionSchema)
+    .min(1, "Al menos una pregunta es requerida."),
 });
 
 export type SurveyFormValues = z.infer<typeof surveySchema>;

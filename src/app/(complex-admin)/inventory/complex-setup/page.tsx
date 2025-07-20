@@ -5,13 +5,22 @@ import { useAuthStore } from "@/store/authStore";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { getComplexInfo, updateComplexInfo } from "@/services/complexService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { complexInfoSchema, ComplexInfoFormValues } from "@/validators/complex-info-schema";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  complexInfoSchema,
+  ComplexInfoFormValues,
+} from "@/validators/complex-info-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 interface ComplexInfo {
   id: number;
@@ -83,7 +92,9 @@ export default function ComplexSetupPage() {
         propertyTypes: data.propertyTypes || [],
         legalName: data.legalName || "",
         nit: data.nit || "",
-        registrationDate: data.registrationDate ? data.registrationDate.split("T")[0] : "",
+        registrationDate: data.registrationDate
+          ? data.registrationDate.split("T")[0]
+          : "",
       });
     } catch (error) {
       console.error("Error fetching complex info:", error);
@@ -157,7 +168,10 @@ export default function ComplexSetupPage() {
 
       {complexInfo && (
         <Form {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+          >
             <FormField
               control={control}
               name="name"
@@ -176,7 +190,9 @@ export default function ComplexSetupPage() {
               name="legalName"
               render={({ field }) => (
                 <FormItem className="grid gap-2">
-                  <FormLabel htmlFor="legalName">Razón Social / Nombre Legal</FormLabel>
+                  <FormLabel htmlFor="legalName">
+                    Razón Social / Nombre Legal
+                  </FormLabel>
                   <FormControl>
                     <Input id="legalName" {...field} />
                   </FormControl>
@@ -189,7 +205,9 @@ export default function ComplexSetupPage() {
               name="nit"
               render={({ field }) => (
                 <FormItem className="grid gap-2">
-                  <FormLabel htmlFor="nit">NIT / Identificación Tributaria</FormLabel>
+                  <FormLabel htmlFor="nit">
+                    NIT / Identificación Tributaria
+                  </FormLabel>
                   <FormControl>
                     <Input id="nit" {...field} />
                   </FormControl>
@@ -202,7 +220,9 @@ export default function ComplexSetupPage() {
               name="registrationDate"
               render={({ field }) => (
                 <FormItem className="grid gap-2">
-                  <FormLabel htmlFor="registrationDate">Fecha de Registro</FormLabel>
+                  <FormLabel htmlFor="registrationDate">
+                    Fecha de Registro
+                  </FormLabel>
                   <FormControl>
                     <Input
                       id="registrationDate"
@@ -238,7 +258,9 @@ export default function ComplexSetupPage() {
               name="adminEmail"
               render={({ field }) => (
                 <FormItem className="grid gap-2">
-                  <FormLabel htmlFor="adminEmail">Email del Administrador</FormLabel>
+                  <FormLabel htmlFor="adminEmail">
+                    Email del Administrador
+                  </FormLabel>
                   <FormControl>
                     <Input id="adminEmail" type="email" {...field} required />
                   </FormControl>
@@ -251,7 +273,9 @@ export default function ComplexSetupPage() {
               name="adminName"
               render={({ field }) => (
                 <FormItem className="grid gap-2">
-                  <FormLabel htmlFor="adminName">Nombre del Administrador</FormLabel>
+                  <FormLabel htmlFor="adminName">
+                    Nombre del Administrador
+                  </FormLabel>
                   <FormControl>
                     <Input id="adminName" {...field} required />
                   </FormControl>
@@ -264,7 +288,9 @@ export default function ComplexSetupPage() {
               name="adminPhone"
               render={({ field }) => (
                 <FormItem className="grid gap-2">
-                  <FormLabel htmlFor="adminPhone">Teléfono del Administrador</FormLabel>
+                  <FormLabel htmlFor="adminPhone">
+                    Teléfono del Administrador
+                  </FormLabel>
                   <FormControl>
                     <Input id="adminPhone" {...field} />
                   </FormControl>

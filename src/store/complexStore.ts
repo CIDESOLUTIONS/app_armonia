@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface ComplexState {
   selectedComplexId: string | null;
@@ -9,5 +9,6 @@ interface ComplexState {
 export const useComplexStore = create<ComplexState>((set) => ({
   selectedComplexId: null,
   selectedComplexName: null,
-  setSelectedComplex: (id, name) => set({ selectedComplexId: id, selectedComplexName: name }),
+  setSelectedComplex: (id, name) =>
+    set({ selectedComplexId: id, selectedComplexName: name }),
 }));

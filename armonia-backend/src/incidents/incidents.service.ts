@@ -31,7 +31,13 @@ export class IncidentsService {
         reportedAt: new Date(),
         status: IncidentStatus.REPORTED,
         attachments: {
-          create: data.attachments?.map((url) => ({ url, name: url.substring(url.lastIndexOf('/') + 1), type: 'image/jpeg', size: 0 })) || [],
+          create:
+            data.attachments?.map((url) => ({
+              url,
+              name: url.substring(url.lastIndexOf('/') + 1),
+              type: 'image/jpeg',
+              size: 0,
+            })) || [],
         },
       },
       include: { updates: true, attachments: true },
@@ -97,7 +103,16 @@ export class IncidentsService {
       where: { id },
       data: {
         ...data,
-        attachments: data.attachments ? { create: data.attachments.map(url => ({ url, name: url.substring(url.lastIndexOf('/') + 1), type: 'image/jpeg', size: 0 })) } : undefined,
+        attachments: data.attachments
+          ? {
+              create: data.attachments.map((url) => ({
+                url,
+                name: url.substring(url.lastIndexOf('/') + 1),
+                type: 'image/jpeg',
+                size: 0,
+              })),
+            }
+          : undefined,
       },
       include: { updates: true, attachments: true },
     });
@@ -116,10 +131,14 @@ export class IncidentsService {
     attachments?: string[],
   ): Promise<IncidentDto> {
     const prisma: any = this.getTenantPrismaClient(schemaName);
-    const incident = await prisma.incident.findUnique({ where: { id: incidentId } });
+    const incident = await prisma.incident.findUnique({
+      where: { id: incidentId },
+    });
 
     if (!incident) {
-      throw new NotFoundException(`Incidente con ID ${incidentId} no encontrado.`);
+      throw new NotFoundException(
+        `Incidente con ID ${incidentId} no encontrado.`,
+      );
     }
 
     return prisma.incident.update({
@@ -132,7 +151,13 @@ export class IncidentsService {
             timestamp: new Date(),
             author: 'System', // TODO: Replace with actual user
             attachments: {
-              create: attachments?.map(url => ({ url, name: url.substring(url.lastIndexOf('/') + 1), type: 'image/jpeg', size: 0 })) || [],
+              create:
+                attachments?.map((url) => ({
+                  url,
+                  name: url.substring(url.lastIndexOf('/') + 1),
+                  type: 'image/jpeg',
+                  size: 0,
+                })) || [],
             },
           },
         },

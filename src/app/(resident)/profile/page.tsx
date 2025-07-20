@@ -10,8 +10,18 @@ import { useToast } from "@/components/ui/use-toast";
 import { getProfileInfo, updateProfileInfo } from "@/services/profileService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { userProfileSchema, UserProfileFormValues } from "@/validators/user-profile-schema";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  userProfileSchema,
+  UserProfileFormValues,
+} from "@/validators/user-profile-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 interface UserProfile {
   id: number;
@@ -114,7 +124,10 @@ export default function ProfilePage() {
 
       {profileInfo && (
         <Form {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-6 md:grid-cols-2">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="grid gap-6 md:grid-cols-2"
+          >
             <FormField
               control={control}
               name="name"

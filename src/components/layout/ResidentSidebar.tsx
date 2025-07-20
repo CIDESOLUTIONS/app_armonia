@@ -110,11 +110,7 @@ export default function ResidentSidebar({
         {
           label: language === "Español" ? "Presupuesto Familiar" : "Family Budget",
           path: "/resident-portal/personal-finances",
-        },
-      ],
-    },
-    },
-      ],
+        ],
     },
     {
       icon: <Coffee className="w-6 h-6" />,

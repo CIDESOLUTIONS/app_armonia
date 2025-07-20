@@ -25,7 +25,7 @@ interface DashboardStats {
 
 export default function InventoryPage() {
   const t = useTranslations("admin.inventory");
-  const { user, loading: authLoading, logout } = useAuthStore();
+  const { user, loading: authLoading } = useAuthStore();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loadingStats, setLoadingStats] = useState(true);
 

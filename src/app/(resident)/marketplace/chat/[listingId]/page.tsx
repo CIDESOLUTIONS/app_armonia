@@ -48,17 +48,26 @@ export default function ChatPage() {
       setListing(fetchedListing);
 
       if (!user || !fetchedListing.author.id) {
-        toast({ title: "Error", description: "Información de usuario o listado incompleta." });
+        toast({
+          title: "Error",
+          description: "Información de usuario o listado incompleta.",
+        });
         setLoading(false);
         return;
       }
 
       // Crear o obtener la conversación
       const participantIds = [user.id, fetchedListing.author.id];
-      const existingConversation = await createConversation({ participantIds, type: "direct" });
+      const existingConversation = await createConversation({
+        participantIds,
+        type: "direct",
+      });
       setConversation(existingConversation);
 
-      const fetchedMessages = await getMarketplaceMessages(Number(listingId), user.id);
+      const fetchedMessages = await getMarketplaceMessages(
+        Number(listingId),
+        user.id,
+      );
       setMessages(fetchedMessages);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -120,7 +129,8 @@ export default function ChatPage() {
       const messageData = {
         listingId: Number(listingId),
         senderId: user.id,
-        receiverId: listing.author.id === user.id ? listing.buyerId : listing.author.id, // Lógica para determinar el receptor
+        receiverId:
+          listing.author.id === user.id ? listing.buyerId : listing.author.id, // Lógica para determinar el receptor
         content: newMessage,
       };
       await sendMarketplaceMessage(messageData);

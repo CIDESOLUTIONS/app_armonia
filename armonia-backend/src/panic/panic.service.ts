@@ -7,7 +7,10 @@ import {
   CreatePanicResponseDto,
 } from '../common/dto/panic.dto';
 import { PanicGateway } from './panic.gateway'; // Import PanicGateway
-import { NotificationType, NotificationSourceType } from '../common/dto/communications.dto';
+import {
+  NotificationType,
+  NotificationSourceType,
+} from '../common/dto/communications.dto';
 
 @Injectable()
 export class PanicService {
@@ -73,7 +76,10 @@ export class PanicService {
     data: UpdatePanicAlertDto,
   ) {
     const prisma = this.getTenantPrismaClient(schemaName);
-    const updatedAlert = await prisma.panicAlert.update({ where: { id }, data });
+    const updatedAlert = await prisma.panicAlert.update({
+      where: { id },
+      data,
+    });
 
     // Emit real-time notification for update
     this.panicGateway.sendNotificationToSchema(schemaName, {

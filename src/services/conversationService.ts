@@ -91,7 +91,9 @@ export async function markMessageAsRead(
   }
 }
 
-export async function createConversation(data: CreateConversationData): Promise<Conversation> {
+export async function createConversation(
+  data: CreateConversationData,
+): Promise<Conversation> {
   try {
     const response = await fetchApi("/communications/conversations", {
       method: "POST",
@@ -121,7 +123,9 @@ interface MarketplaceMessage {
   createdAt: string;
 }
 
-export async function sendMarketplaceMessage(data: MarketplaceMessageData): Promise<void> {
+export async function sendMarketplaceMessage(
+  data: MarketplaceMessageData,
+): Promise<void> {
   try {
     await fetchApi("/marketplace/messages", {
       method: "POST",

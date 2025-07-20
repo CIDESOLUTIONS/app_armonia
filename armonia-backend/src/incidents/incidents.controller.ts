@@ -95,10 +95,14 @@ export class IncidentsController {
 
   @Post('upload-attachment')
   @UseInterceptors(FilesInterceptor('files')) // 'files' is the field name for the array of files
-  async uploadAttachment(@UploadedFiles() files: Array<Express.Multer.File>): Promise<{ urls: string[] }> {
+  async uploadAttachment(
+    @UploadedFiles() files: Array<Express.Multer.File>,
+  ): Promise<{ urls: string[] }> {
     // In a real application, you would upload these files to a cloud storage (e.g., S3)
     // and return their URLs. For now, we'll just return mock URLs.
-    const urls = files.map(file => `http://localhost:3000/uploads/${file.originalname}`);
+    const urls = files.map(
+      (file) => `http://localhost:3000/uploads/${file.originalname}`,
+    );
     return { urls };
   }
 }

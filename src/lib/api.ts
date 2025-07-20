@@ -17,8 +17,8 @@ export async function fetchApi(
 
   // Get token from localStorage or wherever it's stored
   let token = null;
-  if (typeof window !== 'undefined') {
-    const authStore = JSON.parse(localStorage.getItem('auth-store') || '{}');
+  if (typeof window !== "undefined") {
+    const authStore = JSON.parse(localStorage.getItem("auth-store") || "{}");
     token = authStore.state?.token; // Adjust based on your actual auth store structure
   }
 
@@ -36,7 +36,8 @@ export async function fetchApi(
   };
 
   // Modificar la URL para apuntar al backend de NestJS
-  const nestJsBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  const nestJsBaseUrl =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
   const fullUrl = `${nestJsBaseUrl}${url}`;
 
   const response = await fetch(fullUrl, finalOptions);

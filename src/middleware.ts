@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import createIntlMiddleware from "next-intl/middleware";
-import { getTenantSchemaFromToken } from "@/lib/prisma";
+
 
 const locales = ["en", "es"];
 const publicPages = ["/", "/login", "/register-complex"];
@@ -58,7 +58,7 @@ export default async function middleware(req: NextRequest) {
 
   // Si el usuario está autorizado, aplicar el middleware de internacionalización
   const response = intlMiddleware(req);
-  const schemaName = getTenantSchemaFromToken(req);
+  const schemaName = token.schemaName as string;
 
   if (schemaName) {
     response.headers.set("X-Tenant-Schema", schemaName);

@@ -13,7 +13,7 @@ import {
   getFees,
   updateFee,
   deleteFee,
-} from "@/services/financeService";
+} from "@/services/feeService";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2, PlusCircle, Edit, Trash2 } from "lucide-react";
 import {

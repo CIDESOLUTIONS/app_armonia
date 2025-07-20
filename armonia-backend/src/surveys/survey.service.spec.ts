@@ -4,7 +4,7 @@ import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
 import { SurveyStatus, QuestionType } from '../common/dto/surveys.dto';
-import { vi } from "vitest";
+import { vi } from 'vitest';
 
 // Mock dependencies
 const mockPrismaClient = {
@@ -60,7 +60,7 @@ describe('SurveyService', () => {
         createdBy: 1,
         status: SurveyStatus.DRAFT,
         startDate: new Date(), // Return Date object
-        endDate: new Date(),   // Return Date object
+        endDate: new Date(), // Return Date object
         questions: [],
       };
       mockPrismaClient.survey.create.mockResolvedValue(mockSurvey);
@@ -69,7 +69,7 @@ describe('SurveyService', () => {
         title: 'Test Survey',
         description: 'Desc',
         startDate: new Date(), // Pass Date object
-        endDate: new Date(),   // Pass Date object
+        endDate: new Date(), // Pass Date object
         questions: [
           {
             text: 'Q1',
@@ -95,8 +95,8 @@ describe('SurveyService', () => {
           complexId: 123,
           createdBy: 1,
           status: SurveyStatus.DRAFT,
-          startDate: expect.any(Date), 
-          endDate: expect.any(Date),   
+          startDate: expect.any(Date),
+          endDate: expect.any(Date),
           questions: {
             create: [
               {
@@ -197,7 +197,7 @@ describe('SurveyService', () => {
         title: 'New Title',
         description: 'New Desc',
         startDate: new Date(), // Pass Date object
-        endDate: new Date(),   // Pass Date object
+        endDate: new Date(), // Pass Date object
         questions: [
           { text: 'New Q', type: QuestionType.TEXT, options: [], order: 0 },
         ],
@@ -215,8 +215,8 @@ describe('SurveyService', () => {
         data: {
           title: 'New Title',
           description: 'New Desc',
-          startDate: expect.any(Date), 
-          endDate: expect.any(Date),   
+          startDate: expect.any(Date),
+          endDate: expect.any(Date),
           // questions are handled separately, so they should not be in the data object for survey update
         },
         include: { questions: true },
@@ -270,9 +270,7 @@ describe('SurveyService', () => {
     it('should throw NotFoundException if survey not found', async () => {
       mockPrismaClient.survey.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.deleteSurvey('test_schema', 999),
-      ).rejects.toThrow(
+      await expect(service.deleteSurvey('test_schema', 999)).rejects.toThrow(
         NotFoundException,
       );
     });
@@ -322,7 +320,7 @@ describe('SurveyService', () => {
           textAnswer: undefined,
           selectedOptions: ['A'],
           rating: undefined,
-          answeredAt: expect.any(Date), 
+          answeredAt: expect.any(Date),
         },
       });
     });
@@ -444,8 +442,8 @@ describe('SurveyService', () => {
         title: 'Test Survey',
         description: 'Desc',
         status: SurveyStatus.PUBLISHED,
-        startDate: expect.any(Date), 
-        endDate: expect.any(Date),   
+        startDate: expect.any(Date),
+        endDate: expect.any(Date),
         totalResponses: 2,
         questions: [
           {

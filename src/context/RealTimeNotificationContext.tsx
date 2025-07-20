@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 import io, { Socket } from "socket.io-client";
 import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/components/ui/use-toast";
@@ -22,9 +28,15 @@ interface RealTimeNotificationContextType {
   markNotificationAsRead: (id: string) => void;
 }
 
-const RealTimeNotificationContext = createContext<RealTimeNotificationContextType | undefined>(undefined);
+const RealTimeNotificationContext = createContext<
+  RealTimeNotificationContextType | undefined
+>(undefined);
 
-export const RealTimeNotificationProvider = ({ children }: { children: ReactNode }) => {
+export const RealTimeNotificationProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
   const { user } = useAuthStore();
   const { toast } = useToast();
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -40,15 +52,18 @@ export const RealTimeNotificationProvider = ({ children }: { children: ReactNode
         console.log("Connected to notification socket");
       });
 
-      newSocket.on("receiveNotification", (notification: NotificationPayload) => {
-        console.log("Received real-time notification:", notification);
-        setNotifications((prev) => [notification, ...prev]);
-        toast({
-          title: notification.title,
-          description: notification.message,
-          variant: notification.type === "error" ? "destructive" : "default",
-        });
-      });
+      newSocket.on(
+        "receiveNotification",
+        (notification: NotificationPayload) => {
+          console.log("Received real-time notification:", notification);
+          setNotifications((prev) => [notification, ...prev]);
+          toast({
+            title: notification.title,
+            description: notification.message,
+            variant: notification.type === "error" ? "destructive" : "default",
+          });
+        },
+      );
 
       newSocket.on("disconnect", () => {
         console.log("Disconnected from notification socket");
@@ -68,13 +83,15 @@ export const RealTimeNotificationProvider = ({ children }: { children: ReactNode
   const markNotificationAsRead = (id: string) => {
     // Implement logic to mark as read, potentially calling a backend API
     setNotifications((prev) =>
-      prev.map((notif) => (notif.id === id ? { ...notif, read: true } : notif))
+      prev.map((notif) => (notif.id === id ? { ...notif, read: true } : notif)),
     );
     // TODO: Call backend API to persist read status
   };
 
   return (
-    <RealTimeNotificationContext.Provider value={{ socket, notifications, markNotificationAsRead }}>
+    <RealTimeNotificationContext.Provider
+      value={{ socket, notifications, markNotificationAsRead }}
+    >
       {children}
     </RealTimeNotificationContext.Provider>
   );
@@ -83,7 +100,9 @@ export const RealTimeNotificationProvider = ({ children }: { children: ReactNode
 export const useRealTimeNotifications = () => {
   const context = useContext(RealTimeNotificationContext);
   if (context === undefined) {
-    throw new Error("useRealTimeNotifications must be used within a RealTimeNotificationProvider");
+    throw new Error(
+      "useRealTimeNotifications must be used within a RealTimeNotificationProvider",
+    );
   }
   return context;
 };

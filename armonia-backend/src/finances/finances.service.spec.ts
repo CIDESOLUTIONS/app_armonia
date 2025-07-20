@@ -1,6 +1,6 @@
 import { FinancesService } from './finances.service';
 import { PaymentStatus } from '../common/dto/finances.dto';
-import { vi } from "vitest";
+import { vi } from 'vitest';
 
 // Mock dependencies
 const mockPrismaClient = {

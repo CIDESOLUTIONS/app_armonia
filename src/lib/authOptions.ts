@@ -21,7 +21,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         const { email, password, schemaName, rememberMe } = credentials;
-        const publicPrisma = getPublicPrismaClient();
+        const publicPrisma = getPrisma();
 
         let user = null;
 

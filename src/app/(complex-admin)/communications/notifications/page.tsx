@@ -5,7 +5,7 @@ import { useAuthStore } from "@/store/authStore";
 import { Loader2, Send } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -32,8 +32,18 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { notificationSchema, NotificationFormValues } from "@/validators/notification-schema";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  notificationSchema,
+  NotificationFormValues,
+} from "@/validators/notification-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 interface Notification {
   id: string;
@@ -222,17 +232,28 @@ export default function NotificationsPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tipo de Destinatario</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccionar tipo" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="ALL">Todos los Residentes</SelectItem>
-                        <SelectItem value="RESIDENT">Residente Específico</SelectItem>
-                        <SelectItem value="PROPERTY">Propiedad Específica</SelectItem>
-                        <SelectItem value="USER">Usuario Específico (por ID)</SelectItem>
+                        <SelectItem value="ALL">
+                          Todos los Residentes
+                        </SelectItem>
+                        <SelectItem value="RESIDENT">
+                          Residente Específico
+                        </SelectItem>
+                        <SelectItem value="PROPERTY">
+                          Propiedad Específica
+                        </SelectItem>
+                        <SelectItem value="USER">
+                          Usuario Específico (por ID)
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -249,7 +270,11 @@ export default function NotificationsPage() {
                     <FormItem>
                       <FormLabel>ID del Destinatario</FormLabel>
                       <FormControl>
-                        <Input id="recipientId" {...field} placeholder="Ingrese el ID" />
+                        <Input
+                          id="recipientId"
+                          {...field}
+                          placeholder="Ingrese el ID"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

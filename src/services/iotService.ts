@@ -14,7 +14,9 @@ export interface AutomatedBillingTrigger {
   complexId: number; // Assuming complexId is needed for billing
 }
 
-export async function recordSmartMeterReading(data: SmartMeterReading): Promise<SmartMeterReading> {
+export async function recordSmartMeterReading(
+  data: SmartMeterReading,
+): Promise<SmartMeterReading> {
   try {
     const response = await fetchApi("/iot/smart-meters/readings", {
       method: "POST",
@@ -27,7 +29,9 @@ export async function recordSmartMeterReading(data: SmartMeterReading): Promise<
   }
 }
 
-export async function triggerAutomatedBilling(data: AutomatedBillingTrigger): Promise<any> {
+export async function triggerAutomatedBilling(
+  data: AutomatedBillingTrigger,
+): Promise<any> {
   try {
     const response = await fetchApi("/iot/automated-billing/trigger", {
       method: "POST",

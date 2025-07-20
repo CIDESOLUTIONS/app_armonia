@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DocumentsService } from './documents.service';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
-import { vi } from "vitest";
+import { vi } from 'vitest';
 
 describe('DocumentsService', () => {
   let service: DocumentsService;

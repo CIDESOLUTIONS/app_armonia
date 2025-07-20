@@ -7,7 +7,7 @@ import { useAuthStore } from "@/store/authStore";
 
 export default function ComplexAdminLayout({
   children,
-}: { 
+}: {
   children: React.ReactNode;
 }) {
   const { user, loading } = useAuthStore();

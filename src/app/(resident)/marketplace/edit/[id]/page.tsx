@@ -26,7 +26,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Loader2 } from "lucide-react";
-import { getListingById, updateListing, uploadImage, getMarketplaceCategories } from "@/services/marketplaceService";
+import {
+  getListingById,
+  updateListing,
+  uploadImage,
+  getMarketplaceCategories,
+} from "@/services/marketplaceService";
 
 const formSchema = z.object({
   title: z.string().min(5, "El título debe tener al menos 5 caracteres."),
@@ -41,7 +46,10 @@ const formSchema = z.object({
     errorMap: () => ({ message: "La categoría es requerida." }),
   }),
   images: z.array(z.string()).optional(), // URLs de imágenes existentes
-  newImages: z.array(z.instanceof(File)).max(5, "Solo se permiten hasta 5 imágenes nuevas.").optional(), // Nuevas imágenes a subir
+  newImages: z
+    .array(z.instanceof(File))
+    .max(5, "Solo se permiten hasta 5 imágenes nuevas.")
+    .optional(), // Nuevas imágenes a subir
   status: z.enum(["ACTIVE", "SOLD", "PAUSED"]), // Estado del anuncio
 });
 
@@ -131,7 +139,7 @@ export default function EditListingPage() {
           description: "Solo puedes subir un máximo de 5 imágenes en total.",
           variant: "destructive",
         });
-        event.target.value = '';
+        event.target.value = "";
         return;
       }
 
@@ -143,7 +151,9 @@ export default function EditListingPage() {
 
   const handleRemoveExistingImage = (indexToRemove: number) => {
     const currentImages = form.getValues("images") || [];
-    const updatedImages = currentImages.filter((_, index) => index !== indexToRemove);
+    const updatedImages = currentImages.filter(
+      (_, index) => index !== indexToRemove,
+    );
     form.setValue("images", updatedImages);
     setImagePreviews(updatedImages);
   };
@@ -188,9 +198,7 @@ export default function EditListingPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">
-        Editar Anuncio
-      </h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">Editar Anuncio</h1>
       {loading ? (
         <div className="flex justify-center items-center min-h-[200px]">
           <Loader2 className="h-8 w-8 animate-spin" />

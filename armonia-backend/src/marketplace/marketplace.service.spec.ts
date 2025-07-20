@@ -9,7 +9,7 @@ import {
   CreateListingDto,
   UpdateListingDto,
 } from '../common/dto/marketplace.dto';
-import { vi } from "vitest";
+import { vi } from 'vitest';
 
 describe('MarketplaceService', () => {
   let service: MarketplaceService;

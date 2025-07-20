@@ -189,7 +189,8 @@ export class PortfolioService {
       endDate,
       totalIncomeAllComplexes,
       totalExpensesAllComplexes,
-      netBalanceAllComplexes: totalIncomeAllComplexes - totalExpensesAllComplexes,
+      netBalanceAllComplexes:
+        totalIncomeAllComplexes - totalExpensesAllComplexes,
       complexReports: reportData,
     };
   }

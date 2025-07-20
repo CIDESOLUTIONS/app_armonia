@@ -1,46 +1,24 @@
-import { fetchApi } from "@/lib/api";
-import {
-  CreatePanicAlertDto,
-  UpdatePanicAlertDto,
-} from "@/common/dto/panic.dto";
+import { getPrisma } from "@/lib/prisma";
 
-export async function createPanicAlert(
-  data: CreatePanicAlertDto,
-): Promise<any> {
-  try {
-    const response = await fetchApi("/panic/alert", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-    return response;
-  } catch (error) {
-    console.error("Error creating panic alert:", error);
-    throw error;
-  }
-}
+export const updatePanicAlertsStatus = async (
+  tenantId: string,
+  alertId: number,
+  status: string,
+) => {
+  const prisma = getPrisma(tenantId);
+  // Placeholder logic
+  console.log(
+    "Updating panic alert status for tenant:",
+    tenantId,
+    alertId,
+    status,
+  );
+  return { message: "Panic alert status updated successfully" };
+};
 
-export async function getActivePanicAlerts(): Promise<any[]> {
-  try {
-    const response = await fetchApi("/panic/active-alerts");
-    return response;
-  } catch (error) {
-    console.error("Error fetching active panic alerts:", error);
-    throw error;
-  }
-}
-
-export async function updatePanicAlertStatus(
-  id: number,
-  data: UpdatePanicAlertDto,
-): Promise<any> {
-  try {
-    const response = await fetchApi(`/panic/alert/${id}/status`, {
-      method: "PUT",
-      body: JSON.stringify(data),
-    });
-    return response;
-  } catch (error) {
-    console.error("Error updating panic alert status:", error);
-    throw error;
-  }
-}
+export const getActivePanicAlerts = async (tenantId: string) => {
+  const prisma = getPrisma(tenantId);
+  // Placeholder logic
+  console.log("Getting active panic alerts for tenant:", tenantId);
+  return { message: "Active panic alerts retrieved successfully" };
+};

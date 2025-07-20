@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, Download, FileText } from "lucide-react";
+import { Loader2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +14,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { generateFinancialReport } from "@/services/financeService"; // Assuming financeService exists
 
 export default function FinancialReportsPage() {
@@ -29,7 +28,8 @@ export default function FinancialReportsPage() {
     if (!reportType || !startDate || !endDate) {
       toast({
         title: "Advertencia",
-        description: "Por favor, selecciona un tipo de reporte y un rango de fechas.",
+        description:
+          "Por favor, selecciona un tipo de reporte y un rango de fechas.",
         variant: "warning",
       });
       return;
@@ -37,7 +37,12 @@ export default function FinancialReportsPage() {
 
     setLoading(true);
     try {
-      const reportBlob = await generateFinancialReport(reportType, startDate, endDate, "PDF");
+      const reportBlob = await generateFinancialReport(
+        reportType,
+        startDate,
+        endDate,
+        "PDF",
+      );
       const url = window.URL.createObjectURL(reportBlob);
       const a = document.createElement("a");
       a.href = url;
@@ -102,7 +107,9 @@ export default function FinancialReportsPage() {
               <SelectItem value="BALANCE">Balance General</SelectItem>
               <SelectItem value="INCOME">Informe de Ingresos</SelectItem>
               <SelectItem value="EXPENSE">Informe de Gastos</SelectItem>
-              <SelectItem value="DEBTORS">Estado de Cartera (Deudores)</SelectItem>
+              <SelectItem value="DEBTORS">
+                Estado de Cartera (Deudores)
+              </SelectItem>
               <SelectItem value="PAYMENTS_REPORT">Informe de Pagos</SelectItem>
               <SelectItem value="PEACE_AND_SAFE">Paz y Salvos</SelectItem>
             </SelectContent>

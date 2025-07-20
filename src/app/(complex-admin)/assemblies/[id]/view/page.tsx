@@ -3,7 +3,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, CheckCircle, XCircle, UserPlus, Users, BarChart2, FileText } from "lucide-react";
+import {
+  Loader2,
+  CheckCircle,
+  XCircle,
+  UserPlus,
+  Users,
+  BarChart2,
+  FileText,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +25,13 @@ import {
 } from "@/services/assemblyService";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import Link from "next/link";
 
 interface Assembly {
@@ -212,8 +226,8 @@ export default function ViewAssemblyPage() {
           </CardHeader>
           <CardContent className="grid gap-4">
             <p>
-              <strong>Unidades Presentes:</strong> {quorumStatus.presentUnits} de{" "}
-              {quorumStatus.totalUnits}
+              <strong>Unidades Presentes:</strong> {quorumStatus.presentUnits}{" "}
+              de {quorumStatus.totalUnits}
             </p>
             <p>
               <strong>Coeficiente Presente:</strong>{" "}
@@ -249,21 +263,24 @@ export default function ViewAssemblyPage() {
             Gestiona las votaciones de esta asamblea.
           </p>
           <Link href={`/complex-admin/assemblies/${assembly.id}/votes`}>
-            <Button variant="outline">
-              Gestionar Votaciones
-            </Button>
+            <Button variant="outline">Gestionar Votaciones</Button>
           </Link>
         </CardContent>
       </Card>
 
-      <Dialog open={isAttendanceModalOpen} onOpenChange={setIsAttendanceModalOpen}>
+      <Dialog
+        open={isAttendanceModalOpen}
+        onOpenChange={setIsAttendanceModalOpen}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Registrar Asistencia</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="unitId" className="text-right">Unidad ID</Label>
+              <Label htmlFor="unitId" className="text-right">
+                Unidad ID
+              </Label>
               <Input
                 id="unitId"
                 type="number"
@@ -274,10 +291,16 @@ export default function ViewAssemblyPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAttendanceModalOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsAttendanceModalOpen(false)}
+            >
               Cancelar
             </Button>
-            <Button onClick={handleRegisterAttendance} disabled={!unitIdToRegister}>
+            <Button
+              onClick={handleRegisterAttendance}
+              disabled={!unitIdToRegister}
+            >
               Registrar
             </Button>
           </DialogFooter>
