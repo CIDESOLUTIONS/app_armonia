@@ -16,19 +16,15 @@ export const metadata: Metadata = {
 };
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
-  const handleLanguageChange = (_language: string) => {};
-  const handleThemeChange = (_theme: string) => {};
-  const handleCurrencyChange = (_currency: string) => {};
-
   return (
     <div className="public-layout">
       <Header
         theme="Claro"
-        setTheme={handleThemeChange}
+        setTheme={() => {}} // Placeholder for setTheme
         language="Español"
-        setLanguage={handleLanguageChange}
+        setLanguage={() => {}} // Placeholder for setLanguage
         currency="Pesos"
-        setCurrency={handleCurrencyChange}
+        setCurrency={() => {}} // Placeholder for setCurrency
         isLoggedIn={false}
       />
       <div className="pt-16">{children}</div>

@@ -44,7 +44,7 @@ export default function ConsolidatedReportsPage() {
           endDate,
         );
         // For now, just log the data. In a real app, you'd format and display/download it.
-        console.log("Consolidated Financial Report:", reportData);
+        // console.log("Consolidated Financial Report:", reportData); // Removed console.log
         toast({
           title: "Éxito",
           description:
@@ -57,11 +57,11 @@ export default function ConsolidatedReportsPage() {
           variant: "info",
         });
       }
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error generating consolidated report:", error);
       toast({
         title: "Error",
-        description: "Error al generar el reporte consolidado.",
+        description: "Error al generar el reporte consolidado: " + error.message,
         variant: "destructive",
       });
     } finally {
