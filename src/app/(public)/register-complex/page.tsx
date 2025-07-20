@@ -264,7 +264,9 @@ export default function RegisterComplex() {
         } else if (paidParam === "true") {
           // If paidParam is true but no storedTransactionId, it might be a direct return from checkout
           // In a real scenario, you'd verify this with a backend call using a temporary ID or session
-          console.warn("Pago completado pero no se encontró transactionId en localStorage.");
+          console.warn(
+            "Pago completado pero no se encontró transactionId en localStorage.",
+          );
         }
       }
 

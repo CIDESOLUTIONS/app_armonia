@@ -82,7 +82,9 @@ export default function CreateListingPage() {
         console.error("Error fetching categories:", error);
         toast({
           title: "Error",
-          description: "No se pudieron cargar las categorías del Marketplace: " + error.message,
+          description:
+            "No se pudieron cargar las categorías del Marketplace: " +
+            error.message,
           variant: "destructive",
         });
       }

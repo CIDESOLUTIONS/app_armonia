@@ -27,7 +27,8 @@ interface ComplexMetric {
 
 export default function PortfolioDashboardPage() {
   const { toast } = useToast();
-  const [portfolioMetrics, setPortfolioMetrics] = useState<PortfolioMetrics | null>(null);
+  const [portfolioMetrics, setPortfolioMetrics] =
+    useState<PortfolioMetrics | null>(null);
   const [complexMetrics, setComplexMetrics] = useState<ComplexMetric[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -42,7 +43,8 @@ export default function PortfolioDashboardPage() {
         console.error("Error fetching portfolio data:", error);
         toast({
           title: "Error",
-          description: "No se pudieron cargar los datos del portafolio: " + error.message,
+          description:
+            "No se pudieron cargar los datos del portafolio: " + error.message,
           variant: "destructive",
         });
       } finally {

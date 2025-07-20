@@ -82,7 +82,8 @@ export default function ReservationRulesPage() {
       console.error("Error fetching reservation rules:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las reglas de reserva: " + error.message,
+        description:
+          "No se pudieron cargar las reglas de reserva: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -197,7 +198,8 @@ export default function ReservationRulesPage() {
         console.error("Error deleting reservation rule:", error);
         toast({
           title: "Error",
-          description: "Error al eliminar la regla de reserva: " + error.message,
+          description:
+            "Error al eliminar la regla de reserva: " + error.message,
           variant: "destructive",
         });
       }
@@ -434,7 +436,10 @@ export default function ReservationRulesPage() {
                 name="allowCancellation"
                 checked={formData.allowCancellation}
                 onCheckedChange={(checked) =>
-                  setFormData((prev) => ({ ...prev, allowCancellation: checked }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    allowCancellation: checked,
+                  }))
                 }
               />
               <Label htmlFor="allowCancellation">Permitir Cancelación</Label>

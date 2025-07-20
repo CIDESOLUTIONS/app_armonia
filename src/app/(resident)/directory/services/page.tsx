@@ -39,14 +39,17 @@ import {
   MapPin,
   PlusCircle,
 } from "lucide-react";
-import { getServiceProviders, ServiceProviderDto } from "@/services/serviceProviderService";
+import {
+  getServiceProviders,
+  ServiceProviderDto,
+} from "@/services/serviceProviderService";
 
 export default function HomeServicesDirectoryPage() {
   const { user } = useAuthStore();
   const { toast } = useToast();
-  const [serviceProviders, setServiceProviders] = useState<ServiceProviderDto[]>(
-    [],
-  );
+  const [serviceProviders, setServiceProviders] = useState<
+    ServiceProviderDto[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
@@ -67,7 +70,9 @@ export default function HomeServicesDirectoryPage() {
       console.error("Error fetching service providers:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar los proveedores de servicios: " + error.message,
+        description:
+          "No se pudieron cargar los proveedores de servicios: " +
+          error.message,
         variant: "destructive",
       });
     } finally {
@@ -204,8 +209,8 @@ export default function HomeServicesDirectoryPage() {
                 <div className="flex items-center text-sm text-gray-700 mb-1">
                   <Star className="h-4 w-4 text-yellow-400 mr-1 fill-yellow-400" />
                   <span>
-                    {provider.rating?.toFixed(1) || "N/A"} ({provider.reviewCount || 0}{" "}
-                    reseñas)
+                    {provider.rating?.toFixed(1) || "N/A"} (
+                    {provider.reviewCount || 0} reseñas)
                   </span>
                 </div>
                 <div className="flex items-center text-sm text-gray-700">

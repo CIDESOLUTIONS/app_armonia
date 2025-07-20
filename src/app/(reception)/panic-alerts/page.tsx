@@ -49,7 +49,8 @@ export default function PanicAlertsPage() {
       console.error("Error fetching panic alerts:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las alertas de pánico: " + error.message,
+        description:
+          "No se pudieron cargar las alertas de pánico: " + error.message,
         variant: "destructive",
       });
     } finally {

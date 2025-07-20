@@ -85,7 +85,8 @@ export default function AssemblyDetailPage() {
       console.error("Error fetching assembly data:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar la información de la asamblea: " + error.message,
+        description:
+          "No se pudo cargar la información de la asamblea: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -203,7 +204,8 @@ export default function AssemblyDetailPage() {
       console.error("Error generating meeting minutes:", error);
       toast({
         title: "Error",
-        description: "Error al generar el acta de la asamblea: " + error.message,
+        description:
+          "Error al generar el acta de la asamblea: " + error.message,
         variant: "destructive",
       });
     }

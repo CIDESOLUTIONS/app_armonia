@@ -130,7 +130,8 @@ export default function AssemblyVotesPage() {
       console.error("Error fetching assembly and votes:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar la asamblea o las votaciones: " + error.message,
+        description:
+          "No se pudo cargar la asamblea o las votaciones: " + error.message,
         variant: "destructive",
       });
       router.push("/complex-admin/assemblies");
@@ -205,7 +206,9 @@ export default function AssemblyVotesPage() {
       console.error("Error fetching vote results:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar los resultados de la votación: " + error.message,
+        description:
+          "No se pudieron cargar los resultados de la votación: " +
+          error.message,
         variant: "destructive",
       });
     }

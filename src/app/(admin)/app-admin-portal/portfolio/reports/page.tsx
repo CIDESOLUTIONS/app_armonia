@@ -61,7 +61,8 @@ export default function ConsolidatedReportsPage() {
       console.error("Error generating consolidated report:", error);
       toast({
         title: "Error",
-        description: "Error al generar el reporte consolidado: " + error.message,
+        description:
+          "Error al generar el reporte consolidado: " + error.message,
         variant: "destructive",
       });
     } finally {

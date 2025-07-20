@@ -67,7 +67,8 @@ export default function FinancesPage() {
         console.error("Error fetching financial data:", error);
         toast({
           title: "Error",
-          description: "No se pudieron cargar los datos financieros: " + error.message,
+          description:
+            "No se pudieron cargar los datos financieros: " + error.message,
           variant: "destructive",
         });
       } finally {

@@ -66,7 +66,8 @@ export default function ActivityReportsPage() {
       console.error("Error generating activity report:", error);
       toast({
         title: "Error",
-        description: "Error al generar el reporte de actividad: " + error.message,
+        description:
+          "Error al generar el reporte de actividad: " + error.message,
         variant: "destructive",
       });
     } finally {

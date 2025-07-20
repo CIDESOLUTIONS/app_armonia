@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2, CreditCard, History, DollarSign } from "lucide-react";
 
@@ -70,11 +70,12 @@ export default function ResidentFinancialPage() {
       setSummary(fetchedSummary);
       setPayments(fetchedPayments);
       setPendingFees(fetchedPendingFees);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching resident financial data:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar los datos financieros.",
+        description:
+          "No se pudieron cargar los datos financieros: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -87,11 +88,12 @@ export default function ResidentFinancialPage() {
     try {
       const paymentUrl = await initiatePayment(feeId);
       window.location.href = paymentUrl; // Redirect to payment gateway
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error initiating payment:", error);
       toast({
         title: "Error",
-        description: "Error al iniciar el pago. Intente de nuevo.",
+        description:
+          "Error al iniciar el pago. Intente de nuevo: " + error.message,
         variant: "destructive",
       });
     } finally {

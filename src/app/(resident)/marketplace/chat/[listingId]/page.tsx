@@ -144,7 +144,11 @@ export default function ChatPage() {
       setNewMessage("");
     } catch (error: Error) {
       console.error("Error sending message:", error);
-      toast({ title: "Error", description: "No se pudo enviar el mensaje: " + error.message, variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "No se pudo enviar el mensaje: " + error.message,
+        variant: "destructive",
+      });
     }
   };
 

@@ -393,7 +393,8 @@ export default function ReceptionVisitorsPage() {
     } catch (error: Error) {
       console.error("[ReceptionVisitors] Error:", error);
       setError(
-        "Error al registrar el visitante. Por favor, inténtelo de nuevo: " + error.message,
+        "Error al registrar el visitante. Por favor, inténtelo de nuevo: " +
+          error.message,
       );
     }
   };
@@ -427,7 +428,10 @@ export default function ReceptionVisitorsPage() {
       setSuccessMessage("Salida registrada exitosamente.");
     } catch (error: Error) {
       console.error("[ReceptionVisitors] Error:", error);
-      setError("Error al registrar la salida. Por favor, inténtelo de nuevo: " + error.message);
+      setError(
+        "Error al registrar la salida. Por favor, inténtelo de nuevo: " +
+          error.message,
+      );
     }
   };
 
@@ -1124,9 +1128,7 @@ export default function ReceptionVisitorsPage() {
                         type="file"
                         accept="image/*"
                         onChange={(event) => {
-                          onChange(
-                            event.target.files && event.target.files[0],
-                          );
+                          onChange(event.target.files && event.target.files[0]);
                         }}
                       />
                     </FormControl>

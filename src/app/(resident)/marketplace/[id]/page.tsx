@@ -34,7 +34,8 @@ export default function ListingDetailPage() {
           console.error("Error fetching listing details:", error);
           toast({
             title: "Error",
-            description: "No se pudo cargar los detalles del anuncio: " + error.message,
+            description:
+              "No se pudo cargar los detalles del anuncio: " + error.message,
             variant: "destructive",
           });
         } finally {
@@ -120,9 +121,7 @@ export default function ListingDetailPage() {
                 <Calendar className="h-5 w-5 mr-2" />
                 Publicado: {new Date(listing.createdAt).toLocaleDateString()}
               </div>
-              <Link
-                href={`/resident/marketplace/chat/${listing.author.id}`}
-              >
+              <Link href={`/resident/marketplace/chat/${listing.author.id}`}>
                 <Button className="w-full">
                   <MessageSquare className="mr-2 h-4 w-4" /> Contactar Vendedor
                 </Button>

@@ -69,7 +69,8 @@ export default function ProfilePage() {
       console.error("Error fetching profile info:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar la información del perfil: " + error.message,
+        description:
+          "No se pudo cargar la información del perfil: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -98,7 +99,8 @@ export default function ProfilePage() {
       console.error("Error updating profile info:", error);
       toast({
         title: "Error",
-        description: "Error al actualizar la información del perfil: " + error.message,
+        description:
+          "Error al actualizar la información del perfil: " + error.message,
         variant: "destructive",
       });
     } finally {

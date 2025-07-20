@@ -90,7 +90,8 @@ export default function NotificationsPage() {
       console.error("Error fetching notifications:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las notificaciones: " + error.message,
+        description:
+          "No se pudieron cargar las notificaciones: " + error.message,
         variant: "destructive",
       });
     } finally {

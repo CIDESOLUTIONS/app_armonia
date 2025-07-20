@@ -82,7 +82,8 @@ export default function MessagesPage() {
       console.error("Error fetching conversations:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las conversaciones: " + error.message,
+        description:
+          "No se pudieron cargar las conversaciones: " + error.message,
         variant: "destructive",
       });
     } finally {

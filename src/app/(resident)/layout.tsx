@@ -1,15 +1,38 @@
-// src/app/(resident)/layout.tsx
-import { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Portal Residente - Armonía",
-  description: "Portal para residentes de complejos habitacionales",
-};
+import React from "react";
+import { useAuthStore } from "@/store/authStore";
+import { Loader2 } from "lucide-react";
 
 export default function ResidentLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { user, loading } = useAuthStore();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user || (user.role !== "RESIDENT" && user.role !== "ADMIN")) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Acceso Denegado
+          </h1>
+          <p className="text-gray-600">
+            No tienes permisos para acceder a esta página.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return <div className="resident-portal">{children}</div>;
 }
