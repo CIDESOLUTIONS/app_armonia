@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useAuthStore } = "@/store/authStore";
+import { useAuthStore } from "@/store/authStore";
 import { Loader2 } from "lucide-react";
-import { useToast } = "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getComplexInfo, updateComplexInfo } from "@/services/complexService";
@@ -29,7 +29,7 @@ interface ComplexInfo {
   totalUnits: number;
   adminEmail: string;
   adminName: string;
-  adminPhone: string;
+  adminPhone?: string;
   address: string;
   city: string;
   state: string;
@@ -100,7 +100,8 @@ export default function ComplexSetupPage() {
       console.error("Error fetching complex info:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar la información del conjunto.",
+        description:
+          "No se pudo cargar la información del conjunto: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -129,7 +130,8 @@ export default function ComplexSetupPage() {
       console.error("Error saving complex info:", error);
       toast({
         title: "Error",
-        description: "Error al guardar la información del conjunto.",
+        description:
+          "Error al guardar la información del conjunto: " + error.message,
         variant: "destructive",
       });
     }

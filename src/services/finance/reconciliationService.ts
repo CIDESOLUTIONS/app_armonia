@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable } from "@nestjs/common";
+import { PrismaClientManager } from "../prisma/prisma-client-manager";
+import { PrismaService } from "../prisma/prisma.service";
 
 interface BankStatementEntry {
   date: string;
@@ -34,29 +34,30 @@ export class ReconciliationService {
       where: { status: "PENDING" },
     });
 
-  const suggestions = statementEntries.map((entry) => {
-    const potentialMatch = pendingPayments.find(
-      (payment) =>
-        payment.amount === entry.amount &&
-        this.isSimilarDate(new Date(payment.date), new Date(entry.date)) &&
-        (entry.description.includes(payment.reference) ||
-          payment.reference.includes(entry.description)),
-    );
+    const suggestions = statementEntries.map((entry) => {
+      const potentialMatch = pendingPayments.find(
+        (payment) =>
+          payment.amount === entry.amount &&
+          this.isSimilarDate(new Date(payment.date), new Date(entry.date)) &&
+          (entry.description.includes(payment.reference) ||
+            payment.reference.includes(entry.description)),
+      );
 
-    if (potentialMatch) {
+      if (potentialMatch) {
+        return {
+          statementEntry: entry,
+          payment: potentialMatch,
+          status: "SUGGESTED",
+        };
+      }
+
       return {
         statementEntry: entry,
-        payment: potentialMatch,
-        status: "SUGGESTED",
+        payment: null,
+        status: "UNMATCHED",
       };
-    }
+    });
 
-    return {
-      statementEntry: entry,
-      payment: null,
-      status: "UNMATCHED",
-    };
-  });
-
-  return suggestions;
+    return suggestions;
+  }
 }
