@@ -50,7 +50,7 @@ export default function ResidentSidebar({
   const handleItemClick = (label: string, path?: string) => {
     console.log(`[ResidentSidebar] Click en ${label}, path: ${path}`);
     if (path) {
-      router.push(path);
+      _router.push(path);
     } else {
       setExpandedMenu(expandedMenu === label ? null : label);
       if (isCollapsed) {
@@ -110,7 +110,8 @@ export default function ResidentSidebar({
         {
           label: language === "Español" ? "Presupuesto Familiar" : "Family Budget",
           path: "/resident-portal/personal-finances",
-        ],
+        },
+      ],
     },
     {
       icon: <Coffee className="w-6 h-6" />,
