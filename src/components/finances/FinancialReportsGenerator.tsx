@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -27,7 +27,7 @@ export function FinancialReportsGenerator() {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
-  const handleGenerateReport = () => {
+  const handleGenerateReport = async () => {
     if (!reportType) {
       toast({
         title: "Error",
@@ -45,14 +45,33 @@ export function FinancialReportsGenerator() {
       return;
     }
 
-    // Simulate report generation and download
-    console.log(
-      `Generando informe de tipo: ${reportType} desde ${format(startDate, "yyyy-MM-dd")} hasta ${format(endDate, "yyyy-MM-dd")}`,
-    );
-    toast({
-      title: "Informe Generado",
-      description: `El informe de ${reportType} para el rango seleccionado ha sido generado y descargado. (Simulado)`,
-    });
+    try {
+      // Call backend API to generate report
+      const response = await fetch(
+        `/api/finances/reports/${reportType}?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al generar el informe.");
+      }
+
+      const data = await response.json();
+      // Assuming the API returns a downloadable URL
+      window.open(data.downloadUrl, "_blank");
+
+      toast({
+        title: "Informe Generado",
+        description: `El informe de ${reportType} para el rango seleccionado ha sido generado y descargado.`,
+      });
+    } catch (error: Error) {
+      console.error("Error generating report:", error);
+      toast({
+        title: "Error",
+        description: "Error al generar el informe: " + error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (

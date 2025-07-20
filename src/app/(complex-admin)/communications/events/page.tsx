@@ -26,6 +26,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -90,11 +91,12 @@ export default function CommunityEventsPage() {
     try {
       const data = await getCommunityEvents();
       setEvents(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching community events:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar los eventos comunitarios.",
+        description:
+          "No se pudieron cargar los eventos comunitarios: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -151,15 +153,18 @@ export default function CommunityEventsPage() {
       }
       setIsModalOpen(false);
       fetchEvents();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving community event:", error);
       toast({
         title: "Error",
-        description: "Error al guardar el evento comunitario.",
+        description: "Error al guardar el evento comunitario: " + error.message,
         variant: "destructive",
       });
     }
   };
+
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<number | null>(null);
 
   const handleDeleteEvent = (id: number) => {
     setEventToDelete(id);
@@ -175,11 +180,12 @@ export default function CommunityEventsPage() {
         description: "Evento comunitario eliminado correctamente.",
       });
       fetchEvents();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error deleting community event:", error);
       toast({
         title: "Error",
-        description: "Error al eliminar el evento comunitario.",
+        description:
+          "Error al eliminar el evento comunitario: " + error.message,
         variant: "destructive",
       });
     } finally {

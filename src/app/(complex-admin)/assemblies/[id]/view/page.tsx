@@ -5,8 +5,6 @@ import { useRouter, useParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import {
   Loader2,
-  CheckCircle,
-  XCircle,
   UserPlus,
   Users,
   BarChart2,
@@ -18,7 +16,6 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import {
   getAssemblyById,
-  updateAssembly,
   registerAttendance,
   getAssemblyQuorumStatus,
   generateMeetingMinutes,

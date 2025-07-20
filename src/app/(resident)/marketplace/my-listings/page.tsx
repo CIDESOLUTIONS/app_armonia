@@ -2,7 +2,14 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, Edit, Trash2, CheckCircle, Eye } from "lucide-react";
+import {
+  Loader2,
+  Edit,
+  Trash2,
+  CheckCircle,
+  Eye,
+  PlusCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -192,7 +199,7 @@ export default function MyListingsPage() {
                         onClick={() => handleMarkAsSold(listing.id)}
                         className="mr-2"
                       >
-                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <CheckCircle className="h-4 w-4" />
                       </Button>
                     )}
                     <Button

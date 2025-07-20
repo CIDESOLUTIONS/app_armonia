@@ -40,20 +40,31 @@ export function RegisterComplexForm() {
   const onSubmit = async (data: RegisterComplexFormValues) => {
     setLoading(true);
     try {
-      // Aquí se haría la llamada a la API para registrar el conjunto
-      console.log("Registrando conjunto:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1500)); // Simular llamada a API
+      const response = await fetch("/api/register-complex", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al registrar el conjunto.");
+      }
+
       toast({
         title: "¡Registro Exitoso!",
         description:
           "Hemos recibido tu solicitud. Pronto nos pondremos en contacto contigo.",
       });
       form.reset();
-    } catch (error) {
+    } catch (error: Error) {
+      console.error("Error registering complex:", error);
       toast({
         title: "Error en el Registro",
         description:
-          "No pudimos procesar tu solicitud. Por favor, inténtalo de nuevo.",
+          error.message || "No pudimos procesar tu solicitud. Por favor, inténtalo de nuevo.",
         variant: "destructive",
       });
     } finally {

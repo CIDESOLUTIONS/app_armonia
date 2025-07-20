@@ -117,13 +117,13 @@ export default function ReceiptGenerator({
             : `Receipt #${data.receiptNumber} successfully generated`,
         variant: "default",
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("[ReceiptGenerator] Error:", err);
-      setError(err.message);
+      setError((err as Error).message);
 
       toast({
         title: language === "Español" ? "Error" : "Error",
-        description: err.message,
+        description: (err as Error).message,
         variant: "destructive",
       });
     } finally {
@@ -182,13 +182,13 @@ export default function ReceiptGenerator({
             : `${generatedCount} receipts successfully generated`,
         variant: "default",
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("[ReceiptGenerator] Error:", err);
-      setError(err.message);
+      setError((err as Error).message);
 
       toast({
         title: language === "Español" ? "Error" : "Error",
-        description: err.message,
+        description: (err as Error).message,
         variant: "destructive",
       });
     } finally {

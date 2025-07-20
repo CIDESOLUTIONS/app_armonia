@@ -6,9 +6,7 @@ import { useAuthStore } from "@/store/authStore";
 import {
   Loader2,
   CheckCircle,
-  XCircle,
   UserPlus,
-  Users,
   BarChart2,
   FileText,
   PlusCircle,
@@ -20,7 +18,6 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import {
   getAssemblyById,
-  updateAssembly,
   registerAttendance,
   getAssemblyQuorumStatus,
   createVote,
@@ -29,7 +26,6 @@ import {
   generateMeetingMinutes,
   Assembly,
   CreateVoteDto,
-  SubmitVoteDto,
   Vote,
   VoteResult,
 } from "@/services/assemblyService";
@@ -98,7 +94,7 @@ export default function AssemblyDetailPage() {
     fetchAssemblyData();
   }, [assemblyId]);
 
-  const handleRegisterAttendance = async (userId: number, present: boolean) => {
+  const handleRegisterAttendance = async (userId: number, _present: boolean) => {
     if (!assemblyId) return;
     try {
       await registerAttendance(assemblyId, userId, true, 1); // Assuming unitId 1 for now

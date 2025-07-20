@@ -12,7 +12,6 @@ import { Loader2, PlusCircle, Edit, Trash2 } from "lucide-react";
 import {
   FeeDto,
   CreateFeeDto,
-  UpdateFeeDto,
   getFees,
   createFee,
   updateFee,

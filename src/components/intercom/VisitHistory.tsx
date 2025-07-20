@@ -98,8 +98,7 @@ const VisitHistory: React.FC = () => {
   const fetchVisits = useCallback(async () => {
     setLoading(true);
     try {
-      // En un caso real, esto vendría de la API con el ID de la unidad del usuario actual
-      const unitId = 1; // Ejemplo
+      const unitId = 1; // TODO: Get actual unitId from user context
 
       const options = {
         status: filters.status,
@@ -117,8 +116,9 @@ const VisitHistory: React.FC = () => {
 
       setVisits(result.data);
       setTotalRows(result.pagination.total);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error al cargar visitas:", error);
+      // TODO: Add toast notification for error
     } finally {
       setLoading(false);
     }

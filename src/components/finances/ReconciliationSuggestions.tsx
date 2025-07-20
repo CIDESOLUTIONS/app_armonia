@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/table";
 
 interface ReconciliationSuggestion {
-  statementEntry: any;
-  payment: any;
+  statementEntry: unknown;
+  payment: unknown;
   status: string;
 }
 
@@ -28,7 +28,7 @@ export function ReconciliationSuggestions({ suggestions }: Props) {
     try {
       await approveReconciliation(suggestion);
       // Aquí podrías actualizar el estado local o recargar las sugerencias
-      console.log("Conciliación aprobada:", suggestion);
+      
     } catch (error) {
       console.error("Error al aprobar la conciliación:", error);
     }

@@ -20,16 +20,12 @@ export default function LandingPageClient() {
   const _router = useRouter();
   const [currency, setCurrency] = useState("Pesos");
 
-  const handleLanguageChange = (lang: string) => {
-    console.log(`Language change to ${lang} not implemented yet.`);
-  };
-
   return (
     <div className={`flex flex-col min-h-screen overflow-hidden`}>
       {/* Header */}
       <Header
         language={"Español"}
-        setLanguage={handleLanguageChange}
+        setLanguage={setLanguage}
         currency={currency}
         setCurrency={setCurrency}
       />

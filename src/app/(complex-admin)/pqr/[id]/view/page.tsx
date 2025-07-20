@@ -7,8 +7,6 @@ import Link from "next/link";
 import { useAuthStore } from "@/store/authStore";
 import {
   Loader2,
-  Edit,
-  Trash2,
   MessageSquare,
   Paperclip,
   FileText,

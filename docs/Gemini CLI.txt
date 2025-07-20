@@ -54,88 +54,10 @@ Interacciones solo en español. Actúa como un experto en desarrollo full stack,
 
 Posteriormente, crea y ejecuta individualmente y luego de forma masivas las pruebas unitarias (Vitest) e integrales (E2E). Luego, deja la aplicación lista para su despliegue en producción. Finalmente, genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para alinear el desarrollo con los requisitos del proyecto al 100% y lograr el objetivo del despliegue a producción. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones técnicas en docs y luego continuas sistemáticamente con lo solicitado. 
 
+Julio 19 (pruebas)
 
- Fase 1: Análisis Fundacional y Alineación Técnica (Prioridad: Crítica) (ok)
+Interacciones solo en español. Actúa como un experto en desarrollo full stack y pruebas de aplicaciones web y móviles, aplicando buenas y modernas prácticas. Está en el directorio raíz del proyecto "Armonía", una aplicación web y móvil. Las especificaciones técnicas y funcionales están en la carpeta docs. Su tarea principal es revisar exhaustivamente dichas especificaciones y tener el contexto funcional de la aplicación, el desarrollo de cada una de las funcionalidades ya fueron terminadas, se respetuoso con este trabajo realizado, haz un resumen de lo que entendiste de como funciona la aplicación y antes de comenzar la tarea, yo te apruebo si tu entendimiento es correcto. ejecuta el build del proyecto, crear de ser necesario  y ejecuta individualmente y luego de forma masivas las pruebas unitarias (Vitest) e integrales (E2E), si se detectan problemas, realiza las correcciones necesarias, si se requiere desarrollar desde cero respeta el estilo del proyecto. No repitas recomendaciones ya evaluadas evitando los loops. Luego, deja la aplicación lista para su despliegue en producción.  genera un plan de trabajo detallado, ordenado por prioridad y dependencias, con todas las tareas necesarias para validar el  100% de las funcionalidad y lograr el objetivo del despliegue a producción. Mantén este contexto en memoria como guía principal hasta la finalización completa del trabajo. Comienza leyendo las especificaciones técnicas en docs y luego continuas sistemáticamente con lo solicitado.
 
-  Esta fase sienta las bases para todo el trabajo posterior. No se puede construir sobre cimientos inestables.
 
-   * 1.1. Auditoría y Racionalización de Dependencias:
-       * Tarea: Revisar todas las dependencias en package.json.
-       * Acción: Identificar y eliminar paquetes redundantes o innecesarios. Por ejemplo, se observan jspdf, pdf-lib y pdfkit; se debe unificar a una sola librería (pdfkit según especificaciones) para la generación de PDFs. Investigar el uso de firebase-admin que no está en las especificaciones y validar si es reemplazable por una solución ya integrada.
-       * Objetivo: Reducir el tamaño del build, simplificar el mantenimiento y eliminar posibles vectores de vulnerabilidades.
-
-   * 1.2. Refuerzo de la Calidad del Código:
-       * Tarea: Configurar y aplicar de forma estricta las herramientas de linting y formateo.
-       * Acción: Revisar la configuración de ESLint y Prettier para que se alinee con las guías de estilo de Next.js/React y TypeScript. Ejecutar lint --fix en toda la base de código para corregir inconsistencias iniciales.
-       * Objetivo: Garantizar un estilo de código homogéneo y legible en todo el proyecto.
-
-   * 1.3. Verificación de la Arquitectura del Frontend:
-       * Tarea: Auditar la estructura de directorios en src/app.
-       * Acción: Asegurar que la estructura siga las convenciones del App Router de Next.js 15. Planificar la migración de cualquier lógica de negocio que resida incorrectamente en los componentes hacia services/ o lib/.
-       * Objetivo: Mejorar la separación de responsabilidades y la mantenibilidad.
-
-  
-Fase 2: Refactorización y Desarrollo de Módulos Centrales (Prioridad: Alta)
-
-  Se abordarán los portales principales que impactan directamente en la experiencia del usuario final.
-
-   * 2.1. Portal Público (Landing Page):
-       * Tarea: Comparar la implementación actual con las especificaciones.
-       * Acción: Revisar src/app/public/landing/page.tsx (o su equivalente). Implementar las secciones faltantes (videos de flujos, detalles de planes) y asegurar que los llamados a la acción
-         (CTA) sean claros y efectivos para la conversión. Optimizar para SEO según las especificaciones.
-
-   * 2.2. Flujos de Autenticación y Seguridad:
-       * Tarea: Auditar el sistema de autenticación y la protección de rutas.
-       * Acción: Revisar la implementación de next-auth y el middleware.ts. Asegurar que el manejo de JWT sea seguro y que las rutas de cada portal estén correctamente protegidas según el rol
-         del usuario.
-
-   * 2.3. Portal de Administración:
-       * Tarea: Refactorizar y completar cada submódulo.
-       * Acción: Auditar sistemáticamente: Dashboard, Inventario, Comunicaciones, Financiero (verificando la generación de cuotas, multas e intereses), Reservas y el nuevo módulo de Gestión
-         de Proyectos. Se priorizará la funcionalidad de Conciliación Bancaria Automática como un diferenciador clave del plan Premium.
-
-   * 2.4. Portal de Residentes: (ok)
-       * Tarea: Implementar funcionalidades clave para el engagement.
-       * Acción: Además de revisar las funciones básicas (pagos, reservas), el foco principal será el desarrollo completo del Marketplace Comunitario según las detalladas especificaciones:
-         creación/gestión de anuncios, mensajería interna y panel de moderación para el administrador.
-
-   * 2.5. Portal de Seguridad (IoT-Ready):
-       * Tarea: Materializar las funcionalidades de alto valor.
-       * Acción: Desarrollar la Gestión Avanzada de Visitantes con QR y el sistema de notificación de Paquetería. Esto implica trabajo tanto en el frontend (app de residente) como en el portal de seguridad.
-
-  Fase 3: Desarrollo de Módulos Estratégicos y de Negocio (Prioridad: Media-Alta)
-
-  Estos módulos son cruciales para el crecimiento, la monetización y la ventaja competitiva del proyecto.
-
-   * 3.1. Módulo de Democracia Digital (Asambleas):
-       * Tarea: Desarrollar la plataforma y su modelo de servicio desagregado.
-       * Acción: Implementar el flujo completo de asambleas (quorum, votaciones, actas). Diseñar la arquitectura para que este módulo pueda funcionar de forma integrada (Plan Premium) y como un producto independiente ("Asambleas por Armonía").
-
-   * 3.2. Portal Empresarial "Armonía Portafolio":
-       * Tarea: Construir el dashboard para empresas de administración.
-       * Acción: Desarrollar la vista multi-propiedad, la navegación centralizada, los informes consolidados y la funcionalidad de white-labeling. Este es un desarrollo mayor y clave para el modelo B2B.
-
-   * 3.3. Módulo de Ecosistema y Alianzas:
-       * Tarea: Desarrollar las bases para las integraciones de terceros.
-       * Acción: Implementar el Directorio de Servicios Verificados. Diseñar y construir la capa de API necesaria para futuras alianzas (InsurTech, FinTech) y para la integración con Medidores Inteligentes (IoT).
-
-  Fase 4: Calidad, Pruebas y Preparación para Producción (Prioridad: Media - Continua)
-
-  Aunque no se ejecuten pruebas masivas ahora, se preparará el terreno.
-
-   * 4.1. Estructura de Pruebas:
-       * Tarea: Preparar el entorno para pruebas unitarias y E2E.
-       * Acción: Definir la estructura y configuración para Vitest y Playwright. Crear archivos de prueba (.spec.ts) vacíos para los componentes y servicios críticos que se vayan desarrollando o refactorizando, listos para ser implementados.
-
-   * 4.2. Accesibilidad e Internacionalización (i18n):
-       * Tarea: Garantizar el cumplimiento de los estándares.
-       * Acción: Realizar una auditoría de accesibilidad (WCAG 2.1 AA) en los componentes de Shadcn/UI. Asegurar que la implementación de next-intl sea consistente y cubra todos los textos visibles para el usuario, preparando los archivos para español, inglés y portugués.
-
-   * 4.3. Optimización Final y Despliegue:
-       * Tarea: Asegurar que la aplicación esté lista para un rendimiento óptimo.
-       * Acción: Analizar los Core Web Vitals, revisar la configuración de seguridad (CSP, CORS), y validar que el script de build de producción se ejecute sin errores.
-
-  Procederé a guardar este plan en memoria para utilizarlo como nuestra hoja de ruta. Comenzaré con la Fase 1, iniciando por la tarea 1.1. Auditoría y Racionalización de Dependencias.
-
-  ¿Estás de acuerdo con este plan de acción?
  
+Ejecute la siguiente tarea: revisar en este chat los archivos que modifico y dejo con una implementación básica, haz una lista y reescríbelos aplicando la adecuada estructura y déjalos con toda las funcionalidades iniciales respetando lo desarrollado.

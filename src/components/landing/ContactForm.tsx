@@ -36,13 +36,34 @@ export const ContactForm = () => {
     },
   });
 
-  const onSubmit = (data: ContactFormValues) => {
-    console.log(data);
-    toast({
-      title: "Formulario enviado",
-      description: "Gracias por contactarnos. Te responderemos pronto.",
-    });
-    form.reset();
+  const onSubmit = async (data: ContactFormValues) => {
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al enviar el mensaje.");
+      }
+
+      toast({
+        title: "Formulario enviado",
+        description: "Gracias por contactarnos. Te responderemos pronto.",
+      });
+      form.reset();
+    } catch (error: Error) {
+      console.error("Error sending contact form:", error);
+      toast({
+        title: "Error en el Envío",
+        description: error.message || "No se pudo enviar el mensaje. Por favor, inténtalo de nuevo.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

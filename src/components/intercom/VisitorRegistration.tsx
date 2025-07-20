@@ -17,14 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+
 import { useToast } from "@/components/ui/use-toast";
 import {
   UserPlus as PersonAddIcon,
@@ -111,13 +104,10 @@ const VisitorRegistration: React.FC = () => {
   // Cargar datos iniciales
   const fetchData = useCallback(async () => {
     try {
-      // En un caso real, estos datos vendrían de la API
-      const typesResponse = await fetch("/api/intercom/visitor-types");
-      const typesData = await typesResponse.json();
+      const typesData = await intercomService.getVisitorTypes();
       setVisitorTypes(typesData);
 
-      const unitsResponse = await fetch("/api/intercom/units");
-      const unitsData = await unitsResponse.json();
+      const unitsData = await intercomService.getUnits();
       setUnits(unitsData);
     } catch (error) {
       console.error("Error al cargar datos:", error);
@@ -129,30 +119,27 @@ const VisitorRegistration: React.FC = () => {
     }
   }, [toast]);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
   // Manejar envío del formulario
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: unknown) => {
     setLoading(true);
     try {
-      // Agregar foto si existe
+      let uploadedPhotoUrl: string | undefined;
       if (photoUrl) {
-        data.photo = photoUrl;
+        // Assuming uploadPhoto returns a URL
+        uploadedPhotoUrl = await intercomService.uploadPhoto(photoUrl);
       }
 
-      // Registrar visita
-      await intercomService.registerVisit(data, data.unitId, data.purpose);
+      await intercomService.registerVisit({
+        ...(data as Record<string, any>),
+        photoUrl: uploadedPhotoUrl,
+      });
 
-      // Mostrar notificación de éxito
       toast({
         title: "Éxito",
         description: "Visita registrada correctamente",
         variant: "default",
       });
 
-      // Resetear formulario
       reset();
       setPhotoUrl(null);
     } catch (error) {

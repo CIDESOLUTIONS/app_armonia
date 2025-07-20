@@ -56,9 +56,9 @@ export default function RealTimeVoting({
       setStats(data);
       setLastUpdate(new Date());
       setError(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("[RealTimeVoting] Error:", err);
-      setError(err.message);
+      setError((err as Error).message);
     } finally {
       setLoading(false);
     }

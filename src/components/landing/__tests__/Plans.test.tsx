@@ -4,7 +4,7 @@ import { Plans } from "../Plans";
 // Mock de next-intl
 jest.mock("next-intl", () => ({
   useTranslations: () => (key: string) => {
-    const translations: { [key: string]: any } = {
+    const translations: { [key: string]: unknown } = {
       "landing.pricing.title": "Nuestros Planes",
       "landing.pricing.description":
         "Elige el plan que mejor se adapte a tus necesidades.",

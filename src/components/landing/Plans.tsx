@@ -5,6 +5,8 @@ import Link from "next/link";
 import { ROUTES } from "@/constants/routes";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function Plans() {
   const t = useTranslations("landing.pricing");

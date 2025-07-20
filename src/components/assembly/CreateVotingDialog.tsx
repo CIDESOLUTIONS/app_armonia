@@ -122,9 +122,9 @@ const CreateVotingDialog = ({ open, onClose, onSubmit, agendaPoints }) => {
                   control={control}
                   render={({ field }) => (
                     <Select {...field} label="Punto de la agenda">
-                      {agendaPoints?.map((point: any, index: number) => (
+                      {agendaPoints?.map((point: unknown, index: number) => (
                         <MenuItem key={index} value={index + 1}>
-                          {index + 1}. {point.topic}
+                          {index + 1}. {(point as { topic: string }).topic}
                         </MenuItem>
                       ))}
                     </Select>
