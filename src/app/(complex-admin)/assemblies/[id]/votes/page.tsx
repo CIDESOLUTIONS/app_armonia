@@ -126,11 +126,11 @@ export default function AssemblyVotesPage() {
       setAssembly(fetchedAssembly);
       // Assuming assembly object includes votes
       setVotes(fetchedAssembly.votes || []);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching assembly and votes:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar la asamblea o las votaciones.",
+        description: "No se pudo cargar la asamblea o las votaciones: " + error.message,
         variant: "destructive",
       });
       router.push("/complex-admin/assemblies");
@@ -186,11 +186,11 @@ export default function AssemblyVotesPage() {
       }
       setIsModalOpen(false);
       fetchAssemblyAndVotes();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving vote:", error);
       toast({
         title: "Error",
-        description: "Error al guardar la votación.",
+        description: "Error al guardar la votación: " + error.message,
         variant: "destructive",
       });
     }
@@ -201,11 +201,11 @@ export default function AssemblyVotesPage() {
       const results = await getVotingResults(voteId);
       setVoteResults(results);
       setIsResultsModalOpen(true);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching vote results:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar los resultados de la votación.",
+        description: "No se pudieron cargar los resultados de la votación: " + error.message,
         variant: "destructive",
       });
     }
@@ -385,7 +385,7 @@ export default function AssemblyVotesPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => appendOption({ text: "" })}
+                  onClick={() => appendOption("")}
                 >
                   <PlusCircle className="mr-2 h-4 w-4" /> Añadir Opción
                 </Button>

@@ -4,10 +4,8 @@ import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/header";
-import { AlertCircle } from "lucide-react";
-import { ServerLogger } from "@/lib/logging/server-logger";
+import { ArrowLeft, Check } from "lucide-react";
 
-import { FormField } from "@/components/common/FormField";
 import {
   Select,
   SelectContent,
@@ -15,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAuthStore } from "@/store/authStore";
 
 // Textos para soportar múltiples idiomas
 const texts = {
@@ -50,7 +47,7 @@ const texts = {
     premiumPlanFeature2: "Módulo financiero avanzado",
     premiumPlanFeature3: "Personalización de la plataforma",
     premiumPlanFeature4: "API para integraciones",
-    premiumPlanFeature5: "Históricos completos hasta 5 años",
+    premiumPlanFeature5: "Complete historical data up to 5 years",
     premiumPlanFeature6: "Soporte prioritario",
     paymentVerified: "Pago verificado",
     paymentNotVerified: "Pago pendiente de verificación",
@@ -74,11 +71,11 @@ const texts = {
     units: "Número de unidades",
     unitsPlaceholder: "Ej. 30",
     basicPlanLimit:
-      "El plan básico solo permite hasta 30 unidades. Por favor, seleccione otro plan o reduzca el número de unidades.",
+      "El plan básico solo permite hasta 25 unidades. Por favor, seleccione otro plan o reduzca el número de unidades.",
     standardPlanLimit:
-      "El plan estándar solo permite hasta 50 unidades. Por favor, seleccione el plan premium o reduzca el número de unidades.",
+      "El plan estándar solo permite hasta 40 unidades. Por favor, seleccione el plan premium o reduzca el número de unidades.",
     premiumPlanLimit:
-      "El plan premium solo permite hasta 120 unidades. Por favor, contacte con nosotros para un plan personalizado.",
+      "El plan premium solo permite hasta 90 unidades. Por favor, contacte con nosotros para un plan personalizado.",
     services: "Servicios comunes",
     pool: "Piscina",
     gym: "Gimnasio",
@@ -107,6 +104,11 @@ const texts = {
     successMessage:
       "¡Gracias por registrar su conjunto! Te hemos enviado un correo con los pasos a seguir para completar la configuración.",
     copyright: "© 2025 Armonía. Todos los derechos reservados.",
+    invalidEmail: "Correo electrónico inválido.",
+    invalidPhone: "Número de teléfono inválido.",
+    invalidUnit: "Número de unidades inválido.",
+    passwordMinLength: "La contraseña debe tener al menos 8 caracteres.",
+    acceptTerms: "Debe aceptar los términos y condiciones.",
   },
   en: {
     backToHome: "Back to Home",
@@ -164,11 +166,11 @@ const texts = {
     units: "Number of units",
     unitsPlaceholder: "E.g. 30",
     basicPlanLimit:
-      "The basic plan only allows up to 30 units. Please select another plan or reduce the number of units.",
+      "The basic plan only allows up to 25 units. Please select another plan or reduce the number of units.",
     standardPlanLimit:
-      "The standard plan only allows up to 50 units. Please select the premium plan or reduce the number of units.",
+      "The standard plan only allows up to 40 units. Please select the premium plan or reduce the number of units.",
     premiumPlanLimit:
-      "The premium plan only allows up to 120 units. Please contact us for a custom plan.",
+      "The premium plan only allows up to 90 units. Please contact us for a custom plan.",
     services: "Common services",
     pool: "Swimming pool",
     gym: "Gym",
@@ -197,6 +199,11 @@ const texts = {
     successMessage:
       "Thank you for registering your complex! We have sent you an email with the steps to complete the setup.",
     copyright: "© 2025 Armonía. All rights reserved.",
+    invalidEmail: "Invalid email address.",
+    invalidPhone: "Invalid phone number.",
+    invalidUnit: "Invalid number of units.",
+    passwordMinLength: "Password must be at least 8 characters long.",
+    acceptTerms: "You must accept the terms and conditions.",
   },
 };
 
@@ -237,6 +244,10 @@ export default function RegisterComplex() {
     terms: false,
   });
 
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
+
   // Efectos para verificar pago y recuperar datos del formulario
   useEffect(() => {
     // Verificar el estado del pago
@@ -244,26 +255,16 @@ export default function RegisterComplex() {
       const storedPaymentCompleted = localStorage.getItem("paymentCompleted");
       const storedTransactionId = localStorage.getItem("transactionId");
 
-      console.log("Verificando estado de pago:", {
-        storedPaymentCompleted,
-        storedTransactionId,
-        paidParam,
-        planParam,
-      });
-
-      // Si el parámetro paid es true o hay un pago completado en localStorage
       if (storedPaymentCompleted === "true" || paidParam === "true") {
         setPaymentCompleted(true);
 
         // Obtener el ID de transacción del localStorage si existe
         if (storedTransactionId) {
           setTransactionId(storedTransactionId);
-          console.log(
-            "TransactionId recuperado del localStorage:",
-            storedTransactionId,
-          );
-        } else {
-          console.warn("No se encontró transactionId en localStorage");
+        } else if (paidParam === "true") {
+          // If paidParam is true but no storedTransactionId, it might be a direct return from checkout
+          // In a real scenario, you'd verify this with a backend call using a temporary ID or session
+          console.warn("Pago completado pero no se encontró transactionId en localStorage.");
         }
       }
 
@@ -273,7 +274,6 @@ export default function RegisterComplex() {
         try {
           const parsedData = JSON.parse(storedFormData);
           setFormData((prev) => ({ ...prev, ...parsedData }));
-          console.log("Datos de formulario recuperados:", parsedData);
         } catch (error) {
           console.error("Error al recuperar datos del formulario:", error);
         }
@@ -281,12 +281,10 @@ export default function RegisterComplex() {
 
       // Si el pago se completó, avanzamos al paso 2
       if (paidParam === "true" || storedPaymentCompleted === "true") {
-        console.log("Avanzando al paso 2 (pago completado)");
         setStep(2);
       }
     } else if (planParam === "basic") {
       // Para el plan básico, si venimos directamente aquí, establecemos el step 2
-      console.log("Plan básico seleccionado, avanzando al paso 2");
       setStep(2);
     }
   }, [planParam, paidParam]);
@@ -317,26 +315,17 @@ export default function RegisterComplex() {
     // Validaciones paso 2: Información del conjunto
     if (step === 2) {
       if (!formData.complexName.trim()) {
-        errors.complexName =
-          language === "Español"
-            ? "El nombre del conjunto es obligatorio"
-            : "Complex name is required";
+        errors.complexName = t.complexName + " es obligatorio";
         isValid = false;
       }
 
       if (!formData.adminName.trim()) {
-        errors.adminName =
-          language === "Español"
-            ? "El nombre del administrador es obligatorio"
-            : "Administrator name is required";
+        errors.adminName = t.adminName + " es obligatorio";
         isValid = false;
       }
 
       if (!formData.adminEmail.trim()) {
-        errors.adminEmail =
-          language === "Español"
-            ? "El correo electrónico es obligatorio"
-            : "Email is required";
+        errors.adminEmail = t.email + " es obligatorio";
         isValid = false;
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.adminEmail)) {
         errors.adminEmail = t.invalidEmail;
@@ -344,10 +333,7 @@ export default function RegisterComplex() {
       }
 
       if (!formData.adminPhone.trim()) {
-        errors.adminPhone =
-          language === "Español"
-            ? "El teléfono es obligatorio"
-            : "Phone is required";
+        errors.adminPhone = t.phone + " es obligatorio";
         isValid = false;
       } else if (!/^[0-9\s\-+()]+$/.test(formData.adminPhone)) {
         errors.adminPhone = t.invalidPhone;
@@ -355,34 +341,22 @@ export default function RegisterComplex() {
       }
 
       if (!formData.address.trim()) {
-        errors.address =
-          language === "Español"
-            ? "La dirección es obligatoria"
-            : "Address is required";
+        errors.address = t.address + " es obligatoria";
         isValid = false;
       }
 
       if (!formData.city.trim()) {
-        errors.city =
-          language === "Español"
-            ? "La ciudad es obligatoria"
-            : "City is required";
+        errors.city = t.city + " es obligatoria";
         isValid = false;
       }
 
       if (!formData.state.trim()) {
-        errors.state =
-          language === "Español"
-            ? "El departamento/estado es obligatorio"
-            : "State is required";
+        errors.state = t.state + " es obligatorio";
         isValid = false;
       }
 
       if (!formData.units.trim()) {
-        errors.units =
-          language === "Español"
-            ? "El número de unidades es obligatorio"
-            : "Number of units is required";
+        errors.units = t.units + " es obligatorio";
         isValid = false;
       } else {
         const unitsNum = parseInt(formData.units);
@@ -408,18 +382,12 @@ export default function RegisterComplex() {
     // Validaciones paso 3: Creación de cuenta
     if (step === 3) {
       if (!formData.username.trim()) {
-        errors.username =
-          language === "Español"
-            ? "El nombre de usuario es obligatorio"
-            : "Username is required";
+        errors.username = t.username + " es obligatorio";
         isValid = false;
       }
 
       if (!formData.password) {
-        errors.password =
-          language === "Español"
-            ? "La contraseña es obligatoria"
-            : "Password is required";
+        errors.password = t.password + " es obligatoria";
         isValid = false;
       } else if (formData.password.length < 8) {
         errors.password = t.passwordMinLength;
@@ -427,10 +395,7 @@ export default function RegisterComplex() {
       }
 
       if (!formData.confirmPassword) {
-        errors.confirmPassword =
-          language === "Español"
-            ? "Debe confirmar la contraseña"
-            : "Password confirmation is required";
+        errors.confirmPassword = t.confirmPassword + " es obligatoria";
         isValid = false;
       } else if (formData.password !== formData.confirmPassword) {
         errors.confirmPassword = t.passwordsDoNotMatch;
@@ -473,10 +438,7 @@ export default function RegisterComplex() {
 
   // Actualizamos para conectar con el API y procesar la respuesta
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [_error, setError] = useState("");
-  const [validationErrors, setValidationErrors] = useState<
-    Record<string, string>
-  >({});
+  const [apiError, setApiError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -493,7 +455,7 @@ export default function RegisterComplex() {
 
     try {
       setIsSubmitting(true);
-      setError("");
+      setApiError("");
 
       // Convertir los servicios a un formato adecuado para el API
       const propertyTypes = formData.services.map((service) =>
@@ -506,10 +468,6 @@ export default function RegisterComplex() {
         // Intentar recuperar de localStorage como último recurso
         const storedTransactionId = localStorage.getItem("transactionId");
         if (storedTransactionId) {
-          console.log(
-            "Recuperando transactionId de localStorage:",
-            storedTransactionId,
-          );
           txId = storedTransactionId;
           setTransactionId(storedTransactionId);
         } else if (paymentCompleted) {
@@ -541,11 +499,6 @@ export default function RegisterComplex() {
         transactionId: txId,
       };
 
-      console.log("Enviando datos de registro:", {
-        complexName: requestData.complexName,
-        planCode: requestData.planType,
-        transactionId: requestData.transactionId,
-      });
       // Enviar datos al API
       const response = await fetch("http://localhost:3000/auth/register", {
         method: "POST",
@@ -561,14 +514,6 @@ export default function RegisterComplex() {
         throw new Error(data.message || "Error al registrar el conjunto");
       }
 
-      // Si el registro es exitoso, iniciar sesión automáticamente
-      await login(
-        formData.adminEmail,
-        formData.password,
-        data.complexId,
-        data.schemaName,
-      ); // Usar los datos devueltos por el registro
-
       // Registro exitoso
       alert(t.successMessage);
 
@@ -576,7 +521,7 @@ export default function RegisterComplex() {
       router.push("/portal-selector");
     } catch (err: unknown) {
       console.error("Error de registro:", err);
-      setError(
+      setApiError(
         (err as Error).message ||
           "Ocurrió un error durante el registro. Por favor, inténtelo de nuevo.",
       );
@@ -1307,9 +1252,9 @@ export default function RegisterComplex() {
                     </Button>
                   </div>
 
-                  {error && (
+                  {apiError && (
                     <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded">
-                      {error}
+                      {apiError}
                     </div>
                   )}
                 </div>
@@ -1378,25 +1323,37 @@ export default function RegisterComplex() {
                     )}
                   </div>
 
-                  <FormField
-                    label={t.confirmPassword}
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    placeholder={t.confirmPasswordPlaceholder}
-                    error={
-                      validationErrors.confirmPassword ||
-                      (formData.password &&
+                  <div>
+                    <label
+                      htmlFor="confirmPassword"
+                      className="block mb-2 text-sm font-medium text-gray-700"
+                    >
+                      {t.confirmPassword}
+                    </label>
+                    <input
+                      type="password"
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-2 border ${validationErrors.confirmPassword ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-indigo-500 focus:border-indigo-500`}
+                      placeholder={t.confirmPasswordPlaceholder}
+                      minLength={8}
+                      required
+                    />
+                    {validationErrors.confirmPassword && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {validationErrors.confirmPassword}
+                      </p>
+                    )}
+                    {formData.password &&
                       formData.confirmPassword &&
-                      formData.password !== formData.confirmPassword
-                        ? t.passwordsDoNotMatch
-                        : null)
-                    }
-                    minLength={8}
-                    required
-                  />
+                      formData.password !== formData.confirmPassword && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {t.passwordsDoNotMatch}
+                        </p>
+                      )}
+                  </div>
 
                   <div className="flex items-start">
                     <input
@@ -1431,7 +1388,7 @@ export default function RegisterComplex() {
                   {(plan === "standard" || plan === "premium") && (
                     <div className="bg-blue-50 p-3 rounded-md border border-blue-100">
                       <div className="flex items-start">
-                        <AlertCircle className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
+                        <Check className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
                         <div>
                           <h4 className="text-sm font-medium text-blue-800">
                             {plan === "standard"

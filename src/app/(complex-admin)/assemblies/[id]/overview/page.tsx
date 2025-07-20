@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import React, { useState, useEffect, useCallback } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import {
   Loader2,
   CheckCircle,
   XCircle,
   UserPlus,
+  Users,
   BarChart2,
   FileText,
   PlusCircle,
@@ -15,17 +16,11 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import {
   getAssemblyById,
+  updateAssembly,
   registerAttendance,
   getAssemblyQuorumStatus,
   createVote,
@@ -38,6 +33,10 @@ import {
   Vote,
   VoteResult,
 } from "@/services/assemblyService";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -45,10 +44,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 
 export default function AssemblyDetailPage() {
   const params = useParams();
@@ -86,11 +81,11 @@ export default function AssemblyDetailPage() {
       // For now, mock votes or fetch all and filter
       // const fetchedVotes = await getVotesByAssemblyId(assemblyId);
       // setVotes(fetchedVotes);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching assembly data:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar la información de la asamblea.",
+        description: "No se pudo cargar la información de la asamblea: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -108,14 +103,14 @@ export default function AssemblyDetailPage() {
       await registerAttendance(assemblyId, userId, true, 1); // Assuming unitId 1 for now
       toast({
         title: "Éxito",
-        description: "Asistencia registrada correctamente.",
+        description: `Asistencia registrada para la unidad ${userId}.`,
       });
       fetchAssemblyData(); // Refresh data
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error registering attendance:", error);
       toast({
         title: "Error",
-        description: "Error al registrar asistencia.",
+        description: "Error al registrar asistencia: " + error.message,
         variant: "destructive",
       });
     }
@@ -137,11 +132,11 @@ export default function AssemblyDetailPage() {
         options: ["", ""],
         isWeighted: false,
       });
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error creating vote:", error);
       toast({
         title: "Error",
-        description: "Error al crear votación.",
+        description: "Error al crear votación: " + error.message,
         variant: "destructive",
       });
     }
@@ -155,11 +150,11 @@ export default function AssemblyDetailPage() {
         title: "Éxito",
         description: "Resultados de votación cargados.",
       });
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching vote results:", error);
       toast({
         title: "Error",
-        description: "Error al cargar resultados de votación.",
+        description: "Error al cargar resultados de votación: " + error.message,
         variant: "destructive",
       });
     }
@@ -178,11 +173,11 @@ export default function AssemblyDetailPage() {
         description: "Voto registrado correctamente.",
       });
       handleGetVoteResults(voteId); // Refresh results after voting
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error submitting vote:", error);
       toast({
         title: "Error",
-        description: "Error al registrar el voto.",
+        description: "Error al registrar el voto: " + error.message,
         variant: "destructive",
       });
     }
@@ -204,11 +199,11 @@ export default function AssemblyDetailPage() {
         title: "Éxito",
         description: "Acta generada y descargada correctamente.",
       });
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error generating meeting minutes:", error);
       toast({
         title: "Error",
-        description: "Error al generar el acta de la asamblea.",
+        description: "Error al generar el acta de la asamblea: " + error.message,
         variant: "destructive",
       });
     }
@@ -250,7 +245,7 @@ export default function AssemblyDetailPage() {
             <strong>Descripción:</strong> {assembly.description}
           </p>
           <p>
-            <strong>Fecha:</strong>{" "}
+            <strong>Fecha Programada:</strong>{" "}
             {new Date(assembly.scheduledDate).toLocaleString()}
           </p>
           <p>

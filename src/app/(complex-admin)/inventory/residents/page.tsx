@@ -113,12 +113,12 @@ export default function ResidentsPage() {
       ]);
       setResidents(residentsData);
       setProperties(
-        propertiesData.map((p: any) => ({
+        propertiesData.map((p) => ({
           id: p.id,
           unitNumber: p.unitNumber,
         })),
       );
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching data:", error);
       toast({
         title: "Error",
@@ -187,7 +187,7 @@ export default function ResidentsPage() {
       }
       setIsModalOpen(false);
       fetchResidentsAndProperties();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving resident:", error);
       toast({
         title: "Error",
@@ -213,8 +213,8 @@ export default function ResidentsPage() {
         title: "Éxito",
         description: "Residente eliminado correctamente.",
       });
-      fetchResidents();
-    } catch (error) {
+      fetchResidentsAndProperties();
+    } catch (error: Error) {
       console.error("Error deleting resident:", error);
       toast({
         title: "Error",
@@ -281,7 +281,10 @@ export default function ResidentsPage() {
                 <TableCell>{resident.name}</TableCell>
                 <TableCell>{resident.email}</TableCell>
                 <TableCell>{resident.phone}</TableCell>
-                <TableCell>{resident.propertyId}</TableCell>
+                <TableCell>
+                  {properties.find((p) => p.id === resident.propertyId)?.unitNumber ||
+                    "N/A"}
+                </TableCell>
                 <TableCell>
                   {resident.isOwner ? (
                     <Badge variant="default">Sí</Badge>

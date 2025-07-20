@@ -65,11 +65,11 @@ export default function CamerasPage() {
     try {
       const data = await getCameras();
       setCameras(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching cameras:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las cámaras.",
+        description: "No se pudieron cargar las cámaras: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -140,11 +140,11 @@ export default function CamerasPage() {
       }
       setIsModalOpen(false);
       fetchCameras();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving camera:", error);
       toast({
         title: "Error",
-        description: "Error al guardar la cámara.",
+        description: "Error al guardar la cámara: " + error.message,
         variant: "destructive",
       });
     }
@@ -159,11 +159,11 @@ export default function CamerasPage() {
           description: "Cámara eliminada correctamente.",
         });
         fetchCameras();
-      } catch (error) {
+      } catch (error: Error) {
         console.error("Error deleting camera:", error);
         toast({
           title: "Error",
-          description: "Error al eliminar la cámara.",
+          description: "Error al eliminar la cámara: " + error.message,
           variant: "destructive",
         });
       }
@@ -353,9 +353,7 @@ export default function CamerasPage() {
                 name="isActive"
                 checked={formData.isActive}
                 onCheckedChange={(checked) =>
-                  handleInputChange({
-                    target: { name: "isActive", value: checked },
-                  } as React.ChangeEvent<HTMLInputElement>)
+                  setFormData((prev) => ({ ...prev, isActive: checked }))
                 }
               />
               <Label htmlFor="isActive">Activa</Label>

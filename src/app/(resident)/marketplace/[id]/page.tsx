@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { getListingById } from "@/services/marketplaceService";
+import { getListingById, Listing } from "@/services/marketplaceService";
 import {
   Loader2,
   MessageSquare,
@@ -15,12 +15,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function ListingDetailPage() {
   const params = useParams();
   const listingId = params.id ? parseInt(params.id as string) : null;
-  const [listing, setListing] = useState<any>(null);
+  const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (listingId) {
@@ -28,15 +30,20 @@ export default function ListingDetailPage() {
         try {
           const data = await getListingById(listingId);
           setListing(data);
-        } catch (error) {
+        } catch (error: Error) {
           console.error("Error fetching listing details:", error);
+          toast({
+            title: "Error",
+            description: "No se pudo cargar los detalles del anuncio: " + error.message,
+            variant: "destructive",
+          });
         } finally {
           setLoading(false);
         }
       };
       fetchListing();
     }
-  }, [listingId]);
+  }, [listingId, toast]);
 
   if (loading) {
     return (
@@ -114,7 +121,7 @@ export default function ListingDetailPage() {
                 Publicado: {new Date(listing.createdAt).toLocaleDateString()}
               </div>
               <Link
-                href={`/resident/resident/marketplace/chat/${listing.authorId}`}
+                href={`/resident/marketplace/chat/${listing.author.id}`}
               >
                 <Button className="w-full">
                   <MessageSquare className="mr-2 h-4 w-4" /> Contactar Vendedor

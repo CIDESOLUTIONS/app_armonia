@@ -21,6 +21,7 @@ import { PaymentGatewaySection } from "@/components/finances/PaymentGatewaySecti
 import { FinancialReportsGenerator } from "@/components/finances/FinancialReportsGenerator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/components/ui/use-toast";
 
 // Define interfaces for the data structures
 interface FinanceSummary {
@@ -44,6 +45,7 @@ interface Transaction {
 
 export default function FinancesPage() {
   const { user } = useAuthStore();
+  const { toast } = useToast();
   const [summary, setSummary] = useState<FinanceSummary | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,14 +63,19 @@ export default function FinancesPage() {
         ]);
         setSummary(summaryData);
         setTransactions(transactionsData);
-      } catch (error) {
+      } catch (error: Error) {
         console.error("Error fetching financial data:", error);
+        toast({
+          title: "Error",
+          description: "No se pudieron cargar los datos financieros: " + error.message,
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, [user]);
+  }, [user, toast]);
 
   if (loading) {
     return (

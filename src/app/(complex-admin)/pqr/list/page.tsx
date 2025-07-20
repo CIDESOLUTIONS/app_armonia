@@ -1,6 +1,5 @@
 "use client";
 
-"use client";
 import { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Filter, Loader2, PlusCircle, Eye, Edit, Trash2 } from "lucide-react";
@@ -61,11 +60,11 @@ export default function PQRListPage() {
     try {
       const data = await getPQRs(filters);
       setPqrs(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching PQRs:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las PQRs.",
+        description: "No se pudieron cargar las PQRs: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -103,11 +102,11 @@ export default function PQRListPage() {
         description: "PQR eliminada correctamente.",
       });
       fetchPQRs();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error deleting PQR:", error);
       toast({
         title: "Error",
-        description: "Error al eliminar la PQR.",
+        description: "Error al eliminar la PQR: " + error.message,
         variant: "destructive",
       });
     } finally {

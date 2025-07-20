@@ -2,7 +2,13 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, PlusCircle, Edit, Trash2, DollarSign } from "lucide-react";
+import {
+  Loader2,
+  PlusCircle,
+  Edit,
+  Trash2,
+  DollarSign,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -101,7 +107,7 @@ export default function FeesPage() {
     try {
       const data = await getFees();
       setFees(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching fees:", error);
       toast({
         title: "Error",
@@ -166,7 +172,7 @@ export default function FeesPage() {
       }
       setIsModalOpen(false);
       fetchFees();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving fee:", error);
       toast({
         title: "Error",
@@ -193,7 +199,7 @@ export default function FeesPage() {
         description: "Cuota eliminada correctamente.",
       });
       fetchFees();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error deleting fee:", error);
       toast({
         title: "Error",
@@ -215,7 +221,7 @@ export default function FeesPage() {
         description: "Cuotas generadas para el próximo período.",
       });
       fetchFees();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error generating fees:", error);
       toast({
         title: "Error",
@@ -256,7 +262,7 @@ export default function FeesPage() {
         Gestión de Cuotas de Administración
       </h1>
 
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-end mb-4">
         <Button onClick={handleAddFee}>
           <PlusCircle className="mr-2 h-4 w-4" /> Añadir Cuota
         </Button>

@@ -25,13 +25,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import {
   getListingById,
   updateListing,
   uploadImage,
   getMarketplaceCategories,
 } from "@/services/marketplaceService";
+import Image from "next/image";
 
 const formSchema = z.object({
   title: z.string().min(5, "El título debe tener al menos 5 caracteres."),
@@ -112,11 +113,11 @@ export default function EditListingPage() {
 
       const fetchedCategories = await getMarketplaceCategories();
       setCategories(fetchedCategories);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching listing data:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar el anuncio.",
+        description: "No se pudo cargar el anuncio: " + error.message,
         variant: "destructive",
       });
       router.push("/resident/marketplace/my-listings");
@@ -184,11 +185,11 @@ export default function EditListingPage() {
         description: "Anuncio actualizado correctamente.",
       });
       router.push("/resident/marketplace/my-listings");
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error updating listing:", error);
       toast({
         title: "Error",
-        description: "No se pudo actualizar el anuncio.",
+        description: "No se pudo actualizar el anuncio: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -333,6 +334,7 @@ export default function EditListingPage() {
                     <FormControl>
                       <Input
                         {...fieldProps}
+                        id="newImages"
                         type="file"
                         accept="image/*"
                         multiple

@@ -26,6 +26,7 @@ interface Listing {
   id: number;
   title: string;
   author: { id: number; name: string };
+  buyerId?: number; // Assuming buyerId might exist on a listing
   // ... otras propiedades del listado
 }
 
@@ -51,6 +52,7 @@ export default function ChatPage() {
         toast({
           title: "Error",
           description: "Información de usuario o listado incompleta.",
+          variant: "destructive",
         });
         setLoading(false);
         return;
@@ -69,9 +71,13 @@ export default function ChatPage() {
         user.id,
       );
       setMessages(fetchedMessages);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching data:", error);
-      toast({ title: "Error", description: "No se pudo cargar el chat." });
+      toast({
+        title: "Error",
+        description: "No se pudo cargar el chat: " + error.message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -136,9 +142,9 @@ export default function ChatPage() {
       await sendMarketplaceMessage(messageData);
       socket.emit("sendMarketplaceMessage", messageData);
       setNewMessage("");
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error sending message:", error);
-      toast({ title: "Error", description: "No se pudo enviar el mensaje." });
+      toast({ title: "Error", description: "No se pudo enviar el mensaje: " + error.message, variant: "destructive" });
     }
   };
 
@@ -156,11 +162,11 @@ export default function ChatPage() {
           title: "Anuncio Reportado",
           description: "Gracias por tu reporte. Lo revisaremos pronto.",
         });
-      } catch (error) {
+      } catch (error: Error) {
         console.error("Error reporting listing:", error);
         toast({
           title: "Error",
-          description: "No se pudo reportar el anuncio.",
+          description: "No se pudo reportar el anuncio: " + error.message,
           variant: "destructive",
         });
       }

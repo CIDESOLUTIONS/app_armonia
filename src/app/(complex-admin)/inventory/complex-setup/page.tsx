@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } = "@/store/authStore";
 import { Loader2 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } = "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getComplexInfo, updateComplexInfo } from "@/services/complexService";
@@ -96,7 +96,7 @@ export default function ComplexSetupPage() {
           ? data.registrationDate.split("T")[0]
           : "",
       });
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching complex info:", error);
       toast({
         title: "Error",
@@ -125,15 +125,13 @@ export default function ComplexSetupPage() {
         description: "Información del conjunto actualizada correctamente.",
       });
       fetchComplexInfo(); // Re-fetch para asegurar que los datos estén actualizados
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving complex info:", error);
       toast({
         title: "Error",
         description: "Error al guardar la información del conjunto.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 

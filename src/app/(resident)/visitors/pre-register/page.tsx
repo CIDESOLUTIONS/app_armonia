@@ -34,7 +34,7 @@ const formSchema = z.object({
   validFrom: z.string().min(1, "La fecha de inicio de validez es requerida."),
   validUntil: z.string().min(1, "La fecha de fin de validez es requerida."),
   purpose: z.string().optional(),
-  photo: z.any().optional(), // Para el archivo de imagen
+  photo: z.any().optional(), // Keep as any for now, as File type is tricky with Zod and file inputs
 });
 
 export default function PreRegisterVisitorPage() {
@@ -52,13 +52,21 @@ export default function PreRegisterVisitorPage() {
       if (user?.id) {
         try {
           const userProfile = await getUserProfile(user.id);
-          setUserUnitId(userProfile.unitId); // Asumiendo que unitId está en el perfil
-        } catch (error) {
+          if (userProfile && userProfile.unitId) {
+            setUserUnitId(userProfile.unitId);
+          } else {
+            toast({
+              title: "Advertencia",
+              description: "No se encontró la unidad asociada a su perfil.",
+              variant: "warning",
+            });
+          }
+        } catch (error: Error) {
           console.error("Error fetching user unitId:", error);
           toast({
             title: "Error",
             description:
-              "No se pudo obtener la información de la unidad del usuario.",
+              "No se pudo obtener la información de la unidad del usuario: " + error.message,
             variant: "destructive",
           });
         }
@@ -77,7 +85,7 @@ export default function PreRegisterVisitorPage() {
       validFrom: "",
       validUntil: "",
       purpose: "",
-      photo: undefined,
+      photo: undefined, // Keep as undefined for file input
     },
   });
 
@@ -86,11 +94,11 @@ export default function PreRegisterVisitorPage() {
       const qrData = JSON.stringify(visitorData);
       const url = await QRCode.toDataURL(qrData);
       setQrCodeDataUrl(url);
-    } catch (err) {
+    } catch (err: Error) {
       console.error("Error generating QR code:", err);
       toast({
         title: "Error",
-        description: "No se pudo generar el código QR.",
+        description: "No se pudo generar el código QR: " + err.message,
         variant: "destructive",
       });
     }
@@ -100,7 +108,8 @@ export default function PreRegisterVisitorPage() {
     if (!user?.id || !user?.complexId || userUnitId === null) {
       toast({
         title: "Error",
-        description: "Información de usuario o unidad incompleta.",
+        description: "Información de usuario o unidad incompleta. Por favor, asegúrese de que su perfil tenga una unidad asociada.",
+        variant: "destructive",
       });
       return;
     }
@@ -136,11 +145,11 @@ export default function PreRegisterVisitorPage() {
       });
       // Optionally, clear the form after successful submission and QR generation
       // form.reset();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error pre-registering visitor:", error);
       toast({
         title: "Error",
-        description: "No se pudo pre-registrar al visitante.",
+        description: "No se pudo pre-registrar al visitante: " + error.message,
         variant: "destructive",
       });
     } finally {

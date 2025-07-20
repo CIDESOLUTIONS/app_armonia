@@ -96,7 +96,8 @@ export default function ServiceProvidersPage() {
       };
       const fetchedProviders = await getServiceProviders(filters);
       setProviders(fetchedProviders);
-    } catch (err: any) {
+    } catch (err: Error) {
+      console.error("Error fetching service providers:", err);
       toast({
         title: "Error",
         description: "No se pudieron cargar los proveedores de servicios.",
@@ -154,7 +155,7 @@ export default function ServiceProvidersPage() {
       }
       setIsModalOpen(false);
       fetchServiceProviders();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving service provider:", error);
       toast({
         title: "Error",
@@ -174,7 +175,7 @@ export default function ServiceProvidersPage() {
         description: "Proveedor de servicios eliminado correctamente.",
       });
       fetchServiceProviders();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error deleting service provider:", error);
       toast({
         title: "Error",

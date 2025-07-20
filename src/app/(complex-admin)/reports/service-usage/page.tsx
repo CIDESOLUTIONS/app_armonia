@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -37,9 +37,9 @@ export default function ServiceUsageReportsPage() {
     setLoading(true);
     try {
       // Placeholder for actual API call to generate report
-      console.log(
-        `Generating service usage report of type ${reportType} from ${startDate} to ${endDate}`,
-      );
+      // console.log(
+      //   `Generating service usage report of type ${reportType} from ${startDate} to ${endDate}`,
+      // ); // Removed console.log
       await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
 
       toast({
@@ -62,11 +62,11 @@ export default function ServiceUsageReportsPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error generating service usage report:", error);
       toast({
         title: "Error",
-        description: "Error al generar el reporte de uso de servicios.",
+        description: "Error al generar el reporte de uso de servicios: " + error.message,
         variant: "destructive",
       });
     } finally {

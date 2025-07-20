@@ -86,11 +86,11 @@ export default function NotificationsPage() {
     try {
       const data = await getUserNotifications();
       setNotifications(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching notifications:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las notificaciones.",
+        description: "No se pudieron cargar las notificaciones: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -118,11 +118,11 @@ export default function NotificationsPage() {
         recipientId: "",
       });
       fetchNotifications(); // Refresh list
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error sending notification:", error);
       toast({
         title: "Error",
-        description: "Error al enviar la notificación.",
+        description: "Error al enviar la notificación: " + error.message,
         variant: "destructive",
       });
     }
@@ -136,11 +136,11 @@ export default function NotificationsPage() {
         description: "Notificación marcada como leída.",
       });
       fetchNotifications();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error marking as read:", error);
       toast({
         title: "Error",
-        description: "Error al marcar como leída.",
+        description: "Error al marcar como leída: " + error.message,
         variant: "destructive",
       });
     }
@@ -154,11 +154,11 @@ export default function NotificationsPage() {
         description: "Todas las notificaciones marcadas como leídas.",
       });
       fetchNotifications();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error marking all as read:", error);
       toast({
         title: "Error",
-        description: "Error al marcar todas como leídas.",
+        description: "Error al marcar todas como leídas: " + error.message,
         variant: "destructive",
       });
     }

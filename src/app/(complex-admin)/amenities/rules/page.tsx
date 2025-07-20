@@ -78,11 +78,11 @@ export default function ReservationRulesPage() {
     try {
       const data = await getReservationRules();
       setRules(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching reservation rules:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las reglas de reserva.",
+        description: "No se pudieron cargar las reglas de reserva: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -172,11 +172,11 @@ export default function ReservationRulesPage() {
       }
       setIsModalOpen(false);
       fetchRules();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving reservation rule:", error);
       toast({
         title: "Error",
-        description: "Error al guardar la regla de reserva.",
+        description: "Error al guardar la regla de reserva: " + error.message,
         variant: "destructive",
       });
     }
@@ -193,11 +193,11 @@ export default function ReservationRulesPage() {
           description: "Regla de reserva eliminada correctamente.",
         });
         fetchRules();
-      } catch (error) {
+      } catch (error: Error) {
         console.error("Error deleting reservation rule:", error);
         toast({
           title: "Error",
-          description: "Error al eliminar la regla de reserva.",
+          description: "Error al eliminar la regla de reserva: " + error.message,
           variant: "destructive",
         });
       }
@@ -434,12 +434,7 @@ export default function ReservationRulesPage() {
                 name="allowCancellation"
                 checked={formData.allowCancellation}
                 onCheckedChange={(checked) =>
-                  handleCheckboxChange({
-                    target: {
-                      name: "allowCancellation",
-                      checked: checked as boolean,
-                    },
-                  } as React.ChangeEvent<HTMLInputElement>)
+                  setFormData((prev) => ({ ...prev, allowCancellation: checked }))
                 }
               />
               <Label htmlFor="allowCancellation">Permitir Cancelación</Label>
@@ -465,9 +460,7 @@ export default function ReservationRulesPage() {
                 name="isActive"
                 checked={formData.isActive}
                 onCheckedChange={(checked) =>
-                  handleCheckboxChange({
-                    target: { name: "isActive", checked: checked as boolean },
-                  } as React.ChangeEvent<HTMLInputElement>)
+                  setFormData((prev) => ({ ...prev, isActive: checked }))
                 }
               />
               <Label htmlFor="isActive">Activa</Label>

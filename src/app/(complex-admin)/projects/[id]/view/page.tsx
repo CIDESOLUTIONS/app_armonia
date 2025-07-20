@@ -62,11 +62,11 @@ export default function ViewProjectPage() {
         });
         router.push("/admin/projects/list");
       }
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching project:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar el proyecto.",
+        description: "No se pudo cargar el proyecto: " + error.message,
         variant: "destructive",
       });
       router.push("/admin/projects/list");
@@ -76,7 +76,7 @@ export default function ViewProjectPage() {
   }, [projectId, router, toast]);
 
   useEffect(() => {
-    if (!authLoading && user && projectId) {
+    if (!authLoading && user) {
       fetchProject();
     }
   }, [authLoading, user, projectId, fetchProject]);

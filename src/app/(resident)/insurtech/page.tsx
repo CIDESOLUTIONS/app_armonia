@@ -14,6 +14,7 @@ import {
   InsuranceQuote,
   Policy,
 } from "@/services/insurtechService";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function InsurtechPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -33,11 +34,11 @@ export default function InsurtechPage() {
         title: "Cotización Obtenida",
         description: `Cotización de ${result.provider} por ${result.premium} ${result.currency}.`,
       });
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error getting quote:", error);
       toast({
         title: "Error",
-        description: "Error al obtener la cotización.",
+        description: "Error al obtener la cotización: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -54,11 +55,11 @@ export default function InsurtechPage() {
         title: "Póliza Registrada",
         description: `Póliza ${result.policyId} registrada con estado ${result.status}.`,
       });
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error registering policy:", error);
       toast({
         title: "Error",
-        description: "Error al registrar la póliza.",
+        description: "Error al registrar la póliza: " + error.message,
         variant: "destructive",
       });
     } finally {

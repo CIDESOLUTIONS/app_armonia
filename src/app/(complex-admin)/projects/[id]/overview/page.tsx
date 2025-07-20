@@ -3,7 +3,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, Edit, Trash2, Info } from "lucide-react";
+import {
+  Loader2,
+  Edit,
+  Trash2,
+  Info,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +20,7 @@ interface Project {
   id: number;
   name: string;
   description?: string;
-  status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+  status: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
   startDate: string;
   endDate?: string;
   assignedToId?: number;
@@ -52,11 +57,11 @@ export default function ViewProjectPage() {
         });
         router.push("/admin/projects/list");
       }
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching project:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar el proyecto.",
+        description: "No se pudo cargar el proyecto: " + error.message,
         variant: "destructive",
       });
       router.push("/admin/projects/list");
@@ -80,11 +85,11 @@ export default function ViewProjectPage() {
           description: "Proyecto eliminado correctamente.",
         });
         router.push("/admin/projects/list");
-      } catch (error) {
+      } catch (error: Error) {
         console.error("Error deleting project:", error);
         toast({
           title: "Error",
-          description: "Error al eliminar el proyecto.",
+          description: "Error al eliminar el proyecto: " + error.message,
           variant: "destructive",
         });
       }

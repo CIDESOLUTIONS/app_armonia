@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
@@ -13,22 +13,31 @@ import {
   updateFinancialSettings,
 } from "@/services/financialSettingsService";
 
+interface FinancialSettings {
+  bankName?: string;
+  accountNumber?: string;
+  accountType?: string;
+  nit?: string;
+  paymentMethods?: string;
+}
+
 export default function FinancialSettingsPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
   const [formData, setFormData] = useState<Partial<FinancialSettings>>({});
   const [loadingData, setLoadingData] = useState(true);
+  const [loading, setLoading] = useState(false); // Separate loading state for form submission
 
   const fetchFinancialSettings = useCallback(async () => {
     setLoadingData(true);
     try {
       const data = await getFinancialSettings();
       setFormData(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching financial settings:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar la configuración financiera.",
+        description: "No se pudo cargar la configuración financiera: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -62,11 +71,11 @@ export default function FinancialSettingsPage() {
         description: "Configuración financiera guardada correctamente.",
       });
       fetchFinancialSettings(); // Re-fetch para asegurar que los datos estén actualizados
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving financial settings:", error);
       toast({
         title: "Error",
-        description: "Error al guardar la configuración financiera.",
+        description: "Error al guardar la configuración financiera: " + error.message,
         variant: "destructive",
       });
     } finally {

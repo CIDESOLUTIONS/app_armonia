@@ -94,14 +94,8 @@ export default function Checkout() {
   const [currency, setCurrency] = useState("Pesos");
   const [theme, setTheme] = useState("Claro");
   const [paymentStep, setPaymentStep] = useState("form"); // form, processing, verifying, success, error
-  const [_formData, _setFormData] = useState({
-    cardNumber: "",
-    expiryDate: "",
-    cvv: "",
-    cardholderName: "",
-  });
-  const [_transactionId, _setTransactionId] = useState("");
-  const [_errorMessage, setErrorMessage] = useState("");
+  const [transactionId, setTransactionId] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Obtener los textos traducidos
   const t = language === "Español" ? texts.es : texts.en;
@@ -124,7 +118,6 @@ export default function Checkout() {
         setPaymentStep("error");
       }
     } catch (error: unknown) {
-      console.error("Error al verificar pago:", error);
       setErrorMessage((error as Error).message || t.errorMessage);
       setPaymentStep("error");
     }
@@ -166,8 +159,8 @@ export default function Checkout() {
       <Header
         theme={theme}
         setTheme={setTheme}
-        language={language}
-        setLanguage={setLanguage}
+        langlanguage={language}
+        setLanglanguage={setLanguage}
         currency={currency}
         setCurrency={setCurrency}
         hideNavLinks={true}

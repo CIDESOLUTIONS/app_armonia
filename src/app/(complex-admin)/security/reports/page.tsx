@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -37,9 +37,9 @@ export default function SecurityReportsPage() {
     setLoading(true);
     try {
       // Placeholder for actual API call to generate report
-      console.log(
-        `Generating ${reportType} report from ${startDate} to ${endDate}`,
-      );
+      // console.log(
+      //   `Generating ${reportType} report from ${startDate} to ${endDate}`,
+      // ); // Removed console.log
       await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
 
       toast({
@@ -60,11 +60,11 @@ export default function SecurityReportsPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error generating report:", error);
       toast({
         title: "Error",
-        description: "Error al generar el reporte.",
+        description: "Error al generar el reporte: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -106,7 +106,7 @@ export default function SecurityReportsPage() {
         Reportes de Seguridad
       </h1>
 
-      <div className="bg-white shadow-md rounded-lg p-6">
+      <div className="bg-white shadow-md rounded-lg p-6 mb-8">
         <h2 className="text-xl font-semibold mb-4">Generar Nuevo Reporte</h2>
         <div className="grid gap-4 md:grid-cols-2">
           <div>

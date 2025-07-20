@@ -63,11 +63,11 @@ export default function CreateProjectPage() {
         description: "Proyecto creado correctamente.",
       });
       router.push("/admin/projects/list");
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error creating project:", error);
       toast({
         title: "Error",
-        description: "No se pudo crear el proyecto.",
+        description: "No se pudo crear el proyecto: " + error.message,
         variant: "destructive",
       });
     } finally {

@@ -49,6 +49,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface FamilyBudgetEntry {
   id: number;
@@ -92,11 +93,11 @@ export default function FamilyBudgetPage() {
       if (!user?.id) return;
       const data = await getFamilyBudgetEntries(user.id);
       setEntries(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching budget entries:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las entradas del presupuesto.",
+        description: "No se pudieron cargar las entradas del presupuesto: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -120,11 +121,11 @@ export default function FamilyBudgetPage() {
       setIsModalOpen(false);
       reset();
       fetchEntries();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error creating budget entry:", error);
       toast({
         title: "Error",
-        description: "Error al crear la entrada de presupuesto.",
+        description: "Error al crear la entrada de presupuesto: " + error.message,
         variant: "destructive",
       });
     }
@@ -139,11 +140,11 @@ export default function FamilyBudgetPage() {
         description: "Entrada eliminada correctamente.",
       });
       fetchEntries();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error deleting budget entry:", error);
       toast({
         title: "Error",
-        description: "Error al eliminar la entrada.",
+        description: "Error al eliminar la entrada: " + error.message,
         variant: "destructive",
       });
     }

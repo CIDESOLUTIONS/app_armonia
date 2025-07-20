@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import AdminHeader from "@/components/admin/layout/AdminHeader";
 import AdminSidebar from "@/components/admin/layout/AdminSidebar";
 import { useAuthStore } from "@/store/authStore";
+import { Loader2 } from "lucide-react";
 
 export default function ComplexAdminLayout({
   children,
@@ -15,16 +16,23 @@ export default function ComplexAdminLayout({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Cargando...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }
 
   if (!user || (user.role !== "ADMIN" && user.role !== "COMPLEX_ADMIN")) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Acceso denegado. No tienes permisos para ver esta página.</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Acceso Denegado
+          </h1>
+          <p className="text-gray-600">
+            No tienes permisos para acceder a esta página.
+          </p>
+        </div>
       </div>
     );
   }

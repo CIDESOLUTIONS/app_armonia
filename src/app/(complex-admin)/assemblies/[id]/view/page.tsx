@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore }n "@/store/authStore";
 import {
   Loader2,
   CheckCircle,
@@ -86,11 +86,11 @@ export default function ViewAssemblyPage() {
 
       const fetchedQuorumStatus = await getAssemblyQuorumStatus(assemblyId);
       setQuorumStatus(fetchedQuorumStatus);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching assembly data:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar la asamblea.",
+        description: "No se pudo cargar la asamblea: " + error.message,
         variant: "destructive",
       });
       router.push("/complex-admin/assemblies");
@@ -117,11 +117,11 @@ export default function ViewAssemblyPage() {
       setIsAttendanceModalOpen(false);
       setUnitIdToRegister(null);
       fetchAssemblyData(); // Refresh data
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error registering attendance:", error);
       toast({
         title: "Error",
-        description: "Error al registrar asistencia.",
+        description: "Error al registrar asistencia: " + error.message,
         variant: "destructive",
       });
     }
@@ -143,11 +143,11 @@ export default function ViewAssemblyPage() {
         title: "Éxito",
         description: "Acta generada y descargada correctamente.",
       });
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error generating minutes:", error);
       toast({
         title: "Error",
-        description: "Error al generar el acta.",
+        description: "Error al generar el acta: " + error.message,
         variant: "destructive",
       });
     }

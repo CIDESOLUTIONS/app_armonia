@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, Edit, Trash2, CheckCircle } from "lucide-react";
+import { Loader2, Edit, Trash2, CheckCircle, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -44,11 +44,11 @@ export default function MyListingsPage() {
       if (!user?.id) return; // Ensure user ID is available
       const data = await getListings({ authorId: user.id });
       setListings(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching my listings:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar tus anuncios.",
+        description: "No se pudieron cargar tus anuncios: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -74,11 +74,11 @@ export default function MyListingsPage() {
         description: "Anuncio marcado como vendido correctamente.",
       });
       fetchMyListings();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error marking listing as sold:", error);
       toast({
         title: "Error",
-        description: "No se pudo marcar el anuncio como vendido.",
+        description: "No se pudo marcar el anuncio como vendido: " + error.message,
         variant: "destructive",
       });
     }
@@ -98,11 +98,11 @@ export default function MyListingsPage() {
         description: "Anuncio eliminado correctamente.",
       });
       fetchMyListings();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error deleting listing:", error);
       toast({
         title: "Error",
-        description: "Error al eliminar el anuncio.",
+        description: "Error al eliminar el anuncio: " + error.message,
         variant: "destructive",
       });
     } finally {

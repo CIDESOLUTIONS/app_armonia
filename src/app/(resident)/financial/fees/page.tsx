@@ -32,12 +32,12 @@ export default function ResidentFeesPage() {
     setLoading(true);
     try {
       const response = await getFees({ residentId: user?.id }); // Fetch fees for the current resident
-      setFees(response.data);
-    } catch (error) {
+      setFees(response); // Assuming getFees returns the data directly
+    } catch (error: Error) {
       console.error("Error fetching fees:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar tus cuotas.",
+        description: "No se pudieron cargar tus cuotas: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -68,11 +68,11 @@ export default function ResidentFeesPage() {
       });
       // In a real app, you would redirect the user to paymentUrl
       window.open(paymentUrl, "_blank");
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error initiating payment:", error);
       toast({
         title: "Error",
-        description: "Error al iniciar el pago.",
+        description: "Error al iniciar el pago: " + error.message,
         variant: "destructive",
       });
     }

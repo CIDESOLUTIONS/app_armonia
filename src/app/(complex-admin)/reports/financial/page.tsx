@@ -37,9 +37,9 @@ export default function FinancialReportsPage() {
     setLoading(true);
     try {
       // Placeholder for actual API call to generate report
-      console.log(
-        `Generating financial report of type ${reportType} from ${startDate} to ${endDate}`,
-      );
+      // console.log(
+      //   `Generating financial report of type ${reportType} from ${startDate} to ${endDate}`,
+      // ); // Removed console.log
       await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
 
       toast({
@@ -60,11 +60,11 @@ export default function FinancialReportsPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error generating financial report:", error);
       toast({
         title: "Error",
-        description: "Error al generar el reporte financiero.",
+        description: "Error al generar el reporte financiero: " + error.message,
         variant: "destructive",
       });
     } finally {

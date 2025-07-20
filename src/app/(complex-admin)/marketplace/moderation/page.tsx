@@ -17,6 +17,7 @@ import {
   resolveReport,
 } from "@/services/moderationService";
 import Image from "next/image";
+import { ReportedListing } from "@/interfaces/marketplace/reported-listing.interface";
 
 export default function MarketplaceModerationPage() {
   const { toast } = useToast();
@@ -28,11 +29,12 @@ export default function MarketplaceModerationPage() {
       try {
         const data = await getReportedListings();
         setReportedListings(data);
-      } catch (error) {
+      } catch (error: Error) {
         console.error("Error fetching reported listings:", error);
         toast({
           title: "Error",
           description: "No se pudieron cargar los anuncios reportados.",
+          variant: "destructive",
         });
       } finally {
         setLoading(false);
@@ -57,7 +59,7 @@ export default function MarketplaceModerationPage() {
       setReportedListings((prev) =>
         prev.filter((report) => report.id !== reportId),
       );
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error resolving report:", error);
       toast({
         title: "Error",

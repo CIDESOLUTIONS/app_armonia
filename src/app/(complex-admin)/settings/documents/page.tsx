@@ -70,11 +70,11 @@ export default function DocumentsSettingsPage() {
     try {
       const data = await getDocuments();
       setDocuments(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching documents:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar los documentos.",
+        description: "No se pudieron cargar los documentos: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -97,11 +97,11 @@ export default function DocumentsSettingsPage() {
       });
       reset(); // Clear form after successful upload
       fetchDocuments();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error uploading document:", error);
       toast({
         title: "Error",
-        description: "Error al subir el documento.",
+        description: "Error al subir el documento: " + error.message,
         variant: "destructive",
       });
     }
@@ -117,11 +117,11 @@ export default function DocumentsSettingsPage() {
           description: "Documento eliminado correctamente.",
         });
         fetchDocuments();
-      } catch (error) {
+      } catch (error: Error) {
         console.error("Error deleting document:", error);
         toast({
           title: "Error",
-          description: "Error al eliminar el documento.",
+          description: "Error al eliminar el documento: " + error.message,
           variant: "destructive",
         });
       } finally {

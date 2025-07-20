@@ -2,14 +2,15 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -69,11 +70,11 @@ export default function CreateAssemblyPage() {
         description: "Asamblea creada correctamente.",
       });
       router.push("/complex-admin/assemblies");
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error creating assembly:", error);
       toast({
         title: "Error",
-        description: "No se pudo crear la asamblea.",
+        description: "No se pudo crear la asamblea: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -170,8 +171,10 @@ export default function CreateAssemblyPage() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : null}{" "}
             Crear Asamblea
           </Button>
         </form>

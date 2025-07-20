@@ -2,7 +2,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, PlusCircle, Edit, Trash2 } from "lucide-react";
+import {
+  Loader2,
+  PlusCircle,
+  Edit,
+  Trash2,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -57,7 +62,7 @@ interface Vehicle {
   year: number;
   color: string;
   type: string;
-  parkingSpot?: string;
+  parkingSpace?: string; // Corrected from parkingSpot
   notes?: string;
   propertyId: number;
   residentId: number;
@@ -121,13 +126,13 @@ export default function VehiclesPage() {
       ]);
       setVehicles(vehiclesData);
       setProperties(
-        propertiesData.map((p: any) => ({
+        propertiesData.map((p) => ({
           id: p.id,
           unitNumber: p.unitNumber,
         })),
       );
-      setResidents(residentsData.map((r: any) => ({ id: r.id, name: r.name })));
-    } catch (error) {
+      setResidents(residentsData.map((r) => ({ id: r.id, name: r.name })));
+    } catch (error: Error) {
       console.error("Error fetching data:", error);
       toast({
         title: "Error",
@@ -198,7 +203,7 @@ export default function VehiclesPage() {
       }
       setIsModalOpen(false);
       fetchVehiclesAndRelatedData();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error saving vehicle:", error);
       toast({
         title: "Error",
@@ -225,7 +230,7 @@ export default function VehiclesPage() {
         description: "Vehículo eliminado correctamente.",
       });
       fetchVehiclesAndRelatedData();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error deleting vehicle:", error);
       toast({
         title: "Error",
@@ -280,6 +285,7 @@ export default function VehiclesPage() {
               <TableHead>Placa</TableHead>
               <TableHead>Marca</TableHead>
               <TableHead>Modelo</TableHead>
+              <TableHead>Color</TableHead>
               <TableHead>Tipo</TableHead>
               <TableHead>Año</TableHead>
               <TableHead>Parqueadero</TableHead>

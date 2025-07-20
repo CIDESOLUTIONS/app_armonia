@@ -65,7 +65,7 @@ export default function ApiKeysPage() {
     setLoading(true);
     try {
       // Placeholder for API call to generate new key
-      console.log("Generating new API key for:", newKeyName);
+      // console.log("Generating new API key for:", newKeyName); // Removed console.log
       await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate API call
 
       const newKey: ApiKey = {
@@ -81,11 +81,11 @@ export default function ApiKeysPage() {
         title: "Éxito",
         description: "Clave API generada correctamente (simulado).",
       });
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error generating API key:", error);
       toast({
         title: "Error",
-        description: "Error al generar la clave API.",
+        description: "Error al generar la clave API: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -98,7 +98,7 @@ export default function ApiKeysPage() {
       setLoading(true);
       try {
         // Placeholder for API call to delete key
-        console.log("Deleting API key with ID:", id);
+        // console.log("Deleting API key with ID:", id); // Removed console.log
         await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
 
         setApiKeys((prev) => prev.filter((key) => key.id !== id));
@@ -106,11 +106,11 @@ export default function ApiKeysPage() {
           title: "Éxito",
           description: "Clave API eliminada correctamente (simulado).",
         });
-      } catch (error) {
+      } catch (error: Error) {
         console.error("Error deleting API key:", error);
         toast({
           title: "Error",
-          description: "Error al eliminar la clave API.",
+          description: "Error al eliminar la clave API: " + error.message,
           variant: "destructive",
         });
       } finally {

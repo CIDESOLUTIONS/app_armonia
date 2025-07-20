@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, Edit, Trash2, MessageSquare } from "lucide-react";
+import { Loader2, Edit, Trash2, MessageSquare, Paperclip, FileText, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -64,11 +64,11 @@ export default function ViewResidentPQRPage() {
     try {
       const data = await getPQRById(pqrId as number);
       setPqr(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching PQR:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar la PQR.",
+        description: "No se pudo cargar la PQR: " + error.message,
         variant: "destructive",
       });
       router.push("/resident/pqr");
@@ -93,11 +93,11 @@ export default function ViewResidentPQRPage() {
         description: "Comentario añadido correctamente.",
       });
       fetchPQR();
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error adding comment:", error);
       toast({
         title: "Error",
-        description: "Error al añadir comentario.",
+        description: "Error al añadir comentario: " + error.message,
         variant: "destructive",
       });
     }
@@ -200,7 +200,7 @@ export default function ViewResidentPQRPage() {
                   <div className="flex items-center">
                     <FileText className="mr-2 h-5 w-5 text-gray-500" />
                     <span className="text-sm font-medium truncate">
-                      {attachment.name}
+                      {attachment.fileName}
                     </span>
                   </div>
                   <a
