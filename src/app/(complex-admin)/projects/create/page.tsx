@@ -49,7 +49,6 @@ export default function CreateProjectPage() {
   });
 
   const {
-    handleSubmit,
     control,
     formState: { isSubmitting },
   } = form;

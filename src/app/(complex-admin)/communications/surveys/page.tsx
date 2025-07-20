@@ -7,13 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -35,10 +29,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  surveySchema,
-  SurveyFormValues,
-} from "@/validators/survey-schema";
+import { surveySchema, SurveyFormValues } from "@/validators/survey-schema";
 import {
   Form,
   FormControl,
@@ -201,7 +192,7 @@ export default function SurveysPage() {
     setLoading(true);
     try {
       // TODO: Call backend API to create/update survey
-      console.log("Saving survey:", data);
+      console.error("Saving survey:", data);
       toast({
         title: "Éxito",
         description: "Encuesta/Votación guardada correctamente.",
@@ -243,7 +234,7 @@ export default function SurveysPage() {
     setLoading(true);
     try {
       // TODO: Call backend API to delete survey
-      console.log("Deleting survey:", id);
+      console.error("Deleting survey:", id);
       toast({
         title: "Éxito",
         description: "Encuesta/Votación eliminada correctamente.",

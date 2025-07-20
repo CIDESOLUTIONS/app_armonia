@@ -108,7 +108,8 @@ export default function ResidentSidebar({
           path: "/resident-portal/financial",
         },
         {
-          label: language === "Español" ? "Presupuesto Familiar" : "Family Budget",
+          label:
+            language === "Español" ? "Presupuesto Familiar" : "Family Budget",
           path: "/resident-portal/personal-finances",
         },
       ],

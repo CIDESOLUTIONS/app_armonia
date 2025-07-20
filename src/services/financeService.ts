@@ -32,36 +32,79 @@ export const generateFinancialReport = async (tenantId: string) => {
   return { message: "Financial report generated successfully" };
 };
 
-export const processBankStatement = async (tenantId: string, file: File): Promise<ReconciliationSuggestion[]> => {
+export const processBankStatement = async (
+  tenantId: string,
+  file: File,
+): Promise<ReconciliationSuggestion[]> => {
   const prisma = getPrisma(tenantId);
   console.log("Processing bank statement for tenant:", tenantId, file.name);
   // Simulated data for demonstration
   return [
     {
-      transaction: { date: "2024-07-01", description: "Pago de arriendo", amount: 500.00 },
-      matchingPayment: { id: 1, amount: 500.00, resident: { name: "Juan Perez" } },
+      transaction: {
+        date: "2024-07-01",
+        description: "Pago de arriendo",
+        amount: 500.0,
+      },
+      matchingPayment: {
+        id: 1,
+        amount: 500.0,
+        resident: { name: "Juan Perez" },
+      },
       status: "MATCHED",
     },
     {
-      transaction: { date: "2024-07-02", description: "Compra en supermercado", amount: 75.50 },
+      transaction: {
+        date: "2024-07-02",
+        description: "Compra en supermercado",
+        amount: 75.5,
+      },
       matchingPayment: null,
       status: "UNMATCHED",
     },
   ];
 };
 
-export const uploadBankStatement = async (tenantId: string, file: File): Promise<ReconciliationSuggestion[]> => {
+export const approveReconciliation = async (
+  tenantId: string,
+  reconciliationId: number,
+): Promise<{ message: string }> => {
+  const prisma = getPrisma(tenantId);
+  console.log(
+    "Approving reconciliation for tenant:",
+    tenantId,
+    reconciliationId,
+  );
+  return { message: "Reconciliation approved successfully" };
+};
+
+export const uploadBankStatement = async (
+  tenantId: string,
+  file: File,
+): Promise<ReconciliationSuggestion[]> => {
   const prisma = getPrisma(tenantId);
   console.log("Uploading bank statement for tenant:", tenantId, file.name);
   // Simulated data for demonstration
   return [
     {
-      transaction: { date: "2024-07-01", description: "Pago de arriendo", amount: 500.00 },
-      matchingPayment: { id: 1, amount: 500.00, resident: { name: "Juan Perez" } },
+      transaction: {
+        date: "2024-07-01",
+        description: "Pago de arriendo",
+        amount: 500.0,
+      },
+      matchingPayment: {
+        id: 1,
+        amount: 500.0,
+        resident: { name: "Juan Perez" },
+      },
       status: "MATCHED",
     },
     {
-      transaction: { date: "2024-07-02", description: "Compra en supermercado", amount: 75.50 },
+      transaction: {
+        date: "2024-07-02",
+        description: "Compra en supermercado",
+        amount: 75.5,
+      },
       matchingPayment: null,
       status: "UNMATCHED",
     },
@@ -126,7 +169,9 @@ export interface Transaction {
   type: "INCOME" | "EXPENSE";
 }
 
-export const getRecentTransactions = async (tenantId: string): Promise<Transaction[]> => {
+export const getRecentTransactions = async (
+  tenantId: string,
+): Promise<Transaction[]> => {
   const prisma = getPrisma(tenantId);
   console.log("Getting recent transactions for tenant:", tenantId);
   // Simulated data for demonstration
@@ -134,7 +179,7 @@ export const getRecentTransactions = async (tenantId: string): Promise<Transacti
     {
       id: 1,
       description: "Pago de cuota de administración",
-      amount: 150.00,
+      amount: 150.0,
       date: "2024-07-19T10:00:00Z",
       type: "INCOME",
     },
@@ -148,7 +193,7 @@ export const getRecentTransactions = async (tenantId: string): Promise<Transacti
     {
       id: 3,
       description: "Pago de multa por ruido",
-      amount: 25.00,
+      amount: 25.0,
       date: "2024-07-17T11:00:00Z",
       type: "INCOME",
     },

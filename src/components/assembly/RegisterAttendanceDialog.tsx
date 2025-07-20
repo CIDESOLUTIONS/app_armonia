@@ -110,7 +110,9 @@ const RegisterAttendanceDialog = ({
     (propertyUnitId: number) => {
       if (!propertyUnitId) return "";
 
-      const unit = propertyUnits.find((u: unknown) => (u as { id: number }).id === propertyUnitId);
+      const unit = propertyUnits.find(
+        (u: unknown) => (u as { id: number }).id === propertyUnitId,
+      );
       return unit ? (unit as { coefficient: number }).coefficient : "";
     },
     [propertyUnits],
@@ -161,7 +163,10 @@ const RegisterAttendanceDialog = ({
                     </SelectTrigger>
                     <SelectContent>
                       {owners?.map((owner: unknown) => (
-                        <SelectItem key={(owner as { id: number }).id} value={String((owner as { id: number }).id)}>
+                        <SelectItem
+                          key={(owner as { id: number }).id}
+                          value={String((owner as { id: number }).id)}
+                        >
                           {(owner as { name: string }).name}
                         </SelectItem>
                       ))}
@@ -250,7 +255,10 @@ const RegisterAttendanceDialog = ({
                       </SelectTrigger>
                       <SelectContent>
                         {owners?.map((owner: unknown) => (
-                          <SelectItem key={(owner as { id: number }).id} value={String((owner as { id: number }).id)}>
+                          <SelectItem
+                            key={(owner as { id: number }).id}
+                            value={String((owner as { id: number }).id)}
+                          >
                             {(owner as { name: string }).name}
                           </SelectItem>
                         ))}

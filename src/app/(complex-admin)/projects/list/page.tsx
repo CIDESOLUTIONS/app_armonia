@@ -25,7 +25,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-
 interface Project {
   id: number;
   title: string;

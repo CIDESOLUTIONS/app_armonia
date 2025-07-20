@@ -60,7 +60,9 @@ export const ContactForm = () => {
       console.error("Error sending contact form:", error);
       toast({
         title: "Error en el Envío",
-        description: error.message || "No se pudo enviar el mensaje. Por favor, inténtalo de nuevo.",
+        description:
+          error.message ||
+          "No se pudo enviar el mensaje. Por favor, inténtalo de nuevo.",
         variant: "destructive",
       });
     }

@@ -16,6 +16,7 @@ export default [
       "venv/**",
       "build/**",
       "coverage/**",
+      "armonia-backend/dist/**",
     ],
   },
   pluginJs.configs.recommended,

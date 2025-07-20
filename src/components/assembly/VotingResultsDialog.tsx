@@ -6,18 +6,17 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
-  FormControlLabel,
-  FormHelperText,
   Grid,
-  InputLabel,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Select,
-  TextField,
   Typography,
+  Paper,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import {
   CheckCircle as CheckIcon,
   Cancel as CancelIcon,
@@ -33,7 +32,15 @@ import {
 } from "recharts";
 
 // Componente para mostrar los resultados de una votación
-const VotingResultsDialog = ({ open, onClose, voting }) => {
+const VotingResultsDialog = ({
+  open,
+  onClose,
+  voting,
+}: {
+  open: boolean;
+  onClose: () => void;
+  voting: any; // TODO: Define a more specific type for voting
+}) => {
   const theme = useTheme();
 
   // Si no hay votación seleccionada, no mostrar nada
@@ -49,8 +56,8 @@ const VotingResultsDialog = ({ open, onClose, voting }) => {
     return Object.entries(voting.result).map(
       ([option, data]: [string, any]) => ({
         name: option,
-        value: data.coefficient,
-        count: data.count,
+        value: (data as any).coefficient,
+        count: (data as any).count,
       }),
     );
   };
@@ -256,7 +263,10 @@ const VotingResultsDialog = ({ open, onClose, voting }) => {
                           </TableCell>
                           <TableCell align="right">{row.count}</TableCell>
                           <TableCell align="right">
-                            {((row.count / voting.totalVotes) * 100).toFixed(2)}
+                            {(
+                              (row.count / (voting.totalVotes || 1)) *
+                              100
+                            ).toFixed(2)}
                             %
                           </TableCell>
                           <TableCell align="right">
