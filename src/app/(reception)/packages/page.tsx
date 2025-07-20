@@ -902,4 +902,3 @@ export default function ReceptionPackagesPage() {
     </div>
   );
 }
-

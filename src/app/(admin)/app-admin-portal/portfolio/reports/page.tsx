@@ -39,10 +39,7 @@ export default function ConsolidatedReportsPage() {
     setLoading(true);
     try {
       if (reportType === "financial-summary") {
-        await getConsolidatedFinancialReport(
-          startDate,
-          endDate,
-        );
+        await getConsolidatedFinancialReport(startDate, endDate);
         // For now, just log the data. In a real app, you'd format and display/download it.
         // console.log("Consolidated Financial Report:", reportData); // Removed console.log
         toast({

@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Label } from "@/components/ui/label";
 import { useRouter, useParams } from "next/navigation";
-import Link from "next/link";
 import { useAuthStore } from "@/store/authStore";
 import {
   Loader2,

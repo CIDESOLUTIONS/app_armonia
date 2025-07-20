@@ -172,7 +172,7 @@ const UserPreferences: React.FC = () => {
   const onSubmit = async (data: unknown) => {
     setLoading(true);
     try {
-      const formattedData = { ...data as Record<string, any> };
+      const formattedData = { ...(data as Record<string, any>) };
 
       if (
         formattedData.quietHoursEnabled &&
@@ -183,7 +183,9 @@ const UserPreferences: React.FC = () => {
           return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
         };
 
-        formattedData.quietHoursStart = formatTime(formattedData.quietHoursStart);
+        formattedData.quietHoursStart = formatTime(
+          formattedData.quietHoursStart,
+        );
         formattedData.quietHoursEnd = formatTime(formattedData.quietHoursEnd);
       } else {
         formattedData.quietHoursStart = null;

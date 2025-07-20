@@ -30,10 +30,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  uploadDocument,
-  deleteDocument,
-} from "@/services/documentService";
+import { uploadDocument, deleteDocument } from "@/services/documentService";
 
 interface Document {
   id: string;

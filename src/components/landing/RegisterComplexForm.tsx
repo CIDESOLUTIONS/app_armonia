@@ -64,7 +64,8 @@ export function RegisterComplexForm() {
       toast({
         title: "Error en el Registro",
         description:
-          error.message || "No pudimos procesar tu solicitud. Por favor, inténtalo de nuevo.",
+          error.message ||
+          "No pudimos procesar tu solicitud. Por favor, inténtalo de nuevo.",
         variant: "destructive",
       });
     } finally {

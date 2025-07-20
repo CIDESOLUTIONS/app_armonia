@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { useRouter, useParams } from "next/navigation";
+import React, { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import {
   Loader2,
-  CheckCircle,
   UserPlus,
   BarChart2,
   FileText,
@@ -14,7 +13,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import {
   getAssemblyById,
@@ -26,12 +24,10 @@ import {
   generateMeetingMinutes,
   Assembly,
   CreateVoteDto,
-  Vote,
   VoteResult,
 } from "@/services/assemblyService";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -40,6 +36,19 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+
+interface VoteOption {
+  id: number;
+  value: string;
+}
+
+interface Vote {
+  id: number;
+  question: string;
+  options: VoteOption[];
+  isWeighted: boolean;
+  isActive: boolean;
+}
 
 export default function AssemblyDetailPage() {
   const params = useParams();
@@ -59,7 +68,7 @@ export default function AssemblyDetailPage() {
     options: ["", ""],
     isWeighted: false,
   });
-  const [votes, setVotes] = useState<Vote[]>([]);
+  const [votes, setVotes] = useState<Vote[]>([]); // Correctly typed
   const [voteResults, setVoteResults] = useState<{
     [voteId: number]: VoteResult;
   }>({});
@@ -68,9 +77,15 @@ export default function AssemblyDetailPage() {
     if (!assemblyId) return;
     setLoading(true);
     try {
-      const fetchedAssembly = await getAssemblyById(assemblyId);
+      const fetchedAssembly = await getAssemblyById(
+        assemblyId,
+        user?.complexId || "",
+      );
       setAssembly(fetchedAssembly);
-      const fetchedQuorum = await getAssemblyQuorumStatus(assemblyId);
+      const fetchedQuorum = await getAssemblyQuorumStatus(
+        assemblyId,
+        user?.complexId || "",
+      );
       setQuorumStatus(fetchedQuorum);
       // Fetch votes for this assembly
       // Assuming an endpoint to get votes by assemblyId exists or can be added
@@ -92,12 +107,15 @@ export default function AssemblyDetailPage() {
 
   useEffect(() => {
     fetchAssemblyData();
-  }, [assemblyId]);
+  }, [assemblyId, user?.complexId]);
 
-  const handleRegisterAttendance = async (userId: number, _present: boolean) => {
-    if (!assemblyId) return;
+  const handleRegisterAttendance = async (
+    userId: number,
+    _present: boolean,
+  ) => {
+    if (!assemblyId || !user?.complexId) return;
     try {
-      await registerAttendance(assemblyId, userId, true, 1); // Assuming unitId 1 for now
+      await registerAttendance(assemblyId, userId, true, user.complexId); // Assuming unitId 1 for now
       toast({
         title: "Éxito",
         description: `Asistencia registrada para la unidad ${userId}.`,
@@ -114,9 +132,12 @@ export default function AssemblyDetailPage() {
   };
 
   const handleCreateVote = async () => {
-    if (!assemblyId) return;
+    if (!assemblyId || !user?.complexId) return;
     try {
-      const createdVote = await createVote({ ...newVoteForm, assemblyId });
+      const createdVote = await createVote(
+        { ...newVoteForm, assemblyId },
+        user.complexId,
+      );
       setVotes((prev) => [...prev, createdVote]);
       toast({
         title: "Éxito",
@@ -140,8 +161,9 @@ export default function AssemblyDetailPage() {
   };
 
   const handleGetVoteResults = async (voteId: number) => {
+    if (!user?.complexId) return;
     try {
-      const results = await getVoteResults(voteId);
+      const results = await getVoteResults(voteId, user.complexId);
       setVoteResults((prev) => ({ ...prev, [voteId]: results }));
       toast({
         title: "Éxito",
@@ -162,9 +184,9 @@ export default function AssemblyDetailPage() {
     option: string,
     weight: number,
   ) => {
-    if (!user?.id) return;
+    if (!user?.id || !user?.complexId) return;
     try {
-      await submitVote({ voteId, option, userId: user.id, unitId: 1, weight }); // Assuming unitId 1 for now
+      await submitVote(voteId, user.id, option, 1, weight, user.complexId); // Assuming unitId 1 for now
       toast({
         title: "Éxito",
         description: "Voto registrado correctamente.",
@@ -181,9 +203,9 @@ export default function AssemblyDetailPage() {
   };
 
   const handleGenerateMinutes = async () => {
-    if (!assemblyId) return;
+    if (!assemblyId || !user?.complexId) return;
     try {
-      const pdfBlob = await generateMeetingMinutes(assemblyId);
+      const pdfBlob = await generateMeetingMinutes(assemblyId, user.complexId);
       const url = window.URL.createObjectURL(pdfBlob);
       const a = document.createElement("a");
       a.href = url;
@@ -301,7 +323,7 @@ export default function AssemblyDetailPage() {
                 <p>Ponderada: {vote.isWeighted ? "Sí" : "No"}</p>
                 <p>Activa: {vote.isActive ? "Sí" : "No"}</p>
                 <div className="mt-2">
-                  {vote.options.map((option) => (
+                  {vote.options.map((option: VoteOption) => (
                     <Button
                       key={option.id}
                       variant="outline"

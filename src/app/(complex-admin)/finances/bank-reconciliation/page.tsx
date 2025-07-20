@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2, Upload, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   processBankStatement,
   approveReconciliation,
@@ -28,18 +27,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-interface BankTransaction {
-  date: string;
-  description: string;
-  amount: number;
-}
-
-interface ReconciliationSuggestion {
-  transaction: BankTransaction;
-  matchingPayment: any; // Replace with actual Payment interface
-  status: "MATCHED" | "UNMATCHED" | "APPROVED";
-}
+import { ReconciliationSuggestion } from "@/services/financeService";
 
 export default function BankReconciliationPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -70,9 +58,11 @@ export default function BankReconciliationPage() {
 
     setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append("file", selectedFile);
-      const result = await processBankStatement(formData); // Assuming this takes FormData
+      // Assuming processBankStatement takes a File object and returns ReconciliationSuggestion[]
+      const result = await processBankStatement(
+        user?.complexId || "",
+        selectedFile,
+      );
       setSuggestions(result);
       toast({
         title: "Éxito",
@@ -95,7 +85,11 @@ export default function BankReconciliationPage() {
   ) => {
     setLoading(true);
     try {
-      await approveReconciliation(suggestion);
+      // Assuming approveReconciliation takes a reconciliationId and tenantId
+      await approveReconciliation(
+        user?.complexId || "",
+        suggestion.transaction.id,
+      ); // Assuming transaction.id can be used as reconciliationId
       toast({
         title: "Éxito",
         description: "Sugerencia de conciliación aprobada.",

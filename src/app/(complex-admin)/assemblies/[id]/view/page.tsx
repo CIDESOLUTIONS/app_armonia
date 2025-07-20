@@ -1,15 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
-import {
-  Loader2,
-  UserPlus,
-  Users,
-  BarChart2,
-  FileText,
-} from "lucide-react";
+import { Loader2, UserPlus, FileText, Users, BarChart2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +25,25 @@ import {
 } from "@/components/ui/dialog";
 import Link from "next/link";
 
+interface Attendee {
+  id: number;
+  name: string;
+  // Add other relevant properties for an attendee
+}
+
+interface VoteOption {
+  id: number;
+  value: string;
+}
+
+interface Vote {
+  id: number;
+  question: string;
+  options: VoteOption[]; // Refined type
+  isWeighted: boolean;
+  isActive: boolean;
+}
+
 interface Assembly {
   id: number;
   title: string;
@@ -42,8 +55,8 @@ interface Assembly {
   createdBy: number;
   createdAt: string;
   updatedAt: string;
-  attendees?: any[]; // Simplified for now
-  votes?: any[]; // Simplified for now
+  attendees?: Attendee[];
+  votes?: Vote[];
 }
 
 interface QuorumStatus {
@@ -71,17 +84,23 @@ export default function ViewAssemblyPage() {
   const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
   const [unitIdToRegister, setUnitIdToRegister] = useState<number | null>(null);
 
-  const fetchAssemblyData = useCallback(async () => {
+  const fetchAssemblyData = async () => {
     setLoading(true);
     try {
       if (!assemblyId) {
         router.push("/complex-admin/assemblies");
         return;
       }
-      const fetchedAssembly = await getAssemblyById(assemblyId);
+      const fetchedAssembly = await getAssemblyById(
+        assemblyId,
+        user?.complexId || "",
+      );
       setAssembly(fetchedAssembly);
 
-      const fetchedQuorumStatus = await getAssemblyQuorumStatus(assemblyId);
+      const fetchedQuorumStatus = await getAssemblyQuorumStatus(
+        assemblyId,
+        user?.complexId || "",
+      );
       setQuorumStatus(fetchedQuorumStatus);
     } catch (error: Error) {
       console.error("Error fetching assembly data:", error);
@@ -94,19 +113,25 @@ export default function ViewAssemblyPage() {
     } finally {
       setLoading(false);
     }
-  }, [assemblyId, router, toast]);
+  };
 
   useEffect(() => {
     if (!authLoading && user && assemblyId) {
       fetchAssemblyData();
     }
-  }, [authLoading, user, assemblyId, fetchAssemblyData]);
+  }, [authLoading, user, assemblyId]);
 
   const handleRegisterAttendance = async () => {
-    if (!assemblyId || !unitIdToRegister || !user?.id) return;
+    if (!assemblyId || !unitIdToRegister || !user?.id || !user?.complexId)
+      return;
 
     try {
-      await registerAttendance(assemblyId, unitIdToRegister, true); // Assuming 'true' for present
+      await registerAttendance(
+        assemblyId,
+        unitIdToRegister,
+        true,
+        user.complexId,
+      );
       toast({
         title: "Éxito",
         description: `Asistencia registrada para la unidad ${unitIdToRegister}.`,
@@ -125,9 +150,9 @@ export default function ViewAssemblyPage() {
   };
 
   const handleGenerateMinutes = async () => {
-    if (!assemblyId) return;
+    if (!assemblyId || !user?.complexId) return;
     try {
-      const pdfBlob = await generateMeetingMinutes(assemblyId);
+      const pdfBlob = await generateMeetingMinutes(assemblyId, user.complexId);
       const url = window.URL.createObjectURL(pdfBlob);
       const a = document.createElement("a");
       a.href = url;

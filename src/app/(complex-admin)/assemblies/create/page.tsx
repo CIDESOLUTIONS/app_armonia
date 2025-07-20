@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
+
 import { useRouter } from "next/navigation";
 
 import { useForm } from "react-hook-form";
@@ -42,7 +43,6 @@ const formSchema = z.object({
 export default function CreateAssemblyPage() {
   const { toast } = useToast();
   const router = useRouter();
-  
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -62,7 +62,6 @@ export default function CreateAssemblyPage() {
   } = form;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setLoading(true);
     try {
       await createAssembly(values);
       toast({
@@ -77,8 +76,6 @@ export default function CreateAssemblyPage() {
         description: "No se pudo crear la asamblea: " + error.message,
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 

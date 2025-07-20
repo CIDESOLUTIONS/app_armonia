@@ -28,7 +28,6 @@ export function ReconciliationSuggestions({ suggestions }: Props) {
     try {
       await approveReconciliation(suggestion);
       // Aquí podrías actualizar el estado local o recargar las sugerencias
-      
     } catch (error) {
       console.error("Error al aprobar la conciliación:", error);
     }

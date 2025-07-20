@@ -98,8 +98,6 @@ export default function Checkout() {
   // Obtener los textos traducidos
   const t = language === "Español" ? texts.es : texts.en;
 
-  
-
   const handleCancel = () => {
     // Volver a la página de registro manteniendo el plan seleccionado
     router.push(`/register-complex?plan=${planType}`);

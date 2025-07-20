@@ -7,22 +7,93 @@ import {
   UpdateAssemblyDto,
   AssemblyDto,
   AssemblyStatus,
-  CreateVoteDto,
-  SubmitVoteDto,
 } from '../common/dto/assembly.dto';
-import { ServerLogger } from '../common/logging/server-logger'; // Adjusted path
-import { ActivityLogger } from '../common/logging/activity-logger'; // Adjusted path
-import { WebSocketService } from '../communications/websocket.service'; // Adjusted path
-import { DigitalSignatureService } from '../common/services/digital-signature.service'; // Adjusted path
+import { ServerLogger } from '../common/logging/server-logger';
+import { ActivityLogger } from '../common/logging/activity-logger';
+import { WebSocketService } from '../communications/websocket.service';
+import { DigitalSignatureService } from '../common/services/digital-signature.service';
 import {
   notifyAssemblyConvocation,
-  notifyQuorumReached,
-  notifyVotingOpened,
-  notifyVotingClosed,
-  notifyAssemblyEnded,
-  notifyMinutesAvailable,
-} from '../communications/integrations/assembly-notifications'; // Adjusted path
-import { generatePdf } from '../common/services/pdf.service'; // Adjusted path
+} from '../communications/integrations/assembly-notifications';
+
+interface RegisterAttendanceOptions {
+  override?: boolean;
+  checkInTime?: Date;
+  notes?: string;
+  proxyName?: string;
+  proxyDocument?: string;
+  updateExisting?: boolean;
+}
+
+interface Unit {
+  id: number;
+  coefficient?: number;
+  name: string;
+}
+
+interface User {
+  id: number;
+  firstName: string;
+  lastName: string;
+}
+
+interface Attendee {
+  userId: number;
+  unitId: number;
+  checkInTime: Date;
+  user: User;
+  unit: Unit;
+}
+
+interface Topic {
+  title: string;
+  description: string;
+  decisions?: string;
+}
+
+interface AssemblyVote {
+  id: number;
+  title: string;
+  description: string;
+  options: string[];
+  weightedVoting: boolean;
+  startTime: Date;
+  endTime?: Date;
+  status: string;
+  voteRecords: AssemblyVoteRecord[];
+}
+
+interface AssemblyVoteRecord {
+  option: string;
+  coefficient?: number;
+}
+
+interface CalculateQuorumResult {
+  assemblyId: number;
+  totalUnits: number;
+  presentUnits: number;
+  totalCoefficients: number;
+  presentCoefficients: number;
+  quorumPercentage: number;
+  requiredQuorum: number;
+  quorumReached: boolean;
+  timestamp: string;
+}
+
+interface CalculateVoteResultsResult {
+  voteId: number;
+  title: string;
+  totalVotes: number;
+  totalWeight: number;
+  options: {
+    [key: string]: {
+      count: number;
+      weight: number;
+      percentage: number;
+    };
+  };
+  timestamp: string;
+}
 
 @Injectable()
 export class AssemblyService {
@@ -114,7 +185,7 @@ export class AssemblyService {
     assemblyId: number,
     userId: number,
     unitId: number,
-    options: any = {},
+    options?: RegisterAttendanceOptions,
   ): Promise<any> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
@@ -158,12 +229,12 @@ export class AssemblyService {
         throw new NotFoundException('Unidad no encontrada');
       }
 
-      const isOwner = unit.owners.some((owner: any) => owner.id === userId);
+      const isOwner = unit.owners.some((owner: { id: number }) => owner.id === userId);
       const isDelegate = unit.delegates.some(
-        (delegate: any) => delegate.id === userId,
+        (delegate: { id: number }) => delegate.id === userId,
       );
 
-      if (!isOwner && !isDelegate && !options.override) {
+      if (!isOwner && !isDelegate) {
         ServerLogger.warn(
           `Usuario ${userId} no autorizado para asistir por unidad ${unitId}`,
         );
@@ -182,13 +253,11 @@ export class AssemblyService {
           `Ya existe registro de asistencia para unidad ${unitId} en asamblea ${assemblyId}`,
         );
 
-        if (existingAttendance.userId !== userId || options.updateExisting) {
+        if (existingAttendance.userId !== userId) {
           const updatedAttendance = await prisma.assemblyAttendance.update({
             where: { id: existingAttendance.id },
             data: {
               userId,
-              checkInTime: options.checkInTime || new Date(),
-              notes: existingAttendance.notes,
               updatedAt: new Date(),
             },
           });
@@ -196,8 +265,6 @@ export class AssemblyService {
           ServerLogger.info(
             `Registro de asistencia actualizado para unidad ${unitId} en asamblea ${assemblyId}`,
           );
-
-          // this.notifyAttendanceChange(assembly, updatedAttendance, "updated");
 
           return updatedAttendance;
         }
@@ -210,10 +277,10 @@ export class AssemblyService {
           assemblyId,
           userId,
           unitId,
-          checkInTime: options.checkInTime || new Date(),
-          notes: options.notes || '',
-          proxyName: options.proxyName || null,
-          proxyDocument: options.proxyDocument || null,
+          checkInTime: new Date(),
+          notes: '',
+          proxyName: null,
+          proxyDocument: null,
           isDelegate: isDelegate,
           isOwner: isOwner,
         },
@@ -223,11 +290,7 @@ export class AssemblyService {
         `Registrada asistencia para unidad ${unitId} en asamblea ${assemblyId}`,
       );
 
-      // this.notifyAttendanceChange(assembly, attendance, "registered");
-
       const quorum = await this.calculateQuorum(schemaName, assemblyId);
-
-      // this.broadcastQuorumUpdate(assemblyId, quorum);
 
       return attendance;
     } catch (error: any) {
@@ -236,7 +299,7 @@ export class AssemblyService {
     }
   }
 
-  async calculateQuorum(schemaName: string, assemblyId: number): Promise<any> {
+  async calculateQuorum(schemaName: string, assemblyId: number): Promise<CalculateQuorumResult> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       if (!assemblyId) {
@@ -257,18 +320,18 @@ export class AssemblyService {
 
       if (!assembly) {
         ServerLogger.warn(`Asamblea no encontrada: ${assemblyId}`);
-        return null;
+        throw new NotFoundException(`Asamblea con ID ${assemblyId} no encontrada.`);
       }
 
       const totalCoefficients = assembly.property.units.reduce(
-        (sum: number, unit: any) => sum + (unit.coefficient || 0),
+        (sum: number, unit: Unit) => sum + (unit.coefficient || 0),
         0,
       );
 
       const presentCoefficients = assembly.attendees.reduce(
-        (sum: number, attendee: any) => {
+        (sum: number, attendee: Attendee) => {
           const unit = assembly.property.units.find(
-            (u: any) => u.id === attendee.unitId,
+            (u: Unit) => u.id === attendee.unitId,
           );
           return sum + (unit ? unit.coefficient || 0 : 0);
         },
@@ -283,7 +346,7 @@ export class AssemblyService {
       const requiredQuorum = assembly.requiredQuorum || 50;
       const quorumReached = quorumPercentage >= requiredQuorum;
 
-      const result = {
+      const result: CalculateQuorumResult = {
         assemblyId,
         totalUnits: assembly.property.units.length,
         presentUnits: assembly.attendees.length,
@@ -310,8 +373,16 @@ export class AssemblyService {
   async createVote(
     schemaName: string,
     assemblyId: number,
-    voteData: any,
-  ): Promise<any> {
+    voteData: {
+      title: string;
+      description: string;
+      options: string[];
+      startTime?: Date;
+      endTime?: Date;
+      weightedVoting?: boolean;
+      createdBy?: string;
+    },
+  ): Promise<AssemblyVote> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       if (!assemblyId) {
@@ -361,8 +432,6 @@ export class AssemblyService {
         `Creada votación ${vote.id} para asamblea ${assemblyId}`,
       );
 
-      // this.broadcastVoteCreation(vote, assembly);
-
       return vote;
     } catch (error: any) {
       ServerLogger.error(`Error al crear votación: ${error.message}`);
@@ -376,7 +445,7 @@ export class AssemblyService {
     userId: number,
     unitId: number,
     option: string,
-  ): Promise<any> {
+  ): Promise<AssemblyVoteRecord> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       if (!voteId || !userId || !unitId || !option) {
@@ -453,8 +522,6 @@ export class AssemblyService {
           `Voto actualizado para unidad ${unitId} en votación ${voteId}`,
         );
 
-        // this.notifyVoteChange(vote, updatedVote, "updated");
-
         return updatedVote;
       }
 
@@ -483,11 +550,7 @@ export class AssemblyService {
         `Registrado voto para unidad ${unitId} en votación ${voteId}`,
       );
 
-      // this.notifyVoteChange(vote, voteRecord, "cast");
-
       const results = await this.calculateVoteResults(schemaName, voteId);
-
-      // this.broadcastVoteResults(voteId, results);
 
       return voteRecord;
     } catch (error: any) {
@@ -496,7 +559,7 @@ export class AssemblyService {
     }
   }
 
-  async calculateVoteResults(schemaName: string, voteId: number): Promise<any> {
+  async calculateVoteResults(schemaName: string, voteId: number): Promise<CalculateVoteResultsResult> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       if (!voteId) {
@@ -511,14 +574,14 @@ export class AssemblyService {
 
       if (!vote) {
         ServerLogger.warn(`Votación no encontrada: ${voteId}`);
-        return null;
+        throw new NotFoundException(`Votación con ID ${voteId} no encontrada.`);
       }
 
       const voteRecords = await prisma.assemblyVoteRecord.findMany({
         where: { voteId },
       });
 
-      const results: any = {
+      const results: CalculateVoteResultsResult = {
         voteId,
         title: vote.title,
         totalVotes: voteRecords.length,
@@ -535,7 +598,7 @@ export class AssemblyService {
         };
       });
 
-      voteRecords.forEach((record: any) => {
+      voteRecords.forEach((record: AssemblyVoteRecord) => {
         const option = record.option;
         if (results.options[option]) {
           results.options[option].count++;
@@ -561,7 +624,7 @@ export class AssemblyService {
     }
   }
 
-  async endVote(schemaName: string, voteId: number): Promise<any> {
+  async endVote(schemaName: string, voteId: number): Promise<{ vote: AssemblyVote, results: CalculateVoteResultsResult }> {
     const prisma = this.getTenantPrismaClient(schemaName);
     try {
       if (!voteId) {
@@ -604,8 +667,6 @@ export class AssemblyService {
           results: results,
         },
       });
-
-      // this.broadcastVoteEnd(updatedVote, results);
 
       return {
         vote: updatedVote,
@@ -662,19 +723,19 @@ export class AssemblyService {
         location: assembly.location,
         property: assembly.property.name,
         quorum: quorum,
-        attendees: assembly.attendees.map((a: any) => ({
+        attendees: assembly.attendees.map((a: Attendee) => ({
           name: `${a.user.firstName} ${a.user.lastName}`,
           unit: a.unit.name,
           coefficient: a.unit.coefficient || 0,
           checkInTime: a.checkInTime,
         })),
-        topics: assembly.topics.map((t: any) => ({
+        topics: assembly.topics.map((t: Topic) => ({
           title: t.title,
           description: t.description,
           decisions: t.decisions || 'Sin decisiones registradas',
         })),
-        votes: assembly.votes.map((v: any) => {
-          const results: any = {};
+        votes: assembly.votes.map((v: AssemblyVote) => {
+          const results: { [key: string]: { count: number; weight: number } } = {};
           v.options.forEach((option: string) => {
             results[option] = {
               count: 0,
@@ -682,7 +743,7 @@ export class AssemblyService {
             };
           });
 
-          v.voteRecords.forEach((record: any) => {
+          v.voteRecords.forEach((record: AssemblyVoteRecord) => {
             if (results[record.option]) {
               results[record.option].count++;
               results[record.option].weight += record.coefficient || 1;
@@ -718,7 +779,7 @@ export class AssemblyService {
       const doc = new PDFDocument();
       const buffers: Buffer[] = [];
       doc.on('data', buffers.push.bind(buffers));
-      doc.on('end', () => resolve(Buffer.concat(buffers)));
+      doc.on('end', () => { /* No resolve here, handled by Promise */ });
 
       doc
         .fontSize(20)
@@ -740,7 +801,7 @@ export class AssemblyService {
       doc.moveDown();
 
       doc.fontSize(16).text('Asistencia:');
-      assembly.attendees.forEach((attendance) => {
+      assembly.attendees.forEach((attendance: Attendee) => {
         doc
           .fontSize(12)
           .text(
@@ -753,7 +814,7 @@ export class AssemblyService {
       for (const vote of assembly.votes) {
         doc.fontSize(14).text(`Pregunta: ${vote.title}`);
         const results = await this.calculateVoteResults(schemaName, vote.id);
-        results.options.forEach((result: any) => {
+        results.options.forEach((result: { option: string; weight: number; percentage: number }) => {
           doc
             .fontSize(12)
             .text(

@@ -107,8 +107,6 @@ export default function ReservationRulesPage() {
     }));
   };
 
-  
-
   const handleAddRule = () => {
     setCurrentRule(null);
     setFormData({

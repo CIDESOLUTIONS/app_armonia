@@ -20,7 +20,13 @@ export interface FeeDto {
   type: "ORDINARY" | "EXTRAORDINARY" | "FINE";
 }
 
-export async function getFees(filters?: { residentId?: number; type?: "ORDINARY" | "EXTRAORDINARY" | "FINE" }, tenantId?: string): Promise<FeeDto[]> {
+export async function getFees(
+  filters?: {
+    residentId?: number;
+    type?: "ORDINARY" | "EXTRAORDINARY" | "FINE";
+  },
+  tenantId?: string,
+): Promise<FeeDto[]> {
   const prisma = getPrisma(tenantId);
   const where: any = {};
 
@@ -52,7 +58,11 @@ export const deleteFee = async (id: number, tenantId: string) => {
 export const initiatePayment = async (feeId: number, tenantId: string) => {
   // Placeholder for payment initiation logic
   console.log(`Initiating payment for fee ${feeId} in tenant ${tenantId}`);
-  return { success: true, message: "Payment initiated successfully", paymentUrl: "https://example.com/payment" };
+  return {
+    success: true,
+    message: "Payment initiated successfully",
+    paymentUrl: "https://example.com/payment",
+  };
 };
 
 export const generateOrdinaryFees = async (tenantId: string) => {

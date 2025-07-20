@@ -21,6 +21,8 @@ import {
   createVote,
   getVotingResults,
   AssemblyVoteDto,
+  Assembly,
+  VoteResult,
 } from "@/services/assemblyService";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,7 +33,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Table,
@@ -54,13 +55,6 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const voteSchema = z.object({
   title: z.string().min(5, "El título debe tener al menos 5 caracteres."),
@@ -80,13 +74,13 @@ export default function AssemblyVotesPage() {
   const params = useParams();
   const assemblyId = params.id ? parseInt(params.id as string) : null;
 
-  const [assembly, setAssembly] = useState<any>(null);
+  const [assembly, setAssembly] = useState<Assembly | null>(null);
   const [votes, setVotes] = useState<AssemblyVoteDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentVote, setCurrentVote] = useState<AssemblyVoteDto | null>(null);
   const [isResultsModalOpen, setIsResultsModalOpen] = useState(false);
-  const [voteResults, setVoteResults] = useState<any>(null);
+  const [voteResults, setVoteResults] = useState<VoteResult | null>(null);
 
   const form = useForm<z.infer<typeof voteSchema>>({
     resolver: zodResolver(voteSchema),
@@ -121,7 +115,10 @@ export default function AssemblyVotesPage() {
         router.push("/complex-admin/assemblies");
         return;
       }
-      const fetchedAssembly = await getAssemblyById(assemblyId);
+      const fetchedAssembly = await getAssemblyById(
+        assemblyId,
+        user?.complexId || "",
+      );
       setAssembly(fetchedAssembly);
       // Assuming assembly object includes votes
       setVotes(fetchedAssembly.votes || []);
@@ -137,7 +134,7 @@ export default function AssemblyVotesPage() {
     } finally {
       setLoading(false);
     }
-  }, [assemblyId, router, toast]);
+  }, [assemblyId, router, toast, user?.complexId]);
 
   useEffect(() => {
     if (!authLoading && user && assemblyId) {
@@ -161,7 +158,7 @@ export default function AssemblyVotesPage() {
     reset({
       title: vote.title,
       description: vote.description,
-      options: vote.options,
+      options: vote.options.map((opt) => opt.text), // Map options to string array
       weightedVoting: vote.weightedVoting,
     });
     setIsModalOpen(true);
@@ -169,7 +166,7 @@ export default function AssemblyVotesPage() {
 
   const onSubmit = async (data: z.infer<typeof voteSchema>) => {
     try {
-      if (!assemblyId) return;
+      if (!assemblyId || !user?.complexId) return;
 
       if (currentVote) {
         // await updateVote(currentVote.id, data); // Need updateVote in assemblyService
@@ -178,7 +175,7 @@ export default function AssemblyVotesPage() {
           description: "Votación actualizada correctamente.",
         });
       } else {
-        await createVote(assemblyId, data);
+        await createVote({ ...data, assemblyId }, user.complexId);
         toast({
           title: "Éxito",
           description: "Votación creada correctamente.",
@@ -197,8 +194,9 @@ export default function AssemblyVotesPage() {
   };
 
   const handleViewResults = async (voteId: number) => {
+    if (!user?.complexId) return;
     try {
-      const results = await getVotingResults(voteId);
+      const results = await getVotingResults(voteId, user.complexId);
       setVoteResults(results);
       setIsResultsModalOpen(true);
     } catch (error: Error) {
@@ -438,14 +436,24 @@ export default function AssemblyVotesPage() {
             <div className="space-y-4 py-4">
               <p>Total de Votos: {voteResults.totalVotes}</p>
               <p>Peso Total de Votos: {voteResults.totalWeight.toFixed(2)}</p>
-              {Object.entries(voteResults.options).map(
-                ([option, data]: [string, any]) => (
+              {Object.entries(voteResults.results).map(
+                ([option, data]: [
+                  string,
+                  { count: number; totalWeight: number },
+                ]) => (
                   <Card key={option}>
                     <CardContent className="p-4">
                       <p className="font-semibold">{option}</p>
                       <p>Votos: {data.count}</p>
-                      <p>Peso: {data.weight.toFixed(2)}</p>
-                      <p>Porcentaje: {data.percentage.toFixed(2)}%</p>
+                      <p>Peso: {data.totalWeight.toFixed(2)}</p>
+                      {/* Assuming percentage is not directly in data, calculate from totalVotes/totalWeight */}
+                      <p>
+                        Porcentaje:
+                        {((data.count / voteResults.totalVotes) * 100).toFixed(
+                          2,
+                        )}
+                        %
+                      </p>
                     </CardContent>
                   </Card>
                 ),

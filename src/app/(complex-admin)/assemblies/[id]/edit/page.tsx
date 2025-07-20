@@ -39,7 +39,6 @@ export default function EditAssemblyPage() {
   const params = useParams();
   const assemblyId = params.id ? parseInt(params.id as string) : null;
 
-  
   const [pageLoading, setPageLoading] = useState(true); // Renamed to avoid conflict
 
   const form = useForm<AssemblyFormValues>({

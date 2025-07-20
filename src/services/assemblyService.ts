@@ -213,7 +213,12 @@ export const registerAttendance = async (
   tenantId: string,
 ): Promise<any> => {
   const prisma = getPrisma(tenantId);
-  console.log("Registering attendance for assembly:", assemblyId, userId, present);
+  console.log(
+    "Registering attendance for assembly:",
+    assemblyId,
+    userId,
+    present,
+  );
   // Simulated data for demonstration
   return { message: "Attendance registered successfully" };
 };
@@ -303,9 +308,7 @@ export const createAssembly = async (
   };
 };
 
-export const getAssemblies = async (
-  tenantId: string,
-): Promise<Assembly[]> => {
+export const getAssemblies = async (tenantId: string): Promise<Assembly[]> => {
   const prisma = getPrisma(tenantId);
   console.log("Getting assemblies for tenant:", tenantId);
   // Simulated data for demonstration
@@ -346,4 +349,3 @@ export const deleteAssembly = async (
   // Simulated data for demonstration
   return { message: "Assembly deleted successfully" };
 };
-

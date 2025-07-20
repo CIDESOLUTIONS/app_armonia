@@ -182,14 +182,15 @@ export default function ReceptionVisitorsPage() {
       setLoading(true);
       setError(null);
 
-      const [fetchedVisitors, preRegistered, fetchedPackages] = await Promise.all([
-        // Assuming getVisitors, getPreRegisteredVisitors, and getPackages are implemented in their respective services
-        // and return the correct data types.
-        // If not, these lines will need to be adjusted or mocked.
-        getVisitors(),
-        getPreRegisteredVisitors(),
-        getPackages(),
-      ]);
+      const [fetchedVisitors, preRegistered, fetchedPackages] =
+        await Promise.all([
+          // Assuming getVisitors, getPreRegisteredVisitors, and getPackages are implemented in their respective services
+          // and return the correct data types.
+          // If not, these lines will need to be adjusted or mocked.
+          getVisitors(),
+          getPreRegisteredVisitors(),
+          getPackages(),
+        ]);
 
       setVisitors(fetchedVisitors);
       setPreRegisteredVisitors(preRegistered);

@@ -124,7 +124,8 @@ export function ListingCard({ listing }: ListingCardProps) {
       console.error("Error creating/fetching conversation:", error);
       toast({
         title: "Error",
-        description: "No se pudo iniciar la conversación con el vendedor: " +
+        description:
+          "No se pudo iniciar la conversación con el vendedor: " +
           error.message,
         variant: "destructive",
       });
