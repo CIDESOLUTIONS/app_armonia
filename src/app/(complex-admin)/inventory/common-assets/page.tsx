@@ -20,10 +20,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Textarea } from "@/components/ui/textarea";
 import {
   getCommonAssets,
   createCommonAsset,
@@ -32,8 +32,18 @@ import {
 } from "@/services/commonAssetService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { commonAssetSchema, CommonAssetFormValues } from "@/validators/common-asset-schema";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  commonAssetSchema,
+  CommonAssetFormValues,
+} from "@/validators/common-asset-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface CommonAsset {
@@ -155,7 +165,9 @@ export default function CommonAssetsPage() {
   };
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [commonAssetToDelete, setCommonAssetToDelete] = useState<number | null>(null);
+  const [commonAssetToDelete, setCommonAssetToDelete] = useState<number | null>(
+    null,
+  );
 
   const handleDeleteCommonAsset = (id: number) => {
     setCommonAssetToDelete(id);
@@ -344,7 +356,9 @@ export default function CommonAssetsPage() {
                 name="purchaseDate"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Fecha de Compra</FormLabel>
+                    <FormLabel className="text-right">
+                      Fecha de Compra
+                    </FormLabel>
                     <FormControl>
                       <Input type="date" className="col-span-3" {...field} />
                     </FormControl>

@@ -35,15 +35,23 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { surveySchema, SurveyFormValues, questionSchema, QuestionFormValues, optionSchema, OptionFormValues } from "@/validators/survey-schema";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  surveySchema,
+  SurveyFormValues,
+  questionSchema,
+  QuestionFormValues,
+  optionSchema,
+  OptionFormValues,
+} from "@/validators/survey-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 interface Survey {
   id: string;
@@ -88,7 +96,11 @@ export default function SurveysPage() {
     },
   });
 
-  const { fields: questionFields, append: appendQuestion, remove: removeQuestion } = useFieldArray({
+  const {
+    fields: questionFields,
+    append: appendQuestion,
+    remove: removeQuestion,
+  } = useFieldArray({
     control: form.control,
     name: "questions",
   });
@@ -364,7 +376,10 @@ export default function SurveysPage() {
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={handleSubmit(handleSubmitSurvey)} className="space-y-4 py-4">
+            <form
+              onSubmit={handleSubmit(handleSubmitSurvey)}
+              className="space-y-4 py-4"
+            >
               <FormField
                 control={control}
                 name="title"
@@ -372,7 +387,11 @@ export default function SurveysPage() {
                   <FormItem>
                     <Label htmlFor="surveyTitle">Título</Label>
                     <FormControl>
-                      <Input id="surveyTitle" placeholder="Título de la encuesta o votación" {...field} />
+                      <Input
+                        id="surveyTitle"
+                        placeholder="Título de la encuesta o votación"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -385,7 +404,11 @@ export default function SurveysPage() {
                   <FormItem>
                     <Label htmlFor="surveyDescription">Descripción</Label>
                     <FormControl>
-                      <Textarea id="surveyDescription" placeholder="Descripción detallada" {...field} />
+                      <Textarea
+                        id="surveyDescription"
+                        placeholder="Descripción detallada"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -399,7 +422,11 @@ export default function SurveysPage() {
                     <FormItem>
                       <Label htmlFor="startDate">Fecha de Inicio</Label>
                       <FormControl>
-                        <Input id="startDate" type="datetime-local" {...field} />
+                        <Input
+                          id="startDate"
+                          type="datetime-local"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -425,7 +452,10 @@ export default function SurveysPage() {
                 render={({ field }) => (
                   <FormItem>
                     <Label htmlFor="status">Estado</Label>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecciona un estado" />
@@ -510,7 +540,9 @@ export default function SurveysPage() {
                   {isSubmitting ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : null}{" "}
-                  {currentSurvey ? "Guardar Cambios" : "Crear Encuesta/Votación"}
+                  {currentSurvey
+                    ? "Guardar Cambios"
+                    : "Crear Encuesta/Votación"}
                 </Button>
               </DialogFooter>
             </form>

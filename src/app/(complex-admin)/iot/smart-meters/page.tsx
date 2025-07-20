@@ -35,7 +35,8 @@ export default function SmartMetersPage() {
       await recordSmartMeterReading(readingForm);
       toast({
         title: "Lectura Registrada",
-        description: "Lectura del medidor inteligente registrada correctamente.",
+        description:
+          "Lectura del medidor inteligente registrada correctamente.",
       });
       setReadingForm({
         meterId: "",
@@ -66,7 +67,10 @@ export default function SmartMetersPage() {
     }
     setLoading(true);
     try {
-      await triggerAutomatedBilling({ ...billingForm, complexId: user.complexId });
+      await triggerAutomatedBilling({
+        ...billingForm,
+        complexId: user.complexId,
+      });
       toast({
         title: "Facturación Iniciada",
         description: "Facturación automatizada iniciada correctamente.",
@@ -127,7 +131,9 @@ export default function SmartMetersPage() {
               id="meterId"
               name="meterId"
               value={readingForm.meterId}
-              onChange={(e) => setReadingForm({ ...readingForm, meterId: e.target.value })}
+              onChange={(e) =>
+                setReadingForm({ ...readingForm, meterId: e.target.value })
+              }
               placeholder="Ej: MED001"
             />
           </div>
@@ -138,7 +144,12 @@ export default function SmartMetersPage() {
               name="propertyId"
               type="number"
               value={readingForm.propertyId}
-              onChange={(e) => setReadingForm({ ...readingForm, propertyId: parseInt(e.target.value) })}
+              onChange={(e) =>
+                setReadingForm({
+                  ...readingForm,
+                  propertyId: parseInt(e.target.value),
+                })
+              }
               placeholder="Ej: 1"
             />
           </div>
@@ -149,7 +160,12 @@ export default function SmartMetersPage() {
               name="reading"
               type="number"
               value={readingForm.reading}
-              onChange={(e) => setReadingForm({ ...readingForm, reading: parseFloat(e.target.value) })}
+              onChange={(e) =>
+                setReadingForm({
+                  ...readingForm,
+                  reading: parseFloat(e.target.value),
+                })
+              }
               placeholder="Ej: 123.45"
             />
           </div>
@@ -159,7 +175,9 @@ export default function SmartMetersPage() {
               id="unit"
               name="unit"
               value={readingForm.unit}
-              onChange={(e) => setReadingForm({ ...readingForm, unit: e.target.value })}
+              onChange={(e) =>
+                setReadingForm({ ...readingForm, unit: e.target.value })
+              }
               placeholder="Ej: kWh, m3"
             />
           </div>
@@ -175,13 +193,20 @@ export default function SmartMetersPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="billingPeriodStart">Inicio Período Facturación</Label>
+            <Label htmlFor="billingPeriodStart">
+              Inicio Período Facturación
+            </Label>
             <Input
               id="billingPeriodStart"
               name="billingPeriodStart"
               type="date"
               value={billingForm.billingPeriodStart}
-              onChange={(e) => setBillingForm({ ...billingForm, billingPeriodStart: e.target.value })}
+              onChange={(e) =>
+                setBillingForm({
+                  ...billingForm,
+                  billingPeriodStart: e.target.value,
+                })
+              }
             />
           </div>
           <div>
@@ -191,7 +216,12 @@ export default function SmartMetersPage() {
               name="billingPeriodEnd"
               type="date"
               value={billingForm.billingPeriodEnd}
-              onChange={(e) => setBillingForm({ ...billingForm, billingPeriodEnd: e.target.value })}
+              onChange={(e) =>
+                setBillingForm({
+                  ...billingForm,
+                  billingPeriodEnd: e.target.value,
+                })
+              }
             />
           </div>
           <Button onClick={handleTriggerBilling} disabled={loading}>

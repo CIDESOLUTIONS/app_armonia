@@ -33,8 +33,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { communityEventSchema, CommunityEventFormValues } from "@/validators/community-event-schema";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  communityEventSchema,
+  CommunityEventFormValues,
+} from "@/validators/community-event-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 interface CommunityEvent {
   id: number;
@@ -151,25 +161,30 @@ export default function CommunityEventsPage() {
     }
   };
 
-  const handleDeleteEvent = async (id: number) => {
-    if (
-      confirm("¿Estás seguro de que quieres eliminar este evento comunitario?")
-    ) {
-      try {
-        await deleteCommunityEvent(id);
-        toast({
-          title: "Éxito",
-          description: "Evento comunitario eliminado correctamente.",
-        });
-        fetchEvents();
-      } catch (error) {
-        console.error("Error deleting community event:", error);
-        toast({
-          title: "Error",
-          description: "Error al eliminar el evento comunitario.",
-          variant: "destructive",
-        });
-      }
+  const handleDeleteEvent = (id: number) => {
+    setEventToDelete(id);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteEvent = async () => {
+    if (eventToDelete === null) return;
+    try {
+      await deleteCommunityEvent(eventToDelete);
+      toast({
+        title: "Éxito",
+        description: "Evento comunitario eliminado correctamente.",
+      });
+      fetchEvents();
+    } catch (error) {
+      console.error("Error deleting community event:", error);
+      toast({
+        title: "Error",
+        description: "Error al eliminar el evento comunitario.",
+        variant: "destructive",
+      });
+    } finally {
+      setShowDeleteDialog(false);
+      setEventToDelete(null);
     }
   };
 
@@ -287,7 +302,12 @@ export default function CommunityEventsPage() {
                   <FormItem className="grid grid-cols-4 items-center gap-4">
                     <FormLabel className="text-right">Título</FormLabel>
                     <FormControl>
-                      <Input id="title" {...field} className="col-span-3" required />
+                      <Input
+                        id="title"
+                        {...field}
+                        className="col-span-3"
+                        required
+                      />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
@@ -300,7 +320,12 @@ export default function CommunityEventsPage() {
                   <FormItem className="grid grid-cols-4 items-center gap-4">
                     <FormLabel className="text-right">Descripción</FormLabel>
                     <FormControl>
-                      <Textarea id="description" {...field} className="col-span-3" rows={5} />
+                      <Textarea
+                        id="description"
+                        {...field}
+                        className="col-span-3"
+                        rows={5}
+                      />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
@@ -311,9 +336,17 @@ export default function CommunityEventsPage() {
                 name="startDateTime"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Fecha y Hora de Inicio</FormLabel>
+                    <FormLabel className="text-right">
+                      Fecha y Hora de Inicio
+                    </FormLabel>
                     <FormControl>
-                      <Input id="startDateTime" type="datetime-local" {...field} className="col-span-3" required />
+                      <Input
+                        id="startDateTime"
+                        type="datetime-local"
+                        {...field}
+                        className="col-span-3"
+                        required
+                      />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
@@ -324,9 +357,17 @@ export default function CommunityEventsPage() {
                 name="endDateTime"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Fecha y Hora de Fin</FormLabel>
+                    <FormLabel className="text-right">
+                      Fecha y Hora de Fin
+                    </FormLabel>
                     <FormControl>
-                      <Input id="endDateTime" type="datetime-local" {...field} className="col-span-3" required />
+                      <Input
+                        id="endDateTime"
+                        type="datetime-local"
+                        {...field}
+                        className="col-span-3"
+                        required
+                      />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
@@ -339,7 +380,12 @@ export default function CommunityEventsPage() {
                   <FormItem className="grid grid-cols-4 items-center gap-4">
                     <FormLabel className="text-right">Ubicación</FormLabel>
                     <FormControl>
-                      <Input id="location" {...field} className="col-span-3" required />
+                      <Input
+                        id="location"
+                        {...field}
+                        className="col-span-3"
+                        required
+                      />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
@@ -351,7 +397,10 @@ export default function CommunityEventsPage() {
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
                     <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel>Público</FormLabel>
@@ -378,8 +427,8 @@ export default function CommunityEventsPage() {
           <DialogHeader>
             <DialogTitle>Confirmar Eliminación</DialogTitle>
             <DialogDescription>
-              ¿Estás seguro de que quieres eliminar este evento comunitario? Esta acción
-              no se puede deshacer.
+              ¿Estás seguro de que quieres eliminar este evento comunitario?
+              Esta acción no se puede deshacer.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

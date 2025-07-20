@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
@@ -56,7 +60,10 @@ export class FinancesService {
     return fee;
   }
 
-  async getFees(schemaName: string, filters: FeeFilterParamsDto): Promise<{ data: FeeDto[]; total: number }> {
+  async getFees(
+    schemaName: string,
+    filters: FeeFilterParamsDto,
+  ): Promise<{ data: FeeDto[]; total: number }> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const where: any = {};
     if (filters.status) where.status = filters.status;
@@ -86,7 +93,11 @@ export class FinancesService {
     return fee;
   }
 
-  async updateFee(schemaName: string, id: number, data: UpdateFeeDto): Promise<FeeDto> {
+  async updateFee(
+    schemaName: string,
+    id: number,
+    data: UpdateFeeDto,
+  ): Promise<FeeDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const fee = await prisma.fee.findUnique({ where: { id } });
     if (!fee) {
@@ -105,7 +116,10 @@ export class FinancesService {
   }
 
   // Payments
-  async createPayment(schemaName: string, data: CreatePaymentDto): Promise<PaymentDto> {
+  async createPayment(
+    schemaName: string,
+    data: CreatePaymentDto,
+  ): Promise<PaymentDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const payment = await prisma.payment.create({ data });
 
@@ -119,7 +133,10 @@ export class FinancesService {
     return payment;
   }
 
-  async getPayments(schemaName: string, filters: PaymentFilterParamsDto): Promise<{ data: PaymentDto[]; total: number }> {
+  async getPayments(
+    schemaName: string,
+    filters: PaymentFilterParamsDto,
+  ): Promise<{ data: PaymentDto[]; total: number }> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const where: any = {};
     if (filters.status) where.status = filters.status;
@@ -148,7 +165,11 @@ export class FinancesService {
     return payment;
   }
 
-  async updatePayment(schemaName: string, id: number, data: UpdatePaymentDto): Promise<PaymentDto> {
+  async updatePayment(
+    schemaName: string,
+    id: number,
+    data: UpdatePaymentDto,
+  ): Promise<PaymentDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const payment = await prisma.payment.findUnique({ where: { id } });
     if (!payment) {
@@ -157,7 +178,10 @@ export class FinancesService {
     const updatedPayment = await prisma.payment.update({ where: { id }, data });
 
     // Update fee status if payment is completed
-    if (updatedPayment.status === PaymentStatus.COMPLETED && updatedPayment.feeId) {
+    if (
+      updatedPayment.status === PaymentStatus.COMPLETED &&
+      updatedPayment.feeId
+    ) {
       await prisma.fee.update({
         where: { id: updatedPayment.feeId },
         data: { status: FeeStatus.PAID },
@@ -176,12 +200,18 @@ export class FinancesService {
   }
 
   // Budgets
-  async createBudget(schemaName: string, data: CreateBudgetDto): Promise<BudgetDto> {
+  async createBudget(
+    schemaName: string,
+    data: CreateBudgetDto,
+  ): Promise<BudgetDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     return prisma.budget.create({ data });
   }
 
-  async getBudgets(schemaName: string, filters: BudgetFilterParamsDto): Promise<{ data: BudgetDto[]; total: number }> {
+  async getBudgets(
+    schemaName: string,
+    filters: BudgetFilterParamsDto,
+  ): Promise<{ data: BudgetDto[]; total: number }> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const where: any = {};
     if (filters.year) where.year = filters.year;
@@ -203,14 +233,21 @@ export class FinancesService {
 
   async getBudgetById(schemaName: string, id: number): Promise<BudgetDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    const budget = await prisma.budget.findUnique({ where: { id }, include: { items: true } });
+    const budget = await prisma.budget.findUnique({
+      where: { id },
+      include: { items: true },
+    });
     if (!budget) {
       throw new NotFoundException(`Presupuesto con ID ${id} no encontrado.`);
     }
     return budget;
   }
 
-  async updateBudget(schemaName: string, id: number, data: UpdateBudgetDto): Promise<BudgetDto> {
+  async updateBudget(
+    schemaName: string,
+    id: number,
+    data: UpdateBudgetDto,
+  ): Promise<BudgetDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const budget = await prisma.budget.findUnique({ where: { id } });
     if (!budget) {
@@ -228,28 +265,44 @@ export class FinancesService {
     await prisma.budget.delete({ where: { id } });
   }
 
-  async approveBudget(schemaName: string, id: number, approvedById: number): Promise<BudgetDto> {
+  async approveBudget(
+    schemaName: string,
+    id: number,
+    approvedById: number,
+  ): Promise<BudgetDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const budget = await prisma.budget.findUnique({ where: { id } });
     if (!budget) {
       throw new NotFoundException(`Presupuesto con ID ${id} no encontrado.`);
     }
     if (budget.status !== BudgetStatus.DRAFT) {
-      throw new BadRequestException(`El presupuesto no está en estado BORRADOR y no puede ser aprobado.`);
+      throw new BadRequestException(
+        `El presupuesto no está en estado BORRADOR y no puede ser aprobado.`,
+      );
     }
     return prisma.budget.update({
       where: { id },
-      data: { status: BudgetStatus.APPROVED, approvedById, approvedAt: new Date() },
+      data: {
+        status: BudgetStatus.APPROVED,
+        approvedById,
+        approvedAt: new Date(),
+      },
     });
   }
 
   // Expenses
-  async createExpense(schemaName: string, data: CreateExpenseDto): Promise<ExpenseDto> {
+  async createExpense(
+    schemaName: string,
+    data: CreateExpenseDto,
+  ): Promise<ExpenseDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     return prisma.expense.create({ data });
   }
 
-  async getExpenses(schemaName: string, filters: ExpenseFilterParamsDto): Promise<{ data: ExpenseDto[]; total: number }> {
+  async getExpenses(
+    schemaName: string,
+    filters: ExpenseFilterParamsDto,
+  ): Promise<{ data: ExpenseDto[]; total: number }> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const where: any = {};
     if (filters.status) where.status = filters.status;
@@ -277,7 +330,11 @@ export class FinancesService {
     return expense;
   }
 
-  async updateExpense(schemaName: string, id: number, data: UpdateExpenseDto): Promise<ExpenseDto> {
+  async updateExpense(
+    schemaName: string,
+    id: number,
+    data: UpdateExpenseDto,
+  ): Promise<ExpenseDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const expense = await prisma.expense.findUnique({ where: { id } });
     if (!expense) {
@@ -306,14 +363,17 @@ export class FinancesService {
       where: { status: ExpenseStatus.PAID },
     });
 
-    const currentBalance = (totalIncome._sum.amount || 0) - (totalExpenses._sum.amount || 0);
+    const currentBalance =
+      (totalIncome._sum.amount || 0) - (totalExpenses._sum.amount || 0);
 
     // For simplicity, monthly changes are hardcoded or calculated based on recent data
     const monthlyIncome = await prisma.payment.aggregate({
       _sum: { amount: true },
       where: {
         status: PaymentStatus.COMPLETED,
-        paymentDate: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) },
+        paymentDate: {
+          gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+        },
       },
     });
 
@@ -321,7 +381,9 @@ export class FinancesService {
       _sum: { amount: true },
       where: {
         status: ExpenseStatus.PAID,
-        date: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) },
+        date: {
+          gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+        },
       },
     });
 
@@ -381,7 +443,11 @@ export class FinancesService {
     return transactions.slice(0, 5);
   }
 
-  async initiatePayment(schemaName: string, feeId: number, userId: number): Promise<string> {
+  async initiatePayment(
+    schemaName: string,
+    feeId: number,
+    userId: number,
+  ): Promise<string> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const fee = await prisma.fee.findUnique({ where: { id: feeId } });
 
@@ -390,7 +456,9 @@ export class FinancesService {
     }
 
     if (fee.status !== FeeStatus.PENDING) {
-      throw new BadRequestException(`La cuota ${feeId} no está pendiente de pago.`);
+      throw new BadRequestException(
+        `La cuota ${feeId} no está pendiente de pago.`,
+      );
     }
 
     // Simulate payment initiation with a payment gateway
@@ -417,7 +485,7 @@ export class FinancesService {
       await this.communicationsService.notifyUser(schemaName, user.id, {
         type: NotificationType.INFO,
         title: 'Pago Iniciado',
-        message: `Se ha iniciado el pago de tu cuota ${fee.title}. Por favor, completa la transacción.`, 
+        message: `Se ha iniciado el pago de tu cuota ${fee.title}. Por favor, completa la transacción.`,
         link: simulatedPaymentUrl,
         sourceType: NotificationSourceType.PAYMENT,
         sourceId: fee.id.toString(),
@@ -427,12 +495,20 @@ export class FinancesService {
     return simulatedPaymentUrl;
   }
 
-  async handlePaymentWebhook(schemaName: string, transactionId: string, status: PaymentStatus): Promise<PaymentDto> {
+  async handlePaymentWebhook(
+    schemaName: string,
+    transactionId: string,
+    status: PaymentStatus,
+  ): Promise<PaymentDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    const payment = await prisma.payment.findUnique({ where: { transactionId } });
+    const payment = await prisma.payment.findUnique({
+      where: { transactionId },
+    });
 
     if (!payment) {
-      throw new NotFoundException(`Transacción ${transactionId} no encontrada.`);
+      throw new NotFoundException(
+        `Transacción ${transactionId} no encontrada.`,
+      );
     }
 
     if (payment.status === PaymentStatus.COMPLETED) {
@@ -445,19 +521,24 @@ export class FinancesService {
     });
 
     // Update fee status if payment is completed
-    if (updatedPayment.status === PaymentStatus.COMPLETED && updatedPayment.feeId) {
+    if (
+      updatedPayment.status === PaymentStatus.COMPLETED &&
+      updatedPayment.feeId
+    ) {
       await prisma.fee.update({
         where: { id: updatedPayment.feeId },
         data: { status: FeeStatus.PAID },
       });
 
       // Notify user about successful payment
-      const user = await prisma.user.findUnique({ where: { id: updatedPayment.userId } });
+      const user = await prisma.user.findUnique({
+        where: { id: updatedPayment.userId },
+      });
       if (user) {
         await this.communicationsService.notifyUser(schemaName, user.id, {
           type: NotificationType.SUCCESS,
           title: 'Pago Confirmado',
-          message: `Tu pago de ${updatedPayment.amount} para la cuota ${updatedPayment.feeId} ha sido confirmado.`, 
+          message: `Tu pago de ${updatedPayment.amount} para la cuota ${updatedPayment.feeId} ha sido confirmado.`,
           link: `/resident/finances/payments/${updatedPayment.id}`,
           sourceType: NotificationSourceType.PAYMENT,
           sourceId: updatedPayment.id.toString(),

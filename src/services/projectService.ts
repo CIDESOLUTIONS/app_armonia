@@ -82,7 +82,10 @@ export async function createProject(data: CreateProjectData): Promise<Project> {
   }
 }
 
-export async function updateProject(id: number, data: UpdateProjectData): Promise<Project> {
+export async function updateProject(
+  id: number,
+  data: UpdateProjectData,
+): Promise<Project> {
   try {
     const response = await fetchApi(`/projects/${id}`, {
       method: "PUT",
@@ -106,7 +109,9 @@ export async function deleteProject(id: number): Promise<void> {
   }
 }
 
-export async function getResidentProjects(residentId: number): Promise<Project[]> {
+export async function getResidentProjects(
+  residentId: number,
+): Promise<Project[]> {
   try {
     const response = await fetchApi(`/projects/resident/${residentId}`);
     return response.data; // Assuming the API returns { data: Project[] }

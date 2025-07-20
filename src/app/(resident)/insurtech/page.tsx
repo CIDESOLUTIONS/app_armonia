@@ -8,7 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getInsuranceQuote, registerPolicy, InsuranceQuote, Policy } from "@/services/insurtechService";
+import {
+  getInsuranceQuote,
+  registerPolicy,
+  InsuranceQuote,
+  Policy,
+} from "@/services/insurtechService";
 
 export default function InsurtechPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -90,7 +95,9 @@ export default function InsurtechPage() {
               id="propertyType"
               name="propertyType"
               value={quoteData.propertyType || ""}
-              onChange={(e) => setQuoteData({ ...quoteData, propertyType: e.target.value })}
+              onChange={(e) =>
+                setQuoteData({ ...quoteData, propertyType: e.target.value })
+              }
               placeholder="Ej: Apartamento, Casa"
             />
           </div>
@@ -101,7 +108,12 @@ export default function InsurtechPage() {
               name="coverageAmount"
               type="number"
               value={quoteData.coverageAmount || ""}
-              onChange={(e) => setQuoteData({ ...quoteData, coverageAmount: parseFloat(e.target.value) })}
+              onChange={(e) =>
+                setQuoteData({
+                  ...quoteData,
+                  coverageAmount: parseFloat(e.target.value),
+                })
+              }
               placeholder="Ej: 100000"
             />
           </div>
@@ -112,7 +124,8 @@ export default function InsurtechPage() {
             <Alert>
               <AlertTitle>Cotización:</AlertTitle>
               <AlertDescription>
-                Proveedor: {quoteResult.provider}, Prima: {quoteResult.premium} {quoteResult.currency}, Cobertura: {quoteResult.coverage}
+                Proveedor: {quoteResult.provider}, Prima: {quoteResult.premium}{" "}
+                {quoteResult.currency}, Cobertura: {quoteResult.coverage}
               </AlertDescription>
             </Alert>
           )}
@@ -130,7 +143,9 @@ export default function InsurtechPage() {
               id="policyNumber"
               name="policyNumber"
               value={policyData.policyNumber || ""}
-              onChange={(e) => setPolicyData({ ...policyData, policyNumber: e.target.value })}
+              onChange={(e) =>
+                setPolicyData({ ...policyData, policyNumber: e.target.value })
+              }
               placeholder="Ej: POL123456"
             />
           </div>
@@ -140,7 +155,9 @@ export default function InsurtechPage() {
               id="policyProvider"
               name="policyProvider"
               value={policyData.policyProvider || ""}
-              onChange={(e) => setPolicyData({ ...policyData, policyProvider: e.target.value })}
+              onChange={(e) =>
+                setPolicyData({ ...policyData, policyProvider: e.target.value })
+              }
               placeholder="Ej: Seguros XYZ"
             />
           </div>
@@ -151,7 +168,9 @@ export default function InsurtechPage() {
             <Alert>
               <AlertTitle>Póliza Registrada:</AlertTitle>
               <AlertDescription>
-                ID: {policyResult.policyId}, Estado: {policyResult.status}, Inicio: {new Date(policyResult.startDate).toLocaleDateString()}, Fin: {new Date(policyResult.endDate).toLocaleDateString()}
+                ID: {policyResult.policyId}, Estado: {policyResult.status},
+                Inicio: {new Date(policyResult.startDate).toLocaleDateString()},
+                Fin: {new Date(policyResult.endDate).toLocaleDateString()}
               </AlertDescription>
             </Alert>
           )}

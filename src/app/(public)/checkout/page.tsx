@@ -107,7 +107,7 @@ export default function Checkout() {
   const t = language === "Español" ? texts.es : texts.en;
 
   // Función para verificar el estado del pago usando la API
-  const _verifyPayment = async (txId: string) => {
+  const verifyPayment = async (txId: string) => {
     try {
       // Simulación de verificación de pago
       await new Promise((resolve) => setTimeout(resolve, 1000));

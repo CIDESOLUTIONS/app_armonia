@@ -109,7 +109,7 @@ export default function ViewResidentPQRPage() {
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
-  };
+  }
 
   if (!user) {
     return null; // Redirect handled by AuthLayout
@@ -193,14 +193,22 @@ export default function ViewResidentPQRPage() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {pqr.attachments.map((attachment) => (
-                <div key={attachment.id} className="border rounded-md p-3 flex items-center justify-between">
+                <div
+                  key={attachment.id}
+                  className="border rounded-md p-3 flex items-center justify-between"
+                >
                   <div className="flex items-center">
                     <FileText className="mr-2 h-5 w-5 text-gray-500" />
                     <span className="text-sm font-medium truncate">
                       {attachment.name}
                     </span>
                   </div>
-                  <a href={attachment.url} target="_blank" rel="noopener noreferrer" download>
+                  <a
+                    href={attachment.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                  >
                     <Button variant="ghost" size="sm">
                       <Download className="h-4 w-4" />
                     </Button>

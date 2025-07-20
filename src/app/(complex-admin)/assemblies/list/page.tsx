@@ -15,10 +15,7 @@ import {
 } from "@/components/ui/table";
 import Link from "next/link";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  getAssemblies,
-  deleteAssembly,
-} from "@/services/assemblyService";
+import { getAssemblies, deleteAssembly } from "@/services/assemblyService";
 import {
   Dialog,
   DialogContent,
@@ -165,12 +162,16 @@ export default function AssembliesPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Link href={`/complex-admin/assemblies/${assembly.id}/view`}>
+                    <Link
+                      href={`/complex-admin/assemblies/${assembly.id}/view`}
+                    >
                       <Button variant="ghost" size="sm" className="mr-2">
                         <Eye className="h-4 w-4" />
                       </Button>
                     </Link>
-                    <Link href={`/complex-admin/assemblies/${assembly.id}/edit`}>
+                    <Link
+                      href={`/complex-admin/assemblies/${assembly.id}/edit`}
+                    >
                       <Button variant="ghost" size="sm" className="mr-2">
                         <Edit className="h-4 w-4" />
                       </Button>

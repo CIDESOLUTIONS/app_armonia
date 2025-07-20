@@ -36,8 +36,18 @@ import {
 } from "@/services/familyBudgetService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { familyBudgetEntrySchema, FamilyBudgetEntryFormValues } from "@/validators/family-budget-schema";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  familyBudgetEntrySchema,
+  FamilyBudgetEntryFormValues,
+} from "@/validators/family-budget-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface FamilyBudgetEntry {
@@ -235,7 +245,9 @@ export default function FamilyBudgetPage() {
                   <TableCell>${entry.amount.toFixed(2)}</TableCell>
                   <TableCell>
                     <Badge
-                      variant={entry.type === "INCOME" ? "default" : "secondary"}
+                      variant={
+                        entry.type === "INCOME" ? "default" : "secondary"
+                      }
                     >
                       {entry.type === "INCOME" ? "Ingreso" : "Gasto"}
                     </Badge>
@@ -280,7 +292,11 @@ export default function FamilyBudgetPage() {
                   <FormItem className="grid grid-cols-4 items-center gap-4">
                     <FormLabel className="text-right">Descripción</FormLabel>
                     <FormControl>
-                      <Input id="description" {...field} className="col-span-3" />
+                      <Input
+                        id="description"
+                        {...field}
+                        className="col-span-3"
+                      />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
@@ -313,7 +329,10 @@ export default function FamilyBudgetPage() {
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center gap-4">
                     <FormLabel className="text-right">Tipo</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger className="col-span-3">
                           <SelectValue placeholder="Selecciona un tipo" />
@@ -348,7 +367,12 @@ export default function FamilyBudgetPage() {
                   <FormItem className="grid grid-cols-4 items-center gap-4">
                     <FormLabel className="text-right">Fecha</FormLabel>
                     <FormControl>
-                      <Input id="date" type="date" {...field} className="col-span-3" />
+                      <Input
+                        id="date"
+                        type="date"
+                        {...field}
+                        className="col-span-3"
+                      />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>

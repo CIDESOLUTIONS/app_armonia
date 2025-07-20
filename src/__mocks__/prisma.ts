@@ -135,7 +135,6 @@ export const mockPrisma: Partial<PrismaClient> = {
   },
 };
 
-
 export enum PQRStatus {
   OPEN = "OPEN",
   CATEGORIZED = "CATEGORIZED",

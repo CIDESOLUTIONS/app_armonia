@@ -18,8 +18,18 @@ import {
 } from "@/components/ui/table";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { documentUploadSchema, DocumentUploadFormValues } from "@/validators/document-upload-schema";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  documentUploadSchema,
+  DocumentUploadFormValues,
+} from "@/validators/document-upload-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import {
   getDocuments,
   uploadDocument,
@@ -169,7 +179,7 @@ export default function DocumentsPage() {
               <FormField
                 control={control}
                 name="file"
-                render={({ field: { value, onChange, ...fieldProps } }) => (
+                render={({ field: { onChange, ...fieldProps } }) => (
                   <FormItem className="grid w-full max-w-sm items-center gap-1.5">
                     <FormLabel htmlFor="document">Documento</FormLabel>
                     <FormControl>
@@ -187,7 +197,10 @@ export default function DocumentsPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isSubmitting || !form.formState.isValid}>
+              <Button
+                type="submit"
+                disabled={isSubmitting || !form.formState.isValid}
+              >
                 {isSubmitting ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (

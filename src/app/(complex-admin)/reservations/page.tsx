@@ -21,6 +21,14 @@ import {
   Reservation,
 } from "@/services/reservationService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { PlusCircle } from "lucide-react";
 
 export default function ReservationsPage() {
   const { user, loading: authLoading } = useAuthStore();

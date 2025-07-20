@@ -16,8 +16,17 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { processBankStatement, approveReconciliation } from "@/services/financeService"; // Assuming financeService exists
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  processBankStatement,
+  approveReconciliation,
+} from "@/services/financeService"; // Assuming financeService exists
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 
 interface BankTransaction {
   date: string;
@@ -36,7 +45,9 @@ export default function BankReconciliationPage() {
   const { toast } = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [suggestions, setSuggestions] = useState<ReconciliationSuggestion[]>([]);
+  const [suggestions, setSuggestions] = useState<ReconciliationSuggestion[]>(
+    [],
+  );
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -78,7 +89,9 @@ export default function BankReconciliationPage() {
     }
   };
 
-  const handleApproveSuggestion = async (suggestion: ReconciliationSuggestion) => {
+  const handleApproveSuggestion = async (
+    suggestion: ReconciliationSuggestion,
+  ) => {
     setLoading(true);
     try {
       await approveReconciliation(suggestion);
@@ -141,10 +154,20 @@ export default function BankReconciliationPage() {
         </CardHeader>
         <CardContent className="flex flex-col space-y-4">
           <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="bankStatement">Archivo de Extracto (CSV, Excel)</Label>
-            <Input id="bankStatement" type="file" onChange={handleFileChange} accept=".csv,.xls,.xlsx" />
+            <Label htmlFor="bankStatement">
+              Archivo de Extracto (CSV, Excel)
+            </Label>
+            <Input
+              id="bankStatement"
+              type="file"
+              onChange={handleFileChange}
+              accept=".csv,.xls,.xlsx"
+            />
           </div>
-          <Button onClick={handleProcessStatement} disabled={!selectedFile || loading}>
+          <Button
+            onClick={handleProcessStatement}
+            disabled={!selectedFile || loading}
+          >
             {loading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
@@ -182,11 +205,9 @@ export default function BankReconciliationPage() {
                     <TableCell>{suggestion.transaction.description}</TableCell>
                     <TableCell>{suggestion.transaction.amount}</TableCell>
                     <TableCell>
-                      {suggestion.matchingPayment ? (
-                        `ID: ${suggestion.matchingPayment.id}, Monto: ${suggestion.matchingPayment.amount}`
-                      ) : (
-                        "N/A"
-                      )}
+                      {suggestion.matchingPayment
+                        ? `ID: ${suggestion.matchingPayment.id}, Monto: ${suggestion.matchingPayment.amount}`
+                        : "N/A"}
                     </TableCell>
                     <TableCell>
                       <Badge

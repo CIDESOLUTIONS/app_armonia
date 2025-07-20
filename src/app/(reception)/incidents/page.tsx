@@ -3,13 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -37,13 +31,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import {
   AlertTriangle,
   Search,
-  Camera,
   Clock,
   User,
   AlertCircle,
@@ -60,9 +52,26 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { incidentSchema, IncidentFormValues, incidentUpdateSchema, IncidentUpdateFormValues } from "@/validators/incident-schema";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { getIncidents, createIncident, updateIncident, uploadIncidentAttachments } from "@/services/incidentService";
+import {
+  incidentSchema,
+  IncidentFormValues,
+  incidentUpdateSchema,
+  IncidentUpdateFormValues,
+} from "@/validators/incident-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  getIncidents,
+  createIncident,
+  updateIncident,
+  uploadIncidentAttachments,
+} from "@/services/incidentService";
 
 interface Incident {
   id: string;
@@ -161,7 +170,7 @@ export default function ReceptionIncidentsPage() {
       setError(null);
       const fetchedIncidents = await getIncidents();
       setIncidents(fetchedIncidents);
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error("[ReceptionIncidents] Error:", err);
       setError(err.message || "Error al cargar datos de incidentes");
     } finally {
@@ -326,7 +335,9 @@ export default function ReceptionIncidentsPage() {
     return filtered;
   };
 
-  const handleNewIncidentFormSubmitLogic = async (values: IncidentFormValues) => {
+  const handleNewIncidentFormSubmitLogic = async (
+    values: IncidentFormValues,
+  ) => {
     try {
       let uploadedAttachmentUrls: string[] = [];
       if (values.attachments && values.attachments.length > 0) {
@@ -343,13 +354,15 @@ export default function ReceptionIncidentsPage() {
       setIsRegisterDialogOpen(false);
       resetNewIncidentForm();
       fetchData();
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error("Error creating incident:", err);
       setError(err.message || "Error al registrar el incidente.");
     }
   };
 
-  const handleUpdateIncidentFormSubmitLogic = async (values: IncidentUpdateFormValues) => {
+  const handleUpdateIncidentFormSubmitLogic = async (
+    values: IncidentUpdateFormValues,
+  ) => {
     if (!selectedIncident) return;
 
     try {
@@ -369,7 +382,7 @@ export default function ReceptionIncidentsPage() {
       setIsUpdateDialogOpen(false);
       resetUpdateIncidentForm();
       fetchData();
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error("Error updating incident:", err);
       setError(err.message || "Error al actualizar el incidente.");
     }
@@ -903,7 +916,12 @@ export default function ReceptionIncidentsPage() {
           </DialogHeader>
 
           <Form {...newIncidentForm}>
-            <form onSubmit={handleNewIncidentSubmit(handleNewIncidentFormSubmitLogic)} className="space-y-4 py-4">
+            <form
+              onSubmit={handleNewIncidentSubmit(
+                handleNewIncidentFormSubmitLogic,
+              )}
+              className="space-y-4 py-4"
+            >
               <FormField
                 control={newIncidentFormControl}
                 name="title"
@@ -911,7 +929,10 @@ export default function ReceptionIncidentsPage() {
                   <FormItem>
                     <FormLabel>Título</FormLabel>
                     <FormControl>
-                      <Input placeholder="Título breve y descriptivo" {...field} />
+                      <Input
+                        placeholder="Título breve y descriptivo"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -935,7 +956,9 @@ export default function ReceptionIncidentsPage() {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="security">Seguridad</SelectItem>
-                          <SelectItem value="maintenance">Mantenimiento</SelectItem>
+                          <SelectItem value="maintenance">
+                            Mantenimiento
+                          </SelectItem>
                           <SelectItem value="emergency">Emergencia</SelectItem>
                           <SelectItem value="other">Otro</SelectItem>
                         </SelectContent>
@@ -978,7 +1001,10 @@ export default function ReceptionIncidentsPage() {
                   <FormItem>
                     <FormLabel>Ubicación</FormLabel>
                     <FormControl>
-                      <Input placeholder="Ubicación específica del incidente" {...field} />
+                      <Input
+                        placeholder="Ubicación específica del incidente"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -1004,7 +1030,11 @@ export default function ReceptionIncidentsPage() {
                   <FormItem>
                     <FormLabel>Descripción</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Descripción detallada del incidente" rows={4} {...field} />
+                      <Textarea
+                        placeholder="Descripción detallada del incidente"
+                        rows={4}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -1048,7 +1078,9 @@ export default function ReceptionIncidentsPage() {
                               size="sm"
                               className="h-6 w-6 p-0 text-gray-500"
                               onClick={() => {
-                                const newAttachments = value.filter((_: any, i: number) => i !== index);
+                                const newAttachments = value.filter(
+                                  (_: unknown, i: number) => i !== index,
+                                );
                                 onChange(newAttachments);
                               }}
                             >
@@ -1093,7 +1125,12 @@ export default function ReceptionIncidentsPage() {
 
           {selectedIncident && (
             <Form {...updateIncidentForm}>
-              <form onSubmit={handleUpdateIncidentSubmit(handleUpdateIncidentFormSubmitLogic)} className="space-y-4 py-4">
+              <form
+                onSubmit={handleUpdateIncidentSubmit(
+                  handleUpdateIncidentFormSubmitLogic,
+                )}
+                className="space-y-4 py-4"
+              >
                 <div className="bg-gray-50 p-4 rounded-md mb-4">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-medium">{selectedIncident.title}</h3>
@@ -1121,7 +1158,11 @@ export default function ReceptionIncidentsPage() {
                     <FormItem>
                       <FormLabel>Actualización</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Describa la actualización o seguimiento del incidente" rows={4} {...field} />
+                        <Textarea
+                          placeholder="Describa la actualización o seguimiento del incidente"
+                          rows={4}
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1145,7 +1186,9 @@ export default function ReceptionIncidentsPage() {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="reported">Reportado</SelectItem>
-                          <SelectItem value="in_progress">En proceso</SelectItem>
+                          <SelectItem value="in_progress">
+                            En proceso
+                          </SelectItem>
                           <SelectItem value="resolved">Resuelto</SelectItem>
                           <SelectItem value="closed">Cerrado</SelectItem>
                         </SelectContent>
@@ -1193,7 +1236,9 @@ export default function ReceptionIncidentsPage() {
                                 size="sm"
                                 className="h-6 w-6 p-0 text-gray-500"
                                 onClick={() => {
-                                  const newAttachments = value.filter((_: any, i: number) => i !== index);
+                                  const newAttachments = value.filter(
+                                    (_: unknown, i: number) => i !== index,
+                                  );
                                   onChange(newAttachments);
                                 }}
                               >

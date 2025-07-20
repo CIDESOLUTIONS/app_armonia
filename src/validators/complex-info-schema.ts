@@ -3,7 +3,9 @@ import * as z from "zod";
 export const complexInfoSchema = z.object({
   name: z.string().min(3, "El nombre es requerido."),
   schemaName: z.string().min(3, "El nombre del esquema es requerido."),
-  totalUnits: z.number().min(1, "El número total de unidades debe ser al menos 1."),
+  totalUnits: z
+    .number()
+    .min(1, "El número total de unidades debe ser al menos 1."),
   adminEmail: z.string().email("Email del administrador inválido."),
   adminName: z.string().min(3, "El nombre del administrador es requerido."),
   adminPhone: z.string().optional(),

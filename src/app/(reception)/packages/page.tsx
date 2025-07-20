@@ -37,7 +37,6 @@ import {
   Package,
   Mail,
   Search,
-  Camera,
   Clock,
   AlertCircle,
   CheckCircle,
@@ -62,7 +61,7 @@ export default function ReceptionPackagesPage() {
   const _router = useRouter();
   const [loading, setLoading] = useState(true);
   const [packages, setPackages] = useState<PackageItem[]>([]);
-  const [error, _setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<
     PackageItem["status"] | "all"
   >("pending");
@@ -93,7 +92,7 @@ export default function ReceptionPackagesPage() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      _setError(null);
+      setError(null);
 
       const filters: PackageFilterParams = {
         status: statusFilter,
@@ -102,9 +101,9 @@ export default function ReceptionPackagesPage() {
       };
       const fetchedPackages = await getPackages(filters);
       setPackages(fetchedPackages);
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error("[ReceptionPackages] Error:", err);
-      _setError(err.message || "Error al cargar datos de paquetes");
+      setError(err.message || "Error al cargar datos de paquetes");
     } finally {
       setLoading(false);
     }
@@ -257,9 +256,9 @@ export default function ReceptionPackagesPage() {
         notes: "",
         photo: null,
       });
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error("[ReceptionPackages] Error:", err);
-      _setError(
+      setError(
         err.message ||
           "Error al registrar el paquete. Por favor, inténtelo de nuevo.",
       );
@@ -299,9 +298,9 @@ export default function ReceptionPackagesPage() {
       );
       setSuccessMessage("Entrega registrada exitosamente.");
       setIsDeliverDialogOpen(false);
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error("[ReceptionPackages] Error:", err);
-      _setError(
+      setError(
         err.message ||
           "Error al registrar la entrega. Por favor, inténtelo de nuevo.",
       );
@@ -328,9 +327,9 @@ export default function ReceptionPackagesPage() {
         ),
       );
       setSuccessMessage("Paquete marcado como devuelto.");
-    } catch (err: any) {
+    } catch (err: Error) {
       console.error("[ReceptionPackages] Error:", err);
-      _setError(
+      setError(
         err.message ||
           "Error al marcar el paquete como devuelto. Por favor, inténtelo de nuevo.",
       );

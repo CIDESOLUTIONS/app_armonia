@@ -19,10 +19,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   getProperties,
   createProperty,

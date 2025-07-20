@@ -1,15 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, DollarSign, Users, Home, Package, Bell, FileText } from "lucide-react";
+import {
+  Loader2,
+  DollarSign,
+  Users,
+  Home,
+  Package,
+  Bell,
+  FileText,
+} from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/components/ui/use-toast";
 import { getResidentDashboardMetrics } from "@/services/residentService";
@@ -57,7 +60,9 @@ export default function ResidentDashboardPage() {
         setMetrics(metricsData);
         // Filter projects by complexId if user has one
         const relevantProjects = user?.complexId
-          ? projectsData.filter((project: any) => project.complexId === user.complexId)
+          ? projectsData.filter(
+              (project: any) => project.complexId === user.complexId,
+            )
           : [];
         setProjects(relevantProjects);
       } catch (error) {
@@ -81,7 +86,9 @@ export default function ResidentDashboardPage() {
     if (!project.tasks || project.tasks.length === 0) {
       return 0;
     }
-    const completedTasks = project.tasks.filter((task) => task.isCompleted).length;
+    const completedTasks = project.tasks.filter(
+      (task) => task.isCompleted,
+    ).length;
     return Math.round((completedTasks / project.tasks.length) * 100);
   };
 
@@ -218,7 +225,9 @@ export default function ResidentDashboardPage() {
                     <p className="text-sm text-gray-600">
                       Progreso: {calculateProgress(project)}%
                     </p>
-                    <Link href={`/complex-admin/projects/${project.id}/overview`}>
+                    <Link
+                      href={`/complex-admin/projects/${project.id}/overview`}
+                    >
                       <Button variant="link" className="p-0 h-auto">
                         Ver Detalles <FileText className="ml-1 h-4 w-4" />
                       </Button>

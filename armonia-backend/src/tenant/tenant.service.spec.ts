@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TenantService } from './tenant.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { vi } from "vitest";
+import { vi } from 'vitest';
 
 describe('TenantService', () => {
   let service: TenantService;

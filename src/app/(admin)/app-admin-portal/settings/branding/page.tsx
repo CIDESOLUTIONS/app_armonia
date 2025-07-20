@@ -26,7 +26,8 @@ export default function BrandingPage() {
   const { toast } = useToast();
   const [complexes, setComplexes] = useState<ResidentialComplex[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedComplex, setSelectedComplex] = useState<ResidentialComplex | null>(null);
+  const [selectedComplex, setSelectedComplex] =
+    useState<ResidentialComplex | null>(null);
   const [formData, setFormData] = useState({
     logoUrl: "",
     primaryColor: "",

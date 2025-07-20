@@ -2,7 +2,15 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, PlusCircle, Edit, Trash2, CheckCircle, XCircle, DollarSign } from "lucide-react";
+import {
+  Loader2,
+  PlusCircle,
+  Edit,
+  Trash2,
+  CheckCircle,
+  XCircle,
+  DollarSign,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,9 +39,25 @@ import {
 } from "@/services/budgetService"; // Assuming budgetService exists
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { budgetSchema, BudgetItemFormValues, BudgetFormValues } from "@/validators/budget-schema"; // Assuming budget-schema exists
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Card, CardContent, CardHeader, CardTitle as CardTitleShadcn } from "@/components/ui/card";
+import {
+  budgetSchema,
+  BudgetItemFormValues,
+  BudgetFormValues,
+} from "@/validators/budget-schema"; // Assuming budget-schema exists
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle as CardTitleShadcn,
+} from "@/components/ui/card";
 
 interface BudgetItem {
   id: number;
@@ -61,6 +85,24 @@ export default function BudgetsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentBudget, setCurrentBudget] = useState<Budget | null>(null);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [newItem, setNewItem] = useState<BudgetItemFormValues>({
+    description: "",
+    amount: 0,
+    type: "INCOME",
+  });
+
+  const handleAddItem = () => {
+    if (newItem.description && newItem.amount) {
+      form.setValue("items", [...form.getValues("items"), newItem]);
+      setNewItem({ description: "", amount: 0, type: "INCOME" });
+    } else {
+      toast({
+        title: "Error",
+        description: "Por favor, ingresa la descripción y el monto del ítem.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const form = useForm<BudgetFormValues>({
     resolver: zodResolver(budgetSchema),
@@ -256,8 +298,12 @@ export default function BudgetsPage() {
                       {budget.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{calculateTotal(budget.items, "INCOME")}</TableCell>
-                  <TableCell>{calculateTotal(budget.items, "EXPENSE")}</TableCell>
+                  <TableCell>
+                    {calculateTotal(budget.items, "INCOME")}
+                  </TableCell>
+                  <TableCell>
+                    {calculateTotal(budget.items, "EXPENSE")}
+                  </TableCell>
                   <TableCell>{budget.approvedById || "N/A"}</TableCell>
                   <TableCell>
                     {budget.approvedDate
@@ -289,7 +335,8 @@ export default function BudgetsPage() {
                       onClick={() =>
                         toast({
                           title: "Funcionalidad Pendiente",
-                          description: "La eliminación de presupuestos aún no está implementada.",
+                          description:
+                            "La eliminación de presupuestos aún no está implementada.",
                         })
                       }
                     >
@@ -366,7 +413,9 @@ export default function BudgetsPage() {
               />
 
               <div className="col-span-full">
-                <h3 className="text-lg font-semibold mb-2">Ítems del Presupuesto</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  Ítems del Presupuesto
+                </h3>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -417,7 +466,10 @@ export default function BudgetsPage() {
                     id="newItemAmount"
                     value={newItem.amount}
                     onChange={(e) =>
-                      setNewItem({ ...newItem, amount: parseFloat(e.target.value) || 0 })
+                      setNewItem({
+                        ...newItem,
+                        amount: parseFloat(e.target.value) || 0,
+                      })
                     }
                   />
                   <Select

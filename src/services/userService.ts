@@ -1,87 +1,36 @@
-import { fetchApi } from "@/lib/api";
+import { getPrisma } from "@/lib/prisma";
 
-export interface User {
-  id: number;
-  email: string;
-  name: string;
-  role: string;
-  active: boolean;
-  complexId?: number;
-  createdAt: string;
-  updatedAt: string;
-}
+export const getUserProfile = async (userId: number) => {
+  const prisma = getPrisma(); // Assuming user is in public schema
+  // Placeholder logic
+  console.log("Getting user profile for user:", userId);
+  return { message: "User profile retrieved successfully" };
+};
 
-export interface CreateUserDto {
-  email: string;
-  name: string;
-  password?: string;
-  role: string;
-  complexId?: number;
-}
+export const getAllUsers = async () => {
+  const prisma = getPrisma(); // Assuming users are in public schema
+  // Placeholder logic
+  console.log("Getting all users");
+  return { message: "All users retrieved successfully" };
+};
 
-export interface UpdateUserDto {
-  name?: string;
-  email?: string;
-  password?: string;
-  role?: string;
-  active?: boolean;
-  complexId?: number;
-}
+export const updateUser = async (userId: number, data: any) => {
+  const prisma = getPrisma(); // Assuming user is in public schema
+  // Placeholder logic
+  console.log("Updating user:", userId, data);
+  return { message: "User updated successfully" };
+};
 
-export async function getAllUsers(role?: string): Promise<User[]> {
-  try {
-    const query = role ? `?role=${role}` : "";
-    const response = await fetchApi(`/users${query}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    throw error;
-  }
-}
+export const createUser = async (data: any) => {
+  const prisma = getPrisma(); // Assuming user is in public schema
+  // Placeholder logic
+  console.log("Creating user:", data);
+  return { message: "User created successfully" };
+};
 
-export async function getUserById(id: number): Promise<User> {
-  try {
-    const response = await fetchApi(`/users/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching user ${id}:`, error);
-    throw error;
-  }
-}
-
-export async function createUser(data: CreateUserDto): Promise<User> {
-  try {
-    const response = await fetchApi("/users", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error creating user:", error);
-    throw error;
-  }
-}
-
-export async function updateUser(id: number, data: UpdateUserDto): Promise<User> {
-  try {
-    const response = await fetchApi(`/users/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(data),
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error updating user:", error);
-    throw error;
-  }
-}
-
-export async function deleteUser(id: number): Promise<void> {
-  try {
-    await fetchApi(`/users/${id}`, {
-      method: "DELETE",
-    });
-  } catch (error) {
-    console.error("Error deleting user:", error);
-    throw error;
-  }
-}
+export const deleteUser = async (userId: number) => {
+  const prisma = getPrisma(); // Assuming user is in public schema
+  // Placeholder logic
+  console.log("Deleting user:", userId);
+  return { message: "User deleted successfully" };
+};

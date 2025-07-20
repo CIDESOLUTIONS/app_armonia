@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -12,7 +22,15 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get('profile')
-  @Roles(UserRole.ADMIN, UserRole.COMPLEX_ADMIN, UserRole.RESIDENT, UserRole.STAFF, UserRole.RECEPTION, UserRole.SECURITY, UserRole.CONCIERGE)
+  @Roles(
+    UserRole.ADMIN,
+    UserRole.COMPLEX_ADMIN,
+    UserRole.RESIDENT,
+    UserRole.STAFF,
+    UserRole.RECEPTION,
+    UserRole.SECURITY,
+    UserRole.CONCIERGE,
+  )
   getProfile(@GetUser() user: any) {
     return user;
   }
@@ -31,7 +49,11 @@ export class UserController {
 
   @Put(':id')
   @Roles(UserRole.ADMIN, UserRole.COMPLEX_ADMIN)
-  async updateUser(@GetUser() user: any, @Param('id') id: string, @Body() userData: any) {
+  async updateUser(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() userData: any,
+  ) {
     return this.userService.updateUser(user.schemaName, +id, userData);
   }
 

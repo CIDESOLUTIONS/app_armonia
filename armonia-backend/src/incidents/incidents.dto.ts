@@ -1,4 +1,10 @@
-import { IsString, IsEnum, IsOptional, IsArray, IsNumber } from 'class-validator';
+import {
+  IsString,
+  IsEnum,
+  IsOptional,
+  IsArray,
+  IsNumber,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum IncidentCategory {

@@ -16,7 +16,9 @@ export default async function RootLayout({
   return (
     <html lang="es">
       <body className="font-sans">
-        <RealTimeNotificationProvider> {/* Envolver con el proveedor */}
+        <RealTimeNotificationProvider>
+          {" "}
+          {/* Envolver con el proveedor */}
           <Providers>{children}</Providers>
         </RealTimeNotificationProvider>
       </body>

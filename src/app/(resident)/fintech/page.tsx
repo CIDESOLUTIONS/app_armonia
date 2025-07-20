@@ -25,8 +25,10 @@ export default function FintechPage() {
     term: 0,
     purpose: "",
   });
-  const [microCreditResult, setMicroCreditResult] = useState<MicroCreditResponse | null>(null);
-  const [creditScoreResult, setCreditScoreResult] = useState<CreditScoreResponse | null>(null);
+  const [microCreditResult, setMicroCreditResult] =
+    useState<MicroCreditResponse | null>(null);
+  const [creditScoreResult, setCreditScoreResult] =
+    useState<CreditScoreResponse | null>(null);
 
   const handleMicroCreditRequest = async () => {
     setLoading(true);
@@ -108,7 +110,12 @@ export default function FintechPage() {
               name="amount"
               type="number"
               value={microCreditForm.amount}
-              onChange={(e) => setMicroCreditForm({ ...microCreditForm, amount: parseFloat(e.target.value) })}
+              onChange={(e) =>
+                setMicroCreditForm({
+                  ...microCreditForm,
+                  amount: parseFloat(e.target.value),
+                })
+              }
               placeholder="Ej: 500"
             />
           </div>
@@ -119,7 +126,12 @@ export default function FintechPage() {
               name="term"
               type="number"
               value={microCreditForm.term}
-              onChange={(e) => setMicroCreditForm({ ...microCreditForm, term: parseInt(e.target.value) })}
+              onChange={(e) =>
+                setMicroCreditForm({
+                  ...microCreditForm,
+                  term: parseInt(e.target.value),
+                })
+              }
               placeholder="Ej: 12"
             />
           </div>
@@ -129,7 +141,12 @@ export default function FintechPage() {
               id="purpose"
               name="purpose"
               value={microCreditForm.purpose}
-              onChange={(e) => setMicroCreditForm({ ...microCreditForm, purpose: e.target.value })}
+              onChange={(e) =>
+                setMicroCreditForm({
+                  ...microCreditForm,
+                  purpose: e.target.value,
+                })
+              }
               placeholder="Ej: Reparación de vivienda"
             />
           </div>
@@ -140,7 +157,9 @@ export default function FintechPage() {
             <Alert>
               <AlertTitle>Resultado de la Solicitud:</AlertTitle>
               <AlertDescription>
-                ID: {microCreditResult.applicationId}, Estado: {microCreditResult.status}, Monto: {microCreditResult.amount}, Plazo: {microCreditResult.term} meses
+                ID: {microCreditResult.applicationId}, Estado:{" "}
+                {microCreditResult.status}, Monto: {microCreditResult.amount},
+                Plazo: {microCreditResult.term} meses
               </AlertDescription>
             </Alert>
           )}
@@ -159,7 +178,8 @@ export default function FintechPage() {
             <Alert>
               <AlertTitle>Puntaje de Crédito:</AlertTitle>
               <AlertDescription>
-                Tu puntaje es: {creditScoreResult.score} (Proveedor: {creditScoreResult.provider})
+                Tu puntaje es: {creditScoreResult.score} (Proveedor:{" "}
+                {creditScoreResult.provider})
               </AlertDescription>
             </Alert>
           )}

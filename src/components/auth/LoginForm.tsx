@@ -107,7 +107,13 @@ export default function LoginForm({ portalType = null }: LoginFormProps) {
     const complexId = 1; // ID de ejemplo
     const schemaName = "tenant_cj0001"; // Nombre de esquema de ejemplo
 
-    await login(values.email, values.password, complexId, schemaName, portalInfo.redirectTo);
+    await login(
+      values.email,
+      values.password,
+      complexId,
+      schemaName,
+      portalInfo.redirectTo,
+    );
   };
 
   return (

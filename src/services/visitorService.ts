@@ -71,7 +71,9 @@ export async function createPreRegisteredVisitor(
   }
 }
 
-export async function getPreRegisteredVisitors(): Promise<PreRegisteredVisitor[]> {
+export async function getPreRegisteredVisitors(): Promise<
+  PreRegisteredVisitor[]
+> {
   try {
     const response = await fetchApi("/visitors/pre-registered");
     return response.data; // Assuming the API returns { data: PreRegisteredVisitor[] }
@@ -94,7 +96,9 @@ export async function scanQrCode(qrCode: string): Promise<any> {
   }
 }
 
-export async function registerPackage(data: RegisterPackageDto): Promise<Package> {
+export async function registerPackage(
+  data: RegisterPackageDto,
+): Promise<Package> {
   try {
     const response = await fetchApi("/packages", {
       method: "POST",
@@ -157,13 +161,18 @@ export async function uploadPackageImage(file: File): Promise<{ url: string }> {
   }
 }
 
-export async function getPackages(filters?: PackageFilterParams): Promise<Package[]> {
+export async function getPackages(
+  filters?: PackageFilterParams,
+): Promise<Package[]> {
   try {
     const query = new URLSearchParams();
     if (filters) {
       for (const key in filters) {
         if (filters[key as keyof PackageFilterParams]) {
-          query.append(key, filters[key as keyof PackageFilterParams] as string);
+          query.append(
+            key,
+            filters[key as keyof PackageFilterParams] as string,
+          );
         }
       }
     }

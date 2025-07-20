@@ -19,7 +19,7 @@ import {
   initiatePayment,
   FeeDto,
   FeeStatus,
-} from "@/services/financeService";
+} from "@/services/feeService";
 import { Badge } from "@/components/ui/badge";
 
 export default function ResidentFeesPage() {
@@ -135,10 +135,7 @@ export default function ResidentFeesPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       {fee.status === FeeStatus.PENDING && (
-                        <Button
-                          onClick={() => handlePayFee(fee.id)}
-                          size="sm"
-                        >
+                        <Button onClick={() => handlePayFee(fee.id)} size="sm">
                           <DollarSign className="mr-2 h-4 w-4" /> Pagar
                         </Button>
                       )}

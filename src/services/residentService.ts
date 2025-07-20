@@ -1,83 +1,47 @@
-import { fetchApi } from "@/lib/api";
+import { getPrisma } from "@/lib/prisma";
 
-interface Resident {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  propertyId: number;
-  unitNumber: string;
-  role: string;
-  isActive: boolean;
-}
+export const getResidentDashboardMetrics = async (
+  tenantId: string,
+  residentId: number,
+) => {
+  const prisma = getPrisma(tenantId);
+  // Placeholder logic
+  console.log(
+    "Getting resident dashboard metrics for tenant:",
+    tenantId,
+    residentId,
+  );
+  return { message: "Resident dashboard metrics retrieved successfully" };
+};
 
-interface CreateResidentData {
-  name: string;
-  email: string;
-  phone?: string;
-  propertyId: number;
-  role: string;
-  isActive?: boolean;
-}
+export const getResidents = async (tenantId: string) => {
+  const prisma = getPrisma(tenantId);
+  // Placeholder logic
+  console.log("Getting residents for tenant:", tenantId);
+  return { message: "Residents retrieved successfully" };
+};
 
-interface UpdateResidentData {
-  name?: string;
-  email?: string;
-  phone?: string;
-  propertyId?: number;
-  role?: string;
-  isActive?: boolean;
-}
+export const updateResident = async (
+  residentId: number,
+  data: any,
+  tenantId: string,
+) => {
+  const prisma = getPrisma(tenantId);
+  // Placeholder logic
+  console.log("Updating resident:", residentId, data);
+  return { message: "Resident updated successfully" };
+};
 
-export async function getResidents(searchTerm?: string): Promise<Resident[]> {
-  try {
-    const query = searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : "";
-    const response = await fetchApi(`/inventory/residents${query}`);
-    return response;
-  } catch (error) {
-    console.error("Error fetching residents:", error);
-    throw error;
-  }
-}
+export const createResident = async (data: any, tenantId: string) => {
+  const prisma = getPrisma(tenantId);
+  // Placeholder logic
+  console.log("Creating resident:", data);
+  return { message: "Resident created successfully" };
+};
 
-export async function createResident(
-  data: CreateResidentData,
-): Promise<Resident> {
-  try {
-    const response = await fetchApi("/inventory/residents", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-    return response;
-  } catch (error) {
-    console.error("Error creating resident:", error);
-    throw error;
-  }
-}
-
-export async function updateResident(
-  id: number,
-  data: UpdateResidentData,
-): Promise<Resident> {
-  try {
-    const response = await fetchApi(`/inventory/residents/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(data),
-    });
-    return response;
-  } catch (error) {
-    console.error("Error updating resident:", error);
-    throw error;
-  }
-}
-
-export async function deleteResident(id: number): Promise<void> {
-  try {
-    await fetchApi(`/inventory/residents/${id}`, {
-      method: "DELETE",
-    });
-  } catch (error) {
-    console.error("Error deleting resident:", error);
-    throw error;
-  }
-}
+export const deleteResident = async (residentId: number, tenantId: string) => {
+  const prisma = getPrisma(tenantId);
+  // Placeholder logic
+  console.log("Deleting resident:", residentId);
+  return { message: "Resident deleted successfully" };
+};

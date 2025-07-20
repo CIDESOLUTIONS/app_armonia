@@ -63,7 +63,9 @@ export default function MyListingsPage() {
   }, [authLoading, user, fetchMyListings]);
 
   const handleMarkAsSold = async (id: number) => {
-    if (!confirm("¿Estás seguro de que quieres marcar este anuncio como vendido?"))
+    if (
+      !confirm("¿Estás seguro de que quieres marcar este anuncio como vendido?")
+    )
       return;
     try {
       await updateListing(id, { status: "SOLD" }); // Assuming a 'status' field and 'SOLD' value
@@ -218,8 +220,8 @@ export default function MyListingsPage() {
           <DialogHeader>
             <DialogTitle>Confirmar Eliminación</DialogTitle>
             <DialogDescription>
-              ¿Estás seguro de que quieres eliminar este anuncio? Esta acción
-              no se puede deshacer.
+              ¿Estás seguro de que quieres eliminar este anuncio? Esta acción no
+              se puede deshacer.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

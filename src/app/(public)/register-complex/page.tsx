@@ -4,7 +4,8 @@ import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/header";
-import { Check, ArrowLeft, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
+import { ServerLogger } from "@/lib/logging/server-logger";
 
 import { FormField } from "@/components/common/FormField";
 import {

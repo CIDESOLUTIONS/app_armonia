@@ -2,8 +2,14 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, Briefcase, Search, PlusCircle, Edit, Trash2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Loader2,
+  Briefcase,
+  Search,
+  PlusCircle,
+  Edit,
+  Trash2,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -29,11 +35,28 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import { getServiceProviders, createServiceProvider, updateServiceProvider, deleteServiceProvider, ServiceProviderDto } from "@/services/serviceProviderService";
+import {
+  getServiceProviders,
+  createServiceProvider,
+  updateServiceProvider,
+  deleteServiceProvider,
+  ServiceProviderDto,
+} from "@/services/serviceProviderService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { serviceProviderSchema, ServiceProviderFormValues } from "@/validators/service-provider-schema";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  serviceProviderSchema,
+  ServiceProviderFormValues,
+} from "@/validators/service-provider-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
 
 export default function ServiceProvidersPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -43,7 +66,8 @@ export default function ServiceProvidersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentProvider, setCurrentProvider] = useState<ServiceProviderDto | null>(null);
+  const [currentProvider, setCurrentProvider] =
+    useState<ServiceProviderDto | null>(null);
 
   const form = useForm<ServiceProviderFormValues>({
     resolver: zodResolver(serviceProviderSchema),
@@ -141,7 +165,8 @@ export default function ServiceProvidersPage() {
   };
 
   const handleDeleteProvider = async (id: number) => {
-    if (!confirm("¿Estás seguro de que quieres eliminar este proveedor?")) return;
+    if (!confirm("¿Estás seguro de que quieres eliminar este proveedor?"))
+      return;
     try {
       await deleteServiceProvider(id);
       toast({
@@ -245,9 +270,7 @@ export default function ServiceProvidersPage() {
             <TableBody>
               {providers.map((provider) => (
                 <TableRow key={provider.id}>
-                  <TableCell className="font-medium">
-                    {provider.name}
-                  </TableCell>
+                  <TableCell className="font-medium">{provider.name}</TableCell>
                   <TableCell>{provider.category}</TableCell>
                   <TableCell>{provider.contact}</TableCell>
                   <TableCell>{provider.rating} / 5</TableCell>
@@ -303,7 +326,10 @@ export default function ServiceProvidersPage() {
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center gap-4">
                     <FormLabel className="text-right">Categoría</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger className="col-span-3">
                           <SelectValue placeholder="Selecciona una categoría" />
@@ -311,7 +337,9 @@ export default function ServiceProvidersPage() {
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="Plomería">Plomería</SelectItem>
-                        <SelectItem value="Electricidad">Electricidad</SelectItem>
+                        <SelectItem value="Electricidad">
+                          Electricidad
+                        </SelectItem>
                         <SelectItem value="Jardinería">Jardinería</SelectItem>
                         <SelectItem value="Limpieza">Limpieza</SelectItem>
                         <SelectItem value="Seguridad">Seguridad</SelectItem>
@@ -329,7 +357,11 @@ export default function ServiceProvidersPage() {
                   <FormItem className="grid grid-cols-4 items-center gap-4">
                     <FormLabel className="text-right">Descripción</FormLabel>
                     <FormControl>
-                      <Input id="description" {...field} className="col-span-3" />
+                      <Input
+                        id="description"
+                        {...field}
+                        className="col-span-3"
+                      />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>

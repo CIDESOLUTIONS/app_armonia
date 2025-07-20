@@ -3,7 +3,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, PlusCircle, Edit, Trash2, BarChart2, CheckCircle, XCircle } from "lucide-react";
+import {
+  Loader2,
+  PlusCircle,
+  Edit,
+  Trash2,
+  BarChart2,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,17 +32,45 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const voteSchema = z.object({
   title: z.string().min(5, "El título debe tener al menos 5 caracteres."),
-  description: z.string().min(20, "La descripción debe tener al menos 20 caracteres."),
-  options: z.array(z.string().min(1, "La opción no puede estar vacía.")).min(2, "Debe haber al menos 2 opciones."),
+  description: z
+    .string()
+    .min(20, "La descripción debe tener al menos 20 caracteres."),
+  options: z
+    .array(z.string().min(1, "La opción no puede estar vacía."))
+    .min(2, "Debe haber al menos 2 opciones."),
   weightedVoting: z.boolean(),
 });
 
@@ -70,7 +106,11 @@ export default function AssemblyVotesPage() {
     formState: { isSubmitting },
   } = form;
 
-  const { fields: optionFields, append: appendOption, remove: removeOption } = useFieldArray({
+  const {
+    fields: optionFields,
+    append: appendOption,
+    remove: removeOption,
+  } = useFieldArray({
     control: form.control,
     name: "options",
   });
@@ -233,9 +273,7 @@ export default function AssemblyVotesPage() {
                     <TableCell>
                       <Badge
                         variant={
-                          vote.status === "ACTIVE"
-                            ? "default"
-                            : "secondary"
+                          vote.status === "ACTIVE" ? "default" : "secondary"
                         }
                       >
                         {vote.status}
@@ -318,7 +356,10 @@ export default function AssemblyVotesPage() {
                   <FormItem>
                     <FormLabel>Descripción</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Descripción de la votación" {...field} />
+                      <Textarea
+                        placeholder="Descripción de la votación"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -332,12 +373,20 @@ export default function AssemblyVotesPage() {
                       {...form.register(`options.${index}` as const)}
                       defaultValue={item.text}
                     />
-                    <Button type="button" variant="outline" onClick={() => removeOption(index)}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => removeOption(index)}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 ))}
-                <Button type="button" variant="outline" onClick={() => appendOption({ text: "" })}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => appendOption({ text: "" })}
+                >
                   <PlusCircle className="mr-2 h-4 w-4" /> Añadir Opción
                 </Button>
               </div>
@@ -353,9 +402,12 @@ export default function AssemblyVotesPage() {
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none">
-                      <FormLabel>Votación Ponderada (por coeficiente)</FormLabel>
+                      <FormLabel>
+                        Votación Ponderada (por coeficiente)
+                      </FormLabel>
                       <FormDescription>
-                        Si está activado, el voto de cada unidad se ponderará por su coeficiente de copropiedad.
+                        Si está activado, el voto de cada unidad se ponderará
+                        por su coeficiente de copropiedad.
                       </FormDescription>
                     </div>
                     <FormMessage />
@@ -384,16 +436,18 @@ export default function AssemblyVotesPage() {
             <div className="space-y-4 py-4">
               <p>Total de Votos: {voteResults.totalVotes}</p>
               <p>Peso Total de Votos: {voteResults.totalWeight.toFixed(2)}</p>
-              {Object.entries(voteResults.options).map(([option, data]: [string, any]) => (
-                <Card key={option}>
-                  <CardContent className="p-4">
-                    <p className="font-semibold">{option}</p>
-                    <p>Votos: {data.count}</p>
-                    <p>Peso: {data.weight.toFixed(2)}</p>
-                    <p>Porcentaje: {data.percentage.toFixed(2)}%</p>
-                  </CardContent>
-                </Card>
-              ))}
+              {Object.entries(voteResults.options).map(
+                ([option, data]: [string, any]) => (
+                  <Card key={option}>
+                    <CardContent className="p-4">
+                      <p className="font-semibold">{option}</p>
+                      <p>Votos: {data.count}</p>
+                      <p>Peso: {data.weight.toFixed(2)}</p>
+                      <p>Porcentaje: {data.percentage.toFixed(2)}%</p>
+                    </CardContent>
+                  </Card>
+                ),
+              )}
             </div>
           ) : (
             <p>Cargando resultados...</p>

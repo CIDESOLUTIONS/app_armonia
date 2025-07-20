@@ -20,7 +20,14 @@ import { getPQRById, updatePQR } from "@/services/pqrService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { pqrSchema, PQRFormValues } from "@/validators/pqr-schema";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 export default function EditPQRPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -190,7 +197,9 @@ export default function EditPQRPage() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="ADMINISTRATIVE">Administrativa</SelectItem>
+                      <SelectItem value="ADMINISTRATIVE">
+                        Administrativa
+                      </SelectItem>
                       <SelectItem value="MAINTENANCE">Mantenimiento</SelectItem>
                       <SelectItem value="SECURITY">Seguridad</SelectItem>
                       <SelectItem value="COEXISTENCE">Convivencia</SelectItem>

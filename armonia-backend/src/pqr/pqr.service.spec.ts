@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PqrService } from './pqr.service';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
-import { vi } from "vitest";
+import { vi } from 'vitest';
 
 describe('PqrService', () => {
   let service: PqrService;

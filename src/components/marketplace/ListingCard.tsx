@@ -28,8 +28,18 @@ import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { reportListingSchema, ReportListingFormValues } from "@/validators/report-listing-schema";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  reportListingSchema,
+  ReportListingFormValues,
+} from "@/validators/report-listing-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 interface ListingCardProps {
   listing: {
@@ -184,7 +194,10 @@ export function ListingCard({ listing }: ListingCardProps) {
                 </DialogDescription>
               </DialogHeader>
               <Form {...form}>
-                <form onSubmit={handleSubmit(handleReport)} className="space-y-4">
+                <form
+                  onSubmit={handleSubmit(handleReport)}
+                  className="space-y-4"
+                >
                   <FormField
                     control={control}
                     name="reason"

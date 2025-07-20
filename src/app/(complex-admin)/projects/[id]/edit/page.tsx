@@ -260,7 +260,9 @@ export default function EditProjectPage() {
                       type="number"
                       placeholder="0.00"
                       {...field}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                      onChange={(e) =>
+                        field.onChange(parseFloat(e.target.value))
+                      }
                     />
                   </FormControl>
                   <FormMessage />
@@ -278,7 +280,9 @@ export default function EditProjectPage() {
                       type="number"
                       placeholder="0.00"
                       {...field}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                      onChange={(e) =>
+                        field.onChange(parseFloat(e.target.value))
+                      }
                     />
                   </FormControl>
                   <FormMessage />

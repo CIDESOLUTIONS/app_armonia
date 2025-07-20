@@ -66,7 +66,8 @@ export function Header({
   const locale = useLocale();
   const t = useTranslations("Header");
   const { user, changeUserRole } = useAuthStore();
-  const { selectedComplexId, selectedComplexName, setSelectedComplex } = useComplexStore();
+  const { selectedComplexId, selectedComplexName, setSelectedComplex } =
+    useComplexStore();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState(user?.role || "");
@@ -79,7 +80,10 @@ export function Header({
           const fetchedComplexes = await getAllComplexes();
           setComplexes(fetchedComplexes);
           if (fetchedComplexes.length > 0 && !selectedComplexId) {
-            setSelectedComplex(fetchedComplexes[0].schemaName, fetchedComplexes[0].name);
+            setSelectedComplex(
+              fetchedComplexes[0].schemaName,
+              fetchedComplexes[0].name,
+            );
           }
         } catch (error) {
           console.error("Error fetching complexes:", error);
@@ -135,7 +139,7 @@ export function Header({
 
   const handleComplexChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedSchemaName = event.target.value;
-    const selected = complexes.find(c => c.schemaName === selectedSchemaName);
+    const selected = complexes.find((c) => c.schemaName === selectedSchemaName);
     if (selected) {
       setSelectedComplex(selected.schemaName, selected.name);
     }
@@ -152,7 +156,9 @@ export function Header({
             Armonía
           </h1>
           {isLoggedIn && selectedComplexName && (
-            <p className="text-sm text-white opacity-75 ml-2">{selectedComplexName}</p>
+            <p className="text-sm text-white opacity-75 ml-2">
+              {selectedComplexName}
+            </p>
           )}
         </div>
 
@@ -184,11 +190,7 @@ export function Header({
             <button
               onClick={toggleLanguage}
               className="text-white hover:text-indigo-200 focus:outline-none flex items-center gap-1"
-              title={
-                locale === "es"
-                  ? "Cambiar a Inglés"
-                  : "Switch to Spanish"
-              }
+              title={locale === "es" ? "Cambiar a Inglés" : "Switch to Spanish"}
             >
               <Globe className="w-5 h-5" />
               <span className="text-xs">{locale.toUpperCase()}</span>
@@ -229,7 +231,10 @@ export function Header({
                     className="bg-indigo-700 text-white text-sm py-1 px-2 rounded-md appearance-none pr-8 cursor-pointer"
                   >
                     {complexes.map((complex) => (
-                      <option key={complex.schemaName} value={complex.schemaName}>
+                      <option
+                        key={complex.schemaName}
+                        value={complex.schemaName}
+                      >
                         {complex.name}
                       </option>
                     ))}
@@ -351,22 +356,26 @@ export function Header({
                 <span className="text-xs">{currency.substring(0, 1)}</span>
               </button>
             </div>
-            {user && user.isGlobalAdmin && ( // Mobile complex selector
-              <div className="relative px-4 mt-2">
-                <select
-                  value={selectedComplexId || ""}
-                  onChange={handleComplexChange}
-                  className="bg-indigo-700 text-white text-sm py-1 px-2 rounded-md appearance-none pr-8 cursor-pointer w-full"
-                >
-                  {complexes.map((complex) => (
-                    <option key={complex.schemaName} value={complex.schemaName}>
-                      {complex.name}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white pointer-events-none" />
-              </div>
-            )}
+            {user &&
+              user.isGlobalAdmin && ( // Mobile complex selector
+                <div className="relative px-4 mt-2">
+                  <select
+                    value={selectedComplexId || ""}
+                    onChange={handleComplexChange}
+                    className="bg-indigo-700 text-white text-sm py-1 px-2 rounded-md appearance-none pr-8 cursor-pointer w-full"
+                  >
+                    {complexes.map((complex) => (
+                      <option
+                        key={complex.schemaName}
+                        value={complex.schemaName}
+                      >
+                        {complex.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white pointer-events-none" />
+                </div>
+              )}
             <div className="flex flex-col space-y-2 px-4">
               <Link
                 href={ROUTES.PORTAL_SELECTOR}

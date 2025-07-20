@@ -33,8 +33,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { announcementSchema, AnnouncementFormValues } from "@/validators/announcement-schema";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  announcementSchema,
+  AnnouncementFormValues,
+} from "@/validators/announcement-schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 interface Announcement {
   id: number;
@@ -154,11 +164,15 @@ export default function AnnouncementsPage() {
     }
   };
 
-  const handleDeleteAnnouncement = async (id: number) => {
-    if (!confirm("¿Estás seguro de que quieres eliminar este anuncio?"))
-      return;
+  const handleDeleteAnnouncement = (id: number) => {
+    setAnnouncementToDelete(id);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteAnnouncement = async () => {
+    if (announcementToDelete === null) return;
     try {
-      await deleteAnnouncement(id);
+      await deleteAnnouncement(announcementToDelete);
       toast({
         title: "Éxito",
         description: "Anuncio eliminado correctamente.",
@@ -171,6 +185,9 @@ export default function AnnouncementsPage() {
         description: "Error al eliminar el anuncio.",
         variant: "destructive",
       });
+    } finally {
+      setShowDeleteDialog(false);
+      setAnnouncementToDelete(null);
     }
   };
 
@@ -288,7 +305,12 @@ export default function AnnouncementsPage() {
                   <FormItem className="grid grid-cols-4 items-center gap-4">
                     <FormLabel className="text-right">Título</FormLabel>
                     <FormControl>
-                      <Input id="title" {...field} className="col-span-3" required />
+                      <Input
+                        id="title"
+                        {...field}
+                        className="col-span-3"
+                        required
+                      />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
@@ -301,7 +323,13 @@ export default function AnnouncementsPage() {
                   <FormItem className="grid grid-cols-4 items-center gap-4">
                     <FormLabel className="text-right">Contenido</FormLabel>
                     <FormControl>
-                      <Textarea id="content" {...field} className="col-span-3" required rows={5} />
+                      <Textarea
+                        id="content"
+                        {...field}
+                        className="col-span-3"
+                        required
+                        rows={5}
+                      />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
@@ -312,9 +340,17 @@ export default function AnnouncementsPage() {
                 name="publishedAt"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Fecha Publicación</FormLabel>
+                    <FormLabel className="text-right">
+                      Fecha Publicación
+                    </FormLabel>
                     <FormControl>
-                      <Input id="publishedAt" type="datetime-local" {...field} className="col-span-3" required />
+                      <Input
+                        id="publishedAt"
+                        type="datetime-local"
+                        {...field}
+                        className="col-span-3"
+                        required
+                      />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
@@ -325,9 +361,16 @@ export default function AnnouncementsPage() {
                 name="expiresAt"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Fecha Expiración</FormLabel>
+                    <FormLabel className="text-right">
+                      Fecha Expiración
+                    </FormLabel>
                     <FormControl>
-                      <Input id="expiresAt" type="datetime-local" {...field} className="col-span-3" />
+                      <Input
+                        id="expiresAt"
+                        type="datetime-local"
+                        {...field}
+                        className="col-span-3"
+                      />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
@@ -339,7 +382,10 @@ export default function AnnouncementsPage() {
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
                     <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel>Activo</FormLabel>
@@ -351,30 +397,37 @@ export default function AnnouncementsPage() {
               <div className="grid gap-2 col-span-full">
                 <Label>Roles Objetivo</Label>
                 <div className="flex flex-wrap gap-2">
-                  {["ADMIN", "COMPLEX_ADMIN", "RESIDENT", "STAFF"].map((role) => (
-                    <FormField
-                      key={role}
-                      control={control}
-                      name="targetRoles"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value?.includes(role)}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  field.onChange([...(field.value || []), role]);
-                                } else {
-                                  field.onChange(field.value?.filter((r) => r !== role));
-                                }
-                              }}
-                            />
-                          </FormControl>
-                          <FormLabel>{role}</FormLabel>
-                        </FormItem>
-                      )}
-                    />
-                  ))}
+                  {["ADMIN", "COMPLEX_ADMIN", "RESIDENT", "STAFF"].map(
+                    (role) => (
+                      <FormField
+                        key={role}
+                        control={control}
+                        name="targetRoles"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value?.includes(role)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    field.onChange([
+                                      ...(field.value || []),
+                                      role,
+                                    ]);
+                                  } else {
+                                    field.onChange(
+                                      field.value?.filter((r) => r !== role),
+                                    );
+                                  }
+                                }}
+                              />
+                            </FormControl>
+                            <FormLabel>{role}</FormLabel>
+                          </FormItem>
+                        )}
+                      />
+                    ),
+                  )}
                 </div>
               </div>
               <DialogFooter>
@@ -395,8 +448,8 @@ export default function AnnouncementsPage() {
           <DialogHeader>
             <DialogTitle>Confirmar Eliminación</DialogTitle>
             <DialogDescription>
-              ¿Estás seguro de que quieres eliminar este anuncio? Esta acción
-              no se puede deshacer.
+              ¿Estás seguro de que quieres eliminar este anuncio? Esta acción no
+              se puede deshacer.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

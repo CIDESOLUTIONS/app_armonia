@@ -5,70 +5,70 @@ import {
   IsEnum,
   IsOptional,
   IsNumber,
-} from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+} from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
 
 export enum PaymentGatewayType {
-  STRIPE = 'STRIPE',
-  PAYU = 'PAYU',
-  WOMPI = 'WOMPI',
-  MERCADO_PAGO = 'MERCADO_PAGO',
-  PAYPAL = 'PAYPAL',
+  STRIPE = "STRIPE",
+  PAYU = "PAYU",
+  WOMPI = "WOMPI",
+  MERCADO_PAGO = "MERCADO_PAGO",
+  PAYPAL = "PAYPAL",
 }
 
 export class PaymentGatewayConfigDto {
   @ApiProperty({
-    description: 'Unique identifier of the payment gateway configuration',
+    description: "Unique identifier of the payment gateway configuration",
   })
   @IsNumber()
   id: number;
 
   @ApiProperty({
     enum: PaymentGatewayType,
-    description: 'Type of the payment gateway',
+    description: "Type of the payment gateway",
   })
   @IsEnum(PaymentGatewayType)
   type: PaymentGatewayType;
 
-  @ApiProperty({ description: 'Name of the payment gateway configuration' })
+  @ApiProperty({ description: "Name of the payment gateway configuration" })
   @IsString()
   name: string;
 
   @ApiProperty({
-    description: 'API Key for the payment gateway (masked for security)',
+    description: "API Key for the payment gateway (masked for security)",
   })
   @IsString()
   apiKey: string;
 
   @ApiProperty({
-    description: 'Secret Key for the payment gateway (masked for security)',
+    description: "Secret Key for the payment gateway (masked for security)",
   })
   @IsString()
   secretKey: string;
 
-  @ApiProperty({ description: 'Indicates if the payment gateway is active' })
+  @ApiProperty({ description: "Indicates if the payment gateway is active" })
   @IsBoolean()
   isActive: boolean;
 
   @ApiProperty({
     type: [String],
-    description: 'List of supported currencies (e.g., USD, COP)',
+    description: "List of supported currencies (e.g., USD, COP)",
   })
   @IsArray()
   @IsString({ each: true })
   supportedCurrencies: string[];
 
   @ApiProperty({
-    description: 'Date of creation',
+    description: "Date of creation",
     type: String,
-    format: 'date-time',
+    format: "date-time",
   })
   createdAt: Date;
 
   @ApiProperty({
-    description: 'Date of last update',
+    description: "Date of last update",
     type: String,
-    format: 'date-time',
+    format: "date-time",
   })
   updatedAt: Date;
 }
@@ -76,25 +76,25 @@ export class PaymentGatewayConfigDto {
 export class CreatePaymentGatewayDto {
   @ApiProperty({
     enum: PaymentGatewayType,
-    description: 'Type of the payment gateway',
+    description: "Type of the payment gateway",
   })
   @IsEnum(PaymentGatewayType)
   type: PaymentGatewayType;
 
-  @ApiProperty({ description: 'Name of the payment gateway configuration' })
+  @ApiProperty({ description: "Name of the payment gateway configuration" })
   @IsString()
   name: string;
 
-  @ApiProperty({ description: 'API Key for the payment gateway' })
+  @ApiProperty({ description: "API Key for the payment gateway" })
   @IsString()
   apiKey: string;
 
-  @ApiProperty({ description: 'Secret Key for the payment gateway' })
+  @ApiProperty({ description: "Secret Key for the payment gateway" })
   @IsString()
   secretKey: string;
 
   @ApiProperty({
-    description: 'Indicates if the payment gateway is active',
+    description: "Indicates if the payment gateway is active",
     required: false,
     default: true,
   })
@@ -104,7 +104,7 @@ export class CreatePaymentGatewayDto {
 
   @ApiProperty({
     type: [String],
-    description: 'List of supported currencies (e.g., USD, COP)',
+    description: "List of supported currencies (e.g., USD, COP)",
     required: false,
     default: [],
   })
@@ -117,7 +117,7 @@ export class CreatePaymentGatewayDto {
 export class UpdatePaymentGatewayDto {
   @ApiProperty({
     enum: PaymentGatewayType,
-    description: 'Type of the payment gateway',
+    description: "Type of the payment gateway",
     required: false,
   })
   @IsOptional()
@@ -125,7 +125,7 @@ export class UpdatePaymentGatewayDto {
   type?: PaymentGatewayType;
 
   @ApiProperty({
-    description: 'Name of the payment gateway configuration',
+    description: "Name of the payment gateway configuration",
     required: false,
   })
   @IsOptional()
@@ -133,7 +133,7 @@ export class UpdatePaymentGatewayDto {
   name?: string;
 
   @ApiProperty({
-    description: 'API Key for the payment gateway',
+    description: "API Key for the payment gateway",
     required: false,
   })
   @IsOptional()
@@ -141,7 +141,7 @@ export class UpdatePaymentGatewayDto {
   apiKey?: string;
 
   @ApiProperty({
-    description: 'Secret Key for the payment gateway',
+    description: "Secret Key for the payment gateway",
     required: false,
   })
   @IsOptional()
@@ -149,7 +149,7 @@ export class UpdatePaymentGatewayDto {
   secretKey?: string;
 
   @ApiProperty({
-    description: 'Indicates if the payment gateway is active',
+    description: "Indicates if the payment gateway is active",
     required: false,
   })
   @IsOptional()
@@ -158,7 +158,7 @@ export class UpdatePaymentGatewayDto {
 
   @ApiProperty({
     type: [String],
-    description: 'List of supported currencies (e.g., USD, COP)',
+    description: "List of supported currencies (e.g., USD, COP)",
     required: false,
   })
   @IsOptional()

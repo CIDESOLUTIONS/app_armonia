@@ -29,7 +29,8 @@ export default function ConsolidatedReportsPage() {
     if (!reportType || !startDate || !endDate) {
       toast({
         title: "Advertencia",
-        description: "Por favor, selecciona un tipo de reporte y un rango de fechas.",
+        description:
+          "Por favor, selecciona un tipo de reporte y un rango de fechas.",
         variant: "warning",
       });
       return;
@@ -38,12 +39,16 @@ export default function ConsolidatedReportsPage() {
     setLoading(true);
     try {
       if (reportType === "financial-summary") {
-        const reportData = await getConsolidatedFinancialReport(startDate, endDate);
+        const reportData = await getConsolidatedFinancialReport(
+          startDate,
+          endDate,
+        );
         // For now, just log the data. In a real app, you'd format and display/download it.
         console.log("Consolidated Financial Report:", reportData);
         toast({
           title: "Éxito",
-          description: "Reporte financiero consolidado generado correctamente. (Ver consola)",
+          description:
+            "Reporte financiero consolidado generado correctamente. (Ver consola)",
         });
       } else {
         toast({
@@ -101,9 +106,15 @@ export default function ConsolidatedReportsPage() {
               <SelectValue placeholder="Seleccionar tipo de reporte" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="financial-summary">Resumen Financiero</SelectItem>
-              <SelectItem value="operational-overview">Resumen Operacional</SelectItem>
-              <SelectItem value="user-statistics">Estadísticas de Usuarios</SelectItem>
+              <SelectItem value="financial-summary">
+                Resumen Financiero
+              </SelectItem>
+              <SelectItem value="operational-overview">
+                Resumen Operacional
+              </SelectItem>
+              <SelectItem value="user-statistics">
+                Estadísticas de Usuarios
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>

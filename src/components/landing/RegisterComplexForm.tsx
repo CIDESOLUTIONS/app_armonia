@@ -14,7 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 const formSchema = z.object({
   complexName: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),

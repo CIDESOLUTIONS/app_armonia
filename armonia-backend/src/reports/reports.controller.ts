@@ -6,13 +6,26 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '@prisma/client';
 
-@UseGuards(JwtAuthGuard, RolesGuard(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RECEPTION, UserRole.STAFF))
+@UseGuards(
+  JwtAuthGuard,
+  RolesGuard(
+    UserRole.COMPLEX_ADMIN,
+    UserRole.ADMIN,
+    UserRole.RECEPTION,
+    UserRole.STAFF,
+  ),
+)
 @Controller('reports')
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @Get('visitors/pdf')
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RECEPTION, UserRole.STAFF)
+  @Roles(
+    UserRole.COMPLEX_ADMIN,
+    UserRole.ADMIN,
+    UserRole.RECEPTION,
+    UserRole.STAFF,
+  )
   async getVisitorsReportPdf(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -33,7 +46,12 @@ export class ReportsController {
   }
 
   @Get('visitors/excel')
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RECEPTION, UserRole.STAFF)
+  @Roles(
+    UserRole.COMPLEX_ADMIN,
+    UserRole.ADMIN,
+    UserRole.RECEPTION,
+    UserRole.STAFF,
+  )
   async getVisitorsReportExcel(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -46,7 +64,8 @@ export class ReportsController {
       new Date(endDate),
     );
     res.set({
-      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Type':
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'Content-Disposition': 'attachment; filename="reporte_visitantes.xlsx"',
       'Content-Length': buffer.length,
     });
@@ -54,7 +73,12 @@ export class ReportsController {
   }
 
   @Get('packages/pdf')
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RECEPTION, UserRole.STAFF)
+  @Roles(
+    UserRole.COMPLEX_ADMIN,
+    UserRole.ADMIN,
+    UserRole.RECEPTION,
+    UserRole.STAFF,
+  )
   async getPackagesReportPdf(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -75,7 +99,12 @@ export class ReportsController {
   }
 
   @Get('packages/excel')
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RECEPTION, UserRole.STAFF)
+  @Roles(
+    UserRole.COMPLEX_ADMIN,
+    UserRole.ADMIN,
+    UserRole.RECEPTION,
+    UserRole.STAFF,
+  )
   async getPackagesReportExcel(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -88,7 +117,8 @@ export class ReportsController {
       new Date(endDate),
     );
     res.set({
-      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Type':
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'Content-Disposition': 'attachment; filename="reporte_paquetes.xlsx"',
       'Content-Length': buffer.length,
     });
@@ -96,7 +126,12 @@ export class ReportsController {
   }
 
   @Get('incidents/pdf')
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RECEPTION, UserRole.STAFF)
+  @Roles(
+    UserRole.COMPLEX_ADMIN,
+    UserRole.ADMIN,
+    UserRole.RECEPTION,
+    UserRole.STAFF,
+  )
   async getIncidentsReportPdf(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -117,7 +152,12 @@ export class ReportsController {
   }
 
   @Get('incidents/excel')
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RECEPTION, UserRole.STAFF)
+  @Roles(
+    UserRole.COMPLEX_ADMIN,
+    UserRole.ADMIN,
+    UserRole.RECEPTION,
+    UserRole.STAFF,
+  )
   async getIncidentsReportExcel(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -130,7 +170,8 @@ export class ReportsController {
       new Date(endDate),
     );
     res.set({
-      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Type':
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'Content-Disposition': 'attachment; filename="reporte_incidentes.xlsx"',
       'Content-Length': buffer.length,
     });

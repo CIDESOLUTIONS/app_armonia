@@ -79,7 +79,10 @@ export class AssemblyController {
 
   @Get(':id/quorum-status') // New endpoint for quorum status
   async getQuorumStatus(@GetUser() user: any, @Param('id') assemblyId: string) {
-    return this.assemblyService.getAssemblyQuorumStatus(user.schemaName, +assemblyId);
+    return this.assemblyService.getAssemblyQuorumStatus(
+      user.schemaName,
+      +assemblyId,
+    );
   }
 
   @Post(':id/votes')

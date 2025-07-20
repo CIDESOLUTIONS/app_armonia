@@ -35,7 +35,12 @@ export class ReportsService {
     doc.on('end', () => {});
 
     doc.fontSize(18).text('Reporte de Visitantes', { align: 'center' });
-    doc.fontSize(10).text(`Período: ${format(startDate, 'dd/MM/yyyy')} - ${format(endDate, 'dd/MM/yyyy')}`, { align: 'center' });
+    doc
+      .fontSize(10)
+      .text(
+        `Período: ${format(startDate, 'dd/MM/yyyy')} - ${format(endDate, 'dd/MM/yyyy')}`,
+        { align: 'center' },
+      );
     doc.moveDown();
 
     // Table Header
@@ -51,10 +56,21 @@ export class ReportsService {
     doc.font('Helvetica').fontSize(9);
     visitors.forEach((visitor) => {
       doc.text(visitor.name, 50, doc.y, { width: 100, align: 'left' });
-      doc.text(visitor.identification, 150, doc.y, { width: 100, align: 'left' });
+      doc.text(visitor.identification, 150, doc.y, {
+        width: 100,
+        align: 'left',
+      });
       doc.text(visitor.visitedUnit, 250, doc.y, { width: 100, align: 'left' });
-      doc.text(format(visitor.entryTime, 'dd/MM/yyyy HH:mm'), 350, doc.y, { width: 100, align: 'left' });
-      doc.text(visitor.exitTime ? format(visitor.exitTime, 'dd/MM/yyyy HH:mm') : 'N/A', 450, doc.y, { width: 100, align: 'left' });
+      doc.text(format(visitor.entryTime, 'dd/MM/yyyy HH:mm'), 350, doc.y, {
+        width: 100,
+        align: 'left',
+      });
+      doc.text(
+        visitor.exitTime ? format(visitor.exitTime, 'dd/MM/yyyy HH:mm') : 'N/A',
+        450,
+        doc.y,
+        { width: 100, align: 'left' },
+      );
       doc.moveDown();
     });
 
@@ -115,7 +131,12 @@ export class ReportsService {
     doc.on('end', () => {});
 
     doc.fontSize(18).text('Reporte de Paquetes', { align: 'center' });
-    doc.fontSize(10).text(`Período: ${format(startDate, 'dd/MM/yyyy')} - ${format(endDate, 'dd/MM/yyyy')}`, { align: 'center' });
+    doc
+      .fontSize(10)
+      .text(
+        `Período: ${format(startDate, 'dd/MM/yyyy')} - ${format(endDate, 'dd/MM/yyyy')}`,
+        { align: 'center' },
+      );
     doc.moveDown();
 
     // Table Header
@@ -133,11 +154,22 @@ export class ReportsService {
     doc.font('Helvetica').fontSize(9);
     packages.forEach((pkg) => {
       doc.text(pkg.type, 50, doc.y, { width: 80, align: 'left' });
-      doc.text(pkg.trackingNumber || 'N/A', 130, doc.y, { width: 80, align: 'left' });
+      doc.text(pkg.trackingNumber || 'N/A', 130, doc.y, {
+        width: 80,
+        align: 'left',
+      });
       doc.text(pkg.recipientUnit, 210, doc.y, { width: 80, align: 'left' });
       doc.text(pkg.sender || 'N/A', 290, doc.y, { width: 80, align: 'left' });
-      doc.text(format(pkg.registrationDate, 'dd/MM/yyyy HH:mm'), 370, doc.y, { width: 80, align: 'left' });
-      doc.text(pkg.deliveryDate ? format(pkg.deliveryDate, 'dd/MM/yyyy HH:mm') : 'N/A', 450, doc.y, { width: 80, align: 'left' });
+      doc.text(format(pkg.registrationDate, 'dd/MM/yyyy HH:mm'), 370, doc.y, {
+        width: 80,
+        align: 'left',
+      });
+      doc.text(
+        pkg.deliveryDate ? format(pkg.deliveryDate, 'dd/MM/yyyy HH:mm') : 'N/A',
+        450,
+        doc.y,
+        { width: 80, align: 'left' },
+      );
       doc.text(pkg.status, 530, doc.y, { width: 80, align: 'left' });
       doc.moveDown();
     });
@@ -163,7 +195,15 @@ export class ReportsService {
     });
 
     const data = [
-      ['Tipo', 'Seguimiento', 'Destino', 'Remitente', 'Registro', 'Entrega', 'Estado'],
+      [
+        'Tipo',
+        'Seguimiento',
+        'Destino',
+        'Remitente',
+        'Registro',
+        'Entrega',
+        'Estado',
+      ],
       ...packages.map((pkg) => [
         pkg.type,
         pkg.trackingNumber || 'N/A',
@@ -201,7 +241,12 @@ export class ReportsService {
     doc.on('end', () => {});
 
     doc.fontSize(18).text('Reporte de Incidentes', { align: 'center' });
-    doc.fontSize(10).text(`Período: ${format(startDate, 'dd/MM/yyyy')} - ${format(endDate, 'dd/MM/yyyy')}`, { align: 'center' });
+    doc
+      .fontSize(10)
+      .text(
+        `Período: ${format(startDate, 'dd/MM/yyyy')} - ${format(endDate, 'dd/MM/yyyy')}`,
+        { align: 'center' },
+      );
     doc.moveDown();
 
     // Table Header
@@ -247,7 +292,14 @@ export class ReportsService {
     });
 
     const data = [
-      ['Título', 'Categoría', 'Prioridad', 'Ubicación', 'Reportado Por', 'Estado'],
+      [
+        'Título',
+        'Categoría',
+        'Prioridad',
+        'Ubicación',
+        'Reportado Por',
+        'Estado',
+      ],
       ...incidents.map((incident) => [
         incident.subject,
         incident.category,

@@ -84,7 +84,10 @@ export class FinancesController {
     @GetUser() user: any,
     @Body() createPaymentDto: CreatePaymentDto,
   ) {
-    return this.financesService.createPayment(user.schemaName, createPaymentDto);
+    return this.financesService.createPayment(
+      user.schemaName,
+      createPaymentDto,
+    );
   }
 
   @Get('payments')
@@ -169,11 +172,12 @@ export class FinancesController {
 
   @Post('budgets/:id/approve')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
-  async approveBudget(
-    @GetUser() user: any,
-    @Param('id') id: string,
-  ) {
-    return this.financesService.approveBudget(user.schemaName, +id, user.userId);
+  async approveBudget(@GetUser() user: any, @Param('id') id: string) {
+    return this.financesService.approveBudget(
+      user.schemaName,
+      +id,
+      user.userId,
+    );
   }
 
   // Expenses
@@ -183,7 +187,10 @@ export class FinancesController {
     @GetUser() user: any,
     @Body() createExpenseDto: CreateExpenseDto,
   ) {
-    return this.financesService.createExpense(user.schemaName, createExpenseDto);
+    return this.financesService.createExpense(
+      user.schemaName,
+      createExpenseDto,
+    );
   }
 
   @Get('expenses')
@@ -235,11 +242,12 @@ export class FinancesController {
 
   @Post('payments/initiate')
   @Roles(UserRole.RESIDENT)
-  async initiatePayment(
-    @GetUser() user: any,
-    @Body('feeId') feeId: number,
-  ) {
-    return this.financesService.initiatePayment(user.schemaName, feeId, user.userId);
+  async initiatePayment(@GetUser() user: any, @Body('feeId') feeId: number) {
+    return this.financesService.initiatePayment(
+      user.schemaName,
+      feeId,
+      user.userId,
+    );
   }
 
   @Post('payments/webhook')

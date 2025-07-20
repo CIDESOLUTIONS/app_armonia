@@ -24,9 +24,7 @@ export class ResidentialComplexService {
     return this.prisma.residentialComplex.findMany();
   }
 
-  async getResidentialComplexById(
-    id: number,
-  ): Promise<ResidentialComplexDto> {
+  async getResidentialComplexById(id: number): Promise<ResidentialComplexDto> {
     const complex = await this.prisma.residentialComplex.findUnique({
       where: { id },
     });

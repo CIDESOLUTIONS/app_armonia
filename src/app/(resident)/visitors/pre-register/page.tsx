@@ -18,7 +18,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Loader2, Download, Camera } from "lucide-react";
-import { createPreRegisteredVisitor, uploadVisitorImage } from "@/services/visitorService";
+import {
+  createPreRegisteredVisitor,
+  uploadVisitorImage,
+} from "@/services/visitorService";
 import { getUserProfile } from "@/services/userService";
 import { useAuthStore } from "@/store/authStore";
 import QRCode from "qrcode";
@@ -128,7 +131,8 @@ export default function PreRegisterVisitorPage() {
       });
       toast({
         title: "Éxito",
-        description: "Visitante pre-registrado correctamente. Código QR generado.",
+        description:
+          "Visitante pre-registrado correctamente. Código QR generado.",
       });
       // Optionally, clear the form after successful submission and QR generation
       // form.reset();
@@ -302,8 +306,14 @@ export default function PreRegisterVisitorPage() {
 
       {qrCodeDataUrl && (
         <div className="mt-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">Código QR para el Visitante</h2>
-          <img src={qrCodeDataUrl} alt="Código QR del visitante" className="mx-auto border p-2" />
+          <h2 className="text-2xl font-bold mb-4">
+            Código QR para el Visitante
+          </h2>
+          <img
+            src={qrCodeDataUrl}
+            alt="Código QR del visitante"
+            className="mx-auto border p-2"
+          />
           <Button onClick={handleDownloadQrCode} className="mt-4">
             <Download className="mr-2 h-4 w-4" /> Descargar QR
           </Button>

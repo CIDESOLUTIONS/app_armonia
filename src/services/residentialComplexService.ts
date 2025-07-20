@@ -59,7 +59,9 @@ export async function getResidentialComplexes(): Promise<ResidentialComplex[]> {
   }
 }
 
-export async function getResidentialComplexById(id: number): Promise<ResidentialComplex> {
+export async function getResidentialComplexById(
+  id: number,
+): Promise<ResidentialComplex> {
   try {
     const response = await fetchApi(`/residential-complexes/${id}`);
     return response.data;
@@ -69,7 +71,9 @@ export async function getResidentialComplexById(id: number): Promise<Residential
   }
 }
 
-export async function createResidentialComplex(data: CreateResidentialComplexDto): Promise<ResidentialComplex> {
+export async function createResidentialComplex(
+  data: CreateResidentialComplexDto,
+): Promise<ResidentialComplex> {
   try {
     const response = await fetchApi("/residential-complexes", {
       method: "POST",
@@ -82,7 +86,10 @@ export async function createResidentialComplex(data: CreateResidentialComplexDto
   }
 }
 
-export async function updateResidentialComplex(id: number, data: UpdateResidentialComplexDto): Promise<ResidentialComplex> {
+export async function updateResidentialComplex(
+  id: number,
+  data: UpdateResidentialComplexDto,
+): Promise<ResidentialComplex> {
   try {
     const response = await fetchApi(`/residential-complexes/${id}`, {
       method: "PUT",

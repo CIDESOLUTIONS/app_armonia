@@ -14,7 +14,6 @@ import {
 
 // Mock fetchApi
 
-
 describe("visitorService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -32,17 +31,16 @@ describe("visitorService", () => {
       unitId: 101,
       complexId: "complex1",
     };
-    (fetchApi as any).mockResolvedValueOnce({ data: { id: 1, ...mockVisitorData } });
+    (fetchApi as any).mockResolvedValueOnce({
+      data: { id: 1, ...mockVisitorData },
+    });
 
     const result = await createPreRegisteredVisitor(mockVisitorData);
 
-    expect(fetchApi).toHaveBeenCalledWith(
-      "/visitors/pre-register",
-      {
-        method: "POST",
-        body: JSON.stringify(mockVisitorData),
-      },
-    );
+    expect(fetchApi).toHaveBeenCalledWith("/visitors/pre-register", {
+      method: "POST",
+      body: JSON.stringify(mockVisitorData),
+    });
     expect(result).toEqual({ id: 1, ...mockVisitorData });
   });
 
@@ -66,13 +64,10 @@ describe("visitorService", () => {
 
     const result = await scanQrCode(mockQrCode);
 
-    expect(fetchApi).toHaveBeenCalledWith(
-      "/visitors/scan-qr",
-      {
-        method: "POST",
-        body: JSON.stringify({ qrCode: mockQrCode }),
-      },
-    );
+    expect(fetchApi).toHaveBeenCalledWith("/visitors/scan-qr", {
+      method: "POST",
+      body: JSON.stringify({ qrCode: mockQrCode }),
+    });
     expect(result).toEqual(mockVisitor);
   });
 
@@ -81,32 +76,30 @@ describe("visitorService", () => {
       trackingNumber: "TRACK123",
       recipientUnit: "Apto 101",
     };
-    (fetchApi as any).mockResolvedValueOnce({ data: { id: 1, ...mockPackageData } });
+    (fetchApi as any).mockResolvedValueOnce({
+      data: { id: 1, ...mockPackageData },
+    });
 
     const result = await registerPackage(mockPackageData);
 
-    expect(fetchApi).toHaveBeenCalledWith(
-      "/packages",
-      {
-        method: "POST",
-        body: JSON.stringify(mockPackageData),
-      },
-    );
+    expect(fetchApi).toHaveBeenCalledWith("/packages", {
+      method: "POST",
+      body: JSON.stringify(mockPackageData),
+    });
     expect(result).toEqual({ id: 1, ...mockPackageData });
   });
 
   it("deliverPackage should call fetchApi with correct parameters", async () => {
     const packageId = 1;
-    (fetchApi as any).mockResolvedValueOnce({ data: { id: packageId, status: "DELIVERED" } });
+    (fetchApi as any).mockResolvedValueOnce({
+      data: { id: packageId, status: "DELIVERED" },
+    });
 
     const result = await deliverPackage(packageId);
 
-    expect(fetchApi).toHaveBeenCalledWith(
-      `/packages/${packageId}/deliver`,
-      {
-        method: "PUT",
-      },
-    );
+    expect(fetchApi).toHaveBeenCalledWith(`/packages/${packageId}/deliver`, {
+      method: "PUT",
+    });
     expect(result).toEqual({ id: packageId, status: "DELIVERED" });
   });
 

@@ -3,12 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -81,7 +76,12 @@ export default function SurveillancePage() {
     );
   }
 
-  if (!user || (user.role !== "ADMIN" && user.role !== "COMPLEX_ADMIN" && user.role !== "STAFF")) {
+  if (
+    !user ||
+    (user.role !== "ADMIN" &&
+      user.role !== "COMPLEX_ADMIN" &&
+      user.role !== "STAFF")
+  ) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -134,7 +134,8 @@ export default function SurveillancePage() {
                 ) : (
                   <div className="aspect-video w-full bg-gray-200 rounded-md flex items-center justify-center text-gray-500">
                     <AlertTriangle className="h-8 w-8 mr-2" />
-                    Cámara {feed.status === "offline" ? "desconectada" : "sin señal"}
+                    Cámara{" "}
+                    {feed.status === "offline" ? "desconectada" : "sin señal"}
                   </div>
                 )}
                 <p className="text-sm text-gray-600 mt-2">

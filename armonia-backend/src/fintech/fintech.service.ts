@@ -32,7 +32,9 @@ export class FintechService {
 
   async getCreditScore(schemaName: string, userId: number): Promise<any> {
     // Simulate API call to an external FinTech provider for credit score
-    console.log(`Simulating credit score request for ${schemaName}, user ${userId}`);
+    console.log(
+      `Simulating credit score request for ${schemaName}, user ${userId}`,
+    );
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({
