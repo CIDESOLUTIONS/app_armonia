@@ -36,11 +36,11 @@ export default function DocumentsPage() {
     try {
       const data = await getDocuments();
       setDocuments(data);
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error fetching documents:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar los documentos.",
+        description: "No se pudieron cargar los documentos: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -69,11 +69,11 @@ export default function DocumentsPage() {
         title: "Éxito",
         description: "Documento descargado correctamente.",
       });
-    } catch (error) {
+    } catch (error: Error) {
       console.error("Error downloading document:", error);
       toast({
         title: "Error",
-        description: "Error al descargar el documento.",
+        description: "Error al descargar el documento: " + error.message,
         variant: "destructive",
       });
     }

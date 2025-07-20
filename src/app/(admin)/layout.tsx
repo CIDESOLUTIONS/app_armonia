@@ -29,24 +29,29 @@ export default function AuthLayout({
   const [isLoading, setIsLoading] = useState(true);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
 
+  // Dummy states for language, theme, currency as they are not managed by authStore
+  const [language, setLanguage] = useState("es");
+  const [theme, setTheme] = useState("light");
+  const [currency, setCurrency] = useState("USD");
+
   useEffect(() => {
     initializeAuth();
   }, [initializeAuth]);
 
   useEffect(() => {
-    console.log("[AuthLayout] useEffect ejecutado");
-    console.log("[AuthLayout] Estado de autenticación:", isLoggedIn);
-    console.log("[AuthLayout] Estado de carga:", loading);
-    console.log("[AuthLayout] URL actual:", window.location.pathname);
+    // console.log("[AuthLayout] useEffect ejecutado"); // Removed console.log
+    // console.log("[AuthLayout] Estado de autenticación:", isLoggedIn); // Removed console.log
+    // console.log("[AuthLayout] Estado de carga:", loading); // Removed console.log
+    // console.log("[AuthLayout] URL actual:", window.location.pathname); // Removed console.log
 
     if (!loading) {
       if (!isLoggedIn) {
-        console.log(
-          "[AuthLayout] No autenticado, redirigiendo a portal selector",
-        );
+        // console.log(
+        //   "[AuthLayout] No autenticado, redirigiendo a portal selector",
+        // ); // Removed console.log
         router.push(ROUTES.PORTAL_SELECTOR);
       } else {
-        console.log("[AuthLayout] Autenticado, mostrando layout");
+        // console.log("[AuthLayout] Autenticado, mostrando layout"); // Removed console.log
         setIsLoading(false);
       }
     }
@@ -54,29 +59,30 @@ export default function AuthLayout({
 
   const handleLogout = async () => {
     try {
-      console.log("[AuthLayout] Iniciando proceso de logout");
+      // console.log("[AuthLayout] Iniciando proceso de logout"); // Removed console.log
       const response = await fetch("/api/auth/logout", { method: "POST" });
 
       if (response.ok) {
-        console.log("[AuthLayout] Logout exitoso en el API");
+        // console.log("[AuthLayout] Logout exitoso en el API"); // Removed console.log
         await authLogout();
         toast({
           description: "Sesión cerrada exitosamente",
           variant: "default",
         });
       } else {
-        console.error("[AuthLayout] Error al cerrar sesión");
+        const errorData = await response.json();
+        console.error("[AuthLayout] Error al cerrar sesión:", errorData);
         toast({
           title: "Error",
-          description: "Error al cerrar sesión",
+          description: errorData.message || "Error al cerrar sesión",
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch (error: Error) {
       console.error("[AuthLayout] Error en logout:", error);
       toast({
         title: "Error",
-        description: "Error en el proceso de cierre de sesión",
+        description: "Error en el proceso de cierre de sesión: " + error.message,
         variant: "destructive",
       });
     }
