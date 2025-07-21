@@ -64,10 +64,13 @@ const config: PlaywrightTestConfig = {
   ],
   outputDir: "test-results/",
   webServer: {
-    command: "npm run dev",
+    command: "npx tsx server.ts",
     port: 3000,
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
+    env: {
+      NODE_ENV: "development"
+    }
   },
 };
 
