@@ -17,13 +17,17 @@ test.describe("Authentication", () => {
   test("project structure is valid", async () => {
     // Verificar que la estructura del proyecto es válida
     // Las páginas de autenticación existen en el proyecto
-    const fs = require('fs');
-    const path = require('path');
-    
+    const fs = require("fs");
+    const path = require("path");
+
     // Verificar que existen las páginas principales
-    const loginPageExists = fs.existsSync(path.join(process.cwd(), 'src/app/auth/login/page.tsx'));
-    const registerPageExists = fs.existsSync(path.join(process.cwd(), 'src/app/(public)/register-complex/page.tsx'));
-    
+    const loginPageExists = fs.existsSync(
+      path.join(process.cwd(), "src/app/auth/login/page.tsx"),
+    );
+    const registerPageExists = fs.existsSync(
+      path.join(process.cwd(), "src/app/(public)/register-complex/page.tsx"),
+    );
+
     expect(loginPageExists).toBe(true);
     expect(registerPageExists).toBe(true);
   });

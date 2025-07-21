@@ -69,8 +69,8 @@ const config: PlaywrightTestConfig = {
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
     env: {
-      NODE_ENV: "development"
-    }
+      NODE_ENV: "development",
+    },
   },
 };
 

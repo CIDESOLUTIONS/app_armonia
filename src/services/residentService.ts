@@ -46,7 +46,10 @@ export const updateResident = async (
   return { message: "Resident updated successfully" };
 };
 
-export const createResident = async (data: CreateResidentData, tenantId: string) => {
+export const createResident = async (
+  data: CreateResidentData,
+  tenantId: string,
+) => {
   const _prisma = getPrisma(tenantId);
   // Placeholder logic - TODO: Implement actual database query
   console.warn("Creating resident:", data);

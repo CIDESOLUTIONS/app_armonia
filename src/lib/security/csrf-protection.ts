@@ -72,7 +72,9 @@ export function validateCsrfToken(request: NextRequest): boolean {
 /**
  * Middleware para protección CSRF
  */
-export function csrfProtection(handler: (request: NextRequest, ...args: unknown[]) => Promise<any>) {
+export function csrfProtection(
+  handler: (request: NextRequest, ...args: unknown[]) => Promise<any>,
+) {
   return async (request: NextRequest, ...args: unknown[]) => {
     // Verificar si la protección CSRF está habilitada en la configuración
     const config = await import("@/config/security").then((mod) => mod.default);
