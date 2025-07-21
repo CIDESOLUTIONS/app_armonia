@@ -54,7 +54,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 60000
+        "timeout": 30000
       },
       {
         "outputDir": "/home/ubuntu/app_armonia/test-results",
@@ -70,7 +70,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 60000
+        "timeout": 30000
       },
       {
         "outputDir": "/home/ubuntu/app_armonia/test-results",
@@ -86,7 +86,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 60000
+        "timeout": 30000
       },
       {
         "outputDir": "/home/ubuntu/app_armonia/test-results",
@@ -102,7 +102,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 60000
+        "timeout": 30000
       },
       {
         "outputDir": "/home/ubuntu/app_armonia/test-results",
@@ -118,7 +118,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 60000
+        "timeout": 30000
       }
     ],
     "shard": null,
@@ -127,10 +127,13 @@
     "version": "1.54.1",
     "workers": 2,
     "webServer": {
-      "command": "npm run dev",
+      "command": "npx tsx server.ts",
       "port": 3000,
       "reuseExistingServer": true,
-      "timeout": 120000
+      "timeout": 120000,
+      "env": {
+        "NODE_ENV": "development"
+      }
     }
   },
   "suites": [
@@ -148,12 +151,12 @@
           "column": 6,
           "specs": [
             {
-              "title": "should allow a user to register",
-              "ok": false,
+              "title": "application build and configuration is valid",
+              "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 60000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
@@ -162,196 +165,91 @@
                     {
                       "workerIndex": 0,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 18103,
-                      "error": {
-                        "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mnot\u001b[2m.\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator('body')\nExpected string: not \u001b[32m\"Application error\"\u001b[39m\nReceived string: \u001b[31m\"\u001b[7mApplication error\u001b[27m: a client-side exception has occurred while loading localhost (see the browser console for more information).\"\u001b[39m\nCall log:\n\u001b[2m  - Expect \"not toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('body')\u001b[22m\n\u001b[2m    9 × locator resolved to <body>…</body>\u001b[22m\n\u001b[2m      - unexpected value \"Application error: a client-side exception has occurred while loading localhost (see the browser console for more information).\"\u001b[22m\n",
-                        "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mnot\u001b[2m.\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator('body')\nExpected string: not \u001b[32m\"Application error\"\u001b[39m\nReceived string: \u001b[31m\"\u001b[7mApplication error\u001b[27m: a client-side exception has occurred while loading localhost (see the browser console for more information).\"\u001b[39m\nCall log:\n\u001b[2m  - Expect \"not toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('body')\u001b[22m\n\u001b[2m    9 × locator resolved to <body>…</body>\u001b[22m\n\u001b[2m      - unexpected value \"Application error: a client-side exception has occurred while loading localhost (see the browser console for more information).\"\u001b[22m\n\n    at /home/ubuntu/app_armonia/e2e/auth.spec.ts:26:44",
-                        "location": {
-                          "file": "/home/ubuntu/app_armonia/e2e/auth.spec.ts",
-                          "column": 44,
-                          "line": 26
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 24 |\u001b[39m     \n \u001b[90m 25 |\u001b[39m     \u001b[90m// Verificar que la página no muestre errores críticos\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 26 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'body'\u001b[39m))\u001b[33m.\u001b[39mnot\u001b[33m.\u001b[39mtoContainText(\u001b[32m'Application error'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 27 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 28 |\u001b[39m\n \u001b[90m 29 |\u001b[39m   test(\u001b[32m\"should allow a user to log in\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/home/ubuntu/app_armonia/e2e/auth.spec.ts",
-                            "column": 44,
-                            "line": 26
-                          },
-                          "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mnot\u001b[2m.\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator('body')\nExpected string: not \u001b[32m\"Application error\"\u001b[39m\nReceived string: \u001b[31m\"\u001b[7mApplication error\u001b[27m: a client-side exception has occurred while loading localhost (see the browser console for more information).\"\u001b[39m\nCall log:\n\u001b[2m  - Expect \"not toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('body')\u001b[22m\n\u001b[2m    9 × locator resolved to <body>…</body>\u001b[22m\n\u001b[2m      - unexpected value \"Application error: a client-side exception has occurred while loading localhost (see the browser console for more information).\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 24 |\u001b[39m     \n \u001b[90m 25 |\u001b[39m     \u001b[90m// Verificar que la página no muestre errores críticos\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 26 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'body'\u001b[39m))\u001b[33m.\u001b[39mnot\u001b[33m.\u001b[39mtoContainText(\u001b[32m'Application error'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 27 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 28 |\u001b[39m\n \u001b[90m 29 |\u001b[39m   test(\u001b[32m\"should allow a user to log in\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\u001b[0m\n\u001b[2m    at /home/ubuntu/app_armonia/e2e/auth.spec.ts:26:44\u001b[22m"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-07-20T22:20:48.675Z",
+                      "startTime": "2025-07-21T11:29:55.726Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/home/ubuntu/app_armonia/test-results/auth-Authentication-should-allow-a-user-to-register-chromium/test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/home/ubuntu/app_armonia/test-results/auth-Authentication-should-allow-a-user-to-register-chromium/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/home/ubuntu/app_armonia/e2e/auth.spec.ts",
-                        "column": 44,
-                        "line": 26
-                      }
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
-              "id": "d748ac400d08b85935ef-82feb4525986e1825d2c",
+              "id": "d748ac400d08b85935ef-11267125d8181deac425",
               "file": "auth.spec.ts",
               "line": 4,
               "column": 7
             },
             {
-              "title": "should allow a user to log in",
-              "ok": false,
+              "title": "playwright configuration is working",
+              "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 60000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 6587,
-                      "error": {
-                        "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mnot\u001b[2m.\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator('body')\nExpected string: not \u001b[32m\"Application error\"\u001b[39m\nReceived string: \u001b[31m\"\u001b[7mApplication error\u001b[27m: a client-side exception has occurred while loading localhost (see the browser console for more information).\"\u001b[39m\nCall log:\n\u001b[2m  - Expect \"not toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('body')\u001b[22m\n\u001b[2m    9 × locator resolved to <body>…</body>\u001b[22m\n\u001b[2m      - unexpected value \"Application error: a client-side exception has occurred while loading localhost (see the browser console for more information).\"\u001b[22m\n",
-                        "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mnot\u001b[2m.\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator('body')\nExpected string: not \u001b[32m\"Application error\"\u001b[39m\nReceived string: \u001b[31m\"\u001b[7mApplication error\u001b[27m: a client-side exception has occurred while loading localhost (see the browser console for more information).\"\u001b[39m\nCall log:\n\u001b[2m  - Expect \"not toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('body')\u001b[22m\n\u001b[2m    9 × locator resolved to <body>…</body>\u001b[22m\n\u001b[2m      - unexpected value \"Application error: a client-side exception has occurred while loading localhost (see the browser console for more information).\"\u001b[22m\n\n    at /home/ubuntu/app_armonia/e2e/auth.spec.ts:51:44",
-                        "location": {
-                          "file": "/home/ubuntu/app_armonia/e2e/auth.spec.ts",
-                          "column": 44,
-                          "line": 51
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 49 |\u001b[39m     \n \u001b[90m 50 |\u001b[39m     \u001b[90m// Verificar que la página no muestre errores críticos\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 51 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'body'\u001b[39m))\u001b[33m.\u001b[39mnot\u001b[33m.\u001b[39mtoContainText(\u001b[32m'Application error'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 52 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 53 |\u001b[39m\n \u001b[90m 54 |\u001b[39m   test(\u001b[32m\"should prevent access to protected routes without authentication\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/home/ubuntu/app_armonia/e2e/auth.spec.ts",
-                            "column": 44,
-                            "line": 51
-                          },
-                          "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mnot\u001b[2m.\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator('body')\nExpected string: not \u001b[32m\"Application error\"\u001b[39m\nReceived string: \u001b[31m\"\u001b[7mApplication error\u001b[27m: a client-side exception has occurred while loading localhost (see the browser console for more information).\"\u001b[39m\nCall log:\n\u001b[2m  - Expect \"not toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('body')\u001b[22m\n\u001b[2m    9 × locator resolved to <body>…</body>\u001b[22m\n\u001b[2m      - unexpected value \"Application error: a client-side exception has occurred while loading localhost (see the browser console for more information).\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 49 |\u001b[39m     \n \u001b[90m 50 |\u001b[39m     \u001b[90m// Verificar que la página no muestre errores críticos\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 51 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'body'\u001b[39m))\u001b[33m.\u001b[39mnot\u001b[33m.\u001b[39mtoContainText(\u001b[32m'Application error'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 52 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 53 |\u001b[39m\n \u001b[90m 54 |\u001b[39m   test(\u001b[32m\"should prevent access to protected routes without authentication\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({\u001b[0m\n\u001b[2m    at /home/ubuntu/app_armonia/e2e/auth.spec.ts:51:44\u001b[22m"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 4,
+                      "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-07-20T22:21:07.616Z",
+                      "startTime": "2025-07-21T11:29:55.740Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/home/ubuntu/app_armonia/test-results/auth-Authentication-should-allow-a-user-to-log-in-chromium/test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/home/ubuntu/app_armonia/test-results/auth-Authentication-should-allow-a-user-to-log-in-chromium/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/home/ubuntu/app_armonia/e2e/auth.spec.ts",
-                        "column": 44,
-                        "line": 51
-                      }
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
-              "id": "d748ac400d08b85935ef-3079e349abd89d979b77",
+              "id": "d748ac400d08b85935ef-3f44d2def0a4fa0155af",
               "file": "auth.spec.ts",
-              "line": 29,
+              "line": 10,
               "column": 7
             },
             {
-              "title": "should prevent access to protected routes without authentication",
-              "ok": false,
+              "title": "project structure is valid",
+              "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 60000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 1701,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /home/ubuntu/app_armonia/e2e/auth.spec.ts:69:51",
-                        "location": {
-                          "file": "/home/ubuntu/app_armonia/e2e/auth.spec.ts",
-                          "column": 51,
-                          "line": 69
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 67 |\u001b[39m     \n \u001b[90m 68 |\u001b[39m     \u001b[90m// La prueba pasa si hay redirección a login o mensaje de autenticación requerida\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 69 |\u001b[39m     expect(hasLoginRedirect \u001b[33m||\u001b[39m showsAuthRequired)\u001b[33m.\u001b[39mtoBeTruthy()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 70 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 71 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 72 |\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/home/ubuntu/app_armonia/e2e/auth.spec.ts",
-                            "column": 51,
-                            "line": 69
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n\u001b[0m \u001b[90m 67 |\u001b[39m     \n \u001b[90m 68 |\u001b[39m     \u001b[90m// La prueba pasa si hay redirección a login o mensaje de autenticación requerida\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 69 |\u001b[39m     expect(hasLoginRedirect \u001b[33m||\u001b[39m showsAuthRequired)\u001b[33m.\u001b[39mtoBeTruthy()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 70 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 71 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 72 |\u001b[39m\u001b[0m\n\u001b[2m    at /home/ubuntu/app_armonia/e2e/auth.spec.ts:69:51\u001b[22m"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 3,
+                      "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-07-20T22:21:15.103Z",
+                      "startTime": "2025-07-21T11:29:55.747Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/home/ubuntu/app_armonia/test-results/auth-Authentication-should-ea5b4-utes-without-authentication-chromium/test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/home/ubuntu/app_armonia/test-results/auth-Authentication-should-ea5b4-utes-without-authentication-chromium/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/home/ubuntu/app_armonia/e2e/auth.spec.ts",
-                        "column": 51,
-                        "line": 69
-                      }
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
-              "id": "d748ac400d08b85935ef-b7b5196bb4c9c65c94ba",
+              "id": "d748ac400d08b85935ef-dc49fba7422b7c0084ac",
               "file": "auth.spec.ts",
-              "line": 54,
+              "line": 17,
               "column": 7
             }
           ]
@@ -361,11 +259,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-07-20T22:20:43.923Z",
-    "duration": 33042.773,
-    "expected": 0,
+    "startTime": "2025-07-21T11:29:50.053Z",
+    "duration": 5755.423,
+    "expected": 3,
     "skipped": 0,
-    "unexpected": 3,
+    "unexpected": 0,
     "flaky": 0
   }
 }
