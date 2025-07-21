@@ -1,10 +1,9 @@
 ﻿Proyecto Armonía
 Especificaciones Técnicas 
 Sistema de Administración de Conjuntos Residenciales
-Versión: 16
-Fecha de Actualización: 16 de julio de 2025
-Cambios Principales: Se expanden y detallan las especificaciones funcionales para el "Marketplace Comunitario" y el "Módulo de Ecosistema y Alianzas", atendiendo a la necesidad de mayor concreción para el desarrollo.
- 
+Versión: 2.0
+Fecha de Actualización: 21 de julio de 2025
+
 1. Introducción
 
 1.1. Descripción General 
@@ -257,4 +256,117 @@ Gestión de áreas comunes y amenidades (salón social, BBQ, canchas) con calend
 * Plan Premium: Todo lo del Estándar + Conciliación Bancaria Automática, Acceso a API, y acceso al Marketplace Comunitario y al Directorio de Servicios y Democracia Digital integrada. mas de 150 unidades residenciales.
 * Plan Empresarial "Portafolio": Todo lo del Premium + Dashboard "Armonía Portafolio", personalización de marca, soporte prioritario.
 * Plan Democracia Digital
+
+5. Resumen comprensivo del funcionamiento
+
+Visión General del Sistema
+Armonía es un ecosistema operativo integral diseñado específicamente para modernizar y unificar la gestión de propiedades horizontales (conjuntos residenciales). La aplicación trasciende el concepto tradicional de software de gestión para posicionarse como el socio estratégico indispensable de toda la comunidad residencial. Su arquitectura está diseñada para servir a un espectro completo de usuarios que incluye empresas de administración profesional que gestionan vastos portafolios, administradores de conjuntos individuales, residentes que buscan una experiencia de vida más conectada y conveniente, y personal de seguridad y recepción que requiere herramientas fiables y sencillas.
+
+La plataforma centraliza la comunicación, automatiza los procesos financieros, optimiza la seguridad y fomenta una comunidad próspera y conectada. Su misión fundamental es transformar radicalmente la gestión y la experiencia de vida en propiedad horizontal, consolidándose como el sistema operativo central e indispensable para cada comunidad.
+
+
+Arquitectura Técnica y Stack Tecnológico
+
+Arquitectura General
+La aplicación implementa una arquitectura full-stack moderna con separación clara entre frontend y backend, diseñada bajo el principio de multi-tenancy donde cada conjunto residencial opera con su propio esquema de base de datos, garantizando aislamiento de datos y escalabilidad.
+
+Frontend
+El frontend está construido con Next.js 15+ y React 19+, aprovechando las características más avanzadas como Server Components y Server Actions para optimizar el rendimiento y la experiencia del usuario. La aplicación utiliza TypeScript para garantizar la robustez del código y reduce significativamente los errores en tiempo de ejecución.
+El sistema de diseño está basado en Shadcn/UI, proporcionando componentes altamente personalizables y reutilizables que mantienen consistencia visual en toda la plataforma. La interfaz es completamente responsive, adaptándose a dispositivos móviles, tablets y escritorio, con soporte para modo oscuro y claro. La paleta de colores principal utiliza Índigo (#4f46e5) y blanco (#ffffff), con animaciones sutiles que mejoran la experiencia sin comprometer el rendimiento.
+
+Backend
+El backend está desarrollado con Node.js y NestJS, proporcionando una arquitectura modular y escalable. Utiliza PostgreSQL 17+ como base de datos principal con Prisma 6+ como ORM, lo que facilita las migraciones y el manejo de esquemas complejos. La autenticación se basa en JSON Web Tokens (JWT), garantizando seguridad y escalabilidad.
+Para las funcionalidades en tiempo real, la aplicación integra Socket.io, permitiendo notificaciones instantáneas y actualizaciones en vivo. Las comunicaciones externas se manejan a través de Twilio para SMS y notificaciones push.
+
+Características Técnicas Destacadas
+La aplicación implementa métricas de rendimiento optimizadas siguiendo los Core Web Vitals con objetivos específicos: LCP (Largest Contentful Paint) menor a 2.5 segundos, INP (Interaction to Next Paint) menor a 200ms, y CLS (Cumulative Layout Shift) menor a 0.1. Estas métricas aseguran una experiencia de usuario excepcional.
+La seguridad es una prioridad fundamental con implementación de encriptación de datos sensibles, protección contra ataques CSRF, XSS y SQL Injection, rate limiting para prevenir ataques de fuerza bruta, validación de datos tanto en cliente como servidor, auditoría de accesos y cambios, y backups automáticos diarios.
+
+
+Módulos y Portales del Sistema
+
+Portal Público y de Adquisición
+El punto de entrada al ecosistema Armonía es una landing page optimizada para SEO y conversión, diseñada para presentar claramente los planes disponibles y generar leads calificados. La página incluye imágenes alusivas a las amenidades de los conjuntos residenciales y una sección de videos que demuestran los flujos de las funcionalidades más importantes como acceso vía QR, asambleas, generación y pago de cuotas, reservas de amenidades y el uso del marketplace comunitario.
+
+Portal de Administración
+El portal de administración constituye el centro de control para los administradores de conjunto, proporcionando una vista integral de todas las operaciones del conjunto residencial.
+
+Dashboard Principal
+El dashboard presenta una vista general con KPIs críticos que incluyen el estado de cartera, PQR pendientes, reservas del día y últimos comunicados. Esta vista permite a los administradores tener un control inmediato del estado operativo del conjunto.
+
+Módulo de Inventario
+Este módulo maneja la gestión completa de inmuebles incluyendo apartamentos, casas y oficinas, mantiene una base de datos actualizada de residentes y propietarios, gestiona el inventario de vehículos y parqueaderos, registra mascotas con sus respectivas vacunas y documentación, y administra el registro de amenidades y áreas comunes con sus especificaciones y capacidades.
+
+Módulo de Comunicaciones
+El sistema de comunicaciones incluye una cartelera digital para anuncios oficiales que se sincroniza automáticamente con todos los portales, un sistema robusto de envío de notificaciones push y email masivo con segmentación de audiencias, un módulo de encuestas y votaciones simples para decisiones comunitarias, un sistema completo de PQR (Peticiones, Quejas, Reclamos) con seguimiento de estados y tiempos de respuesta, y un repositorio central de documentos que incluye reglamentos, actas y manuales con control de versiones.
+
+Módulo Financiero Avanzado
+Este es uno de los módulos más sofisticados del sistema, ofreciendo generación y automatización de cuotas de administración que incluye cargos fijos y variables con cálculos automáticos basados en coeficientes de participación, gestión integral de multas e intereses por mora con escalamiento automático, integración completa con pasarelas de pago incluyendo PSE y tarjetas de crédito, gestión y seguimiento del presupuesto anual con alertas de desviaciones, y generación de informes financieros comprehensivos que incluyen estado de cartera, paz y salvos, e informes de pagos.
+Una característica distintiva es la Conciliación Bancaria Automática, una herramienta avanzada que permite importar extractos bancarios en formatos estándar como Excel y CSV, cruzándolos automáticamente con los pagos registrados en la plataforma. El sistema identifica y sugiere coincidencias, marca las cuotas como pagadas automáticamente y señala discrepancias para revisión manual. Esta funcionalidad reduce drásticamente el trabajo manual y los errores, convirtiéndose en una característica clave para justificar el valor de los planes Premium.
+
+Módulo de Reservas
+Gestiona integralmente las áreas comunes y amenidades como salón social, BBQ y canchas deportivas, con un calendario interactivo, reglas de uso personalizables por amenidad, sistema de aprobación automático o manual según configuración, y gestión de conflictos de horarios.
+
+Módulo de Proyectos y Obras
+Este módulo maneja el ciclo completo de proyectos desde la aprobación en asamblea hasta la entrega final, incluyendo gestión de presupuestos con múltiples cotizaciones, recolección de cuotas extraordinarias con seguimiento individual, planeación detallada con cronogramas y hitos, seguimiento de ejecución con reportes de avance, y visibilidad completa para residentes a través del dashboard.
+
+Módulo de Gestión de Usuarios y Roles
+Administra usuarios del personal operativo como recepcionistas, vigilantes, conserjes y otras labores, diferenciándolos claramente de residentes y propietarios, con asignación de roles y permisos específicos según las responsabilidades de cada posición.
+
+Portal de Residentes
+El portal de residentes está disponible tanto como aplicación móvil como aplicación web, proporcionando acceso completo a comunicados, cartelera y documentos del conjunto, capacidad de realizar pagos en línea de manera segura y conveniente, sistema de reserva de amenidades y áreas comunes con disponibilidad en tiempo real, pre-registro de visitantes con generación de códigos QR temporales para acceso seguro, botón de pánico integrado para emergencias, recepción de notificaciones sobre paquetería y anuncios importantes, y gestión de presupuesto familiar por inmueble con plantillas de ayuda para manejo de ingresos y gastos mensuales y anuales, manteniendo hasta 2 años de histórico.
+
+Marketplace Comunitario
+Una característica innovadora es el Marketplace Comunitario, una sección donde los residentes pueden publicar anuncios clasificados para comprar, vender o intercambiar artículos y servicios con otros miembros de la comunidad. Esta funcionalidad fomenta la interacción horizontal entre residentes, aumenta el compromiso y el uso diario de la aplicación, transformando la plataforma de una simple herramienta de gestión a un verdadero centro de vida comunitaria.
+El marketplace incluye un formulario intuitivo para crear anuncios con título, descripción detallada, categorización, precio y hasta 5 fotografías del producto o servicio. Los usuarios pueden navegar a través de una vista de galería, utilizar un buscador por palabra clave y aplicar filtros por categoría y rango de precios. La comunicación entre interesados y vendedores se maneja a través de un sistema de mensajería interna y privada, protegiendo la privacidad al no exponer números de teléfono públicamente.
+Los usuarios pueden gestionar sus anuncios a través de un panel personal donde pueden ver anuncios activos, editarlos, marcarlos como vendidos o eliminarlos permanentemente. El sistema incluye moderación con botones para reportar contenido inapropiado y un panel de moderación para administradores que pueden revisar anuncios reportados y tomar acciones correctivas.
+
+Portal de Seguridad y Recepción
+Este portal está diseñado específicamente para el personal de seguridad y recepción, siendo "IoT-Ready" para futuras integraciones con dispositivos inteligentes. Incluye una bitácora digital de novedades y registro de incidentes con atención especial al botón de pánico, y una Gestión Avanzada de Visitantes y Paquetería que representa una evolución del pre-registro básico.
+Los residentes pueden generar códigos QR únicos y temporales para sus visitantes desde la aplicación, y el personal de seguridad escanea estos códigos para un acceso rápido y seguro. El sistema implementa un registro automatizado de paquetería que envía notificaciones push automáticas al residente en el momento exacto en que su paquete es recibido en portería, mejorando significativamente la seguridad y la conveniencia.
+
+Módulo de Democracia Digital
+Este módulo revoluciona la realización de asambleas proporcionando una plataforma completa para asambleas virtuales o híbridas. Incluye registro automático de asistencia y cálculo de quórum en tiempo real basado en coeficientes de participación, sistema de votaciones ponderadas que respeta los porcentajes de participación de cada unidad, y generación automática del borrador del acta con todos los puntos discutidos y decisiones tomadas.
+Una estrategia comercial innovadora es el Servicio Desagregado "Asambleas por Armonía", que empaqueta este módulo como un servicio independiente que puede ser contratado por cualquier conjunto residencial sin necesidad de adquirir la plataforma completa. Esta estrategia crea un nuevo flujo de ingresos y actúa como un potente embudo de generación de prospectos para la plataforma completa.
+
+Portal Empresarial "Armonía Portafolio"
+Diseñado específicamente para empresas de administración profesional que gestionan múltiples propiedades, este portal representa una oportunidad significativa en el segmento B2B. Incluye un Dashboard Multi-Propiedad que muestra KPIs consolidados de todos los conjuntos administrados en una sola pantalla, gestión centralizada que permite navegar entre diferentes propiedades sin necesidad de cerrar e iniciar sesión repetidamente, informes consolidados que agrupan información financiera y operativa de todo el portafolio, y personalización de marca (White-Labeling) que permite a las empresas administradoras personalizar la plataforma con su propio logo y colores, ofreciéndola a sus clientes como una solución propia.
+
+Módulo de Ecosistema y Alianzas
+Este módulo expande el modelo de negocio más allá del SaaS tradicional, integrando servicios de valor agregado a través de alianzas estratégicas. Incluye un Directorio de Servicios para el Hogar con proveedores verificados organizados por categorías como plomería, electricidad y limpieza, donde cada proveedor tiene un perfil completo con calificaciones y reseñas de otros residentes del mismo conjunto.
+El módulo implementa un Programa de Alianzas vía API que incluye alianzas InsurTech para ofrecer cotizaciones de seguros de hogar directamente desde el portal del residente con formularios pre-llenados y cotizaciones instantáneas, y alianzas FinTech para ofrecer soluciones como micro-créditos para el pago de cuotas atrasadas o reparaciones locativas.
+Una característica avanzada es la Integración con Medidores Inteligentes (IoT), donde el backend puede recibir datos vía API desde proveedores de telemetría, asociar lecturas con inmuebles específicos, y automatizar la facturación añadiendo el consumo registrado como ítem facturable en la cuenta de cobro del mes siguiente.
+
+
+Estructura de Planes y Modelo de Negocio
+La aplicación implementa una estrategia de monetización escalonada con cinco planes principales:
+
+Plan Básico (Freemium): Dirigido a conjuntos de hasta 40 unidades residenciales, incluye gestión de inventario, PQR, cartelera digital y encuestas básicas. Este plan actúa como gancho para atraer usuarios y demostrar el valor de la plataforma.
+
+Plan Estándar: Para conjuntos de hasta 150 unidades, añade el Módulo de Reservas, Módulo Financiero sin conciliación bancaria, y Gestión Avanzada de Visitantes con QR y Paquetería.
+
+Plan Premium: Para conjuntos de más de 150 unidades, incluye todas las funcionalidades del Estándar más Conciliación Bancaria Automática, acceso a API, Marketplace Comunitario, Directorio de Servicios y Democracia Digital integrada.
+
+Plan Empresarial "Portafolio": Incluye todas las funcionalidades del Premium más Dashboard "Armonía Portafolio", personalización de marca y soporte prioritario, dirigido específicamente a empresas de administración profesional.
+
+Plan Democracia Digital: Un servicio independiente que permite a cualquier conjunto contratar únicamente el módulo de asambleas sin necesidad de la plataforma completa.
+
+
+Características de Seguridad y Privacidad
+La aplicación implementa un enfoque integral de seguridad que incluye encriptación de datos sensibles de cada conjunto residencial, protección robusta contra ataques CSRF, XSS y SQL Injection, rate limiting para prevenir ataques de fuerza bruta, validación exhaustiva de datos tanto en cliente como servidor, auditoría completa de accesos y cambios con logs detallados, y backups automáticos diarios con múltiples puntos de restauración.
+En términos de privacidad, la aplicación cumple con regulaciones de protección de datos, implementa políticas claras de privacidad y términos de uso, ofrece la opción de convertir datos a datos anónimos al eliminar cuentas, permite exportación de datos personales, y requiere consentimiento explícito para uso de cookies.
+
+Estrategia de Pruebas y Calidad
+La aplicación implementa una estrategia comprehensiva de pruebas que incluye pruebas unitarias para componentes y flujos de servicios utilizando Vitest, pruebas de integración para flujos principales, pruebas End-to-End de las funcionalidades para cada portal utilizando Playwright, pruebas de rendimiento y carga, y pruebas de compatibilidad con múltiples navegadores.
+El control de calidad se mantiene a través de revisión de código obligatoria, análisis estático de código, monitoreo de errores en producción, retroalimentación continua de usuarios, y métricas de calidad que incluyen cobertura de pruebas y complejidad ciclomática.
+
+Consideraciones de Escalabilidad e Internacionalización
+La arquitectura está diseñada para escalar horizontalmente con optimización de consultas a base de datos, caché estratégica para datos frecuentemente accedidos, lazy loading de componentes y datos, y particionamiento de base de datos para grandes volúmenes.
+La aplicación incluye soporte inicial para español, inglés y portugués con estructura preparada para fácil expansión a otros idiomas, formatos de fecha y número según localización, y soporte para múltiples monedas incluyendo dólares americanos, real brasileño y pesos colombianos. Por defecto, la aplicación arranca en español, pesos colombianos y modo claro.
+
+Conclusión
+Armonía representa una solución integral y sofisticada para la gestión de conjuntos residenciales que va mucho más allá de las herramientas tradicionales de administración. Su arquitectura multi-tenant, su enfoque en la experiencia del usuario, sus características avanzadas como la conciliación bancaria automática y el marketplace comunitario, y su estrategia de monetización escalonada la posicionan como una plataforma líder en el sector PropTech.
+La aplicación no solo automatiza procesos administrativos sino que crea un verdadero ecosistema comunitario que mejora la calidad de vida de los residentes, optimiza las operaciones de los administradores, y genera múltiples flujos de ingresos a través de alianzas estratégicas y servicios de valor agregado. Su diseño técnico robusto, su enfoque en la seguridad y privacidad, y su capacidad de escalabilidad la convierten en una solución preparada para el futuro de la gestión de propiedades horizontales.
+
+
 
