@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Header } from "@/components/layout/header";
 import { Testimonials } from "@/components/landing/Testimonials";
 import { BlogSection } from "@/components/landing/BlogSection";
