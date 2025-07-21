@@ -11,28 +11,28 @@ import {
   FeeDto,
   FeeFilterParamsDto,
   FeeStatus,
-} from '../common/dto/fees.dto';
+} from '../common/dto/finances.dto';
 import {
   CreatePaymentDto,
   UpdatePaymentDto,
   PaymentDto,
   PaymentFilterParamsDto,
   PaymentStatus,
-} from '../common/dto/payments.dto';
+} from '../common/dto/finances.dto';
 import {
   CreateBudgetDto,
   UpdateBudgetDto,
   BudgetDto,
   BudgetFilterParamsDto,
   BudgetStatus,
-} from '../common/dto/budgets.dto';
+} from '../common/dto/finances.dto';
 import {
   CreateExpenseDto,
   UpdateExpenseDto,
   ExpenseDto,
   ExpenseFilterParamsDto,
   ExpenseStatus,
-} from '../common/dto/expenses.dto';
+} from '../common/dto/finances.dto';
 import { CommunicationsService } from '../communications/communications.service';
 import {
   NotificationType,
@@ -63,25 +63,32 @@ export class FinancesService {
   async getFees(
     schemaName: string,
     filters: FeeFilterParamsDto,
-  ): Promise<{ data: FeeDto[]; total: number }> {
-    const prisma = this.getTenantPrismaClient(schemaName);
-    const where: any = {};
-    if (filters.status) where.status = filters.status;
-    if (filters.type) where.type = filters.type;
-    if (filters.propertyId) where.propertyId = filters.propertyId;
-    if (filters.residentId) where.residentId = filters.residentId;
+  ): Promise<{ fees: FeeDto[]; total: number }> {
+    try {
+      const prisma = this.getTenantPrismaClient(schemaName);
+      const where: any = {};
+      if (filters.status) where.status = filters.status;
+      if (filters.type) where.type = filters.type;
+      if (filters.propertyId) where.propertyId = filters.propertyId;
+      if (filters.residentId) where.residentId = filters.residentId;
 
-    const [data, total] = await Promise.all([
-      prisma.fee.findMany({
-        where,
-        skip: filters.skip,
-        take: filters.take,
-        orderBy: { dueDate: 'asc' },
-      }),
-      prisma.fee.count({ where }),
-    ]);
+      const skip = filters.skip || 0;
+      const take = filters.take || 10;
 
-    return { data, total };
+      const [fees, total] = await Promise.all([
+        prisma.fee.findMany({
+          where,
+          skip,
+          take,
+          orderBy: { createdAt: 'desc' },
+        }),
+        prisma.fee.count({ where }),
+      ]);
+
+      return { fees, total };
+    } catch (error) {
+      throw new BadRequestException('Error al obtener cuotas');
+    }
   }
 
   async getFeeById(schemaName: string, id: number): Promise<FeeDto> {
@@ -91,6 +98,16 @@ export class FinancesService {
       throw new NotFoundException(`Cuota con ID ${id} no encontrada.`);
     }
     return fee;
+  }
+
+  async getFee(schemaName: string, id: number): Promise<FeeDto | null> {
+    try {
+      const prisma = this.getTenantPrismaClient(schemaName);
+      const fee = await prisma.fee.findUnique({ where: { id } });
+      return fee;
+    } catch (error) {
+      throw new BadRequestException('Error al obtener cuota');
+    }
   }
 
   async updateFee(

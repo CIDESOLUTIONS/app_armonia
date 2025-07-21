@@ -27,19 +27,18 @@ export interface MessageEvent {
 }
 
 // Adaptador para WhatsApp (usando Twilio como proveedor)
+import twilio from "twilio";
+
 export class WhatsAppAdapter implements MessageAdapter {
   private accountSid: string;
   private authToken: string;
   private fromNumber: string;
-  private client: any;
+  private client: twilio.Twilio;
 
   constructor(config: any) {
     this.accountSid = config.accountSid;
     this.authToken = config.authToken;
     this.fromNumber = config.fromNumber;
-
-    // Importamos Twilio solo cuando se instancia el adaptador
-    const twilio = require("twilio");
     this.client = twilio(this.accountSid, this.authToken);
   }
 
@@ -85,7 +84,7 @@ export class WhatsAppAdapter implements MessageAdapter {
       // Implementar verificación de firma para webhooks de Twilio
       if (!signature) return false;
 
-      const twilio = require("twilio");
+      const twilioClient = twilio;
       const { url, method, headers } = payload;
 
       return twilio.validateRequest(
