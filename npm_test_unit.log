@@ -1,0 +1,28 @@
+
+> armonia-frontend@0.1.0 test
+> vitest
+
+ Vitest  "deps.inline" is deprecated. If you rely on vite-node directly, use "server.deps.inline" instead. Otherwise, consider using "deps.optimizer.web.include"
+
+ DEV  v3.2.4 /home/ubuntu/app_armonia
+
+ ✓ armonia-backend/src/surveys/survey.service.spec.ts (16 tests) 16ms
+ ✓ armonia-backend/src/marketplace/marketplace.service.spec.ts (15 tests) 43ms
+ ✓ src/services/__tests__/visitorService.test.ts (9 tests) 14ms
+ ✓ armonia-backend/src/finances/finances.service.spec.ts (7 tests) 10ms
+ ✓ armonia-backend/src/pqr/pqr.service.spec.ts (1 test) 13ms
+ ✓ armonia-backend/src/visitors/visitors.service.spec.ts (1 test) 13ms
+ ✓ armonia-backend/src/projects/projects.service.spec.ts (1 test) 13ms
+ ✓ armonia-backend/src/packages/packages.service.spec.ts (1 test) 12ms
+ ✓ armonia-backend/src/documents/documents.service.spec.ts (1 test) 12ms
+ ✓ armonia-backend/src/plans/plans.service.spec.ts (1 test) 14ms
+ ✓ armonia-backend/src/tenant/tenant.service.spec.ts (1 test) 15ms
+ ✓ armonia-backend/src/app.controller.spec.ts (2 tests) 4ms
+
+ Test Files  12 passed (12)
+      Tests  56 passed (56)
+   Start at  08:22:58
+   Duration  10.32s (transform 436ms, setup 1.96s, collect 6.19s, tests 179ms, environment 8.14s, prepare 1.47s)
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit

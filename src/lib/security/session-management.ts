@@ -89,7 +89,7 @@ export async function updateSessionActivity(): Promise<void> {
 /**
  * Middleware para gestión de sesiones
  */
-export function sessionManagement(handler: Function) {
+export function sessionManagement(handler: (request: NextRequest, ...args: unknown[]) => Promise<any>) {
   return async (request: NextRequest, ...args: unknown[]) => {
     // Verificar si la gestión de sesiones está habilitada
     const config = await import("@/config/security").then((mod) => mod.default);

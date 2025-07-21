@@ -64,7 +64,7 @@ class TemplateService {
 
     let rendered = template.content;
     Object.entries(mergedVars).forEach(([key, value]) => {
-      const regex = new RegExp(`{{\s*${key}\s*}}`, "g");
+      const regex = new RegExp(`{{${key}}`, "g");
       rendered = rendered.replace(regex, String(value));
     });
 
