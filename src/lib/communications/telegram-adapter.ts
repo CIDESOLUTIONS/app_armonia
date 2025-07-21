@@ -27,17 +27,17 @@ export interface MessageEvent {
 }
 
 // Adaptador para Telegram
+import axios from "axios";
+
+// Adaptador para Telegram
 export class TelegramAdapter implements MessageAdapter {
   private botToken: string;
   private apiUrl: string = "https://api.telegram.org/bot";
-  private axios: any;
 
   constructor(config: any) {
     this.botToken = config.botToken;
-
-    // Importamos axios solo cuando se instancia el adaptador
-    this.axios = require("axios").default;
   }
+
 
   async sendMessage(
     to: string,
@@ -65,7 +65,7 @@ export class TelegramAdapter implements MessageAdapter {
       }
 
       // Enviar el mensaje
-      const response = await this.axios.post(
+      const response = await axios.post(
         `${this.apiUrl}${this.botToken}/sendMessage`,
         data,
       );
@@ -130,3 +130,5 @@ export class TelegramAdapter implements MessageAdapter {
     throw new Error("Formato de mensaje no reconocido");
   }
 }
+
+

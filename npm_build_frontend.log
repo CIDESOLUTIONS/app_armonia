@@ -1,0 +1,1489 @@
+
+> armonia-frontend@0.1.0 build
+> npx prisma generate --schema=./armonia-backend/prisma/schema.prisma && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from armonia-backend/prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.12.0) to ./node_modules/.prisma/client in 45ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+
+   ▲ Next.js 15.4.2
+   - Environments: .env.local, .env.production, .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 44s
+   Linting and checking validity of types ...
+
+ ⚠ The Next.js plugin was not detected in your ESLint configuration. See https://nextjs.org/docs/app/api-reference/config/eslint#migrating-existing-config
+
+Failed to compile.
+
+./src/__mocks__/jest-prisma-setup.ts
+7:3  Warning: 'PrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/__mocks__/jose-mock.ts
+18:3  Warning: 'secret' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+54:21  Warning: 'time' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+58:14  Warning: 'secret' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/__mocks__/payment-service.ts
+8:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+82:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+119:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+133:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+133:70  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+150:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+164:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+182:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+186:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/__mocks__/prisma-client-extended.ts
+15:15  Warning: 'options' is assigned a value but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/__mocks__/prisma-client.ts
+14:15  Warning: 'options' is assigned a value but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/__mocks__/prisma-mock-helper.ts
+14:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+52:53  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+81:65  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/__mocks__/template-helper.ts
+13:24  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/__mocks__/template-service.ts
+14:3  Warning: 'schema' is assigned a value but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+15:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+17:35  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+61:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+62:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+93:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+95:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+112:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/(complex-admin)/projects/[id]/edit/page.tsx
+32:11  Warning: 'Project' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/(complex-admin)/projects/create/page.tsx
+53:18  Warning: 'isSubmitting' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/(complex-admin)/settings/branding/page.tsx
+15:11  Warning: 'BrandingSettings' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/(complex-admin)/settings/documents/page.tsx
+185:35  Warning: 'value' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/app/(public)/checkout/page.tsx
+96:23  Warning: 'setPaymentStep' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/(reception)/incidents/page.tsx
+113:10  Warning: 'error' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+835:60  Warning: 'index' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/app/(reception)/panic-alerts/page.tsx
+5:19  Warning: 'AlertTriangle' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/(reception)/surveillance/page.tsx
+21:9  Warning: 'router' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+24:10  Warning: 'selectedFeed' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+24:24  Warning: 'setSelectedFeed' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/(reception)/visitors/page.tsx
+3:51  Warning: 'useMemo' is defined but never used.  @typescript-eslint/no-unused-vars
+40:10  Warning: 'Label' is defined but never used.  @typescript-eslint/no-unused-vars
+46:3  Warning: 'Camera' is defined but never used.  @typescript-eslint/no-unused-vars
+49:3  Warning: 'AlertCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+51:3  Warning: 'X' is defined but never used.  @typescript-eslint/no-unused-vars
+124:10  Warning: 'error' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+132:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+133:10  Warning: 'isPackageRegisterDialogOpen' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+647:29  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+1057:25  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/app/(resident)/directory/services/page.tsx
+19:3  Warning: 'Table' is defined but never used.  @typescript-eslint/no-unused-vars
+20:3  Warning: 'TableBody' is defined but never used.  @typescript-eslint/no-unused-vars
+21:3  Warning: 'TableCell' is defined but never used.  @typescript-eslint/no-unused-vars
+22:3  Warning: 'TableHead' is defined but never used.  @typescript-eslint/no-unused-vars
+23:3  Warning: 'TableHeader' is defined but never used.  @typescript-eslint/no-unused-vars
+24:3  Warning: 'TableRow' is defined but never used.  @typescript-eslint/no-unused-vars
+41:3  Warning: 'PlusCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+100:57  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+119:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/app/(resident)/financial/family-budget/page.tsx
+5:39  Warning: 'DollarSign' is defined but never used.  @typescript-eslint/no-unused-vars
+8:10  Warning: 'Label' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/(resident)/financial/fees/page.tsx
+5:44  Warning: 'XCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/(resident)/financial/micro-credits/page.tsx
+8:10  Warning: 'Label' is defined but never used.  @typescript-eslint/no-unused-vars
+25:19  Warning: 'DollarSign' is defined but never used.  @typescript-eslint/no-unused-vars
+25:31  Warning: 'CheckCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+25:44  Warning: 'XCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+114:27  Warning: 'values' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/app/(resident)/financial/page.tsx
+3:31  Warning: 'useCallback' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/(resident)/insurtech/page.tsx
+23:46  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+24:48  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/(resident)/marketplace/chat/[listingId]/page.tsx
+23:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+97:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+119:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/app/(resident)/marketplace/create/page.tsx
+241:24  Warning: 'field' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+255:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/app/(resident)/marketplace/edit/[id]/page.tsx
+332:37  Warning: 'value' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+332:44  Warning: 'onChange' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/app/(resident)/profile/page.tsx
+8:10  Warning: 'Label' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/(resident)/resident-dashboard/page.tsx
+3:31  Warning: 'useCallback' is defined but never used.  @typescript-eslint/no-unused-vars
+64:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/(resident)/visitors/pre-register/page.tsx
+11:10  Warning: 'Label' is defined but never used.  @typescript-eslint/no-unused-vars
+20:29  Warning: 'Camera' is defined but never used.  @typescript-eslint/no-unused-vars
+43:9  Warning: 'router' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+93:46  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+288:24  Warning: 'field' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+301:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+323:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/app/auth/forgot-password/page.tsx
+35:27  Warning: 'values' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/app/auth/reset-password/page.tsx
+44:27  Warning: 'values' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/communications/websocket-service.ts
+106:9  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+146:61  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+156:36  Warning: 'clientId' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/components/admin/dashboard/AdminDashboardContent.tsx
+16:3  Warning: 'CheckCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+17:3  Warning: 'Clock' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/admin/layout/AdminSidebar.tsx
+15:3  Warning: 'FileText' is defined but never used.  @typescript-eslint/no-unused-vars
+22:3  Warning: 'Camera' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/admin/layout/DashboardHeader/DashboardHeader.tsx
+16:22  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+22:22  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+27:22  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+51:28  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/components/admin/layout/DashboardSidebar/DashboardSidebar.tsx
+15:9  Warning: '_router' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/admin/pqr/PQRForm.tsx
+59:10  Warning: '_formData' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+59:21  Warning: '_setFormData' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/admin/services/ServiceForm.tsx
+26:10  Warning: '_formData' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+26:21  Warning: '_setFormData' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/assemblies/RealTimeVoting.tsx
+105:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/assemblies/__tests__/RealTimeVoting.test.tsx
+5:10  Warning: 'act' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/assembly/AssemblyLiveView.tsx
+8:10  Warning: 'AssemblyStatus' is defined but never used.  @typescript-eslint/no-unused-vars
+36:18  Warning: 'CheckIcon' is defined but never used.  @typescript-eslint/no-unused-vars
+37:14  Warning: 'CloseIcon' is defined but never used.  @typescript-eslint/no-unused-vars
+38:11  Warning: 'EditIcon' is defined but never used.  @typescript-eslint/no-unused-vars
+107:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+112:9  Warning: 'router' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+117:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+119:46  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+120:42  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+121:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+124:56  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+150:43  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+161:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+166:30  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+174:30  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+181:30  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+189:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+190:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+198:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+212:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+220:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+221:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+242:11  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+296:49  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+336:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/assembly/VotingResultsDialog.tsx
+42:11  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+57:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+59:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+60:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/cameras/CameraManagement.tsx
+38:3  Warning: 'Settings' is defined but never used.  @typescript-eslint/no-unused-vars
+39:3  Warning: 'Play' is defined but never used.  @typescript-eslint/no-unused-vars
+41:3  Warning: 'RotateCcw' is defined but never used.  @typescript-eslint/no-unused-vars
+51:3  Warning: 'Trash2' is defined but never used.  @typescript-eslint/no-unused-vars
+52:3  Warning: 'Edit' is defined but never used.  @typescript-eslint/no-unused-vars
+66:36  Warning: 'complexId' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+75:5  Warning: 'updateCamera' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+76:5  Warning: 'deleteCamera' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+85:5  Warning: 'checkCameraStatus' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+95:58  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+213:68  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+817:65  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/common/Badge/Badge.tsx
+3:11  Warning: 'BadgeProps' is defined but never used.  @typescript-eslint/no-unused-vars
+8:16  Warning: 'props' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/components/common/Dropdown/Dropdown.tsx
+3:11  Warning: 'DropdownProps' is defined but never used.  @typescript-eslint/no-unused-vars
+11:19  Warning: 'props' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/components/common/Table/Table.tsx
+19:41  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/common/Tabs/Tabs.tsx
+3:11  Warning: 'TabsProps' is defined but never used.  @typescript-eslint/no-unused-vars
+13:15  Warning: 'props' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/components/communications/AnnouncementBoard.tsx
+66:3  Warning: 'userRole' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/components/communications/CommunityCalendar.tsx
+77:3  Warning: 'userRole' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+96:15  Warning: 'startDate' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+97:15  Warning: 'endDate' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+101:17  Warning: '_data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/communications/NotificationCenterThemed.tsx
+40:3  Warning: 'themeMode' is assigned a value but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/components/finances/CustomReportGenerator.tsx
+26:3  Warning: 'token' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+32:17  Warning: '_setError' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+65:13  Warning: 'endpoint' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+72:13  Warning: '_data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/finances/PaymentForm.tsx
+72:17  Warning: 'session' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+76:26  Warning: 'setPaymentMethods' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/finances/PaymentGatewayConfig.tsx
+17:41  Warning: 'config' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+28:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+54:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/finances/PaymentGatewaySection.tsx
+7:31  Warning: 'Edit' is defined but never used.  @typescript-eslint/no-unused-vars
+41:10  Warning: 'isEditDialogOpen' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+119:9  Warning: 'handleEditGateway' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/finances/ReceiptGenerator.tsx
+3:20  Warning: 'useEffect' is defined but never used.  @typescript-eslint/no-unused-vars
+247:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/finances/TransactionHistory.tsx
+23:10  Warning: 'Input' is defined but never used.  @typescript-eslint/no-unused-vars
+31:10  Warning: 'Skeleton' is defined but never used.  @typescript-eslint/no-unused-vars
+95:39  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+108:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+113:19  Warning: 'setFilters' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/financial/FinancialDashboard.tsx
+19:3  Warning: 'Calendar' is defined but never used.  @typescript-eslint/no-unused-vars
+22:3  Warning: 'Clock' is defined but never used.  @typescript-eslint/no-unused-vars
+32:38  Warning: 'complexId' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+39:5  Warning: 'loadBills' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+40:5  Warning: 'loadStats' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/intercom/IntercomAdminPanel.tsx
+121:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/intercom/UserPreferences.tsx
+175:58  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/intercom/VisitHistory.tsx
+10:10  Warning: 'Input' is defined but never used.  @typescript-eslint/no-unused-vars
+11:10  Warning: 'Label' is defined but never used.  @typescript-eslint/no-unused-vars
+43:3  Warning: 'User' is defined but never used.  @typescript-eslint/no-unused-vars
+144:66  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/intercom/VisitorRegistration.tsx
+1:27  Warning: 'useEffect' is defined but never used.  @typescript-eslint/no-unused-vars
+106:9  Warning: 'fetchData' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+134:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/inventory/ComplexDataForm.tsx
+33:10  Warning: '_formData' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+33:21  Warning: '_setFormData' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+46:17  Warning: '_setError' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/inventory/ResidentForm.tsx
+52:10  Warning: '_formData' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+52:21  Warning: '_setFormData' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+66:17  Warning: '_setError' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/landing/LandingPageClient.tsx
+20:9  Warning: '_router' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/landing/PricingPlans.tsx
+2:10  Warning: 'useTranslations' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/landing/RegisterComplexForm.tsx
+17:10  Warning: 'useToast' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/layout/ReceptionSidebar.tsx
+35:3  Warning: 'theme' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+36:3  Warning: 'currency' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+39:3  Warning: 'logout' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+42:3  Warning: 'addToast' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+44:9  Warning: '_router' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+52:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/components/layout/ResidentSidebar.tsx
+34:3  Warning: 'theme' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+35:3  Warning: 'currency' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+38:3  Warning: 'logout' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+41:3  Warning: 'addToast' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+51:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/components/layout/Sidebar.tsx
+38:3  Warning: 'theme' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+39:3  Warning: 'currency' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+40:3  Warning: 'adminName' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+41:3  Warning: 'complexName' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+42:3  Warning: 'logout' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+45:3  Warning: 'addToast' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+56:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/components/layout/__tests__/header.test.tsx
+4:10  Warning: 'usePathname' is defined but never used.  @typescript-eslint/no-unused-vars
+5:10  Warning: 'useLocale' is defined but never used.  @typescript-eslint/no-unused-vars
+5:21  Warning: 'useTranslations' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/layout/header.tsx
+24:7  Warning: 'headerTexts' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+58:3  Warning: 'complexName' is assigned a value but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+59:3  Warning: 'adminName' is assigned a value but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+112:9  Warning: 'handleLogin' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/marketplace/ListingCard.tsx
+40:3  Warning: 'FormLabel' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/monitoring/MonitoringDashboard.tsx
+55:15  Warning: 'TimelineIcon' is defined but never used.  @typescript-eslint/no-unused-vars
+57:19  Warning: 'CheckCircleIcon' is defined but never used.  @typescript-eslint/no-unused-vars
+99:42  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+100:40  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+101:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+102:56  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+106:54  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+127:35  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+213:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+310:41  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+326:43  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+332:41  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+434:9  Warning: 'renderStatusIcon' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/notifications/NotificationCenter.tsx
+11:10  Warning: 'Button' is defined but never used.  @typescript-eslint/no-unused-vars
+12:10  Warning: 'Input' is defined but never used.  @typescript-eslint/no-unused-vars
+13:10  Warning: 'Label' is defined but never used.  @typescript-eslint/no-unused-vars
+14:10  Warning: 'Badge' is defined but never used.  @typescript-eslint/no-unused-vars
+15:10  Warning: 'Alert' is defined but never used.  @typescript-eslint/no-unused-vars
+15:17  Warning: 'AlertDescription' is defined but never used.  @typescript-eslint/no-unused-vars
+16:10  Warning: 'Tabs' is defined but never used.  @typescript-eslint/no-unused-vars
+16:16  Warning: 'TabsContent' is defined but never used.  @typescript-eslint/no-unused-vars
+16:29  Warning: 'TabsList' is defined but never used.  @typescript-eslint/no-unused-vars
+16:39  Warning: 'TabsTrigger' is defined but never used.  @typescript-eslint/no-unused-vars
+18:3  Warning: 'Select' is defined but never used.  @typescript-eslint/no-unused-vars
+19:3  Warning: 'SelectContent' is defined but never used.  @typescript-eslint/no-unused-vars
+20:3  Warning: 'SelectItem' is defined but never used.  @typescript-eslint/no-unused-vars
+21:3  Warning: 'SelectTrigger' is defined but never used.  @typescript-eslint/no-unused-vars
+22:3  Warning: 'SelectValue' is defined but never used.  @typescript-eslint/no-unused-vars
+24:10  Warning: 'Textarea' is defined but never used.  @typescript-eslint/no-unused-vars
+27:3  Warning: 'Send' is defined but never used.  @typescript-eslint/no-unused-vars
+28:3  Warning: 'Users' is defined but never used.  @typescript-eslint/no-unused-vars
+29:3  Warning: 'User' is defined but never used.  @typescript-eslint/no-unused-vars
+30:3  Warning: 'MessageSquare' is defined but never used.  @typescript-eslint/no-unused-vars
+31:3  Warning: 'Calendar' is defined but never used.  @typescript-eslint/no-unused-vars
+32:3  Warning: 'DollarSign' is defined but never used.  @typescript-eslint/no-unused-vars
+33:3  Warning: 'AlertTriangle' is defined but never used.  @typescript-eslint/no-unused-vars
+34:3  Warning: 'CheckCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+35:3  Warning: 'Clock' is defined but never used.  @typescript-eslint/no-unused-vars
+36:3  Warning: 'Loader2' is defined but never used.  @typescript-eslint/no-unused-vars
+45:38  Warning: 'complexId' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+46:11  Warning: 'user' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+48:5  Warning: 'loading' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+49:5  Warning: 'error' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+50:5  Warning: 'templates' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+51:5  Warning: 'history' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+53:5  Warning: 'sendTemplateNotification' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+56:5  Warning: 'sendPaymentReminder' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+57:5  Warning: 'sendAssemblyInvitation' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+58:5  Warning: 'sendIncidentUpdate' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+59:5  Warning: 'sendPQRResponse' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+60:5  Warning: 'sendGeneralAnnouncement' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+63:10  Warning: 'activeTab' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+63:21  Warning: 'setActiveTab' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+70:10  Warning: 'templateForm' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+70:24  Warning: 'setTemplateForm' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+72:32  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+89:9  Warning: 'handleQuickSend' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+97:39  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/pqr/CreatePQRForm.tsx
+127:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/components/pqr/PQRDetailDialog.tsx
+92:17  Warning: '_setError' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+100:19  Warning: 'setIsAdmin' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/pqr/PQRList.tsx
+101:64  Warning: 'createPQR' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/pqr/PQRManagement.tsx
+10:3  Warning: 'MessageSquare' is defined but never used.  @typescript-eslint/no-unused-vars
+24:10  Warning: 'Card' is defined but never used.  @typescript-eslint/no-unused-vars
+24:16  Warning: 'CardContent' is defined but never used.  @typescript-eslint/no-unused-vars
+24:29  Warning: 'CardHeader' is defined but never used.  @typescript-eslint/no-unused-vars
+24:41  Warning: 'CardTitle' is defined but never used.  @typescript-eslint/no-unused-vars
+44:3  Warning: 'PQRComment' is defined but never used.  @typescript-eslint/no-unused-vars
+62:10  Warning: 'isCommentDialogOpen' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+62:31  Warning: 'setIsCommentDialogOpen' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/providers.tsx
+6:10  Warning: 'ReactNode' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/reception/dashboard/ReceptionDashboardContent.tsx
+8:3  Warning: 'Car' is defined but never used.  @typescript-eslint/no-unused-vars
+18:10  Warning: 'Badge' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/reception/layout/ReceptionSidebar.tsx
+15:3  Warning: 'Settings' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/reservations/CommonAreaReservation.tsx
+13:3  Warning: 'CardFooter' is defined but never used.  @typescript-eslint/no-unused-vars
+34:3  Warning: 'DialogTrigger' is defined but never used.  @typescript-eslint/no-unused-vars
+36:10  Warning: 'Tabs' is defined but never used.  @typescript-eslint/no-unused-vars
+36:16  Warning: 'TabsContent' is defined but never used.  @typescript-eslint/no-unused-vars
+36:29  Warning: 'TabsList' is defined but never used.  @typescript-eslint/no-unused-vars
+36:39  Warning: 'TabsTrigger' is defined but never used.  @typescript-eslint/no-unused-vars
+47:3  Warning: 'DollarSign' is defined but never used.  @typescript-eslint/no-unused-vars
+48:3  Warning: 'CreditCard' is defined but never used.  @typescript-eslint/no-unused-vars
+55:8  Warning: 'PaymentModal' is defined but never used.  @typescript-eslint/no-unused-vars
+109:11  Warning: 'Reservation' is defined but never used.  @typescript-eslint/no-unused-vars
+139:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+142:11  Warning: 'Property' is defined but never used.  @typescript-eslint/no-unused-vars
+148:17  Warning: 'session' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+149:11  Warning: 'toast' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+158:5  Warning: 'viewDate' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+162:5  Warning: 'isCreatingReservation' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+171:5  Warning: 'isPaymentModalOpen' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+176:5  Warning: 'fetchReservations' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+184:5  Warning: 'setIsPaymentModalOpen' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+191:5  Warning: 'handlePaymentComplete' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/reservations/CommonAreaReservationImproved.tsx
+14:3  Warning: 'CardFooter' is defined but never used.  @typescript-eslint/no-unused-vars
+44:3  Warning: 'Info' is defined but never used.  @typescript-eslint/no-unused-vars
+63:17  Warning: 'session' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+64:11  Warning: 'toast' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+124:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/reservations/PaymentModal.tsx
+13:10  Warning: 'Badge' is defined but never used.  @typescript-eslint/no-unused-vars
+14:10  Warning: 'Separator' is defined but never used.  @typescript-eslint/no-unused-vars
+16:10  Warning: 'Alert' is defined but never used.  @typescript-eslint/no-unused-vars
+16:17  Warning: 'AlertDescription' is defined but never used.  @typescript-eslint/no-unused-vars
+18:3  Warning: 'CreditCard' is defined but never used.  @typescript-eslint/no-unused-vars
+19:3  Warning: 'Clock' is defined but never used.  @typescript-eslint/no-unused-vars
+20:3  Warning: 'DollarSign' is defined but never used.  @typescript-eslint/no-unused-vars
+21:3  Warning: 'AlertCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+22:3  Warning: 'CheckCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+23:3  Warning: 'ExternalLink' is defined but never used.  @typescript-eslint/no-unused-vars
+25:10  Warning: 'format' is defined but never used.  @typescript-eslint/no-unused-vars
+26:10  Warning: 'es' is defined but never used.  @typescript-eslint/no-unused-vars
+59:3  Warning: 'onPaymentComplete' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+62:10  Warning: 'isCreatingPayment' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+63:10  Warning: 'paymentInfo' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+64:10  Warning: 'paymentStep' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+68:9  Warning: 'handleCreatePayment' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/reservations/__tests__/CommonAreaReservation.test.tsx
+2:26  Warning: 'fireEvent' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/resident/dashboard/ResidentDashboardContent.tsx
+11:3  Warning: 'CheckCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/security/DigitalMinutes.tsx
+44:3  Warning: 'Edit' is defined but never used.  @typescript-eslint/no-unused-vars
+46:3  Warning: 'Filter' is defined but never used.  @typescript-eslint/no-unused-vars
+47:3  Warning: 'Download' is defined but never used.  @typescript-eslint/no-unused-vars
+49:3  Warning: 'Camera' is defined but never used.  @typescript-eslint/no-unused-vars
+54:3  Warning: 'DigitalLog' is defined but never used.  @typescript-eslint/no-unused-vars
+63:34  Warning: 'complexId' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+72:5  Warning: 'updateLog' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+77:5  Warning: 'clearError' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+78:5  Warning: 'getLogStats' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+234:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+259:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+318:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/tables/PetsTable.tsx
+63:10  Warning: '_searchTerm' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+63:23  Warning: '_setSearchTerm' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+67:10  Warning: '_formData' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+67:21  Warning: '_setFormData' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/tables/ResidentsTable.tsx
+44:10  Warning: '_searchTerm' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+44:23  Warning: '_setSearchTerm' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+82:14  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/tables/VehiclesTable.tsx
+69:10  Warning: '_searchTerm' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+69:23  Warning: '_setSearchTerm' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+73:10  Warning: '_formData' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+73:21  Warning: '_setFormData' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/ui/calendar.tsx
+57:25  Warning: 'props' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+58:26  Warning: 'props' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/components/ui/data-table.tsx
+74:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/ui/error/ErrorBoundary.tsx
+42:17  Warning: '_setError' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/ui/form.tsx
+29:39  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+29:61  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+90:11  Warning: 'error' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/context/RealTimeNotificationContext.tsx
+52:9  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+58:11  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+69:9  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/hooks/use-toast.ts
+2:10  Warning: 'useState' is defined but never used.  @typescript-eslint/no-unused-vars
+2:20  Warning: 'useCallback' is defined but never used.  @typescript-eslint/no-unused-vars
+5:11  Warning: 'ToastOptions' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/hooks/useAssemblies.ts
+90:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/hooks/useAuth.ts
+11:30  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+48:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/hooks/useBudgets.ts
+28:17  Warning: '_setError' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+38:13  Warning: '_response' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+41:13  Warning: '_data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+54:13  Warning: '_response' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+80:15  Warning: '_response' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+110:13  Warning: '_response' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+131:13  Warning: '_response' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/hooks/useDashboardData.ts
+10:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+11:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+32:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/hooks/useFees.ts
+40:17  Warning: '_setError' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+53:13  Warning: '_response' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+56:13  Warning: '_data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+71:15  Warning: '_response' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+98:13  Warning: '_response' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+116:13  Warning: '_response' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+148:15  Warning: '_response' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+156:15  Warning: '_result' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/hooks/useFinancialSummary.ts
+35:17  Warning: '_setError' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+41:13  Warning: '_response' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+44:13  Warning: '_data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+58:13  Warning: '_response' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+61:13  Warning: '_data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+136:15  Warning: '_response' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+139:15  Warning: '_data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+145:15  Warning: '_url' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/hooks/useNotifications.ts
+28:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+66:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+166:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/hooks/usePQR.ts
+76:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/hooks/usePayments.ts
+4:20  Warning: 'useEffect' is defined but never used.  @typescript-eslint/no-unused-vars
+5:10  Warning: 'apiClient' is defined but never used.  @typescript-eslint/no-unused-vars
+38:17  Warning: '_setError' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+56:13  Warning: '_response' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+59:13  Warning: '_data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+73:13  Warning: '_response' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+76:13  Warning: '_data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+90:13  Warning: '_response' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+109:15  Warning: '_response' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+142:13  Warning: '_response' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+147:13  Warning: '_data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/hooks/useResidents.ts
+68:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/api/fetcher.ts
+17:35  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+27:11  Warning: 'fullUrl' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+39:13  Warning: '_token' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+51:11  Warning: 'finalOptions' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+65:16  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+71:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+72:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+83:11  Warning: '_data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+94:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+104:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+119:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+134:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+149:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/api/payments.ts
+3:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+3:61  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+16:74  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/auth/authService.ts
+28:12  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+34:36  Warning: 'request' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+36:9  Warning: '_token' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+45:12  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/lib/authOptions.ts
+4:10  Warning: 'JWTPayload' is defined but never used.  @typescript-eslint/no-unused-vars
+6:10  Warning: 'getPublicPrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+140:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+141:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/biometrics/biometric-service.ts
+3:3  Warning: 'generateRegistrationOptions' is defined but never used.  @typescript-eslint/no-unused-vars
+4:3  Warning: 'verifyRegistrationResponse' is defined but never used.  @typescript-eslint/no-unused-vars
+5:3  Warning: 'generateAuthenticationOptions' is defined but never used.  @typescript-eslint/no-unused-vars
+6:3  Warning: 'verifyAuthenticationResponse' is defined but never used.  @typescript-eslint/no-unused-vars
+7:3  Warning: 'VerifiedRegistrationResponse' is defined but never used.  @typescript-eslint/no-unused-vars
+8:3  Warning: 'VerifiedAuthenticationResponse' is defined but never used.  @typescript-eslint/no-unused-vars
+14:10  Warning: 'encryptData' is defined but never used.  @typescript-eslint/no-unused-vars
+14:23  Warning: 'decryptData' is defined but never used.  @typescript-eslint/no-unused-vars
+20:7  Warning: 'rpName' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+25:7  Warning: 'origin' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+51:44  Warning: 'user' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+51:56  Warning: 'deviceName' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+56:5  Warning: 'user' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+57:5  Warning: 'credential' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+58:5  Warning: 'deviceName' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+59:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+64:46  Warning: 'user' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+69:5  Warning: 'user' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+70:5  Warning: 'credential' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+71:41  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/communications/integration-test.ts
+17:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+18:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+19:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+23:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+27:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+28:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+37:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+41:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+42:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+54:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+58:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+59:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+89:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/lib/communications/integrations/assembly-notifications.ts
+254:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+261:13  Warning: '_result' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/lib/communications/integrations/finance-notifications.ts
+14:7  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/lib/communications/integrations/security-notifications.ts
+18:7  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+302:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/communications/message-adapters.ts
+1:10  Warning: 'NotificationChannel' is defined but never used.  @typescript-eslint/no-unused-vars
+7:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+9:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+10:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/communications/messaging-service.ts
+29:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+42:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/communications/notification-service.ts
+28:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+40:11  Warning: '_user' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+98:15  Warning: '_result' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+286:13  Warning: '_data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/lib/communications/push-notification-service.ts
+14:10  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+27:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+56:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+76:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+81:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+106:24  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+129:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+142:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+164:8  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+167:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+215:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+232:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+235:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+294:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+313:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+316:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+363:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+382:3  Warning: 'deviceInfo' is assigned a value but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+382:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+383:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+403:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+421:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+441:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/communications/real-time-context.tsx
+22:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+136:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+141:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/lib/communications/sms-service.ts
+30:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+66:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+86:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+107:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+130:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+149:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/communications/telegram-adapter.ts
+1:10  Warning: 'NotificationChannel' is defined but never used.  @typescript-eslint/no-unused-vars
+8:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+10:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+11:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+37:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+41:1  Warning: Delete `⏎`  prettier/prettier
+45:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+49:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+58:57  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+93:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+103:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+133:1  Warning: Delete `⏎⏎`  prettier/prettier
+
+./src/lib/communications/theme-config.ts
+118:13  Warning: '_data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/lib/communications/validation-integration.ts
+21:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+27:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+29:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+36:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+38:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+45:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+47:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+80:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+84:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+86:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+89:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+91:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+94:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+96:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+99:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+102:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+107:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+112:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+273:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+276:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+277:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+281:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+285:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+291:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+292:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+318:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/lib/communications/validation.ts
+21:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+25:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+29:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+37:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+40:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+45:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+48:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+56:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+62:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+67:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+70:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+77:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+80:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+87:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+90:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+106:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+108:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+131:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+152:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+156:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+161:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+170:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+179:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+186:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+189:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/lib/communications/websocket-server.ts
+39:13  Warning: '_token' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+46:13  Warning: '_user' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+65:13  Warning: '_user' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+250:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+307:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+315:15  Warning: '_result' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+337:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+366:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/communications/websocket-service.ts
+10:71  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+17:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/communications/whatsapp-adapter.ts
+1:10  Warning: 'NotificationChannel' is defined but never used.  @typescript-eslint/no-unused-vars
+8:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+10:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+11:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+38:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+48:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+55:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+82:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+87:13  Warning: 'twilioClient' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+88:20  Warning: 'method' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+88:28  Warning: 'headers' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+102:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/communications/whatsapp-service.ts
+29:11  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+30:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+51:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+72:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+91:11  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+92:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+113:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+136:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+155:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/db.ts
+66:11  Warning: '_result' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/lib/financial/billing-engine.ts
+2:10  Warning: 'PlanType' is defined but never used.  @typescript-eslint/no-unused-vars
+3:33  Warning: 'getPublicPrismaClient' is defined but never used.  @typescript-eslint/no-unused-vars
+316:30  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/financial/common-service-fee-service.ts
+6:5  Warning: 'complexId' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+7:5  Warning: 'year' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+8:5  Warning: 'month' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+32:5  Warning: 'complexId' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+33:5  Warning: 'year' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+34:5  Warning: 'month' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+57:43  Warning: 'propertyId' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+79:39  Warning: 'feeId' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+79:54  Warning: 'reason' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+102:5  Warning: 'feeId' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+103:5  Warning: 'newAmount' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+104:5  Warning: 'reason' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+125:33  Warning: 'complexId' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/lib/financial/extraordinary-fee-service.ts
+6:5  Warning: 'complexId' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+7:5  Warning: 'amount' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+8:5  Warning: 'description' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+9:5  Warning: 'dueDate' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+30:37  Warning: 'complexId' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+52:39  Warning: 'feeId' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+52:54  Warning: 'reason' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+72:42  Warning: 'feeId' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/lib/logging/client-logger.ts
+14:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+19:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+76:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/lib/logging/server-logger.ts
+16:34  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+17:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+25:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+34:34  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+43:35  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+44:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/lib/marketing/seo-optimization-service.ts
+70:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/marketing/theme-service.ts
+94:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+112:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/metadata/metadata-constants.ts
+105:49  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/multi-tenant/schema-resolver.ts
+59:43  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/notifications/push-notification-service.ts
+15:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+83:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+148:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+183:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+293:13  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+307:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+338:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+359:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+382:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/pdf/pdfGenerator.ts
+5:9  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/pdf/receipt-service.ts
+66:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/lib/scheduler.ts
+41:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+58:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/security/audit-trail.ts
+9:23  Warning: 'NextResponse' is defined but never used.  @typescript-eslint/no-unused-vars
+43:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+133:20  Error: The `Function` type accepts any function-like value.
+Prefer explicitly defining any function parameters and return type.  @typescript-eslint/no-unsafe-function-type
+188:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/security/csrf-protection.ts
+75:32  Warning: Replace `handler:·(request:·NextRequest,·...args:·unknown[])·=>·Promise<any>` with `⏎··handler:·(request:·NextRequest,·...args:·unknown[])·=>·Promise<any>,⏎`  prettier/prettier
+75:95  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/security/session-management.ts
+92:35  Warning: Replace `handler:·(request:·NextRequest,·...args:·unknown[])·=>·Promise<any>` with `⏎··handler:·(request:·NextRequest,·...args:·unknown[])·=>·Promise<any>,⏎`  prettier/prettier
+92:98  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/security/xss-protection.ts
+20:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+54:31  Warning: Replace `handler:·(request:·NextRequest,·...args:·unknown[])·=>·Promise<any>` with `⏎··handler:·(request:·NextRequest,·...args:·unknown[])·=>·Promise<any>,⏎`  prettier/prettier
+54:94  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/storage/s3-upload.ts
+50:30  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+53:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/templates/template-service.ts
+7:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+12:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+26:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+35:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+52:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/utils/encryption.ts
+23:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+51:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+88:14  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+91:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+107:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+126:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+135:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/lib/utils.ts
+65:9  Warning: '_result' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/lib/validation.ts
+13:9  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+52:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+52:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+63:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/models/service/common-service.service.ts
+85:11  Warning: '_result' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/services/__tests__/visitorService.test.ts
+34:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+52:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+63:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+79:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+94:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+109:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+130:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+153:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+164:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/accessPassService.ts
+4:10  Warning: 'format' is defined but never used.  @typescript-eslint/no-unused-vars
+53:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+60:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+210:32  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+310:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/assemblyService.ts
+34:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+64:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+105:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+106:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+123:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+124:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+172:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+173:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+193:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+194:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+214:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+215:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+216:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+231:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+232:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+254:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+255:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+256:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+265:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+266:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+277:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+278:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+294:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+295:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+312:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+313:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+346:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+347:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+348:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/services/billing-engine.ts
+30:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+206:39  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+247:56  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+259:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+429:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+430:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+434:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/camera-service-impl.ts
+9:10  Warning: 'getTenantSchema' is defined but never used.  @typescript-eslint/no-unused-vars
+44:63  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+79:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+123:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+123:58  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+185:40  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+185:70  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+270:59  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+327:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+370:48  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+489:11  Warning: 'resolution' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+490:11  Warning: 'bitrate' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+491:11  Warning: 'fps' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+520:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+601:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+685:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+739:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+739:69  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+746:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+802:49  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+802:68  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+809:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+868:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+901:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+903:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+1064:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+1066:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+1175:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+1202:35  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+1306:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/camera-service-onvif.ts
+2:23  Warning: 'decryptData' is defined but never used.  @typescript-eslint/no-unused-vars
+76:41  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+97:5  Warning: 'timeout' is assigned a value but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+100:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+181:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+233:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+281:5  Warning: 'profileToken' is assigned a value but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+320:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+349:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+362:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+438:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+463:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+475:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+480:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+492:59  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+549:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+563:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+577:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+599:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/services/communication-service.ts
+240:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+792:67  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+836:73  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/communicationService.ts
+26:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+349:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+769:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+1032:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/complexService.ts
+39:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/services/conversationService.ts
+20:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+25:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/digitalLogService.ts
+4:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+6:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+12:9  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+15:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+17:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+21:46  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+22:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+24:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+29:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+31:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/services/feeService.ts
+31:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+43:39  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+48:51  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+60:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+70:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/services/finance-service.ts
+4:26  Warning: 'del' is defined but never used.  @typescript-eslint/no-unused-vars
+164:13  Warning: '_url' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/services/financeService.ts
+22:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+24:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+29:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+31:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+39:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+40:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+72:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+73:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+85:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+86:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+115:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+117:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+122:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+124:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+130:9  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+132:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+134:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+141:9  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+143:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+145:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+158:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+160:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+175:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+176:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+208:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+210:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/services/freemium-service.ts
+58:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+94:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/insurtechService.ts
+18:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+31:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/intercom-service.ts
+21:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+50:51  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+66:7  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+76:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+79:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+137:57  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+236:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+267:41  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+316:56  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+335:24  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+391:32  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+391:48  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+413:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+415:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+490:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+769:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+769:69  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+774:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+829:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+829:74  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+860:34  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+860:48  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+896:32  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+896:51  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+901:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+957:56  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+957:67  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+963:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+963:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+971:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+971:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/inventory-service.ts
+221:13  Warning: '_url' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/services/invoice-rule-service.ts
+67:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+88:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+116:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+152:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+194:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+219:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+235:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+272:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+282:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+295:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/invoice-template-service.ts
+58:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+86:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+126:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+178:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+215:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+231:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+257:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+270:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/iotService.ts
+34:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/marketplaceService.ts
+9:7  Warning: 'API_URL' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+30:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+89:70  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+102:54  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+115:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/moderationService.ts
+4:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+6:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+11:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+13:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+18:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+20:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+25:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+27:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/services/monitoring-service.ts
+58:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+59:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+68:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+77:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+374:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+379:31  Warning: 'parameters' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+381:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+477:42  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+483:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+600:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+605:31  Warning: 'parameters' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+607:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+710:40  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+782:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+808:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+897:36  Warning: 'config' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+897:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+915:39  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+915:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+1124:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+1125:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/notification-service-impl.ts
+33:72  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+34:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+46:5  Warning: 'options' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+47:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+48:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+59:69  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+60:5  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+68:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+68:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/panicService.ts
+8:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+10:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+20:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+22:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/services/payment-service.ts
+12:29  Warning: 'DiscountType' is defined but never used.  @typescript-eslint/no-unused-vars
+23:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+24:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+31:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+45:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+52:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+61:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+62:30  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+62:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+63:54  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+63:68  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+64:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+65:69  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+66:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+77:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+94:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+94:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+113:47  Warning: 'paymentData' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+113:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+113:74  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+132:58  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+150:75  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+165:19  Warning: 'payload' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+165:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+165:33  Warning: 'signature' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+183:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+198:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+198:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+217:47  Warning: 'paymentData' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+217:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+217:74  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+236:58  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+254:75  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+269:19  Warning: 'payload' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+269:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+269:33  Warning: 'signature' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+318:5  Warning: 'complexId' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+370:64  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+494:59  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+571:17  Warning: 'receipt' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+620:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+622:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+710:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+845:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+909:55  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+951:70  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+994:59  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+1088:65  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+1149:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+1202:66  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+1337:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+1348:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+1358:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+1373:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/services/paymentService.ts
+14:30  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+14:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+16:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+27:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+63:45  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+87:41  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+87:55  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/portfolioService.ts
+6:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+14:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+16:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+21:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+23:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/services/pqr-service-impl.ts
+145:72  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+246:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+246:58  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/pqrAssignmentService.ts
+12:3  Warning: 'PQRStatus' is defined but never used.  @typescript-eslint/no-unused-vars
+28:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/pqrMetricsService.ts
+9:10  Warning: 'PQRCategory' is defined but never used.  @typescript-eslint/no-unused-vars
+9:23  Warning: 'PQRPriority' is defined but never used.  @typescript-eslint/no-unused-vars
+407:24  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+638:57  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+643:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+690:5  Warning: 'idField' is assigned a value but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+691:6  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/pqrNotificationService.mock.ts
+11:3  Warning: 'PQRNotificationTemplate' is defined but never used.  @typescript-eslint/no-unused-vars
+196:32  Warning: 'pqrId' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+212:54  Warning: 'previousStatus' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+249:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/pqrNotificationService.ts
+11:10  Warning: 'sendSMS' is defined but never used.  @typescript-eslint/no-unused-vars
+12:21  Warning: 'PQRNotificationTemplate' is defined but never used.  @typescript-eslint/no-unused-vars
+252:15  Warning: 'reporter' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+280:17  Warning: 'assigneeData' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+486:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/pqrService.ts
+182:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+184:3  Warning: Unexpected console statement. Only these console methods are allowed: warn, error.  no-console
+
+./src/services/preRegistrationService.ts
+58:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+254:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/reservationService.ts
+54:9  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/residentDashboardService.ts
+7:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+8:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/residentService.ts
+21:9  Warning: '_prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+32:9  Warning: '_prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+43:9  Warning: '_prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+49:38  Warning: Replace `data:·CreateResidentData,·tenantId:·string` with `⏎··data:·CreateResidentData,⏎··tenantId:·string,⏎`  prettier/prettier
+50:9  Warning: '_prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+57:9  Warning: '_prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/services/userService.ts
+16:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+23:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+30:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+37:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+44:9  Warning: 'prisma' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/services/visitorService.ts
+86:59  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/services/votingService.ts
+199:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/store/authStore.ts
+103:31  Warning: Replace `·err·instanceof·Error·?·err.message·:·'Error·desconocido'` with `⏎············err·instanceof·Error·?·err.message·:·"Error·desconocido"`  prettier/prettier
+185:31  Warning: Replace `·err·instanceof·Error·?·err.message·:·'Error·desconocido'` with `⏎············err·instanceof·Error·?·err.message·:·"Error·desconocido"`  prettier/prettier
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules

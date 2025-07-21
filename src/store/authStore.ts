@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { useRouter } from "next/navigation";
 
 interface User {
   id: number;
@@ -100,8 +99,9 @@ export const useAuthStore = create<AuthState>()(
             schemaName: userData.schemaName || null,
             token: access_token,
           });
-        } catch (err: any) {
-          set({ error: err.message, isLoggedIn: false });
+        } catch (err: unknown) {
+          const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+          set({ error: errorMessage, isLoggedIn: false });
           throw err;
         } finally {
           set({ loading: false });
@@ -180,9 +180,10 @@ export const useAuthStore = create<AuthState>()(
               updatedUser.complexName || `Conjunto ${updatedUser.complexId}`,
             schemaName: updatedUser.schemaName || null,
           });
-          console.log("Rol de usuario actualizado a:", newRole);
-        } catch (err: any) {
-          set({ error: err.message });
+          console.warn("Rol de usuario actualizado a:", newRole);
+        } catch (err: unknown) {
+          const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+          set({ error: errorMessage });
           throw err;
         } finally {
           set({ loading: false });
