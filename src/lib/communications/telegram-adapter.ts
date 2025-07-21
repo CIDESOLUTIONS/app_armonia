@@ -38,7 +38,6 @@ export class TelegramAdapter implements MessageAdapter {
     this.botToken = config.botToken;
   }
 
-
   async sendMessage(
     to: string,
     message: string,
@@ -130,5 +129,3 @@ export class TelegramAdapter implements MessageAdapter {
     throw new Error("Formato de mensaje no reconocido");
   }
 }
-
-

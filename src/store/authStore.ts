@@ -100,7 +100,8 @@ export const useAuthStore = create<AuthState>()(
             token: access_token,
           });
         } catch (err: unknown) {
-          const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+          const errorMessage =
+            err instanceof Error ? err.message : "Error desconocido";
           set({ error: errorMessage, isLoggedIn: false });
           throw err;
         } finally {
@@ -182,7 +183,8 @@ export const useAuthStore = create<AuthState>()(
           });
           console.warn("Rol de usuario actualizado a:", newRole);
         } catch (err: unknown) {
-          const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+          const errorMessage =
+            err instanceof Error ? err.message : "Error desconocido";
           set({ error: errorMessage });
           throw err;
         } finally {

@@ -51,7 +51,9 @@ export function setSecurityHeaders(response: NextResponse): NextResponse {
 /**
  * Middleware para protección XSS
  */
-export function xssProtection(handler: (request: NextRequest, ...args: unknown[]) => Promise<any>) {
+export function xssProtection(
+  handler: (request: NextRequest, ...args: unknown[]) => Promise<any>,
+) {
   return async (request: NextRequest, ...args: unknown[]) => {
     // Verificar si la protección XSS está habilitada en la configuración
     const config = await import("@/config/security").then((mod) => mod.default);
