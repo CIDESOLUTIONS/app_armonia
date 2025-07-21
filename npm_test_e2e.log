@@ -1,0 +1,32 @@
+[MR] clean output dir ...
+[MR] generating report data ...
+[MR] generating test report ...
+[MR] Armonia Test Report
+┌─────────────┬───────────────────────┐
+│ Tests       │ 15                    │
+│ ├ Failed    │ 0  (0.0%)             │
+│ ├ Flaky     │ 0  (0.0%)             │
+│ ├ Skipped   │ 0  (0.0%)             │
+│ └ Passed    │ 15 (100.0%)           │
+│ Steps       │ 55                    │
+│ Suites      │ 5                     │
+│ ├ Projects  │ 5                     │
+│ ├ Files     │ 1                     │
+│ ├ Describes │ 5                     │
+│ └ Shards    │ 0                     │
+│ Errors      │ 0                     │
+│ Retries     │ 0                     │
+│ Logs        │ 0                     │
+│ Attachments │ 0                     │
+│ Artifacts   │ 0                     │
+│ Playwright  │ v1.54.1               │
+│ Date        │ 7/21/2025, 8:35:17 AM │
+│ Duration    │ 7.1s                  │
+└─────────────┴───────────────────────┘
+[MR] json: test-results/report.json
+[MR] view report: npx monocart show-report test-results/report.html
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report[39m
+[36m[39m
