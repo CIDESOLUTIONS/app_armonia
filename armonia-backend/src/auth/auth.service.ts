@@ -1,8 +1,10 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { TenantService } from '../tenant/tenant.service';
+import { ResidentialComplexService } from '../residential-complex/residential-complex.service';
+import { UserRole } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -10,6 +12,7 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     private tenantService: TenantService,
+    @Inject(ResidentialComplexService) private residentialComplexService: ResidentialComplexService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
@@ -37,11 +40,24 @@ export class AuthService {
     };
   }
 
-  async register(data: any) {
-    const existingUser = await this.userService.findByEmail(data.email);
+  async registerComplex(data: any) {
+    const { complexData, adminData } = data;
+
+    const existingUser = await this.userService.findByEmail(adminData.email);
     if (existingUser) {
       throw new UnauthorizedException('User with this email already exists');
     }
-    return this.userService.createUser(data);
+
+    const newComplex = await this.residentialComplexService.createComplexAndSchema(complexData);
+
+    const adminPayload = {
+      ...adminData,
+      role: UserRole.COMPLEX_ADMIN,
+      complexId: newComplex.id,
+    };
+
+    const newAdmin = await this.userService.createUser(newComplex.schemaName, adminPayload);
+
+    return this.login(newAdmin);
   }
 }

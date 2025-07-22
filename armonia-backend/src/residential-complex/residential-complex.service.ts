@@ -14,10 +14,15 @@ export class ResidentialComplexService {
     private prisma: PrismaService,
   ) {}
 
-  async createResidentialComplex(
+  async createComplexAndSchema(
     data: CreateResidentialComplexDto,
   ): Promise<ResidentialComplexDto> {
-    return this.prisma.residentialComplex.create({ data });
+    const newComplex = await this.prisma.residentialComplex.create({ data });
+    const schemaName = `complex_${newComplex.id}`;
+    return this.prisma.residentialComplex.update({
+      where: { id: newComplex.id },
+      data: { schemaName },
+    });
   }
 
   async getResidentialComplexes(): Promise<ResidentialComplexDto[]> {

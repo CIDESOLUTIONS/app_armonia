@@ -19,8 +19,13 @@ import {
   getReservations,
   updateReservationStatus,
   deleteReservation,
+  createReservation,
+  updateReservation,
+  getCommonAreas,
   Reservation,
+  CommonArea,
 } from "@/services/reservationService";
+import { getResidents } from "@/services/residentService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
@@ -29,32 +34,91 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+
+const reservationSchema = z.object({
+  commonAreaId: z.number().min(1, "El área común es requerida."),
+  userId: z.number().min(1, "El usuario es requerido."),
+  title: z.string().min(1, "El título es requerido."),
+  description: z.string().optional(),
+  startDateTime: z.string().min(1, "La fecha de inicio es requerida."),
+  endDateTime: z.string().min(1, "La fecha de fin es requerida."),
+  attendees: z.number().min(0).optional(),
+  requiresPayment: z.boolean().optional(),
+  paymentAmount: z.number().optional(),
+});
+
+type ReservationFormValues = z.infer<typeof reservationSchema>;
+
+interface ResidentOption {
+  id: number;
+  name: string;
+}
 
 export default function ReservationsPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
   const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [commonAreas, setCommonAreas] = useState<CommonArea[]>([]);
+  const [residents, setResidents] = useState<ResidentOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentReservation, setCurrentReservation] =
     useState<Reservation | null>(null);
 
-  const handleAddReservation = () => {
-    setCurrentReservation(null);
-    // Aquí puedes inicializar un formulario vacío si usas react-hook-form
-    setIsModalOpen(true);
-  };
+  const form = useForm<ReservationFormValues>({
+    resolver: zodResolver(reservationSchema),
+    defaultValues: {
+      commonAreaId: 0,
+      userId: 0,
+      title: "",
+      description: "",
+      startDateTime: "",
+      endDateTime: "",
+      attendees: 0,
+      requiresPayment: false,
+      paymentAmount: 0,
+    },
+  });
 
-  const fetchReservations = useCallback(async () => {
+  const { handleSubmit, control, reset } = form;
+
+  const fetchReservationsAndData = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getReservations();
-      setReservations(data);
+      const [reservationsData, commonAreasData, residentsData] = await Promise.all([
+        getReservations(),
+        getCommonAreas(),
+        getResidents(),
+      ]);
+      setReservations(reservationsData);
+      setCommonAreas(commonAreasData);
+      setResidents(residentsData.map((r) => ({ id: r.id, name: r.name })));
     } catch (error: Error) {
-      console.error("Error fetching reservations:", error);
+      console.error("Error fetching data:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las reservas.",
+        description: "No se pudieron cargar los datos de reservas.",
         variant: "destructive",
       });
     } finally {
@@ -64,9 +128,68 @@ export default function ReservationsPage() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      fetchReservations();
+      fetchReservationsAndData();
     }
-  }, [authLoading, user, fetchReservations]);
+  }, [authLoading, user, fetchReservationsAndData]);
+
+  const handleAddReservation = () => {
+    setCurrentReservation(null);
+    reset({
+      commonAreaId: 0,
+      userId: 0,
+      title: "",
+      description: "",
+      startDateTime: "",
+      endDateTime: "",
+      attendees: 0,
+      requiresPayment: false,
+      paymentAmount: 0,
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleEditReservation = (reservation: Reservation) => {
+    setCurrentReservation(reservation);
+    reset({
+      commonAreaId: reservation.commonAreaId,
+      userId: reservation.userId,
+      title: reservation.title,
+      description: reservation.description || "",
+      startDateTime: reservation.startDateTime.slice(0, 16),
+      endDateTime: reservation.endDateTime.slice(0, 16),
+      attendees: reservation.attendees || 0,
+      requiresPayment: reservation.requiresPayment || false,
+      paymentAmount: reservation.paymentAmount || 0,
+    });
+    setIsModalOpen(true);
+  };
+
+  const onSubmit = async (data: ReservationFormValues) => {
+    try {
+      if (currentReservation) {
+        await updateReservation(currentReservation.id, data);
+        toast({
+          title: "Éxito",
+          description: "Reserva actualizada correctamente.",
+        });
+      } else {
+        await createReservation(data);
+        toast({
+          title: "Éxito",
+          description: "Reserva creada correctamente.",
+        });
+      }
+      setIsModalOpen(false);
+      fetchReservationsAndData();
+    } catch (error: Error) {
+      console.error("Error saving reservation:", error);
+      toast({
+        title: "Error",
+        description: "Error al guardar la reserva.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleUpdateStatus = async (
     id: number,
@@ -78,7 +201,7 @@ export default function ReservationsPage() {
         title: "Éxito",
         description: `Reserva ${status === "APPROVED" ? "aprobada" : "rechazada"} correctamente.`,
       });
-      fetchReservations();
+      fetchReservationsAndData();
     } catch (error: Error) {
       console.error("Error updating reservation status:", error);
       toast({
@@ -97,7 +220,7 @@ export default function ReservationsPage() {
           title: "Éxito",
           description: "Reserva eliminada correctamente.",
         });
-        fetchReservations();
+        fetchReservationsAndData();
       } catch (error: Error) {
         console.error("Error deleting reservation:", error);
         toast({
@@ -281,16 +404,167 @@ export default function ReservationsPage() {
               {currentReservation ? "Editar Reserva" : "Crear Nueva Reserva"}
             </DialogTitle>
           </DialogHeader>
-          {/* Aquí irá el formulario de creación/edición de reservas */}
-          <div className="py-4">
-            <p>Formulario de reserva en construcción...</p>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-              Cancelar
-            </Button>
-            <Button type="submit">Guardar</Button>
-          </DialogFooter>
+          <Form {...form}>
+            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
+              <FormField
+                control={control}
+                name="commonAreaId"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Área Común</FormLabel>
+                    <Select
+                      onValueChange={(value) => field.onChange(parseInt(value))}
+                      value={field.value ? String(field.value) : ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="col-span-3 p-2 border rounded-md">
+                          <SelectValue placeholder="Seleccionar Área Común" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {commonAreas.map((area) => (
+                          <SelectItem key={area.id} value={String(area.id)}>
+                            {area.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="userId"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Usuario</FormLabel>
+                    <Select
+                      onValueChange={(value) => field.onChange(parseInt(value))}
+                      value={field.value ? String(field.value) : ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="col-span-3 p-2 border rounded-md">
+                          <SelectValue placeholder="Seleccionar Usuario" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {residents.map((resident) => (
+                          <SelectItem key={resident.id} value={String(resident.id)}>
+                            {resident.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Título</FormLabel>
+                    <FormControl>
+                      <Input className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Descripción</FormLabel>
+                    <FormControl>
+                      <Textarea className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="startDateTime"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Inicio</FormLabel>
+                    <FormControl>
+                      <Input type="datetime-local" className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="endDateTime"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Fin</FormLabel>
+                    <FormControl>
+                      <Input type="datetime-local" className="col-span-3" {...field} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="attendees"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-4 items-center gap-4">
+                    <FormLabel className="text-right">Asistentes</FormLabel>
+                    <FormControl>
+                      <Input type="number" className="col-span-3" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
+                    </FormControl>
+                    <FormMessage className="col-span-full text-right" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="requiresPayment"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Requiere Pago</FormLabel>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {form.watch("requiresPayment") && (
+                <FormField
+                  control={control}
+                  name="paymentAmount"
+                  render={({ field }) => (
+                    <FormItem className="grid grid-cols-4 items-center gap-4">
+                      <FormLabel className="text-right">Monto de Pago</FormLabel>
+                      <FormControl>
+                        <Input type="number" className="col-span-3" {...field} onChange={(e) => field.onChange(parseFloat(e.target.value))} />
+                      </FormControl>
+                      <FormMessage className="col-span-full text-right" />
+                    </FormItem>
+                  )}
+                />
+              )}
+              <DialogFooter>
+                <Button type="submit" disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : null}{" "}
+                  {currentReservation ? "Guardar Cambios" : "Crear Reserva"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
     </div>

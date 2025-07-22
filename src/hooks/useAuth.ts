@@ -4,7 +4,7 @@ import { useAuthStore } from "@/store/authStore";
 
 export function useAuth() {
   const router = useRouter();
-  const { login: storeLogin } = useAuthStore();
+  const { login: storeLogin, logout: storeLogout } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -52,5 +52,38 @@ export function useAuth() {
     }
   };
 
-  return { login, loading, error };
+  const registerComplex = async (data: any) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/auth/register-complex", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Error al registrar el conjunto");
+      }
+
+      storeLogin(result.user, result.token);
+      router.push("/admin/complex-admin/admin-dashboard");
+
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = () => {
+    storeLogout();
+    router.push("/");
+  };
+
+  return { login, registerComplex, logout, loading, error };
 }
