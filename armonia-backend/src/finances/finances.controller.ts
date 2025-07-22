@@ -19,23 +19,24 @@ import {
   CreateFeeDto,
   UpdateFeeDto,
   FeeFilterParamsDto,
-} from '../common/dto/fees.dto';
+} from '../common/dto/finances.dto';
 import {
   CreatePaymentDto,
   UpdatePaymentDto,
   PaymentFilterParamsDto,
   PaymentStatus,
-} from '../common/dto/payments.dto';
+  RegisterManualPaymentDto,
+} from '../common/dto/finances.dto';
 import {
   CreateBudgetDto,
   UpdateBudgetDto,
   BudgetFilterParamsDto,
-} from '../common/dto/budgets.dto';
+} from '../common/dto/finances.dto';
 import {
   CreateExpenseDto,
   UpdateExpenseDto,
   ExpenseFilterParamsDto,
-} from '../common/dto/expenses.dto';
+} from '../common/dto/finances.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard(UserRole.COMPLEX_ADMIN, UserRole.ADMIN))
 @Controller('finances')
@@ -87,6 +88,23 @@ export class FinancesController {
     return this.financesService.createPayment(
       user.schemaName,
       createPaymentDto,
+    );
+  }
+
+  @Post('payments/manual')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async registerManualPayment(
+    @GetUser() user: any,
+    @Body() registerManualPaymentDto: RegisterManualPaymentDto,
+  ) {
+    return this.financesService.registerManualPayment(
+      user.schemaName,
+      registerManualPaymentDto.feeId,
+      registerManualPaymentDto.userId,
+      registerManualPaymentDto.amount,
+      new Date(registerManualPaymentDto.paymentDate),
+      registerManualPaymentDto.paymentMethod,
+      registerManualPaymentDto.transactionId,
     );
   }
 

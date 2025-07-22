@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Res, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Query, Res, UseGuards, Req, Body } from '@nestjs/common';
 import { Response } from 'express';
 import { ReportsService } from './reports.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -173,6 +173,27 @@ export class ReportsController {
       'Content-Type':
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'Content-Disposition': 'attachment; filename="reporte_incidentes.xlsx"',
+      'Content-Length': buffer.length,
+    });
+    res.end(buffer);
+  }
+
+  @Post('consolidated-financial/pdf')
+  @Roles(UserRole.ADMIN)
+  async getConsolidatedFinancialReportPdf(
+    @Body('schemaNames') schemaNames: string[],
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+    @Res() res: Response,
+  ) {
+    const buffer = await this.reportsService.generateConsolidatedFinancialReportPdf(
+      schemaNames,
+      new Date(startDate),
+      new Date(endDate),
+    );
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="reporte_financiero_consolidado.pdf"',
       'Content-Length': buffer.length,
     });
     res.end(buffer);

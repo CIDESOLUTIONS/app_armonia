@@ -1,40 +1,24 @@
-import {
-  Controller,
-  Post,
-  UseInterceptors,
-  UploadedFile,
-  Body,
-  UseGuards,
-  Request,
-} from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { BankReconciliationService } from './bank-reconciliation.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { UserRole } from '@prisma/client';
 import { GetUser } from '../common/decorators/user.decorator';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard(UserRole.COMPLEX_ADMIN, UserRole.ADMIN))
 @Controller('bank-reconciliation')
 export class BankReconciliationController {
-  constructor(
-    private readonly bankReconciliationService: BankReconciliationService,
-  ) {}
+  constructor(private readonly bankReconciliationService: BankReconciliationService) {}
 
-  @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadStatement(
-    @UploadedFile() file: Express.Multer.File,
+  @Post('reconcile')
+  async reconcileBankStatement(
     @GetUser() user: any,
-    @Body('complexId') complexId: string,
+    @Body() transactions: any[], // This would be a DTO for bank transactions
   ) {
-    if (!file) {
-      throw new Error('No file uploaded');
-    }
-    // Asumiendo que el servicio procesará el archivo y devolverá sugerencias
-    return this.bankReconciliationService.processBankStatement(
+    return this.bankReconciliationService.reconcileBankStatement(
       user.schemaName,
-      file.buffer,
-      file.mimetype,
-      +complexId,
+      transactions,
     );
   }
 }

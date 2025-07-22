@@ -1,24 +1,39 @@
-import { getPrisma } from "@/lib/prisma";
+import { fetchApi } from "@/lib/api";
 
-export const updatePanicAlertsStatus = async (
-  tenantId: string,
-  alertId: number,
-  status: string,
-) => {
-  const prisma = getPrisma(tenantId);
-  // Placeholder logic
-  console.log(
-    "Updating panic alert status for tenant:",
-    tenantId,
-    alertId,
-    status,
-  );
-  return { message: "Panic alert status updated successfully" };
-};
+interface PanicAlertPayload {
+  userId: number;
+  complexId: number;
+  location: string;
+  message?: string;
+  type: "EMERGENCY" | "MEDICAL" | "SECURITY" | "OTHER";
+}
 
-export const getActivePanicAlerts = async (tenantId: string) => {
-  const prisma = getPrisma(tenantId);
-  // Placeholder logic
-  console.log("Getting active panic alerts for tenant:", tenantId);
-  return { message: "Active panic alerts retrieved successfully" };
-};
+interface PanicAlert {
+  id: number;
+  userId: number;
+  complexId: number;
+  location: string;
+  message?: string;
+  type: "EMERGENCY" | "MEDICAL" | "SECURITY" | "OTHER";
+  status: "ACTIVE" | "RESOLVED" | "DISMISSED";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function triggerPanicAlert(data: PanicAlertPayload): Promise<PanicAlert> {
+  return fetchApi("/panic/trigger", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function getActivePanicAlerts(): Promise<PanicAlert[]> {
+  return fetchApi("/panic/active");
+}
+
+export async function updatePanicAlertStatus(id: number, status: "RESOLVED" | "DISMISSED"): Promise<PanicAlert> {
+  return fetchApi(`/panic/${id}/status`, {
+    method: "PUT",
+    body: JSON.stringify({ status }),
+  });
+}

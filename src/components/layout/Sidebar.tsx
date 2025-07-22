@@ -19,6 +19,7 @@ import {
   ChevronRight,
   Coffee,
   Briefcase,
+  Palette,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -182,25 +183,6 @@ export default function Sidebar({
     },
     {
       icon: <Users className="w-6 h-6" />,
-      label: language === "Español" ? "Residentes" : "Residents",
-      roles: ["COMPLEX_ADMIN"],
-      subitems: [
-        {
-          label:
-            language === "Español" ? "Listado de Residentes" : "Residents List",
-          path: "/admin/complex-admin/residents",
-        },
-        {
-          label:
-            language === "Español"
-              ? "Registro de Residentes"
-              : "Residents Registry",
-          path: "/admin/complex-admin/residents/registry",
-        },
-      ],
-    },
-    {
-      icon: <Shield className="w-6 h-6" />,
       label: language === "Español" ? "Usuarios" : "Users",
       roles: ["COMPLEX_ADMIN"],
       subitems: [
@@ -247,7 +229,7 @@ export default function Sidebar({
     {
       icon: <Settings className="w-6 h-6" />,
       label: language === "Español" ? "Configuraciones" : "Settings",
-      roles: ["COMPLEX_ADMIN"],
+      roles: ["COMPLEX_ADMIN", "ADMIN"],
       subitems: [
         {
           label: language === "Español" ? "General" : "General",
@@ -264,6 +246,11 @@ export default function Sidebar({
         {
           label: language === "Español" ? "Cámaras" : "Cameras",
           path: "/admin-portal/configuration/cameras",
+        },
+        {
+          label: language === "Español" ? "Marca" : "Branding",
+          path: "/admin/settings/branding",
+          roles: ["ADMIN"], // Only platform admin can access branding
         },
       ],
     },

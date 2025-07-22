@@ -19,9 +19,10 @@ import { DocumentsModule } from './documents/documents.module';
 import { PaymentGatewaysModule } from './payment-gateways/payment-gateways.module';
 import { ResidentialComplexModule } from './residential-complex/residential-complex.module';
 import { InsurtechModule } from './insurtech/insurtech.module';
-import { ReportsModule } from './reports/reports.module'; // Importar el nuevo módulo
+import { ReportsModule } from './reports/reports.module';
+import { StaffModule } from './staff/staff.module'; // Importar el nuevo módulo
 
-import { FintechModule } from './fintech/fintech.module';
+import { FintechModule }n'./fintech/fintech.module';
 
 @Module({
   imports: [
@@ -54,7 +55,8 @@ import { FintechModule } from './fintech/fintech.module';
     PaymentGatewaysModule,
     ResidentialComplexModule,
     InsurtechModule,
-    ReportsModule, // Añadir el nuevo módulo aquí
+    ReportsModule,
+    StaffModule, // Añadir el nuevo módulo aquí
   ],
   controllers: [AppController],
   providers: [AppService],

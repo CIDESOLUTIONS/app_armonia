@@ -19,6 +19,7 @@ import { FeeGenerationSection } from "@/components/finances/FeeGenerationSection
 import { FineManagementSection } from "@/components/finances/FineManagementSection";
 import { PaymentGatewaySection } from "@/components/finances/PaymentGatewaySection";
 import { FinancialReportsGenerator } from "@/components/finances/FinancialReportsGenerator";
+import { ManualPaymentForm } from "@/components/finances/ManualPaymentForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
@@ -108,11 +109,12 @@ export default function FinancesPage() {
       </h1>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="overview">Resumen</TabsTrigger>
           <TabsTrigger value="fees">Cuotas</TabsTrigger>
           <TabsTrigger value="fines">Multas/Intereses</TabsTrigger>
-          <TabsTrigger value="payments">Pagos</TabsTrigger>
+          <TabsTrigger value="payments">Pasarelas de Pago</TabsTrigger>
+          <TabsTrigger value="manual-payments">Pagos Manuales</TabsTrigger>
           <TabsTrigger value="reports">Informes</TabsTrigger>
         </TabsList>
 
@@ -231,6 +233,10 @@ export default function FinancesPage() {
 
         <TabsContent value="payments" className="mt-6">
           <PaymentGatewaySection />
+        </TabsContent>
+
+        <TabsContent value="manual-payments" className="mt-6">
+          <ManualPaymentForm />
         </TabsContent>
 
         <TabsContent value="reports" className="mt-6">

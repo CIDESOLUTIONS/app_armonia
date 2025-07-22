@@ -7,7 +7,7 @@ import {
   IsArray,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type } 'from 'class-transformer';
 
 export enum PaymentStatus {
   PENDING = 'PENDING',
@@ -261,6 +261,27 @@ export class CreatePaymentDto {
 
   @IsNumber()
   propertyId: number;
+}
+
+export class RegisterManualPaymentDto {
+  @IsNumber()
+  feeId: number;
+
+  @IsNumber()
+  userId: number;
+
+  @IsNumber()
+  amount: number;
+
+  @IsDateString()
+  paymentDate: string;
+
+  @IsString()
+  paymentMethod: string;
+
+  @IsOptional()
+  @IsString()
+  transactionId?: string;
 }
 
 export class CreateBudgetDto {
