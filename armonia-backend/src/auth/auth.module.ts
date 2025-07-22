@@ -7,11 +7,14 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { TenantModule } from '../tenant/tenant.module';
 
+import { ResidentialComplexModule } from '../residential-complex/residential-complex.module';
+
 @Module({
   imports: [
     UserModule,
     PassportModule,
     TenantModule,
+    ResidentialComplexModule,
     JwtModule.register({
       secret:
         process.env.JWT_SECRET_KEY || 'superSecretKeyThatShouldBeLongAndRandom',

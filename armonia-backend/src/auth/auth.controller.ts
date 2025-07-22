@@ -18,9 +18,9 @@ export class AuthController {
     return this.authService.login(user);
   }
 
-  @Post('register')
-  async register(@Body() registerDto: Record<string, any>) {
-    return this.authService.register(registerDto);
+  @Post('register-complex')
+  async registerComplex(@Body() registerDto: any) {
+    return this.authService.registerComplex(registerDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
