@@ -12,12 +12,14 @@ import {
   Package,
   Bell,
   FileText,
+  AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/components/ui/use-toast";
 import { getResidentDashboardMetrics } from "@/services/residentService";
 import { getProjects } from "@/services/projectService";
 import { Badge } from "@/components/ui/badge";
+import { triggerPanicAlert } from "@/services/panicService"; // Import panicService
 
 interface ResidentDashboardMetrics {
   totalProperties: number;
@@ -91,6 +93,41 @@ export default function ResidentDashboardPage() {
       (task) => task.isCompleted,
     ).length;
     return Math.round((completedTasks / project.tasks.length) * 100);
+  };
+
+  const handlePanicTrigger = async () => {
+    if (!user?.id || !user?.complexId) {
+      toast({
+        title: "Error",
+        description: "Información de usuario o complejo incompleta para la alerta de pánico.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (confirm("¿Estás seguro de que quieres activar la alerta de pánico? Esto notificará al personal de seguridad.")) {
+      try {
+        await triggerPanicAlert({
+          userId: user.id,
+          complexId: user.complexId,
+          location: "Ubicación del residente (ej. Apto. 101)", // This should be dynamic
+          message: "Alerta de pánico activada por residente.",
+          type: "EMERGENCY",
+        });
+        toast({
+          title: "Alerta de Pánico Activada",
+          description: "El personal de seguridad ha sido notificado.",
+          variant: "default",
+        });
+      } catch (error: Error) {
+        console.error("Error triggering panic alert:", error);
+        toast({
+          title: "Error",
+          description: "No se pudo activar la alerta de pánico: " + error.message,
+          variant: "destructive",
+        });
+      }
+    }
   };
 
   if (authLoading || loading) {
@@ -207,6 +244,14 @@ export default function ResidentDashboardPage() {
                 <Bell className="mr-2 h-4 w-4" /> Mis Reservas
               </Button>
             </Link>
+            <Link href="/resident/communications/announcements">
+              <Button variant="outline" className="w-full">
+                <Bell className="mr-2 h-4 w-4" /> Mis Comunicados
+              </Button>
+            </Link>
+            <Button variant="destructive" className="w-full" onClick={handlePanicTrigger}>
+              <AlertTriangle className="mr-2 h-4 w-4" /> Botón de Pánico
+            </Button>
           </CardContent>
         </Card>
 

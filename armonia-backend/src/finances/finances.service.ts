@@ -150,6 +150,46 @@ export class FinancesService {
     return payment;
   }
 
+  async registerManualPayment(
+    schemaName: string,
+    feeId: number,
+    userId: number,
+    amount: number,
+    paymentDate: Date,
+    paymentMethod: string,
+    transactionId?: string,
+  ): Promise<PaymentDto> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+
+    const fee = await prisma.fee.findUnique({ where: { id: feeId } });
+    if (!fee) {
+      throw new NotFoundException(`Cuota con ID ${feeId} no encontrada.`);
+    }
+
+    if (fee.status === FeeStatus.PAID) {
+      throw new BadRequestException(`La cuota ${feeId} ya ha sido pagada.`);
+    }
+
+    const payment = await prisma.payment.create({
+      data: {
+        feeId: fee.id,
+        userId: userId,
+        amount: amount,
+        paymentDate: paymentDate,
+        status: PaymentStatus.COMPLETED,
+        paymentMethod: paymentMethod,
+        transactionId: transactionId || `MANUAL_${Date.now()}`,
+      },
+    });
+
+    await prisma.fee.update({
+      where: { id: fee.id },
+      data: { status: FeeStatus.PAID },
+    });
+
+    return payment;
+  }
+
   async getPayments(
     schemaName: string,
     filters: PaymentFilterParamsDto,

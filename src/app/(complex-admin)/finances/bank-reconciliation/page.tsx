@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, Upload, CheckCircle } from "lucide-react";
+import { Loader2, Upload, FileText, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,39 +15,40 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  processBankStatement,
-  approveReconciliation,
-} from "@/services/financeService"; // Assuming financeService exists
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ReconciliationSuggestion } from "@/services/financeService";
+import { reconcileBankStatement } from "@/services/bankReconciliationService"; // Assuming this service will be created
+import * as XLSX from 'xlsx';
+
+interface BankTransaction {
+  date: string;
+  description: string;
+  amount: number;
+  type: string;
+  reference: string;
+}
+
+interface ReconciliationResult {
+  bankTransaction: BankTransaction;
+  systemPayment: any; // Replace with actual PaymentDto if available
+  status: 'MATCHED' | 'UNMATCHED';
+}
 
 export default function BankReconciliationPage() {
-  const { user, loading: authLoading } = useAuthStore();
+  const { user } = useAuthStore();
   const { toast } = useToast();
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [suggestions, setSuggestions] = useState<ReconciliationSuggestion[]>(
-    [],
-  );
+  const [file, setFile] = useState<File | null>(null);
+  const [reconciliationResults, setReconciliationResults] = useState<ReconciliationResult[]>([]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      setSelectedFile(event.target.files[0]);
+      setFile(event.target.files[0]);
     } else {
-      setSelectedFile(null);
+      setFile(null);
     }
   };
 
-  const handleProcessStatement = async () => {
-    if (!selectedFile) {
+  const handleReconcile = useCallback(async () => {
+    if (!file) {
       toast({
         title: "Advertencia",
         description: "Por favor, selecciona un archivo de extracto bancario.",
@@ -58,63 +59,54 @@ export default function BankReconciliationPage() {
 
     setLoading(true);
     try {
-      // Assuming processBankStatement takes a File object and returns ReconciliationSuggestion[]
-      const result = await processBankStatement(
-        user?.complexId || "",
-        selectedFile,
-      );
-      setSuggestions(result);
-      toast({
-        title: "Éxito",
-        description: "Extracto procesado y sugerencias generadas.",
-      });
-    } catch (error: Error) {
-      console.error("Error processing bank statement:", error);
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const json = XLSX.utils.sheet_to_json(worksheet);
+
+        // Assuming the CSV/Excel has columns like 'Date', 'Description', 'Amount', 'Type', 'Reference'
+        const bankTransactions: BankTransaction[] = json.map((row: any) => ({
+          date: row.Date,
+          description: row.Description,
+          amount: row.Amount,
+          type: row.Type,
+          reference: row.Reference,
+        }));
+
+        if (!user?.schemaName) {
+          toast({
+            title: "Error",
+            description: "No se pudo obtener el esquema del usuario.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+
+        const results = await reconcileBankStatement(user.schemaName, bankTransactions);
+        setReconciliationResults(results);
+        toast({
+          title: "Éxito",
+          description: "Conciliación bancaria completada.",
+        });
+      };
+      reader.readAsArrayBuffer(file);
+    } catch (error: any) {
+      console.error("Error during reconciliation:", error);
       toast({
         title: "Error",
-        description: "Error al procesar el extracto bancario: " + error.message,
+        description: "Error al realizar la conciliación: " + error.message,
         variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
-  };
+  }, [file, user?.schemaName, toast]);
 
-  const handleApproveSuggestion = async (
-    suggestion: ReconciliationSuggestion,
-  ) => {
-    setLoading(true);
-    try {
-      // Assuming approveReconciliation takes a reconciliationId and tenantId
-      await approveReconciliation(
-        user?.complexId || "",
-        suggestion.transaction.id,
-      ); // Assuming transaction.id can be used as reconciliationId
-      toast({
-        title: "Éxito",
-        description: "Sugerencia de conciliación aprobada.",
-      });
-      // Refresh suggestions or remove approved one
-      setSuggestions((prev) =>
-        prev.map((s) =>
-          s.transaction.description === suggestion.transaction.description
-            ? { ...s, status: "APPROVED" }
-            : s,
-        ),
-      );
-    } catch (error: Error) {
-      console.error("Error approving suggestion:", error);
-      toast({
-        title: "Error",
-        description: "Error al aprobar la sugerencia: " + error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (authLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -143,108 +135,73 @@ export default function BankReconciliationPage() {
         Conciliación Bancaria Automática
       </h1>
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Subir Extracto Bancario</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col space-y-4">
-          <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="bankStatement">
-              Archivo de Extracto (CSV, Excel)
-            </Label>
+      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+        <h2 className="text-xl font-semibold mb-4">Importar Extracto Bancario</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+          <div>
+            <Label htmlFor="bankStatementFile">Seleccionar Archivo (CSV/Excel)</Label>
             <Input
-              id="bankStatement"
+              id="bankStatementFile"
               type="file"
+              accept=".csv, .xls, .xlsx"
               onChange={handleFileChange}
-              accept=".csv,.xls,.xlsx"
             />
           </div>
-          <Button
-            onClick={handleProcessStatement}
-            disabled={!selectedFile || loading}
-          >
+          <Button onClick={handleReconcile} disabled={!file || loading}>
             {loading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               <Upload className="mr-2 h-4 w-4" />
             )}
-            Procesar Extracto
+            Conciliar Extracto
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {suggestions.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Sugerencias de Conciliación</CardTitle>
-            <CardDescription>
-              Revisa las transacciones y aprueba las coincidencias.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Fecha Transacción</TableHead>
-                  <TableHead>Descripción Transacción</TableHead>
-                  <TableHead>Monto Transacción</TableHead>
-                  <TableHead>Pago Coincidente</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {suggestions.map((suggestion, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{suggestion.transaction.date}</TableCell>
-                    <TableCell>{suggestion.transaction.description}</TableCell>
-                    <TableCell>{suggestion.transaction.amount}</TableCell>
-                    <TableCell>
-                      {suggestion.matchingPayment
-                        ? `ID: ${suggestion.matchingPayment.id}, Monto: ${suggestion.matchingPayment.amount}`
-                        : "N/A"}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          suggestion.status === "MATCHED"
-                            ? "default"
-                            : suggestion.status === "APPROVED"
-                              ? "outline" // Changed from 'success' to 'outline'
-                              : "destructive"
-                        }
-                      >
-                        {suggestion.status}
+      {reconciliationResults.length > 0 && (
+        <div className="bg-white shadow-md rounded-lg p-6">
+          <h2 className="text-xl font-semibold mb-4">Resultados de la Conciliación</h2>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Fecha Transacción</TableHead>
+                <TableHead>Descripción Bancaria</TableHead>
+                <TableHead>Monto Bancario</TableHead>
+                <TableHead>Referencia Bancaria</TableHead>
+                <TableHead>Pago en Sistema</TableHead>
+                <TableHead>Estado</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {reconciliationResults.map((result, index) => (
+                <TableRow key={index}>
+                  <TableCell>{result.bankTransaction.date}</TableCell>
+                  <TableCell>{result.bankTransaction.description}</TableCell>
+                  <TableCell>{result.bankTransaction.amount}</TableCell>
+                  <TableCell>{result.bankTransaction.reference}</TableCell>
+                  <TableCell>
+                    {result.systemPayment ? (
+                      `ID: ${result.systemPayment.id} - Monto: ${result.systemPayment.amount}`
+                    ) : (
+                      "N/A"
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {result.status === "MATCHED" ? (
+                      <Badge variant="default" className="bg-green-100 text-green-800">
+                        <CheckCircle className="h-4 w-4 mr-1" /> Conciliado
                       </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {suggestion.status === "UNMATCHED" && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleApproveSuggestion(suggestion)}
-                          disabled={loading}
-                        >
-                          <CheckCircle className="mr-2 h-4 w-4" /> Aprobar
-                        </Button>
-                      )}
-                      {suggestion.status === "MATCHED" && (
-                        <Button variant="ghost" size="sm" disabled>
-                          <CheckCircle className="mr-2 h-4 w-4" /> Coincidente
-                        </Button>
-                      )}
-                      {suggestion.status === "APPROVED" && (
-                        <Button variant="ghost" size="sm" disabled>
-                          <CheckCircle className="mr-2 h-4 w-4" /> Aprobado
-                        </Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                    ) : (
+                      <Badge variant="destructive">
+                        <XCircle className="h-4 w-4 mr-1" /> No Conciliado
+                      </Badge>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       )}
     </div>
   );

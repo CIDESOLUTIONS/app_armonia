@@ -16,10 +16,12 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 
 import { getConsolidatedFinancialReport } from "@/services/portfolioService";
+import { useComplexStore } from "@/store/complexStore";
 
 export default function ConsolidatedReportsPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
+  const { allComplexes } = useComplexStore();
   const [loading, setLoading] = useState(false);
   const [reportType, setReportType] = useState("financial-summary");
   const [startDate, setStartDate] = useState("");
@@ -39,13 +41,19 @@ export default function ConsolidatedReportsPage() {
     setLoading(true);
     try {
       if (reportType === "financial-summary") {
-        await getConsolidatedFinancialReport(startDate, endDate);
-        // For now, just log the data. In a real app, you'd format and display/download it.
-        // console.log("Consolidated Financial Report:", reportData); // Removed console.log
+        const schemaNames = allComplexes.map(c => c.schemaName); // Get all schema names from the store
+        const reportBlob = await getConsolidatedFinancialReport(schemaNames, startDate, endDate);
+        const url = window.URL.createObjectURL(reportBlob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `reporte_financiero_consolidado_${startDate}_${endDate}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
         toast({
           title: "Éxito",
-          description:
-            "Reporte financiero consolidado generado correctamente. (Ver consola)",
+          description: "Reporte financiero consolidado generado y descargado correctamente.",
         });
       } else {
         toast({

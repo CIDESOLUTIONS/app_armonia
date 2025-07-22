@@ -1,70 +1,66 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
-import * as XLSX from 'xlsx';
+import { PrismaService } from '../prisma/prisma.service';
+import { PaymentStatus, FeeStatus } from '@prisma/client';
 
 @Injectable()
 export class BankReconciliationService {
   constructor(
-    private prisma: PrismaService,
     private prismaClientManager: PrismaClientManager,
+    private prisma: PrismaService,
   ) {}
 
   private getTenantPrismaClient(schemaName: string) {
     return this.prismaClientManager.getClient(schemaName);
   }
 
-  async processBankStatement(
+  async reconcileBankStatement(
     schemaName: string,
-    fileBuffer: Buffer,
-    mimetype: string,
-    complexId: number,
-  ) {
+    transactions: any[], // This would be a DTO for bank transactions
+  ): Promise<any> {
     const prisma = this.getTenantPrismaClient(schemaName);
-    let workbook;
+    const reconciliationResults: any[] = [];
 
-    if (mimetype === 'text/csv') {
-      workbook = XLSX.read(fileBuffer.toString('utf8'), { type: 'string' });
-    } else if (
-      mimetype ===
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    ) {
-      workbook = XLSX.read(fileBuffer, { type: 'buffer' });
-    } else {
-      throw new Error('Unsupported file type');
-    }
-
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
-    const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
-    const processedEntries = [];
-
-    for (const row of jsonData) {
-      // Asumiendo un formato simple: Fecha, Descripción, Monto, Tipo (Ingreso/Egreso)
-      const date = new Date(row['Fecha']);
-      const description = row['Descripción'];
-      const amount = parseFloat(row['Monto']);
-      const type = row['Tipo']; // 'Ingreso' o 'Egreso'
-
-      // Aquí se podría añadir lógica para identificar transacciones y sugerir conciliaciones
-      // Por ahora, solo almacenaremos la entrada del extracto
-      const entry = await prisma.bankStatementEntry.create({
-        data: {
-          complexId,
-          date,
-          description,
-          amount,
-          type,
-          raw_data: JSON.stringify(row),
+    for (const bankTransaction of transactions) {
+      // Attempt to find a matching payment in the system
+      const matchingPayment = await prisma.payment.findFirst({
+        where: {
+          amount: bankTransaction.amount,
+          // Add more sophisticated matching logic here (e.g., date range, reference number)
+          status: PaymentStatus.PENDING, // Only match pending payments
         },
       });
-      processedEntries.push(entry);
+
+      if (matchingPayment) {
+        // If a match is found, update the payment status to COMPLETED
+        await prisma.payment.update({
+          where: { id: matchingPayment.id },
+          data: { status: PaymentStatus.COMPLETED, paymentDate: new Date() },
+        });
+
+        // Update the associated fee status
+        if (matchingPayment.feeId) {
+          await prisma.fee.update({
+            where: { id: matchingPayment.feeId },
+            data: { status: FeeStatus.PAID },
+          });
+        }
+
+        reconciliationResults.push({
+          bankTransaction,
+          systemPayment: matchingPayment,
+          status: 'MATCHED',
+        });
+      } else {
+        // If no match is found, flag it as unmatched
+        reconciliationResults.push({
+          bankTransaction,
+          systemPayment: null,
+          status: 'UNMATCHED',
+        });
+      }
     }
 
-    return {
-      message: `Processed ${processedEntries.length} entries.`,
-      processedEntries,
-    };
+    return reconciliationResults;
   }
 }
