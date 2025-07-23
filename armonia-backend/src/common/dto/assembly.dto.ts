@@ -73,18 +73,19 @@ export class RegisterAttendanceDto {
 }
 
 export class CreateVoteDto {
-  @IsNumber()
-  assemblyId: number;
+  @IsString()
+  title: string;
 
   @IsString()
-  question: string;
+  description: string;
 
   @IsArray()
   @IsString({ each: true })
   options: string[]; // Array of option texts
 
+  @IsOptional()
   @IsBoolean()
-  isWeighted: boolean;
+  weightedVoting?: boolean;
 }
 
 export class SubmitVoteDto {
@@ -92,11 +93,11 @@ export class SubmitVoteDto {
   voteId: number;
 
   @IsNumber()
-  optionId: number; // Use option ID instead of index
-
-  @IsNumber()
   userId: number;
 
   @IsNumber()
-  weight: number;
+  unitId: number;
+
+  @IsString()
+  option: string;
 }

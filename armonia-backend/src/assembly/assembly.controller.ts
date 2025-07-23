@@ -31,6 +31,7 @@ export class AssemblyController {
     return this.assemblyService.createAssembly(
       user.schemaName,
       createAssemblyDto,
+      user.userId,
     );
   }
 
@@ -91,10 +92,11 @@ export class AssemblyController {
     @Param('id') assemblyId: string,
     @Body() createVoteDto: CreateVoteDto,
   ) {
-    return this.assemblyService.createVote(user.schemaName, {
-      ...createVoteDto,
-      assemblyId: +assemblyId,
-    });
+    return this.assemblyService.createVote(
+      user.schemaName,
+      +assemblyId,
+      createVoteDto,
+    );
   }
 
   @Post(':voteId/submit-vote')
@@ -103,11 +105,13 @@ export class AssemblyController {
     @Param('voteId') voteId: string,
     @Body() submitVoteDto: SubmitVoteDto,
   ) {
-    return this.assemblyService.castVote(user.schemaName, {
-      ...submitVoteDto,
-      voteId: +voteId,
-      userId: user.userId,
-    });
+    return this.assemblyService.castVote(
+      user.schemaName,
+      +voteId,
+      user.userId,
+      submitVoteDto.unitId,
+      submitVoteDto.option,
+    );
   }
 
   @Get(':voteId/results')
