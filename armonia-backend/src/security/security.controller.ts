@@ -6,7 +6,7 @@ import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '../common/enums/user-role.enum';
 import { GetUser } from '../common/decorators/user.decorator';
 import {
-  CreateSecurityLogDto,
+  CreateSecurityEventDto,
   CreateAccessAttemptDto,
 } from '../common/dto/security.dto';
 
@@ -19,11 +19,11 @@ export class SecurityController {
   @Roles(UserRole.ADMIN, UserRole.COMPLEX_ADMIN, UserRole.STAFF)
   async createSecurityLog(
     @GetUser() user: any,
-    @Body() createSecurityLogDto: CreateSecurityLogDto,
+    @Body() createSecurityEventDto: CreateSecurityEventDto,
   ) {
     return this.securityService.createSecurityLog(
       user.schemaName,
-      createSecurityLogDto,
+      createSecurityEventDto,
     );
   }
 

@@ -8,6 +8,16 @@ import {
 } from '../common/dto/iot.dto';
 import { FeeType } from '../common/dto/finances.dto';
 
+interface FeeCreateInput {
+  title: string;
+  description: string;
+  amount: number;
+  type: FeeType;
+  dueDate: string;
+  propertyId: number;
+  createdById: number;
+}
+
 @Injectable()
 export class IotService {
   constructor(
@@ -133,7 +143,7 @@ export class IotService {
       }
     }
 
-    const feesToCreate = [];
+    const feesToCreate: FeeCreateInput[] = [];
 
     for (const [propertyId, consumptionData] of Object.entries(
       consumptionByProperty,

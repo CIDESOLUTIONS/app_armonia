@@ -20,12 +20,7 @@ export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @Get('visitors/pdf')
-  @Roles([
-    UserRole.COMPLEX_ADMIN,
-    UserRole.ADMIN,
-    UserRole.RECEPTION,
-    UserRole.STAFF,
-  ])
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RECEPTION, UserRole.STAFF)
   async getVisitorsReportPdf(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -46,12 +41,7 @@ export class ReportsController {
   }
 
   @Get('visitors/excel')
-  @Roles([
-    UserRole.COMPLEX_ADMIN,
-    UserRole.ADMIN,
-    UserRole.RECEPTION,
-    UserRole.STAFF,
-  ])
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RECEPTION, UserRole.STAFF)
   async getVisitorsReportExcel(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -73,12 +63,7 @@ export class ReportsController {
   }
 
   @Get('packages/pdf')
-  @Roles([
-    UserRole.COMPLEX_ADMIN,
-    UserRole.ADMIN,
-    UserRole.RECEPTION,
-    UserRole.STAFF,
-  ])
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RECEPTION, UserRole.STAFF)
   async getPackagesReportPdf(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -99,12 +84,7 @@ export class ReportsController {
   }
 
   @Get('packages/excel')
-  @Roles([
-    UserRole.COMPLEX_ADMIN,
-    UserRole.ADMIN,
-    UserRole.RECEPTION,
-    UserRole.STAFF,
-  ])
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RECEPTION, UserRole.STAFF)
   async getPackagesReportExcel(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -126,12 +106,7 @@ export class ReportsController {
   }
 
   @Get('incidents/pdf')
-  @Roles([
-    UserRole.COMPLEX_ADMIN,
-    UserRole.ADMIN,
-    UserRole.RECEPTION,
-    UserRole.STAFF,
-  ])
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RECEPTION, UserRole.STAFF)
   async getIncidentsReportPdf(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -152,12 +127,7 @@ export class ReportsController {
   }
 
   @Get('incidents/excel')
-  @Roles([
-    UserRole.COMPLEX_ADMIN,
-    UserRole.ADMIN,
-    UserRole.RECEPTION,
-    UserRole.STAFF,
-  ])
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RECEPTION, UserRole.STAFF)
   async getIncidentsReportExcel(
     @Req() req,
     @Query('startDate') startDate: string,

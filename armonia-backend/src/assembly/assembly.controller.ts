@@ -17,6 +17,12 @@ import {
   CreateVoteDto,
   SubmitVoteDto,
 } from '../common/dto/assembly.dto';
+import {
+  AssemblyAttendance,
+  AssemblyVote,
+  AssemblyVoteRecord,
+  CalculateVoteResultsResult,
+} from './assembly.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('assemblies')

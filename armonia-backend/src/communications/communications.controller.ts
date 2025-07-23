@@ -28,6 +28,7 @@ export class CommunicationsController {
   @Get('notifications')
   async getUserNotifications(@GetUser() user: any, @Query() filters: any) {
     return this.communicationsService.getUserNotifications(
+      user.schemaName,
       user.userId,
       filters,
     );
@@ -35,12 +36,19 @@ export class CommunicationsController {
 
   @Post('notifications/mark-read/:id')
   async markNotificationAsRead(@GetUser() user: any, @Param('id') id: string) {
-    return this.communicationsService.markNotificationAsRead(user.schemaName, id, user.userId);
+    return this.communicationsService.markNotificationAsRead(
+      user.schemaName,
+      id,
+      user.userId,
+    );
   }
 
   @Post('notifications/mark-all-read')
   async markAllNotificationsAsRead(@GetUser() user: any) {
-    return this.communicationsService.markAllNotificationsAsRead(user.schemaName, user.userId);
+    return this.communicationsService.markAllNotificationsAsRead(
+      user.schemaName,
+      user.userId,
+    );
   }
 
   @Post('notifications/confirm-reading/:id')
@@ -48,7 +56,12 @@ export class CommunicationsController {
     @GetUser() user: any,
     @Param('id') id: string,
   ) {
-    return this.communicationsService.confirmNotificationReading(user.schemaName, id, user.userId);
+    return this.communicationsService.confirmNotificationReading(
+      user.schemaName,
+      id,
+      user.userId,
+    );
+  }
 
   // ANUNCIOS
   @Get('announcements')

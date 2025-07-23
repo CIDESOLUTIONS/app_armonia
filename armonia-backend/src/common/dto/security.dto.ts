@@ -1,55 +1,95 @@
-import {
-  IsString,
-  IsOptional,
-  IsNumber,
-  IsBoolean,
-  IsDateString,
-  IsEnum,
-} from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsDateString, IsEnum, IsBoolean } from 'class-validator';
 import { SecurityEventType } from '@backend/common/enums/security-event-type.enum';
 
-export class CreateSecurityLogDto {
-  @IsNumber()
-  complexId: number;
-
-  @IsOptional()
-  @IsNumber()
-  userId?: number;
-
+export class CreateSecurityEventDto {
   @IsEnum(SecurityEventType)
-  eventType: SecurityEventType;
+  type: SecurityEventType;
 
   @IsString()
   description: string;
 
-  @IsOptional()
   @IsString()
-  ipAddress?: string;
+  @IsOptional()
+  location?: string;
+
+  @IsNumber()
+  @IsOptional()
+  reportedByUserId?: number;
+
+  @IsNumber()
+  complexId: number;
+}
+
+export class UpdateSecurityEventDto {
+  @IsOptional()
+  @IsEnum(SecurityEventType)
+  type?: SecurityEventType;
 
   @IsOptional()
   @IsString()
-  userAgent?: string;
+  description?: string;
 
   @IsOptional()
-  details?: Record<string, any>;
+  @IsString()
+  location?: string;
+
+  @IsOptional()
+  @IsNumber()
+  reportedByUserId?: number;
+}
+
+export class SecurityEventDto {
+  id: number;
+  type: SecurityEventType;
+  description: string;
+  location?: string;
+  reportedByUserId?: number;
+  complexId: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export class SecurityEventFilterParamsDto {
+  @IsOptional()
+  @IsEnum(SecurityEventType)
+  type?: SecurityEventType;
+
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @IsOptional()
+  @IsDateString()
+  startDate?: string;
+
+  @IsOptional()
+  @IsDateString()
+  endDate?: string;
+
+  @IsOptional()
+  @IsNumber()
+  page?: number;
+
+  @IsOptional()
+  @IsNumber()
+  limit?: number;
 }
 
 export class CreateAccessAttemptDto {
-  @IsOptional()
-  @IsNumber()
-  userId?: number;
-
   @IsString()
   ipAddress: string;
 
-  @IsOptional()
   @IsString()
-  userAgent?: string;
+  username: string;
 
   @IsBoolean()
-  success: boolean;
+  isSuccess: boolean;
 
-  @IsOptional()
   @IsString()
+  @IsOptional()
   reason?: string;
+
+  @IsNumber()
+  @IsOptional()
+  userId?: number;
 }

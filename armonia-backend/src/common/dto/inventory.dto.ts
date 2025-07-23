@@ -8,7 +8,7 @@ import {
   IsEnum,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-
+import { PartialType } from '@nestjs/swagger';
 
 export enum CommonAreaType {
   SALON = 'SALON',
@@ -20,6 +20,9 @@ export enum CommonAreaType {
 }
 
 export class CreateCommonAreaDto {
+  @IsNumber()
+  complexId: number;
+
   @IsString()
   name: string;
 
@@ -330,6 +333,9 @@ export class UpdatePropertyDto {
 }
 
 export class CreatePetDto {
+  @IsNumber()
+  complexId: number;
+
   @IsString()
   name: string;
 

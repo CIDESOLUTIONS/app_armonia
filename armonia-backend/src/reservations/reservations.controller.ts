@@ -18,7 +18,7 @@ import {
   ReservationDto,
   ReservationFilterParamsDto,
   ReservationStatus,
-} from '../../common/dto/reservations.dto';
+} from '../common/dto/reservations.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('reservations')

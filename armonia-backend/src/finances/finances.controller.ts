@@ -25,7 +25,8 @@ import {
   CreateBudgetDto,
   UpdateBudgetDto,
   BudgetFilterParamsDto,
-  
+  CreateExpenseDto,
+  ExpenseFilterParamsDto,
 } from '../common/dto/finances.dto';
 import { PaymentStatus } from '../common/enums/payment-status.enum';
 
@@ -222,7 +223,7 @@ export class FinancesController {
   async updateExpense(
     @GetUser() user: any,
     @Param('id') id: string,
-    @Body() updateExpenseDto: UpdateFeeDto,
+    @Body() updateExpenseDto: UpdateExpenseDto,
   ) {
     return this.financesService.updateExpense(
       user.schemaName,
