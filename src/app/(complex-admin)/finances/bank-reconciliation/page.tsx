@@ -14,8 +14,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
-import { reconcileBankStatement } from "@/services/bankReconciliationService"; // Assuming this service will be created
+import { reconcileTransactions } from "@/services/bankReconciliationService";
 import * as XLSX from 'xlsx';
 
 interface BankTransaction {
@@ -86,7 +87,7 @@ export default function BankReconciliationPage() {
           return;
         }
 
-        const results = await reconcileBankStatement(user.schemaName, bankTransactions);
+        const results = await reconcileTransactions(user.schemaName, bankTransactions);
         setReconciliationResults(results);
         toast({
           title: "Éxito",

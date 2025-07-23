@@ -130,7 +130,7 @@ export function auditMiddleware(
   actionType: AuditActionType,
   detailsGenerator: (req: NextRequest) => string,
 ) {
-  return (handler: Function) => {
+  return (handler: (request: NextRequest, ...args: unknown[]) => Promise<Response>) => {
     return async (request: NextRequest, ...args: unknown[]) => {
       // Procesar la solicitud primero
       const response = await handler(request, ...args);

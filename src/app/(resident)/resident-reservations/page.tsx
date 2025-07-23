@@ -43,6 +43,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const reservationSchema = z.object({
   commonAreaId: z.number().min(1, "El área común es requerida."),

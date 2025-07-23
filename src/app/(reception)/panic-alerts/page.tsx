@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import {
   getActivePanicAlerts,
-  updatePanicAlertsStatus,
+  updatePanicAlertStatus,
 } from "@/services/panicService";
 
 interface PanicAlert {
@@ -63,7 +63,7 @@ export default function PanicAlertsPage() {
     status: "RESOLVED" | "DISMISSED",
   ) => {
     try {
-      await updatePanicAlertsStatus(alertId, {
+      await updatePanicAlertStatus(alertId, {
         status,
         resolvedBy: user?.name || "Desconocido",
       });

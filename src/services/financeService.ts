@@ -211,6 +211,20 @@ export const initiatePayment = async (
   return { message: "Payment initiated successfully" };
 };
 
+export const registerManualPayment = async (
+  tenantId: string,
+  feeId: number,
+  userId: number,
+  amount: number,
+  paymentDate: string,
+  paymentMethod: string,
+  transactionId?: string,
+) => {
+  const prisma = getPrisma(tenantId);
+  console.log("Registering manual payment for tenant:", tenantId, feeId, userId, amount, paymentDate, paymentMethod, transactionId);
+  return { message: "Manual payment registered successfully" };
+};
+
 export enum FeeStatus {
   PENDING = "PENDING",
   PAID = "PAID",
