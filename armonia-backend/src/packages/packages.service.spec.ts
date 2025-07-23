@@ -3,7 +3,6 @@ import { PackagesService } from './packages.service';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import { CommunicationsService } from '../communications/communications.service';
-import { vi } from 'vitest';
 
 describe('PackagesService', () => {
   let service: PackagesService;
@@ -17,16 +16,16 @@ describe('PackagesService', () => {
         {
           provide: PrismaClientManager,
           useValue: {
-            getClient: vi.fn().mockReturnValue({
+            getClient: jest.fn().mockReturnValue({
               package: {
-                create: vi.fn(),
-                findMany: vi.fn(),
-                findUnique: vi.fn(),
-                update: vi.fn(),
-                delete: vi.fn(),
+                create: jest.fn(),
+                findMany: jest.fn(),
+                findUnique: jest.fn(),
+                update: jest.fn(),
+                delete: jest.fn(),
               },
-              packageStatusHistory: { create: vi.fn() },
-              packageNotification: { create: vi.fn() },
+              packageStatusHistory: { create: jest.fn() },
+              packageNotification: { create: jest.fn() },
             }),
           },
         },
@@ -39,7 +38,7 @@ describe('PackagesService', () => {
         {
           provide: CommunicationsService,
           useValue: {
-            notifyUser: vi.fn(),
+            notifyUser: jest.fn(),
           },
         },
       ],

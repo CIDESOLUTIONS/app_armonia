@@ -9,7 +9,6 @@ import {
   CreateListingDto,
   UpdateListingDto,
 } from '../common/dto/marketplace.dto';
-import { vi } from 'vitest';
 
 describe('MarketplaceService', () => {
   let service: MarketplaceService;
@@ -18,21 +17,21 @@ describe('MarketplaceService', () => {
 
   const mockPrismaClient = {
     listing: {
-      create: vi.fn(),
-      findMany: vi.fn(),
-      findUnique: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
+      create: jest.fn(),
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
     },
     reportedListing: {
-      create: vi.fn(),
-      findMany: vi.fn(),
-      findUnique: vi.fn(),
-      update: vi.fn(),
+      create: jest.fn(),
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
     },
     message: {
-      create: vi.fn(),
-      findMany: vi.fn(),
+      create: jest.fn(),
+      findMany: jest.fn(),
     },
   };
 
@@ -43,7 +42,7 @@ describe('MarketplaceService', () => {
         {
           provide: PrismaClientManager,
           useValue: {
-            getClient: vi.fn(() => mockPrismaClient),
+            getClient: jest.fn(() => mockPrismaClient),
           },
         },
         {
@@ -278,7 +277,11 @@ describe('MarketplaceService', () => {
 
   describe('resolveReport', () => {
     it('should resolve a report', async () => {
-      const mockReport = { id: 1, listingId: 1, status: 'PENDING' };
+      const mockReport = {
+        id: 1,
+        listingId: 1,
+        status: 'PENDING',
+      };
       const updatedReport = { ...mockReport, status: 'RESOLVED' };
       mockPrismaClient.reportedListing.findUnique.mockResolvedValue(mockReport);
       mockPrismaClient.reportedListing.update.mockResolvedValue(updatedReport);

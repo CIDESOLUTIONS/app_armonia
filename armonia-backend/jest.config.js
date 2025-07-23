@@ -6,25 +6,22 @@ const tsConfig = JSON.parse(readFileSync(join(__dirname, './tsconfig.json'), 'ut
 
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 const jestConfig = {
-  moduleFileExtensions: ['js', 'json', 'ts'],
-  rootDir: 'src',
-  testRegex: '.*\\.spec\\.ts$',
-  transform: {
-    '^.+\\.(t|j)s$': ['ts-jest', {
-      tsconfig: 'tsconfig.json',
-    }],
-  },
-  collectCoverageFrom: ['**/*.(t|j)s'],
+  moduleFileExtensions: ['js', 'json'],
+  rootDir: '.',
+  testRegex: 'dist/src/.*\\.spec\\.js$',
+  transform: {},
+  collectCoverageFrom: ['dist/src/**/*.(js)'],
   coverageDirectory: '../coverage',
   testEnvironment: 'node',
+  setupFiles: ['./dist/test/jest-setup.js'],
   roots: ['<rootDir>'],
   modulePaths: [tsConfig.compilerOptions.baseUrl],
   moduleNameMapper: {
-    '^@nestjs/(.*)$': '<rootDir>/node_modules/@nestjs/$1',
-    '^src/(.*)$': '<rootDir>/src/$1',
+    '^@nestjs/(.*)$' : '<rootDir>/node_modules/@nestjs/$1',
+    '^src/(.*)$': '<rootDir>/dist/src/$1',
     '^lib/logging/activity-logger$':
-      '<rootDir>/src/lib/logging/activity-logger.ts',
-    ...pathsToModuleNameMapper(tsConfig.compilerOptions.paths, { prefix: '<rootDir>/' }),
+      '<rootDir>/dist/src/lib/logging/activity-logger.js',
+    ...pathsToModuleNameMapper(tsConfig.compilerOptions.paths, { prefix: '<rootDir>/dist/' }),
   },
   transformIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/'],
 };

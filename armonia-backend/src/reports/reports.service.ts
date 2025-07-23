@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
-import * as PDFDocument from 'pdfkit';
+import PDFDocument from 'pdfkit';
 import * as XLSX from 'xlsx';
 import { format } from 'date-fns';
 import { PaymentStatus } from '../common/enums/payment-status.enum';

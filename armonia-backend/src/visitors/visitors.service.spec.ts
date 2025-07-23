@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { VisitorsService } from './visitors.service';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
-import { vi } from 'vitest';
 
 describe('VisitorsService', () => {
   let service: VisitorsService;
@@ -16,29 +15,29 @@ describe('VisitorsService', () => {
         {
           provide: PrismaClientManager,
           useValue: {
-            getClient: vi.fn().mockReturnValue({
+            getClient: jest.fn().mockReturnValue({
               visitor: {
-                create: vi.fn(),
-                findMany: vi.fn(),
-                findUnique: vi.fn(),
-                update: vi.fn(),
-                delete: vi.fn(),
+                create: jest.fn(),
+                findMany: jest.fn(),
+                findUnique: jest.fn(),
+                update: jest.fn(),
+                delete: jest.fn(),
               },
               vehicle: {
-                create: vi.fn(),
-                findMany: vi.fn(),
-                findUnique: vi.fn(),
-                update: vi.fn(),
-                delete: vi.fn(),
+                create: jest.fn(),
+                findMany: jest.fn(),
+                findUnique: jest.fn(),
+                update: jest.fn(),
+                delete: jest.fn(),
               },
               invitation: {
-                create: vi.fn(),
-                findMany: vi.fn(),
-                findUnique: vi.fn(),
-                update: vi.fn(),
-                delete: vi.fn(),
+                create: jest.fn(),
+                findMany: jest.fn(),
+                findUnique: jest.fn(),
+                update: jest.fn(),
+                delete: jest.fn(),
               },
-              accessLog: { create: vi.fn(), findMany: vi.fn() },
+              accessLog: { create: jest.fn(), findMany: jest.fn() },
             }),
           },
         },

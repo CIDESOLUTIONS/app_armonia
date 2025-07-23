@@ -13,8 +13,8 @@ export default defineConfig({
     setupFiles: "./vitest.setup.ts",
     globals: true,
     tsconfig: "./tsconfig.json",
-    include: ["**/*.test.ts", "**/*.spec.ts"],
-    exclude: ["e2e/**", "**/node_modules/**"], // Exclude e2e tests and node_modules
+    include: ["src/**/*.test.ts", "src/**/*.spec.ts"], // Only include frontend tests
+    exclude: ["e2e/**", "**/node_modules/**", "armonia-backend/**"], // Exclude e2e, node_modules, and backend tests
     mock: {
       imports: {
         "@backend/lib/logging/server-logger": {
