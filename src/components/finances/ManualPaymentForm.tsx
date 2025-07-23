@@ -21,10 +21,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
-import { registerManualPayment } from "@/services/financeService"; // Assuming financeService exists
-import { getFees } from "@/services/feeService"; // Assuming feeService exists
-import { getResidents } from "@/services/residentService"; // Assuming residentService exists
+import { registerManualPayment } from "@/services/financeService";
+import { getFees } from "@/services/feeService";
+import { getResidents } from "@/services/residentService";
 import { Loader2 } from "lucide-react";
+import { useAuthStore } from "@/store/authStore";
 
 const formSchema = z.object({
   feeId: z.number().min(1, "La cuota es requerida."),
@@ -50,6 +51,7 @@ interface ResidentOption {
 }
 
 export function ManualPaymentForm() {
+  const { user } = useAuthStore();
   const { toast } = useToast();
   const [fees, setFees] = useState<FeeOption[]>([]);
   const [residents, setResidents] = useState<ResidentOption[]>([]);
@@ -94,8 +96,24 @@ export function ManualPaymentForm() {
   }, [toast]);
 
   const onSubmit = async (data: ManualPaymentFormValues) => {
+    if (!user?.schemaName) {
+      toast({
+        title: "Error",
+        description: "No se pudo obtener el esquema del usuario.",
+        variant: "destructive",
+      });
+      return;
+    }
     try {
-      await registerManualPayment(data);
+      await registerManualPayment(
+        user.schemaName,
+        data.feeId,
+        data.userId,
+        data.amount,
+        data.paymentDate,
+        data.paymentMethod,
+        data.transactionId,
+      );
       toast({
         title: "Éxito",
         description: "Pago manual registrado correctamente.",
