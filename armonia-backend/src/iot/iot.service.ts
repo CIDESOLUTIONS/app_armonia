@@ -12,7 +12,7 @@ interface FeeCreateInput {
   title: string;
   description: string;
   amount: number;
-  type: FeeType;
+  type: string; // Changed from FeeType to string
   dueDate: string;
   propertyId: number;
   createdById: number;
@@ -172,7 +172,7 @@ export class IotService {
         title: `Factura de Consumo ${consumptionData.type} - ${new Date(billingPeriodStart).toLocaleDateString()} a ${new Date(billingPeriodEnd).toLocaleDateString()}`,
         description: `Consumo de ${consumedAmount} ${consumptionData.unit}`,
         amount: calculatedAmount,
-        type: FeeType.UTILITY,
+        type: FeeType.UTILITY, // Still using FeeType enum here
         dueDate: new Date(
           new Date().setMonth(new Date().getMonth() + 1),
         ).toISOString(),

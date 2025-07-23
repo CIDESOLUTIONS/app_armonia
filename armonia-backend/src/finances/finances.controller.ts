@@ -26,7 +26,9 @@ import {
   UpdateBudgetDto,
   BudgetFilterParamsDto,
   CreateExpenseDto,
+  UpdateExpenseDto,
   ExpenseFilterParamsDto,
+  PaymentGatewayCallbackDto,
 } from '../common/dto/finances.dto';
 import { PaymentStatus } from '../common/enums/payment-status.enum';
 
@@ -262,9 +264,12 @@ export class FinancesController {
 
   @Post('payments/webhook')
   async handlePaymentWebhook(
-    @Body('transactionId') transactionId: string,
-    @Body('status') status: PaymentStatus,
+    @Body() paymentGatewayCallbackDto: PaymentGatewayCallbackDto,
   ) {
-    return this.financesService.handlePaymentWebhook(transactionId, status);
+    return this.financesService.handlePaymentWebhook(
+      paymentGatewayCallbackDto.schemaName,
+      paymentGatewayCallbackDto.transactionId,
+      paymentGatewayCallbackDto.status,
+    );
   }
 }

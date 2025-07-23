@@ -8,6 +8,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { PartialType } from '@nestjs/swagger';
 
 export enum PaymentStatus {
   PENDING = 'PENDING',
@@ -15,6 +16,7 @@ export enum PaymentStatus {
   OVERDUE = 'OVERDUE',
   CANCELLED = 'CANCELLED',
   PARTIAL = 'PARTIAL',
+  COMPLETED = 'COMPLETED',
 }
 
 export enum FeeType {
@@ -168,13 +170,7 @@ export class BudgetDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => BudgetItemDto)
-  items: BudgetItemDto[];
-
-  @IsString()
-  createdAt: string;
-
-  @IsString()
-  updatedAt: string;
+  items: Omit<BudgetItemDto, 'id' | 'budgetId'>[];
 }
 
 export class FeeListResponseDto {
@@ -388,8 +384,11 @@ export class PaymentGatewayCallbackDto {
   @IsString()
   transactionId: string;
 
+  @IsEnum(PaymentStatus)
+  status: PaymentStatus;
+
   @IsString()
-  status: string;
+  schemaName: string;
 
   @IsOptional()
   @IsString()
@@ -458,6 +457,45 @@ export class BudgetFilterParamsDto extends FeeFilterParamsDto {
   @IsNumber()
   year?: number;
 }
+
+export class CreateExpenseDto {
+  @IsString()
+  description: string;
+
+  @IsNumber()
+  amount: number;
+
+  @IsString()
+  category: string;
+
+  @IsDateString()
+  expenseDate: string;
+
+  @IsString()
+  @IsOptional()
+  vendor?: string;
+
+  @IsString()
+  @IsOptional()
+  invoiceNumber?: string;
+
+  @IsString()
+  @IsOptional()
+  notes?: string;
+
+  @IsNumber()
+  complexId: number;
+
+  @IsNumber()
+  @IsOptional()
+  budgetId?: number;
+
+  @IsNumber()
+  @IsOptional()
+  approvedById?: number;
+}
+
+export class UpdateExpenseDto extends PartialType(CreateExpenseDto) {}
 
 export class ExpenseFilterParamsDto extends FeeFilterParamsDto {
   @IsOptional()
