@@ -8,8 +8,8 @@ import {
   AssemblyDto,
   AssemblyStatus,
 } from '../common/dto/assembly.dto';
-import { ServerLogger } from '../common/logging/server-logger';
-import { ActivityLogger } from '../common/logging/activity-logger';
+import { ServerLogger } from '../lib/logging/server-logger';
+import { ActivityLogger } from '../lib/logging/activity-logger';
 import { WebSocketService } from '../communications/websocket.service';
 import { DigitalSignatureService } from '../common/services/digital-signature.service';
 import { notifyAssemblyConvocation } from '../communications/integrations/assembly-notifications';
@@ -625,6 +625,14 @@ export class AssemblyService {
       };
 
       vote.options.forEach((option: string) => {
+        results.options[option] = {
+          count: 0,
+          weight: 0,
+          percentage: 0,
+        };
+      });
+
+      Object.keys(results.options).forEach((option: string) => {
         results.options[option] = {
           count: 0,
           weight: 0,

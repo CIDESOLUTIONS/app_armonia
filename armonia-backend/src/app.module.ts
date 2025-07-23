@@ -1,3 +1,7 @@
+import { SurveyModule } from './surveys/survey.module';
+import { PackagesModule } from './packages/packages.module';
+import { VisitorsModule } from './visitors/visitors.module';
+import { PqrModule } from './pqr/pqr.module';
 import { PersonalFinancesModule } from './personal-finances/personal-finances.module';
 import { ReservationsModule } from './reservations/reservations.module';
 import { Module } from '@nestjs/common';
@@ -21,8 +25,14 @@ import { ResidentialComplexModule } from './residential-complex/residential-comp
 import { InsurtechModule } from './insurtech/insurtech.module';
 import { ReportsModule } from './reports/reports.module';
 import { StaffModule } from './staff/staff.module'; // Importar el nuevo módulo
+import { ServiceProvidersModule } from './service-providers/service-providers.module';
 
-import { FintechModule }n'./fintech/fintech.module';
+import { FintechModule } from './fintech/fintech.module';
+import { IotModule } from './iot/iot.module';
+import { PortfolioModule } from './portfolio/portfolio.module';
+import { MarketplaceModule } from './marketplace/marketplace.module';
+import { AssemblyModule } from './assembly/assembly.module';
+import { PanicModule } from './panic/panic.module';
 
 @Module({
   imports: [
@@ -42,7 +52,7 @@ import { FintechModule }n'./fintech/fintech.module';
     DocumentsModule,
     VisitorsModule,
     PackagesModule,
-    SurveysModule,
+    SurveyModule,
     ServiceProvidersModule,
     FintechModule,
     IotModule,
