@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
-
 import {
   CreateAssemblyDto,
   UpdateAssemblyDto,
@@ -14,7 +13,7 @@ import { WebSocketService } from '../communications/websocket.service';
 import { DigitalSignatureService } from '../common/services/digital-signature.service';
 import { notifyAssemblyConvocation } from '../communications/integrations/assembly-notifications';
 
-interface AssemblyAttendance {
+export interface AssemblyAttendance {
   id: number;
   assemblyId: number;
   userId: number;
@@ -56,7 +55,7 @@ interface Topic {
   decisions?: string;
 }
 
-interface AssemblyVote {
+export interface AssemblyVote {
   id: number;
   title: string;
   description: string;
@@ -68,7 +67,7 @@ interface AssemblyVote {
   voteRecords: AssemblyVoteRecord[];
 }
 
-interface AssemblyVoteRecord {
+export interface AssemblyVoteRecord {
   option: string;
   coefficient?: number;
 }
@@ -85,7 +84,7 @@ interface CalculateQuorumResult {
   timestamp: string;
 }
 
-interface CalculateVoteResultsResult {
+export interface CalculateVoteResultsResult {
   voteId: number;
   title: string;
   totalVotes: number;

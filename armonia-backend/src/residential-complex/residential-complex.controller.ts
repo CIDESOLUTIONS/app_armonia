@@ -18,7 +18,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '../common/enums/user-role.enum';
 
-@UseGuards(JwtAuthGuard, RolesGuard(UserRole.ADMIN))
+@UseGuards(JwtAuthGuard, RolesGuard([UserRole.ADMIN]))
 @Controller('residential-complexes')
 export class ResidentialComplexController {
   constructor(
@@ -30,7 +30,7 @@ export class ResidentialComplexController {
   async create(
     @Body() createResidentialComplexDto: CreateResidentialComplexDto,
   ) {
-    return this.residentialComplexService.createResidentialComplex(
+    return this.residentialComplexService.createComplexAndSchema(
       createResidentialComplexDto,
     );
   }

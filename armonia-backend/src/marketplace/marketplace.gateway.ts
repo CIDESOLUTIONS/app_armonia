@@ -51,6 +51,7 @@ export class MarketplaceGateway {
       senderId: number;
       receiverId: number;
       content: string;
+      schemaName: string;
     },
     @ConnectedSocket() client: Socket,
   ): Promise<void> {

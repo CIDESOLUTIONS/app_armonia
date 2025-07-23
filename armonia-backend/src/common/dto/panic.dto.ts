@@ -1,10 +1,4 @@
-import {
-  IsString,
-  IsOptional,
-  IsNumber,
-  IsDateString,
-  IsEnum,
-} from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsDateString, IsEnum } from 'class-validator';
 import { PanicStatus, PanicType } from '@backend/common/enums/panic.enum';
 
 export class CreatePanicAlertDto {

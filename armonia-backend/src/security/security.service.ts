@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
-  CreateSecurityLogDto,
+  CreateSecurityEventDto,
   CreateAccessAttemptDto,
 } from '../common/dto/security.dto';
 
@@ -17,7 +17,7 @@ export class SecurityService {
     return this.prismaClientManager.getClient(schemaName);
   }
 
-  async createSecurityLog(schemaName: string, data: CreateSecurityLogDto) {
+  async createSecurityLog(schemaName: string, data: CreateSecurityEventDto) {
     const prisma = this.getTenantPrismaClient(schemaName);
     return prisma.securityLog.create({ data });
   }

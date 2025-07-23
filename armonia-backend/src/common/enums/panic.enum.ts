@@ -2,6 +2,7 @@ export enum PanicStatus {
   ACTIVE = 'ACTIVE',
   RESOLVED = 'RESOLVED',
   CANCELLED = 'CANCELLED',
+  DISMISSED = 'DISMISSED',
 }
 
 export enum PanicType {

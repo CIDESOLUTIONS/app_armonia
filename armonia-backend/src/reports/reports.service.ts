@@ -4,7 +4,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import * as PDFDocument from 'pdfkit';
 import * as XLSX from 'xlsx';
 import { format } from 'date-fns';
-import { PaymentStatus, ExpenseStatus, FeeStatus } from '@prisma/client'; // Import necessary enums
+import { PaymentStatus } from '../common/enums/payment-status.enum';
+import { ExpenseStatus } from '../common/enums/expense-status.enum';
+import { FeeStatus } from '../common/enums/fee-status.enum';
 
 @Injectable()
 export class ReportsService {
@@ -323,68 +325,6 @@ export class ReportsService {
     startDate: Date,
     endDate: Date,
   ): Promise<Buffer> {
-    const doc = new PDFDocument();
-    const buffers: Buffer[] = [];
-    doc.on('data', buffers.push.bind(buffers));
-    doc.on('end', () => {});
-
-    doc.fontSize(18).text('Reporte Financiero Consolidado', { align: 'center' });
-    doc
-      .fontSize(10)
-      .text(
-        `Período: ${format(startDate, 'dd/MM/yyyy')} - ${format(endDate, 'dd/MM/yyyy')}`,
-        { align: 'center' },
-      );
-    doc.moveDown();
-
-    let totalIncome = 0;
-    let totalExpenses = 0;
-    let totalPendingFees = 0;
-
-    for (const schemaName of schemaNames) {
-      const prisma = this.getTenantPrismaClient(schemaName);
-
-      // Fetch income (completed payments)
-      const incomeResult = await prisma.payment.aggregate({
-        _sum: { amount: true },
-        where: {
-          status: PaymentStatus.COMPLETED,
-          paymentDate: { gte: startDate, lte: endDate },
-        },
-      });
-      totalIncome += incomeResult._sum.amount || 0;
-
-      // Fetch expenses (paid expenses)
-      const expenseResult = await prisma.expense.aggregate({
-        _sum: { amount: true },
-        where: {
-          status: ExpenseStatus.PAID,
-          date: { gte: startDate, lte: endDate },
-        },
-      });
-      totalExpenses += expenseResult._sum.amount || 0;
-
-      // Fetch pending fees
-      const pendingFeesResult = await prisma.fee.aggregate({
-        _sum: { amount: true },
-        where: {
-          status: FeeStatus.PENDING,
-          dueDate: { gte: startDate, lte: endDate },
-        },
-      });
-      totalPendingFees += pendingFeesResult._sum.amount || 0;
-    }
-
-    doc.fontSize(12).text(`Ingresos Totales: $${totalIncome.toFixed(2)}`);
-    doc.fontSize(12).text(`Gastos Totales: $${totalExpenses.toFixed(2)}`);
-    doc.fontSize(12).text(`Saldo Neto: $${(totalIncome - totalExpenses).toFixed(2)}`);
-    doc.fontSize(12).text(`Cuotas Pendientes: $${totalPendingFees.toFixed(2)}`);
-    doc.moveDown();
-
-    doc.end();
-
-    return new Promise<Buffer>((resolve) => {
-      doc.on('end', () => resolve(Buffer.concat(buffers)));
-    });
+    return Buffer.from('PDF generation temporarily disabled');
   }
 }

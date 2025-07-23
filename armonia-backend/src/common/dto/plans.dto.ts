@@ -1,110 +1,47 @@
-import {
-  IsString,
-  IsOptional,
-  IsNumber,
-  IsBoolean,
-  IsDateString,
-  IsArray,
-  IsEnum,
-} from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsBoolean, IsArray, IsDateString, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
+import { PartialType } from '@nestjs/swagger';
 import { PlanType } from '@backend/common/enums/plan-type.enum';
-
-export class CreateFeatureDto {
-  @IsString()
-  name: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
-}
 
 export class CreatePlanDto {
   @IsString()
   name: string;
 
-  @IsOptional()
   @IsString()
-  description?: string;
+  description: string;
 
   @IsNumber()
   price: number;
 
   @IsEnum(PlanType)
-  planType: PlanType;
+  type: PlanType;
 
-  @IsOptional()
-  @IsNumber()
-  maxUnits?: number;
-
-  @IsOptional()
   @IsBoolean()
-  isActive?: boolean;
+  isActive: boolean;
 
-  @IsOptional()
   @IsArray()
-  @Type(() => CreateFeatureDto)
-  features?: CreateFeatureDto[];
+  @IsString({ each: true })
+  features: string[];
 }
 
-export class UpdatePlanDto {
-  @IsOptional()
-  @IsString()
-  name?: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @IsOptional()
-  @IsNumber()
-  price?: number;
-
-  @IsOptional()
-  @IsEnum(PlanType)
-  planType?: PlanType;
-
-  @IsOptional()
-  @IsNumber()
-  maxUnits?: number;
-
-  @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
-}
+export class UpdatePlanDto extends PartialType(CreatePlanDto) {}
 
 export class CreateSubscriptionDto {
   @IsNumber()
-  complexId: number;
-
-  @IsNumber()
   planId: number;
 
-  @IsDateString()
-  startDate: Date;
-
-  @IsDateString()
-  endDate: Date;
-
-  @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
-}
-
-export class UpdateSubscriptionDto {
-  @IsOptional()
   @IsNumber()
-  planId?: number;
+  complexId: number;
+
+  @IsDateString()
+  startDate: string;
 
   @IsOptional()
   @IsDateString()
-  startDate?: Date;
+  endDate?: string;
 
-  @IsOptional()
-  @IsDateString()
-  endDate?: Date;
-
-  @IsOptional()
   @IsBoolean()
-  isActive?: boolean;
+  isActive: boolean;
 }
+
+export class UpdateSubscriptionDto extends PartialType(CreateSubscriptionDto) {}

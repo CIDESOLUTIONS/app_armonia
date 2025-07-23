@@ -11,6 +11,7 @@ import {
   NotificationType,
   NotificationSourceType,
 } from '../common/dto/communications.dto';
+import { PanicStatus } from '../common/enums/panic.enum';
 
 interface NotificationPayload {
   id: string;
@@ -54,7 +55,7 @@ export class PanicGateway {
     const updatedAlert = await this.panicService.updatePanicAlert(
       data.schemaName,
       data.alertId,
-      { status: data.status },
+      { status: data.status as PanicStatus },
     );
     // Emitir la alerta actualizada a todos los clientes conectados en el esquema
     this.server

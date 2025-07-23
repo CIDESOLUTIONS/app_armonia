@@ -6,7 +6,7 @@ import { UserRole } from '../common/enums/user-role.enum';
 import { GetUser } from '../common/decorators/user.decorator';
 import { Roles } from '../auth/roles.decorator';
 
-@UseGuards(JwtAuthGuard, RolesGuard(UserRole.APP_ADMIN))
+@UseGuards(JwtAuthGuard, RolesGuard([UserRole.APP_ADMIN]))
 @Controller('portfolio')
 export class PortfolioController {
   constructor(private readonly portfolioService: PortfolioService) {}
