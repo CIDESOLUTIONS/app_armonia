@@ -872,12 +872,12 @@ export class AssemblyService {
       for (const vote of assembly.votes) {
         doc.fontSize(14).text(`Pregunta: ${vote.title}`);
         const results = await this.calculateVoteResults(schemaName, vote.id);
-        results.options.forEach(
-          (result: { option: string; weight: number; percentage: number }) => {
+        Object.entries(results.options).forEach(
+          ([option, data]: [string, { count: number; weight: number; percentage: number }]) => {
             doc
               .fontSize(12)
               .text(
-                `  - ${result.option}: ${result.weight} votos (${result.percentage.toFixed(2)}%)`,
+                `  - ${option}: ${data.weight} votos (${data.percentage.toFixed(2)}%)`,
               );
           },
         );
