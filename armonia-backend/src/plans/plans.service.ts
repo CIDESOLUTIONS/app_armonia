@@ -81,4 +81,10 @@ export class PlansService {
     await this.prisma.subscription.delete({ where: { id } });
     return { message: 'Suscripción eliminada correctamente' };
   }
+
+  async checkFeatureAccess(complexId: number, feature: string): Promise<boolean> {
+    // Placeholder implementation: always return true for now
+    console.log(`Checking feature access for complex ${complexId} and feature ${feature}`);
+    return true;
+  }
 }

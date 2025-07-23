@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { TenantService } from '../tenant/tenant.service';
 import { ResidentialComplexService } from '../residential-complex/residential-complex.service';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '../common/enums/user-role.enum';
 
 @Injectable()
 export class AuthService {

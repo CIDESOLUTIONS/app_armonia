@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
@@ -6,6 +6,7 @@ import {
   SmartMeterFilterParamsDto,
   AutomatedBillingDto,
 } from '../common/dto/iot.dto';
+import { FeeType } from '../common/dto/finances.dto';
 
 @Injectable()
 export class IotService {
@@ -66,8 +67,8 @@ export class IotService {
 
     return prisma.smartMeterReading.findMany({
       where,
-      skip: (filters.page - 1) * filters.limit || 0,
-      take: filters.limit || 10,
+      skip: ((filters.page ?? 1) - 1) * (filters.limit ?? 10),
+      take: filters.limit ?? 10,
       orderBy: { timestamp: 'desc' },
     });
   }
@@ -166,6 +167,7 @@ export class IotService {
           new Date().setMonth(new Date().getMonth() + 1),
         ).toISOString(),
         propertyId: parseInt(propertyId),
+        createdById: 1, // Assuming a system user with ID 1 for automated billing
       });
     }
 

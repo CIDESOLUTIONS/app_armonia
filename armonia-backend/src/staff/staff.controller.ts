@@ -3,11 +3,11 @@ import { UserService } from '../user/user.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '../common/enums/user-role.enum';
 import { GetUser } from '../common/decorators/user.decorator';
 import { CreateUserDto, UpdateUserDto } from '../common/dto/user.dto'; // Assuming these DTOs exist
 
-@UseGuards(JwtAuthGuard, RolesGuard(UserRole.COMPLEX_ADMIN, UserRole.ADMIN))
+@UseGuards(JwtAuthGuard, RolesGuard([UserRole.COMPLEX_ADMIN, UserRole.ADMIN]))
 @Controller('staff')
 export class StaffController {
   constructor(private readonly userService: UserService) {}
@@ -55,7 +55,7 @@ export class StaffController {
   @Delete(':id')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
   async deleteStaffUser(@GetUser() user: any, @Param('id') id: string) {
-    const existingUser = await this.userService.findById(user.schemaName, +id);
+    const existingUser = await this.userService.findById(+id);
     if (existingUser && existingUser.role !== UserRole.STAFF) {
       throw new Error('User is not a STAFF member.');
     }

@@ -12,11 +12,11 @@ import {
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '../common/enums/user-role.enum';
 import { UserService } from './user.service';
 import { GetUser } from '../common/decorators/user.decorator';
 
-@UseGuards(JwtAuthGuard, RolesGuard(UserRole.ADMIN, UserRole.COMPLEX_ADMIN))
+@UseGuards(JwtAuthGuard, RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}

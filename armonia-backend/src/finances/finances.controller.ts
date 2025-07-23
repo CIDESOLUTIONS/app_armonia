@@ -13,32 +13,23 @@ import { FinancesService } from './finances.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '../common/enums/user-role.enum';
 import { GetUser } from '../common/decorators/user.decorator';
 import {
   CreateFeeDto,
   UpdateFeeDto,
   FeeFilterParamsDto,
-} from '../common/dto/finances.dto';
-import {
   CreatePaymentDto,
   UpdatePaymentDto,
-  PaymentFilterParamsDto,
-  PaymentStatus,
   RegisterManualPaymentDto,
-} from '../common/dto/finances.dto';
-import {
   CreateBudgetDto,
   UpdateBudgetDto,
   BudgetFilterParamsDto,
+  
 } from '../common/dto/finances.dto';
-import {
-  CreateExpenseDto,
-  UpdateExpenseDto,
-  ExpenseFilterParamsDto,
-} from '../common/dto/finances.dto';
+import { PaymentStatus } from '../common/enums/payment-status.enum';
 
-@UseGuards(JwtAuthGuard, RolesGuard(UserRole.COMPLEX_ADMIN, UserRole.ADMIN))
+@UseGuards(JwtAuthGuard, RolesGuard([UserRole.COMPLEX_ADMIN, UserRole.ADMIN]))
 @Controller('finances')
 export class FinancesController {
   constructor(private readonly financesService: FinancesService) {}
@@ -112,7 +103,7 @@ export class FinancesController {
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RESIDENT)
   async getPayments(
     @GetUser() user: any,
-    @Query() filters: PaymentFilterParamsDto,
+    @Query() filters: FeeFilterParamsDto,
   ) {
     return this.financesService.getPayments(user.schemaName, filters);
   }
@@ -231,7 +222,7 @@ export class FinancesController {
   async updateExpense(
     @GetUser() user: any,
     @Param('id') id: string,
-    @Body() updateExpenseDto: UpdateExpenseDto,
+    @Body() updateExpenseDto: UpdateFeeDto,
   ) {
     return this.financesService.updateExpense(
       user.schemaName,

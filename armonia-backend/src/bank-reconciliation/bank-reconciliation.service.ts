@@ -1,7 +1,8 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
-import { PaymentStatus, FeeStatus } from '@prisma/client';
+import { PaymentStatus } from '../common/enums/payment-status.enum';
+import { FeeStatus } from '../common/enums/fee-status.enum';
 
 @Injectable()
 export class BankReconciliationService {

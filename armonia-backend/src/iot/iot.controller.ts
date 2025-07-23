@@ -1,12 +1,12 @@
 import { Controller, Get, Post, Body, Query, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
-import { GetUser } from '../../common/decorators/user.decorator';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GetUser } from '../common/decorators/user.decorator';
 import { IotService } from './iot.service';
 import {
   SmartMeterReadingDto,
   SmartMeterFilterParamsDto,
   AutomatedBillingDto,
-} from '../../common/dto/iot.dto';
+} from '../common/dto/iot.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('iot')

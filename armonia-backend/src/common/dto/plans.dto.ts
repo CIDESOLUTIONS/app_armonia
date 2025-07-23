@@ -8,7 +8,7 @@ import {
   IsEnum,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { PlanType } from '@prisma/client';
+import { PlanType } from '@backend/common/enums/plan-type.enum';
 
 export class CreateFeatureDto {
   @IsString()

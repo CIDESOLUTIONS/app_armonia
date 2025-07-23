@@ -51,7 +51,7 @@ export class PanicGateway {
       status: 'RESOLVED' | 'DISMISSED';
     },
   ): Promise<void> {
-    const updatedAlert = await this.panicService.updatePanicAlertStatus(
+    const updatedAlert = await this.panicService.updatePanicAlert(
       data.schemaName,
       data.alertId,
       { status: data.status },

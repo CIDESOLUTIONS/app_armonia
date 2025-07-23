@@ -9,6 +9,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
+
 export enum CommonAreaType {
   SALON = 'SALON',
   BBQ = 'BBQ',
@@ -55,7 +56,7 @@ export class CreateCommonAreaDto {
   closingTime?: string; // e.g., "22:00"
 }
 
-export class UpdateCommonAreaDto extends Partial(CreateCommonAreaDto) {}
+export class UpdateCommonAreaDto extends PartialType(CreateCommonAreaDto) {}
 
 export class CommonAreaDto {
   id: number;
@@ -113,7 +114,7 @@ export class CreateParkingSpotDto {
   notes?: string;
 }
 
-export class UpdateParkingSpotDto extends Partial(CreateParkingSpotDto) {}
+export class UpdateParkingSpotDto extends PartialType(CreateParkingSpotDto) {}
 
 export class ParkingSpotDto {
   id: number;
@@ -370,6 +371,9 @@ export class CreatePetDto {
 }
 
 export class CreateVehicleDto {
+  @IsNumber()
+  complexId: number;
+
   @IsString()
   licensePlate: string;
 

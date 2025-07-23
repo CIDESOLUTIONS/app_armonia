@@ -108,6 +108,40 @@ export class UpdateIncidentDto {
   attachments?: string[];
 }
 
+export class IncidentAttachmentDto {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  name: string;
+
+  @ApiProperty()
+  url: string;
+
+  @ApiProperty()
+  type: string;
+
+  @ApiProperty()
+  size: number;
+}
+
+export class IncidentUpdateDto {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  content: string;
+
+  @ApiProperty()
+  timestamp: Date;
+
+  @ApiProperty()
+  author: string;
+
+  @ApiProperty({ type: [IncidentAttachmentDto] })
+  attachments: IncidentAttachmentDto[];
+}
+
 export class IncidentDto {
   @ApiProperty()
   id: number;
@@ -147,40 +181,6 @@ export class IncidentDto {
 
   @ApiProperty({ type: [IncidentAttachmentDto] })
   attachments: IncidentAttachmentDto[];
-}
-
-export class IncidentUpdateDto {
-  @ApiProperty()
-  id: number;
-
-  @ApiProperty()
-  content: string;
-
-  @ApiProperty()
-  timestamp: Date;
-
-  @ApiProperty()
-  author: string;
-
-  @ApiProperty({ type: [IncidentAttachmentDto] })
-  attachments: IncidentAttachmentDto[];
-}
-
-export class IncidentAttachmentDto {
-  @ApiProperty()
-  id: number;
-
-  @ApiProperty()
-  name: string;
-
-  @ApiProperty()
-  url: string;
-
-  @ApiProperty()
-  type: string;
-
-  @ApiProperty()
-  size: number;
 }
 
 export class IncidentFilterParamsDto {
