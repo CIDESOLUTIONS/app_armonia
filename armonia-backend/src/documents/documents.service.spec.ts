@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DocumentsService } from './documents.service';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
-import { vi } from 'vitest';
+
 
 describe('DocumentsService', () => {
   let service: DocumentsService;
@@ -16,13 +16,13 @@ describe('DocumentsService', () => {
         {
           provide: PrismaClientManager,
           useValue: {
-            getClient: vi.fn().mockReturnValue({
+            getClient: jest.fn().mockReturnValue({
               document: {
-                create: vi.fn(),
-                findMany: vi.fn(),
-                findUnique: vi.fn(),
-                update: vi.fn(),
-                delete: vi.fn(),
+                create: jest.fn(),
+                findMany: jest.fn(),
+                findUnique: jest.fn(),
+                update: jest.fn(),
+                delete: jest.fn(),
               },
             }),
           },

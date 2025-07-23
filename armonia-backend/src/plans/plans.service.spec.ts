@@ -1,11 +1,32 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlansService } from './plans.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { vi } from 'vitest';
 
 describe('PlansService', () => {
   let service: PlansService;
   let prisma: PrismaService;
+
+  // Mock the PrismaService to return mock clients for each model
+  const mockPrismaService = {
+    plan: {
+      create: jest.fn(),
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    },
+    feature: {
+      create: jest.fn(),
+    },
+    subscription: {
+      create: jest.fn(),
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    },
+    // Add other Prisma models used by PlansService here if any
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -13,23 +34,7 @@ describe('PlansService', () => {
         PlansService,
         {
           provide: PrismaService,
-          useValue: {
-            plan: {
-              create: vi.fn(),
-              findMany: vi.fn(),
-              findUnique: vi.fn(),
-              update: vi.fn(),
-              delete: vi.fn(),
-            },
-            feature: { create: vi.fn() },
-            subscription: {
-              create: vi.fn(),
-              findMany: vi.fn(),
-              findUnique: vi.fn(),
-              update: vi.fn(),
-              delete: vi.fn(),
-            },
-          },
+          useValue: mockPrismaService, // Provide the mock PrismaService
         },
       ],
     }).compile();

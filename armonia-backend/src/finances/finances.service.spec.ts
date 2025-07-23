@@ -1,93 +1,107 @@
+import { Test, TestingModule } from '@nestjs/testing';
 import { FinancesService } from './finances.service';
+import { PrismaClientManager } from '../prisma/prisma-client-manager';
+import { PrismaService } from '../prisma/prisma.service';
+import { CommunicationsService } from '../communications/communications.service';
 import { PaymentStatus } from '../common/dto/finances.dto';
-import { vi } from 'vitest';
 
 // Mock dependencies
 const mockPrismaClient = {
   fee: {
-    findMany: vi.fn(),
-    count: vi.fn(),
-    findUnique: vi.fn(),
+    findMany: jest.fn(),
+    count: jest.fn(),
+    findUnique: jest.fn(),
   },
   payment: {
-    findMany: vi.fn(),
-    create: vi.fn(),
+    findMany: jest.fn(),
+    create: jest.fn(),
   },
   budget: {
-    create: vi.fn(),
-    findMany: vi.fn(),
-    update: vi.fn(),
+    create: jest.fn(),
+    findMany: jest.fn(),
+    update: jest.fn(),
   },
   bill: {
-    findUnique: vi.fn(),
+    findUnique: jest.fn(),
   },
   paymentAttempt: {
-    create: vi.fn(),
-    findUnique: vi.fn(),
-    update: vi.fn(),
+    create: jest.fn(),
+    findUnique: jest.fn(),
+    update: jest.fn(),
   },
   property: {
-    findMany: vi.fn(),
+    findMany: jest.fn(),
   },
   user: {
-    findUnique: vi.fn(),
+    findUnique: jest.fn(),
   },
   paymentGateway: {
-    findFirst: vi.fn(),
+    findFirst: jest.fn(),
   },
   paymentMethod: {
-    findFirst: vi.fn(),
+    findFirst: jest.fn(),
   },
 };
 
 const mockPrismaClientManager = {
-  getClient: vi.fn(() => mockPrismaClient),
+  getClient: jest.fn(() => mockPrismaClient),
 };
 
 const mockPrismaService = {
   client: {
     user: {
-      findUnique: vi.fn(),
+      findUnique: jest.fn(),
     },
     residentialComplex: {
-      findMany: vi.fn(),
+      findMany: jest.fn(),
     },
   },
 };
 
 const mockCommunicationService = {
-  notifyUser: vi.fn(),
+  notifyUser: jest.fn(),
 };
 
-const mockPdfService = {
-  generateFinancialReportPdf: vi.fn(),
-};
+// No mockPdfService needed as it's not injected in the constructor
 
-vi.mock('../lib/logging/server-logger', () => ({
+jest.mock('../lib/logging/server-logger', () => ({
   ServerLogger: {
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
   },
 }));
 
-vi.mock('../lib/logging/activity-logger', () => ({
+jest.mock('../lib/logging/activity-logger', () => ({
   ActivityLogger: {
-    log: vi.fn(),
+    log: jest.fn(),
   },
 }));
 
 describe('FinancesService', () => {
   let service: FinancesService;
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-    service = new FinancesService(
-      mockPrismaClientManager as any,
-      mockPrismaService as any,
-      mockCommunicationService as any,
-      mockPdfService as any,
-    );
+  beforeEach(async () => {
+    jest.clearAllMocks();
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        FinancesService,
+        {
+          provide: PrismaClientManager,
+          useValue: mockPrismaClientManager,
+        },
+        {
+          provide: PrismaService,
+          useValue: mockPrismaService,
+        },
+        {
+          provide: CommunicationsService,
+          useValue: mockCommunicationService,
+        },
+      ],
+    }).compile();
+
+    service = module.get<FinancesService>(FinancesService);
   });
 
   it('should be defined', () => {
