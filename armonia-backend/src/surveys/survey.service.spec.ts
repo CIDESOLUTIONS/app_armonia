@@ -4,41 +4,42 @@ import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
 import { SurveyStatus, QuestionType } from '../common/dto/surveys.dto';
+import { vi } from 'vitest';
 
 // Mock dependencies
 const mockPrismaClient = {
   survey: {
-    create: jest.fn(),
-    findMany: jest.fn(),
-    findUnique: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
+    create: vi.fn(),
+    findMany: vi.fn(),
+    findUnique: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
   },
   question: {
-    create: jest.fn(),
-    createMany: jest.fn(),
-    deleteMany: jest.fn(),
-    findMany: jest.fn(),
-    findUnique: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
+    create: vi.fn(),
+    createMany: vi.fn(),
+    deleteMany: vi.fn(),
+    findMany: vi.fn(),
+    findUnique: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
   },
   answer: {
-    create: jest.fn(),
-    findMany: jest.fn(),
-    deleteMany: jest.fn(),
+    create: vi.fn(),
+    findMany: vi.fn(),
+    deleteMany: vi.fn(),
   },
 };
 
 const mockPrismaClientManager = {
-  getClient: jest.fn(() => mockPrismaClient),
+  getClient: vi.fn(() => mockPrismaClient),
 };
 
 describe('SurveyService', () => {
   let service: SurveyService;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     service = new SurveyService(
       mockPrismaClientManager as any,
       // new PrismaService(), // Removed as it's not needed for this mock setup
