@@ -33,6 +33,15 @@ export default defineConfig({
     deps: {
       inline: ["armonia-backend"], // Forzar a Vitest a procesar módulos de armonia-backend
     },
+    transform: {
+      '^.+\.tsx?$': ['@swc/jest', { 
+        jsc: {
+          transform: {
+            decoratorMetadata: true,
+          }
+        }
+       }],
+    },
   },
   resolve: {
     alias: {

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PqrService } from './pqr.service';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
-
+import { vi } from 'vitest';
 
 describe('PqrService', () => {
   let service: PqrService;
@@ -16,26 +16,26 @@ describe('PqrService', () => {
         {
           provide: PrismaClientManager,
           useValue: {
-            getClient: jest.fn().mockReturnValue({
+            getClient: vi.fn().mockReturnValue({
               pQR: {
-                create: jest.fn(),
-                findMany: jest.fn(),
-                findUnique: jest.fn(),
-                update: jest.fn(),
-                delete: jest.fn(),
+                create: vi.fn(),
+                findMany: vi.fn(),
+                findUnique: vi.fn(),
+                update: vi.fn(),
+                delete: vi.fn(),
               },
-              pQRStatusHistory: { create: jest.fn() },
-              pQRComment: { create: jest.fn() },
-              pQRAttachment: { create: jest.fn() },
-              pQRNotification: { create: jest.fn() },
-              pQRSLA: { findMany: jest.fn() },
-              pQRTeam: { findMany: jest.fn() },
-              pQRTeamMember: { create: jest.fn() },
-              pQRAssignmentRule: { findMany: jest.fn() },
-              pQRSettings: { findUnique: jest.fn() },
-              pQRCustomCategory: { findMany: jest.fn() },
-              pQRResponseTemplate: { findMany: jest.fn() },
-              pQRReport: { create: jest.fn(), findMany: jest.fn() },
+              pQRStatusHistory: { create: vi.fn() },
+              pQRComment: { create: vi.fn() },
+              pQRAttachment: { create: vi.fn() },
+              pQRNotification: { create: vi.fn() },
+              pQRSLA: { findMany: vi.fn() },
+              pQRTeam: { findMany: vi.fn() },
+              pQRTeamMember: { create: vi.fn() },
+              pQRAssignmentRule: { findMany: vi.fn() },
+              pQRSettings: { findUnique: vi.fn() },
+              pQRCustomCategory: { findMany: vi.fn() },
+              pQRResponseTemplate: { findMany: vi.fn() },
+              pQRReport: { create: vi.fn(), findMany: vi.fn() },
             }),
           },
         },
@@ -59,3 +59,4 @@ describe('PqrService', () => {
 
   // Add tests for each method in PqrService
 });
+
