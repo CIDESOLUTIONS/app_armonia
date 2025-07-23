@@ -9,7 +9,7 @@ import {
 
 @Injectable()
 export class PlansService {
-  constructor(private prisma: any) {}
+  constructor(private prisma: PrismaService) {}
 
   async createPlan(data: CreatePlanDto) {
     return this.prisma.plan.create({
