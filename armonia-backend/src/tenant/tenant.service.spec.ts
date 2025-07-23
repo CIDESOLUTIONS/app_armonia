@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TenantService } from './tenant.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { vi } from 'vitest';
+
 
 describe('TenantService', () => {
   let service: TenantService;
@@ -15,11 +15,11 @@ describe('TenantService', () => {
           provide: PrismaService,
           useValue: {
             residentialComplex: {
-              create: vi.fn(),
-              findMany: vi.fn(),
-              findUnique: vi.fn(),
-              update: vi.fn(),
-              delete: vi.fn(),
+              create: jest.fn(),
+              findMany: jest.fn(),
+              findUnique: jest.fn(),
+              update: jest.fn(),
+              delete: jest.fn(),
             },
           },
         },

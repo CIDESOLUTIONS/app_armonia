@@ -7,7 +7,7 @@ import {
   IsArray,
   ValidateNested,
 } from 'class-validator';
-import { Type } 'from 'class-transformer';
+import { Type } from 'class-transformer';
 
 export enum PaymentStatus {
   PENDING = 'PENDING',
@@ -263,6 +263,40 @@ export class CreatePaymentDto {
   propertyId: number;
 }
 
+export class UpdatePaymentDto {
+  @IsOptional()
+  @IsNumber()
+  amount?: number;
+
+  @IsOptional()
+  @IsDateString()
+  date?: string;
+
+  @IsOptional()
+  @IsString()
+  method?: string;
+
+  @IsOptional()
+  @IsString()
+  reference?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsNumber()
+  feeId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  propertyId?: number;
+
+  @IsOptional()
+  @IsEnum(PaymentStatus)
+  status?: PaymentStatus;
+}
+
 export class RegisterManualPaymentDto {
   @IsNumber()
   feeId: number;
@@ -305,6 +339,38 @@ export class CreateBudgetDto {
   @ValidateNested({ each: true })
   @Type(() => BudgetItemDto)
   items: Omit<BudgetItemDto, 'id' | 'budgetId'>[];
+}
+
+export class UpdateBudgetDto {
+  @IsOptional()
+  @IsNumber()
+  year?: number;
+
+  @IsOptional()
+  @IsNumber()
+  month?: number;
+
+  @IsOptional()
+  @IsString()
+  title?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsNumber()
+  totalAmount?: number;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => BudgetItemDto)
+  items?: Omit<BudgetItemDto, 'id' | 'budgetId'>[];
+
+  @IsOptional()
+  @IsEnum(BudgetStatus)
+  status?: BudgetStatus;
 }
 
 export class InitiatePaymentDto {
@@ -385,4 +451,16 @@ export class FeeFilterParamsDto {
   @IsOptional()
   @IsString()
   search?: string;
+}
+
+export class BudgetFilterParamsDto extends FeeFilterParamsDto {
+  @IsOptional()
+  @IsNumber()
+  year?: number;
+}
+
+export class ExpenseFilterParamsDto extends FeeFilterParamsDto {
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
 }

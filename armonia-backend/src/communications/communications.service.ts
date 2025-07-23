@@ -17,7 +17,7 @@ import * as admin from 'firebase-admin';
 @Injectable()
 export class CommunicationsService {
   private twilioClient: any;
-  private twilioPhoneNumber: string;
+  private twilioPhoneNumber: string | undefined;
 
   constructor(
     private prismaClientManager: PrismaClientManager,

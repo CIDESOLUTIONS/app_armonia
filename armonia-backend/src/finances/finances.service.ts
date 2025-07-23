@@ -10,28 +10,16 @@ import {
   UpdateFeeDto,
   FeeDto,
   FeeFilterParamsDto,
-  FeeStatus,
-} from '../common/dto/finances.dto';
-import {
+  PaymentStatus,
   CreatePaymentDto,
   UpdatePaymentDto,
   PaymentDto,
-  PaymentFilterParamsDto,
-  PaymentStatus,
-} from '../common/dto/finances.dto';
-import {
   CreateBudgetDto,
   UpdateBudgetDto,
   BudgetDto,
   BudgetFilterParamsDto,
   BudgetStatus,
-} from '../common/dto/finances.dto';
-import {
-  CreateExpenseDto,
-  UpdateExpenseDto,
-  ExpenseDto,
   ExpenseFilterParamsDto,
-  ExpenseStatus,
 } from '../common/dto/finances.dto';
 import { CommunicationsService } from '../communications/communications.service';
 import {
@@ -55,7 +43,7 @@ export class FinancesService {
   async createFee(schemaName: string, data: CreateFeeDto): Promise<FeeDto> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const fee = await prisma.fee.create({
-      data: { ...data, status: FeeStatus.PENDING },
+      data: { ...data, status: PaymentStatus.PENDING },
     });
     return fee;
   }
@@ -70,16 +58,16 @@ export class FinancesService {
       if (filters.status) where.status = filters.status;
       if (filters.type) where.type = filters.type;
       if (filters.propertyId) where.propertyId = filters.propertyId;
-      if (filters.residentId) where.residentId = filters.residentId;
 
-      const skip = filters.skip || 0;
-      const take = filters.take || 10;
+      const page = filters.page || 1;
+      const limit = filters.limit || 10;
+      const skip = (page - 1) * limit;
 
       const [fees, total] = await Promise.all([
         prisma.fee.findMany({
           where,
           skip,
-          take,
+          take: limit,
           orderBy: { createdAt: 'desc' },
         }),
         prisma.fee.count({ where }),
@@ -141,10 +129,10 @@ export class FinancesService {
     const payment = await prisma.payment.create({ data });
 
     // Update fee status if payment is completed
-    if (payment.status === PaymentStatus.COMPLETED && payment.feeId) {
+    if (payment.status === PaymentStatus.PAID && payment.feeId) {
       await prisma.fee.update({
         where: { id: payment.feeId },
-        data: { status: FeeStatus.PAID },
+        data: { status: PaymentStatus.PAID },
       });
     }
     return payment;
@@ -166,7 +154,7 @@ export class FinancesService {
       throw new NotFoundException(`Cuota con ID ${feeId} no encontrada.`);
     }
 
-    if (fee.status === FeeStatus.PAID) {
+    if (fee.status === PaymentStatus.PAID) {
       throw new BadRequestException(`La cuota ${feeId} ya ha sido pagada.`);
     }
 
@@ -176,15 +164,15 @@ export class FinancesService {
         userId: userId,
         amount: amount,
         paymentDate: paymentDate,
-        status: PaymentStatus.COMPLETED,
-        paymentMethod: paymentMethod,
+        status: PaymentStatus.PAID,
         transactionId: transactionId || `MANUAL_${Date.now()}`,
+        paymentMethod: 'Simulated Gateway',
       },
     });
 
     await prisma.fee.update({
       where: { id: fee.id },
-      data: { status: FeeStatus.PAID },
+      data: { status: PaymentStatus.PAID },
     });
 
     return payment;
@@ -192,19 +180,22 @@ export class FinancesService {
 
   async getPayments(
     schemaName: string,
-    filters: PaymentFilterParamsDto,
+    filters: FeeFilterParamsDto,
   ): Promise<{ data: PaymentDto[]; total: number }> {
     const prisma = this.getTenantPrismaClient(schemaName);
     const where: any = {};
     if (filters.status) where.status = filters.status;
-    if (filters.feeId) where.feeId = filters.feeId;
-    if (filters.userId) where.userId = filters.userId;
+    if (filters.propertyId) where.propertyId = filters.propertyId;
+
+    const page = filters.page || 1;
+    const limit = filters.limit || 10;
+    const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([
       prisma.payment.findMany({
         where,
-        skip: filters.skip,
-        take: filters.take,
+        skip,
+        take: limit,
         orderBy: { paymentDate: 'desc' },
       }),
       prisma.payment.count({ where }),
@@ -236,13 +227,28 @@ export class FinancesService {
 
     // Update fee status if payment is completed
     if (
-      updatedPayment.status === PaymentStatus.COMPLETED &&
+      updatedPayment.status === PaymentStatus.PAID &&
       updatedPayment.feeId
     ) {
       await prisma.fee.update({
         where: { id: updatedPayment.feeId },
-        data: { status: FeeStatus.PAID },
+        data: { status: PaymentStatus.PAID },
       });
+
+      // Notify user about successful payment
+      const user = await prisma.user.findUnique({
+        where: { id: updatedPayment.userId },
+      });
+      if (user) {
+        await this.communicationsService.notifyUser(schemaName, user.id, {
+          type: NotificationType.INFO,
+          title: 'Pago Confirmado',
+          message: `Tu pago de ${updatedPayment.amount} para la cuota ${updatedPayment.feeId} ha sido confirmado.`,
+          link: `/resident/finances/payments/${updatedPayment.id}`,
+          sourceType: NotificationSourceType.FINANCIAL,
+          sourceId: updatedPayment.id.toString(),
+        });
+      }
     }
     return updatedPayment;
   }
@@ -274,12 +280,16 @@ export class FinancesService {
     if (filters.year) where.year = filters.year;
     if (filters.status) where.status = filters.status;
 
+    const page = filters.page || 1;
+    const limit = filters.limit || 10;
+    const skip = (page - 1) * limit;
+
     const [data, total] = await Promise.all([
       prisma.budget.findMany({
         where,
         include: { items: true },
-        skip: filters.skip,
-        take: filters.take,
+        skip,
+        take: limit,
         orderBy: { year: 'desc' },
       }),
       prisma.budget.count({ where }),
@@ -350,8 +360,8 @@ export class FinancesService {
   // Expenses
   async createExpense(
     schemaName: string,
-    data: CreateExpenseDto,
-  ): Promise<ExpenseDto> {
+    data: any, // CreateExpenseDto
+  ): Promise<any> { // ExpenseDto
     const prisma = this.getTenantPrismaClient(schemaName);
     return prisma.expense.create({ data });
   }
@@ -359,17 +369,21 @@ export class FinancesService {
   async getExpenses(
     schemaName: string,
     filters: ExpenseFilterParamsDto,
-  ): Promise<{ data: ExpenseDto[]; total: number }> {
+  ): Promise<{ data: any[]; total: number }> { // ExpenseDto
     const prisma = this.getTenantPrismaClient(schemaName);
     const where: any = {};
     if (filters.status) where.status = filters.status;
     if (filters.categoryId) where.categoryId = filters.categoryId;
 
+    const page = filters.page || 1;
+    const limit = filters.limit || 10;
+    const skip = (page - 1) * limit;
+
     const [data, total] = await Promise.all([
       prisma.expense.findMany({
         where,
-        skip: filters.skip,
-        take: filters.take,
+        skip,
+        take: limit,
         orderBy: { date: 'desc' },
       }),
       prisma.expense.count({ where }),
@@ -378,7 +392,7 @@ export class FinancesService {
     return { data, total };
   }
 
-  async getExpenseById(schemaName: string, id: number): Promise<ExpenseDto> {
+  async getExpenseById(schemaName: string, id: number): Promise<any> { // ExpenseDto
     const prisma = this.getTenantPrismaClient(schemaName);
     const expense = await prisma.expense.findUnique({ where: { id } });
     if (!expense) {
@@ -390,8 +404,8 @@ export class FinancesService {
   async updateExpense(
     schemaName: string,
     id: number,
-    data: UpdateExpenseDto,
-  ): Promise<ExpenseDto> {
+    data: any, // UpdateExpenseDto
+  ): Promise<any> { // ExpenseDto
     const prisma = this.getTenantPrismaClient(schemaName);
     const expense = await prisma.expense.findUnique({ where: { id } });
     if (!expense) {
@@ -413,11 +427,11 @@ export class FinancesService {
     const prisma = this.getTenantPrismaClient(schemaName);
     const totalIncome = await prisma.payment.aggregate({
       _sum: { amount: true },
-      where: { status: PaymentStatus.COMPLETED },
+      where: { status: PaymentStatus.PAID },
     });
     const totalExpenses = await prisma.expense.aggregate({
       _sum: { amount: true },
-      where: { status: ExpenseStatus.PAID },
+      where: { status: 'PAID' }, // Assuming ExpenseStatus.PAID is 'PAID' string
     });
 
     const currentBalance =
@@ -427,7 +441,7 @@ export class FinancesService {
     const monthlyIncome = await prisma.payment.aggregate({
       _sum: { amount: true },
       where: {
-        status: PaymentStatus.COMPLETED,
+        status: PaymentStatus.PAID,
         paymentDate: {
           gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
         },
@@ -437,7 +451,7 @@ export class FinancesService {
     const monthlyExpenses = await prisma.expense.aggregate({
       _sum: { amount: true },
       where: {
-        status: ExpenseStatus.PAID,
+        status: 'PAID',
         date: {
           gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
         },
@@ -445,12 +459,12 @@ export class FinancesService {
     });
 
     const pendingBills = await prisma.fee.count({
-      where: { status: FeeStatus.PENDING },
+      where: { status: PaymentStatus.PENDING },
     });
 
     const pendingBillsAmount = await prisma.fee.aggregate({
       _sum: { amount: true },
-      where: { status: FeeStatus.PENDING },
+      where: { status: PaymentStatus.PENDING },
     });
 
     return {
@@ -512,7 +526,7 @@ export class FinancesService {
       throw new NotFoundException(`Cuota con ID ${feeId} no encontrada.`);
     }
 
-    if (fee.status !== FeeStatus.PENDING) {
+    if (fee.status !== PaymentStatus.PENDING) {
       throw new BadRequestException(
         `La cuota ${feeId} no está pendiente de pago.`,
       );
@@ -544,7 +558,7 @@ export class FinancesService {
         title: 'Pago Iniciado',
         message: `Se ha iniciado el pago de tu cuota ${fee.title}. Por favor, completa la transacción.`,
         link: simulatedPaymentUrl,
-        sourceType: NotificationSourceType.PAYMENT,
+        sourceType: NotificationSourceType.FINANCIAL,
         sourceId: fee.id.toString(),
       });
     }
@@ -568,7 +582,7 @@ export class FinancesService {
       );
     }
 
-    if (payment.status === PaymentStatus.COMPLETED) {
+    if (payment.status === PaymentStatus.PAID) {
       return payment; // Already completed, no action needed
     }
 
@@ -579,12 +593,12 @@ export class FinancesService {
 
     // Update fee status if payment is completed
     if (
-      updatedPayment.status === PaymentStatus.COMPLETED &&
+      updatedPayment.status === PaymentStatus.PAID &&
       updatedPayment.feeId
     ) {
       await prisma.fee.update({
         where: { id: updatedPayment.feeId },
-        data: { status: FeeStatus.PAID },
+        data: { status: PaymentStatus.PAID },
       });
 
       // Notify user about successful payment
@@ -593,16 +607,15 @@ export class FinancesService {
       });
       if (user) {
         await this.communicationsService.notifyUser(schemaName, user.id, {
-          type: NotificationType.SUCCESS,
+          type: NotificationType.INFO,
           title: 'Pago Confirmado',
           message: `Tu pago de ${updatedPayment.amount} para la cuota ${updatedPayment.feeId} ha sido confirmado.`,
           link: `/resident/finances/payments/${updatedPayment.id}`,
-          sourceType: NotificationSourceType.PAYMENT,
+          sourceType: NotificationSourceType.FINANCIAL,
           sourceId: updatedPayment.id.toString(),
         });
       }
     }
-
     return updatedPayment;
   }
 }

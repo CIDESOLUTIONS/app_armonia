@@ -4,42 +4,41 @@ import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
 import { SurveyStatus, QuestionType } from '../common/dto/surveys.dto';
-import { vi } from 'vitest';
 
 // Mock dependencies
 const mockPrismaClient = {
   survey: {
-    create: vi.fn(),
-    findMany: vi.fn(),
-    findUnique: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
+    create: jest.fn(),
+    findMany: jest.fn(),
+    findUnique: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
   },
   question: {
-    create: vi.fn(),
-    createMany: vi.fn(),
-    deleteMany: vi.fn(),
-    findMany: vi.fn(),
-    findUnique: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
+    create: jest.fn(),
+    createMany: jest.fn(),
+    deleteMany: jest.fn(),
+    findMany: jest.fn(),
+    findUnique: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
   },
   answer: {
-    create: vi.fn(),
-    findMany: vi.fn(),
-    deleteMany: vi.fn(),
+    create: jest.fn(),
+    findMany: jest.fn(),
+    deleteMany: jest.fn(),
   },
 };
 
 const mockPrismaClientManager = {
-  getClient: vi.fn(() => mockPrismaClient),
+  getClient: jest.fn(() => mockPrismaClient),
 };
 
 describe('SurveyService', () => {
   let service: SurveyService;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
     service = new SurveyService(
       mockPrismaClientManager as any,
       // new PrismaService(), // Removed as it's not needed for this mock setup
@@ -59,8 +58,8 @@ describe('SurveyService', () => {
         complexId: 123,
         createdBy: 1,
         status: SurveyStatus.DRAFT,
-        startDate: new Date(), // Return Date object
-        endDate: new Date(), // Return Date object
+        startDate: new Date().toISOString(), // Return Date object
+        endDate: new Date().toISOString(), // Return Date object
         questions: [],
       };
       mockPrismaClient.survey.create.mockResolvedValue(mockSurvey);
@@ -68,8 +67,8 @@ describe('SurveyService', () => {
       const createSurveyDto = {
         title: 'Test Survey',
         description: 'Desc',
-        startDate: new Date(), // Pass Date object
-        endDate: new Date(), // Pass Date object
+        startDate: new Date().toISOString(), // Pass Date object
+        endDate: new Date().toISOString(), // Pass Date object
         questions: [
           {
             text: 'Q1',
@@ -95,8 +94,8 @@ describe('SurveyService', () => {
           complexId: 123,
           createdBy: 1,
           status: SurveyStatus.DRAFT,
-          startDate: expect.any(Date),
-          endDate: expect.any(Date),
+          startDate: expect.any(String),
+          endDate: expect.any(String),
           questions: {
             create: [
               {
@@ -161,8 +160,8 @@ describe('SurveyService', () => {
         id: 1,
         title: 'Old Title',
         description: 'Old Desc',
-        startDate: new Date(),
-        endDate: new Date(),
+        startDate: new Date().toISOString(),
+        endDate: new Date().toISOString(),
         questions: [
           {
             id: 10,
@@ -196,8 +195,8 @@ describe('SurveyService', () => {
       const updateSurveyDto = {
         title: 'New Title',
         description: 'New Desc',
-        startDate: new Date(), // Pass Date object
-        endDate: new Date(), // Pass Date object
+        startDate: new Date().toISOString(), // Pass Date object
+        endDate: new Date().toISOString(), // Pass Date object
         questions: [
           { text: 'New Q', type: QuestionType.TEXT, options: [], order: 0 },
         ],
@@ -215,8 +214,8 @@ describe('SurveyService', () => {
         data: {
           title: 'New Title',
           description: 'New Desc',
-          startDate: expect.any(Date),
-          endDate: expect.any(Date),
+          startDate: expect.any(String),
+          endDate: expect.any(String),
           // questions are handled separately, so they should not be in the data object for survey update
         },
         include: { questions: true },
@@ -402,8 +401,8 @@ describe('SurveyService', () => {
         title: 'Test Survey',
         description: 'Desc',
         status: SurveyStatus.PUBLISHED,
-        startDate: new Date(),
-        endDate: new Date(),
+        startDate: new Date().toISOString(),
+        endDate: new Date().toISOString(),
         questions: [
           {
             id: 10,
@@ -442,8 +441,8 @@ describe('SurveyService', () => {
         title: 'Test Survey',
         description: 'Desc',
         status: SurveyStatus.PUBLISHED,
-        startDate: expect.any(Date),
-        endDate: expect.any(Date),
+        startDate: expect.any(String),
+        endDate: expect.any(String),
         totalResponses: 2,
         questions: [
           {
