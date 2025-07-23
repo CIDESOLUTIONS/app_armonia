@@ -3,10 +3,10 @@ import { BankReconciliationService } from './bank-reconciliation.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '../common/enums/user-role.enum';
 import { GetUser } from '../common/decorators/user.decorator';
 
-@UseGuards(JwtAuthGuard, RolesGuard(UserRole.COMPLEX_ADMIN, UserRole.ADMIN))
+@UseGuards(JwtAuthGuard, RolesGuard([UserRole.COMPLEX_ADMIN, UserRole.ADMIN]))
 @Controller('bank-reconciliation')
 export class BankReconciliationController {
   constructor(private readonly bankReconciliationService: BankReconciliationService) {}

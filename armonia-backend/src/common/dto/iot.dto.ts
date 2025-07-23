@@ -64,6 +64,9 @@ export class SmartMeterFilterParamsDto {
 }
 
 export class AutomatedBillingDto {
+  @IsNumber()
+  complexId: number;
+
   @IsOptional()
   @IsDateString()
   billingPeriodStart?: string;

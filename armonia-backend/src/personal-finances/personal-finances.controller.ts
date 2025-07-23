@@ -9,8 +9,8 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
-import { GetUser } from '../../common/decorators/user.decorator';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GetUser } from '../common/decorators/user.decorator';
 import { PersonalFinancesService } from './personal-finances.service';
 import {
   CreatePersonalTransactionDto,

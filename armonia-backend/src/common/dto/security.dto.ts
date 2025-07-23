@@ -6,7 +6,7 @@ import {
   IsDateString,
   IsEnum,
 } from 'class-validator';
-import { SecurityEventType } from '@prisma/client';
+import { SecurityEventType } from '@backend/common/enums/security-event-type.enum';
 
 export class CreateSecurityLogDto {
   @IsNumber()

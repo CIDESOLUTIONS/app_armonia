@@ -67,6 +67,9 @@ export class RegisterAttendanceDto {
   @IsNumber()
   userId: number;
 
+  @IsNumber()
+  unitId: number;
+
   @IsOptional()
   @IsBoolean()
   present?: boolean;

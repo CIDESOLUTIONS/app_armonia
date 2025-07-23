@@ -44,12 +44,17 @@ export class AssemblyGateway {
     @MessageBody() data: RegisterAttendanceDto & { schemaName: string },
     @ConnectedSocket() client: Socket,
   ): Promise<void> {
+    const { schemaName, assemblyId, userId, unitId } = data;
+    const attendance = await this.assemblyService.registerAttendance(
+      schemaName,
+      assemblyId,
+      userId,
+      unitId,
+    );
     const { currentAttendance, quorumMet } =
-      await this.assemblyService.registerAttendance(
+      await this.assemblyService.getAssemblyQuorumStatus(
         data.schemaName,
         data.assemblyId,
-        data.userId,
-        data.present,
       );
     // Emitir actualización de quórum a todos los clientes en la sala
     this.server
@@ -63,8 +68,14 @@ export class AssemblyGateway {
     data: SubmitVoteDto & { schemaName: string; assemblyId: number },
     @ConnectedSocket() client: Socket,
   ): Promise<void> {
-    await this.assemblyService.submitVote(data.schemaName, data);
-    const results = await this.assemblyService.getVoteResults(
+    await this.assemblyService.castVote(
+      data.schemaName,
+      data.voteId,
+      data.userId,
+      data.unitId,
+      data.option,
+    );
+    const results = await this.assemblyService.calculateVoteResults(
       data.schemaName,
       data.voteId,
     );
@@ -73,7 +84,7 @@ export class AssemblyGateway {
       .to(`assembly-${data.assemblyId}-${data.schemaName}`)
       .emit('voteResultsUpdate', {
         voteId: data.voteId,
-        results: results.results,
+        results: results,
       });
   }
 }

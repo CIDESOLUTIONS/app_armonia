@@ -9,14 +9,14 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
-import { GetUser } from '../../common/decorators/user.decorator';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GetUser } from '../common/decorators/user.decorator';
 import { SurveyService } from './survey.service';
 import {
   CreateSurveyDto,
   UpdateSurveyDto,
   CreateAnswerDto,
-} from '../../common/dto/surveys.dto';
+} from '../common/dto/surveys.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('surveys')

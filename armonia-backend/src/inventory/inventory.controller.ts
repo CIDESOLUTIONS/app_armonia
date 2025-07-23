@@ -183,10 +183,7 @@ export class InventoryController {
     @GetUser() user: any,
     @Body() createVehicleDto: CreateVehicleDto,
   ) {
-    return this.inventoryService.createVehicle(user.schemaName, {
-      ...createVehicleDto,
-      complexId: user.complexId,
-    });
+    return this.inventoryService.createVehicle(user.schemaName, createVehicleDto);
   }
 
   @Get('residents')

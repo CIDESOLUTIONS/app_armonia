@@ -8,6 +8,7 @@ import {
   IsArray,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { PartialType } from '@nestjs/swagger';
 
 export enum ReservationStatus {
   PENDING = 'PENDING',
@@ -50,7 +51,7 @@ export class CreateReservationDto {
   paymentAmount?: number;
 }
 
-export class UpdateReservationDto extends Partial(CreateReservationDto) {
+export class UpdateReservationDto extends PartialType(CreateReservationDto) {
   @IsOptional()
   @IsEnum(ReservationStatus)
   status?: ReservationStatus;

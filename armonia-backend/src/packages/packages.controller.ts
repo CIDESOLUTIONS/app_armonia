@@ -8,15 +8,15 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
-import { GetUser } from '../../common/decorators/user.decorator';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GetUser } from '../common/decorators/user.decorator';
 import { PackagesService } from './packages.service';
 import {
   RegisterPackageDto,
   UpdatePackageDto,
   PackageDto,
   PackageFilterParamsDto,
-} from '../../common/dto/packages.dto';
+} from '../common/dto/packages.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('packages')

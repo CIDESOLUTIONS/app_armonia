@@ -1,31 +1,31 @@
-import { Controller, Get, Query, Res, UseGuards, Req, Body } from '@nestjs/common';
+import { Controller, Get, Query, Res, UseGuards, Req, Body, Post } from '@nestjs/common';
 import { Response } from 'express';
 import { ReportsService } from './reports.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '../common/enums/user-role.enum';
 
 @UseGuards(
   JwtAuthGuard,
-  RolesGuard(
+  RolesGuard([
     UserRole.COMPLEX_ADMIN,
     UserRole.ADMIN,
     UserRole.RECEPTION,
     UserRole.STAFF,
-  ),
+  ]),
 )
 @Controller('reports')
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @Get('visitors/pdf')
-  @Roles(
+  @Roles([
     UserRole.COMPLEX_ADMIN,
     UserRole.ADMIN,
     UserRole.RECEPTION,
     UserRole.STAFF,
-  )
+  ])
   async getVisitorsReportPdf(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -46,12 +46,12 @@ export class ReportsController {
   }
 
   @Get('visitors/excel')
-  @Roles(
+  @Roles([
     UserRole.COMPLEX_ADMIN,
     UserRole.ADMIN,
     UserRole.RECEPTION,
     UserRole.STAFF,
-  )
+  ])
   async getVisitorsReportExcel(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -73,12 +73,12 @@ export class ReportsController {
   }
 
   @Get('packages/pdf')
-  @Roles(
+  @Roles([
     UserRole.COMPLEX_ADMIN,
     UserRole.ADMIN,
     UserRole.RECEPTION,
     UserRole.STAFF,
-  )
+  ])
   async getPackagesReportPdf(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -99,12 +99,12 @@ export class ReportsController {
   }
 
   @Get('packages/excel')
-  @Roles(
+  @Roles([
     UserRole.COMPLEX_ADMIN,
     UserRole.ADMIN,
     UserRole.RECEPTION,
     UserRole.STAFF,
-  )
+  ])
   async getPackagesReportExcel(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -126,12 +126,12 @@ export class ReportsController {
   }
 
   @Get('incidents/pdf')
-  @Roles(
+  @Roles([
     UserRole.COMPLEX_ADMIN,
     UserRole.ADMIN,
     UserRole.RECEPTION,
     UserRole.STAFF,
-  )
+  ])
   async getIncidentsReportPdf(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -152,12 +152,12 @@ export class ReportsController {
   }
 
   @Get('incidents/excel')
-  @Roles(
+  @Roles([
     UserRole.COMPLEX_ADMIN,
     UserRole.ADMIN,
     UserRole.RECEPTION,
     UserRole.STAFF,
-  )
+  ])
   async getIncidentsReportExcel(
     @Req() req,
     @Query('startDate') startDate: string,

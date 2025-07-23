@@ -74,7 +74,6 @@ export class AssemblyController {
       +assemblyId,
       user.userId,
       body.unitId,
-      { present: body.present },
     );
   }
 
