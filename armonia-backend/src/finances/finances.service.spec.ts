@@ -3,21 +3,44 @@ import { FinancesService } from './finances.service';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { CommunicationsService } from '../communications/communications.service';
 import { Logger } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
-const mockPrismaClient = {
+// Mock PrismaClient methods that FinancesService uses
+const mockPrismaClientMethods = {
   fee: {
+    create: jest.fn(),
     findMany: jest.fn(),
     count: jest.fn(),
     findUnique: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    aggregate: jest.fn(),
   },
   payment: {
-    findMany: jest.fn(),
-    create: jest.fn(),
-  },
-  budgetItem: {
     create: jest.fn(),
     findMany: jest.fn(),
+    count: jest.fn(),
+    findUnique: jest.fn(),
     update: jest.fn(),
+    delete: jest.fn(),
+    aggregate: jest.fn(),
+  },
+  budget: {
+    create: jest.fn(),
+    findMany: jest.fn(),
+    count: jest.fn(),
+    findUnique: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  },
+  expense: {
+    create: jest.fn(),
+    findMany: jest.fn(),
+    count: jest.fn(),
+    findUnique: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    aggregate: jest.fn(),
   },
   invoice: {
     findUnique: jest.fn(),
@@ -41,6 +64,14 @@ const mockPrismaClient = {
   },
 };
 
+// Mock PrismaClient itself
+const mockPrismaClient = {
+  ...mockPrismaClientMethods,
+  $connect: jest.fn(),
+  $disconnect: jest.fn(),
+  // Add any other top-level PrismaClient methods that might be called
+};
+
 describe('FinancesService', () => {
   let service: FinancesService;
   let prismaClientManager: PrismaClientManager;
@@ -56,6 +87,10 @@ describe('FinancesService', () => {
           useValue: {
             getClient: jest.fn(() => mockPrismaClient),
           },
+        },
+        {
+          provide: PrismaService,
+          useValue: mockPrismaClient, // Directly provide the mocked client
         },
         {
           provide: CommunicationsService,
