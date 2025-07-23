@@ -3,49 +3,48 @@ import { FinancesService } from './finances.service';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { CommunicationsService } from '../communications/communications.service';
 import { Logger } from '@nestjs/common';
-import { vi } from 'vitest';
 
 const mockPrismaClient = {
   fee: {
-    findMany: vi.fn(),
-    count: vi.fn(),
-    findUnique: vi.fn(),
+    findMany: jest.fn(),
+    count: jest.fn(),
+    findUnique: jest.fn(),
   },
   payment: {
-    findMany: vi.fn(),
-    create: vi.fn(),
+    findMany: jest.fn(),
+    create: jest.fn(),
   },
   budgetItem: {
-    create: vi.fn(),
-    findMany: vi.fn(),
-    update: vi.fn(),
+    create: jest.fn(),
+    findMany: jest.fn(),
+    update: jest.fn(),
   },
   invoice: {
-    findUnique: vi.fn(),
+    findUnique: jest.fn(),
   },
   bankTransaction: {
-    create: vi.fn(),
-    findUnique: vi.fn(),
-    update: vi.fn(),
+    create: jest.fn(),
+    findUnique: jest.fn(),
+    update: jest.fn(),
   },
   property: {
-    findMany: vi.fn(),
+    findMany: jest.fn(),
   },
   user: {
-    findUnique: vi.fn(),
+    findUnique: jest.fn(),
   },
   paymentAttempt: {
-    findFirst: vi.fn(),
+    findFirst: jest.fn(),
   },
   paymentConfirmation: {
-    findFirst: vi.fn(),
+    findFirst: jest.fn(),
   },
 };
 
 describe('FinancesService', () => {
   let service: FinancesService;
   let prismaClientManager: PrismaClientManager;
-  let notificationsService: NotificationsService;
+  let communicationsService: CommunicationsService;
   let logger: Logger;
 
   beforeEach(async () => {
@@ -55,22 +54,22 @@ describe('FinancesService', () => {
         {
           provide: PrismaClientManager,
           useValue: {
-            getClient: vi.fn(() => mockPrismaClient),
+            getClient: jest.fn(() => mockPrismaClient),
           },
         },
         {
-          provide: NotificationsService,
+          provide: CommunicationsService,
           useValue: {
-            notifyUser: vi.fn(),
+            notifyUser: jest.fn(),
           },
         },
         {
           provide: Logger,
           useValue: {
-            info: vi.fn(),
-            warn: vi.fn(),
-            error: vi.fn(),
-            log: vi.fn(),
+            info: jest.fn(),
+            warn: jest.fn(),
+            error: jest.fn(),
+            log: jest.fn(),
           },
         },
       ],
