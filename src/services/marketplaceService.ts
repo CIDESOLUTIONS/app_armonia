@@ -1,4 +1,4 @@
-import { fetchApi } from "@/lib/api";
+import { fetchApi } from "@/lib/apiClient";
 import {
   CreateListingDto,
   UpdateListingDto,

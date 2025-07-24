@@ -53,3 +53,4 @@ generator client {
 /// @prisma.schema ./schema_vote.prisma
 /// @prisma.schema ./schema_amenities.prisma
 /// @prisma.schema ./schema_parking.prisma
+/// @prisma.schema ./schema_demo_request.prisma

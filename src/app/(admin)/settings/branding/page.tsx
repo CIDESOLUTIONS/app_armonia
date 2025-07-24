@@ -7,76 +7,78 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { getResidentialComplexById, updateResidentialComplex } from "@/services/residentialComplexService";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
-  getBrandingSettings,
-  updateBrandingSettings,
-} from "@/services/brandingService";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+const formSchema = z.object({
+  logoUrl: z.string().url("Debe ser una URL válida").optional().or(z.literal("")),
+  primaryColor: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Formato de color inválido (ej: #RRGGBB)").optional().or(z.literal("")),
+  secondaryColor: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Formato de color inválido (ej: #RRGGBB)").optional().or(z.literal("")),
+});
 
 export default function BrandingSettingsPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [primaryColor, setPrimaryColor] = useState("#4f46e5"); // Default Indigo
-  const [secondaryColor, setSecondaryColor] = useState("#818cf8"); // Default Indigo-300
 
-  useEffect(() => {
-    const fetchSettings = async () => {
-      setLoading(true);
-      try {
-        const settings = await getBrandingSettings();
-        if (settings.logoUrl) {
-          setLogoPreview(settings.logoUrl);
-        }
-        setPrimaryColor(settings.primaryColor || "#4f46e5");
-        setSecondaryColor(settings.secondaryColor || "#818cf8");
-      } catch (error: any) {
-        console.error("Error fetching branding settings:", error);
-        toast({
-          title: "Error",
-          description: "No se pudieron cargar las configuraciones de marca: " + error.message,
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSettings();
-  }, [toast]);
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      logoUrl: "",
+      primaryColor: "",
+      secondaryColor: "",
+    },
+  });
 
-  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      setLogoFile(file);
-      setLogoPreview(URL.createObjectURL(file));
-    } else {
-      setLogoFile(null);
-      setLogoPreview(null);
+  const fetchBrandingSettings = async () => {
+    if (!user?.complexId) return;
+    setLoading(true);
+    try {
+      const complex = await getResidentialComplexById(user.complexId);
+      form.reset({
+        logoUrl: complex.logoUrl || "",
+        primaryColor: complex.primaryColor || "",
+        secondaryColor: complex.secondaryColor || "",
+      });
+    } catch (error: any) {
+      console.error("Error fetching branding settings:", error);
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar las configuraciones de marca: " + error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSaveSettings = async () => {
+  useEffect(() => {
+    if (!authLoading && user && user.complexId) {
+      fetchBrandingSettings();
+    }
+  }, [authLoading, user]);
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!user?.complexId) return;
     setLoading(true);
     try {
-      const formData = new FormData();
-      if (logoFile) {
-        formData.append("logo", logoFile);
-      }
-      formData.append("primaryColor", primaryColor);
-      formData.append("secondaryColor", secondaryColor);
-
-      await updateBrandingSettings(formData);
-      toast({
-        title: "Éxito",
-        description: "Configuración de marca guardada correctamente.",
-      });
+      await updateResidentialComplex(user.complexId, values);
+      toast({ title: "Éxito", description: "Configuración de marca actualizada." });
     } catch (error: any) {
-      console.error("Error saving branding settings:", error);
+      console.error("Error updating branding settings:", error);
       toast({
         title: "Error",
-        description: "Error al guardar la configuración de marca: " + error.message,
+        description: "Error al actualizar la configuración de marca: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -92,7 +94,7 @@ export default function BrandingSettingsPage() {
     );
   }
 
-  if (!user || user.role !== "APP_ADMIN") {
+  if (!user || (user.role !== "ADMIN" && user.role !== "COMPLEX_ADMIN")) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -113,53 +115,59 @@ export default function BrandingSettingsPage() {
         Personalización de Marca
       </h1>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Configuración de Marca</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div>
-            <Label htmlFor="logo">Logo</Label>
-            <Input id="logo" type="file" accept="image/*" onChange={handleLogoChange} />
-            {logoPreview && (
-              <div className="mt-4">
-                <img src={logoPreview} alt="Logo Preview" className="h-24 w-auto" />
-              </div>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="primaryColor">Color Primario</Label>
-            <Input
-              id="primaryColor"
-              type="color"
-              value={primaryColor}
-              onChange={(e) => setPrimaryColor(e.target.value)}
-              className="w-full h-10"
+      <div className="bg-white shadow-md rounded-lg p-6">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="logoUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>URL del Logo</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://example.com/logo.png" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-
-          <div>
-            <Label htmlFor="secondaryColor">Color Secundario</Label>
-            <Input
-              id="secondaryColor"
-              type="color"
-              value={secondaryColor}
-              onChange={(e) => setSecondaryColor(e.target.value)}
-              className="w-full h-10"
+            <FormField
+              control={form.control}
+              name="primaryColor"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Color Primario</FormLabel>
+                  <FormControl>
+                    <Input type="color" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-
-          <Button onClick={handleSaveSettings} disabled={loading}>
-            {loading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Upload className="mr-2 h-4 w-4" />
-            )}
-            Guardar Configuración
-          </Button>
-        </CardContent>
-      </Card>
+            <FormField
+              control={form.control}
+              name="secondaryColor"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Color Secundario</FormLabel>
+                  <FormControl>
+                    <Input type="color" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" disabled={loading}>
+              {loading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Upload className="mr-2 h-4 w-4" />
+              )}
+              Guardar Cambios
+            </Button>
+          </form>
+        </Form>
+      </div>
     </div>
   );
 }

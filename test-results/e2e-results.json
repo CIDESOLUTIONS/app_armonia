@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "/home/meciza/Documentos/app_armonia/playwright.config.ts",
-    "rootDir": "/home/meciza/Documentos/app_armonia/e2e",
+    "configFile": "C:\\Users\\videc\\Documents\\app_armonia\\playwright.config.ts",
+    "rootDir": "C:/Users/videc/Documents/app_armonia/e2e",
     "forbidOnly": false,
     "fullyParallel": false,
     "globalSetup": null,
@@ -11,7 +11,7 @@
     "grepInvert": null,
     "maxFailures": 0,
     "metadata": {
-      "actualWorkers": 1
+      "actualWorkers": 5
     },
     "preserveOutput": "always",
     "reporter": [
@@ -26,7 +26,7 @@
         }
       ],
       [
-        "/home/meciza/Documentos/app_armonia/node_modules/monocart-reporter/lib/index.js",
+        "C:\\Users\\videc\\Documents\\app_armonia\\node_modules\\monocart-reporter\\lib\\index.js",
         {
           "name": "Armonia Test Report",
           "outputFile": "./test-results/report.html",
@@ -41,15 +41,15 @@
     "quiet": false,
     "projects": [
       {
-        "outputDir": "/home/meciza/Documentos/app_armonia/test-results",
+        "outputDir": "C:/Users/videc/Documents/app_armonia/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 1
+          "actualWorkers": 5
         },
         "id": "chromium",
         "name": "chromium",
-        "testDir": "/home/meciza/Documentos/app_armonia/e2e",
+        "testDir": "C:/Users/videc/Documents/app_armonia/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -57,15 +57,15 @@
         "timeout": 30000
       },
       {
-        "outputDir": "/home/meciza/Documentos/app_armonia/test-results",
+        "outputDir": "C:/Users/videc/Documents/app_armonia/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 1
+          "actualWorkers": 5
         },
         "id": "firefox",
         "name": "firefox",
-        "testDir": "/home/meciza/Documentos/app_armonia/e2e",
+        "testDir": "C:/Users/videc/Documents/app_armonia/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -73,15 +73,15 @@
         "timeout": 30000
       },
       {
-        "outputDir": "/home/meciza/Documentos/app_armonia/test-results",
+        "outputDir": "C:/Users/videc/Documents/app_armonia/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 1
+          "actualWorkers": 5
         },
         "id": "webkit",
         "name": "webkit",
-        "testDir": "/home/meciza/Documentos/app_armonia/e2e",
+        "testDir": "C:/Users/videc/Documents/app_armonia/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -89,15 +89,15 @@
         "timeout": 30000
       },
       {
-        "outputDir": "/home/meciza/Documentos/app_armonia/test-results",
+        "outputDir": "C:/Users/videc/Documents/app_armonia/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 1
+          "actualWorkers": 5
         },
         "id": "Mobile Chrome",
         "name": "Mobile Chrome",
-        "testDir": "/home/meciza/Documentos/app_armonia/e2e",
+        "testDir": "C:/Users/videc/Documents/app_armonia/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -105,15 +105,15 @@
         "timeout": 30000
       },
       {
-        "outputDir": "/home/meciza/Documentos/app_armonia/test-results",
+        "outputDir": "C:/Users/videc/Documents/app_armonia/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 1
+          "actualWorkers": 5
         },
         "id": "Mobile Safari",
         "name": "Mobile Safari",
-        "testDir": "/home/meciza/Documentos/app_armonia/e2e",
+        "testDir": "C:/Users/videc/Documents/app_armonia/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -125,7 +125,7 @@
     "updateSnapshots": "missing",
     "updateSourceMethod": "patch",
     "version": "1.54.1",
-    "workers": 1,
+    "workers": 6,
     "webServer": {
       "command": "npx tsx server.ts",
       "port": 3000,
@@ -151,6 +151,74 @@
           "column": 6,
           "specs": [
             {
+              "title": "application build and configuration is valid",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 15,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-24T02:57:45.567Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d748ac400d08b85935ef-11267125d8181deac425",
+              "file": "auth.spec.ts",
+              "line": 4,
+              "column": 7
+            },
+            {
+              "title": "playwright configuration is working",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-24T02:57:45.600Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d748ac400d08b85935ef-3f44d2def0a4fa0155af",
+              "file": "auth.spec.ts",
+              "line": 10,
+              "column": 7
+            },
+            {
               "title": "project structure is valid",
               "ok": false,
               "tags": [],
@@ -166,35 +234,35 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 35,
+                      "duration": 11,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n    at /home/meciza/Documentos/app_armonia/e2e/auth.spec.ts:32:32",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n    at C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts:32:32",
                         "location": {
-                          "file": "/home/meciza/Documentos/app_armonia/e2e/auth.spec.ts",
+                          "file": "C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts",
                           "column": 32,
                           "line": 32
                         },
-                        "snippet": "  30 |\n  31 |     expect(loginPageExists).toBe(true);\n> 32 |     expect(registerPageExists).toBe(true);\n     |                                ^\n  33 |   });\n  34 | });\n  35 |"
+                        "snippet": "\u001b[0m \u001b[90m 30 |\u001b[39m\n \u001b[90m 31 |\u001b[39m     expect(loginPageExists)\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 32 |\u001b[39m     expect(registerPageExists)\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 33 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 34 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 35 |\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "/home/meciza/Documentos/app_armonia/e2e/auth.spec.ts",
+                            "file": "C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts",
                             "column": 32,
                             "line": 32
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  30 |\n  31 |     expect(loginPageExists).toBe(true);\n> 32 |     expect(registerPageExists).toBe(true);\n     |                                ^\n  33 |   });\n  34 | });\n  35 |\n    at /home/meciza/Documentos/app_armonia/e2e/auth.spec.ts:32:32"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  30 |\n  31 |     expect(loginPageExists).toBe(true);\n> 32 |     expect(registerPageExists).toBe(true);\n     |                                ^\n  33 |   });\n  34 | });\n  35 |\n    at C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts:32:32"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-07-23T21:25:57.578Z",
+                      "startTime": "2025-07-24T02:57:45.610Z",
                       "annotations": [],
                       "attachments": [],
                       "errorLocation": {
-                        "file": "/home/meciza/Documentos/app_armonia/e2e/auth.spec.ts",
+                        "file": "C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts",
                         "column": 32,
                         "line": 32
                       }
@@ -206,6 +274,74 @@
               "id": "d748ac400d08b85935ef-dc49fba7422b7c0084ac",
               "file": "auth.spec.ts",
               "line": 17,
+              "column": 7
+            },
+            {
+              "title": "application build and configuration is valid",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 22,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-24T02:57:45.687Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d748ac400d08b85935ef-39db2037a157e2ceee69",
+              "file": "auth.spec.ts",
+              "line": 4,
+              "column": 7
+            },
+            {
+              "title": "playwright configuration is working",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 8,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-24T02:57:45.736Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d748ac400d08b85935ef-ad38fade4e028e21712b",
+              "file": "auth.spec.ts",
+              "line": 10,
               "column": 7
             },
             {
@@ -222,37 +358,37 @@
                   "results": [
                     {
                       "workerIndex": 1,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "failed",
-                      "duration": 40,
+                      "duration": 13,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n    at /home/meciza/Documentos/app_armonia/e2e/auth.spec.ts:32:32",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n    at C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts:32:32",
                         "location": {
-                          "file": "/home/meciza/Documentos/app_armonia/e2e/auth.spec.ts",
+                          "file": "C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts",
                           "column": 32,
                           "line": 32
                         },
-                        "snippet": "  30 |\n  31 |     expect(loginPageExists).toBe(true);\n> 32 |     expect(registerPageExists).toBe(true);\n     |                                ^\n  33 |   });\n  34 | });\n  35 |"
+                        "snippet": "\u001b[0m \u001b[90m 30 |\u001b[39m\n \u001b[90m 31 |\u001b[39m     expect(loginPageExists)\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 32 |\u001b[39m     expect(registerPageExists)\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 33 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 34 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 35 |\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "/home/meciza/Documentos/app_armonia/e2e/auth.spec.ts",
+                            "file": "C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts",
                             "column": 32,
                             "line": 32
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  30 |\n  31 |     expect(loginPageExists).toBe(true);\n> 32 |     expect(registerPageExists).toBe(true);\n     |                                ^\n  33 |   });\n  34 | });\n  35 |\n    at /home/meciza/Documentos/app_armonia/e2e/auth.spec.ts:32:32"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  30 |\n  31 |     expect(loginPageExists).toBe(true);\n> 32 |     expect(registerPageExists).toBe(true);\n     |                                ^\n  33 |   });\n  34 | });\n  35 |\n    at C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts:32:32"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-07-23T21:25:59.773Z",
+                      "startTime": "2025-07-24T02:57:45.750Z",
                       "annotations": [],
                       "attachments": [],
                       "errorLocation": {
-                        "file": "/home/meciza/Documentos/app_armonia/e2e/auth.spec.ts",
+                        "file": "C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts",
                         "column": 32,
                         "line": 32
                       }
@@ -264,6 +400,74 @@
               "id": "d748ac400d08b85935ef-d29c85631391d88f6647",
               "file": "auth.spec.ts",
               "line": 17,
+              "column": 7
+            },
+            {
+              "title": "application build and configuration is valid",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 16,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-24T02:57:45.591Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d748ac400d08b85935ef-3ef72f35e3eef13b56d1",
+              "file": "auth.spec.ts",
+              "line": 4,
+              "column": 7
+            },
+            {
+              "title": "playwright configuration is working",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 7,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-24T02:57:45.627Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d748ac400d08b85935ef-c7faa43931e13a623c9b",
+              "file": "auth.spec.ts",
+              "line": 10,
               "column": 7
             },
             {
@@ -280,37 +484,37 @@
                   "results": [
                     {
                       "workerIndex": 2,
-                      "parallelIndex": 0,
+                      "parallelIndex": 2,
                       "status": "failed",
-                      "duration": 28,
+                      "duration": 11,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n    at /home/meciza/Documentos/app_armonia/e2e/auth.spec.ts:32:32",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n    at C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts:32:32",
                         "location": {
-                          "file": "/home/meciza/Documentos/app_armonia/e2e/auth.spec.ts",
+                          "file": "C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts",
                           "column": 32,
                           "line": 32
                         },
-                        "snippet": "  30 |\n  31 |     expect(loginPageExists).toBe(true);\n> 32 |     expect(registerPageExists).toBe(true);\n     |                                ^\n  33 |   });\n  34 | });\n  35 |"
+                        "snippet": "\u001b[0m \u001b[90m 30 |\u001b[39m\n \u001b[90m 31 |\u001b[39m     expect(loginPageExists)\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 32 |\u001b[39m     expect(registerPageExists)\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 33 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 34 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 35 |\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "/home/meciza/Documentos/app_armonia/e2e/auth.spec.ts",
+                            "file": "C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts",
                             "column": 32,
                             "line": 32
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  30 |\n  31 |     expect(loginPageExists).toBe(true);\n> 32 |     expect(registerPageExists).toBe(true);\n     |                                ^\n  33 |   });\n  34 | });\n  35 |\n    at /home/meciza/Documentos/app_armonia/e2e/auth.spec.ts:32:32"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  30 |\n  31 |     expect(loginPageExists).toBe(true);\n> 32 |     expect(registerPageExists).toBe(true);\n     |                                ^\n  33 |   });\n  34 | });\n  35 |\n    at C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts:32:32"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-07-23T21:26:02.103Z",
+                      "startTime": "2025-07-24T02:57:45.640Z",
                       "annotations": [],
                       "attachments": [],
                       "errorLocation": {
-                        "file": "/home/meciza/Documentos/app_armonia/e2e/auth.spec.ts",
+                        "file": "C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts",
                         "column": 32,
                         "line": 32
                       }
@@ -322,6 +526,74 @@
               "id": "d748ac400d08b85935ef-ecca4b71eaab18e1a873",
               "file": "auth.spec.ts",
               "line": 17,
+              "column": 7
+            },
+            {
+              "title": "application build and configuration is valid",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 18,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-24T02:57:45.605Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d748ac400d08b85935ef-9092fbf6998766e074c1",
+              "file": "auth.spec.ts",
+              "line": 4,
+              "column": 7
+            },
+            {
+              "title": "playwright configuration is working",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 4,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-24T02:57:45.644Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d748ac400d08b85935ef-38ade946e5ac3fb77339",
+              "file": "auth.spec.ts",
+              "line": 10,
               "column": 7
             },
             {
@@ -338,37 +610,37 @@
                   "results": [
                     {
                       "workerIndex": 3,
-                      "parallelIndex": 0,
+                      "parallelIndex": 3,
                       "status": "failed",
-                      "duration": 32,
+                      "duration": 14,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n    at /home/meciza/Documentos/app_armonia/e2e/auth.spec.ts:32:32",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n    at C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts:32:32",
                         "location": {
-                          "file": "/home/meciza/Documentos/app_armonia/e2e/auth.spec.ts",
+                          "file": "C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts",
                           "column": 32,
                           "line": 32
                         },
-                        "snippet": "  30 |\n  31 |     expect(loginPageExists).toBe(true);\n> 32 |     expect(registerPageExists).toBe(true);\n     |                                ^\n  33 |   });\n  34 | });\n  35 |"
+                        "snippet": "\u001b[0m \u001b[90m 30 |\u001b[39m\n \u001b[90m 31 |\u001b[39m     expect(loginPageExists)\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 32 |\u001b[39m     expect(registerPageExists)\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 33 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 34 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 35 |\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "/home/meciza/Documentos/app_armonia/e2e/auth.spec.ts",
+                            "file": "C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts",
                             "column": 32,
                             "line": 32
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  30 |\n  31 |     expect(loginPageExists).toBe(true);\n> 32 |     expect(registerPageExists).toBe(true);\n     |                                ^\n  33 |   });\n  34 | });\n  35 |\n    at /home/meciza/Documentos/app_armonia/e2e/auth.spec.ts:32:32"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  30 |\n  31 |     expect(loginPageExists).toBe(true);\n> 32 |     expect(registerPageExists).toBe(true);\n     |                                ^\n  33 |   });\n  34 | });\n  35 |\n    at C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts:32:32"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-07-23T21:26:04.383Z",
+                      "startTime": "2025-07-24T02:57:45.653Z",
                       "annotations": [],
                       "attachments": [],
                       "errorLocation": {
-                        "file": "/home/meciza/Documentos/app_armonia/e2e/auth.spec.ts",
+                        "file": "C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts",
                         "column": 32,
                         "line": 32
                       }
@@ -380,6 +652,74 @@
               "id": "d748ac400d08b85935ef-f81face3fd542ba3988b",
               "file": "auth.spec.ts",
               "line": 17,
+              "column": 7
+            },
+            {
+              "title": "application build and configuration is valid",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 17,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-24T02:57:45.625Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d748ac400d08b85935ef-4b296beaeff35833daf2",
+              "file": "auth.spec.ts",
+              "line": 4,
+              "column": 7
+            },
+            {
+              "title": "playwright configuration is working",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 7,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-24T02:57:45.663Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d748ac400d08b85935ef-39a40f49a7aab69a1bee",
+              "file": "auth.spec.ts",
+              "line": 10,
               "column": 7
             },
             {
@@ -396,37 +736,37 @@
                   "results": [
                     {
                       "workerIndex": 4,
-                      "parallelIndex": 0,
+                      "parallelIndex": 4,
                       "status": "failed",
-                      "duration": 28,
+                      "duration": 12,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n    at /home/meciza/Documentos/app_armonia/e2e/auth.spec.ts:32:32",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n    at C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts:32:32",
                         "location": {
-                          "file": "/home/meciza/Documentos/app_armonia/e2e/auth.spec.ts",
+                          "file": "C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts",
                           "column": 32,
                           "line": 32
                         },
-                        "snippet": "  30 |\n  31 |     expect(loginPageExists).toBe(true);\n> 32 |     expect(registerPageExists).toBe(true);\n     |                                ^\n  33 |   });\n  34 | });\n  35 |"
+                        "snippet": "\u001b[0m \u001b[90m 30 |\u001b[39m\n \u001b[90m 31 |\u001b[39m     expect(loginPageExists)\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 32 |\u001b[39m     expect(registerPageExists)\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 33 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 34 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 35 |\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "/home/meciza/Documentos/app_armonia/e2e/auth.spec.ts",
+                            "file": "C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts",
                             "column": 32,
                             "line": 32
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  30 |\n  31 |     expect(loginPageExists).toBe(true);\n> 32 |     expect(registerPageExists).toBe(true);\n     |                                ^\n  33 |   });\n  34 | });\n  35 |\n    at /home/meciza/Documentos/app_armonia/e2e/auth.spec.ts:32:32"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  30 |\n  31 |     expect(loginPageExists).toBe(true);\n> 32 |     expect(registerPageExists).toBe(true);\n     |                                ^\n  33 |   });\n  34 | });\n  35 |\n    at C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts:32:32"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-07-23T21:26:06.575Z",
+                      "startTime": "2025-07-24T02:57:45.676Z",
                       "annotations": [],
                       "attachments": [],
                       "errorLocation": {
-                        "file": "/home/meciza/Documentos/app_armonia/e2e/auth.spec.ts",
+                        "file": "C:\\Users\\videc\\Documents\\app_armonia\\e2e\\auth.spec.ts",
                         "column": 32,
                         "line": 32
                       }
@@ -447,9 +787,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-07-23T21:25:44.249Z",
-    "duration": 22472.002,
-    "expected": 0,
+    "startTime": "2025-07-24T02:57:34.331Z",
+    "duration": 13332.993,
+    "expected": 10,
     "skipped": 0,
     "unexpected": 5,
     "flaky": 0

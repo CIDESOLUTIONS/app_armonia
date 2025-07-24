@@ -246,7 +246,7 @@ export default function PQRListPage() {
                         <Eye className="h-4 w-4" />
                       </Button>
                     </Link>
-                    <Link href={`/admin/pqr/${pqr.id}/edit`}>
+                    <Link href={`/complex-admin/pqr/${pqr.id}/edit`}>
                       <Button variant="ghost" size="sm" className="mr-2">
                         <Edit className="h-4 w-4" />
                       </Button>

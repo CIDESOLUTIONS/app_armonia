@@ -1,34 +1,43 @@
-import { fetchApi } from "@/lib/api";
-import { CreateUserDto, UpdateUserDto } from "@/common/dto/user.dto"; // Assuming these DTOs exist
+import { apiClient } from "@/lib/apiClient";
 
-interface StaffUser {
+export interface StaffUser {
   id: number;
   name: string;
   email: string;
-  role: "RECEPTION" | "STAFF" | "SECURITY";
-  isActive: boolean;
+  role: string;
+  active: boolean;
 }
 
-export async function getStaffUsers(): Promise<StaffUser[]> {
-  return fetchApi("/staff");
+export interface CreateStaffUserData {
+  name: string;
+  email: string;
+  password?: string;
+  role: string;
+  active?: boolean;
 }
 
-export async function createStaffUser(data: CreateUserDto): Promise<StaffUser> {
-  return fetchApi("/staff", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+export interface UpdateStaffUserData {
+  name?: string;
+  email?: string;
+  password?: string;
+  role?: string;
+  active?: boolean;
 }
 
-export async function updateStaffUser(id: number, data: UpdateUserDto): Promise<StaffUser> {
-  return fetchApi(`/staff/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(data),
-  });
-}
-
-export async function deleteStaffUser(id: number): Promise<void> {
-  return fetchApi(`/staff/${id}`, {
-    method: "DELETE",
-  });
-}
+export const staffService = {
+  getStaffUsers: async (): Promise<StaffUser[]> => {
+    const response = await apiClient.get('/user-management/staff');
+    return response.data;
+  },
+  createStaffUser: async (data: CreateStaffUserData): Promise<StaffUser> => {
+    const response = await apiClient.post('/user-management/staff', data);
+    return response.data;
+  },
+  updateStaffUser: async (id: number, data: UpdateStaffUserData): Promise<StaffUser> => {
+    const response = await apiClient.put(`/user-management/staff/${id}`, data);
+    return response.data;
+  },
+  deleteStaffUser: async (id: number): Promise<void> => {
+    await apiClient.delete(`/user-management/staff/${id}`);
+  },
+};

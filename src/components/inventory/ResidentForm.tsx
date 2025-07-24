@@ -1,272 +1,134 @@
-// src/components/inventory/ResidentForm.tsx
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { inventoryService } from '@/services/inventory.service';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useModal } from '@/hooks/useModal';
+import { toast } from '@/components/ui/use-toast';
 
-interface Resident {
-  id?: number;
-  name: string;
-  email: string;
-  dni: string;
-  birthDate: string;
-  whatsapp: string;
-  residentType: "permanente" | "temporal";
-  startDate: string;
-  endDate?: string;
-  status: string;
-  propertyNumber: string;
-}
+const formSchema = z.object({
+  name: z.string().min(1, { message: 'El nombre es requerido.' }),
+  email: z.string().email({ message: 'El email no es válido.' }),
+  phone: z.string().optional(),
+  propertyId: z.number(),
+  isOwner: z.boolean(),
+});
 
-interface Property {
-  id: number;
-  unitNumber: string;
-  type: string;
-  status: string;
-  ownerName: string;
-  ownerDNI: string;
-  ownerEmail: string;
-}
+export default function ResidentForm({ resident }) {
+  const { closeModal } = useModal();
+  const queryClient = useQueryClient();
 
-interface ResidentFormProps {
-  resident: Resident | null;
-  onSave: (residentData: Resident) => Promise<void>;
-  onCancel: () => void;
-  properties: Property[];
-}
-
-export function ResidentForm({
-  resident,
-  onSave,
-  onCancel,
-  properties,
-}: ResidentFormProps) {
-  const [_formData, _setFormData] = useState<Resident>(
-    resident || {
-      name: "",
-      email: "",
-      dni: "",
-      birthDate: "",
-      whatsapp: "",
-      residentType: "permanente",
-      startDate: new Date().toISOString().split("T")[0],
-      status: "activo",
-      propertyNumber: "",
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: resident || {
+      name: '',
+      email: '',
+      phone: '',
+      propertyId: undefined,
+      isOwner: false,
     },
-  );
-  const [loading, setLoading] = useState(false);
-  const [error, _setError] = useState("");
+  });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const mutation = useMutation({
+    mutationFn: (data) =>
+      resident
+        ? inventoryService.updateResident(resident.id, data)
+        : inventoryService.createResident(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['residents']);
+      toast({ title: `Residente ${resident ? 'actualizado' : 'creado'} con éxito` });
+      closeModal();
+    },
+    onError: () => {
+      toast({ title: `Error al ${resident ? 'actualizar' : 'crear'} el residente`, variant: 'destructive' });
+    },
+  });
+
+  const onSubmit = (data) => {
+    mutation.mutate(data);
   };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    try {
-      await onSave(formData);
-    } catch (err) {
-      console.error("Error al guardar residente:", err);
-      setError(
-        err instanceof Error ? err.message : "Error al guardar residente",
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const isTemporary = formData.residentType === "temporal";
 
   return (
-    <Dialog open={true} onOpenChange={() => onCancel()}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>
-            {resident ? "Editar Residente" : "Nuevo Residente"}
-          </DialogTitle>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-          <div>
-            <Label htmlFor="name">Nombre Completo</Label>
-            <Input
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              disabled={loading}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="dni">DNI/Identificación</Label>
-            <Input
-              id="dni"
-              name="dni"
-              value={formData.dni}
-              onChange={handleChange}
-              required
-              disabled={loading}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              disabled={loading}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="whatsapp">WhatsApp</Label>
-            <Input
-              id="whatsapp"
-              name="whatsapp"
-              value={formData.whatsapp}
-              onChange={handleChange}
-              disabled={loading}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="birthDate">Fecha de Nacimiento</Label>
-            <Input
-              id="birthDate"
-              name="birthDate"
-              type="date"
-              value={formData.birthDate}
-              onChange={handleChange}
-              required
-              disabled={loading}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="propertyNumber">Propiedad</Label>
-            <select
-              id="propertyNumber"
-              name="propertyNumber"
-              value={formData.propertyNumber}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
-              disabled={loading}
-            >
-              <option value="">Seleccione una propiedad</option>
-              {properties.map((property) => (
-                <option key={property.id} value={property.unitNumber}>
-                  {property.unitNumber} - {property.ownerName}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <Label htmlFor="residentType">Tipo de Residente</Label>
-            <select
-              id="residentType"
-              name="residentType"
-              value={formData.residentType}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
-              disabled={loading}
-            >
-              <option value="permanente">Permanente</option>
-              <option value="temporal">Temporal</option>
-            </select>
-          </div>
-
-          <div>
-            <Label htmlFor="startDate">Fecha de Inicio</Label>
-            <Input
-              id="startDate"
-              name="startDate"
-              type="date"
-              value={formData.startDate}
-              onChange={handleChange}
-              required
-              disabled={loading}
-            />
-          </div>
-
-          {isTemporary && (
-            <div>
-              <Label htmlFor="endDate">Fecha de Finalización</Label>
-              <Input
-                id="endDate"
-                name="endDate"
-                type="date"
-                value={formData.endDate || ""}
-                onChange={handleChange}
-                required={isTemporary}
-                disabled={loading}
-              />
-            </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nombre</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
-
-          <div>
-            <Label htmlFor="status">Estado</Label>
-            <select
-              id="status"
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
-              disabled={loading}
-            >
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
-            </select>
-          </div>
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
+        />
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
-
-          <div className="flex justify-end space-x-4 pt-4">
-            <Button
-              type="button"
-              onClick={onCancel}
-              variant="outline"
-              disabled={loading}
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white"
-              disabled={loading}
-            >
-              {loading ? "Guardando..." : "Guardar"}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+        />
+        <FormField
+          control={form.control}
+          name="phone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Teléfono</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="propertyId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>ID de Inmueble</FormLabel>
+              <FormControl>
+                <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value))}/>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="isOwner"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+              <FormControl>
+                <Input type="checkbox" checked={field.value} onChange={field.onChange} />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>
+                  ¿Es propietario?
+                </FormLabel>
+              </div>
+            </FormItem>
+          )}
+        />
+        <Button type="submit" disabled={mutation.isLoading}>
+          {mutation.isLoading ? 'Guardando...' : 'Guardar'}
+        </Button>
+      </form>
+    </Form>
   );
 }

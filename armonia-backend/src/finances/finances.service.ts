@@ -120,6 +120,27 @@ export class FinancesService {
     await prisma.fee.delete({ where: { id } });
   }
 
+  async generateOrdinaryFees(schemaName: string): Promise<{ count: number }> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const properties = await prisma.property.findMany();
+
+    const feesToCreate = properties.map((property) => ({
+      name: `Cuota Ordinaria ${new Date().toLocaleString('es-CO', { month: 'long', year: 'numeric' })}`,
+      amount: 100000, // Example fixed amount, this could be dynamic based on property type/size/coefficient
+      dueDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 5).toISOString(), // Next month, 5th day
+      status: PaymentStatus.PENDING,
+      type: 'ORDINARY',
+      propertyId: property.id,
+      residentId: property.ownerId, // Assuming owner is the primary resident for billing
+      isRecurring: true,
+      frequency: 'MONTHLY',
+    }));
+
+    const createdFees = await prisma.fee.createMany({ data: feesToCreate });
+
+    return { count: createdFees.count };
+  }
+
   // Payments
   async createPayment(
     schemaName: string,

@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { TenantService } from '../tenant/tenant.service';
 import { ResidentialComplexService } from '../residential-complex/residential-complex.service';
 import { UserRole } from '../common/enums/user-role.enum';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
@@ -12,6 +13,7 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     private tenantService: TenantService,
+    private prisma: PrismaService,
     @Inject(ResidentialComplexService) private residentialComplexService: ResidentialComplexService,
   ) {}
 
@@ -59,5 +61,25 @@ export class AuthService {
     const newAdmin = await this.userService.createUser(newComplex.schemaName, adminPayload);
 
     return this.login(newAdmin);
+  }
+
+  async handleDemoRequest(data: any) {
+    const { name, email, complexName, units } = data;
+
+    // Save the demo request to the database
+    await this.prisma.demoRequest.create({
+      data: {
+        name,
+        email,
+        complexName,
+        units,
+      },
+    });
+
+    // Here you would typically send an email to the sales team
+    // For this example, we'll just log it to the console
+    console.log(`New demo request: ${name} <${email}> for ${complexName} with ${units} units`);
+
+    return { message: 'Demo request received successfully' };
   }
 }

@@ -72,6 +72,12 @@ export class FinancesController {
     return this.financesService.deleteFee(user.schemaName, +id);
   }
 
+  @Post('fees/generate-ordinary')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async generateOrdinaryFees(@GetUser() user: any) {
+    return this.financesService.generateOrdinaryFees(user.schemaName);
+  }
+
   // Payments
   @Post('payments')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)

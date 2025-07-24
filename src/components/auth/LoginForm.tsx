@@ -67,7 +67,7 @@ export default function LoginForm({ portalType = null }: LoginFormProps) {
           icon: <Building className="h-6 w-6" />,
           color: "bg-indigo-600",
           textColor: "text-indigo-600",
-          redirectTo: ROUTES.DASHBOARD,
+          redirectTo: ROUTES.COMPLEX_ADMIN_DASHBOARD,
         };
       case "resident":
         return {
@@ -76,7 +76,7 @@ export default function LoginForm({ portalType = null }: LoginFormProps) {
           icon: <User className="h-6 w-6" />,
           color: "bg-green-600",
           textColor: "text-green-600",
-          redirectTo: ROUTES.RESIDENT_DASHBOARD,
+          redirectTo: ROUTES.RESIDENT_FINANCES_FEES,
         };
       case "reception":
         return {
@@ -95,7 +95,7 @@ export default function LoginForm({ portalType = null }: LoginFormProps) {
           icon: <Building className="h-6 w-6" />,
           color: "bg-indigo-600",
           textColor: "text-indigo-600",
-          redirectTo: ROUTES.DASHBOARD,
+          redirectTo: ROUTES.APP_ADMIN_DASHBOARD,
         };
     }
   };
