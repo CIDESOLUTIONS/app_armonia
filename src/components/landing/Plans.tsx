@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DemoRequestModal } from "./DemoRequestModal";
 
 export function Plans() {
   const t = useTranslations("landing.pricing");
@@ -29,7 +30,7 @@ export function Plans() {
           </select>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Basic Plan */}
           <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-indigo-500">
             <h3 className="text-2xl font-bold text-gray-800 mb-4">
@@ -139,6 +140,36 @@ export function Plans() {
                 {t("premium.cta")}
               </Button>
             </Link>
+          </div>
+
+          {/* Empresarial Plan */}
+          <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-yellow-500">
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">
+              {t("plans.enterprise.name")}
+            </h3>
+            <p className="text-gray-600 mb-6">{t("plans.enterprise.description")}</p>
+            <div className="text-5xl font-extrabold text-yellow-600 mb-6">
+              {t("plans.enterprise.price")}
+            </div>
+            <ul className="text-left text-gray-700 space-y-3 mb-8">
+              <li>
+                <Check className="inline-block text-green-500 mr-2" />
+                {t("plans.enterprise.feature1")}
+              </li>
+              <li>
+                <Check className="inline-block text-green-500 mr-2" />
+                {t("plans.enterprise.feature2")}
+              </li>
+              <li>
+                <Check className="inline-block text-green-500 mr-2" />
+                {t("plans.enterprise.feature3")}
+              </li>
+            </ul>
+            <DemoRequestModal>
+              <Button className="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-6 rounded-md">
+                {t("plans.enterprise.buttonText")}
+              </Button>
+            </DemoRequestModal>
           </div>
         </div>
       </div>

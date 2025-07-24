@@ -1,64 +1,50 @@
-import { getPrisma } from "@/lib/prisma";
+import { apiClient } from "@/lib/apiClient";
 
-interface ResidentData {
-  name?: string;
-  email?: string;
-  phone?: string;
-  propertyId?: number;
-  unitNumber?: string;
-}
-
-interface CreateResidentData extends ResidentData {
+export interface ResidentData {
+  id: number;
   name: string;
   email: string;
+  phone?: string;
   propertyId: number;
+  unitNumber?: string;
+  isOwner: boolean;
 }
 
-export const getResidentDashboardMetrics = async (
-  tenantId: string,
-  residentId: number,
-) => {
-  const _prisma = getPrisma(tenantId);
-  // Placeholder logic - TODO: Implement actual database query
-  console.warn(
-    "Getting resident dashboard metrics for tenant:",
-    tenantId,
-    residentId,
-  );
-  return { message: "Resident dashboard metrics retrieved successfully" };
+export interface CreateResidentData {
+  name: string;
+  email: string;
+  phone?: string;
+  propertyId: number;
+  isOwner: boolean;
+}
+
+export interface UpdateResidentData extends Partial<CreateResidentData> {}
+
+export const getResidentDashboardMetrics = async () => {
+  const response = await apiClient.get("/residents/dashboard-metrics");
+  return response.data;
 };
 
-export const getResidents = async (tenantId: string) => {
-  const _prisma = getPrisma(tenantId);
-  // Placeholder logic - TODO: Implement actual database query
-  console.warn("Getting residents for tenant:", tenantId);
-  return { message: "Residents retrieved successfully" };
+export const getResidents = async (): Promise<ResidentData[]> => {
+  const response = await apiClient.get("/inventory/residents");
+  return response.data;
 };
 
 export const updateResident = async (
-  residentId: number,
-  data: ResidentData,
-  tenantId: string,
-) => {
-  const _prisma = getPrisma(tenantId);
-  // Placeholder logic - TODO: Implement actual database query
-  console.warn("Updating resident:", residentId, data);
-  return { message: "Resident updated successfully" };
+  id: number,
+  data: UpdateResidentData,
+): Promise<ResidentData> => {
+  const response = await apiClient.put(`/inventory/residents/${id}`, data);
+  return response.data;
 };
 
 export const createResident = async (
   data: CreateResidentData,
-  tenantId: string,
-) => {
-  const _prisma = getPrisma(tenantId);
-  // Placeholder logic - TODO: Implement actual database query
-  console.warn("Creating resident:", data);
-  return { message: "Resident created successfully" };
+): Promise<ResidentData> => {
+  const response = await apiClient.post("/inventory/residents", data);
+  return response.data;
 };
 
-export const deleteResident = async (residentId: number, tenantId: string) => {
-  const _prisma = getPrisma(tenantId);
-  // Placeholder logic - TODO: Implement actual database query
-  console.warn("Deleting resident:", residentId);
-  return { message: "Resident deleted successfully" };
+export const deleteResident = async (id: number): Promise<void> => {
+  await apiClient.delete(`/inventory/residents/${id}`);
 };

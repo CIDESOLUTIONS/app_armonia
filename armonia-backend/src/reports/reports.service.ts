@@ -327,4 +327,64 @@ export class ReportsService {
   ): Promise<Buffer> {
     return Buffer.from('PDF generation temporarily disabled');
   }
+
+  async generatePeaceAndSafePdf(
+    schemaName: string,
+    residentId: number,
+  ): Promise<Buffer> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+
+    const resident = await prisma.resident.findUnique({
+      where: { id: residentId },
+      include: { property: true },
+    });
+
+    if (!resident) {
+      throw new NotFoundException(`Residente con ID ${residentId} no encontrado.`);
+    }
+
+    const outstandingFees = await prisma.fee.count({
+      where: {
+        residentId: resident.id,
+        status: { in: [FeeStatus.PENDING, FeeStatus.OVERDUE] },
+      },
+    });
+
+    if (outstandingFees > 0) {
+      throw new BadRequestException(
+        `El residente ${resident.name} tiene ${outstandingFees} cuotas pendientes. No se puede generar Paz y Salvo.`,
+      );
+    }
+
+    const doc = new PDFDocument();
+    const buffers: Buffer[] = [];
+    doc.on('data', buffers.push.bind(buffers));
+    doc.on('end', () => {});
+
+    doc.fontSize(24).text('Certificado de Paz y Salvo', { align: 'center' });
+    doc.moveDown();
+
+    doc.fontSize(12).text(
+      `Por medio del presente, se certifica que el residente ${resident.name},
+      identificado con ID ${resident.id}, de la unidad ${resident.property.unitNumber},
+      se encuentra a PAZ Y SALVO por todo concepto con la administración del conjunto residencial.
+      `,
+      { align: 'justify' },
+    );
+    doc.moveDown();
+    doc.moveDown();
+
+    doc.fontSize(10).text(`Fecha de Emisión: ${format(new Date(), 'dd/MM/yyyy')}`, { align: 'right' });
+    doc.moveDown();
+    doc.moveDown();
+
+    doc.fontSize(12).text('____________________________', { align: 'center' });
+    doc.fontSize(12).text('Firma de la Administración', { align: 'center' });
+
+    doc.end();
+
+    return new Promise<Buffer>((resolve) => {
+      doc.on('end', () => resolve(Buffer.concat(buffers)));
+    });
+  }
 }

@@ -1,4 +1,4 @@
-import { getPrisma } from "@/lib/prisma";
+import { apiClient } from "@/lib/apiClient";
 
 export enum FeeStatus {
   PENDING = "PENDING",
@@ -9,64 +9,67 @@ export enum FeeStatus {
 
 export interface FeeDto {
   id: number;
-  title: string;
-  amount: number;
-  dueDate: string;
-  status: FeeStatus;
-  propertyId?: number;
-  unitId?: number;
-  residentId?: number;
+  name: string;
   description?: string;
-  type: "ORDINARY" | "EXTRAORDINARY" | "FINE";
+  amount: number;
+  type: "FIXED" | "VARIABLE";
+  dueDate: string;
+  isRecurring: boolean;
+  frequency?: "MONTHLY" | "QUARTERLY" | "ANNUALLY";
+  isActive: boolean;
 }
 
-export async function getFees(
-  filters?: {
-    residentId?: number;
-    type?: "ORDINARY" | "EXTRAORDINARY" | "FINE";
-  },
-  tenantId?: string,
-): Promise<FeeDto[]> {
-  const prisma = getPrisma(tenantId);
-  const where: any = {};
-
-  if (filters?.residentId) {
-    where.residentId = filters.residentId;
-  }
-  if (filters?.type) {
-    where.type = filters.type;
-  }
-
-  return await prisma.fee.findMany({ where });
+export interface CreateFeeData {
+  name: string;
+  description?: string;
+  amount: number;
+  type: "FIXED" | "VARIABLE";
+  dueDate: string;
+  isRecurring: boolean;
+  frequency?: "MONTHLY" | "QUARTERLY" | "ANNUALLY";
+  isActive: boolean;
 }
 
-export const createFee = async (data: any, tenantId: string) => {
-  const prisma = getPrisma(tenantId);
-  return await prisma.fee.create({ data });
+export interface UpdateFeeData {
+  name?: string;
+  description?: string;
+  amount?: number;
+  type?: "FIXED" | "VARIABLE";
+  dueDate?: string;
+  isRecurring?: boolean;
+  frequency?: "MONTHLY" | "QUARTERLY" | "ANNUALLY";
+  isActive?: boolean;
+}
+
+export const getFees = async (): Promise<FeeDto[]> => {
+  const response = await apiClient.get("/finances/fees");
+  return response.data.fees; // Assuming the API returns { fees: FeeDto[] }
 };
 
-export const updateFee = async (id: number, data: any, tenantId: string) => {
-  const prisma = getPrisma(tenantId);
-  return await prisma.fee.update({ where: { id }, data });
+export const createFee = async (data: CreateFeeData): Promise<FeeDto> => {
+  const response = await apiClient.post("/finances/fees", data);
+  return response.data;
 };
 
-export const deleteFee = async (id: number, tenantId: string) => {
-  const prisma = getPrisma(tenantId);
-  return await prisma.fee.delete({ where: { id } });
+export const updateFee = async (
+  id: number,
+  data: UpdateFeeData,
+): Promise<FeeDto> => {
+  const response = await apiClient.put(`/finances/fees/${id}`, data);
+  return response.data;
 };
 
-export const initiatePayment = async (feeId: number, tenantId: string) => {
-  // Placeholder for payment initiation logic
-  console.log(`Initiating payment for fee ${feeId} in tenant ${tenantId}`);
-  return {
-    success: true,
-    message: "Payment initiated successfully",
-    paymentUrl: "https://example.com/payment",
-  };
+export const deleteFee = async (id: number): Promise<void> => {
+  await apiClient.delete(`/finances/fees/${id}`);
 };
 
-export const generateOrdinaryFees = async (tenantId: string) => {
-  // Placeholder for ordinary fee generation logic
-  console.log(`Generating ordinary fees for tenant ${tenantId}`);
-  return { success: true, message: "Ordinary fees generated successfully" };
+export const generateOrdinaryFees = async (): Promise<any> => {
+  const response = await apiClient.post("/finances/fees/generate-ordinary");
+  return response.data;
 };
+
+export const initiatePayment = async (feeId: number): Promise<any> => {
+  const response = await apiClient.post("/finances/payments/initiate", { feeId });
+  return response.data;
+};
+

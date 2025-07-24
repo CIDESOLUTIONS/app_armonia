@@ -23,6 +23,11 @@ export class AuthController {
     return this.authService.registerComplex(registerDto);
   }
 
+  @Post('request-demo')
+  async requestDemo(@Body() demoRequestDto: any) {
+    return this.authService.handleDemoRequest(demoRequestDto);
+  }
+
   @UseGuards(AuthGuard('jwt'))
   @Post('profile')
   getProfile(@Request() req) {

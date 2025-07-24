@@ -168,4 +168,23 @@ export class ReportsController {
     });
     res.end(buffer);
   }
+
+  @Get('peace-and-safe/pdf/:residentId')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async getPeaceAndSafePdf(
+    @Req() req,
+    @Param('residentId') residentId: string,
+    @Res() res: Response,
+  ) {
+    const buffer = await this.reportsService.generatePeaceAndSafePdf(
+      req.user.schemaName,
+      +residentId,
+    );
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="paz_y_salvo.pdf"',
+      'Content-Length': buffer.length,
+    });
+    res.end(buffer);
+  }
 }

@@ -1,219 +1,103 @@
-import React, { useState, ChangeEvent } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+"use client";
 
-interface PropertyFormData {
-  id?: number;
-  unitNumber: string;
-  type: string;
-  block: string;
-  zone: string;
-  area: string;
-  bathrooms: string;
-  bedrooms: string;
-  parking: string;
-  floor: string;
-  status: string;
-}
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { inventoryService } from '@/services/inventory.service';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useModal } from '@/hooks/useModal';
+import { toast } from '@/components/ui/use-toast';
 
-interface PropertyFormProps {
-  initialData?: PropertyFormData;
-  onSubmit: (property: PropertyFormData) => void;
-  onCancel: () => void;
-}
+const formSchema = z.object({
+  unitNumber: z.string().min(1, { message: 'El número de unidad es requerido.' }),
+  type: z.string().min(1, { message: 'El tipo es requerido.' }),
+  status: z.string().min(1, { message: 'El estado es requerido.' }),
+  ownerId: z.number().optional(),
+});
 
-/**
- * Formulario para crear o editar propiedades
- */
-export const PropertyForm: React.FC<PropertyFormProps> = ({
-  initialData,
-  onSubmit,
-  onCancel,
-}) => {
-  const [property, setProperty] = useState<PropertyFormData>(
-    initialData || {
-      unitNumber: "",
-      type: "APARTMENT",
-      block: "",
-      zone: "",
-      area: "",
-      bathrooms: "",
-      bedrooms: "",
-      parking: "",
-      floor: "",
-      status: "AVAILABLE",
+export default function PropertyForm({ property }) {
+  const { closeModal } = useModal();
+  const queryClient = useQueryClient();
+
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: property || {
+      unitNumber: '',
+      type: '',
+      status: '',
+      ownerId: undefined,
     },
-  );
+  });
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value } = e.target;
-    setProperty((prev) => ({ ...prev, [name]: value }));
-  };
+  const mutation = useMutation({
+    mutationFn: (data) =>
+      property
+        ? inventoryService.updateProperty(property.id, data)
+        : inventoryService.createProperty(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['properties']);
+      toast({ title: `Inmueble ${property ? 'actualizado' : 'creado'} con éxito` });
+      closeModal();
+    },
+    onError: () => {
+      toast({ title: `Error al ${property ? 'actualizar' : 'crear'} el inmueble`, variant: 'destructive' });
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(property);
+  const onSubmit = (data) => {
+    mutation.mutate(data);
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>
-          {property.id ? "Editar Propiedad" : "Nueva Propiedad"}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Número/Identificador
-              </label>
-              <Input
-                name="unitNumber"
-                value={property.unitNumber}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Tipo
-              </label>
-              <select
-                name="type"
-                value={property.type}
-                onChange={handleChange}
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-              >
-                <option value="APARTMENT">Apartamento</option>
-                <option value="HOUSE">Casa</option>
-                <option value="OFFICE">Oficina</option>
-                <option value="COMMERCIAL">Local Comercial</option>
-                <option value="PARKING">Parqueadero</option>
-                <option value="STORAGE">Depósito</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Bloque/Torre
-              </label>
-              <Input
-                name="block"
-                value={property.block}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Zona/Sector
-              </label>
-              <Input
-                name="zone"
-                value={property.zone}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Área (m²)
-              </label>
-              <Input
-                name="area"
-                type="number"
-                value={property.area}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Baños
-              </label>
-              <Input
-                name="bathrooms"
-                type="number"
-                value={property.bathrooms}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Habitaciones
-              </label>
-              <Input
-                name="bedrooms"
-                type="number"
-                value={property.bedrooms}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Parqueaderos
-              </label>
-              <Input
-                name="parking"
-                type="number"
-                value={property.parking}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Piso
-              </label>
-              <Input
-                name="floor"
-                type="number"
-                value={property.floor}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Estado
-              </label>
-              <select
-                name="status"
-                value={property.status}
-                onChange={handleChange}
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-              >
-                <option value="AVAILABLE">Disponible</option>
-                <option value="OCCUPIED">Ocupado</option>
-                <option value="MAINTENANCE">En Mantenimiento</option>
-                <option value="INACTIVE">Inactivo</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="flex justify-end space-x-3 mt-6">
-            <Button type="button" variant="outline" onClick={onCancel}>
-              Cancelar
-            </Button>
-            <Button type="submit">
-              {property.id ? "Actualizar" : "Crear"} Propiedad
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="unitNumber"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Número de Unidad</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="type"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Tipo</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Estado</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" disabled={mutation.isLoading}>
+          {mutation.isLoading ? 'Guardando...' : 'Guardar'}
+        </Button>
+      </form>
+    </Form>
   );
-};
-
-export default PropertyForm;
+}

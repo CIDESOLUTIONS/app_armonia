@@ -17,3 +17,4 @@ export * from "./alert";
 export * from "./popover";
 export * from "./calendar";
 export * from "./label";
+export * from "./dropdown-menu";

@@ -176,7 +176,7 @@ export default function ProjectsPage() {
                         <Eye className="h-4 w-4" />
                       </Button>
                     </Link>
-                    <Link href={`/admin/projects/${project.id}/edit`}>
+                    <Link href={`/complex-admin/projects/${project.id}/edit`}>
                       <Button variant="ghost" size="sm" className="mr-2">
                         <Edit className="h-4 w-4" />
                       </Button>

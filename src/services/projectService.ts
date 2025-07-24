@@ -1,4 +1,4 @@
-import { fetchApi } from "@/lib/api";
+import { apiClient } from "@/lib/apiClient";
 
 interface Project {
   id: number;

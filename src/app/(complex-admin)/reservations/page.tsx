@@ -262,7 +262,7 @@ export default function ReservationsPage() {
       </h1>
 
       <div className="flex justify-between items-center mb-4">
-        <Link href="/admin/amenities">
+        <Link href="/complex-admin/amenities">
           <Button variant="outline">
             <CalendarDays className="mr-2 h-4 w-4" /> Gestionar Áreas Comunes
           </Button>
