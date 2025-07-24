@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint . --config eslint.config.mjs --fix",
     "test": "vitest",
-    "test:e2e": "npx playwright test"
+    "test:e2e": "concurrently \"npm:start:dev --prefix armonia-backend\" \"npm:dev\" -k --success first && wait-on tcp:3001 http://localhost:3000 && npx playwright test"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.844.0",
@@ -122,6 +122,7 @@
     "typescript-eslint": "^8.37.0",
     "unplugin-swc": "^1.5.5",
     "vitest": "^3.2.4",
+    "wait-on": "^8.0.4",
     "whatwg-fetch": "^3.6.20"
   }
 }
