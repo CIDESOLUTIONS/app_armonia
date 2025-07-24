@@ -1,77 +1,34 @@
-// playwright.config.ts
-import { PlaywrightTestConfig, devices } from "@playwright/test";
+import { defineConfig, devices } from '@playwright/test';
 
-const config: PlaywrightTestConfig = {
-  testDir: "./e2e",
-  timeout: 30000,
+export default defineConfig({
+  testDir: './e2e',
+  fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: [
-    ["html"],
-    ["json", { outputFile: "test-results/e2e-results.json" }],
-    [
-      "monocart-reporter",
-      {
-        name: "Armonia Test Report",
-        outputFile: "./test-results/report.html",
-        coverage: {
-          entryFilter: (entry) => {
-            // Exclude files from node_modules
-            if (entry.url.includes("node_modules")) {
-              return false;
-            }
-            // Exclude test files
-            if (entry.url.includes("e2e")) {
-              return false;
-            }
-            return true;
-          },
-          sourceFilter: (sourcePath) => {
-            return sourcePath.startsWith("src/");
-          },
-        },
-      },
-    ],
-  ],
+  reporter: 'html',
   use: {
-    baseURL: process.env.BASE_URL || "http://localhost:3000",
-    trace: "on-first-retry",
-    screenshot: "only-on-failure",
-    video: "on-first-retry",
+    baseURL: 'http://localhost:3000',
+    trace: 'on-first-retry',
   },
   projects: [
     {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
-    },
-    {
-      name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
-    },
-    {
-      name: "webkit",
-      use: { ...devices["Desktop Safari"] },
-    },
-    {
-      name: "Mobile Chrome",
-      use: { ...devices["Pixel 5"] },
-    },
-    {
-      name: "Mobile Safari",
-      use: { ...devices["iPhone 12"] },
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
     },
   ],
-  outputDir: "test-results/",
-  webServer: {
-    command: "npx tsx server.ts",
-    port: 3000,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120000,
-    env: {
-      NODE_ENV: "development",
+  webServer: [
+    {
+      command: 'npm run dev',
+      url: 'http://localhost:3000',
+      timeout: 120 * 1000,
+      reuseExistingServer: !process.env.CI,
     },
-  },
-};
-
-export default config;
+    {
+      command: 'npm run start:dev --prefix armonia-backend',
+      url: 'http://localhost:3001',
+      timeout: 120 * 1000,
+      reuseExistingServer: !process.env.CI,
+    },
+  ],
+});
