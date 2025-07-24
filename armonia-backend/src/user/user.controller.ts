@@ -29,7 +29,7 @@ export class UserController {
     UserRole.STAFF,
     UserRole.RECEPTION,
     UserRole.SECURITY,
-    UserRole.CONCIERGE,
+    UserRole.STAFF,
   )
   getProfile(@GetUser() user: any) {
     return user;

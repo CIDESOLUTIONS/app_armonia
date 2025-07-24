@@ -6,25 +6,25 @@ import { UserRole } from '../common/enums/user-role.enum';
 import { GetUser } from '../common/decorators/user.decorator';
 import { Roles } from '../auth/roles.decorator';
 
-@UseGuards(JwtAuthGuard, RolesGuard([UserRole.APP_ADMIN]))
+@UseGuards(JwtAuthGuard, RolesGuard([UserRole.ADMIN]))
 @Controller('portfolio')
 export class PortfolioController {
   constructor(private readonly portfolioService: PortfolioService) {}
 
   @Get('metrics')
-  @Roles(UserRole.APP_ADMIN)
+  @Roles(UserRole.ADMIN)
   async getPortfolioMetrics(@GetUser() user: any) {
     return this.portfolioService.getPortfolioMetrics(user.userId);
   }
 
   @Get('complexes')
-  @Roles(UserRole.APP_ADMIN)
+  @Roles(UserRole.ADMIN)
   async getComplexMetrics(@GetUser() user: any) {
     return this.portfolioService.getComplexMetrics(user.userId);
   }
 
   @Get('reports/financial-summary')
-  @Roles(UserRole.APP_ADMIN)
+  @Roles(UserRole.ADMIN)
   async getConsolidatedFinancialReport(
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
