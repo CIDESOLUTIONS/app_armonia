@@ -27,7 +27,7 @@ export class PlansController {
   constructor(private readonly plansService: PlansService) {}
 
   @Post('plan')
-  @Roles(UserRole.APP_ADMIN)
+  @Roles(UserRole.ADMIN)
   async createPlan(@Body() createPlanDto: CreatePlanDto) {
     return this.plansService.createPlan(createPlanDto);
   }
@@ -43,7 +43,7 @@ export class PlansController {
   }
 
   @Put('plan/:id')
-  @Roles(UserRole.APP_ADMIN)
+  @Roles(UserRole.ADMIN)
   async updatePlan(
     @Param('id') id: string,
     @Body() updatePlanDto: UpdatePlanDto,
@@ -52,13 +52,13 @@ export class PlansController {
   }
 
   @Delete('plan/:id')
-  @Roles(UserRole.APP_ADMIN)
+  @Roles(UserRole.ADMIN)
   async deletePlan(@Param('id') id: string) {
     return this.plansService.deletePlan(+id);
   }
 
   @Post('subscription')
-  @Roles(UserRole.APP_ADMIN, UserRole.COMPLEX_ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.COMPLEX_ADMIN)
   async createSubscription(
     @Body() createSubscriptionDto: CreateSubscriptionDto,
   ) {
@@ -66,19 +66,19 @@ export class PlansController {
   }
 
   @Get('subscription')
-  @Roles(UserRole.APP_ADMIN, UserRole.COMPLEX_ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.COMPLEX_ADMIN)
   async getSubscriptions(@Query() filters: any) {
     return this.plansService.getSubscriptions(filters);
   }
 
   @Get('subscription/:id')
-  @Roles(UserRole.APP_ADMIN, UserRole.COMPLEX_ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.COMPLEX_ADMIN)
   async getSubscriptionById(@Param('id') id: string) {
     return this.plansService.getSubscriptionById(+id);
   }
 
   @Put('subscription/:id')
-  @Roles(UserRole.APP_ADMIN, UserRole.COMPLEX_ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.COMPLEX_ADMIN)
   async updateSubscription(
     @Param('id') id: string,
     @Body() updateSubscriptionDto: UpdateSubscriptionDto,
@@ -87,7 +87,7 @@ export class PlansController {
   }
 
   @Delete('subscription/:id')
-  @Roles(UserRole.APP_ADMIN, UserRole.COMPLEX_ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.COMPLEX_ADMIN)
   async deleteSubscription(@Param('id') id: string) {
     return this.plansService.deleteSubscription(+id);
   }
