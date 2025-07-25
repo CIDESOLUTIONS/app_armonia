@@ -1,7 +1,7 @@
 import {
   WebSocketGateway,
   SubscribeMessage,
-  MessageBody,
+  import { Inject, forwardRef } from '@nestjs/common';
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
@@ -27,7 +27,10 @@ export class PanicGateway {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly panicService: PanicService) {}
+  constructor(
+    @Inject(forwardRef(() => PanicService))
+    private readonly panicService: PanicService,
+  ) {}
 
   @SubscribeMessage('triggerPanic')
   async handleTriggerPanic(

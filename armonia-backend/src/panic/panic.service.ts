@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject, forwardRef } from '@nestjs/common';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
@@ -17,6 +17,7 @@ export class PanicService {
   constructor(
     private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
+    @Inject(forwardRef(() => PanicGateway))
     private panicGateway: PanicGateway, // Inject PanicGateway
   ) {}
 

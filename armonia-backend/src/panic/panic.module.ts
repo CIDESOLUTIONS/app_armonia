@@ -8,5 +8,6 @@ import { PrismaService } from '../prisma/prisma.service';
 @Module({
   controllers: [PanicController],
   providers: [PanicService, PanicGateway, PrismaClientManager, PrismaService],
+  exports: [PanicGateway, PanicService],
 })
 export class PanicModule {}

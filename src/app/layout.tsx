@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Providers } from "@/components/providers";
 import { RealTimeNotificationProvider } from "@/context/RealTimeNotificationContext";
-import { ModalProvider } from "@/hooks/useModal"; // Importar ModalProvider
+import { ModalProvider } from "@/hooks/useModal.tsx"; // Importar ModalProvider
 import "./globals.css";
 
 export const metadata: Metadata = {
