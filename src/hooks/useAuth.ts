@@ -8,7 +8,7 @@ export function useAuth() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const login = async (data: any) => {
+  const login = async (email, password, complexId, schemaName, redirectTo) => {
     setLoading(true);
     setError(null);
     try {
@@ -17,7 +17,7 @@ export function useAuth() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ email, password, complexId, schemaName }),
       });
 
       const result = await response.json();

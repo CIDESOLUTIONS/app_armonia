@@ -103,9 +103,10 @@ export default function LoginForm({ portalType = null }: LoginFormProps) {
   const portalInfo = getPortalInfo();
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    // Hardcode complexId y schemaName por ahora, esto debería venir de la selección del portal o de la URL
-    const complexId = 1; // ID de ejemplo
-    const schemaName = "tenant_cj0001"; // Nombre de esquema de ejemplo
+    // TODO: Implement logic to dynamically get complexId and schemaName
+    // from the URL or a portal selection component.
+    const complexId = 1; // Placeholder
+    const schemaName = "tenant_cj0001"; // Placeholder
 
     await login(
       values.email,

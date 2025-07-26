@@ -1,8 +1,6 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { getListingById, Listing } from "@/services/marketplaceService";
+import { getListingById, reportListing, Listing } from "@/services/marketplaceService";
 import {
   Loader2,
   MessageSquare,
@@ -10,12 +8,14 @@ import {
   Tag,
   Calendar,
   User,
+  Flag,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuthStore } from "@/store/authStore";
 
 export default function ListingDetailPage() {
   const params = useParams();
@@ -23,6 +23,7 @@ export default function ListingDetailPage() {
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { user } = useAuthStore();
 
   useEffect(() => {
     if (listingId) {
@@ -45,6 +46,31 @@ export default function ListingDetailPage() {
       fetchListing();
     }
   }, [listingId, toast]);
+
+  const handleReportListing = async () => {
+    if (!user || !listing) return;
+
+    if (confirm("¿Estás seguro de que quieres reportar este anuncio?")) {
+      try {
+        await reportListing({
+          listingId: listing.id,
+          reporterId: user.id,
+          reason: "Contenido inapropiado o fraudulento", // Hardcoded reason for now
+        });
+        toast({
+          title: "Anuncio Reportado",
+          description: "Gracias por tu reporte. Lo revisaremos pronto.",
+        });
+      } catch (error: Error) {
+        console.error("Error reporting listing:", error);
+        toast({
+          title: "Error",
+          description: "No se pudo reportar el anuncio: " + error.message,
+          variant: "destructive",
+        });
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -121,11 +147,20 @@ export default function ListingDetailPage() {
                 <Calendar className="h-5 w-5 mr-2" />
                 Publicado: {new Date(listing.createdAt).toLocaleDateString()}
               </div>
-              <Link href={`/resident/marketplace/chat/${listing.author.id}`}>
-                <Button className="w-full">
+              <Link href={`/resident/marketplace/chat/${listing.id}`}>
+                <Button className="w-full mb-2">
                   <MessageSquare className="mr-2 h-4 w-4" /> Contactar Vendedor
                 </Button>
               </Link>
+              {user && listing.author.id !== user.id && (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleReportListing}
+                >
+                  <Flag className="mr-2 h-4 w-4" /> Reportar Anuncio
+                </Button>
+              )}
             </div>
           </div>
         </CardContent>

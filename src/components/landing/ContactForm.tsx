@@ -38,7 +38,7 @@ export const ContactForm = () => {
 
   const onSubmit = async (data: ContactFormValues) => {
     try {
-      const response = await fetch("/api/contact", {
+      const response = await fetch("/api/auth/request-demo", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -93,7 +93,18 @@ Este documento presenta un conjunto completo de pruebas funcionales que cubren t
 **Validaciones:** Campos requeridos validados, consistencia de datos (por ejemplo, una unidad no puede tener dos propietarios simultáneamente).
 **Resultado Esperado:** Residentes creados, editados y eliminados correctamente. Listado de residentes actualizado.
 
-#### CP-203 - Registro de vehículos y parqueaderos
+#### CP-203 - Registro Biométrico (Cara) de residentes y propietarios
+**Objetivo:** Validar la creación y gestión de biométricos de residentes y propietarios.
+**Precondición:** Administrador logueado.
+**Pasos:**
+1. Navegar a "Gestión de Inventario" -> "Residentes".
+2. **Crear Residente:** Hacer clic en "Añadir Residente", llenar formulario (nombre, email, teléfono, unidad, si es propietario, biométrico, etc.), guardar.
+3. **Editar Residente:** Seleccionar un residente, modificar datos, el biométrico y guardar.
+4. **Eliminar Residente:** Seleccionar un residente, confirmar eliminación.
+**Validaciones:** Campos requeridos validados, consistencia de datos (por ejemplo, acceso automático puerta principal con lectura biométricas).
+**Resultado Esperado:** Biométrico de Residentes creados, editados y eliminados correctamente. bitacora de accesos con biométrico de residentes actualizado.
+
+#### CP-204 - Registro de vehículos y parqueaderos
 **Objetivo:** Verificar la gestión de vehículos y parqueaderos.
 **Precondición:** Administrador logueado.
 **Pasos:**
@@ -102,7 +113,7 @@ Este documento presenta un conjunto completo de pruebas funcionales que cubren t
 3. **Editar/Eliminar:** Modificar o remover vehículos.
 **Resultado Esperado:** Datos de vehículos y parqueaderos gestionados correctamente.
 
-#### CP-204 - Registro de mascotas
+#### CP-205 - Registro de mascotas
 **Objetivo:** Verificar la gestión de mascotas.
 **Precondición:** Administrador logueado.
 **Pasos:**
@@ -111,7 +122,7 @@ Este documento presenta un conjunto completo de pruebas funcionales que cubren t
 3. **Editar/Eliminar:** Modificar o remover mascotas.
 **Resultado Esperado:** Datos de mascotas gestionados correctamente.
 
-#### CP-205 - Gestión de amenidades
+#### CP-206 - Gestión de amenidades
 **Objetivo:** Verificar la gestión de áreas comunes y amenidades.
 **Precondición:** Administrador logueado.
 **Pasos:**
@@ -120,7 +131,7 @@ Este documento presenta un conjunto completo de pruebas funcionales que cubren t
 3. **Editar/Eliminar:** Modificar o remover amenidades.
 **Resultado Esperado:** Datos de amenidades gestionados correctamente.
 
-#### CP-206 - Creación y publicación de anuncios
+#### CP-207 - Creación y publicación de anuncios
 **Objetivo:** Verificar la creación y publicación de anuncios en la cartelera digital.
 **Precondición:** Administrador logueado.
 **Pasos:**
@@ -130,7 +141,7 @@ Este documento presenta un conjunto completo de pruebas funcionales que cubren t
 4. Publicar anuncio.
 **Resultado Esperado:** Anuncio guardado, visible en la cartelera digital, y (si aplica) notificaciones enviadas a los roles objetivo.
 
-#### CP-207 - Envío de notificaciones push/email
+#### CP-208 - Envío de notificaciones push/email
 **Objetivo:** Validar el envío de notificaciones a grupos específicos.
 **Precondición:** Administrador logueado.
 **Pasos:**
@@ -140,7 +151,7 @@ Este documento presenta un conjunto completo de pruebas funcionales que cubren t
 4. Escribir mensaje y enviar.
 **Resultado Esperado:** Notificaciones enviadas y recibidas por los destinatarios correctos.
 
-#### CP-208 - Envío y seguimiento de PQR
+#### CP-209 - Envío y seguimiento de PQR
 **Objetivo:** Verificar el flujo completo de PQR.
 **Precondición:** Administrador logueado.
 **Pasos:**
@@ -150,7 +161,7 @@ Este documento presenta un conjunto completo de pruebas funcionales que cubren t
 4. **Responder:** Añadir una respuesta a la PQR.
 **Resultado Esperado:** PQR registrada, estados actualizados, respuestas visibles, seguimiento correcto.
 
-#### CP-209 - Generación de cuotas administrativas (por coeficiente)
+#### CP-210 - Generación de cuotas administrativas (por coeficiente)
 **Objetivo:** Validar la generación automática de cuotas.
 **Precondición:** Administrador logueado, inmuebles con coeficientes configurados.
 **Pasos:**
@@ -159,7 +170,7 @@ Este documento presenta un conjunto completo de pruebas funcionales que cubren t
 3. Confirmar parámetros de generación.
 **Resultado Esperado:** Cuotas generadas para todas las unidades según sus coeficientes, visibles en el listado de cuotas.
 
-#### CP-210 - Registro de pagos manuales
+#### CP-211 - Registro de pagos manuales
 **Objetivo:** Verificar el registro de pagos recibidos fuera de la pasarela.
 **Precondición:** Administrador logueado, cuotas pendientes.
 **Pasos:**
@@ -168,7 +179,7 @@ Este documento presenta un conjunto completo de pruebas funcionales que cubren t
 3. Registrar un pago manual (monto, fecha, método).
 **Resultado Esperado:** Cuota marcada como pagada, registro de pago visible en el historial.
 
-#### CP-211 - Verificación integración con pasarela de pago
+#### CP-212 - Verificación integración con pasarela de pago
 **Objetivo:** Validar la redirección y el procesamiento de pagos a través de la pasarela.
 **Precondición:** Administrador logueado, cuotas pendientes.
 **Pasos:**
@@ -176,7 +187,7 @@ Este documento presenta un conjunto completo de pruebas funcionales que cubren t
 2. Seleccionar una cuota pendiente y hacer clic en "Pagar" (simulado).
 **Resultado Esperado:** Redirección a la pasarela de pago (simulada), y al completar el pago (simulado), la cuota se marca como pagada.
 
-#### CP-212 - Generación de paz y salvo
+#### CP-213 - Generación de paz y salvo
 **Objetivo:** Verificar la generación de documentos de paz y salvo.
 **Precondición:** Administrador logueado, residente sin cuotas pendientes.
 **Pasos:**
@@ -185,7 +196,7 @@ Este documento presenta un conjunto completo de pruebas funcionales que cubren t
 3. Generar paz y salvo.
 **Resultado Esperado:** Documento de paz y salvo generado correctamente (PDF), confirmando la ausencia de deudas.
 
-#### CP-213 - Conciliación Bancaria Automática
+#### CP-214 - Conciliación Bancaria Automática
 **Objetivo:** Validar la importación de extractos y la conciliación automática de pagos.
 **Precondición:** Administrador logueado, extracto bancario (CSV/Excel) con transacciones de pago.
 **Pasos:**
@@ -194,7 +205,7 @@ Este documento presenta un conjunto completo de pruebas funcionales que cubren t
 3. Iniciar proceso de conciliación.
 **Resultado Esperado:** El sistema identifica y sugiere coincidencias entre transacciones del extracto y pagos registrados, marcando cuotas como pagadas y señalando discrepancias.
 
-#### CP-214 - Gestión de reservas de amenidades
+#### CP-215 - Gestión de reservas de amenidades
 **Objetivo:** Verificar la creación, aprobación y gestión de reservas.
 **Precondición:** Administrador logueado.
 **Pasos:**
@@ -203,7 +214,7 @@ Este documento presenta un conjunto completo de pruebas funcionales que cubren t
 3. **Aprobar/Rechazar:** Revisar solicitudes de reserva de residentes y aprobar/rechazar.
 **Resultado Esperado:** Reservas gestionadas correctamente, calendario actualizado, notificaciones enviadas.
 
-#### CP-215 - Gestión de proyectos/obras
+#### CP-216 - Gestión de proyectos/obras
 **Objetivo:** Verificar el ciclo de vida de un proyecto (desde aprobación hasta ejecución).
 **Precondición:** Administrador logueado.
 **Pasos:**
@@ -213,7 +224,7 @@ Este documento presenta un conjunto completo de pruebas funcionales que cubren t
 4. **Seguimiento:** Actualizar el avance del proyecto.
 **Resultado Esperado:** Proyecto creado, fondos recaudados, avance visible.
 
-#### CP-216 - Registro y roles de personal operativo
+#### CP-217 - Registro y roles de personal operativo
 **Objetivo:** Verificar la gestión de usuarios del personal (recepcionistas, vigilantes).
 **Precondición:** Administrador logueado.
 **Pasos:**

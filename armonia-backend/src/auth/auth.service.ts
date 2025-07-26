@@ -45,22 +45,24 @@ export class AuthService {
   async registerComplex(data: any) {
     const { complexData, adminData } = data;
 
-    const existingUser = await this.userService.findByEmail(adminData.email);
-    if (existingUser) {
-      throw new UnauthorizedException('User with this email already exists');
-    }
+    return this.prisma.$transaction(async (prisma) => {
+      const existingUser = await this.userService.findByEmail(adminData.email, prisma);
+      if (existingUser) {
+        throw new UnauthorizedException('User with this email already exists');
+      }
 
-    const newComplex = await this.residentialComplexService.createComplexAndSchema(complexData);
+      const newComplex = await this.residentialComplexService.createComplexAndSchema(complexData, prisma);
 
-    const adminPayload = {
-      ...adminData,
-      role: UserRole.COMPLEX_ADMIN,
-      complexId: newComplex.id,
-    };
+      const adminPayload = {
+        ...adminData,
+        role: UserRole.COMPLEX_ADMIN,
+        complexId: newComplex.id,
+      };
 
-    const newAdmin = await this.userService.createUser(newComplex.schemaName, adminPayload);
+      const newAdmin = await this.userService.createUser(newComplex.schemaName, adminPayload, prisma);
 
-    return this.login(newAdmin);
+      return this.login(newAdmin);
+    });
   }
 
   async handleDemoRequest(data: any) {

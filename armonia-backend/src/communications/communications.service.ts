@@ -284,6 +284,47 @@ export class CommunicationsService {
     });
   }
 
+  async sendNotification(
+    schemaName: string,
+    senderId: number,
+    notificationData: NotificationDataDto,
+  ) {
+    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const { recipientType, recipientId, ...data } = notificationData;
+
+    let targetUserIds: number[] = [];
+
+    switch (recipientType) {
+      case "ALL":
+        const allUsers = await prisma.user.findMany({ select: { id: true } });
+        targetUserIds = allUsers.map((user) => user.id);
+        break;
+      case "RESIDENT":
+        if (!recipientId) throw new Error("Recipient ID is required for RESIDENT type.");
+        const resident = await prisma.resident.findUnique({ where: { id: parseInt(recipientId) }, select: { userId: true } });
+        if (resident && resident.userId) targetUserIds.push(resident.userId);
+        break;
+      case "PROPERTY":
+        if (!recipientId) throw new Error("Recipient ID is required for PROPERTY type.");
+        const propertyResidents = await prisma.resident.findMany({ where: { propertyId: parseInt(recipientId) }, select: { userId: true } });
+        targetUserIds = propertyResidents.map((resident) => resident.userId).filter(Boolean) as number[];
+        break;
+      case "USER":
+        if (!recipientId) throw new Error("Recipient ID is required for USER type.");
+        targetUserIds.push(parseInt(recipientId));
+        break;
+      default:
+        throw new Error("Invalid recipient type.");
+    }
+
+    if (targetUserIds.length === 0) {
+      return { message: "No recipients found for the given criteria." };
+    }
+
+    const results = await this.notifyUsers(schemaName, targetUserIds, data);
+    return { message: "Notifications sent successfully", results };
+  }
+
   // ANUNCIOS (Modelos de tenant)
   async getAnnouncements(
     schemaName: string,
