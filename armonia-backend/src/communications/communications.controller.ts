@@ -63,6 +63,18 @@ export class CommunicationsController {
     );
   }
 
+  @Post('notifications/send')
+  async sendNotification(
+    @GetUser() user: any,
+    @Body() notificationData: NotificationDataDto,
+  ) {
+    return this.communicationsService.sendNotification(
+      user.schemaName,
+      user.userId,
+      notificationData,
+    );
+  }
+
   // ANUNCIOS
   @Get('announcements')
   async getAnnouncements(@GetUser() user: any, @Query() filters: any) {

@@ -19,31 +19,11 @@ export async function getConsolidatedFinancialReport(
 }
 
 export const getPortfolioMetrics = async () => {
-  // This is a placeholder. In a real implementation, you would fetch actual data.
-  return {
-    totalIncome: 120000,
-    totalProperties: 15,
-    totalResidents: 2500,
-    totalPendingFees: 15000,
-  };
+  const response = await fetchApi("/portfolio/metrics");
+  return response.data;
 };
 
 export const getComplexMetrics = async () => {
-  // This is a placeholder. In a real implementation, you would fetch actual data.
-  return [
-    {
-      id: 1,
-      name: "Conjunto A",
-      residents: 500,
-      pendingFees: 2000,
-      income: 40000,
-    },
-    {
-      id: 2,
-      name: "Conjunto B",
-      residents: 300,
-      pendingFees: 1000,
-      income: 25000,
-    },
-  ];
+  const response = await fetchApi("/portfolio/complex-metrics");
+  return response.data;
 };

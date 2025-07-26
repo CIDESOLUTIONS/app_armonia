@@ -278,4 +278,22 @@ export class FinancesController {
       paymentGatewayCallbackDto.status,
     );
   }
+
+  @Get('reports/generate')
+  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  async generateReport(
+    @GetUser() user: any,
+    @Query('reportType') reportType: string,
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+    @Query('format') format: string,
+  ) {
+    return this.financesService.generateFinancialReport(
+      user.schemaName,
+      reportType,
+      startDate,
+      endDate,
+      format,
+    );
+  }
 }

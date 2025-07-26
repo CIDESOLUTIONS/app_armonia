@@ -447,6 +447,10 @@ export class CreateResidentDto {
   @IsOptional()
   @IsString()
   relationshipWithOwner?: string;
+
+  @IsOptional()
+  @IsString()
+  biometricId?: string;
 }
 
 export class UpdateResidentDto {
@@ -489,4 +493,8 @@ export class UpdateResidentDto {
   @IsOptional()
   @IsString()
   relationshipWithOwner?: string;
+
+  @IsOptional()
+  @IsString()
+  biometricId?: string;
 }

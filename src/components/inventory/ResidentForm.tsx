@@ -8,6 +8,7 @@ import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { inventoryService } from '@/services/inventory.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useModal } from '@/hooks/useModal';
 import { toast } from '@/components/ui/use-toast';
@@ -18,6 +19,7 @@ const formSchema = z.object({
   phone: z.string().optional(),
   propertyId: z.number(),
   isOwner: z.boolean(),
+  biometricId: z.string().optional(),
 });
 
 export default function ResidentForm({ resident }) {
@@ -32,6 +34,7 @@ export default function ResidentForm({ resident }) {
       phone: '',
       propertyId: undefined,
       isOwner: false,
+      biometricId: '',
     },
   });
 
@@ -111,11 +114,24 @@ export default function ResidentForm({ resident }) {
         />
         <FormField
           control={form.control}
+          name="biometricId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>ID Biométrico</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="isOwner"
           render={({ field }) => (
             <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
               <FormControl>
-                <Input type="checkbox" checked={field.value} onChange={field.onChange} />
+                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel>

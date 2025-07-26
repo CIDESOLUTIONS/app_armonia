@@ -26,6 +26,8 @@ import {
   NotificationType,
   NotificationSourceType,
 } from '../common/dto/communications.dto';
+import * as PDFDocument from 'pdfkit';
+import { Readable } from 'stream';
 
 @Injectable()
 export class FinancesService {
@@ -535,6 +537,208 @@ export class FinancesService {
     return transactions.slice(0, 5);
   }
 
+  async generateFinancialReport(
+    schemaName: string,
+    reportType: string,
+    startDate: string,
+    endDate: string,
+    format: string,
+  ): Promise<Readable> {
+    const prisma = this.getTenantPrismaClient(schemaName);
+    const doc = new PDFDocument();
+    const stream = new Readable();
+    stream._read = () => {}; // _read is required but can be empty
+
+    doc.on('data', (chunk) => stream.push(chunk));
+    doc.on('end', () => stream.push(null));
+
+    doc.fontSize(20).text(`Reporte Financiero: ${reportType}`, { align: 'center' });
+    doc.fontSize(12).text(`Desde: ${startDate} Hasta: ${endDate}`, { align: 'center' });
+    doc.moveDown();
+
+    let data: any[] = [];
+    let title = '';
+
+    switch (reportType) {
+      case 'BALANCE':
+        title = 'Balance General';
+        const summary = await this.getFinancialSummary(schemaName);
+        data = [
+          ['Concepto', 'Monto'],
+          ['Balance Actual', summary.currentBalance],
+          ['Ingresos Mensuales', summary.monthlyIncome],
+          ['Gastos Mensuales', summary.monthlyExpenses],
+          ['Facturas Pendientes', summary.pendingBills],
+          ['Monto Pendiente', summary.pendingBillsAmount],
+        ];
+        break;
+      case 'INCOME':
+        title = 'Informe de Ingresos';
+        const incomes = await prisma.payment.findMany({
+          where: {
+            status: PaymentStatus.PAID,
+            paymentDate: {
+              gte: new Date(startDate),
+              lte: new Date(endDate),
+            },
+          },
+          include: { fee: true, user: true },
+        });
+        data = [
+          ['Fecha', 'Concepto', 'Monto', 'Residente', 'Cuota'],
+          ...incomes.map(i => [
+            i.paymentDate.toLocaleDateString(),
+            `Pago de ${i.fee?.name || 'cuota'}`,
+            i.amount,
+            i.user?.name || 'N/A',
+            i.fee?.name || 'N/A',
+          ]),
+        ];
+        break;
+      case 'EXPENSE':
+        title = 'Informe de Gastos';
+        const expenses = await prisma.expense.findMany({
+          where: {
+            date: {
+              gte: new Date(startDate),
+              lte: new Date(endDate),
+            },
+          },
+          include: { category: true },
+        });
+        data = [
+          ['Fecha', 'Concepto', 'Monto', 'Categoría'],
+          ...expenses.map(e => [
+            e.date.toLocaleDateString(),
+            e.description,
+            e.amount,
+            e.category?.name || 'N/A',
+          ]),
+        ];
+        break;
+      case 'DEBTORS':
+        title = 'Estado de Cartera (Deudores)';
+        const overdueFees = await prisma.fee.findMany({
+          where: {
+            status: PaymentStatus.OVERDUE,
+            dueDate: {
+              lte: new Date(),
+            },
+          },
+          include: { property: true, resident: true },
+        });
+        data = [
+          ['Cuota', 'Monto', 'Fecha Vencimiento', 'Unidad', 'Residente'],
+          ...overdueFees.map(f => [
+            f.name,
+            f.amount,
+            f.dueDate.toLocaleDateString(),
+            f.property?.unitNumber || 'N/A',
+            f.resident?.name || 'N/A',
+          ]),
+        ];
+        break;
+      case 'PAYMENTS_REPORT':
+        title = 'Informe de Pagos';
+        const payments = await prisma.payment.findMany({
+          where: {
+            paymentDate: {
+              gte: new Date(startDate),
+              lte: new Date(endDate),
+            },
+          },
+          include: { fee: true, user: true },
+        });
+        data = [
+          ['Fecha', 'Monto', 'Método', 'Estado', 'Cuota', 'Residente'],
+          ...payments.map(p => [
+            p.paymentDate.toLocaleDateString(),
+            p.amount,
+            p.paymentMethod,
+            p.status,
+            p.fee?.name || 'N/A',
+            p.user?.name || 'N/A',
+          ]),
+        ];
+        break;
+      case 'PEACE_AND_SAFE':
+        title = 'Paz y Salvos';
+        // This report type would typically require a residentId to generate a specific document
+        // For a general report, we might list all residents with no pending fees
+        const residentsWithoutPendingFees = await prisma.resident.findMany({
+          where: {
+            fees: {
+              none: {
+                status: PaymentStatus.PENDING,
+              },
+            },
+          },
+          include: { property: true },
+        });
+        data = [
+          ['Residente', 'Unidad', 'Email'],
+          ...residentsWithoutPendingFees.map(r => [
+            r.name,
+            r.property?.unitNumber || 'N/A',
+            r.email,
+          ]),
+        ];
+        break;
+      default:
+        throw new BadRequestException('Tipo de reporte no válido.');
+    }
+
+    doc.fontSize(16).text(title, { align: 'center' });
+    doc.moveDown();
+
+    // Basic table generation
+    const tableTop = doc.y;
+    const startX = 50;
+    const rowHeight = 20;
+    const colWidth = (doc.page.width - 2 * startX) / data[0].length;
+
+    // Draw table headers
+    doc.font('Helvetica-Bold');
+    data[0].forEach((header, i) => {
+      doc.text(header, startX + i * colWidth, tableTop, {
+        width: colWidth,
+        align: 'left',
+      });
+    });
+    doc.font('Helvetica');
+    doc.moveTo(startX, tableTop + rowHeight).lineTo(startX + data[0].length * colWidth, tableTop + rowHeight).stroke();
+
+    // Draw table rows
+    let currentY = tableTop + rowHeight + 5;
+    for (let i = 1; i < data.length; i++) {
+      data[i].forEach((cell, j) => {
+        doc.text(String(cell), startX + j * colWidth, currentY, {
+          width: colWidth,
+          align: 'left',
+        });
+      });
+      currentY += rowHeight;
+      if (currentY > doc.page.height - 50) { // Check for page overflow
+        doc.addPage();
+        currentY = 50; // Reset Y for new page
+        // Redraw headers on new page
+        doc.font('Helvetica-Bold');
+        data[0].forEach((header, i) => {
+          doc.text(header, startX + i * colWidth, currentY, {
+            width: colWidth,
+            align: 'left',
+          });
+        });
+        doc.font('Helvetica');
+        doc.moveTo(startX, currentY + rowHeight).lineTo(startX + data[0].length * colWidth, currentY + rowHeight).stroke();
+        currentY += rowHeight + 5;
+      }
+    }
+
+    doc.end();
+    return stream;
+  }
+
   async initiatePayment(
     schemaName: string,
     feeId: number,
@@ -577,7 +781,7 @@ export class FinancesService {
       await this.communicationsService.notifyUser(schemaName, user.id, {
         type: NotificationType.INFO,
         title: 'Pago Iniciado',
-        message: `Se ha iniciado el pago de tu cuota ${fee.title}. Por favor, completa la transacción.`,
+        message: `Se ha iniciado el pago de tu cuota ${fee.name}. Por favor, completa la transacción.`,
         link: simulatedPaymentUrl,
         sourceType: NotificationSourceType.FINANCIAL,
         sourceId: fee.id.toString(),

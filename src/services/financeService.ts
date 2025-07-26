@@ -25,11 +25,19 @@ export const getFinanceSummary = async (tenantId: string) => {
   return { message: "Finance summary retrieved successfully" };
 };
 
-export const generateFinancialReport = async (tenantId: string) => {
-  const prisma = getPrisma(tenantId);
-  // Placeholder logic
-  console.log("Generating financial report for tenant:", tenantId);
-  return { message: "Financial report generated successfully" };
+import { apiClient } from "@/lib/apiClient";
+
+export const generateFinancialReport = async (
+  reportType: string,
+  startDate: string,
+  endDate: string,
+  format: string,
+): Promise<Blob> => {
+  const response = await apiClient.get("/finances/reports/generate", {
+    params: { reportType, startDate, endDate, format },
+    responseType: "blob", // Important for downloading files
+  });
+  return response.data;
 };
 
 export const processBankStatement = async (
