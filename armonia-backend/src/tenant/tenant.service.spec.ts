@@ -1,32 +1,35 @@
+import '@test/jest-setup';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TenantService } from './tenant.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaClientManager } from '../prisma/prisma-client-manager';
 
 describe('TenantService', () => {
   let service: TenantService;
-  let prisma: PrismaService;
+  let prismaClientManager: PrismaClientManager;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TenantService,
         {
-          provide: PrismaService,
+          provide: PrismaClientManager,
           useValue: {
-            residentialComplex: {
-              create: jest.fn(),
-              findMany: jest.fn(),
-              findUnique: jest.fn(),
-              update: jest.fn(),
-              delete: jest.fn(),
-            },
+            getClient: jest.fn(() => ({
+              residentialComplex: {
+                create: jest.fn(),
+                findMany: jest.fn(),
+                findUnique: jest.fn(),
+                update: jest.fn(),
+                delete: jest.fn(),
+              },
+            })),
           },
         },
       ],
     }).compile();
 
     service = module.get<TenantService>(TenantService);
-    prisma = module.get<PrismaService>(PrismaService);
+    prismaClientManager = module.get<PrismaClientManager>(PrismaClientManager);
   });
 
   it('should be defined', () => {
@@ -35,4 +38,3 @@ describe('TenantService', () => {
 
   // Add tests for each method in TenantService
 });
-

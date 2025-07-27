@@ -11,7 +11,6 @@ import {
 @Injectable()
 export class PlansService {
   constructor(
-    private prisma: PrismaService,
     private prismaClientManager: PrismaClientManager,
   ) {}
 

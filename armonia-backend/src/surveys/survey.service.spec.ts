@@ -1,3 +1,4 @@
+import '@test/jest-setup';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SurveyService } from './survey.service';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
