@@ -1,6 +1,4 @@
-
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto, UpdateUserDto } from '../common/dto/user-management.dto';
 import { UserRole } from '../common/enums/user-role.enum';
@@ -9,16 +7,11 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UserManagementService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
   ) {}
 
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
-
   async getStaffUsers(schemaName: string) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     return prisma.user.findMany({
       where: { role: { in: [UserRole.STAFF, UserRole.RECEPTION, UserRole.SECURITY] } },
       select: { id: true, name: true, email: true, role: true, active: true },
@@ -26,7 +19,7 @@ export class UserManagementService {
   }
 
   async createStaffUser(schemaName: string, complexId: number, data: CreateUserDto) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
     if (existingUser) {
       throw new BadRequestException('Ya existe un usuario con este email.');
@@ -46,7 +39,7 @@ export class UserManagementService {
   }
 
   async updateStaffUser(schemaName: string, id: number, data: UpdateUserDto) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado.`);
@@ -64,7 +57,7 @@ export class UserManagementService {
   }
 
   async deleteStaffUser(schemaName: string, id: number) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado.`);

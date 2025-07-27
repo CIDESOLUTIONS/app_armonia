@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException, Inject, forwardRef } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreatePanicAlertDto,
@@ -15,18 +14,13 @@ import {
 @Injectable()
 export class PanicService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
     @Inject(forwardRef(() => PanicGateway))
     private panicGateway: PanicGateway, // Inject PanicGateway
   ) {}
 
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
-
   async createPanicAlert(schemaName: string, data: CreatePanicAlertDto) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const newAlert = await prisma.panicAlert.create({ data });
 
     // Emit real-time notification
@@ -43,7 +37,7 @@ export class PanicService {
   }
 
   async getPanicAlerts(schemaName: string, filters: any = {}) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const where: any = {};
     if (filters.status) where.status = filters.status;
     if (filters.type) where.type = filters.type;
@@ -58,7 +52,7 @@ export class PanicService {
   }
 
   async getPanicAlertById(schemaName: string, id: number) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const alert = await prisma.panicAlert.findUnique({
       where: { id },
       include: { user: true, complex: true, property: true, responses: true },
@@ -76,7 +70,7 @@ export class PanicService {
     id: number,
     data: UpdatePanicAlertDto,
   ) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const updatedAlert = await prisma.panicAlert.update({
       where: { id },
       data,
@@ -96,12 +90,12 @@ export class PanicService {
   }
 
   async addPanicResponse(schemaName: string, data: CreatePanicResponseDto) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     return prisma.panicResponse.create({ data });
   }
 
   async getPanicResponses(schemaName: string, alertId: number) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     return prisma.panicResponse.findMany({
       where: { alertId },
       include: { responder: true },

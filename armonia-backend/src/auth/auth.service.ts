@@ -6,7 +6,6 @@ import { TenantService } from '../tenant/tenant.service';
 import { ResidentialComplexService } from '../residential-complex/residential-complex.service';
 import { UserRole } from '../common/enums/user-role.enum';
 import { PrismaService } from '../prisma/prisma.service';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 
 @Injectable()
 export class AuthService {
@@ -14,13 +13,12 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     private tenantService: TenantService,
-    private prismaService: PrismaService, // Cambiado a prismaService
-    private prismaClientManager: PrismaClientManager, // Añadido
+    private prismaService: PrismaService,
     @Inject(ResidentialComplexService) private residentialComplexService: ResidentialComplexService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
-    const prisma = this.prismaClientManager.getClient('default'); // Usar el cliente por defecto
+    const prisma = this.prismaService; // Usar el cliente por defecto
     const user = await this.userService.findByEmail(email, prisma);
     if (user && (await bcrypt.compare(pass, user.password))) {
       const { password, ...result } = user;
@@ -49,7 +47,7 @@ export class AuthService {
     const { complexData, adminData } = data;
 
     // Usar el cliente por defecto para la transacción
-    const defaultPrisma = this.prismaClientManager.getClient('default');
+    const defaultPrisma = this.prismaService;
 
     return defaultPrisma.$transaction(async (txPrisma) => {
       const existingUser = await this.userService.findByEmail(adminData.email, txPrisma);
@@ -75,7 +73,7 @@ export class AuthService {
     const { name, email, complexName, units } = data;
 
     // Save the demo request to the database using the default client
-    const defaultPrisma = this.prismaClientManager.getClient('default');
+    const defaultPrisma = this.prismaService;
     await defaultPrisma.demoRequest.create({
       data: {
         name,

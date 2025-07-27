@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   PQRDto,
@@ -14,19 +13,14 @@ import {
 @Injectable()
 export class PqrService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
-    private prisma: PrismaService, // Inyectar PrismaService
+    private prisma: PrismaService,
   ) {}
-
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
 
   async getPQRs(
     schemaName: string,
     params?: GetPQRParamsDto,
   ): Promise<PQRDto[]> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     try {
       const where: any = {};
       if (params?.status) where.status = params.status;
@@ -56,7 +50,7 @@ export class PqrService {
   }
 
   async getPQRById(schemaName: string, id: number): Promise<PQRDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     try {
       const pqr = await prisma.pQR.findUnique({
         where: { id },
@@ -85,7 +79,7 @@ export class PqrService {
   }
 
   async createPQR(schemaName: string, data: CreatePQRDto): Promise<PQRDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     try {
       const pqr = await prisma.pQR.create({ data });
       return this.getPQRById(schemaName, pqr.id);
@@ -100,7 +94,7 @@ export class PqrService {
     id: number,
     data: Partial<UpdatePQRDto>,
   ): Promise<PQRDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     try {
       const pqr = await prisma.pQR.update({ where: { id }, data });
       return this.getPQRById(schemaName, pqr.id);
@@ -111,7 +105,7 @@ export class PqrService {
   }
 
   async deletePQR(schemaName: string, id: number): Promise<void> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     try {
       await prisma.pQR.delete({ where: { id } });
     } catch (error) {
@@ -126,7 +120,7 @@ export class PqrService {
     comment: string,
     authorId: number,
   ): Promise<PQRCommentDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     try {
       const pqrComment = await prisma.pQRComment.create({
         data: { pqrId, comment, authorId },
@@ -144,7 +138,7 @@ export class PqrService {
     pqrId: number,
     assignedToId: number,
   ): Promise<PQRDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     try {
       const pqr = await prisma.pQR.update({
         where: { id: pqrId },

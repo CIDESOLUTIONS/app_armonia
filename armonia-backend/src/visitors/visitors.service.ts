@@ -3,7 +3,6 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateVisitorDto,
@@ -18,22 +17,14 @@ import {
 @Injectable()
 export class VisitorsService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
   ) {}
-
-  private getTenantPrismaClient(schemaName: string) {
-    // The global PrismaService instance already has access to all schemas
-    // via the @@schema("tenant") directive. We just need to ensure we're
-    // using the correct client instance.
-    return this.prismaClientManager.getClient(schemaName);
-  }
 
   async createVisitor(
     schemaName: string,
     data: CreateVisitorDto,
   ): Promise<VisitorDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     return prisma.visitor.create({
       data: {
         ...data,
@@ -47,7 +38,7 @@ export class VisitorsService {
     schemaName: string,
     filters: VisitorFilterParamsDto,
   ): Promise<VisitorDto[]> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const where: any = {};
 
     if (filters.search) {
@@ -87,7 +78,7 @@ export class VisitorsService {
   }
 
   async getVisitorById(schemaName: string, id: number): Promise<VisitorDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const visitor = await prisma.visitor.findUnique({ where: { id } });
     if (!visitor) {
       throw new NotFoundException(`Visitante con ID ${id} no encontrado.`);
@@ -100,7 +91,7 @@ export class VisitorsService {
     id: number,
     data: UpdateVisitorDto,
   ): Promise<VisitorDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const visitor = await prisma.visitor.findUnique({ where: { id } });
 
     if (!visitor) {
@@ -114,12 +105,12 @@ export class VisitorsService {
   }
 
   async deleteVisitor(schemaName: string, id: number): Promise<void> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     await prisma.visitor.delete({ where: { id } });
   }
 
   async scanQrCode(schemaName: string, qrCode: string): Promise<VisitorDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const now = new Date();
 
     // Try to find a pre-registered visitor
@@ -209,7 +200,7 @@ export class VisitorsService {
   }
 
   async getPreRegisteredVisitors(schemaName: string): Promise<VisitorDto[]> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const now = new Date();
     const preRegistered = await prisma.preRegisteredVisitor.findMany({
       where: {

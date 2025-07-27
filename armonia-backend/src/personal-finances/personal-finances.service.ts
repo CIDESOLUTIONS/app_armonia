@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreatePersonalTransactionDto,
@@ -11,20 +10,15 @@ import {
 @Injectable()
 export class PersonalFinancesService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
   ) {}
-
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
 
   async createTransaction(
     schemaName: string,
     userId: number,
     data: CreatePersonalTransactionDto,
   ): Promise<PersonalTransactionDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     return prisma.personalTransaction.create({
       data: {
         ...data,
@@ -38,7 +32,7 @@ export class PersonalFinancesService {
     userId: number,
     filters: PersonalTransactionFilterParamsDto,
   ): Promise<PersonalTransactionDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const where: any = { userId };
 
     if (filters.type) {
@@ -66,7 +60,7 @@ export class PersonalFinancesService {
     id: number,
     data: UpdatePersonalTransactionDto,
   ): Promise<PersonalTransactionDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const transaction = await prisma.personalTransaction.findFirst({
       where: { id, userId },
     });
@@ -86,7 +80,7 @@ export class PersonalFinancesService {
     userId: number,
     id: number,
   ): Promise<void> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const transaction = await prisma.personalTransaction.findFirst({
       where: { id, userId },
     });

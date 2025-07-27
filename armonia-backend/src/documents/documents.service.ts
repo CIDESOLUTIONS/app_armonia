@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateDocumentDto,
@@ -11,13 +10,8 @@ import { uploadFileToS3, deleteFileFromS3 } from '../lib/storage/s3-upload';
 @Injectable()
 export class DocumentsService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
   ) {}
-
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
 
   async uploadDocument(
     schemaName: string,
@@ -25,7 +19,7 @@ export class DocumentsService {
     file: any,
     createDocumentDto: CreateDocumentDto,
   ): Promise<DocumentDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const fileUrl = await uploadFileToS3(file);
 
     const document = await prisma.document.create({
@@ -45,7 +39,7 @@ export class DocumentsService {
     schemaName: string,
     filters: DocumentFilterParamsDto,
   ): Promise<DocumentDto[]> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const where: any = {};
 
     if (filters.search) {
@@ -79,7 +73,7 @@ export class DocumentsService {
   }
 
   async getDocumentById(schemaName: string, id: number): Promise<DocumentDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const document = await prisma.document.findUnique({
       where: { id },
     });
@@ -91,7 +85,7 @@ export class DocumentsService {
   }
 
   async deleteDocument(schemaName: string, id: number): Promise<void> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const document = await prisma.document.findUnique({ where: { id } });
 
     if (!document) {

@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   PortfolioMetricDto,
@@ -10,13 +9,12 @@ import { format } from 'date-fns';
 @Injectable()
 export class PortfolioService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
-    private prismaService: PrismaService, // Cambiado a prismaService
+    private prisma: PrismaService,
   ) {}
 
   async getPortfolioMetrics(userId: number): Promise<PortfolioMetricDto> {
     // Para un APP_ADMIN, obtener todos los schemas de los complejos residenciales
-    const prisma = this.prismaClientManager.getClient('default');
+    const prisma = this.prisma;
     const complexes = await prisma.residentialComplex.findMany({
       select: { schemaName: true, id: true, name: true },
     });
@@ -30,9 +28,7 @@ export class PortfolioService {
     let totalExpenses = 0;
 
     for (const complex of complexes) {
-      const tenantPrisma = this.prismaClientManager.getClient(
-        complex.schemaName,
-      );
+      const tenantPrisma = this.prisma;
       // Obtener métricas de cada tenant
       const propertiesCount = await tenantPrisma.property.count();
       totalProperties += propertiesCount;
@@ -84,7 +80,7 @@ export class PortfolioService {
   }
 
   async getComplexMetrics(userId: number): Promise<ComplexMetricDto[]> {
-    const prisma = this.prismaClientManager.getClient('default');
+    const prisma = this.prisma;
     const complexes = await prisma.residentialComplex.findMany({
       select: { schemaName: true, id: true, name: true },
     });
@@ -92,9 +88,7 @@ export class PortfolioService {
     const complexMetrics: ComplexMetricDto[] = [];
 
     for (const complex of complexes) {
-      const tenantPrisma = this.prismaClientManager.getClient(
-        complex.schemaName,
-      );
+      const tenantPrisma = this.prisma;
 
       const residents = await tenantPrisma.user.count({
         where: { role: 'RESIDENT' },
@@ -143,7 +137,7 @@ export class PortfolioService {
     startDate: string,
     endDate: string,
   ): Promise<any> {
-    const prisma = this.prismaClientManager.getClient('default');
+    const prisma = this.prisma;
     const complexes = await prisma.residentialComplex.findMany({
       select: { schemaName: true, name: true },
     });
@@ -153,9 +147,7 @@ export class PortfolioService {
     let totalExpensesAllComplexes = 0;
 
     for (const complex of complexes) {
-      const tenantPrisma = this.prismaClientManager.getClient(
-        complex.schemaName,
-      );
+      const tenantPrisma = this.prisma;
 
       const income = await tenantPrisma.payment.aggregate({
         _sum: { amount: true },
@@ -191,7 +183,8 @@ export class PortfolioService {
       startDate,
       endDate,
       totalIncomeAllComplexes,
-      totalExpensesAllComplexes,
+      totalExpensesAllComplexes:
+        totalExpensesAllComplexes,
       netBalanceAllComplexes:
         totalIncomeAllComplexes - totalExpensesAllComplexes,
       complexReports: reportData,

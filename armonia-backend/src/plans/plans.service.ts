@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import {
   CreatePlanDto,
   UpdatePlanDto,
@@ -11,18 +10,18 @@ import {
 @Injectable()
 export class PlansService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
+    private prisma: PrismaService,
   ) {}
 
   async createPlan(data: CreatePlanDto) {
-    const prisma = this.prismaClientManager.getClient('default');
+    const prisma = this.prisma;
     return prisma.plan.create({
       data: { ...data, features: { create: data.features } },
     });
   }
 
   async getPlans(filters: any = {}) {
-    const prisma = this.prismaClientManager.getClient('default');
+    const prisma = this.prisma;
     const where: any = {};
     if (filters.planType) where.planType = filters.planType;
     if (filters.isActive !== undefined) where.isActive = filters.isActive;
@@ -33,7 +32,7 @@ export class PlansService {
   }
 
   async getPlanById(id: number) {
-    const prisma = this.prismaClientManager.getClient('default');
+    const prisma = this.prisma;
     const plan = await prisma.plan.findUnique({
       where: { id },
       include: { features: true },
@@ -45,23 +44,23 @@ export class PlansService {
   }
 
   async updatePlan(id: number, data: UpdatePlanDto) {
-    const prisma = this.prismaClientManager.getClient('default');
+    const prisma = this.prisma;
     return prisma.plan.update({ where: { id }, data });
   }
 
   async deletePlan(id: number) {
-    const prisma = this.prismaClientManager.getClient('default');
+    const prisma = this.prisma;
     await prisma.plan.delete({ where: { id } });
     return { message: 'Plan eliminado correctamente' };
   }
 
   async createSubscription(data: CreateSubscriptionDto) {
-    const prisma = this.prismaClientManager.getClient('default');
+    const prisma = this.prisma;
     return prisma.subscription.create({ data });
   }
 
   async getSubscriptions(filters: any = {}) {
-    const prisma = this.prismaClientManager.getClient('default');
+    const prisma = this.prisma;
     const where: any = {};
     if (filters.complexId) where.complexId = filters.complexId;
     if (filters.planId) where.planId = filters.planId;
@@ -73,7 +72,7 @@ export class PlansService {
   }
 
   async getSubscriptionById(id: number) {
-    const prisma = this.prismaClientManager.getClient('default');
+    const prisma = this.prisma;
     const subscription = await prisma.subscription.findUnique({
       where: { id },
       include: { plan: true, complex: true },
@@ -85,12 +84,12 @@ export class PlansService {
   }
 
   async updateSubscription(id: number, data: UpdateSubscriptionDto) {
-    const prisma = this.prismaClientManager.getClient('default');
+    const prisma = this.prisma;
     return prisma.subscription.update({ where: { id }, data });
   }
 
   async deleteSubscription(id: number) {
-    const prisma = this.prismaClientManager.getClient('default');
+    const prisma = this.prisma;
     await prisma.subscription.delete({ where: { id } });
     return { message: 'Suscripción eliminada correctamente' };
   }

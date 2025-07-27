@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateAssemblyDto,
@@ -102,23 +101,18 @@ export interface CalculateVoteResultsResult {
 @Injectable()
 export class AssemblyService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
     private activityLogger: ActivityLogger,
     private wsService: WebSocketService,
     private signatureService: DigitalSignatureService,
   ) {}
 
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
-
   async createAssembly(
     schemaName: string,
     data: CreateAssemblyDto,
     userId: number,
   ): Promise<AssemblyDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       const realtimeChannel = `assembly-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
@@ -161,12 +155,12 @@ export class AssemblyService {
   }
 
   async getAssemblies(schemaName: string): Promise<AssemblyDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     return prisma.assembly.findMany({ orderBy: { scheduledDate: 'desc' } });
   }
 
   async getAssemblyById(schemaName: string, id: number): Promise<AssemblyDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const assembly = await prisma.assembly.findUnique({ where: { id } });
     if (!assembly) {
       throw new NotFoundException(`Asamblea con ID ${id} no encontrada.`);
@@ -179,12 +173,12 @@ export class AssemblyService {
     id: number,
     data: UpdateAssemblyDto,
   ): Promise<AssemblyDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     return prisma.assembly.update({ where: { id }, data });
   }
 
   async deleteAssembly(schemaName: string, id: number): Promise<void> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     await prisma.assembly.delete({ where: { id } });
   }
 
@@ -194,7 +188,7 @@ export class AssemblyService {
     userId: number,
     unitId: number,
   ): Promise<AssemblyAttendance> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       if (!assemblyId || !userId || !unitId) {
         throw new Error(
@@ -314,7 +308,7 @@ export class AssemblyService {
     schemaName: string,
     assemblyId: number,
   ): Promise<CalculateQuorumResult> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       if (!assemblyId) {
         throw new Error('Se requiere un ID de asamblea para calcular quórum');
@@ -405,7 +399,7 @@ export class AssemblyService {
       createdBy?: string;
     },
   ): Promise<AssemblyVote> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       if (!assemblyId) {
         throw new Error('Se requiere un ID de asamblea para crear votación');
@@ -472,7 +466,7 @@ export class AssemblyService {
     unitId: number,
     option: string,
   ): Promise<AssemblyVoteRecord> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       if (!voteId || !userId || !unitId || !option) {
         throw new Error(
@@ -593,7 +587,7 @@ export class AssemblyService {
     schemaName: string,
     voteId: number,
   ): Promise<CalculateVoteResultsResult> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       if (!voteId) {
         throw new Error(
@@ -675,7 +669,7 @@ export class AssemblyService {
     schemaName: string,
     voteId: number,
   ): Promise<{ vote: AssemblyVote; results: CalculateVoteResultsResult }> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       if (!voteId) {
         throw new Error('Se requiere un ID de votación para finalizar');
@@ -738,7 +732,7 @@ export class AssemblyService {
     schemaName: string,
     assemblyId: number,
   ): Promise<Buffer> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       if (!assemblyId) {
         throw new Error('Se requiere un ID de asamblea para generar acta');
@@ -851,7 +845,7 @@ export class AssemblyService {
     schemaName: string,
     assemblyId: number,
   ): Promise<{ currentAttendance: number; quorumMet: boolean }> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const assembly = await prisma.assembly.findUnique({
       where: { id: assemblyId },
     });

@@ -3,7 +3,6 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateFeeDto,
@@ -32,18 +31,13 @@ import { Readable } from 'stream';
 @Injectable()
 export class FinancesService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
     private communicationsService: CommunicationsService,
   ) {}
 
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
-
   // Fees
   async createFee(schemaName: string, data: CreateFeeDto): Promise<FeeDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const fee = await prisma.fee.create({
       data: { ...data, status: PaymentStatus.PENDING },
     });
@@ -55,7 +49,7 @@ export class FinancesService {
     filters: FeeFilterParamsDto,
   ): Promise<{ fees: FeeDto[]; total: number }> {
     try {
-      const prisma = this.getTenantPrismaClient(schemaName);
+      const prisma = this.prisma;
       const where: any = {};
       if (filters.status) where.status = filters.status;
       if (filters.type) where.type = filters.type;
@@ -82,7 +76,7 @@ export class FinancesService {
   }
 
   async getFeeById(schemaName: string, id: number): Promise<FeeDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const fee = await prisma.fee.findUnique({ where: { id } });
     if (!fee) {
       throw new NotFoundException(`Cuota con ID ${id} no encontrada.`);
@@ -92,7 +86,7 @@ export class FinancesService {
 
   async getFee(schemaName: string, id: number): Promise<FeeDto | null> {
     try {
-      const prisma = this.getTenantPrismaClient(schemaName);
+      const prisma = this.prisma;
       const fee = await prisma.fee.findUnique({ where: { id } });
       return fee;
     } catch (error) {
@@ -105,7 +99,7 @@ export class FinancesService {
     id: number,
     data: UpdateFeeDto,
   ): Promise<FeeDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const fee = await prisma.fee.findUnique({ where: { id } });
     if (!fee) {
       throw new NotFoundException(`Cuota con ID ${id} no encontrada.`);
@@ -114,7 +108,7 @@ export class FinancesService {
   }
 
   async deleteFee(schemaName: string, id: number): Promise<void> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const fee = await prisma.fee.findUnique({ where: { id } });
     if (!fee) {
       throw new NotFoundException(`Cuota con ID ${id} no encontrada.`);
@@ -123,7 +117,7 @@ export class FinancesService {
   }
 
   async generateOrdinaryFees(schemaName: string): Promise<{ count: number }> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const properties = await prisma.property.findMany();
 
     const feesToCreate = properties.map((property) => ({
@@ -148,7 +142,7 @@ export class FinancesService {
     schemaName: string,
     data: CreatePaymentDto,
   ): Promise<PaymentDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const payment = await prisma.payment.create({ data });
 
     // Update fee status if payment is completed
@@ -170,7 +164,7 @@ export class FinancesService {
     paymentMethod: string,
     transactionId?: string,
   ): Promise<PaymentDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
 
     const fee = await prisma.fee.findUnique({ where: { id: feeId } });
     if (!fee) {
@@ -205,7 +199,7 @@ export class FinancesService {
     schemaName: string,
     filters: FeeFilterParamsDto,
   ): Promise<{ data: PaymentDto[]; total: number }> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const where: any = {};
     if (filters.status) where.status = filters.status;
     if (filters.propertyId) where.propertyId = filters.propertyId;
@@ -228,7 +222,7 @@ export class FinancesService {
   }
 
   async getPaymentById(schemaName: string, id: number): Promise<PaymentDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const payment = await prisma.payment.findUnique({ where: { id } });
     if (!payment) {
       throw new NotFoundException(`Pago con ID ${id} no encontrado.`);
@@ -241,7 +235,7 @@ export class FinancesService {
     id: number,
     data: UpdatePaymentDto,
   ): Promise<PaymentDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const payment = await prisma.payment.findUnique({ where: { id } });
     if (!payment) {
       throw new NotFoundException(`Pago con ID ${id} no encontrado.`);
@@ -277,7 +271,7 @@ export class FinancesService {
   }
 
   async deletePayment(schemaName: string, id: number): Promise<void> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const payment = await prisma.payment.findUnique({ where: { id } });
     if (!payment) {
       throw new NotFoundException(`Pago con ID ${id} no encontrado.`);
@@ -290,7 +284,7 @@ export class FinancesService {
     schemaName: string,
     data: CreateBudgetDto,
   ): Promise<BudgetDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     return prisma.budget.create({ data });
   }
 
@@ -298,7 +292,7 @@ export class FinancesService {
     schemaName: string,
     filters: BudgetFilterParamsDto,
   ): Promise<{ data: BudgetDto[]; total: number }> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const where: any = {};
     if (filters.year) where.year = filters.year;
     if (filters.status) where.status = filters.status;
@@ -322,7 +316,7 @@ export class FinancesService {
   }
 
   async getBudgetById(schemaName: string, id: number): Promise<BudgetDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const budget = await prisma.budget.findUnique({
       where: { id },
       include: { items: true },
@@ -338,7 +332,7 @@ export class FinancesService {
     id: number,
     data: UpdateBudgetDto,
   ): Promise<BudgetDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const budget = await prisma.budget.findUnique({ where: { id } });
     if (!budget) {
       throw new NotFoundException(`Presupuesto con ID ${id} no encontrado.`);
@@ -347,7 +341,7 @@ export class FinancesService {
   }
 
   async deleteBudget(schemaName: string, id: number): Promise<void> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const budget = await prisma.budget.findUnique({ where: { id } });
     if (!budget) {
       throw new NotFoundException(`Presupuesto con ID ${id} no encontrado.`);
@@ -360,7 +354,7 @@ export class FinancesService {
     id: number,
     approvedById: number,
   ): Promise<BudgetDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const budget = await prisma.budget.findUnique({ where: { id } });
     if (!budget) {
       throw new NotFoundException(`Presupuesto con ID ${id} no encontrado.`);
@@ -385,7 +379,7 @@ export class FinancesService {
     schemaName: string,
     data: any, // CreateExpenseDto
   ): Promise<any> { // ExpenseDto
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     return prisma.expense.create({ data });
   }
 
@@ -393,7 +387,7 @@ export class FinancesService {
     schemaName: string,
     filters: ExpenseFilterParamsDto,
   ): Promise<{ data: any[]; total: number }> { // ExpenseDto
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const where: any = {};
     if (filters.status) where.status = filters.status;
     if (filters.categoryId) where.categoryId = filters.categoryId;
@@ -416,7 +410,7 @@ export class FinancesService {
   }
 
   async getExpenseById(schemaName: string, id: number): Promise<any> { // ExpenseDto
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const expense = await prisma.expense.findUnique({ where: { id } });
     if (!expense) {
       throw new NotFoundException(`Gasto con ID ${id} no encontrado.`);
@@ -429,7 +423,7 @@ export class FinancesService {
     id: number,
     data: any, // UpdateExpenseDto
   ): Promise<any> { // ExpenseDto
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const expense = await prisma.expense.findUnique({ where: { id } });
     if (!expense) {
       throw new NotFoundException(`Gasto con ID ${id} no encontrado.`);
@@ -438,7 +432,7 @@ export class FinancesService {
   }
 
   async deleteExpense(schemaName: string, id: number): Promise<void> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const expense = await prisma.expense.findUnique({ where: { id } });
     if (!expense) {
       throw new NotFoundException(`Gasto con ID ${id} no encontrado.`);
@@ -447,7 +441,7 @@ export class FinancesService {
   }
 
   async getFinancialSummary(schemaName: string): Promise<any> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const totalIncome = await prisma.payment.aggregate({
       _sum: { amount: true },
       where: { status: PaymentStatus.PAID },
@@ -503,7 +497,7 @@ export class FinancesService {
   }
 
   async getRecentTransactions(schemaName: string): Promise<any[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
 
     const recentPayments = await prisma.payment.findMany({
       orderBy: { paymentDate: 'desc' },
@@ -544,7 +538,7 @@ export class FinancesService {
     endDate: string,
     format: string,
   ): Promise<Readable> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const doc = new PDFDocument();
     const stream = new Readable();
     stream._read = () => {}; // _read is required but can be empty
@@ -744,7 +738,7 @@ export class FinancesService {
     feeId: number,
     userId: number,
   ): Promise<string> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const fee = await prisma.fee.findUnique({ where: { id: feeId } });
 
     if (!fee) {
@@ -796,7 +790,7 @@ export class FinancesService {
     transactionId: string,
     status: PaymentStatus,
   ): Promise<PaymentDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const payment = await prisma.payment.findUnique({
       where: { transactionId },
     });

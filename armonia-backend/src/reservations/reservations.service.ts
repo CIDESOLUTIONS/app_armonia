@@ -3,7 +3,6 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateReservationDto,
@@ -23,22 +22,17 @@ import { CommonAreaDto } from '../common/dto/inventory.dto'; // Import CommonAre
 @Injectable()
 export class ReservationsService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
     private communicationsService: CommunicationsService,
     private inventoryService: InventoryService, // Inject InventoryService
   ) {}
-
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
 
   // Reservation Management
   async createReservation(
     schemaName: string,
     data: CreateReservationDto,
   ): Promise<ReservationDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const commonArea = await this.inventoryService.getCommonAreaById(
       schemaName,
       data.commonAreaId,
@@ -154,7 +148,7 @@ export class ReservationsService {
     schemaName: string,
     filters: ReservationFilterParamsDto,
   ): Promise<ReservationDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const where: any = {};
 
     if (filters.commonAreaId) {
@@ -184,7 +178,7 @@ export class ReservationsService {
     schemaName: string,
     id: number,
   ): Promise<ReservationDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const reservation = await prisma.reservation.findUnique({
       where: { id },
       include: { commonArea: true, user: true },
@@ -200,7 +194,7 @@ export class ReservationsService {
     id: number,
     data: UpdateReservationDto,
   ): Promise<ReservationDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const reservation = await prisma.reservation.findUnique({ where: { id } });
     if (!reservation) {
       throw new NotFoundException(`Reserva con ID ${id} no encontrada.`);
@@ -214,7 +208,7 @@ export class ReservationsService {
     id: number,
     status: ReservationStatus,
   ): Promise<ReservationDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const reservation = await prisma.reservation.findUnique({ where: { id } });
     if (!reservation) {
       throw new NotFoundException(`Reserva con ID ${id} no encontrada.`);
@@ -223,7 +217,7 @@ export class ReservationsService {
   }
 
   async deleteReservation(schemaName: string, id: number): Promise<void> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const reservation = await prisma.reservation.findUnique({ where: { id } });
     if (!reservation) {
       throw new NotFoundException(`Reserva con ID ${id} no encontrada.`);
@@ -236,7 +230,7 @@ export class ReservationsService {
     reservationId: number,
     userId: number,
   ): Promise<ReservationDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const reservation = await prisma.reservation.findUnique({
       where: { id: reservationId },
     });
@@ -284,7 +278,7 @@ export class ReservationsService {
     userId: number,
     reason: string,
   ): Promise<ReservationDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const reservation = await prisma.reservation.findUnique({
       where: { id: reservationId },
     });

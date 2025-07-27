@@ -1,17 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class FintechService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
   ) {}
-
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
 
   async requestMicroCredit(schemaName: string, data: any): Promise<any> {
     // Simulate API call to an external FinTech provider for micro-credit

@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateResidentialComplexDto,
@@ -10,15 +9,14 @@ import {
 @Injectable()
 export class ResidentialComplexService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
-    private prismaService: PrismaService, // Cambiado a prismaService
+    private prisma: PrismaService,
   ) {}
 
   async createComplexAndSchema(
     data: CreateResidentialComplexDto,
     prismaClient?: any,
   ): Promise<ResidentialComplexDto> {
-    const prisma = prismaClient || this.prismaClientManager.getClient('default');
+    const prisma = prismaClient || this.prisma;
     const newComplex = await prisma.residentialComplex.create({ data });
     const schemaName = `complex_${newComplex.id}`;
     return prisma.residentialComplex.update({
@@ -28,12 +26,12 @@ export class ResidentialComplexService {
   }
 
   async getResidentialComplexes(): Promise<ResidentialComplexDto[]> {
-    const prisma = this.prismaClientManager.getClient('default');
+    const prisma = this.prisma;
     return prisma.residentialComplex.findMany();
   }
 
   async getResidentialComplexById(id: number): Promise<ResidentialComplexDto> {
-    const prisma = this.prismaClientManager.getClient('default');
+    const prisma = this.prisma;
     const complex = await prisma.residentialComplex.findUnique({
       where: { id },
     });
@@ -49,7 +47,7 @@ export class ResidentialComplexService {
     id: number,
     data: UpdateResidentialComplexDto,
   ): Promise<ResidentialComplexDto> {
-    const prisma = this.prismaClientManager.getClient('default');
+    const prisma = this.prisma;
     const complex = await prisma.residentialComplex.findUnique({
       where: { id },
     });
@@ -62,7 +60,7 @@ export class ResidentialComplexService {
   }
 
   async deleteResidentialComplex(id: number): Promise<void> {
-    const prisma = this.prismaClientManager.getClient('default');
+    const prisma = this.prisma;
     const complex = await prisma.residentialComplex.findUnique({
       where: { id },
     });

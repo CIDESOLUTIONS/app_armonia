@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import { uploadFileToS3 } from '../lib/storage/s3-upload'; // Importar el servicio S3
 import {
@@ -14,13 +13,8 @@ import {
 @Injectable()
 export class MarketplaceService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
   ) {}
-
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
 
   async uploadImage(file: any): Promise<{ url: string }> {
     const fileUrl = await uploadFileToS3(file);
@@ -32,7 +26,7 @@ export class MarketplaceService {
     userId: number,
     data: CreateListingDto,
   ): Promise<ListingDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     return prisma.listing.create({
       data: { ...data, authorId: userId, status: ListingStatus.ACTIVE },
     });
@@ -42,7 +36,7 @@ export class MarketplaceService {
     schemaName: string,
     filters: ListingFilterParamsDto,
   ): Promise<ListingDto[]> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const where: any = { status: ListingStatus.ACTIVE };
 
     if (filters.search) {
@@ -71,7 +65,7 @@ export class MarketplaceService {
   }
 
   async getListingById(schemaName: string, id: number): Promise<ListingDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const listing = await prisma.listing.findUnique({
       where: { id },
       include: { author: { select: { name: true } } },
@@ -88,7 +82,7 @@ export class MarketplaceService {
     userId: number,
     data: UpdateListingDto,
   ): Promise<ListingDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const listing = await prisma.listing.findUnique({ where: { id } });
 
     if (!listing || listing.authorId !== userId) {
@@ -108,7 +102,7 @@ export class MarketplaceService {
     id: number,
     userId: number,
   ): Promise<void> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const listing = await prisma.listing.findUnique({ where: { id } });
 
     if (!listing || listing.authorId !== userId) {
@@ -126,7 +120,7 @@ export class MarketplaceService {
     reporterId: number,
     reason: string,
   ): Promise<any> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     return prisma.reportedListing.create({
       data: {
         listingId,
@@ -138,7 +132,7 @@ export class MarketplaceService {
   }
 
   async getReportedListings(schemaName: string): Promise<any[]> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     return prisma.reportedListing.findMany({
       where: { status: 'PENDING' },
       include: {
@@ -153,7 +147,7 @@ export class MarketplaceService {
     reportId: number,
     action: 'APPROVE' | 'REJECT',
   ): Promise<any> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const report = await prisma.reportedListing.findUnique({
       where: { id: reportId },
     });
@@ -189,7 +183,7 @@ export class MarketplaceService {
       content: string;
     },
   ): Promise<any> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     return prisma.message.create({
       data: {
         listingId: data.listingId,
@@ -205,7 +199,7 @@ export class MarketplaceService {
     listingId: number,
     userId: number,
   ): Promise<any[]> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     return prisma.message.findMany({
       where: {
         listingId: listingId,

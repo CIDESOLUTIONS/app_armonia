@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateServiceProviderDto,
@@ -13,19 +12,14 @@ import {
 @Injectable()
 export class ServiceProvidersService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
   ) {}
-
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
 
   async createServiceProvider(
     schemaName: string,
     data: CreateServiceProviderDto,
   ): Promise<ServiceProviderDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     return prisma.serviceProvider.create({
       data: { ...data, rating: 0, reviewCount: 0 },
     });
@@ -35,7 +29,7 @@ export class ServiceProvidersService {
     schemaName: string,
     filters: ServiceProviderFilterParamsDto,
   ): Promise<ServiceProviderDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const where: any = {};
 
     if (filters.search) {
@@ -64,7 +58,7 @@ export class ServiceProvidersService {
     schemaName: string,
     id: number,
   ): Promise<ServiceProviderDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const provider = await prisma.serviceProvider.findUnique({ where: { id } });
     if (!provider) {
       throw new NotFoundException(
@@ -79,7 +73,7 @@ export class ServiceProvidersService {
     id: number,
     data: UpdateServiceProviderDto,
   ): Promise<ServiceProviderDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const provider = await prisma.serviceProvider.findUnique({ where: { id } });
 
     if (!provider) {
@@ -95,7 +89,7 @@ export class ServiceProvidersService {
   }
 
   async deleteServiceProvider(schemaName: string, id: number): Promise<void> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     await prisma.serviceProvider.delete({ where: { id } });
   }
 
@@ -105,7 +99,7 @@ export class ServiceProvidersService {
     userId: number,
     data: CreateReviewDto,
   ): Promise<ReviewDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const review = await prisma.review.create({
       data: {
         serviceProviderId,
@@ -140,7 +134,7 @@ export class ServiceProvidersService {
     schemaName: string,
     serviceProviderId: number,
   ): Promise<ReviewDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     return prisma.review.findMany({
       where: { serviceProviderId },
       orderBy: { createdAt: 'desc' },

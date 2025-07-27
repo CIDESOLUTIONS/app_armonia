@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   NotificationType,
@@ -20,7 +19,7 @@ export class CommunicationsService {
   private twilioPhoneNumber: string | undefined;
 
   constructor(
-    private prismaClientManager: PrismaClientManager,
+    private prisma: PrismaService,
     private configService: ConfigService,
   ) {
     const accountSid = this.configService.get<string>('TWILIO_ACCOUNT_SID');
@@ -52,10 +51,6 @@ export class CommunicationsService {
         );
       }
     }
-  }
-
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
   }
 
   private async sendSms(to: string, message: string): Promise<void> {
@@ -111,7 +106,7 @@ export class CommunicationsService {
     userId: number,
     notification: NotificationDataDto,
   ) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     try {
       const user = await prisma.user.findUnique({ where: { id: userId } });
       if (!user) {
@@ -181,7 +176,7 @@ export class CommunicationsService {
     role: string,
     notification: NotificationDataDto,
   ) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const users = await prisma.user.findMany({
       where: { role },
       select: { id: true, phoneNumber: true, deviceToken: true }, // Select phoneNumber and deviceToken
@@ -195,7 +190,7 @@ export class CommunicationsService {
     userId: number,
     filters: any = {},
   ) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const { read, type, sourceType, priority, limit } = filters;
     return await prisma.notification.findMany({
       where: {
@@ -217,7 +212,7 @@ export class CommunicationsService {
     notificationId: string,
     userId: number,
   ) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const notification = await prisma.notification.findFirst({
       where: {
         id: notificationId,
@@ -237,7 +232,7 @@ export class CommunicationsService {
   }
 
   async markAllNotificationsAsRead(schemaName: string, userId: number) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     return await prisma.notification.updateMany({
       where: {
         recipientId: userId,
@@ -255,7 +250,7 @@ export class CommunicationsService {
     notificationId: string,
     userId: number,
   ) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const notification = await prisma.notification.findFirst({
       where: {
         id: notificationId,
@@ -288,7 +283,7 @@ export class CommunicationsService {
     senderId: number,
     notificationData: NotificationDataDto,
   ) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const { recipientType, recipientId, ...data } = notificationData;
 
     let targetUserIds: number[] = [];
@@ -331,7 +326,7 @@ export class CommunicationsService {
     userRole: string,
     filters: any = {},
   ) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const { type, read, limit } = filters;
     const queryOptions: any = {
       where: {},
@@ -362,13 +357,13 @@ export class CommunicationsService {
     }
     let announcements;
     if (userRole === 'ADMIN' || userRole === 'COMPLEX_ADMIN') {
-      announcements = await prisma.announcement.findMany(queryOptions);
+      announcements = await this.prisma.announcement.findMany(queryOptions);
     } else {
       queryOptions.where.OR = [
         { visibility: 'public' },
         { targetRoles: { has: userRole } },
       ];
-      announcements = await prisma.announcement.findMany(queryOptions);
+      announcements = await this.prisma.announcement.findMany(queryOptions);
     }
     return announcements.map((announcement) => ({
       id: announcement.id,
@@ -396,7 +391,7 @@ export class CommunicationsService {
     userId: number,
     data: AnnouncementDataDto,
   ) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const announcement = await prisma.announcement.create({
       data: {
         title: data.title,
@@ -517,7 +512,7 @@ export class CommunicationsService {
     id: number,
     data: AnnouncementDataDto,
   ) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     try {
       const announcement = await prisma.announcement.update({
         where: { id },
@@ -539,7 +534,7 @@ export class CommunicationsService {
   }
 
   async deleteAnnouncement(schemaName: string, id: number) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     try {
       await prisma.announcement.delete({ where: { id } });
       return { message: 'Anuncio eliminado correctamente' };
@@ -554,7 +549,7 @@ export class CommunicationsService {
     announcementId: string,
     userId: number,
   ) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const existingRead = await prisma.announcementRead.findUnique({
       where: {
         announcementId_userId: { announcementId, userId },
@@ -574,7 +569,7 @@ export class CommunicationsService {
     userId1: number,
     userId2: number,
   ) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const existingConversation = await prisma.conversation.findFirst({
       where: {
         type: 'direct',
@@ -612,7 +607,7 @@ export class CommunicationsService {
     senderId: number,
     data: MessageDataDto,
   ) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const participant = await prisma.conversationParticipant.findFirst({
       where: { conversationId, userId: senderId },
     });
@@ -660,7 +655,7 @@ export class CommunicationsService {
     userId: number,
     options: any = {},
   ) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const participant = await prisma.conversationParticipant.findFirst({
       where: { conversationId, userId },
     });
@@ -699,7 +694,7 @@ export class CommunicationsService {
     messageId: string,
     userId: number,
   ) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const message = await prisma.message.findUnique({
       where: { id: parseInt(messageId) },
       include: {
@@ -745,7 +740,7 @@ export class CommunicationsService {
     organizerId: number,
     data: EventDataDto,
   ) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const event = await prisma.communityEvent.create({
       data: {
         title: data.title,
@@ -860,7 +855,7 @@ export class CommunicationsService {
   }
 
   async updateEvent(schemaName: string, id: number, data: EventDataDto) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     try {
       const event = await prisma.communityEvent.update({
         where: { id },
@@ -884,7 +879,7 @@ export class CommunicationsService {
   }
 
   async deleteEvent(schemaName: string, id: number) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     try {
       await prisma.communityEvent.delete({ where: { id } });
       return { message: 'Evento eliminado correctamente' };
@@ -900,7 +895,7 @@ export class CommunicationsService {
     userRole: string,
     filters: any = {},
   ) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const { type, upcoming, limit, startDate, endDate } = filters;
     const queryOptions: any = {
       where: {},
@@ -930,13 +925,13 @@ export class CommunicationsService {
     }
     let events;
     if (userRole === 'ADMIN' || userRole === 'COMPLEX_ADMIN') {
-      events = await prisma.communityEvent.findMany(queryOptions);
+      events = await this.prisma.communityEvent.findMany(queryOptions);
     } else {
       queryOptions.where.OR = [
         { visibility: 'public' },
         { targetRoles: { has: userRole } },
       ];
-      events = await prisma.communityEvent.findMany(queryOptions);
+      events = await this.prisma.communityEvent.findMany(queryOptions);
     }
     return events.map((event) => ({
       id: event.id,
@@ -966,7 +961,7 @@ export class CommunicationsService {
     userId: number,
     status: 'confirmed' | 'tentative' | 'declined',
   ) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const event = await prisma.communityEvent.findUnique({
       where: { id: eventId },
       include: { attendees: { where: { userId } } },
@@ -999,7 +994,7 @@ export class CommunicationsService {
 
   // UTILIDADES (Modelos globales y de tenant)
   async cleanupExpiredItems(schemaName: string) {
-    const prismaTenant = this.getTenantPrismaClient(schemaName);
+    const prismaTenant = this.prisma;
     const now = new Date();
     const deletedNotifications = await prismaTenant.notification.deleteMany({
       where: { expiresAt: { lt: now } },
@@ -1015,7 +1010,7 @@ export class CommunicationsService {
   }
 
   async migrateReservationNotifications(schemaName: string) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const reservationNotifications =
       await prisma.reservationNotification.findMany({
         where: { migrated: false },
@@ -1028,7 +1023,7 @@ export class CommunicationsService {
         if (oldNotification.type === 'rejection') type = NotificationType.ERROR;
         if (oldNotification.type === 'cancellation')
           type = NotificationType.WARNING;
-        const prisma = this.getTenantPrismaClient(schemaName);
+        const prisma = this.prisma;
         await prisma.notification.create({
           data: {
             recipientId: oldNotification.userId,
