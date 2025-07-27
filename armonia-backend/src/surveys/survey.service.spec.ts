@@ -1,7 +1,6 @@
 import '@test/jest-setup';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SurveyService } from './survey.service';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
 import { SurveyStatus, QuestionType } from '../common/dto/surveys.dto';
@@ -31,19 +30,23 @@ const mockPrismaClient = {
   },
 };
 
-const mockPrismaClientManager = {
-  getClient: jest.fn(() => mockPrismaClient),
-};
-
 describe('SurveyService', () => {
   let service: SurveyService;
+  let prisma: PrismaService;
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-    service = new SurveyService(
-      mockPrismaClientManager as any,
-      // new PrismaService(), // Removed as it's not needed for this mock setup
-    );
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        SurveyService,
+        {
+          provide: PrismaService,
+          useValue: mockPrismaClient,
+        },
+      ],
+    }).compile();
+
+    service = module.get<SurveyService>(SurveyService);
+    prisma = module.get<PrismaService>(PrismaService);
   });
 
   it('should be defined', () => {
@@ -228,9 +231,9 @@ describe('SurveyService', () => {
         data: [
           {
             surveyId: 1,
-            text: 'New Q',
-            type: QuestionType.TEXT,
-            options: [],
+            text: 'Q1',
+            type: QuestionType.SINGLE_CHOICE,
+            options: ['A', 'B'],
             order: 0,
           },
         ],

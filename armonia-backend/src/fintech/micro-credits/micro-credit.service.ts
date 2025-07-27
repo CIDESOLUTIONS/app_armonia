@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaClientManager } from '../../prisma/prisma-client-manager';
+import { PrismaService } from '../../prisma/prisma.service';
 import {
   CreateMicroCreditApplicationDto,
   UpdateMicroCreditApplicationDto,
@@ -9,18 +9,14 @@ import {
 
 @Injectable()
 export class MicroCreditService {
-  constructor(private prismaClientManager: PrismaClientManager) {}
-
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
+  constructor(private prisma: PrismaService) {}
 
   async createApplication(
     schemaName: string,
     userId: number,
     data: CreateMicroCreditApplicationDto,
   ): Promise<MicroCreditApplicationDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const application = await prisma.microCreditApplication.create({
       data: {
         amount: data.amount,
@@ -37,7 +33,7 @@ export class MicroCreditService {
     schemaName: string,
     userId: number,
   ): Promise<MicroCreditApplicationDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     return prisma.microCreditApplication.findMany({
       where: { userId: userId },
       orderBy: { applicationDate: 'desc' },
@@ -49,7 +45,7 @@ export class MicroCreditService {
     id: number,
     data: UpdateMicroCreditApplicationDto,
   ): Promise<MicroCreditApplicationDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const application = await prisma.microCreditApplication.findUnique({
       where: { id },
     });

@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateSecurityEventDto,
@@ -9,21 +8,16 @@ import {
 @Injectable()
 export class SecurityService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
-    private prismaService: PrismaService, // Cambiado a prismaService
+    private prisma: PrismaService,
   ) {}
 
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
-
   async createSecurityLog(schemaName: string, data: CreateSecurityEventDto) {
-    const prisma = this.prismaClientManager.getClient(schemaName);
+    const prisma = this.prisma;
     return prisma.securityLog.create({ data });
   }
 
   async getSecurityLogs(schemaName: string, filters: any = {}) {
-    const prisma = this.prismaClientManager.getClient(schemaName);
+    const prisma = this.prisma;
     const where: any = {};
     if (filters.userId) where.userId = filters.userId;
     if (filters.eventType) where.eventType = filters.eventType;
@@ -35,12 +29,12 @@ export class SecurityService {
   }
 
   async createAccessAttempt(data: CreateAccessAttemptDto) {
-    const prisma = this.prismaClientManager.getClient('default');
+    const prisma = this.prisma;
     return prisma.accessAttempt.create({ data });
   }
 
   async getAccessAttempts(filters: any = {}) {
-    const prisma = this.prismaClientManager.getClient('default');
+    const prisma = this.prisma;
     const where: any = {};
     if (filters.userId) where.userId = filters.userId;
     if (filters.ipAddress) where.ipAddress = filters.ipAddress;

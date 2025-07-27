@@ -1,5 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateIncidentDto,
@@ -12,19 +15,14 @@ import {
 @Injectable()
 export class IncidentsService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
   ) {}
-
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
 
   async createIncident(
     schemaName: string,
     data: CreateIncidentDto,
   ): Promise<IncidentDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     return prisma.incident.create({
       data: {
         ...data,
@@ -48,7 +46,7 @@ export class IncidentsService {
     schemaName: string,
     filters: IncidentFilterParamsDto,
   ): Promise<IncidentDto[]> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const where: any = {};
 
     if (filters.search) {
@@ -76,7 +74,7 @@ export class IncidentsService {
   }
 
   async getIncidentById(schemaName: string, id: number): Promise<IncidentDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const incident = await prisma.incident.findUnique({
       where: { id },
       include: { updates: true, attachments: true },
@@ -92,7 +90,7 @@ export class IncidentsService {
     id: number,
     data: UpdateIncidentDto,
   ): Promise<IncidentDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const incident = await prisma.incident.findUnique({ where: { id } });
 
     if (!incident) {
@@ -119,7 +117,7 @@ export class IncidentsService {
   }
 
   async deleteIncident(schemaName: string, id: number): Promise<void> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     await prisma.incident.delete({ where: { id } });
   }
 
@@ -130,7 +128,7 @@ export class IncidentsService {
     status: IncidentStatus,
     attachments?: string[],
   ): Promise<IncidentDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const incident = await prisma.incident.findUnique({
       where: { id: incidentId },
     });

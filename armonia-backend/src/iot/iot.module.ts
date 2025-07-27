@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { IotController } from './iot.controller';
 import { IotService } from './iot.service';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
+import { PrismaModule } from '../prisma/prisma.module.js';
 
 @Module({
+  imports: [PrismaModule],
   controllers: [IotController],
-  providers: [IotService, PrismaClientManager, PrismaService],
+  providers: [IotService, PrismaService],
 })
 export class IotModule {}

@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   RegisterPackageDto,
@@ -17,20 +16,15 @@ import {
 @Injectable()
 export class PackagesService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
     private communicationsService: CommunicationsService,
   ) {}
-
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
 
   async registerPackage(
     schemaName: string,
     data: RegisterPackageDto,
   ): Promise<PackageDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     return prisma.package.create({
       data: {
         ...data,
@@ -44,7 +38,7 @@ export class PackagesService {
     schemaName: string,
     filters: PackageFilterParamsDto,
   ): Promise<PackageDto[]> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const where: any = {};
 
     if (filters.search) {
@@ -74,7 +68,7 @@ export class PackagesService {
   }
 
   async getPackageById(schemaName: string, id: number): Promise<PackageDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const pkg = await prisma.package.findUnique({ where: { id } });
     if (!pkg) {
       throw new NotFoundException(`Paquete con ID ${id} no encontrado.`);
@@ -83,7 +77,7 @@ export class PackagesService {
   }
 
   async deliverPackage(schemaName: string, id: number): Promise<PackageDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const pkg = await prisma.package.findUnique({ where: { id } });
 
     if (!pkg) {
@@ -128,7 +122,7 @@ export class PackagesService {
     id: number,
     data: UpdatePackageDto,
   ): Promise<PackageDto> {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const pkg = await prisma.package.findUnique({ where: { id } });
 
     if (!pkg) {

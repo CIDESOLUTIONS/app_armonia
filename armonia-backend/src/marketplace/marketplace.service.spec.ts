@@ -1,7 +1,6 @@
 import '@test/jest-setup';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MarketplaceService } from './marketplace.service';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
 import {
@@ -14,7 +13,6 @@ import {
 describe('MarketplaceService', () => {
   let service: MarketplaceService;
   let prisma: PrismaService;
-  let prismaClientManager: PrismaClientManager;
 
   const mockPrismaClient = {
     listing: {
@@ -41,24 +39,14 @@ describe('MarketplaceService', () => {
       providers: [
         MarketplaceService,
         {
-          provide: PrismaClientManager,
-          useValue: {
-            getClient: jest.fn(() => mockPrismaClient),
-          },
-        },
-        {
           provide: PrismaService,
-          useValue: {
-            // Mock global PrismaService methods if needed
-          },
+          useValue: mockPrismaClient, // Directly provide the mocked client
         },
       ],
     }).compile();
 
     service = module.get<MarketplaceService>(MarketplaceService);
     prisma = module.get<PrismaService>(PrismaService);
-    prismaClientManager = module.get<PrismaClientManager>(PrismaClientManager);
-    (service as any).prismaClientManager = prismaClientManager;
     (service as any).prisma = prisma;
   });
 

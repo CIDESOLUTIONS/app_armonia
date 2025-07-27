@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import PDFDocument from 'pdfkit';
 import * as XLSX from 'xlsx';
@@ -11,20 +10,15 @@ import { FeeStatus } from '../common/enums/fee-status.enum';
 @Injectable()
 export class ReportsService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
   ) {}
-
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
 
   async generateVisitorsReportPdf(
     schemaName: string,
     startDate: Date,
     endDate: Date,
   ): Promise<Buffer> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const visitors = await prisma.visitor.findMany({
       where: {
         entryTime: { gte: startDate, lte: endDate },
@@ -89,7 +83,7 @@ export class ReportsService {
     startDate: Date,
     endDate: Date,
   ): Promise<Buffer> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const visitors = await prisma.visitor.findMany({
       where: {
         entryTime: { gte: startDate, lte: endDate },
@@ -120,7 +114,7 @@ export class ReportsService {
     startDate: Date,
     endDate: Date,
   ): Promise<Buffer> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const packages = await prisma.package.findMany({
       where: {
         registrationDate: { gte: startDate, lte: endDate },
@@ -189,7 +183,7 @@ export class ReportsService {
     startDate: Date,
     endDate: Date,
   ): Promise<Buffer> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const packages = await prisma.package.findMany({
       where: {
         registrationDate: { gte: startDate, lte: endDate },
@@ -230,7 +224,7 @@ export class ReportsService {
     startDate: Date,
     endDate: Date,
   ): Promise<Buffer> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const incidents = await prisma.pQR.findMany({
       where: {
         createdAt: { gte: startDate, lte: endDate },
@@ -286,7 +280,7 @@ export class ReportsService {
     startDate: Date,
     endDate: Date,
   ): Promise<Buffer> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const incidents = await prisma.pQR.findMany({
       where: {
         createdAt: { gte: startDate, lte: endDate },
@@ -332,7 +326,7 @@ export class ReportsService {
     schemaName: string,
     residentId: number,
   ): Promise<Buffer> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
 
     const resident = await prisma.resident.findUnique({
       where: { id: residentId },

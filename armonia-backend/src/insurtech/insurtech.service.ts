@@ -1,17 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class InsurtechService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
   ) {}
-
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
 
   async getInsuranceQuote(schemaName: string, data: any): Promise<any> {
     // Simulate API call to an external InsurTech provider

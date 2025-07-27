@@ -1,35 +1,33 @@
 import '@test/jest-setup';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TenantService } from './tenant.service';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
+import { PrismaService } from '../prisma/prisma.service';
 
 describe('TenantService', () => {
   let service: TenantService;
-  let prismaClientManager: PrismaClientManager;
+  let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TenantService,
         {
-          provide: PrismaClientManager,
+          provide: PrismaService,
           useValue: {
-            getClient: jest.fn(() => ({
-              residentialComplex: {
-                create: jest.fn(),
-                findMany: jest.fn(),
-                findUnique: jest.fn(),
-                update: jest.fn(),
-                delete: jest.fn(),
-              },
-            })),
+            residentialComplex: {
+              create: jest.fn(),
+              findMany: jest.fn(),
+              findUnique: jest.fn(),
+              update: jest.fn(),
+              delete: jest.fn(),
+            },
           },
         },
       ],
     }).compile();
 
     service = module.get<TenantService>(TenantService);
-    prismaClientManager = module.get<PrismaClientManager>(PrismaClientManager);
+    prisma = module.get<PrismaService>(PrismaService);
   });
 
   it('should be defined', () => {

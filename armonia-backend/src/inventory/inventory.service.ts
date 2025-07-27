@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   PropertyWithDetailsDto,
@@ -22,23 +21,25 @@ import {
 @Injectable()
 export class InventoryService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
   ) {}
-
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
 
   // PROPIEDADES
   async getProperties(
     schemaName: string,
     complexId: number,
+    propertyId?: number, // Added propertyId as an optional parameter
   ): Promise<PropertyWithDetailsDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
+      const whereClause: any = {
+        property: { complexId },
+      };
+      if (propertyId) {
+        whereClause.propertyId = propertyId;
+      }
       const properties = await prisma.property.findMany({
-        where: { complexId },
+        where: whereClause,
         include: {
           owner: {
             select: { id: true, name: true, email: true },
@@ -74,7 +75,7 @@ export class InventoryService {
   }
 
   async createProperty(schemaName: string, data: CreatePropertyDto) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       const property = await prisma.property.create({
         data: {
@@ -106,7 +107,7 @@ export class InventoryService {
     id: number,
     data: UpdatePropertyDto,
   ) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       const property = await prisma.property.update({
         where: { id },
@@ -129,9 +130,9 @@ export class InventoryService {
   async getPets(
     schemaName: string,
     complexId: number,
-    propertyId?: number,
+    propertyId?: number, // Added propertyId as an optional parameter
   ): Promise<PetWithDetailsDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       const whereClause: any = {
         property: { complexId },
@@ -175,7 +176,7 @@ export class InventoryService {
   }
 
   async createPet(schemaName: string, data: CreatePetDto) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       const pet = await prisma.pet.create({
         data: {
@@ -214,9 +215,9 @@ export class InventoryService {
   async getVehicles(
     schemaName: string,
     complexId: number,
-    propertyId?: number,
+    propertyId?: number, // Added propertyId as an optional parameter
   ): Promise<VehicleWithDetailsDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       const whereClause: any = {
         property: { complexId },
@@ -259,7 +260,7 @@ export class InventoryService {
   }
 
   async createVehicle(schemaName: string, data: CreateVehicleDto) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       const vehicle = await prisma.vehicle.create({
         data: {
@@ -295,9 +296,9 @@ export class InventoryService {
   async getResidents(
     schemaName: string,
     complexId: number,
-    propertyId?: number,
+    propertyId?: number, // Added propertyId as an optional parameter
   ) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       const whereClause: any = {
         property: { complexId },
@@ -333,7 +334,7 @@ export class InventoryService {
     id: number,
     data: UpdateResidentDto,
   ) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       const resident = await prisma.resident.update({
         where: { id },
@@ -353,7 +354,7 @@ export class InventoryService {
   }
 
   async createResident(schemaName: string, data: CreateResidentDto) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       const resident = await prisma.resident.create({
         data: {
@@ -370,7 +371,7 @@ export class InventoryService {
   }
 
   async deleteResident(schemaName: string, id: number) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       await prisma.resident.delete({ where: { id } });
     } catch (error) {
@@ -381,7 +382,7 @@ export class InventoryService {
 
   // SERVICIOS COMUNES
   async getServices(schemaName: string, complexId: number) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       const services = await prisma.commonService.findMany({
         where: { complexId },
@@ -402,7 +403,7 @@ export class InventoryService {
 
   // ESTADÍSTICAS GENERALES
   async getInventoryStats(schemaName: string, complexId: number) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     try {
       const [
         totalProperties,
@@ -474,12 +475,12 @@ export class InventoryService {
     schemaName: string,
     data: CreateCommonAreaDto,
   ): Promise<CommonAreaDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     return prisma.commonArea.create({ data });
   }
 
   async getCommonAreas(schemaName: string): Promise<CommonAreaDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     return prisma.commonArea.findMany();
   }
 
@@ -487,7 +488,7 @@ export class InventoryService {
     schemaName: string,
     id: number,
   ): Promise<CommonAreaDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const commonArea = await prisma.commonArea.findUnique({ where: { id } });
     if (!commonArea) {
       throw new NotFoundException(`Área común con ID ${id} no encontrada.`);
@@ -500,7 +501,7 @@ export class InventoryService {
     id: number,
     data: UpdateCommonAreaDto,
   ): Promise<CommonAreaDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const commonArea = await prisma.commonArea.findUnique({ where: { id } });
     if (!commonArea) {
       throw new NotFoundException(`Área común con ID ${id} no encontrada.`);
@@ -509,7 +510,7 @@ export class InventoryService {
   }
 
   async deleteCommonArea(schemaName: string, id: number): Promise<void> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const commonArea = await prisma.commonArea.findUnique({ where: { id } });
     if (!commonArea) {
       throw new NotFoundException(`Área común con ID ${id} no encontrada.`);
@@ -522,7 +523,7 @@ export class InventoryService {
     schemaName: string,
     data: CreateParkingSpotDto,
   ): Promise<ParkingSpotDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     return prisma.parkingSpot.create({ data });
   }
 
@@ -530,7 +531,7 @@ export class InventoryService {
     schemaName: string,
     complexId: number,
   ): Promise<ParkingSpotDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     return prisma.parkingSpot.findMany({ where: { complexId } });
   }
 
@@ -538,7 +539,7 @@ export class InventoryService {
     schemaName: string,
     id: number,
   ): Promise<ParkingSpotDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const parkingSpot = await prisma.parkingSpot.findUnique({ where: { id } });
     if (!parkingSpot) {
       throw new NotFoundException(
@@ -553,7 +554,7 @@ export class InventoryService {
     id: number,
     data: UpdateParkingSpotDto,
   ): Promise<ParkingSpotDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const parkingSpot = await prisma.parkingSpot.findUnique({ where: { id } });
     if (!parkingSpot) {
       throw new NotFoundException(
@@ -564,7 +565,7 @@ export class InventoryService {
   }
 
   async deleteParkingSpot(schemaName: string, id: number): Promise<void> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const parkingSpot = await prisma.parkingSpot.findUnique({ where: { id } });
     if (!parkingSpot) {
       throw new NotFoundException(

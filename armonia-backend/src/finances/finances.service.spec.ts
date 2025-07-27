@@ -1,7 +1,6 @@
 import '@test/jest-setup';
 import { Test, TestingModule } from '@nestjs/testing';
 import { FinancesService } from './finances.service';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { CommunicationsService } from '../communications/communications.service';
 import { Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
@@ -75,7 +74,7 @@ const mockPrismaClient = {
 
 describe('FinancesService', () => {
   let service: FinancesService;
-  let prismaClientManager: PrismaClientManager;
+  let prisma: PrismaService;
   let communicationsService: CommunicationsService;
   let logger: Logger;
 
@@ -83,12 +82,6 @@ describe('FinancesService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         FinancesService,
-        {
-          provide: PrismaClientManager,
-          useValue: {
-            getClient: jest.fn(() => mockPrismaClient),
-          },
-        },
         {
           provide: PrismaService,
           useValue: mockPrismaClient, // Directly provide the mocked client
@@ -112,7 +105,7 @@ describe('FinancesService', () => {
     }).compile();
 
     service = module.get<FinancesService>(FinancesService);
-    prismaClientManager = module.get<PrismaClientManager>(PrismaClientManager);
+    prisma = module.get<PrismaService>(PrismaService);
     communicationsService = module.get<CommunicationsService>(CommunicationsService);
     logger = module.get<Logger>(Logger);
   });

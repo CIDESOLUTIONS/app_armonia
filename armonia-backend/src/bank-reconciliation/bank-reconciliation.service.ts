@@ -1,5 +1,4 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import { PaymentStatus } from '../common/enums/payment-status.enum';
 import { FeeStatus } from '../common/enums/fee-status.enum';
@@ -7,19 +6,14 @@ import { FeeStatus } from '../common/enums/fee-status.enum';
 @Injectable()
 export class BankReconciliationService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
   ) {}
-
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
 
   async reconcileBankStatement(
     schemaName: string,
     transactions: any[], // This would be a DTO for bank transactions
   ): Promise<any> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const reconciliationResults: any[] = [];
 
     for (const bankTransaction of transactions) {

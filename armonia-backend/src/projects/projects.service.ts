@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateProjectDto,
@@ -12,21 +11,16 @@ import {
 @Injectable()
 export class ProjectsService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
   ) {}
 
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
-
   async createProject(schemaName: string, data: CreateProjectDto) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     return prisma.project.create({ data });
   }
 
   async getProjects(schemaName: string, filters: any = {}) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const where: any = {};
     if (filters.status) where.status = filters.status;
     if (filters.complexId) where.complexId = filters.complexId;
@@ -37,7 +31,7 @@ export class ProjectsService {
   }
 
   async getProjectById(schemaName: string, id: number) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     const project = await prisma.project.findUnique({
       where: { id },
       include: { tasks: true, updates: true },
@@ -49,39 +43,39 @@ export class ProjectsService {
   }
 
   async updateProject(schemaName: string, id: number, data: UpdateProjectDto) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     return prisma.project.update({ where: { id }, data });
   }
 
   async deleteProject(schemaName: string, id: number) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     await prisma.project.delete({ where: { id } });
     return { message: 'Proyecto eliminado correctamente' };
   }
 
   async createTask(schemaName: string, data: CreateProjectTaskDto) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     return prisma.projectTask.create({ data });
   }
 
   async updateTask(schemaName: string, id: number, data: UpdateProjectTaskDto) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     return prisma.projectTask.update({ where: { id }, data });
   }
 
   async deleteTask(schemaName: string, id: number) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     await prisma.projectTask.delete({ where: { id } });
     return { message: 'Tarea eliminada correctamente' };
   }
 
   async addProjectUpdate(schemaName: string, data: CreateProjectUpdateDto) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     return prisma.projectUpdate.create({ data });
   }
 
   async getProjectUpdates(schemaName: string, projectId: number) {
-    const prisma: any = this.getTenantPrismaClient(schemaName);
+    const prisma: any = this.prisma;
     return prisma.projectUpdate.findMany({
       where: { projectId },
       orderBy: { createdAt: 'desc' },

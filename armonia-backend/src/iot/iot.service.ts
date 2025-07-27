@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   SmartMeterReadingDto,
@@ -21,19 +20,14 @@ interface FeeCreateInput {
 @Injectable()
 export class IotService {
   constructor(
-    private prismaClientManager: PrismaClientManager,
     private prisma: PrismaService,
   ) {}
-
-  private getTenantPrismaClient(schemaName: string) {
-    return this.prismaClientManager.getClient(schemaName);
-  }
 
   async recordSmartMeterReading(
     schemaName: string,
     data: SmartMeterReadingDto,
   ): Promise<SmartMeterReadingDto> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const device = await prisma.smartMeterDevice.findUnique({
       where: { meterId: data.meterId },
     });
@@ -59,7 +53,7 @@ export class IotService {
     schemaName: string,
     filters: SmartMeterFilterParamsDto,
   ): Promise<SmartMeterReadingDto[]> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
     const where: any = {};
 
     if (filters.meterId) {
@@ -87,7 +81,7 @@ export class IotService {
     schemaName: string,
     data: AutomatedBillingDto,
   ): Promise<any> {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prisma;
 
     if (!data.billingPeriodStart || !data.billingPeriodEnd) {
       throw new Error(
