@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlansService } from './plans.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaClientManager } from '../prisma/prisma-client-manager';
 
-const mockPrismaService = {
+const mockPrismaClient = {
   plan: {
     create: jest.fn(),
     findMany: jest.fn(),
@@ -20,26 +20,29 @@ const mockPrismaService = {
     update: jest.fn(),
     delete: jest.fn(),
   },
-  // Add other Prisma models used by PlansService here if any
+};
+
+const mockPrismaClientManager = {
+  getClient: jest.fn(() => mockPrismaClient),
 };
 
 describe('PlansService', () => {
   let service: PlansService;
-  let prisma: PrismaService;
+  let prismaClientManager: PrismaClientManager;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PlansService,
         {
-          provide: PrismaService,
-          useValue: mockPrismaService, // Provide the mock PrismaService
+          provide: PrismaClientManager,
+          useValue: mockPrismaClientManager, // Provide the mock PrismaClientManager
         },
       ],
     }).compile();
 
     service = module.get<PlansService>(PlansService);
-    prisma = module.get<PrismaService>(PrismaService);
+    prismaClientManager = module.get<PrismaClientManager>(PrismaClientManager);
   });
 
   it('should be defined', () => {

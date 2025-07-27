@@ -8,12 +8,11 @@ const tsConfig = JSON.parse(readFileSync(join(__dirname, './tsconfig.json'), 'ut
 const jestConfig = {
   moduleFileExtensions: ['js', 'json'],
   rootDir: '.',
-  testRegex: 'dist/src/.*\\.spec\\.js$',
+  testMatch: ['<rootDir>/dist/src/**/*.spec.js', '<rootDir>/dist/test/**/*.spec.js'],
   transform: {},
   collectCoverageFrom: ['dist/src/**/*.(js)'],
   coverageDirectory: '../coverage',
   testEnvironment: 'node',
-  setupFiles: ['./dist/test/jest-setup.js'],
   roots: ['<rootDir>'],
   modulePaths: [tsConfig.compilerOptions.baseUrl],
   moduleNameMapper: {

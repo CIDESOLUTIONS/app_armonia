@@ -5,7 +5,6 @@ import { PrismaClientManager } from '../prisma/prisma-client-manager';
 @Injectable()
 export class TenantService {
   constructor(
-    private prismaService: PrismaService, // Cambiado a prismaService
     private prismaClientManager: PrismaClientManager,
   ) {}
 

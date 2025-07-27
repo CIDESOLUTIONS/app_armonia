@@ -21,7 +21,6 @@ export class CommunicationsService {
 
   constructor(
     private prismaClientManager: PrismaClientManager,
-    private prisma: PrismaService,
     private configService: ConfigService,
   ) {
     const accountSid = this.configService.get<string>('TWILIO_ACCOUNT_SID');
@@ -1046,7 +1045,7 @@ export class CommunicationsService {
             },
           },
         });
-        await this.prisma.prisma.reservationNotification.update({
+        await prisma.reservationNotification.update({
           where: { id: oldNotification.id },
           data: { migrated: true },
         });

@@ -1,3 +1,4 @@
+import '@test/jest-setup';
 import { Test, TestingModule } from '@nestjs/testing';
 import { FinancesService } from './finances.service';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
