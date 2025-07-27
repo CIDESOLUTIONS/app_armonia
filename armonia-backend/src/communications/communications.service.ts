@@ -266,7 +266,7 @@ export class CommunicationsService {
     });
     if (!notification) {
       throw new Error(
-        'Notificación no encontrada, no pertenece al usuario o no requiere confirmación',
+        'Notificación no encontrada, no pertenece o no requiere confirmación de usurio',
       );
     }
     await prisma.notificationConfirmation.create({
@@ -1046,7 +1046,7 @@ export class CommunicationsService {
             },
           },
         });
-        await this.prisma.reservationNotification.update({
+        await this.prisma.prisma.reservationNotification.update({
           where: { id: oldNotification.id },
           data: { migrated: true },
         });

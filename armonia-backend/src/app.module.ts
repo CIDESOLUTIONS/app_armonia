@@ -1,9 +1,3 @@
-import { SurveyModule } from './surveys/survey.module';
-import { PackagesModule } from './packages/packages.module';
-import { VisitorsModule } from './visitors/visitors.module';
-import { PqrModule } from './pqr/pqr.module';
-import { PersonalFinancesModule } from './personal-finances/personal-finances.module';
-import { ReservationsModule } from './reservations/reservations.module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -11,28 +5,33 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
-import { TenantModule } from './tenant/tenant.module';
-import { InventoryModule } from './inventory/inventory.module';
-import { CommunicationsModule } from './communications/communications.module';
-import { FinancesModule } from './finances/finances.module';
-import { ProjectsModule } from './projects/projects.module';
-import { SecurityModule } from './security/security.module';
-import { PlansModule } from './plans/plans.module';
-import { BankReconciliationModule } from './bank-reconciliation/bank-reconciliation.module';
-import { DocumentsModule } from './documents/documents.module';
-import { PaymentGatewaysModule } from './payment-gateways/payment-gateways.module';
-import { ResidentialComplexModule } from './residential-complex/residential-complex.module';
-import { InsurtechModule } from './insurtech/insurtech.module';
-import { ReportsModule } from './reports/reports.module';
-import { StaffModule } from './staff/staff.module'; // Importar el nuevo módulo
-import { ServiceProvidersModule } from './service-providers/service-providers.module';
-
-import { FintechModule } from './fintech/fintech.module';
-import { IotModule } from './iot/iot.module';
-import { PortfolioModule } from './portfolio/portfolio.module';
-import { MarketplaceModule } from './marketplace/marketplace.module';
-import { AssemblyModule } from './assembly/assembly.module';
-import { PanicModule } from './panic/panic.module';
+// import { SurveyModule } from './surveys/survey.module';
+// import { PackagesModule } from './packages/packages.module';
+// import { VisitorsModule } from './visitors/visitors.module';
+// import { PqrModule } from './pqr/pqr.module';
+// import { PersonalFinancesModule } from './personal-finances/personal-finances.module';
+// import { ReservationsModule } './reservations/reservations.module';
+// import { TenantModule } from './tenant/tenant.module';
+// import { InventoryModule } from './inventory/inventory.module';
+// import { CommunicationsModule } from './communications/communications.module';
+// import { FinancesModule } from './finances/finances.module';
+// import { ProjectsModule } from './projects/projects.module';
+// import { SecurityModule } from './security/security.module';
+// import { PlansModule } from './plans/plans.module';
+// import { BankReconciliationModule } from './bank-reconciliation/bank-reconciliation.module';
+// import { DocumentsModule } from './documents/documents.module';
+// import { PaymentGatewaysModule } from './payment-gateways/payment-gateways.module';
+// import { ResidentialComplexModule } from './residential-complex/residential-complex.module';
+// import { InsurtechModule } from './insurtech/insurtech.module';
+// import { ReportsModule } from './reports/reports.module';
+// import { StaffModule } from './staff/staff.module';
+// import { ServiceProvidersModule } from './service-providers/service-providers.module';
+// import { FintechModule } from './fintech/fintech.module';
+// import { IotModule } from './iot/iot.module';
+// import { PortfolioModule } from './portfolio/portfolio.module';
+// import { MarketplaceModule } from './marketplace/marketplace.module';
+// import { AssemblyModule } from './assembly/assembly.module';
+// import { PanicModule } './panic/panic.module';
 
 @Module({
   imports: [
@@ -40,33 +39,33 @@ import { PanicModule } from './panic/panic.module';
     AuthModule,
     UserModule,
     PrismaModule,
-    TenantModule,
-    InventoryModule,
-    CommunicationsModule,
-    FinancesModule,
-    PqrModule,
-    ProjectsModule,
-    SecurityModule,
-    PlansModule,
-    BankReconciliationModule,
-    DocumentsModule,
-    VisitorsModule,
-    PackagesModule,
-    SurveyModule,
-    ServiceProvidersModule,
-    FintechModule,
-    IotModule,
-    PortfolioModule,
-    MarketplaceModule,
-    AssemblyModule,
-    PanicModule,
-    ReservationsModule,
-    PersonalFinancesModule,
-    PaymentGatewaysModule,
-    ResidentialComplexModule,
-    InsurtechModule,
-    ReportsModule,
-    StaffModule, // Añadir el nuevo módulo aquí
+    // TenantModule,
+    // InventoryModule,
+    // CommunicationsModule,
+    // FinancesModule,
+    // PqrModule,
+    // ProjectsModule,
+    // SecurityModule,
+    // PlansModule,
+    // BankReconciliationModule,
+    // DocumentsModule,
+    // VisitorsModule,
+    // PackagesModule,
+    // SurveyModule,
+    // ServiceProvidersModule,
+    // FintechModule,
+    // IotModule,
+    // PortfolioModule,
+    // MarketplaceModule,
+    // AssemblyModule,
+    // PanicModule,
+    // ReservationsModule,
+    // PersonalFinancesModule,
+    // PaymentGatewaysModule,
+    // ResidentialComplexModule,
+    // InsurtechModule,
+    // ReportsModule,
+    // StaffModule,
   ],
   controllers: [AppController],
   providers: [AppService],

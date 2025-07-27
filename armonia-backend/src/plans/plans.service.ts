@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import {
   CreatePlanDto,
   UpdatePlanDto,
@@ -9,26 +10,32 @@ import {
 
 @Injectable()
 export class PlansService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private prismaClientManager: PrismaClientManager,
+  ) {}
 
   async createPlan(data: CreatePlanDto) {
-    return this.prisma.plan.create({
+    const prisma = this.prismaClientManager.getClient('default');
+    return prisma.plan.create({
       data: { ...data, features: { create: data.features } },
     });
   }
 
   async getPlans(filters: any = {}) {
+    const prisma = this.prismaClientManager.getClient('default');
     const where: any = {};
     if (filters.planType) where.planType = filters.planType;
     if (filters.isActive !== undefined) where.isActive = filters.isActive;
-    return this.prisma.plan.findMany({
+    return prisma.plan.findMany({
       where,
       include: { features: true },
     });
   }
 
   async getPlanById(id: number) {
-    const plan = await this.prisma.plan.findUnique({
+    const prisma = this.prismaClientManager.getClient('default');
+    const plan = await prisma.plan.findUnique({
       where: { id },
       include: { features: true },
     });
@@ -39,31 +46,36 @@ export class PlansService {
   }
 
   async updatePlan(id: number, data: UpdatePlanDto) {
-    return this.prisma.plan.update({ where: { id }, data });
+    const prisma = this.prismaClientManager.getClient('default');
+    return prisma.plan.update({ where: { id }, data });
   }
 
   async deletePlan(id: number) {
-    await this.prisma.plan.delete({ where: { id } });
+    const prisma = this.prismaClientManager.getClient('default');
+    await prisma.plan.delete({ where: { id } });
     return { message: 'Plan eliminado correctamente' };
   }
 
   async createSubscription(data: CreateSubscriptionDto) {
-    return this.prisma.subscription.create({ data });
+    const prisma = this.prismaClientManager.getClient('default');
+    return prisma.subscription.create({ data });
   }
 
   async getSubscriptions(filters: any = {}) {
+    const prisma = this.prismaClientManager.getClient('default');
     const where: any = {};
     if (filters.complexId) where.complexId = filters.complexId;
     if (filters.planId) where.planId = filters.planId;
     if (filters.isActive !== undefined) where.isActive = filters.isActive;
-    return this.prisma.subscription.findMany({
+    return prisma.subscription.findMany({
       where,
       include: { plan: true, complex: true },
     });
   }
 
   async getSubscriptionById(id: number) {
-    const subscription = await this.prisma.subscription.findUnique({
+    const prisma = this.prismaClientManager.getClient('default');
+    const subscription = await prisma.subscription.findUnique({
       where: { id },
       include: { plan: true, complex: true },
     });
@@ -74,11 +86,13 @@ export class PlansService {
   }
 
   async updateSubscription(id: number, data: UpdateSubscriptionDto) {
-    return this.prisma.subscription.update({ where: { id }, data });
+    const prisma = this.prismaClientManager.getClient('default');
+    return prisma.subscription.update({ where: { id }, data });
   }
 
   async deleteSubscription(id: number) {
-    await this.prisma.subscription.delete({ where: { id } });
+    const prisma = this.prismaClientManager.getClient('default');
+    await prisma.subscription.delete({ where: { id } });
     return { message: 'Suscripción eliminada correctamente' };
   }
 

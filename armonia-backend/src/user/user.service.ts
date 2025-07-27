@@ -6,7 +6,7 @@ import { PrismaClientManager } from '../prisma/prisma-client-manager';
 @Injectable()
 export class UserService {
   constructor(
-    private prisma: PrismaService,
+    private prismaService: PrismaService, // Cambiado a prismaService
     private prismaClientManager: PrismaClientManager,
   ) {}
 
@@ -14,16 +14,18 @@ export class UserService {
     return this.prismaClientManager.getClient(schemaName);
   }
 
-  async findByEmail(email: string) {
-    return this.prisma.user.findUnique({ where: { email } });
+  async findByEmail(email: string, prismaClient?: any) {
+    const prisma = prismaClient || this.prismaClientManager.getClient('default');
+    return prisma.user.findUnique({ where: { email } });
   }
 
   async findById(id: number) {
-    return this.prisma.user.findUnique({ where: { id } });
+    const prisma = this.prismaClientManager.getClient('default');
+    return prisma.user.findUnique({ where: { id } });
   }
 
-  async createUser(schemaName: string, data: any) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+  async createUser(schemaName: string, data: any, prismaClient?: any) {
+    const prisma = prismaClient || this.getTenantPrismaClient(schemaName);
     const hashedPassword = await bcrypt.hash(data.password, 10);
     return prisma.user.create({
       data: {

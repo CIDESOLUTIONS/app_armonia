@@ -5,5 +5,6 @@ import { CommunicationsController } from './communications.controller';
 @Module({
   providers: [CommunicationsService],
   controllers: [CommunicationsController],
+  exports: [CommunicationsService],
 })
 export class CommunicationsModule {}

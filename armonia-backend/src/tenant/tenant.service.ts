@@ -1,12 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { PrismaClientManager } from '../prisma/prisma-client-manager';
 
 @Injectable()
 export class TenantService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService, // Cambiado a prismaService
+    private prismaClientManager: PrismaClientManager,
+  ) {}
 
   async getTenantSchemaName(complexId: number): Promise<string | null> {
-    const complex = await this.prisma.residentialComplex.findUnique({
+    const prisma = this.prismaClientManager.getClient('default');
+    const complex = await prisma.residentialComplex.findUnique({
       where: { id: complexId },
       select: { schemaName: true },
     });

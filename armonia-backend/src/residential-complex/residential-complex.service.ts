@@ -11,26 +11,30 @@ import {
 export class ResidentialComplexService {
   constructor(
     private prismaClientManager: PrismaClientManager,
-    private prisma: PrismaService,
+    private prismaService: PrismaService, // Cambiado a prismaService
   ) {}
 
   async createComplexAndSchema(
     data: CreateResidentialComplexDto,
+    prismaClient?: any,
   ): Promise<ResidentialComplexDto> {
-    const newComplex = await this.prisma.residentialComplex.create({ data });
+    const prisma = prismaClient || this.prismaClientManager.getClient('default');
+    const newComplex = await prisma.residentialComplex.create({ data });
     const schemaName = `complex_${newComplex.id}`;
-    return this.prisma.residentialComplex.update({
+    return prisma.residentialComplex.update({
       where: { id: newComplex.id },
       data: { schemaName },
     });
   }
 
   async getResidentialComplexes(): Promise<ResidentialComplexDto[]> {
-    return this.prisma.residentialComplex.findMany();
+    const prisma = this.prismaClientManager.getClient('default');
+    return prisma.residentialComplex.findMany();
   }
 
   async getResidentialComplexById(id: number): Promise<ResidentialComplexDto> {
-    const complex = await this.prisma.residentialComplex.findUnique({
+    const prisma = this.prismaClientManager.getClient('default');
+    const complex = await prisma.residentialComplex.findUnique({
       where: { id },
     });
     if (!complex) {
@@ -45,7 +49,8 @@ export class ResidentialComplexService {
     id: number,
     data: UpdateResidentialComplexDto,
   ): Promise<ResidentialComplexDto> {
-    const complex = await this.prisma.residentialComplex.findUnique({
+    const prisma = this.prismaClientManager.getClient('default');
+    const complex = await prisma.residentialComplex.findUnique({
       where: { id },
     });
     if (!complex) {
@@ -53,11 +58,12 @@ export class ResidentialComplexService {
         `Residential Complex with ID ${id} not found`,
       );
     }
-    return this.prisma.residentialComplex.update({ where: { id }, data });
+    return prisma.residentialComplex.update({ where: { id }, data });
   }
 
   async deleteResidentialComplex(id: number): Promise<void> {
-    const complex = await this.prisma.residentialComplex.findUnique({
+    const prisma = this.prismaClientManager.getClient('default');
+    const complex = await prisma.residentialComplex.findUnique({
       where: { id },
     });
     if (!complex) {
@@ -65,6 +71,6 @@ export class ResidentialComplexService {
         `Residential Complex with ID ${id} not found`,
       );
     }
-    await this.prisma.residentialComplex.delete({ where: { id } });
+    await prisma.residentialComplex.delete({ where: { id } });
   }
 }
