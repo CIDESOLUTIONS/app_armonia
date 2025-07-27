@@ -26,7 +26,7 @@ import {
   NotificationType,
   NotificationSourceType,
 } from '../common/dto/communications.dto';
-import * as PDFDocument from 'pdfkit';
+import PDFDocument from 'pdfkit';
 import { Readable } from 'stream';
 
 @Injectable()

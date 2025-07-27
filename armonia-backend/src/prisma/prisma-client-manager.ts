@@ -1,27 +1,65 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { PrismaService } from './prisma.service';
+import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class PrismaClientManager {
-  constructor(private prismaService: PrismaService) {}
+  private clients: Map<string, PrismaClient> = new Map();
 
-  getClient(schemaName: string): PrismaService {
-    // In a multi-schema setup within a single database, the global PrismaClient
-    // instance (PrismaService) already has access to all schemas defined in schema.prisma
-    // via the @@schema("tenant") directive. The schemaName parameter can be used
-    // for logging or validation, but the same PrismaService instance is returned.
-    // For actual schema switching in queries, you would typically use Prisma's
-    // `$extends` or pass the schema name in the query options if supported by the connector.
-    // However, for this project's current multi-schema approach, the generated client
-    // handles schema selection based on the model's @@schema directive.
-    return this.prismaService;
+  constructor() {
+    // Conectar el cliente de Prisma para el esquema por defecto (si aplica)
+    // Esto es para asegurar que el cliente global se inicialice
+    const databaseUrl = process.env.DATABASE_URL;
+    if (!databaseUrl) {
+      console.error('DATABASE_URL is not defined in environment variables. PrismaClientManager might fail.');
+    }
+    const defaultClient = new PrismaClient({
+      datasources: {
+        db: {
+          url: databaseUrl,
+        },
+      },
+    });
+    this.clients.set('default', defaultClient);
+    defaultClient.$connect().then(() => {
+      console.log('PrismaClientManager: Connected to default DB.');
+    }).catch((error) => {
+      console.error('PrismaClientManager: Failed to connect to default DB:', error);
+    });
+  }
+
+  getClient(schemaName: string): PrismaClient {
+    if (schemaName === 'default') {
+      return this.clients.get('default')!;
+    }
+    if (!this.clients.has(schemaName)) {
+      const databaseUrl = process.env.DATABASE_URL; // Obtener la URL de la base de datos
+      if (!databaseUrl) {
+        throw new InternalServerErrorException('DATABASE_URL is not defined in environment variables.');
+      }
+      const client = new PrismaClient({
+        datasources: {
+          db: {
+            url: databaseUrl,
+          },
+        },
+      });
+      this.clients.set(schemaName, client);
+      // Conectar el cliente de Prisma inmediatamente
+      client.$connect().then(() => {
+        console.log(`PrismaClientManager: Connected to DB for schema ${schemaName}.`);
+      }).catch((error) => {
+        console.error(`PrismaClientManager: Failed to connect to DB for schema ${schemaName}:`, error);
+        // No relanzar el error aquí, ya que esto es un manager
+      });
+    }
+    return this.clients.get(schemaName)!;
   }
 
   async disconnectAll() {
-    // The global PrismaService handles its own disconnection.
-    // This method can be kept for consistency if needed, but it won't manage multiple clients.
-    console.warn(
-      'disconnectAll in PrismaClientManager is deprecated in this multi-schema setup. PrismaService handles global disconnection.',
-    );
+    for (const client of this.clients.values()) {
+      await client.$disconnect();
+    }
+    this.clients.clear();
+    console.log('PrismaClientManager: All Prisma clients disconnected.');
   }
 }

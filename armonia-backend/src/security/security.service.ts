@@ -10,7 +10,7 @@ import {
 export class SecurityService {
   constructor(
     private prismaClientManager: PrismaClientManager,
-    private prisma: PrismaService,
+    private prismaService: PrismaService, // Cambiado a prismaService
   ) {}
 
   private getTenantPrismaClient(schemaName: string) {
@@ -18,12 +18,12 @@ export class SecurityService {
   }
 
   async createSecurityLog(schemaName: string, data: CreateSecurityEventDto) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prismaClientManager.getClient(schemaName);
     return prisma.securityLog.create({ data });
   }
 
   async getSecurityLogs(schemaName: string, filters: any = {}) {
-    const prisma = this.getTenantPrismaClient(schemaName);
+    const prisma = this.prismaClientManager.getClient(schemaName);
     const where: any = {};
     if (filters.userId) where.userId = filters.userId;
     if (filters.eventType) where.eventType = filters.eventType;
@@ -35,15 +35,17 @@ export class SecurityService {
   }
 
   async createAccessAttempt(data: CreateAccessAttemptDto) {
-    return this.prisma.accessAttempt.create({ data });
+    const prisma = this.prismaClientManager.getClient('default');
+    return prisma.accessAttempt.create({ data });
   }
 
   async getAccessAttempts(filters: any = {}) {
+    const prisma = this.prismaClientManager.getClient('default');
     const where: any = {};
     if (filters.userId) where.userId = filters.userId;
     if (filters.ipAddress) where.ipAddress = filters.ipAddress;
     if (filters.success !== undefined) where.success = filters.success;
-    return this.prisma.accessAttempt.findMany({
+    return prisma.accessAttempt.findMany({
       where,
       orderBy: { timestamp: 'desc' },
     });

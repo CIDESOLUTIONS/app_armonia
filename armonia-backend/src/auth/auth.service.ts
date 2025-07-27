@@ -6,6 +6,7 @@ import { TenantService } from '../tenant/tenant.service';
 import { ResidentialComplexService } from '../residential-complex/residential-complex.service';
 import { UserRole } from '../common/enums/user-role.enum';
 import { PrismaService } from '../prisma/prisma.service';
+import { PrismaClientManager } from '../prisma/prisma-client-manager';
 
 @Injectable()
 export class AuthService {
@@ -13,12 +14,14 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     private tenantService: TenantService,
-    private prisma: PrismaService,
+    private prismaService: PrismaService, // Cambiado a prismaService
+    private prismaClientManager: PrismaClientManager, // Añadido
     @Inject(ResidentialComplexService) private residentialComplexService: ResidentialComplexService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
-    const user = await this.userService.findByEmail(email);
+    const prisma = this.prismaClientManager.getClient('default'); // Usar el cliente por defecto
+    const user = await this.userService.findByEmail(email, prisma);
     if (user && (await bcrypt.compare(pass, user.password))) {
       const { password, ...result } = user;
       return result;
@@ -45,13 +48,16 @@ export class AuthService {
   async registerComplex(data: any) {
     const { complexData, adminData } = data;
 
-    return this.prisma.$transaction(async (prisma) => {
-      const existingUser = await this.userService.findByEmail(adminData.email, prisma);
+    // Usar el cliente por defecto para la transacción
+    const defaultPrisma = this.prismaClientManager.getClient('default');
+
+    return defaultPrisma.$transaction(async (txPrisma) => {
+      const existingUser = await this.userService.findByEmail(adminData.email, txPrisma);
       if (existingUser) {
         throw new UnauthorizedException('User with this email already exists');
       }
 
-      const newComplex = await this.residentialComplexService.createComplexAndSchema(complexData, prisma);
+      const newComplex = await this.residentialComplexService.createComplexAndSchema(complexData, txPrisma);
 
       const adminPayload = {
         ...adminData,
@@ -59,7 +65,7 @@ export class AuthService {
         complexId: newComplex.id,
       };
 
-      const newAdmin = await this.userService.createUser(newComplex.schemaName, adminPayload, prisma);
+      const newAdmin = await this.userService.createUser(newComplex.schemaName, adminPayload, txPrisma);
 
       return this.login(newAdmin);
     });
@@ -68,8 +74,9 @@ export class AuthService {
   async handleDemoRequest(data: any) {
     const { name, email, complexName, units } = data;
 
-    // Save the demo request to the database
-    await this.prisma.demoRequest.create({
+    // Save the demo request to the database using the default client
+    const defaultPrisma = this.prismaClientManager.getClient('default');
+    await defaultPrisma.demoRequest.create({
       data: {
         name,
         email,

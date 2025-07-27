@@ -11,12 +11,13 @@ import { format } from 'date-fns';
 export class PortfolioService {
   constructor(
     private prismaClientManager: PrismaClientManager,
-    private prisma: PrismaService,
+    private prismaService: PrismaService, // Cambiado a prismaService
   ) {}
 
   async getPortfolioMetrics(userId: number): Promise<PortfolioMetricDto> {
     // Para un APP_ADMIN, obtener todos los schemas de los complejos residenciales
-    const complexes = await this.prisma.residentialComplex.findMany({
+    const prisma = this.prismaClientManager.getClient('default');
+    const complexes = await prisma.residentialComplex.findMany({
       select: { schemaName: true, id: true, name: true },
     });
 
@@ -83,7 +84,8 @@ export class PortfolioService {
   }
 
   async getComplexMetrics(userId: number): Promise<ComplexMetricDto[]> {
-    const complexes = await this.prisma.residentialComplex.findMany({
+    const prisma = this.prismaClientManager.getClient('default');
+    const complexes = await prisma.residentialComplex.findMany({
       select: { schemaName: true, id: true, name: true },
     });
 
@@ -141,7 +143,8 @@ export class PortfolioService {
     startDate: string,
     endDate: string,
   ): Promise<any> {
-    const complexes = await this.prisma.residentialComplex.findMany({
+    const prisma = this.prismaClientManager.getClient('default');
+    const complexes = await prisma.residentialComplex.findMany({
       select: { schemaName: true, name: true },
     });
 

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AssemblyController } from './assembly.controller';
-import { AssemblyAdvancedService } from '../services/assembly-advanced-service-impl';
+import { AssemblyService } from './assembly.service';
 import { AssemblyGateway } from './assembly.gateway';
 import { PrismaClientManager } from '../prisma/prisma-client-manager';
 import { PrismaService } from '../prisma/prisma.service';
@@ -11,7 +11,7 @@ import { DigitalSignatureService } from '../common/services/digital-signature.se
 @Module({
   controllers: [AssemblyController],
   providers: [
-    AssemblyAdvancedService,
+    AssemblyService,
     AssemblyGateway,
     PrismaClientManager,
     PrismaService,
@@ -19,5 +19,6 @@ import { DigitalSignatureService } from '../common/services/digital-signature.se
     WebSocketService,
     DigitalSignatureService,
   ],
+  exports: [AssemblyService] // Export AssemblyService if it's used by other modules
 })
 export class AssemblyModule {}

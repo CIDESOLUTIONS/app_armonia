@@ -72,6 +72,14 @@ export class NotificationDataDto {
   @IsOptional()
   @IsDateString()
   expiresAt?: Date;
+
+  @IsOptional()
+  @IsString()
+  recipientType?: "ALL" | "RESIDENT" | "PROPERTY" | "USER";
+
+  @IsOptional()
+  @IsString()
+  recipientId?: string;
 }
 
 export class AttachmentDto {
