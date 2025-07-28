@@ -3,7 +3,7 @@ import { PackagesController } from './packages.controller';
 import { PackagesService } from './packages.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CommunicationsModule } from '../communications/communications.module';
-import { PrismaModule } from '../prisma/prisma.module.js';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [CommunicationsModule, PrismaModule],

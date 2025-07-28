@@ -3,7 +3,7 @@ import { PanicController } from './panic.controller';
 import { PanicService } from './panic.service';
 import { PanicGateway } from './panic.gateway';
 import { PrismaService } from '../prisma/prisma.service';
-import { PrismaModule } from '../prisma/prisma.module.js';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [PrismaModule],

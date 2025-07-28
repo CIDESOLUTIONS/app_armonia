@@ -10,10 +10,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { PaymentGatewaysService } from './payment-gateways.service';
-import {
-  CreatePaymentGatewayDto,
-  UpdatePaymentGatewayDto,
-} from '../common/dto/payment-gateways.dto';
+import { CreatePaymentGatewayDto, UpdatePaymentGatewayDto, } from '../common/dto/payment-gateways.dto';
 import {
   ApiTags,
   ApiOperation,

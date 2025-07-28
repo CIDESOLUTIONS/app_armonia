@@ -1,13 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import {
-  CreateSurveyDto,
-  UpdateSurveyDto,
-  SurveyDto,
-  CreateAnswerDto,
-  SurveyStatus,
-  QuestionType,
-} from '../common/dto/surveys.dto';
+import { CreateSurveyDto, UpdateSurveyDto, SurveyDto, CreateAnswerDto, SurveyStatus, QuestionType, } from '../common/dto/surveys.dto';
 
 @Injectable()
 export class SurveyService {

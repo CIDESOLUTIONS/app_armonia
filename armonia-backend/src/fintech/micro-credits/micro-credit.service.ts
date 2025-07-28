@@ -1,11 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import {
-  CreateMicroCreditApplicationDto,
-  UpdateMicroCreditApplicationDto,
-  MicroCreditApplicationDto,
-  MicroCreditStatus,
-} from '../../common/dto/fintech.dto';
+import { CreateMicroCreditApplicationDto, UpdateMicroCreditApplicationDto, MicroCreditApplicationDto, MicroCreditStatus, } from '../../common/dto/fintech.dto';
 
 @Injectable()
 export class MicroCreditService {

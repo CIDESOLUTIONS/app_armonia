@@ -12,13 +12,7 @@ import {
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { GetUser } from '../common/decorators/user.decorator';
 import { VisitorsService } from './visitors.service';
-import {
-  CreateVisitorDto,
-  UpdateVisitorDto,
-  VisitorDto,
-  VisitorFilterParamsDto,
-  ScanQrCodeDto,
-} from '../common/dto/visitors.dto';
+import { CreateVisitorDto, UpdateVisitorDto, VisitorDto, VisitorFilterParamsDto, ScanQrCodeDto, } from '../common/dto/visitors.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('visitors')

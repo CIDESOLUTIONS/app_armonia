@@ -460,24 +460,24 @@ export class CommunicationsService {
         select: { id: true, phoneNumber: true, deviceToken: true },
       });
       targetUserIds = users.map((user) => user.id);
-      if (completeAnnouncement.type === 'emergency') {
+      if (completeEvent.type === 'emergency') {
         for (const user of users) {
           if (user.phoneNumber) {
             await this.sendSms(
               user.phoneNumber,
-              `Alerta de emergencia: ${completeAnnouncement.title}. ${completeAnnouncement.content.substring(0, 100)}...`,
+              `Alerta de emergencia: ${completeEvent.title}. ${completeEvent.content.substring(0, 100)}...`,
             );
           }
         }
       }
       // Send push notifications for emergency announcements to targeted roles
-      if (completeAnnouncement.type === 'emergency') {
+      if (completeEvent.type === 'emergency') {
         for (const user of users) {
           if (user.deviceToken) {
             await this.sendPushNotification(
               user.deviceToken,
-              `Alerta de emergencia: ${completeAnnouncement.title}`,
-              completeAnnouncement.content,
+              `Alerta de emergencia: ${completeEvent.title}`,
+              completeEvent.content,
             );
           }
         }

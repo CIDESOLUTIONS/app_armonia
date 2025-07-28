@@ -6,11 +6,11 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { AssemblyService } from './assembly.service.js';
+import { AssemblyService } from './assembly.service';
 import {
   RegisterAttendanceDto,
   SubmitVoteDto,
-} from '../common/dto/assembly.dto.js';
+} from '../common/dto/assembly.dto';
 
 @WebSocketGateway({ namespace: '/assembly', cors: { origin: '*' } })
 export class AssemblyGateway {
