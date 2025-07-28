@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { PortfolioMetricDto, ComplexMetricDto, } from '../common/dto/portfolio.dto';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { PortfolioMetricDto, ComplexMetricDto, } from '../common/dto/portfolio.dto.js';
 import { format } from 'date-fns';
 
 @Injectable()

@@ -1,10 +1,10 @@
 import { Controller, Get, Query, Res, UseGuards, Req, Body, Post, Param } from '@nestjs/common';
 import { Response } from 'express';
-import { ReportsService } from './reports.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
-import { UserRole } from '../common/enums/user-role.enum';
+import { ReportsService } from './reports.service.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import { RolesGuard } from '../auth/roles.guard.js';
+import { Roles } from '../auth/roles.decorator.js';
+import { UserRole } from '../common/enums/user-role.enum.js';
 
 @UseGuards(
   JwtAuthGuard,

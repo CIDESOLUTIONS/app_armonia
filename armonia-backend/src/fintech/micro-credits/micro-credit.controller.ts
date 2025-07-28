@@ -9,11 +9,11 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@backend/auth/jwt-auth.guard';
 import { GetUser } from '@backend/common/decorators/user.decorator';
-import { MicroCreditService } from './micro-credit.service';
+import { MicroCreditService } from './micro-credit.service.js';
 import {
   CreateMicroCreditApplicationDto,
   UpdateMicroCreditApplicationDto,
-} from '../../common/dto/fintech.dto';
+} from '../../common/dto/fintech.dto.js';
 
 @UseGuards(JwtAuthGuard)
 @Controller('fintech/micro-credits')

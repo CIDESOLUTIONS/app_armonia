@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service.js';
 import PDFDocument from 'pdfkit';
 import * as XLSX from 'xlsx';
 import { format } from 'date-fns';
-import { PaymentStatus } from '../common/enums/payment-status.enum';
-import { ExpenseStatus } from '../common/enums/expense-status.enum';
-import { FeeStatus } from '../common/enums/fee-status.enum';
+import { PaymentStatus } from '../common/enums/payment-status.enum.js';
+import { ExpenseStatus } from '../common/enums/expense-status.enum.js';
+import { FeeStatus } from '../common/enums/fee-status.enum.js';
 
 @Injectable()
 export class ReportsService {

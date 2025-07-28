@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { uploadFileToS3 } from '../lib/storage/s3-upload'; // Importar el servicio S3
+import { PrismaService } from '../prisma/prisma.service.js';
+import { uploadFileToS3 } from '../lib/storage/s3-upload.js'; // Importar el servicio S3
 import {
   CreateListingDto,
   UpdateListingDto,
@@ -8,7 +8,7 @@ import {
   ListingFilterParamsDto,
   ListingStatus,
   ListingCategory,
-} from '../common/dto/marketplace.dto';
+} from '../common/dto/marketplace.dto.js';
 
 @Injectable()
 export class MarketplaceService {

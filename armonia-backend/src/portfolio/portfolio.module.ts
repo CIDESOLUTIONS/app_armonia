@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { PortfolioController } from './portfolio.controller';
-import { PortfolioService } from './portfolio.service';
-import { PrismaService } from '../prisma/prisma.service';
-import { PrismaModule } from '../prisma/prisma.module';
+import { PortfolioController } from './portfolio.controller.js';
+import { PortfolioService } from './portfolio.service.js';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { PrismaModule } from '../prisma/prisma.module.js';
 
 @Module({
   imports: [PrismaModule],

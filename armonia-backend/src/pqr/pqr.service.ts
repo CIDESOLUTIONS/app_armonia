@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service.js';
 import {
   PQRDto,
   PQRCommentDto,
@@ -8,7 +8,7 @@ import {
   UpdatePQRDto,
   PQRStatus,
   PQRPriority,
-} from '../common/dto/pqr.dto';
+} from '../common/dto/pqr.dto.js';
 
 @Injectable()
 export class PqrService {

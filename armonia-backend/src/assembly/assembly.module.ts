@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AssemblyController } from './assembly.controller';
-import { AssemblyService } from './assembly.service';
-import { AssemblyGateway } from './assembly.gateway';
-import { PrismaService } from '../prisma/prisma.service';
-import { ActivityLogger } from '../lib/logging/activity-logger';
-import { WebSocketService } from '../communications/websocket.service';
-import { DigitalSignatureService } from '../common/services/digital-signature.service';
-import { PrismaModule } from '../prisma/prisma.module';
+import { AssemblyController } from './assembly.controller.js';
+import { AssemblyService } from './assembly.service.js';
+import { AssemblyGateway } from './assembly.gateway.js';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { ActivityLogger } from '../lib/logging/activity-logger.js';
+import { WebSocketService } from '../communications/websocket.service.js';
+import { DigitalSignatureService } from '../common/services/digital-signature.service.js';
+import { PrismaModule } from '../prisma/prisma.module.js';
 
 @Module({
   imports: [PrismaModule],

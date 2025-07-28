@@ -14,7 +14,7 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
-      "@backend/*": ["src/*"],
+      "@armonia-backend/*": ["src/*"],
       "@test/*": ["test/*"]
     },
     "incremental": true,

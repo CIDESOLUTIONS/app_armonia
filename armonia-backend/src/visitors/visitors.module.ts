@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { VisitorsController } from './visitors.controller';
-import { VisitorsService } from './visitors.service';
-import { PrismaService } from '../prisma/prisma.service';
-import { PrismaModule } from '../prisma/prisma.module';
+import { VisitorsController } from './visitors.controller.js';
+import { VisitorsService } from './visitors.service.js';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { PrismaModule } from '../prisma/prisma.module.js';
 
 @Module({
   imports: [PrismaModule],
