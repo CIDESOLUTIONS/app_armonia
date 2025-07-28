@@ -3,7 +3,7 @@ import { FinancesService } from './finances.service';
 import { FinancesController } from './finances.controller';
 import { PrismaService } from '../prisma/prisma.service';
 import { CommunicationsService } from '../communications/communications.service';
-import { PrismaModule } from '../prisma/prisma.module.js';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [PrismaModule],

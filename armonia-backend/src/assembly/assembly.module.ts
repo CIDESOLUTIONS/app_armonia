@@ -6,7 +6,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ActivityLogger } from '../lib/logging/activity-logger';
 import { WebSocketService } from '../communications/websocket.service';
 import { DigitalSignatureService } from '../common/services/digital-signature.service';
-import { PrismaModule } from '../prisma/prisma.module.js';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [PrismaModule],

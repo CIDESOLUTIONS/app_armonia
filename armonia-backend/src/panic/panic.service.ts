@@ -6,10 +6,7 @@ import {
   CreatePanicResponseDto,
 } from '../common/dto/panic.dto';
 import { PanicGateway } from './panic.gateway'; // Import PanicGateway
-import {
-  NotificationType,
-  NotificationSourceType,
-} from '../common/dto/communications.dto';
+import { NotificationType, NotificationSourceType, } from '../common/dto/communications.dto';
 
 @Injectable()
 export class PanicService {

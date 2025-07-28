@@ -12,13 +12,7 @@ import {
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { GetUser } from '../common/decorators/user.decorator';
 import { ReservationsService } from './reservations.service';
-import {
-  CreateReservationDto,
-  UpdateReservationDto,
-  ReservationDto,
-  ReservationFilterParamsDto,
-  ReservationStatus,
-} from '../common/dto/reservations.dto';
+import { CreateReservationDto, UpdateReservationDto, ReservationDto, ReservationFilterParamsDto, ReservationStatus, } from '../common/dto/reservations.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('reservations')

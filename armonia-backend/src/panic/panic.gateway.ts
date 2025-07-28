@@ -8,10 +8,7 @@ import {
 import { Server } from 'socket.io';
 import { PanicService } from './panic.service';
 import { CreatePanicAlertDto } from '../common/dto/panic.dto';
-import {
-  NotificationType,
-  NotificationSourceType,
-} from '../common/dto/communications.dto';
+import { NotificationType, NotificationSourceType, } from '../common/dto/communications.dto';
 import { PanicStatus } from '../common/enums/panic.enum';
 
 interface NotificationPayload {

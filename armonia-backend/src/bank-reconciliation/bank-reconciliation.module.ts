@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { BankReconciliationService } from './bank-reconciliation.service';
 import { BankReconciliationController } from './bank-reconciliation.controller';
 import { PrismaService } from '../prisma/prisma.service';
-import { PrismaModule } from '../prisma/prisma.module.js';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [PrismaModule],

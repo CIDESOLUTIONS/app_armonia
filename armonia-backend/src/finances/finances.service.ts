@@ -21,10 +21,7 @@ import {
   ExpenseFilterParamsDto,
 } from '../common/dto/finances.dto';
 import { CommunicationsService } from '../communications/communications.service';
-import {
-  NotificationType,
-  NotificationSourceType,
-} from '../common/dto/communications.dto';
+import { NotificationType, NotificationSourceType, } from '../common/dto/communications.dto';
 import PDFDocument from 'pdfkit';
 import { Readable } from 'stream';
 

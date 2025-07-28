@@ -12,14 +12,7 @@ import {
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { GetUser } from '../common/decorators/user.decorator';
 import { ServiceProvidersService } from './service-providers.service';
-import {
-  CreateServiceProviderDto,
-  UpdateServiceProviderDto,
-  ServiceProviderDto,
-  ServiceProviderFilterParamsDto,
-  CreateReviewDto,
-  ReviewDto,
-} from '../common/dto/service-providers.dto';
+import { CreateServiceProviderDto, UpdateServiceProviderDto, ServiceProviderDto, ServiceProviderFilterParamsDto, CreateReviewDto, ReviewDto, } from '../common/dto/service-providers.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('service-providers')

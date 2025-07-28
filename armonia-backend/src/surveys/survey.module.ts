@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { SurveyController } from './survey.controller';
 import { SurveyService } from './survey.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { PrismaModule } from '../prisma/prisma.module.js';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [PrismaModule],
