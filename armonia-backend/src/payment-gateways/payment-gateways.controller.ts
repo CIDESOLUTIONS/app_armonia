@@ -9,8 +9,8 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
-import { PaymentGatewaysService } from './payment-gateways.service';
-import { CreatePaymentGatewayDto, UpdatePaymentGatewayDto, } from '../common/dto/payment-gateways.dto';
+import { PaymentGatewaysService } from './payment-gateways.service.js';
+import { CreatePaymentGatewayDto, UpdatePaymentGatewayDto, } from '../common/dto/payment-gateways.dto.js';
 import {
   ApiTags,
   ApiOperation,
@@ -18,9 +18,9 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
-import { UserRole } from '../common/enums/user-role.enum';
+import { RolesGuard } from '../auth/roles.guard.js';
+import { Roles } from '../auth/roles.decorator.js';
+import { UserRole } from '../common/enums/user-role.enum.js';
 
 @ApiTags('payment-gateways')
 @Controller('payment-gateways')

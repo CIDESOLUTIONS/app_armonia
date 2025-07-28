@@ -9,15 +9,15 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { GetUser } from '../common/decorators/user.decorator';
-import { PersonalFinancesService } from './personal-finances.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import { GetUser } from '../common/decorators/user.decorator.js';
+import { PersonalFinancesService } from './personal-finances.service.js';
 import {
   CreatePersonalTransactionDto,
   UpdatePersonalTransactionDto,
   PersonalTransactionDto,
   PersonalTransactionFilterParamsDto,
-} from '../common/dto/personal-finances.dto';
+} from '../common/dto/personal-finances.dto.js';
 
 @UseGuards(JwtAuthGuard)
 @Controller('personal-finances')

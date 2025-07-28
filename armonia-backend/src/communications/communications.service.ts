@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service.js';
 import {
   NotificationType,
   NotificationDataDto,
@@ -8,7 +8,7 @@ import {
   EventDataDto,
   NotificationPriority,
   NotificationSourceType,
-} from '../common/dto/communications.dto';
+} from '../common/dto/communications.dto.js';
 import { ConfigService } from '@nestjs/config';
 import twilio from 'twilio';
 import * as admin from 'firebase-admin';
@@ -231,20 +231,6 @@ export class CommunicationsService {
     });
   }
 
-  async markAllNotificationsAsRead(schemaName: string, userId: number) {
-    const prisma: any = this.prisma;
-    return await prisma.notification.updateMany({
-      where: {
-        recipientId: userId,
-        read: false,
-      },
-      data: {
-        read: true,
-        readAt: new Date(),
-      },
-    });
-  }
-
   async confirmNotificationReading(
     schemaName: string,
     notificationId: string,
@@ -446,7 +432,7 @@ export class CommunicationsService {
             await this.sendPushNotification(
               user.deviceToken,
               `Alerta de emergencia: ${completeAnnouncement.title}`,
-              completeAnnouncement.content,
+              completeEvent.content,
             );
           }
         }

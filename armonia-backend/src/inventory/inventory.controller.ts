@@ -9,9 +9,9 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
-import { InventoryService } from './inventory.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { GetUser } from '../common/decorators/user.decorator';
+import { InventoryService } from './inventory.service.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import { GetUser } from '../common/decorators/user.decorator.js';
 import {
   PropertyWithDetailsDto,
   PetWithDetailsDto,
@@ -28,7 +28,7 @@ import {
   CreateParkingSpotDto,
   UpdateParkingSpotDto,
   ParkingSpotDto,
-} from '../common/dto/inventory.dto';
+} from '../common/dto/inventory.dto.js';
 
 @UseGuards(JwtAuthGuard)
 @Controller('inventory')

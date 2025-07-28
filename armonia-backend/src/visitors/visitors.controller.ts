@@ -9,10 +9,10 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { GetUser } from '../common/decorators/user.decorator';
-import { VisitorsService } from './visitors.service';
-import { CreateVisitorDto, UpdateVisitorDto, VisitorDto, VisitorFilterParamsDto, ScanQrCodeDto, } from '../common/dto/visitors.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import { GetUser } from '../common/decorators/user.decorator.js';
+import { VisitorsService } from './visitors.service.js';
+import { CreateVisitorDto, UpdateVisitorDto, VisitorDto, VisitorFilterParamsDto, ScanQrCodeDto, } from '../common/dto/visitors.dto.js';
 
 @UseGuards(JwtAuthGuard)
 @Controller('visitors')

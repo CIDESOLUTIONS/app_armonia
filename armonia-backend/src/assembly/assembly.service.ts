@@ -1,16 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service.js';
 import {
   CreateAssemblyDto,
   UpdateAssemblyDto,
   AssemblyDto,
   AssemblyStatus,
-} from '../common/dto/assembly.dto';
-import { ServerLogger } from '../lib/logging/server-logger';
-import { ActivityLogger } from '../lib/logging/activity-logger';
-import { WebSocketService } from '../communications/websocket.service';
-import { DigitalSignatureService } from '../common/services/digital-signature.service';
-import { notifyAssemblyConvocation } from '../communications/integrations/assembly-notifications';
+} from '../common/dto/assembly.dto.js';
+import { ServerLogger } from '../lib/logging/server-logger.js';
+import { ActivityLogger } from '../lib/logging/activity-logger.js';
+import { WebSocketService } from '../communications/websocket.service.js';
+import { DigitalSignatureService } from '../common/services/digital-signature.service.js';
+import { notifyAssemblyConvocation } from '../communications/integrations/assembly-notifications.js';
 
 export interface AssemblyAttendance {
   id: number;

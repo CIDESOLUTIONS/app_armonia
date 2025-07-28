@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { SecurityService } from './security.service';
-import { SecurityController } from './security.controller';
+import { SecurityService } from './security.service.js';
+import { SecurityController } from './security.controller.js';
 
 @Module({
   providers: [SecurityService],

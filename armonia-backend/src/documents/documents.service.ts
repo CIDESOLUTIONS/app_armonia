@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service.js';
 import {
   CreateDocumentDto,
   DocumentDto,
   DocumentFilterParamsDto,
-} from '../common/dto/documents.dto';
-import { uploadFileToS3, deleteFileFromS3 } from '../lib/storage/s3-upload';
+} from '../common/dto/documents.dto.js';
+import { uploadFileToS3, deleteFileFromS3 } from '../lib/storage/s3-upload.js';
 
 @Injectable()
 export class DocumentsService {

@@ -3,7 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service.js';
 import {
   CreateVisitorDto,
   UpdateVisitorDto,
@@ -12,7 +12,7 @@ import {
   VisitorStatus,
   VisitorDocumentType,
   PreRegistrationStatus,
-} from '../common/dto/visitors.dto';
+} from '../common/dto/visitors.dto.js';
 
 @Injectable()
 export class VisitorsService {

@@ -3,21 +3,21 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service.js';
 import {
   CreateReservationDto,
   UpdateReservationDto,
   ReservationDto,
   ReservationFilterParamsDto,
   ReservationStatus,
-} from '../common/dto/reservations.dto';
-import { CommunicationsService } from '../communications/communications.service';
+} from '../common/dto/reservations.dto.js';
+import { CommunicationsService } from '../communications/communications.service.js';
 import {
   NotificationType,
   NotificationSourceType,
-} from '../common/dto/communications.dto';
-import { InventoryService } from '../inventory/inventory.service'; // Import InventoryService
-import { CommonAreaDto } from '../common/dto/inventory.dto'; // Import CommonAreaDto
+} from '../common/dto/communications.dto.js';
+import { InventoryService } from '../inventory/inventory.service.js'; // Import InventoryService
+import { CommonAreaDto } from '../common/dto/inventory.dto.js'; // Import CommonAreaDto
 
 @Injectable()
 export class ReservationsService {

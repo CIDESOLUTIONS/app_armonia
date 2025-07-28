@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException, Inject, forwardRef } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service.js';
 import {
   CreatePanicAlertDto,
   UpdatePanicAlertDto,
   CreatePanicResponseDto,
-} from '../common/dto/panic.dto';
-import { PanicGateway } from './panic.gateway'; // Import PanicGateway
-import { NotificationType, NotificationSourceType, } from '../common/dto/communications.dto';
+} from '../common/dto/panic.dto.js';
+import { PanicGateway } from './panic.gateway.js'; // Import PanicGateway
+import { NotificationType, NotificationSourceType, } from '../common/dto/communications.dto.js';
 
 @Injectable()
 export class PanicService {

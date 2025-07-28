@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service.js';
 import {
   CreateFeeDto,
   UpdateFeeDto,
@@ -19,9 +14,12 @@ import {
   BudgetFilterParamsDto,
   BudgetStatus,
   ExpenseFilterParamsDto,
-} from '../common/dto/finances.dto';
-import { CommunicationsService } from '../communications/communications.service';
-import { NotificationType, NotificationSourceType, } from '../common/dto/communications.dto';
+} from '../common/dto/finances.dto.js';
+import { CommunicationsService } from '../communications/communications.service.js';
+import {
+  NotificationType,
+  NotificationSourceType,
+} from '../common/dto/communications.dto.js';
 import PDFDocument from 'pdfkit';
 import { Readable } from 'stream';
 

@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service.js';
 import {
   CreateResidentialComplexDto,
   UpdateResidentialComplexDto,
   ResidentialComplexDto,
-} from '../common/dto/residential-complex.dto';
+} from '../common/dto/residential-complex.dto.js';
 
 @Injectable()
 export class ResidentialComplexService {
