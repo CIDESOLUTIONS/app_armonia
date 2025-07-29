@@ -7,8 +7,8 @@ import {
   Param,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '@backend/auth/jwt-auth.guard';
-import { GetUser } from '@backend/common/decorators/user.decorator';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard.js';
+import { GetUser } from '../../common/decorators/user.decorator.js';
 import { MicroCreditService } from './micro-credit.service.js';
 import {
   CreateMicroCreditApplicationDto,

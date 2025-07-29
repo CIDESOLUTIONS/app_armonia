@@ -1,7 +1,7 @@
 import '@test/jest-setup';
 import { Test, TestingModule } from '@nestjs/testing';
-import { PqrService } from './pqr.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { PqrService } from './pqr.service.js';
+import { PrismaService } from '../prisma/prisma.service.js';
 
 describe('PqrService', () => {
   let service: PqrService;

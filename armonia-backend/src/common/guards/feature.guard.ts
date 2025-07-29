@@ -5,7 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { PlansService } from '../../plans/plans.service'; // Adjust path as needed
+import { PlansService } from '../../plans/plans.service.js'; // Adjust path as needed
 import { Observable } from 'rxjs';
 
 @Injectable()

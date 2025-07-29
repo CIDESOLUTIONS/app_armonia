@@ -35,6 +35,7 @@ export enum NotificationSourceType {
   SECURITY = 'security',
   MESSAGE = 'message',
   PACKAGE = 'package',
+  PANIC = 'panic',
 }
 
 export class NotificationDataDto {

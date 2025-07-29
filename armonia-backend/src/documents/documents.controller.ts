@@ -11,14 +11,14 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { GetUser } from '../common/decorators/user.decorator';
-import { DocumentsService } from './documents.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import { GetUser } from '../common/decorators/user.decorator.js';
+import { DocumentsService } from './documents.service.js';
 import {
   CreateDocumentDto,
   DocumentDto,
   DocumentFilterParamsDto,
-} from '../common/dto/documents.dto';
+} from '../common/dto/documents.dto.js';
 
 @UseGuards(JwtAuthGuard)
 @Controller('documents')

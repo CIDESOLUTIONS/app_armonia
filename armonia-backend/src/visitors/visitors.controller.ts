@@ -1,18 +1,11 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  UseGuards,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Query } from '@nestjs/common';
+import { VisitorsService } from './visitors.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { GetUser } from '../common/decorators/user.decorator.js';
-import { VisitorsService } from './visitors.service.js';
-import { CreateVisitorDto, UpdateVisitorDto, VisitorDto, VisitorFilterParamsDto, ScanQrCodeDto, } from '../common/dto/visitors.dto.js';
+import { CreateVisitorDto, UpdateVisitorDto, VisitorFilterParamsDto } from '../common/dto/visitors.dto.js';
+import { RolesGuard } from '../auth/roles.guard.js';
+import { Roles } from '../auth/roles.decorator.js';
+import { UserRole } from '../common/enums/user-role.enum.js';
 
 @UseGuards(JwtAuthGuard)
 @Controller('visitors')
@@ -20,66 +13,42 @@ export class VisitorsController {
   constructor(private readonly visitorsService: VisitorsService) {}
 
   @Post()
-  async createVisitor(
-    @GetUser() user: any,
-    @Body() createVisitorDto: CreateVisitorDto,
-  ): Promise<VisitorDto> {
-    return this.visitorsService.createVisitor(
-      user.schemaName,
-      createVisitorDto,
-    );
+  @UseGuards(RolesGuard([UserRole.SECURITY, UserRole.RECEPTION]))
+  createVisitor(@GetUser() user: any, @Body() createVisitorDto: CreateVisitorDto) {
+    return this.visitorsService.createVisitor(user.schemaName, createVisitorDto);
   }
 
   @Get()
-  async getVisitors(
-    @GetUser() user: any,
-    @Query() filters: VisitorFilterParamsDto,
-  ): Promise<VisitorDto[]> {
+  getVisitors(@GetUser() user: any, @Query() filters: VisitorFilterParamsDto) {
     return this.visitorsService.getVisitors(user.schemaName, filters);
   }
 
+  @Get('pre-registered')
+  @UseGuards(RolesGuard([UserRole.SECURITY, UserRole.RECEPTION]))
+  getPreRegisteredVisitors(@GetUser() user: any) {
+    return this.visitorsService.getPreRegisteredVisitors(user.schemaName);
+  }
+
+  @Post('scan-qr')
+  @UseGuards(RolesGuard([UserRole.SECURITY, UserRole.RECEPTION]))
+  scanQrCode(@GetUser() user: any, @Body('qrCode') qrCode: string) {
+    return this.visitorsService.scanQrCode(user.schemaName, qrCode);
+  }
+
   @Get(':id')
-  async getVisitorById(
-    @GetUser() user: any,
-    @Param('id') id: string,
-  ): Promise<VisitorDto> {
+  getVisitorById(@GetUser() user: any, @Param('id') id: string) {
     return this.visitorsService.getVisitorById(user.schemaName, +id);
   }
 
   @Put(':id')
-  async updateVisitor(
-    @GetUser() user: any,
-    @Param('id') id: string,
-    @Body() updateVisitorDto: UpdateVisitorDto,
-  ): Promise<VisitorDto> {
-    return this.visitorsService.updateVisitor(
-      user.schemaName,
-      +id,
-      updateVisitorDto,
-    );
+  @UseGuards(RolesGuard([UserRole.SECURITY, UserRole.RECEPTION]))
+  updateVisitor(@GetUser() user: any, @Param('id') id: string, @Body() updateVisitorDto: UpdateVisitorDto) {
+    return this.visitorsService.updateVisitor(user.schemaName, +id, updateVisitorDto);
   }
 
   @Delete(':id')
-  async deleteVisitor(
-    @GetUser() user: any,
-    @Param('id') id: string,
-  ): Promise<void> {
+  @UseGuards(RolesGuard([UserRole.SECURITY, UserRole.RECEPTION]))
+  deleteVisitor(@GetUser() user: any, @Param('id') id: string) {
     return this.visitorsService.deleteVisitor(user.schemaName, +id);
-  }
-
-  @Post('scan-qr')
-  async scanQrCode(
-    @GetUser() user: any,
-    @Body() scanQrCodeDto: ScanQrCodeDto,
-  ): Promise<VisitorDto> {
-    return this.visitorsService.scanQrCode(
-      user.schemaName,
-      scanQrCodeDto.qrCode,
-    );
-  }
-
-  @Get('pre-registered')
-  async getPreRegisteredVisitors(@GetUser() user: any): Promise<VisitorDto[]> {
-    return this.visitorsService.getPreRegisteredVisitors(user.schemaName);
   }
 }

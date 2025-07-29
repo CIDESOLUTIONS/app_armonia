@@ -1,22 +1,11 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Put,
-  Delete,
-  Body,
-  Param,
-  UseGuards,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Query } from '@nestjs/common';
+import { SurveyService } from './survey.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { GetUser } from '../common/decorators/user.decorator.js';
-import { SurveyService } from './survey.service.js';
-import {
-  CreateSurveyDto,
-  UpdateSurveyDto,
-  CreateAnswerDto,
-} from '../common/dto/surveys.dto.js';
+import { CreateSurveyDto, UpdateSurveyDto, CreateAnswerDto } from '../common/dto/surveys.dto.js';
+import { RolesGuard } from '../auth/roles.guard.js';
+import { Roles } from '../auth/roles.decorator.js';
+import { UserRole } from '../common/enums/user-role.enum.js';
 
 @UseGuards(JwtAuthGuard)
 @Controller('surveys')
@@ -24,62 +13,41 @@ export class SurveyController {
   constructor(private readonly surveyService: SurveyService) {}
 
   @Post()
-  async createSurvey(
-    @GetUser() user: any,
-    @Body() createSurveyDto: CreateSurveyDto,
-  ) {
-    return this.surveyService.createSurvey(
-      user.schemaName,
-      user.userId,
-      user.complexId,
-      createSurveyDto,
-    );
+  @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
+  createSurvey(@GetUser() user: any, @Body() createSurveyDto: CreateSurveyDto) {
+    return this.surveyService.createSurvey(user.schemaName, user.userId, user.complexId, createSurveyDto);
   }
 
   @Get()
-  async getSurveys(@GetUser() user: any) {
+  getSurveys(@GetUser() user: any) {
     return this.surveyService.getSurveys(user.schemaName, user.complexId);
   }
 
   @Get(':id')
-  async getSurveyById(@GetUser() user: any, @Param('id') id: string) {
+  getSurveyById(@GetUser() user: any, @Param('id') id: string) {
     return this.surveyService.getSurveyById(user.schemaName, +id);
   }
 
   @Put(':id')
-  async updateSurvey(
-    @GetUser() user: any,
-    @Param('id') id: string,
-    @Body() updateSurveyDto: UpdateSurveyDto,
-  ) {
-    return this.surveyService.updateSurvey(
-      user.schemaName,
-      +id,
-      updateSurveyDto,
-    );
+  @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
+  updateSurvey(@GetUser() user: any, @Param('id') id: string, @Body() updateSurveyDto: UpdateSurveyDto) {
+    return this.surveyService.updateSurvey(user.schemaName, +id, updateSurveyDto);
   }
 
   @Delete(':id')
-  async deleteSurvey(@GetUser() user: any, @Param('id') id: string) {
+  @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
+  deleteSurvey(@GetUser() user: any, @Param('id') id: string) {
     return this.surveyService.deleteSurvey(user.schemaName, +id);
   }
 
-  @Post(':id/answer')
-  async submitAnswer(
-    @GetUser() user: any,
-    @Param('id') surveyId: string,
-    @Body() createAnswerDto: CreateAnswerDto,
-  ) {
-    return this.surveyService.submitAnswer(
-      user.schemaName,
-      +surveyId,
-      user.userId,
-      createAnswerDto,
-    );
+  @Post(':id/answers')
+  submitAnswer(@GetUser() user: any, @Param('id') id: string, @Body() createAnswerDto: CreateAnswerDto) {
+    return this.surveyService.submitAnswer(user.schemaName, +id, user.userId, createAnswerDto);
   }
 
   @Get(':id/results')
-  async getSurveyResults(@GetUser() user: any, @Param('id') id: string) {
+  @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
+  getSurveyResults(@GetUser() user: any, @Param('id') id: string) {
     return this.surveyService.getSurveyResults(user.schemaName, +id);
   }
 }

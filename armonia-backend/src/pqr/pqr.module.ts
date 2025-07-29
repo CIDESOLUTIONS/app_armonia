@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { PqrService } from './pqr.service.js';
 import { PqrController } from './pqr.controller.js';
+import { PqrService } from './pqr.service.js';
 
 @Module({
-  providers: [PqrService],
   controllers: [PqrController],
+  providers: [PqrService],
 })
 export class PqrModule {}

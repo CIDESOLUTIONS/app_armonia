@@ -1,5 +1,5 @@
 import { IsString, IsNumber, IsOptional, IsDateString, IsEnum, IsBoolean } from 'class-validator';
-import { SecurityEventType } from '@backend/common/enums/security-event-type.enum';
+import { SecurityEventType } from '../enums/security-event-type.enum.js';
 
 export class CreateSecurityEventDto {
   @IsEnum(SecurityEventType)

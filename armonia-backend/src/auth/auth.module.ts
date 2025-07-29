@@ -7,7 +7,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy.js';
 import { TenantModule } from '../tenant/tenant.module.js';
 
-import { ResidentialComplexModule } from '../residential-complex/residential-complex.module';
+import { ResidentialComplexModule } from '../residential-complex/residential-complex.module.js';
 
 @Module({
   imports: [

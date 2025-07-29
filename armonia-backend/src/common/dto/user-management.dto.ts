@@ -1,6 +1,6 @@
 
 import { IsString, IsEmail, IsOptional, IsBoolean, IsEnum, IsNumber } from 'class-validator';
-import { UserRole } from '../enums/user-role.enum';
+import { UserRole } from '../enums/user-role.enum.js';
 
 export class CreateUserDto {
   @IsString()

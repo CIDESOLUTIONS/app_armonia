@@ -1,7 +1,7 @@
 import '@test/jest-setup';
 import { Test, TestingModule } from '@nestjs/testing';
-import { DocumentsService } from './documents.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { DocumentsService } from './documents.service.js';
+import { PrismaService } from '../prisma/prisma.service.js';
 
 describe('DocumentsService', () => {
   let service: DocumentsService;
