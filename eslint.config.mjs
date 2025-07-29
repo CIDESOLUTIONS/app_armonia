@@ -69,5 +69,23 @@ export default [
       },
     },
   },
+  {
+    files: ["armonia-backend/**/*.js", "armonia-backend/**/*.cjs"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
+  {
+    files: ["armonia-backend/**/*.js", "armonia-backend/**/*.cjs"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
+  {
+    files: ["armonia-backend/**/*.js", "armonia-backend/**/*.cjs"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
   prettierConfig,
 ];
