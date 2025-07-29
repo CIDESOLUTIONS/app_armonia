@@ -1,4 +1,4 @@
-import { apiClient } from "@/lib/apiClient";
+import { fetchApi } from "@/lib/apiClient";
 
 export interface StaffUser {
   id: number;
@@ -26,18 +26,15 @@ export interface UpdateStaffUserData {
 
 export const staffService = {
   getStaffUsers: async (): Promise<StaffUser[]> => {
-    const response = await apiClient.get('/user-management/staff');
-    return response.data;
+    return fetchApi('/user-management/staff');
   },
   createStaffUser: async (data: CreateStaffUserData): Promise<StaffUser> => {
-    const response = await apiClient.post('/user-management/staff', data);
-    return response.data;
+    return fetchApi('/user-management/staff', { method: 'POST', data });
   },
   updateStaffUser: async (id: number, data: UpdateStaffUserData): Promise<StaffUser> => {
-    const response = await apiClient.put(`/user-management/staff/${id}`, data);
-    return response.data;
+    return fetchApi(`/user-management/staff/${id}`, { method: 'PUT', data });
   },
   deleteStaffUser: async (id: number): Promise<void> => {
-    await apiClient.delete(`/user-management/staff/${id}`);
+    await fetchApi(`/user-management/staff/${id}`, { method: 'DELETE' });
   },
 };

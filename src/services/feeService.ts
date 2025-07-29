@@ -1,4 +1,4 @@
-import { apiClient } from "@/lib/apiClient";
+import { fetchApi } from "@/lib/apiClient";
 
 export enum FeeStatus {
   PENDING = "PENDING",
@@ -42,34 +42,29 @@ export interface UpdateFeeData {
 }
 
 export const getFees = async (): Promise<FeeDto[]> => {
-  const response = await apiClient.get("/finances/fees");
-  return response.data.fees; // Assuming the API returns { fees: FeeDto[] }
+  const result = await fetchApi<{ fees: FeeDto[] }>("/finances/fees");
+  return result.fees;
 };
 
 export const createFee = async (data: CreateFeeData): Promise<FeeDto> => {
-  const response = await apiClient.post("/finances/fees", data);
-  return response.data;
+  return fetchApi("/finances/fees", { method: 'POST', data });
 };
 
 export const updateFee = async (
   id: number,
   data: UpdateFeeData,
 ): Promise<FeeDto> => {
-  const response = await apiClient.put(`/finances/fees/${id}`, data);
-  return response.data;
+  return fetchApi(`/finances/fees/${id}`, { method: 'PUT', data });
 };
 
 export const deleteFee = async (id: number): Promise<void> => {
-  await apiClient.delete(`/finances/fees/${id}`);
+  await fetchApi(`/finances/fees/${id}`, { method: 'DELETE' });
 };
 
 export const generateOrdinaryFees = async (): Promise<any> => {
-  const response = await apiClient.post("/finances/fees/generate-ordinary");
-  return response.data;
+  return fetchApi("/finances/fees/generate-ordinary", { method: 'POST' });
 };
 
 export const initiatePayment = async (feeId: number): Promise<any> => {
-  const response = await apiClient.post("/finances/payments/initiate", { feeId });
-  return response.data;
+  return fetchApi("/finances/payments/initiate", { method: 'POST', data: { feeId } });
 };
-

@@ -19,7 +19,7 @@ import { FeeGenerationSection } from "@/components/finances/FeeGenerationSection
 import { FineManagementSection } from "@/components/finances/FineManagementSection";
 import { PaymentGatewaySection } from "@/components/finances/PaymentGatewaySection";
 import { FinancialReportsGenerator } from "@/components/finances/FinancialReportsGenerator";
-import { ManualPaymentForm } from "@/components/finances/ManualPaymentForm";
+import ManualPaymentForm from "@/components/finances/ManualPaymentForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";

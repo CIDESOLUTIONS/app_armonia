@@ -51,7 +51,7 @@ export interface UpdateIncidentDto {
 export async function getIncidents(): Promise<Incident[]> {
   try {
     const response = await fetchApi("/incidents");
-    return response.data; // Assuming the API returns { data: Incident[] }
+    return response; // Assuming the API returns { data: Incident[] }
   } catch (error) {
     console.error("Error fetching incidents:", error);
     throw error;
@@ -61,7 +61,7 @@ export async function getIncidents(): Promise<Incident[]> {
 export async function getIncidentById(id: string): Promise<Incident> {
   try {
     const response = await fetchApi(`/incidents/${id}`);
-    return response.data; // Assuming the API returns { data: Incident }
+    return response; // Assuming the API returns { data: Incident }
   } catch (error) {
     console.error(`Error fetching incident with ID ${id}:`, error);
     throw error;
@@ -76,7 +76,7 @@ export async function createIncident(
       method: "POST",
       body: JSON.stringify(data),
     });
-    return response.data; // Assuming the API returns { data: Incident }
+    return response; // Assuming the API returns { data: Incident }
   } catch (error) {
     console.error("Error creating incident:", error);
     throw error;
@@ -92,7 +92,7 @@ export async function updateIncident(
       method: "PUT",
       body: JSON.stringify(data),
     });
-    return response.data; // Assuming the API returns { data: Incident }
+    return response; // Assuming the API returns { data: Incident }
   } catch (error) {
     console.error("Error updating incident:", error);
     throw error;
@@ -115,7 +115,7 @@ export async function uploadIncidentAttachments(
       },
       true,
     ); // The third parameter indicates that Content-Type should not be automatically added
-    return response.data; // Assuming the API returns { data: { urls: string[] } }
+    return response; // Assuming the API returns { data: { urls: string[] } }
   } catch (error) {
     console.error("Error uploading incident attachments:", error);
     throw error;

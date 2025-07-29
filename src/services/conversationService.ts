@@ -34,7 +34,7 @@ interface CreateConversationData {
 export async function getConversations(): Promise<Conversation[]> {
   try {
     const response = await fetchApi("/communications/conversations");
-    return response.data; // Assuming the API returns { data: Conversation[] }
+    return response; // Assuming the API returns { data: Conversation[] }
   } catch (error) {
     console.error("Error fetching conversations:", error);
     throw error;
@@ -48,7 +48,7 @@ export async function getConversationMessages(
     const response = await fetchApi(
       `/communications/conversations/${conversationId}/messages`,
     );
-    return response.data; // Assuming the API returns { data: Message[] }
+    return response; // Assuming the API returns { data: Message[] }
   } catch (error) {
     console.error("Error fetching conversation messages:", error);
     throw error;
@@ -67,7 +67,7 @@ export async function sendMessage(
         body: JSON.stringify(data),
       },
     );
-    return response.data; // Assuming the API returns { data: Message }
+    return response; // Assuming the API returns { data: Message }
   } catch (error) {
     console.error("Error sending message:", error);
     throw error;
@@ -99,7 +99,7 @@ export async function createConversation(
       method: "POST",
       body: JSON.stringify(data),
     });
-    return response.data; // Assuming the API returns { data: Conversation }
+    return response; // Assuming the API returns { data: Conversation }
   } catch (error) {
     console.error("Error creating conversation:", error);
     throw error;
@@ -145,7 +145,7 @@ export async function getMarketplaceMessages(
     const response = await fetchApi(
       `/marketplace/messages/${listingId}/${userId}`,
     );
-    return response.data; // Assuming the API returns { data: MarketplaceMessage[] }
+    return response; // Assuming the API returns { data: MarketplaceMessage[] }
   } catch (error) {
     console.error("Error fetching marketplace messages:", error);
     throw error;

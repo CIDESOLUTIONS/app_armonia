@@ -1,89 +1,68 @@
-
-import { apiClient } from "@/lib/apiClient";
+import { fetchApi } from "@/lib/apiClient";
 
 export const inventoryService = {
   getProperties: async () => {
-    const response = await apiClient.get('/inventory/properties');
-    return response.data;
+    return fetchApi('/inventory/properties');
   },
   createProperty: async (data) => {
-    const response = await apiClient.post('/inventory/properties', data);
-    return response.data;
+    return fetchApi('/inventory/properties', { method: 'POST', data });
   },
   updateProperty: async (id, data) => {
-    const response = await apiClient.put(`/inventory/properties/${id}`, data);
-    return response.data;
+    return fetchApi(`/inventory/properties/${id}`, { method: 'PUT', data });
   },
   deleteProperty: async (id) => {
-    const response = await apiClient.delete(`/inventory/properties/${id}`);
-    return response.data;
+    return fetchApi(`/inventory/properties/${id}`, { method: 'DELETE' });
   },
 
   getResidents: async () => {
-    const response = await apiClient.get('/inventory/residents');
-    return response.data;
+    return fetchApi('/inventory/residents');
   },
   createResident: async (data) => {
-    const response = await apiClient.post('/inventory/residents', data);
-    return response.data;
+    return fetchApi('/inventory/residents', { method: 'POST', data });
   },
   updateResident: async (id, data) => {
-    const response = await apiClient.put(`/inventory/residents/${id}`, data);
-    return response.data;
+    return fetchApi(`/inventory/residents/${id}`, { method: 'PUT', data });
   },
   deleteResident: async (id) => {
-    const response = await apiClient.delete(`/inventory/residents/${id}`);
-    return response.data;
+    return fetchApi(`/inventory/residents/${id}`, { method: 'DELETE' });
   },
 
   getVehicles: async () => {
-    const response = await apiClient.get('/inventory/vehicles');
-    return response.data;
+    return fetchApi('/inventory/vehicles');
   },
   createVehicle: async (data) => {
-    const response = await apiClient.post('/inventory/vehicles', data);
-    return response.data;
+    return fetchApi('/inventory/vehicles', { method: 'POST', data });
   },
   updateVehicle: async (id, data) => {
-    const response = await apiClient.put(`/inventory/vehicles/${id}`, data);
-    return response.data;
+    return fetchApi(`/inventory/vehicles/${id}`, { method: 'PUT', data });
   },
   deleteVehicle: async (id) => {
-    const response = await apiClient.delete(`/inventory/vehicles/${id}`);
-    return response.data;
+    return fetchApi(`/inventory/vehicles/${id}`, { method: 'DELETE' });
   },
 
   getPets: async () => {
-    const response = await apiClient.get('/inventory/pets');
-    return response.data;
+    return fetchApi('/inventory/pets');
   },
   createPet: async (data) => {
-    const response = await apiClient.post('/inventory/pets', data);
-    return response.data;
+    return fetchApi('/inventory/pets', { method: 'POST', data });
   },
   updatePet: async (id, data) => {
-    const response = await apiClient.put(`/inventory/pets/${id}`, data);
-    return response.data;
+    return fetchApi(`/inventory/pets/${id}`, { method: 'PUT', data });
   },
   deletePet: async (id) => {
-    const response = await apiClient.delete(`/inventory/pets/${id}`);
-    return response.data;
+    return fetchApi(`/inventory/pets/${id}`, { method: 'DELETE' });
   },
 
   getCommonAreas: async () => {
-    const response = await apiClient.get('/inventory/common-areas');
-    return response.data;
+    return fetchApi('/inventory/common-areas');
   },
   createCommonArea: async (data) => {
-    const response = await apiClient.post('/inventory/common-areas', data);
-    return response.data;
+    return fetchApi('/inventory/common-areas', { method: 'POST', data });
   },
   updateCommonArea: async (id, data) => {
-    const response = await apiClient.put(`/inventory/common-areas/${id}`, data);
-    return response.data;
+    return fetchApi(`/inventory/common-areas/${id}`, { method: 'PUT', data });
   },
   deleteCommonArea: async (id) => {
-    const response = await apiClient.delete(`/inventory/common-areas/${id}`);
-    return response.data;
+    return fetchApi(`/inventory/common-areas/${id}`, { method: 'DELETE' });
   },
 };

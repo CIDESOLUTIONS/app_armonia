@@ -1,10 +1,9 @@
-import { apiClient } from "@/lib/apiClient";
+import { fetchApi } from "@/lib/apiClient";
 
 export const generatePeaceAndSafePdf = async (residentId: number): Promise<ArrayBuffer> => {
-  const response = await apiClient.get(`/reports/peace-and-safe/pdf/${residentId}`, {
+  return fetchApi(`/reports/peace-and-safe/pdf/${residentId}`, {
     responseType: 'arraybuffer',
   });
-  return response.data;
 };
 
 export const generateConsolidatedFinancialReportPdf = async (
@@ -12,12 +11,8 @@ export const generateConsolidatedFinancialReportPdf = async (
   startDate: string,
   endDate: string,
 ): Promise<ArrayBuffer> => {
-  const response = await apiClient.post(
+  return fetchApi(
     `/reports/consolidated-financial/pdf`,
-    { schemaNames, startDate, endDate },
-    {
-      responseType: 'arraybuffer',
-    },
+    { method: 'POST', data: { schemaNames, startDate, endDate }, responseType: 'arraybuffer' },
   );
-  return response.data;
 };

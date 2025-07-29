@@ -1,4 +1,4 @@
-import { apiClient } from "@/lib/apiClient";
+import { fetchApi } from "@/lib/apiClient";
 
 export enum AssemblyStatus {
   SCHEDULED = "SCHEDULED",
@@ -99,51 +99,44 @@ export interface QuorumStatus {
 }
 
 export const getAssemblies = async (): Promise<Assembly[]> => {
-  const response = await apiClient.get("/assemblies");
-  return response.data;
+  return fetchApi("/assemblies");
 };
 
 export const getAssemblyById = async (id: number): Promise<Assembly> => {
-  const response = await apiClient.get(`/assemblies/${id}`);
-  return response.data;
+  return fetchApi(`/assemblies/${id}`);
 };
 
 export const createAssembly = async (data: CreateAssemblyDto): Promise<Assembly> => {
-  const response = await apiClient.post("/assemblies", data);
-  return response.data;
+  return fetchApi("/assemblies", { method: 'POST', data });
 };
 
 export const updateAssembly = async (
   id: number,
   data: UpdateAssemblyDto,
 ): Promise<Assembly> => {
-  const response = await apiClient.put(`/assemblies/${id}`, data);
-  return response.data;
+  return fetchApi(`/assemblies/${id}`, { method: 'PUT', data });
 };
 
 export const deleteAssembly = async (id: number): Promise<void> => {
-  await apiClient.delete(`/assemblies/${id}`);
+  await fetchApi(`/assemblies/${id}`, { method: 'DELETE' });
 };
 
 export const registerAttendance = async (
   assemblyId: number,
   unitId: number,
 ): Promise<any> => {
-  const response = await apiClient.post(`/assemblies/${assemblyId}/attendance`, { unitId });
-  return response.data;
+  return fetchApi(`/assemblies/${assemblyId}/attendance`, { method: 'POST', data: { unitId } });
 };
 
 export const getAssemblyQuorumStatus = async (assemblyId: number): Promise<QuorumStatus> => {
-  const response = await apiClient.get(`/assemblies/${assemblyId}/quorum-status`);
-  return response.data;
+  return fetchApi(`/assemblies/${assemblyId}/quorum-status`);
 };
 
 export const createVote = async (
   assemblyId: number,
   data: CreateVoteDto,
 ): Promise<AssemblyVoteDto> => {
-  const response = await apiClient.post(`/assemblies/${assemblyId}/votes`, data);
-  return response.data;
+  return fetchApi(`/assemblies/${assemblyId}/votes`, { method: 'POST', data });
 };
 
 export const submitVote = async (
@@ -151,22 +144,16 @@ export const submitVote = async (
   unitId: number,
   option: string,
 ): Promise<any> => {
-  const response = await apiClient.post(`/assemblies/${voteId}/submit-vote`, { unitId, option });
-  return response.data;
+  return fetchApi(`/assemblies/${voteId}/submit-vote`, { method: 'POST', data: { unitId, option } });
 };
 
 export const getVoteResults = async (voteId: number): Promise<VoteResult> => {
-  const response = await apiClient.get(`/assemblies/${voteId}/results`);
-  return response.data;
+  return fetchApi(`/assemblies/${voteId}/results`);
 };
 
 export const generateMeetingMinutes = async (assemblyId: number): Promise<ArrayBuffer> => {
-  const response = await apiClient.post(
+  return fetchApi(
     `/assemblies/${assemblyId}/generate-minutes`,
-    {},
-    {
-      responseType: 'arraybuffer',
-    },
+    { method: 'POST', responseType: 'arraybuffer' },
   );
-  return response.data;
 };

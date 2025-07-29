@@ -1,4 +1,4 @@
-import { getPrisma } from "@/lib/prisma";
+import { fetchApi } from "@/lib/apiClient";
 
 interface BankTransaction {
   date: string;
@@ -18,14 +18,32 @@ export interface ReconciliationSuggestion {
   status: "MATCHED" | "UNMATCHED" | "APPROVED";
 }
 
-export const getFinanceSummary = async (tenantId: string) => {
-  const prisma = getPrisma(tenantId);
-  // Placeholder logic
-  console.log("Getting finance summary for tenant:", tenantId);
-  return { message: "Finance summary retrieved successfully" };
+export interface FinanceSummary {
+  currentBalance: number;
+  balanceChange: string;
+  monthlyIncome: number;
+  incomeChange: string;
+  monthlyExpenses: number;
+  expenseChange: string;
+  pendingBills: number;
+  pendingBillsAmount: number;
+}
+
+export interface Transaction {
+  id: string;
+  date: string;
+  description: string;
+  amount: number;
+  type: "income" | "expense";
+}
+
+export const getFinanceSummary = async (complexId: number): Promise<FinanceSummary> => {
+  return fetchApi(`/finances/summary`, { params: { complexId } });
 };
 
-import { apiClient } from "@/lib/apiClient";
+export const getRecentTransactions = async (complexId: number): Promise<Transaction[]> => {
+  return fetchApi(`/finances/transactions`, { params: { complexId } });
+};
 
 export const generateFinancialReport = async (
   reportType: string,
@@ -33,208 +51,22 @@ export const generateFinancialReport = async (
   endDate: string,
   format: string,
 ): Promise<Blob> => {
-  const response = await apiClient.get("/finances/reports/generate", {
+  return fetchApi("/finances/reports/generate", {
     params: { reportType, startDate, endDate, format },
-    responseType: "blob", // Important for downloading files
+    responseType: "blob",
   });
-  return response.data;
 };
 
-export const processBankStatement = async (
-  tenantId: string,
-  file: File,
-): Promise<ReconciliationSuggestion[]> => {
-  const prisma = getPrisma(tenantId);
-  console.log("Processing bank statement for tenant:", tenantId, file.name);
-  // Simulated data for demonstration
-  return [
-    {
-      transaction: {
-        date: "2024-07-01",
-        description: "Pago de arriendo",
-        amount: 500.0,
-      },
-      matchingPayment: {
-        id: 1,
-        amount: 500.0,
-        resident: { name: "Juan Perez" },
-      },
-      status: "MATCHED",
-    },
-    {
-      transaction: {
-        date: "2024-07-02",
-        description: "Compra en supermercado",
-        amount: 75.5,
-      },
-      matchingPayment: null,
-      status: "UNMATCHED",
-    },
-  ];
+export const uploadBankStatement = async (file: File): Promise<ReconciliationSuggestion[]> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  return fetchApi('/finances/bank-statement/upload', {
+    method: 'POST',
+    data: formData,
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
 };
 
-export const approveReconciliation = async (
-  tenantId: string,
-  reconciliationId: number,
-): Promise<{ message: string }> => {
-  const prisma = getPrisma(tenantId);
-  console.log(
-    "Approving reconciliation for tenant:",
-    tenantId,
-    reconciliationId,
-  );
-  return { message: "Reconciliation approved successfully" };
+export const approveReconciliation = async (reconciliationId: number): Promise<{ message: string }> => {
+  return fetchApi(`/finances/reconciliation/${reconciliationId}/approve`, { method: 'POST' });
 };
-
-export const uploadBankStatement = async (
-  tenantId: string,
-  file: File,
-): Promise<ReconciliationSuggestion[]> => {
-  const prisma = getPrisma(tenantId);
-  console.log("Uploading bank statement for tenant:", tenantId, file.name);
-  // Simulated data for demonstration
-  return [
-    {
-      transaction: {
-        date: "2024-07-01",
-        description: "Pago de arriendo",
-        amount: 500.0,
-      },
-      matchingPayment: {
-        id: 1,
-        amount: 500.0,
-        resident: { name: "Juan Perez" },
-      },
-      status: "MATCHED",
-    },
-    {
-      transaction: {
-        date: "2024-07-02",
-        description: "Compra en supermercado",
-        amount: 75.5,
-      },
-      matchingPayment: null,
-      status: "UNMATCHED",
-    },
-  ];
-};
-
-export const generateOrdinaryFees = async (tenantId: string) => {
-  const prisma = getPrisma(tenantId);
-  // Placeholder logic
-  console.log("Generating ordinary fees for tenant:", tenantId);
-  return { message: "Ordinary fees generated successfully" };
-};
-
-export const getPaymentGatewaysConfig = async (tenantId: string) => {
-  const prisma = getPrisma(tenantId);
-  // Placeholder logic
-  console.log("Getting payment gateways config for tenant:", tenantId);
-  return { message: "Payment gateways config retrieved successfully" };
-};
-
-export const createPaymentGatewayConfig = async (
-  tenantId: string,
-  data: any,
-) => {
-  const prisma = getPrisma(tenantId);
-  // Placeholder logic
-  console.log("Creating payment gateway config for tenant:", tenantId, data);
-  return { message: "Payment gateway config created successfully" };
-};
-
-export const updatePaymentGatewayConfig = async (
-  tenantId: string,
-  id: number,
-  data: any,
-) => {
-  const prisma = getPrisma(tenantId);
-  // Placeholder logic
-  console.log(
-    "Updating payment gateway config for tenant:",
-    tenantId,
-    id,
-    data,
-  );
-  return { message: "Payment gateway config updated successfully" };
-};
-
-export const deletePaymentGatewayConfig = async (
-  tenantId: string,
-  id: number,
-) => {
-  const prisma = getPrisma(tenantId);
-  // Placeholder logic
-  console.log("Deleting payment gateway config for tenant:", tenantId, id);
-  return { message: "Payment gateway config deleted successfully" };
-};
-
-export interface Transaction {
-  id: number;
-  description: string;
-  amount: number;
-  date: string;
-  type: "INCOME" | "EXPENSE";
-}
-
-export const getRecentTransactions = async (
-  tenantId: string,
-): Promise<Transaction[]> => {
-  const prisma = getPrisma(tenantId);
-  console.log("Getting recent transactions for tenant:", tenantId);
-  // Simulated data for demonstration
-  return [
-    {
-      id: 1,
-      description: "Pago de cuota de administración",
-      amount: 150.0,
-      date: "2024-07-19T10:00:00Z",
-      type: "INCOME",
-    },
-    {
-      id: 2,
-      description: "Compra de insumos de limpieza",
-      amount: 45.75,
-      date: "2024-07-18T14:30:00Z",
-      type: "EXPENSE",
-    },
-    {
-      id: 3,
-      description: "Pago de multa por ruido",
-      amount: 25.0,
-      date: "2024-07-17T11:00:00Z",
-      type: "INCOME",
-    },
-  ];
-};
-
-export const initiatePayment = async (
-  tenantId: string,
-  feeId: number,
-  amount: number,
-) => {
-  const prisma = getPrisma(tenantId);
-  // Placeholder logic
-  console.log("Initiating payment for tenant:", tenantId, feeId, amount);
-  return { message: "Payment initiated successfully" };
-};
-
-export const registerManualPayment = async (
-  tenantId: string,
-  feeId: number,
-  userId: number,
-  amount: number,
-  paymentDate: string,
-  paymentMethod: string,
-  transactionId?: string,
-) => {
-  const prisma = getPrisma(tenantId);
-  console.log("Registering manual payment for tenant:", tenantId, feeId, userId, amount, paymentDate, paymentMethod, transactionId);
-  return { message: "Manual payment registered successfully" };
-};
-
-export enum FeeStatus {
-  PENDING = "PENDING",
-  PAID = "PAID",
-  OVERDUE = "OVERDUE",
-}

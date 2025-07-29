@@ -1,4 +1,4 @@
-import { apiClient } from "@/lib/apiClient";
+import { fetchApi } from "@/lib/apiClient";
 
 export interface ResidentData {
   id: number;
@@ -21,30 +21,26 @@ export interface CreateResidentData {
 export interface UpdateResidentData extends Partial<CreateResidentData> {}
 
 export const getResidentDashboardMetrics = async () => {
-  const response = await apiClient.get("/residents/dashboard-metrics");
-  return response.data;
+  return fetchApi("/residents/dashboard-metrics");
 };
 
 export const getResidents = async (): Promise<ResidentData[]> => {
-  const response = await apiClient.get("/inventory/residents");
-  return response.data;
+  return fetchApi("/inventory/residents");
 };
 
 export const updateResident = async (
   id: number,
   data: UpdateResidentData,
 ): Promise<ResidentData> => {
-  const response = await apiClient.put(`/inventory/residents/${id}`, data);
-  return response.data;
+  return fetchApi(`/inventory/residents/${id}`, { method: 'PUT', data });
 };
 
 export const createResident = async (
   data: CreateResidentData,
 ): Promise<ResidentData> => {
-  const response = await apiClient.post("/inventory/residents", data);
-  return response.data;
+  return fetchApi("/inventory/residents", { method: 'POST', data });
 };
 
 export const deleteResident = async (id: number): Promise<void> => {
-  await apiClient.delete(`/inventory/residents/${id}`);
+  await fetchApi(`/inventory/residents/${id}`, { method: 'DELETE' });
 };
