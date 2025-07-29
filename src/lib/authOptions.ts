@@ -1,11 +1,16 @@
-import { NextAuthOptions } from "next-auth";
+import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import * as bcrypt from "bcrypt";
 import { JWTPayload } from "./auth";
 import { ServerLogger } from "./logging/server-logger";
 import { getPublicPrismaClient } from "@/lib/prisma";
 
-export const authOptions: NextAuthOptions = {
+export const {
+  handlers,
+  auth,
+  signIn,
+  signOut
+} = NextAuth({
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -163,4 +168,4 @@ export const authOptions: NextAuthOptions = {
     error: "/public/login",
   },
   secret: process.env.NEXTAUTH_SECRET,
-};
+});

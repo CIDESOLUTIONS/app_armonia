@@ -15,7 +15,7 @@ import {
 @WebSocketGateway({ namespace: '/assembly', cors: { origin: '*' } })
 export class AssemblyGateway {
   @WebSocketServer()
-  server: Server;
+  server!: Server;
 
   constructor(private readonly assemblyService: AssemblyService) {}
 

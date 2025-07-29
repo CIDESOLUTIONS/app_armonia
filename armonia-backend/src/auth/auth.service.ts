@@ -6,6 +6,7 @@ import { TenantService } from '../tenant/tenant.service.js';
 import { ResidentialComplexService } from '../residential-complex/residential-complex.service.js';
 import { UserRole } from '../common/enums/user-role.enum.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -50,7 +51,7 @@ export class AuthService {
     // Usar el cliente por defecto para la transacción
     const defaultPrisma = this.prismaService;
 
-    return defaultPrisma.$transaction(async (txPrisma) => {
+    return defaultPrisma.$transaction(async (txPrisma: PrismaClient) => {
       const existingUser = await this.userService.findByEmail(
         adminData.email,
         txPrisma,

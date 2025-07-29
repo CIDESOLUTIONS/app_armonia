@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import QRCode from "qrcode.react";
+import { QRCodeSVG } from "qrcode.react";
 import { createVisitor } from "@/services/visitorService"; // Assuming this service exists
 
 const formSchema = z.object({
