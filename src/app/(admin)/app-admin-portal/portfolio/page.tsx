@@ -39,12 +39,15 @@ export default function PortfolioDashboardPage() {
         setPortfolioMetrics(metrics);
         const complexes = await getComplexMetrics();
         setComplexMetrics(complexes);
-      } catch (error: Error) {
+      } catch (error) {
         console.error("Error fetching portfolio data:", error);
+        const description =
+          error instanceof Error
+            ? "No se pudieron cargar los datos del portafolio: " + error.message
+            : "No se pudieron cargar los datos del portafolio";
         toast({
           title: "Error",
-          description:
-            "No se pudieron cargar los datos del portafolio: " + error.message,
+          description,
           variant: "destructive",
         });
       } finally {
