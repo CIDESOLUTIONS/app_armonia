@@ -106,29 +106,36 @@ export const getAssemblyById = async (id: number): Promise<Assembly> => {
   return fetchApi(`/assemblies/${id}`);
 };
 
-export const createAssembly = async (data: CreateAssemblyDto): Promise<Assembly> => {
-  return fetchApi("/assemblies", { method: 'POST', data });
+export const createAssembly = async (
+  data: CreateAssemblyDto,
+): Promise<Assembly> => {
+  return fetchApi("/assemblies", { method: "POST", data });
 };
 
 export const updateAssembly = async (
   id: number,
   data: UpdateAssemblyDto,
 ): Promise<Assembly> => {
-  return fetchApi(`/assemblies/${id}`, { method: 'PUT', data });
+  return fetchApi(`/assemblies/${id}`, { method: "PUT", data });
 };
 
 export const deleteAssembly = async (id: number): Promise<void> => {
-  await fetchApi(`/assemblies/${id}`, { method: 'DELETE' });
+  await fetchApi(`/assemblies/${id}`, { method: "DELETE" });
 };
 
 export const registerAttendance = async (
   assemblyId: number,
   unitId: number,
 ): Promise<any> => {
-  return fetchApi(`/assemblies/${assemblyId}/attendance`, { method: 'POST', data: { unitId } });
+  return fetchApi(`/assemblies/${assemblyId}/attendance`, {
+    method: "POST",
+    data: { unitId },
+  });
 };
 
-export const getAssemblyQuorumStatus = async (assemblyId: number): Promise<QuorumStatus> => {
+export const getAssemblyQuorumStatus = async (
+  assemblyId: number,
+): Promise<QuorumStatus> => {
   return fetchApi(`/assemblies/${assemblyId}/quorum-status`);
 };
 
@@ -136,7 +143,7 @@ export const createVote = async (
   assemblyId: number,
   data: CreateVoteDto,
 ): Promise<AssemblyVoteDto> => {
-  return fetchApi(`/assemblies/${assemblyId}/votes`, { method: 'POST', data });
+  return fetchApi(`/assemblies/${assemblyId}/votes`, { method: "POST", data });
 };
 
 export const submitVote = async (
@@ -144,16 +151,21 @@ export const submitVote = async (
   unitId: number,
   option: string,
 ): Promise<any> => {
-  return fetchApi(`/assemblies/${voteId}/submit-vote`, { method: 'POST', data: { unitId, option } });
+  return fetchApi(`/assemblies/${voteId}/submit-vote`, {
+    method: "POST",
+    data: { unitId, option },
+  });
 };
 
 export const getVoteResults = async (voteId: number): Promise<VoteResult> => {
   return fetchApi(`/assemblies/${voteId}/results`);
 };
 
-export const generateMeetingMinutes = async (assemblyId: number): Promise<ArrayBuffer> => {
-  return fetchApi(
-    `/assemblies/${assemblyId}/generate-minutes`,
-    { method: 'POST', responseType: 'arraybuffer' },
-  );
+export const generateMeetingMinutes = async (
+  assemblyId: number,
+): Promise<ArrayBuffer> => {
+  return fetchApi(`/assemblies/${assemblyId}/generate-minutes`, {
+    method: "POST",
+    responseType: "arraybuffer",
+  });
 };

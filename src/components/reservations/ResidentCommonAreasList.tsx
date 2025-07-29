@@ -1,20 +1,26 @@
-
 "use client";
 
-import React from 'react';
-import { CommonArea } from '@/services/reservationService';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import React from "react";
+import { CommonArea } from "@/services/reservationService";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
 
 interface ResidentCommonAreasListProps {
   commonAreas: CommonArea[];
   onCreateReservation: (commonArea: CommonArea) => void;
 }
 
-export default function ResidentCommonAreasList({ commonAreas, onCreateReservation }: ResidentCommonAreasListProps) {
+export default function ResidentCommonAreasList({
+  commonAreas,
+  onCreateReservation,
+}: ResidentCommonAreasListProps) {
   if (commonAreas.length === 0) {
-    return <p className="text-center text-gray-500">No hay áreas comunes disponibles para reservar.</p>;
+    return (
+      <p className="text-center text-gray-500">
+        No hay áreas comunes disponibles para reservar.
+      </p>
+    );
   }
 
   return (
@@ -25,12 +31,33 @@ export default function ResidentCommonAreasList({ commonAreas, onCreateReservati
             <CardTitle>{area.name}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p><strong>Tipo:</strong> {area.type}</p>
-            {area.description && <p><strong>Descripción:</strong> {area.description}</p>}
-            {area.capacity && <p><strong>Capacidad:</strong> {area.capacity}</p>}
-            {area.requiresApproval && <p><strong>Requiere Aprobación:</strong> Sí</p>}
-            {area.hourlyRate && <p><strong>Tarifa por Hora:</strong> ${area.hourlyRate}</p>}
-            <Button className="mt-4 w-full" onClick={() => onCreateReservation(area)}>
+            <p>
+              <strong>Tipo:</strong> {area.type}
+            </p>
+            {area.description && (
+              <p>
+                <strong>Descripción:</strong> {area.description}
+              </p>
+            )}
+            {area.capacity && (
+              <p>
+                <strong>Capacidad:</strong> {area.capacity}
+              </p>
+            )}
+            {area.requiresApproval && (
+              <p>
+                <strong>Requiere Aprobación:</strong> Sí
+              </p>
+            )}
+            {area.hourlyRate && (
+              <p>
+                <strong>Tarifa por Hora:</strong> ${area.hourlyRate}
+              </p>
+            )}
+            <Button
+              className="mt-4 w-full"
+              onClick={() => onCreateReservation(area)}
+            >
               <PlusCircle className="mr-2 h-4 w-4" /> Reservar
             </Button>
           </CardContent>

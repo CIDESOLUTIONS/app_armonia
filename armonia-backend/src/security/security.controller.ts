@@ -10,14 +10,23 @@ import {
   CreateAccessAttemptDto,
 } from '../common/dto/security.dto.js';
 
-@UseGuards(JwtAuthGuard, RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN, UserRole.SECURITY]))
+@UseGuards(
+  JwtAuthGuard,
+  RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN, UserRole.SECURITY]),
+)
 @Controller('security')
 export class SecurityController {
   constructor(private readonly securityService: SecurityService) {}
 
   @Post('events')
-  createSecurityEvent(@GetUser() user: any, @Body() createSecurityEventDto: CreateSecurityEventDto) {
-    return this.securityService.createSecurityEvent(user.schemaName, createSecurityEventDto);
+  createSecurityEvent(
+    @GetUser() user: any,
+    @Body() createSecurityEventDto: CreateSecurityEventDto,
+  ) {
+    return this.securityService.createSecurityEvent(
+      user.schemaName,
+      createSecurityEventDto,
+    );
   }
 
   @Get('events')
@@ -26,8 +35,14 @@ export class SecurityController {
   }
 
   @Post('access-attempts')
-  createAccessAttempt(@GetUser() user: any, @Body() createAccessAttemptDto: CreateAccessAttemptDto) {
-    return this.securityService.createAccessAttempt(user.schemaName, createAccessAttemptDto);
+  createAccessAttempt(
+    @GetUser() user: any,
+    @Body() createAccessAttemptDto: CreateAccessAttemptDto,
+  ) {
+    return this.securityService.createAccessAttempt(
+      user.schemaName,
+      createAccessAttemptDto,
+    );
   }
 
   @Get('access-attempts')

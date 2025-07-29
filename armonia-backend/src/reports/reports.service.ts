@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import PDFDocument from 'pdfkit';
 import * as XLSX from 'xlsx';
@@ -9,9 +13,7 @@ import { FeeStatus } from '../common/enums/fee-status.enum.js';
 
 @Injectable()
 export class ReportsService {
-  constructor(
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async generateVisitorsReportPdf(
     schemaName: string,
@@ -334,7 +336,9 @@ export class ReportsService {
     });
 
     if (!resident) {
-      throw new NotFoundException(`Residente con ID ${residentId} no encontrado.`);
+      throw new NotFoundException(
+        `Residente con ID ${residentId} no encontrado.`,
+      );
     }
 
     const outstandingFees = await prisma.fee.count({
@@ -368,7 +372,11 @@ export class ReportsService {
     doc.moveDown();
     doc.moveDown();
 
-    doc.fontSize(10).text(`Fecha de Emisión: ${format(new Date(), 'dd/MM/yyyy')}`, { align: 'right' });
+    doc
+      .fontSize(10)
+      .text(`Fecha de Emisión: ${format(new Date(), 'dd/MM/yyyy')}`, {
+        align: 'right',
+      });
     doc.moveDown();
     doc.moveDown();
 

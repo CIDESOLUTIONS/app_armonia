@@ -1,4 +1,4 @@
-import 'reflect-metadata';
+import "reflect-metadata";
 import "@testing-library/jest-dom";
 import "whatwg-fetch";
 import "text-encoding";

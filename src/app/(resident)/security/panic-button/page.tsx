@@ -1,12 +1,11 @@
-
 "use client";
 
-import React, { useState } from 'react';
-import { useAuthStore } from '@/store/authStore';
-import { Loader2, Siren } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
-import { Button } from '@/components/ui/button';
-import { triggerPanicAlert } from '@/services/panicService'; // Assuming this service exists
+import React, { useState } from "react";
+import { useAuthStore } from "@/store/authStore";
+import { Loader2, Siren } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { triggerPanicAlert } from "@/services/panicService"; // Assuming this service exists
 
 export default function PanicButtonPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -17,13 +16,19 @@ export default function PanicButtonPage() {
     setLoading(true);
     try {
       if (!user?.id || !user?.complexId) {
-        toast({ title: "Error", description: "Información de usuario incompleta.", variant: "destructive" });
+        toast({
+          title: "Error",
+          description: "Información de usuario incompleta.",
+          variant: "destructive",
+        });
         setLoading(false);
         return;
       }
 
       // For simplicity, location can be hardcoded or derived from user's property
-      const location = user.propertyId ? `Unidad ${user.propertyId}` : "Ubicación Desconocida";
+      const location = user.propertyId
+        ? `Unidad ${user.propertyId}`
+        : "Ubicación Desconocida";
 
       await triggerPanicAlert({
         userId: user.id,
@@ -33,10 +38,17 @@ export default function PanicButtonPage() {
         status: "ACTIVE",
       });
 
-      toast({ title: "Alerta Enviada", description: "Se ha enviado una alerta de pánico a seguridad." });
+      toast({
+        title: "Alerta Enviada",
+        description: "Se ha enviado una alerta de pánico a seguridad.",
+      });
     } catch (error: any) {
       console.error("Error sending panic alert:", error);
-      toast({ title: "Error", description: error.message || "Error al enviar la alerta de pánico.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: error.message || "Error al enviar la alerta de pánico.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -67,13 +79,12 @@ export default function PanicButtonPage() {
 
   return (
     <div className="container mx-auto p-6 flex flex-col items-center justify-center min-h-[calc(100vh-100px)]">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">
-        Botón de Pánico
-      </h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">Botón de Pánico</h1>
 
       <div className="bg-white shadow-md rounded-lg p-8 text-center">
         <p className="text-gray-700 mb-6">
-          En caso de emergencia, presiona el botón de abajo para enviar una alerta a seguridad.
+          En caso de emergencia, presiona el botón de abajo para enviar una
+          alerta a seguridad.
         </p>
         <Button
           onClick={handlePanicAlert}

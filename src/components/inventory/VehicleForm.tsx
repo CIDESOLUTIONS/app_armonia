@@ -1,22 +1,28 @@
-
 "use client";
 
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { useQueryClient, useMutation } from '@tanstack/react-query';
-import { inventoryService } from '@/services/inventory.service';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useModal } from '@/hooks/useModal';
-import { toast } from '@/components/ui/use-toast';
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { inventoryService } from "@/services/inventory.service";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useModal } from "@/hooks/useModal";
+import { toast } from "@/components/ui/use-toast";
 
 const formSchema = z.object({
-  licensePlate: z.string().min(1, { message: 'La placa es requerida.' }),
-  brand: z.string().min(1, { message: 'La marca es requerida.' }),
-  model: z.string().min(1, { message: 'El modelo es requerido.' }),
+  licensePlate: z.string().min(1, { message: "La placa es requerida." }),
+  brand: z.string().min(1, { message: "La marca es requerida." }),
+  model: z.string().min(1, { message: "El modelo es requerido." }),
   residentId: z.number(),
 });
 
@@ -27,9 +33,9 @@ export default function VehicleForm({ vehicle }) {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: vehicle || {
-      licensePlate: '',
-      brand: '',
-      model: '',
+      licensePlate: "",
+      brand: "",
+      model: "",
       residentId: undefined,
     },
   });
@@ -40,12 +46,17 @@ export default function VehicleForm({ vehicle }) {
         ? inventoryService.updateVehicle(vehicle.id, data)
         : inventoryService.createVehicle(data),
     onSuccess: () => {
-      queryClient.invalidateQueries(['vehicles']);
-      toast({ title: `Vehículo ${vehicle ? 'actualizado' : 'creado'} con éxito` });
+      queryClient.invalidateQueries(["vehicles"]);
+      toast({
+        title: `Vehículo ${vehicle ? "actualizado" : "creado"} con éxito`,
+      });
       closeModal();
     },
     onError: () => {
-      toast({ title: `Error al ${vehicle ? 'actualizar' : 'crear'} el vehículo`, variant: 'destructive' });
+      toast({
+        title: `Error al ${vehicle ? "actualizar" : "crear"} el vehículo`,
+        variant: "destructive",
+      });
     },
   });
 
@@ -102,14 +113,18 @@ export default function VehicleForm({ vehicle }) {
             <FormItem>
               <FormLabel>ID de Residente</FormLabel>
               <FormControl>
-                <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value))}/>
+                <Input
+                  type="number"
+                  {...field}
+                  onChange={(e) => field.onChange(parseInt(e.target.value))}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         <Button type="submit" disabled={mutation.isLoading}>
-          {mutation.isLoading ? 'Guardando...' : 'Guardar'}
+          {mutation.isLoading ? "Guardando..." : "Guardar"}
         </Button>
       </form>
     </Form>

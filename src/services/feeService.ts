@@ -47,24 +47,27 @@ export const getFees = async (): Promise<FeeDto[]> => {
 };
 
 export const createFee = async (data: CreateFeeData): Promise<FeeDto> => {
-  return fetchApi("/finances/fees", { method: 'POST', data });
+  return fetchApi("/finances/fees", { method: "POST", data });
 };
 
 export const updateFee = async (
   id: number,
   data: UpdateFeeData,
 ): Promise<FeeDto> => {
-  return fetchApi(`/finances/fees/${id}`, { method: 'PUT', data });
+  return fetchApi(`/finances/fees/${id}`, { method: "PUT", data });
 };
 
 export const deleteFee = async (id: number): Promise<void> => {
-  await fetchApi(`/finances/fees/${id}`, { method: 'DELETE' });
+  await fetchApi(`/finances/fees/${id}`, { method: "DELETE" });
 };
 
 export const generateOrdinaryFees = async (): Promise<any> => {
-  return fetchApi("/finances/fees/generate-ordinary", { method: 'POST' });
+  return fetchApi("/finances/fees/generate-ordinary", { method: "POST" });
 };
 
 export const initiatePayment = async (feeId: number): Promise<any> => {
-  return fetchApi("/finances/payments/initiate", { method: 'POST', data: { feeId } });
+  return fetchApi("/finances/payments/initiate", {
+    method: "POST",
+    data: { feeId },
+  });
 };

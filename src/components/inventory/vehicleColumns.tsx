@@ -1,9 +1,14 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const vehicleColumns = ({ onEdit, onDelete }) => [
   { accessorKey: "licensePlate", header: "Placa" },
@@ -24,8 +29,12 @@ export const vehicleColumns = ({ onEdit, onDelete }) => [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => onEdit(vehicle)}>Editar</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onDelete(vehicle.id)}>Eliminar</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onEdit(vehicle)}>
+              Editar
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onDelete(vehicle.id)}>
+              Eliminar
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

@@ -99,13 +99,18 @@ export default function ResidentDashboardPage() {
     if (!user?.id || !user?.complexId) {
       toast({
         title: "Error",
-        description: "Información de usuario o complejo incompleta para la alerta de pánico.",
+        description:
+          "Información de usuario o complejo incompleta para la alerta de pánico.",
         variant: "destructive",
       });
       return;
     }
 
-    if (confirm("¿Estás seguro de que quieres activar la alerta de pánico? Esto notificará al personal de seguridad.")) {
+    if (
+      confirm(
+        "¿Estás seguro de que quieres activar la alerta de pánico? Esto notificará al personal de seguridad.",
+      )
+    ) {
       try {
         await triggerPanicAlert({
           userId: user.id,
@@ -123,7 +128,8 @@ export default function ResidentDashboardPage() {
         console.error("Error triggering panic alert:", error);
         toast({
           title: "Error",
-          description: "No se pudo activar la alerta de pánico: " + error.message,
+          description:
+            "No se pudo activar la alerta de pánico: " + error.message,
           variant: "destructive",
         });
       }
@@ -249,7 +255,11 @@ export default function ResidentDashboardPage() {
                 <Bell className="mr-2 h-4 w-4" /> Mis Comunicados
               </Button>
             </Link>
-            <Button variant="destructive" className="w-full" onClick={handlePanicTrigger}>
+            <Button
+              variant="destructive"
+              className="w-full"
+              onClick={handlePanicTrigger}
+            >
               <AlertTriangle className="mr-2 h-4 w-4" /> Botón de Pánico
             </Button>
           </CardContent>

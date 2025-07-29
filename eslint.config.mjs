@@ -59,7 +59,7 @@ export default [
       "@typescript-eslint/no-empty-object-type": "off",
       "@typescript-eslint/no-unsafe-function-type": "error",
       "@typescript-eslint/no-require-imports": "error",
-      "no-useless-escape": "error",
+      "no-useless-escape": "off",
       "prefer-const": "error",
       "prettier/prettier": ["warn", { endOfLine: "auto" }],
     },

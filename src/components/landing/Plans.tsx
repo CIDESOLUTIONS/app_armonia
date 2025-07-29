@@ -147,7 +147,9 @@ export function Plans() {
             <h3 className="text-2xl font-bold text-gray-800 mb-4">
               {t("plans.enterprise.name")}
             </h3>
-            <p className="text-gray-600 mb-6">{t("plans.enterprise.description")}</p>
+            <p className="text-gray-600 mb-6">
+              {t("plans.enterprise.description")}
+            </p>
             <div className="text-5xl font-extrabold text-yellow-600 mb-6">
               {t("plans.enterprise.price")}
             </div>

@@ -18,7 +18,7 @@ export default async function middleware(req: NextRequest) {
   // Create a regex to check for public paths, including the root
   const publicPathnameRegex = RegExp(
     `^(/(${locales.join("|")}))?(${publicPages.join("|")}|/?)$`,
-    "i"
+    "i",
   );
 
   const isPublicPage = publicPathnameRegex.test(pathname);
@@ -33,7 +33,7 @@ export default async function middleware(req: NextRequest) {
 
   // If no token, redirect to the login page, preserving the locale
   if (!token) {
-    const locale = locales.find(l => pathname.startsWith(`/${l}/`)) || "es";
+    const locale = locales.find((l) => pathname.startsWith(`/${l}/`)) || "es";
     const url = req.nextUrl.clone();
     url.pathname = `/${locale}/login`;
     return NextResponse.redirect(url);

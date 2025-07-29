@@ -1,13 +1,15 @@
-
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import React, { createContext, useContext, useState, ReactNode } from "react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
-const ModalContext = createContext<{
-  openModal: (content: React.ReactNode) => void;
-  closeModal: () => void;
-} | undefined>(undefined);
+const ModalContext = createContext<
+  | {
+      openModal: (content: React.ReactNode) => void;
+      closeModal: () => void;
+    }
+  | undefined
+>(undefined);
 
 export function ModalProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,7 +38,7 @@ export function ModalProvider({ children }: { children: ReactNode }) {
 export function useModal() {
   const context = useContext(ModalContext);
   if (context === undefined) {
-    throw new Error('useModal must be used within a ModalProvider');
+    throw new Error("useModal must be used within a ModalProvider");
   }
   return context;
 }

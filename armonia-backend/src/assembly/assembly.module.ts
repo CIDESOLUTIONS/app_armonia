@@ -19,6 +19,6 @@ import { PrismaModule } from '../prisma/prisma.module.js';
     WebSocketService,
     DigitalSignatureService,
   ],
-  exports: [AssemblyService] // Export AssemblyService if it's used by other modules
+  exports: [AssemblyService], // Export AssemblyService if it's used by other modules
 })
 export class AssemblyModule {}

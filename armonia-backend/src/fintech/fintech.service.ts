@@ -3,9 +3,7 @@ import { PrismaService } from '../prisma/prisma.service.js';
 
 @Injectable()
 export class FintechService {
-  constructor(
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async requestMicroCredit(schemaName: string, data: any): Promise<any> {
     // Simulate API call to an external FinTech provider for micro-credit

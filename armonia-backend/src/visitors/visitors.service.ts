@@ -16,9 +16,7 @@ import {
 
 @Injectable()
 export class VisitorsService {
-  constructor(
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async createVisitor(
     schemaName: string,

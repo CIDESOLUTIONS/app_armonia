@@ -18,20 +18,28 @@ export interface CreatePersonalTransactionData {
   date: string;
 }
 
-export interface UpdatePersonalTransactionData extends Partial<CreatePersonalTransactionData> {}
+export interface UpdatePersonalTransactionData
+  extends Partial<CreatePersonalTransactionData> {}
 
-export const getPersonalTransactions = async (): Promise<PersonalTransaction[]> => {
-  return fetchApi('/personal-finances');
+export const getPersonalTransactions = async (): Promise<
+  PersonalTransaction[]
+> => {
+  return fetchApi("/personal-finances");
 };
 
-export const createPersonalTransaction = async (data: CreatePersonalTransactionData): Promise<PersonalTransaction> => {
-  return fetchApi('/personal-finances', { method: 'POST', data });
+export const createPersonalTransaction = async (
+  data: CreatePersonalTransactionData,
+): Promise<PersonalTransaction> => {
+  return fetchApi("/personal-finances", { method: "POST", data });
 };
 
-export const updatePersonalTransaction = async (id: number, data: UpdatePersonalTransactionData): Promise<PersonalTransaction> => {
-  return fetchApi(`/personal-finances/${id}`, { method: 'PUT', data });
+export const updatePersonalTransaction = async (
+  id: number,
+  data: UpdatePersonalTransactionData,
+): Promise<PersonalTransaction> => {
+  return fetchApi(`/personal-finances/${id}`, { method: "PUT", data });
 };
 
 export const deletePersonalTransaction = async (id: number): Promise<void> => {
-  await fetchApi(`/personal-finances/${id}`, { method: 'DELETE' });
+  await fetchApi(`/personal-finances/${id}`, { method: "DELETE" });
 };

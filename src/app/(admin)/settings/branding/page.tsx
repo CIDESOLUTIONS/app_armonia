@@ -7,7 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { getResidentialComplexById, updateResidentialComplex } from "@/services/residentialComplexService";
+import {
+  getResidentialComplexById,
+  updateResidentialComplex,
+} from "@/services/residentialComplexService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -21,9 +24,27 @@ import {
 } from "@/components/ui/form";
 
 const formSchema = z.object({
-  logoUrl: z.string().url("Debe ser una URL válida").optional().or(z.literal("")),
-  primaryColor: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Formato de color inválido (ej: #RRGGBB)").optional().or(z.literal("")),
-  secondaryColor: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Formato de color inválido (ej: #RRGGBB)").optional().or(z.literal("")),
+  logoUrl: z
+    .string()
+    .url("Debe ser una URL válida")
+    .optional()
+    .or(z.literal("")),
+  primaryColor: z
+    .string()
+    .regex(
+      /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/,
+      "Formato de color inválido (ej: #RRGGBB)",
+    )
+    .optional()
+    .or(z.literal("")),
+  secondaryColor: z
+    .string()
+    .regex(
+      /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/,
+      "Formato de color inválido (ej: #RRGGBB)",
+    )
+    .optional()
+    .or(z.literal("")),
 });
 
 export default function BrandingSettingsPage() {
@@ -54,7 +75,9 @@ export default function BrandingSettingsPage() {
       console.error("Error fetching branding settings:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las configuraciones de marca: " + error.message,
+        description:
+          "No se pudieron cargar las configuraciones de marca: " +
+          error.message,
         variant: "destructive",
       });
     } finally {
@@ -73,12 +96,16 @@ export default function BrandingSettingsPage() {
     setLoading(true);
     try {
       await updateResidentialComplex(user.complexId, values);
-      toast({ title: "Éxito", description: "Configuración de marca actualizada." });
+      toast({
+        title: "Éxito",
+        description: "Configuración de marca actualizada.",
+      });
     } catch (error: any) {
       console.error("Error updating branding settings:", error);
       toast({
         title: "Error",
-        description: "Error al actualizar la configuración de marca: " + error.message,
+        description:
+          "Error al actualizar la configuración de marca: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -125,7 +152,10 @@ export default function BrandingSettingsPage() {
                 <FormItem>
                   <FormLabel>URL del Logo</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://example.com/logo.png" {...field} />
+                    <Input
+                      placeholder="https://example.com/logo.png"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

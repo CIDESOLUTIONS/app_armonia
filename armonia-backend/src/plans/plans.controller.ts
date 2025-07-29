@@ -68,7 +68,10 @@ export class PlansController {
 
   @Put('subscriptions/:id')
   @UseGuards(JwtAuthGuard, RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
-  updateSubscription(@Param('id') id: string, @Body() updateSubscriptionDto: UpdateSubscriptionDto) {
+  updateSubscription(
+    @Param('id') id: string,
+    @Body() updateSubscriptionDto: UpdateSubscriptionDto,
+  ) {
     return this.plansService.updateSubscription(+id, updateSubscriptionDto);
   }
 }

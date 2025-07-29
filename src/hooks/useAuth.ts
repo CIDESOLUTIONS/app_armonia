@@ -72,7 +72,6 @@ export function useAuth() {
 
       storeLogin(result.user, result.token);
       router.push("/admin/complex-admin/admin-dashboard");
-
     } catch (err: any) {
       setError(err.message);
     } finally {

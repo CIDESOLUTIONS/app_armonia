@@ -8,7 +8,7 @@ describe('VisitorsService', () => {
   let prisma: PrismaService;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    const testModule: TestingModule = await Test.createTestingModule({
       providers: [
         VisitorsService,
         {
@@ -41,8 +41,8 @@ describe('VisitorsService', () => {
       ],
     }).compile();
 
-    service = module.get<VisitorsService>(VisitorsService);
-    prisma = module.get<PrismaService>(PrismaService);
+    service = testModule.get<VisitorsService>(VisitorsService);
+    prisma = testModule.get<PrismaService>(PrismaService);
   });
 
   it('should be defined', () => {

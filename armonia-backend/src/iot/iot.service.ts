@@ -19,9 +19,7 @@ interface FeeCreateInput {
 
 @Injectable()
 export class IotService {
-  constructor(
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async recordSmartMeterReading(
     schemaName: string,

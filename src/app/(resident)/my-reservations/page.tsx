@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
@@ -6,10 +5,16 @@ import { useAuthStore } from "@/store/authStore";
 import { Loader2, PlusCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { getCommonAreas, getReservations, Reservation, CommonArea } from "@/services/reservationService";
+import {
+  getCommonAreas,
+  getReservations,
+  Reservation,
+  CommonArea,
+} from "@/services/reservationService";
 import { useModal } from "@/hooks/useModal";
 import ResidentReservationForm from "@/components/reservations/ResidentReservationForm";
 import ResidentReservationsList from "@/components/reservations/ResidentReservationsList";
+import ResidentCommonAreasList from "@/components/reservations/ResidentCommonAreasList";
 
 export default function ResidentReservationsPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -33,7 +38,8 @@ export default function ResidentReservationsPage() {
       console.error("Error fetching data:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar los datos de reservas: " + error.message,
+        description:
+          "No se pudieron cargar los datos de reservas: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -48,7 +54,12 @@ export default function ResidentReservationsPage() {
   }, [authLoading, user, fetchReservationsAndCommonAreas]);
 
   const handleCreateReservation = (commonArea?: CommonArea) => {
-    openModal(<ResidentReservationForm commonArea={commonArea} onReservationSuccess={fetchReservationsAndCommonAreas} />);
+    openModal(
+      <ResidentReservationForm
+        commonArea={commonArea}
+        onReservationSuccess={fetchReservationsAndCommonAreas}
+      />,
+    );
   };
 
   if (authLoading || loading) {
@@ -86,10 +97,17 @@ export default function ResidentReservationsPage() {
         </Button>
       </div>
 
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">Áreas Comunes Disponibles</h2>
-      <ResidentCommonAreasList commonAreas={commonAreas} onCreateReservation={handleCreateReservation} />
+      <h2 className="text-2xl font-bold text-gray-900 mb-4">
+        Áreas Comunes Disponibles
+      </h2>
+      <ResidentCommonAreasList
+        commonAreas={commonAreas}
+        onCreateReservation={handleCreateReservation}
+      />
 
-      <h2 className="text-2xl font-bold text-gray-900 mb-4 mt-8">Mis Reservas</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-4 mt-8">
+        Mis Reservas
+      </h2>
       <ResidentReservationsList reservations={reservations} />
     </div>
   );

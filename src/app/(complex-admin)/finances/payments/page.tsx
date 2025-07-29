@@ -1,20 +1,23 @@
-
 "use client";
 
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { getPayments } from '@/services/paymentService';
-import PaymentsDataTable from '@/components/finances/PaymentsDataTable';
-import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
-import { useModal } from '@/hooks/useModal';
-import ManualPaymentForm from '@/components/finances/ManualPaymentForm';
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getPayments } from "@/services/paymentService";
+import PaymentsDataTable from "@/components/finances/PaymentsDataTable";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
+import { useModal } from "@/hooks/useModal";
+import ManualPaymentForm from "@/components/finances/ManualPaymentForm";
 
 export default function PaymentsPage() {
   const { openModal } = useModal();
 
-  const { data: payments, isLoading, error } = useQuery({
-    queryKey: ['payments'],
+  const {
+    data: payments,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["payments"],
     queryFn: () => getPayments(),
   });
 

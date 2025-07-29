@@ -1,21 +1,24 @@
-
 "use client";
 
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { inventoryService } from '@/services/inventory.service';
-import ResidentsDataTable from '@/components/inventory/ResidentsDataTable';
-import { Button } from '@/components/ui/button';
-import { PlusCircle, FileText } from 'lucide-react';
-import { useModal } from '@/hooks/useModal';
-import ResidentForm from '@/components/inventory/ResidentForm';
-import GeneratePeaceAndSafeForm from '@/components/reports/GeneratePeaceAndSafeForm';
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { inventoryService } from "@/services/inventory.service";
+import ResidentsDataTable from "@/components/inventory/ResidentsDataTable";
+import { Button } from "@/components/ui/button";
+import { PlusCircle, FileText } from "lucide-react";
+import { useModal } from "@/hooks/useModal";
+import ResidentForm from "@/components/inventory/ResidentForm";
+import GeneratePeaceAndSafeForm from "@/components/reports/GeneratePeaceAndSafeForm";
 
 export default function ResidentsPage() {
   const { openModal } = useModal();
 
-  const { data: residents, isLoading, error } = useQuery({
-    queryKey: ['residents'],
+  const {
+    data: residents,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["residents"],
     queryFn: () => inventoryService.getResidents(),
   });
 

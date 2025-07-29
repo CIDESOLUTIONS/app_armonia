@@ -1,19 +1,23 @@
 "use client";
 
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { inventoryService } from '@/services/inventory.service';
-import PetsDataTable from '@/components/inventory/PetsDataTable';
-import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
-import { useModal } from '@/hooks/useModal';
-import PetForm from '@/components/inventory/PetForm';
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { inventoryService } from "@/services/inventory.service";
+import PetsDataTable from "@/components/inventory/PetsDataTable";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
+import { useModal } from "@/hooks/useModal";
+import PetForm from "@/components/inventory/PetForm";
 
 export default function PetsPage() {
   const { openModal } = useModal();
 
-  const { data: pets, isLoading, error } = useQuery({
-    queryKey: ['pets'],
+  const {
+    data: pets,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["pets"],
     queryFn: () => inventoryService.getPets(),
   });
 

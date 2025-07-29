@@ -1,8 +1,22 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { VisitorsService } from './visitors.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { GetUser } from '../common/decorators/user.decorator.js';
-import { CreateVisitorDto, UpdateVisitorDto, VisitorFilterParamsDto } from '../common/dto/visitors.dto.js';
+import {
+  CreateVisitorDto,
+  UpdateVisitorDto,
+  VisitorFilterParamsDto,
+} from '../common/dto/visitors.dto.js';
 import { RolesGuard } from '../auth/roles.guard.js';
 import { Roles } from '../auth/roles.decorator.js';
 import { UserRole } from '../common/enums/user-role.enum.js';
@@ -14,8 +28,14 @@ export class VisitorsController {
 
   @Post()
   @UseGuards(RolesGuard([UserRole.SECURITY, UserRole.RECEPTION]))
-  createVisitor(@GetUser() user: any, @Body() createVisitorDto: CreateVisitorDto) {
-    return this.visitorsService.createVisitor(user.schemaName, createVisitorDto);
+  createVisitor(
+    @GetUser() user: any,
+    @Body() createVisitorDto: CreateVisitorDto,
+  ) {
+    return this.visitorsService.createVisitor(
+      user.schemaName,
+      createVisitorDto,
+    );
   }
 
   @Get()
@@ -42,8 +62,16 @@ export class VisitorsController {
 
   @Put(':id')
   @UseGuards(RolesGuard([UserRole.SECURITY, UserRole.RECEPTION]))
-  updateVisitor(@GetUser() user: any, @Param('id') id: string, @Body() updateVisitorDto: UpdateVisitorDto) {
-    return this.visitorsService.updateVisitor(user.schemaName, +id, updateVisitorDto);
+  updateVisitor(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() updateVisitorDto: UpdateVisitorDto,
+  ) {
+    return this.visitorsService.updateVisitor(
+      user.schemaName,
+      +id,
+      updateVisitorDto,
+    );
   }
 
   @Delete(':id')

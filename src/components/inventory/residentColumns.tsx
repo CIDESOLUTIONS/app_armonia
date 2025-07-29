@@ -1,15 +1,24 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const residentColumns = ({ onEdit, onDelete }) => [
   { accessorKey: "name", header: "Nombre" },
   { accessorKey: "email", header: "Email" },
   { accessorKey: "property.unitNumber", header: "Unidad" },
-  { accessorKey: "isOwner", header: "Propietario", cell: ({ row }) => (row.original.isOwner ? "Sí" : "No") },
+  {
+    accessorKey: "isOwner",
+    header: "Propietario",
+    cell: ({ row }) => (row.original.isOwner ? "Sí" : "No"),
+  },
   {
     id: "actions",
     cell: ({ row }) => {
@@ -24,8 +33,12 @@ export const residentColumns = ({ onEdit, onDelete }) => [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => onEdit(resident)}>Editar</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onDelete(resident.id)}>Eliminar</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onEdit(resident)}>
+              Editar
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onDelete(resident.id)}>
+              Eliminar
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

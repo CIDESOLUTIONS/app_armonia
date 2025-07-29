@@ -1,4 +1,14 @@
-import { Controller, Get, Query, Res, UseGuards, Req, Body, Post, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  Res,
+  UseGuards,
+  Req,
+  Body,
+  Post,
+  Param,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { ReportsService } from './reports.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
@@ -20,7 +30,12 @@ export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @Get('visitors/pdf')
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RECEPTION, UserRole.STAFF)
+  @Roles(
+    UserRole.COMPLEX_ADMIN,
+    UserRole.ADMIN,
+    UserRole.RECEPTION,
+    UserRole.STAFF,
+  )
   async getVisitorsReportPdf(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -41,7 +56,12 @@ export class ReportsController {
   }
 
   @Get('visitors/excel')
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RECEPTION, UserRole.STAFF)
+  @Roles(
+    UserRole.COMPLEX_ADMIN,
+    UserRole.ADMIN,
+    UserRole.RECEPTION,
+    UserRole.STAFF,
+  )
   async getVisitorsReportExcel(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -63,7 +83,12 @@ export class ReportsController {
   }
 
   @Get('packages/pdf')
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RECEPTION, UserRole.STAFF)
+  @Roles(
+    UserRole.COMPLEX_ADMIN,
+    UserRole.ADMIN,
+    UserRole.RECEPTION,
+    UserRole.STAFF,
+  )
   async getPackagesReportPdf(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -84,7 +109,12 @@ export class ReportsController {
   }
 
   @Get('packages/excel')
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RECEPTION, UserRole.STAFF)
+  @Roles(
+    UserRole.COMPLEX_ADMIN,
+    UserRole.ADMIN,
+    UserRole.RECEPTION,
+    UserRole.STAFF,
+  )
   async getPackagesReportExcel(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -106,7 +136,12 @@ export class ReportsController {
   }
 
   @Get('incidents/pdf')
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RECEPTION, UserRole.STAFF)
+  @Roles(
+    UserRole.COMPLEX_ADMIN,
+    UserRole.ADMIN,
+    UserRole.RECEPTION,
+    UserRole.STAFF,
+  )
   async getIncidentsReportPdf(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -127,7 +162,12 @@ export class ReportsController {
   }
 
   @Get('incidents/excel')
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RECEPTION, UserRole.STAFF)
+  @Roles(
+    UserRole.COMPLEX_ADMIN,
+    UserRole.ADMIN,
+    UserRole.RECEPTION,
+    UserRole.STAFF,
+  )
   async getIncidentsReportExcel(
     @Req() req,
     @Query('startDate') startDate: string,
@@ -156,14 +196,16 @@ export class ReportsController {
     @Query('endDate') endDate: string,
     @Res() res: Response,
   ) {
-    const buffer = await this.reportsService.generateConsolidatedFinancialReportPdf(
-      schemaNames,
-      new Date(startDate),
-      new Date(endDate),
-    );
+    const buffer =
+      await this.reportsService.generateConsolidatedFinancialReportPdf(
+        schemaNames,
+        new Date(startDate),
+        new Date(endDate),
+      );
     res.set({
       'Content-Type': 'application/pdf',
-      'Content-Disposition': 'attachment; filename="reporte_financiero_consolidado.pdf"',
+      'Content-Disposition':
+        'attachment; filename="reporte_financiero_consolidado.pdf"',
       'Content-Length': buffer.length,
     });
     res.end(buffer);

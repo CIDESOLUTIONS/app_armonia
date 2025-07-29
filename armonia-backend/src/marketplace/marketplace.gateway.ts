@@ -60,7 +60,10 @@ export class MarketplaceGateway {
     );
 
     // Save message to database
-    const savedMessage = await this.marketplaceService.createMessage(data.schemaName, data);
+    const savedMessage = await this.marketplaceService.createMessage(
+      data.schemaName,
+      data,
+    );
 
     // Emit message to all clients in the room
     this.server

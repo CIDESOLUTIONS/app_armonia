@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from '../user/user.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { RolesGuard } from '../auth/roles.guard.js';
@@ -14,12 +23,18 @@ export class StaffController {
 
   @Post()
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
-  async createStaffUser(@GetUser() user: any, @Body() createUserDto: CreateUserDto) {
+  async createStaffUser(
+    @GetUser() user: any,
+    @Body() createUserDto: CreateUserDto,
+  ) {
     // Ensure the role is STAFF when creating via this endpoint
     if (createUserDto.role && createUserDto.role !== UserRole.STAFF) {
       throw new Error('Only STAFF role can be created via this endpoint.');
     }
-    return this.userService.createUser(user.schemaName, { ...createUserDto, role: UserRole.STAFF });
+    return this.userService.createUser(user.schemaName, {
+      ...createUserDto,
+      role: UserRole.STAFF,
+    });
   }
 
   @Get()
@@ -40,7 +55,11 @@ export class StaffController {
 
   @Put(':id')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
-  async updateStaffUser(@GetUser() user: any, @Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  async updateStaffUser(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     const existingUser = await this.userService.findById(+id);
     if (existingUser && existingUser.role !== UserRole.STAFF) {
       throw new Error('User is not a STAFF member.');
@@ -49,7 +68,10 @@ export class StaffController {
     if (updateUserDto.role && updateUserDto.role !== UserRole.STAFF) {
       throw new Error('Role cannot be changed via this endpoint.');
     }
-    return this.userService.updateUser(user.schemaName, +id, { ...updateUserDto, role: UserRole.STAFF });
+    return this.userService.updateUser(user.schemaName, +id, {
+      ...updateUserDto,
+      role: UserRole.STAFF,
+    });
   }
 
   @Delete(':id')

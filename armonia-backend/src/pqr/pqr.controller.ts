@@ -29,22 +29,40 @@ export class PqrController {
 
   @Post()
   async createPqr(@GetUser() user: any, @Body() createPQRDto: CreatePQRDto) {
-    return this.pqrService.createPqr(user.schemaName, user.userId, createPQRDto);
+    return this.pqrService.createPqr(
+      user.schemaName,
+      user.userId,
+      createPQRDto,
+    );
   }
 
   @Get()
   async getPqrs(@GetUser() user: any, @Query() filters: GetPQRParamsDto) {
-    return this.pqrService.getPqrs(user.schemaName, user.userId, user.role, filters);
+    return this.pqrService.getPqrs(
+      user.schemaName,
+      user.userId,
+      user.role,
+      filters,
+    );
   }
 
   @Get(':id')
   async getPqrById(@GetUser() user: any, @Param('id') id: string) {
-    return this.pqrService.getPqrById(user.schemaName, user.userId, user.role, +id);
+    return this.pqrService.getPqrById(
+      user.schemaName,
+      user.userId,
+      user.role,
+      +id,
+    );
   }
 
   @Put(':id')
   @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
-  async updatePqr(@GetUser() user: any, @Param('id') id: string, @Body() updatePQRDto: UpdatePQRDto) {
+  async updatePqr(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() updatePQRDto: UpdatePQRDto,
+  ) {
     return this.pqrService.updatePqr(user.schemaName, +id, updatePQRDto);
   }
 
@@ -54,6 +72,11 @@ export class PqrController {
     @Param('id') id: string,
     @Body() pqrCommentDto: PQRCommentDto,
   ) {
-    return this.pqrService.addComment(user.schemaName, user.userId, +id, pqrCommentDto);
+    return this.pqrService.addComment(
+      user.schemaName,
+      user.userId,
+      +id,
+      pqrCommentDto,
+    );
   }
 }

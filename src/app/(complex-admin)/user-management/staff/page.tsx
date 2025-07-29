@@ -1,19 +1,23 @@
 "use client";
 
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { staffService } from '@/services/staffService';
-import StaffDataTable from '@/components/user-management/StaffDataTable';
-import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
-import { useModal } from '@/hooks/useModal';
-import StaffForm from '@/components/user-management/StaffForm';
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { staffService } from "@/services/staffService";
+import StaffDataTable from "@/components/user-management/StaffDataTable";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
+import { useModal } from "@/hooks/useModal";
+import StaffForm from "@/components/user-management/StaffForm";
 
 export default function StaffPage() {
   const { openModal } = useModal();
 
-  const { data: staffUsers, isLoading, error } = useQuery({
-    queryKey: ['staffUsers'],
+  const {
+    data: staffUsers,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["staffUsers"],
     queryFn: () => staffService.getStaffUsers(),
   });
 

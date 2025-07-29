@@ -212,14 +212,26 @@ export default function ResidentReservationsPage() {
                   <TableRow key={reservation.id}>
                     <TableCell>{reservation.commonArea.name}</TableCell>
                     <TableCell>{reservation.title}</TableCell>
-                    <TableCell>{new Date(reservation.startDateTime).toLocaleString()}</TableCell>
-                    <TableCell>{new Date(reservation.endDateTime).toLocaleString()}</TableCell>
                     <TableCell>
-                      <Badge variant={reservation.status === "APPROVED" ? "default" : "secondary"}>
+                      {new Date(reservation.startDateTime).toLocaleString()}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(reservation.endDateTime).toLocaleString()}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          reservation.status === "APPROVED"
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
                         {reservation.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>${reservation.paymentAmount?.toFixed(2) || "0.00"}</TableCell>
+                    <TableCell>
+                      ${reservation.paymentAmount?.toFixed(2) || "0.00"}
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
@@ -235,7 +247,9 @@ export default function ResidentReservationsPage() {
       </Card>
 
       <div className="mt-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Calendario de Disponibilidad</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          Calendario de Disponibilidad
+        </h2>
         <div className="h-64 bg-gray-100 flex items-center justify-center rounded-md text-gray-500">
           Aquí irá el calendario de disponibilidad de amenidades.
         </div>
@@ -295,7 +309,10 @@ export default function ResidentReservationsPage() {
                   <FormItem>
                     <FormLabel>Descripción (Opcional)</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Detalles de la reserva" {...field} />
+                      <Textarea
+                        placeholder="Detalles de la reserva"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -334,7 +351,13 @@ export default function ResidentReservationsPage() {
                   <FormItem>
                     <FormLabel>Número de Asistentes (Opcional)</FormLabel>
                     <FormControl>
-                      <Input type="number" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
+                      <Input
+                        type="number"
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -346,7 +369,10 @@ export default function ResidentReservationsPage() {
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
                     <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel>Requiere Pago</FormLabel>
@@ -363,14 +389,24 @@ export default function ResidentReservationsPage() {
                     <FormItem>
                       <FormLabel>Monto de Pago</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} onChange={(e) => field.onChange(parseFloat(e.target.value))} />
+                        <Input
+                          type="number"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(parseFloat(e.target.value))
+                          }
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               )}
-              <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={form.formState.isSubmitting}
+              >
                 {form.formState.isSubmitting ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : null}{" "}

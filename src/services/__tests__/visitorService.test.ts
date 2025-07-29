@@ -36,7 +36,10 @@ describe("visitorService", () => {
 
     const result = await createPreRegisteredVisitor(mockVisitorData);
 
-    expect(apiClient.post).toHaveBeenCalledWith("/visitors/pre-register", mockVisitorData);
+    expect(apiClient.post).toHaveBeenCalledWith(
+      "/visitors/pre-register",
+      mockVisitorData,
+    );
     expect(result).toEqual(response.data);
   });
 
@@ -60,7 +63,9 @@ describe("visitorService", () => {
 
     const result = await scanQrCode(mockQrCode);
 
-    expect(apiClient.post).toHaveBeenCalledWith("/visitors/scan-qr", { qrCode: mockQrCode });
+    expect(apiClient.post).toHaveBeenCalledWith("/visitors/scan-qr", {
+      qrCode: mockQrCode,
+    });
     expect(result).toEqual(mockVisitor);
   });
 
@@ -69,7 +74,9 @@ describe("visitorService", () => {
       trackingNumber: "TRACK123",
       recipientUnit: "Apto 101",
     };
-    const response = { data: { id: 1, status: "PENDING", createdAt: "", ...mockPackageData } };
+    const response = {
+      data: { id: 1, status: "PENDING", createdAt: "", ...mockPackageData },
+    };
     (apiClient.post as any).mockResolvedValue(response);
 
     const result = await registerPackage(mockPackageData);
@@ -85,7 +92,9 @@ describe("visitorService", () => {
 
     const result = await deliverPackage(packageId);
 
-    expect(apiClient.put).toHaveBeenCalledWith(`/packages/${packageId}/deliver`);
+    expect(apiClient.put).toHaveBeenCalledWith(
+      `/packages/${packageId}/deliver`,
+    );
     expect(result).toEqual(response.data);
   });
 
@@ -102,7 +111,7 @@ describe("visitorService", () => {
     expect(apiClient.post).toHaveBeenCalledWith(
       "/visitors/upload-image",
       formData,
-      { headers: { "Content-Type": "multipart/form-data" } }
+      { headers: { "Content-Type": "multipart/form-data" } },
     );
     expect(result).toEqual(mockUrl);
   });
@@ -120,7 +129,7 @@ describe("visitorService", () => {
     expect(apiClient.post).toHaveBeenCalledWith(
       "/packages/upload-image",
       formData,
-      { headers: { "Content-Type": "multipart/form-data" } }
+      { headers: { "Content-Type": "multipart/form-data" } },
     );
     expect(result).toEqual(mockUrl);
   });

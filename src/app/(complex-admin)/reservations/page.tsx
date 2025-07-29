@@ -106,11 +106,12 @@ export default function ReservationsPage() {
   const fetchReservationsAndData = useCallback(async () => {
     setLoading(true);
     try {
-      const [reservationsData, commonAreasData, residentsData] = await Promise.all([
-        getReservations(),
-        getCommonAreas(),
-        getResidents(),
-      ]);
+      const [reservationsData, commonAreasData, residentsData] =
+        await Promise.all([
+          getReservations(),
+          getCommonAreas(),
+          getResidents(),
+        ]);
       setReservations(reservationsData);
       setCommonAreas(commonAreasData);
       setResidents(residentsData.map((r) => ({ id: r.id, name: r.name })));
@@ -450,7 +451,10 @@ export default function ReservationsPage() {
                       </FormControl>
                       <SelectContent>
                         {residents.map((resident) => (
-                          <SelectItem key={resident.id} value={String(resident.id)}>
+                          <SelectItem
+                            key={resident.id}
+                            value={String(resident.id)}
+                          >
                             {resident.name}
                           </SelectItem>
                         ))}
@@ -493,7 +497,11 @@ export default function ReservationsPage() {
                   <FormItem className="grid grid-cols-4 items-center gap-4">
                     <FormLabel className="text-right">Inicio</FormLabel>
                     <FormControl>
-                      <Input type="datetime-local" className="col-span-3" {...field} />
+                      <Input
+                        type="datetime-local"
+                        className="col-span-3"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
@@ -506,7 +514,11 @@ export default function ReservationsPage() {
                   <FormItem className="grid grid-cols-4 items-center gap-4">
                     <FormLabel className="text-right">Fin</FormLabel>
                     <FormControl>
-                      <Input type="datetime-local" className="col-span-3" {...field} />
+                      <Input
+                        type="datetime-local"
+                        className="col-span-3"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
@@ -519,7 +531,14 @@ export default function ReservationsPage() {
                   <FormItem className="grid grid-cols-4 items-center gap-4">
                     <FormLabel className="text-right">Asistentes</FormLabel>
                     <FormControl>
-                      <Input type="number" className="col-span-3" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
+                      <Input
+                        type="number"
+                        className="col-span-3"
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
+                      />
                     </FormControl>
                     <FormMessage className="col-span-full text-right" />
                   </FormItem>
@@ -531,7 +550,10 @@ export default function ReservationsPage() {
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
                     <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel>Requiere Pago</FormLabel>
@@ -546,9 +568,18 @@ export default function ReservationsPage() {
                   name="paymentAmount"
                   render={({ field }) => (
                     <FormItem className="grid grid-cols-4 items-center gap-4">
-                      <FormLabel className="text-right">Monto de Pago</FormLabel>
+                      <FormLabel className="text-right">
+                        Monto de Pago
+                      </FormLabel>
                       <FormControl>
-                        <Input type="number" className="col-span-3" {...field} onChange={(e) => field.onChange(parseFloat(e.target.value))} />
+                        <Input
+                          type="number"
+                          className="col-span-3"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(parseFloat(e.target.value))
+                          }
+                        />
                       </FormControl>
                       <FormMessage className="col-span-full text-right" />
                     </FormItem>

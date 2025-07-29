@@ -1,20 +1,23 @@
-
 "use client";
 
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { inventoryService } from '@/services/inventory.service';
-import PropertiesDataTable from '@/components/inventory/PropertiesDataTable';
-import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
-import { useModal } from '@/hooks/useModal';
-import PropertyForm from '@/components/inventory/PropertyForm';
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { inventoryService } from "@/services/inventory.service";
+import PropertiesDataTable from "@/components/inventory/PropertiesDataTable";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
+import { useModal } from "@/hooks/useModal";
+import PropertyForm from "@/components/inventory/PropertyForm";
 
 export default function PropertiesPage() {
   const { openModal } = useModal();
 
-  const { data: properties, isLoading, error } = useQuery({
-    queryKey: ['properties'],
+  const {
+    data: properties,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["properties"],
     queryFn: () => inventoryService.getProperties(),
   });
 

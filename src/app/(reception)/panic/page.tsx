@@ -1,9 +1,14 @@
-
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { Loader2, Eye, CheckCircle, XCircle, MessageSquare } from "lucide-react";
+import {
+  Loader2,
+  Eye,
+  CheckCircle,
+  XCircle,
+  MessageSquare,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -83,7 +88,8 @@ export default function PanicAlertsPage() {
       console.error("Error fetching panic alerts:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las alertas de pánico: " + error.message,
+        description:
+          "No se pudieron cargar las alertas de pánico: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -106,20 +112,28 @@ export default function PanicAlertsPage() {
       console.error("Error fetching alert details:", error);
       toast({
         title: "Error",
-        description: "No se pudo cargar el detalle de la alerta: " + error.message,
+        description:
+          "No se pudo cargar el detalle de la alerta: " + error.message,
         variant: "destructive",
       });
     }
   };
 
-  const handleUpdateStatus = async (alertId: number, status: "RESOLVED" | "IN_PROGRESS") => {
+  const handleUpdateStatus = async (
+    alertId: number,
+    status: "RESOLVED" | "IN_PROGRESS",
+  ) => {
     try {
       await updatePanicAlert(alertId, { status });
       toast({ title: "Éxito", description: "Estado de alerta actualizado." });
       fetchAlerts();
     } catch (error: any) {
       console.error("Error updating alert status:", error);
-      toast({ title: "Error", description: "Error al actualizar el estado de la alerta.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Error al actualizar el estado de la alerta.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -137,13 +151,20 @@ export default function PanicAlertsPage() {
         responderId: user.id,
         content: values.content,
       });
-      toast({ title: "Éxito", description: "Respuesta añadida correctamente." });
+      toast({
+        title: "Éxito",
+        description: "Respuesta añadida correctamente.",
+      });
       setIsResponseModalOpen(false);
       setIsDetailModalOpen(false); // Close detail modal if open
       fetchAlerts();
     } catch (error: any) {
       console.error("Error adding response:", error);
-      toast({ title: "Error", description: "Error al añadir respuesta: " + error.message, variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Error al añadir respuesta: " + error.message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -155,7 +176,13 @@ export default function PanicAlertsPage() {
     );
   }
 
-  if (!user || (user.role !== "RECEPTION" && user.role !== "SECURITY" && user.role !== "COMPLEX_ADMIN" && user.role !== "ADMIN")) {
+  if (
+    !user ||
+    (user.role !== "RECEPTION" &&
+      user.role !== "SECURITY" &&
+      user.role !== "COMPLEX_ADMIN" &&
+      user.role !== "ADMIN")
+  ) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -210,7 +237,9 @@ export default function PanicAlertsPage() {
                       {alert.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{new Date(alert.alertTime).toLocaleString()}</TableCell>
+                  <TableCell>
+                    {new Date(alert.alertTime).toLocaleString()}
+                  </TableCell>
                   <TableCell className="text-right">
                     <Button
                       variant="ghost"
@@ -224,7 +253,9 @@ export default function PanicAlertsPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleUpdateStatus(alert.id, "IN_PROGRESS")}
+                        onClick={() =>
+                          handleUpdateStatus(alert.id, "IN_PROGRESS")
+                        }
                         className="mr-2"
                       >
                         <CheckCircle className="h-4 w-4 text-blue-600" />
@@ -272,21 +303,55 @@ export default function PanicAlertsPage() {
           </DialogHeader>
           {selectedAlert && (
             <div className="space-y-4 py-4">
-              <p><strong>ID:</strong> {selectedAlert.id}</p>
-              <p><strong>Usuario:</strong> {selectedAlert.userId}</p>
-              <p><strong>Ubicación:</strong> {selectedAlert.location}</p>
-              <p><strong>Tipo:</strong> {selectedAlert.type}</p>
-              <p><strong>Estado:</strong> <Badge variant={selectedAlert.status === "ACTIVE" ? "destructive" : selectedAlert.status === "IN_PROGRESS" ? "secondary" : "default"}>{selectedAlert.status}</Badge></p>
-              <p><strong>Fecha/Hora:</strong> {new Date(selectedAlert.alertTime).toLocaleString()}</p>
-              {selectedAlert.resolvedAt && <p><strong>Resuelta:</strong> {new Date(selectedAlert.resolvedAt).toLocaleString()}</p>}
+              <p>
+                <strong>ID:</strong> {selectedAlert.id}
+              </p>
+              <p>
+                <strong>Usuario:</strong> {selectedAlert.userId}
+              </p>
+              <p>
+                <strong>Ubicación:</strong> {selectedAlert.location}
+              </p>
+              <p>
+                <strong>Tipo:</strong> {selectedAlert.type}
+              </p>
+              <p>
+                <strong>Estado:</strong>{" "}
+                <Badge
+                  variant={
+                    selectedAlert.status === "ACTIVE"
+                      ? "destructive"
+                      : selectedAlert.status === "IN_PROGRESS"
+                        ? "secondary"
+                        : "default"
+                  }
+                >
+                  {selectedAlert.status}
+                </Badge>
+              </p>
+              <p>
+                <strong>Fecha/Hora:</strong>{" "}
+                {new Date(selectedAlert.alertTime).toLocaleString()}
+              </p>
+              {selectedAlert.resolvedAt && (
+                <p>
+                  <strong>Resuelta:</strong>{" "}
+                  {new Date(selectedAlert.resolvedAt).toLocaleString()}
+                </p>
+              )}
 
               <h3 className="text-lg font-semibold mt-4">Respuestas:</h3>
               {selectedAlert.responses && selectedAlert.responses.length > 0 ? (
                 <div className="space-y-2">
                   {selectedAlert.responses.map((response, index) => (
                     <div key={index} className="bg-gray-100 p-3 rounded-md">
-                      <p><strong>{response.responderId}:</strong> {response.content}</p>
-                      <p className="text-xs text-gray-500">{new Date(response.responseTime).toLocaleString()}</p>
+                      <p>
+                        <strong>{response.responderId}:</strong>{" "}
+                        {response.content}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(response.responseTime).toLocaleString()}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -296,7 +361,12 @@ export default function PanicAlertsPage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDetailModalOpen(false)}>Cerrar</Button>
+            <Button
+              variant="outline"
+              onClick={() => setIsDetailModalOpen(false)}
+            >
+              Cerrar
+            </Button>
             {selectedAlert?.status !== "RESOLVED" && (
               <Button onClick={() => handleAddResponse(selectedAlert!)}>
                 <MessageSquare className="mr-2 h-4 w-4" /> Añadir Respuesta
@@ -317,9 +387,16 @@ export default function PanicAlertsPage() {
           </DialogHeader>
           {selectedAlert && (
             <Form {...responseForm}>
-              <form onSubmit={handleResponseSubmit(onResponseSubmit)} className="space-y-4 py-4">
-                <p><strong>Alerta ID:</strong> {selectedAlert.id}</p>
-                <p><strong>Ubicación:</strong> {selectedAlert.location}</p>
+              <form
+                onSubmit={handleResponseSubmit(onResponseSubmit)}
+                className="space-y-4 py-4"
+              >
+                <p>
+                  <strong>Alerta ID:</strong> {selectedAlert.id}
+                </p>
+                <p>
+                  <strong>Ubicación:</strong> {selectedAlert.location}
+                </p>
                 <FormField
                   control={responseFormControl}
                   name="content"
@@ -334,9 +411,17 @@ export default function PanicAlertsPage() {
                   )}
                 />
                 <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsResponseModalOpen(false)}>Cancelar</Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsResponseModalOpen(false)}
+                  >
+                    Cancelar
+                  </Button>
                   <Button type="submit" disabled={isResponseSubmitting}>
-                    {isResponseSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null} Enviar Respuesta
+                    {isResponseSubmitting ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : null}{" "}
+                    Enviar Respuesta
                   </Button>
                 </DialogFooter>
               </form>

@@ -1,17 +1,23 @@
-
 "use client";
 
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { useQueryClient, useMutation } from '@tanstack/react-query';
-import { generatePeaceAndSafePdf } from '@/services/reportService';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useModal } from '@/hooks/useModal';
-import { toast } from '@/components/ui/use-toast';
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { generatePeaceAndSafePdf } from "@/services/reportService";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useModal } from "@/hooks/useModal";
+import { toast } from "@/components/ui/use-toast";
 
 const formSchema = z.object({
   residentId: z.number({ required_error: "El ID del residente es requerido." }),
@@ -29,16 +35,21 @@ export default function GeneratePeaceAndSafeForm() {
   });
 
   const mutation = useMutation({
-    mutationFn: (data: { residentId: number }) => generatePeaceAndSafePdf(data.residentId),
+    mutationFn: (data: { residentId: number }) =>
+      generatePeaceAndSafePdf(data.residentId),
     onSuccess: (data) => {
-      const blob = new Blob([data], { type: 'application/pdf' });
+      const blob = new Blob([data], { type: "application/pdf" });
       const url = window.URL.createObjectURL(blob);
-      window.open(url, '_blank');
-      toast({ title: 'Paz y Salvo generado con éxito' });
+      window.open(url, "_blank");
+      toast({ title: "Paz y Salvo generado con éxito" });
       closeModal();
     },
     onError: (error: any) => {
-      toast({ title: 'Error al generar Paz y Salvo', description: error.message || 'Ocurrió un error', variant: 'destructive' });
+      toast({
+        title: "Error al generar Paz y Salvo",
+        description: error.message || "Ocurrió un error",
+        variant: "destructive",
+      });
     },
   });
 
@@ -56,14 +67,18 @@ export default function GeneratePeaceAndSafeForm() {
             <FormItem>
               <FormLabel>ID del Residente</FormLabel>
               <FormControl>
-                <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value))}/>
+                <Input
+                  type="number"
+                  {...field}
+                  onChange={(e) => field.onChange(parseInt(e.target.value))}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         <Button type="submit" disabled={mutation.isLoading}>
-          {mutation.isLoading ? 'Generando...' : 'Generar Paz y Salvo'}
+          {mutation.isLoading ? "Generando..." : "Generar Paz y Salvo"}
         </Button>
       </form>
     </Form>

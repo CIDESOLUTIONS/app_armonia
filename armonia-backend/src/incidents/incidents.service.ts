@@ -14,9 +14,7 @@ import {
 
 @Injectable()
 export class IncidentsService {
-  constructor(
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async createIncident(
     schemaName: string,

@@ -21,7 +21,9 @@ export interface RegisterManualPaymentData {
 }
 
 export const getPayments = async (filters?: any): Promise<PaymentDto[]> => {
-  const result = await fetchApi<{ data: PaymentDto[] }>("/finances/payments", { params: filters });
+  const result = await fetchApi<{ data: PaymentDto[] }>("/finances/payments", {
+    params: filters,
+  });
   return result.data;
 };
 
@@ -33,15 +35,15 @@ export const updatePayment = async (
   id: number,
   data: Partial<PaymentDto>,
 ): Promise<PaymentDto> => {
-  return fetchApi(`/finances/payments/${id}`, { method: 'PUT', data });
+  return fetchApi(`/finances/payments/${id}`, { method: "PUT", data });
 };
 
 export const deletePayment = async (id: number): Promise<void> => {
-  await fetchApi(`/finances/payments/${id}`, { method: 'DELETE' });
+  await fetchApi(`/finances/payments/${id}`, { method: "DELETE" });
 };
 
 export const registerManualPayment = async (
   data: RegisterManualPaymentData,
 ): Promise<PaymentDto> => {
-  return fetchApi("/finances/payments/manual", { method: 'POST', data });
+  return fetchApi("/finances/payments/manual", { method: "POST", data });
 };

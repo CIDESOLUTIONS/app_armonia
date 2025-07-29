@@ -29,7 +29,8 @@ export const ROUTES = {
   RESIDENT_ASSEMBLIES: "/(resident)/assemblies",
   RESIDENT_RESERVATIONS: "/(resident)/my-reservations",
   RESIDENT_PROFILE: "/(resident)/profile",
-  RESIDENT_SECURITY_PRE_REGISTER_VISITOR: "/(resident)/security/pre-register-visitor",
+  RESIDENT_SECURITY_PRE_REGISTER_VISITOR:
+    "/(resident)/security/pre-register-visitor",
   RESIDENT_SECURITY_PANIC_BUTTON: "/(resident)/security/panic-button",
   RESIDENT_MARKETPLACE: "/(resident)/marketplace",
 

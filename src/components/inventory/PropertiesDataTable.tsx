@@ -1,14 +1,13 @@
-
 "use client";
 
-import React from 'react';
-import { useQueryClient, useMutation } from '@tanstack/react-query';
-import { inventoryService } from '@/services/inventory.service';
-import { DataTable } from '@/components/ui/data-table';
-import { columns } from './columns';
-import { useModal } from '@/hooks/useModal';
-import PropertyForm from './PropertyForm';
-import { toast } from '@/components/ui/use-toast';
+import React from "react";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { inventoryService } from "@/services/inventory.service";
+import { DataTable } from "@/components/ui/data-table";
+import { columns } from "./columns";
+import { useModal } from "@/hooks/useModal";
+import PropertyForm from "./PropertyForm";
+import { toast } from "@/components/ui/use-toast";
 
 export default function PropertiesDataTable({ data }) {
   const { openModal } = useModal();
@@ -17,11 +16,11 @@ export default function PropertiesDataTable({ data }) {
   const deleteMutation = useMutation({
     mutationFn: (id: number) => inventoryService.deleteProperty(id),
     onSuccess: () => {
-      queryClient.invalidateQueries(['properties']);
-      toast({ title: 'Inmueble eliminado con éxito' });
+      queryClient.invalidateQueries(["properties"]);
+      toast({ title: "Inmueble eliminado con éxito" });
     },
     onError: () => {
-      toast({ title: 'Error al eliminar el inmueble', variant: 'destructive' });
+      toast({ title: "Error al eliminar el inmueble", variant: "destructive" });
     },
   });
 
@@ -30,7 +29,9 @@ export default function PropertiesDataTable({ data }) {
   };
 
   const handleDelete = (id) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este inmueble?')) {
+    if (
+      window.confirm("¿Estás seguro de que quieres eliminar este inmueble?")
+    ) {
       deleteMutation.mutate(id);
     }
   };

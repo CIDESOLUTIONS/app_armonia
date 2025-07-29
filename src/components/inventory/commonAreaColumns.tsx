@@ -1,9 +1,14 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const commonAreaColumns = ({ onEdit, onDelete }) => [
   { accessorKey: "name", header: "Nombre" },
@@ -23,8 +28,12 @@ export const commonAreaColumns = ({ onEdit, onDelete }) => [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => onEdit(commonArea)}>Editar</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onDelete(commonArea.id)}>Eliminar</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onEdit(commonArea)}>
+              Editar
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onDelete(commonArea.id)}>
+              Eliminar
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

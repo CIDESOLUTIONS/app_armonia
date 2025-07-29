@@ -35,7 +35,7 @@ describe('MarketplaceService', () => {
   };
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    const testModule: TestingModule = await Test.createTestingModule({
       providers: [
         MarketplaceService,
         {
@@ -45,8 +45,8 @@ describe('MarketplaceService', () => {
       ],
     }).compile();
 
-    service = module.get<MarketplaceService>(MarketplaceService);
-    prisma = module.get<PrismaService>(PrismaService);
+    service = testModule.get<MarketplaceService>(MarketplaceService);
+    prisma = testModule.get<PrismaService>(PrismaService);
     (service as any).prisma = prisma;
   });
 

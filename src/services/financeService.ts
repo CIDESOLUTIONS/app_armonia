@@ -37,11 +37,15 @@ export interface Transaction {
   type: "income" | "expense";
 }
 
-export const getFinanceSummary = async (complexId: number): Promise<FinanceSummary> => {
+export const getFinanceSummary = async (
+  complexId: number,
+): Promise<FinanceSummary> => {
   return fetchApi(`/finances/summary`, { params: { complexId } });
 };
 
-export const getRecentTransactions = async (complexId: number): Promise<Transaction[]> => {
+export const getRecentTransactions = async (
+  complexId: number,
+): Promise<Transaction[]> => {
   return fetchApi(`/finances/transactions`, { params: { complexId } });
 };
 
@@ -57,32 +61,43 @@ export const generateFinancialReport = async (
   });
 };
 
-export const uploadBankStatement = async (file: File): Promise<ReconciliationSuggestion[]> => {
+export const uploadBankStatement = async (
+  file: File,
+): Promise<ReconciliationSuggestion[]> => {
   const formData = new FormData();
-  formData.append('file', file);
-  return fetchApi('/finances/bank-statement/upload', {
-    method: 'POST',
+  formData.append("file", file);
+  return fetchApi("/finances/bank-statement/upload", {
+    method: "POST",
     data: formData,
-    headers: { 'Content-Type': 'multipart/form-data' },
+    headers: { "Content-Type": "multipart/form-data" },
   });
 };
 
-export const approveReconciliation = async (reconciliationId: number): Promise<{ message: string }> => {
-  return fetchApi(`/finances/reconciliation/${reconciliationId}/approve`, { method: 'POST' });
+export const approveReconciliation = async (
+  reconciliationId: number,
+): Promise<{ message: string }> => {
+  return fetchApi(`/finances/reconciliation/${reconciliationId}/approve`, {
+    method: "POST",
+  });
 };
 
-export const getPaymentGatewaysConfig = async (complexId: number): Promise<any[]> => {
+export const getPaymentGatewaysConfig = async (
+  complexId: number,
+): Promise<any[]> => {
   return fetchApi(`/payment-gateways`, { params: { complexId } });
 };
 
 export const createPaymentGatewayConfig = async (data: any): Promise<any> => {
-  return fetchApi('/payment-gateways', { method: 'POST', data });
+  return fetchApi("/payment-gateways", { method: "POST", data });
 };
 
-export const updatePaymentGatewayConfig = async (id: number, data: any): Promise<any> => {
-  return fetchApi(`/payment-gateways/${id}`, { method: 'PUT', data });
+export const updatePaymentGatewayConfig = async (
+  id: number,
+  data: any,
+): Promise<any> => {
+  return fetchApi(`/payment-gateways/${id}`, { method: "PUT", data });
 };
 
 export const deletePaymentGatewayConfig = async (id: number): Promise<void> => {
-  await fetchApi(`/payment-gateways/${id}`, { method: 'DELETE' });
+  await fetchApi(`/payment-gateways/${id}`, { method: "DELETE" });
 };

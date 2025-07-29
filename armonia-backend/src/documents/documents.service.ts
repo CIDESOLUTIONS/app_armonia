@@ -9,9 +9,7 @@ import { uploadFileToS3, deleteFileFromS3 } from '../lib/storage/s3-upload.js';
 
 @Injectable()
 export class DocumentsService {
-  constructor(
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async uploadDocument(
     schemaName: string,
