@@ -34,7 +34,7 @@ export default defineConfig({
       inline: ["armonia-backend"], // Forzar a Vitest a procesar módulos de armonia-backend
     },
     transform: {
-      '^.+\.tsx?$': ['@swc/jest', { 
+      '^.+\.(t|j)sx?$': ['@swc/jest', { 
         jsc: {
           transform: {
             decoratorMetadata: true,

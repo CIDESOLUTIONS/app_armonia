@@ -12,9 +12,7 @@ import {
 
 @Injectable()
 export class MarketplaceService {
-  constructor(
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async uploadImage(file: any): Promise<{ url: string }> {
     const fileUrl = await uploadFileToS3(file);

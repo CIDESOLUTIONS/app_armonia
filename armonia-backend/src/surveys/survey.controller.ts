@@ -1,8 +1,22 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { SurveyService } from './survey.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { GetUser } from '../common/decorators/user.decorator.js';
-import { CreateSurveyDto, UpdateSurveyDto, CreateAnswerDto } from '../common/dto/surveys.dto.js';
+import {
+  CreateSurveyDto,
+  UpdateSurveyDto,
+  CreateAnswerDto,
+} from '../common/dto/surveys.dto.js';
 import { RolesGuard } from '../auth/roles.guard.js';
 import { Roles } from '../auth/roles.decorator.js';
 import { UserRole } from '../common/enums/user-role.enum.js';
@@ -15,7 +29,12 @@ export class SurveyController {
   @Post()
   @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
   createSurvey(@GetUser() user: any, @Body() createSurveyDto: CreateSurveyDto) {
-    return this.surveyService.createSurvey(user.schemaName, user.userId, user.complexId, createSurveyDto);
+    return this.surveyService.createSurvey(
+      user.schemaName,
+      user.userId,
+      user.complexId,
+      createSurveyDto,
+    );
   }
 
   @Get()
@@ -30,8 +49,16 @@ export class SurveyController {
 
   @Put(':id')
   @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
-  updateSurvey(@GetUser() user: any, @Param('id') id: string, @Body() updateSurveyDto: UpdateSurveyDto) {
-    return this.surveyService.updateSurvey(user.schemaName, +id, updateSurveyDto);
+  updateSurvey(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() updateSurveyDto: UpdateSurveyDto,
+  ) {
+    return this.surveyService.updateSurvey(
+      user.schemaName,
+      +id,
+      updateSurveyDto,
+    );
   }
 
   @Delete(':id')
@@ -41,8 +68,17 @@ export class SurveyController {
   }
 
   @Post(':id/answers')
-  submitAnswer(@GetUser() user: any, @Param('id') id: string, @Body() createAnswerDto: CreateAnswerDto) {
-    return this.surveyService.submitAnswer(user.schemaName, +id, user.userId, createAnswerDto);
+  submitAnswer(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() createAnswerDto: CreateAnswerDto,
+  ) {
+    return this.surveyService.submitAnswer(
+      user.schemaName,
+      +id,
+      user.userId,
+      createAnswerDto,
+    );
   }
 
   @Get(':id/results')

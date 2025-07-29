@@ -1,26 +1,41 @@
 "use client";
 
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { useQueryClient, useMutation } from '@tanstack/react-query';
-import { createReservation, CommonArea } from '@/services/reservationService';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useModal } from '@/hooks/useModal';
-import { toast } from '@/components/ui/use-toast';
-import { useAuthStore } from '@/store/authStore';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { createReservation, CommonArea } from "@/services/reservationService";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useModal } from "@/hooks/useModal";
+import { toast } from "@/components/ui/use-toast";
+import { useAuthStore } from "@/store/authStore";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const formSchema = z.object({
   commonAreaId: z.number({ required_error: "El área común es requerida." }),
-  title: z.string().min(1, { message: 'El título es requerido.' }),
+  title: z.string().min(1, { message: "El título es requerido." }),
   description: z.string().optional(),
-  startDateTime: z.string().min(1, { message: 'La fecha de inicio es requerida.' }),
-  endDateTime: z.string().min(1, { message: 'La fecha de fin es requerida.' }),
+  startDateTime: z
+    .string()
+    .min(1, { message: "La fecha de inicio es requerida." }),
+  endDateTime: z.string().min(1, { message: "La fecha de fin es requerida." }),
   attendees: z.number().min(0).optional(),
 });
 
@@ -29,7 +44,10 @@ interface ResidentReservationFormProps {
   onReservationSuccess: () => void;
 }
 
-export default function ResidentReservationForm({ commonArea, onReservationSuccess }: ResidentReservationFormProps) {
+export default function ResidentReservationForm({
+  commonArea,
+  onReservationSuccess,
+}: ResidentReservationFormProps) {
   const { closeModal } = useModal();
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
@@ -38,10 +56,10 @@ export default function ResidentReservationForm({ commonArea, onReservationSucce
     resolver: zodResolver(formSchema),
     defaultValues: {
       commonAreaId: commonArea?.id || undefined,
-      title: '',
-      description: '',
-      startDateTime: '',
-      endDateTime: '',
+      title: "",
+      description: "",
+      startDateTime: "",
+      endDateTime: "",
       attendees: 0,
     },
   });
@@ -49,13 +67,17 @@ export default function ResidentReservationForm({ commonArea, onReservationSucce
   const mutation = useMutation({
     mutationFn: (data) => createReservation({ ...data, userId: user!.id }),
     onSuccess: () => {
-      queryClient.invalidateQueries(['residentReservations']);
-      toast({ title: 'Reserva creada con éxito' });
+      queryClient.invalidateQueries(["residentReservations"]);
+      toast({ title: "Reserva creada con éxito" });
       onReservationSuccess();
       closeModal();
     },
     onError: (error: any) => {
-      toast({ title: 'Error al crear la reserva', description: error.message || 'Ocurrió un error', variant: 'destructive' });
+      toast({
+        title: "Error al crear la reserva",
+        description: error.message || "Ocurrió un error",
+        variant: "destructive",
+      });
     },
   });
 
@@ -73,7 +95,10 @@ export default function ResidentReservationForm({ commonArea, onReservationSucce
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Área Común</FormLabel>
-                <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value ? String(field.value) : ""}>
+                <Select
+                  onValueChange={(value) => field.onChange(parseInt(value))}
+                  value={field.value ? String(field.value) : ""}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar Área Común" />
@@ -148,14 +173,18 @@ export default function ResidentReservationForm({ commonArea, onReservationSucce
             <FormItem>
               <FormLabel>Número de Asistentes</FormLabel>
               <FormControl>
-                <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value))}/>
+                <Input
+                  type="number"
+                  {...field}
+                  onChange={(e) => field.onChange(parseInt(e.target.value))}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         <Button type="submit" disabled={mutation.isLoading}>
-          {mutation.isLoading ? 'Creando...' : 'Crear Reserva'}
+          {mutation.isLoading ? "Creando..." : "Crear Reserva"}
         </Button>
       </form>
     </Form>

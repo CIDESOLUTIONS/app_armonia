@@ -1,26 +1,39 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { CreateUserDto, UpdateUserDto } from '../common/dto/user-management.dto.js';
+import {
+  CreateUserDto,
+  UpdateUserDto,
+} from '../common/dto/user-management.dto.js';
 import { UserRole } from '../common/enums/user-role.enum.js';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserManagementService {
-  constructor(
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async getStaffUsers(schemaName: string) {
     const prisma = this.prisma;
     return prisma.user.findMany({
-      where: { role: { in: [UserRole.STAFF, UserRole.RECEPTION, UserRole.SECURITY] } },
+      where: {
+        role: { in: [UserRole.STAFF, UserRole.RECEPTION, UserRole.SECURITY] },
+      },
       select: { id: true, name: true, email: true, role: true, active: true },
     });
   }
 
-  async createStaffUser(schemaName: string, complexId: number, data: CreateUserDto) {
+  async createStaffUser(
+    schemaName: string,
+    complexId: number,
+    data: CreateUserDto,
+  ) {
     const prisma = this.prisma;
-    const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
+    const existingUser = await prisma.user.findUnique({
+      where: { email: data.email },
+    });
     if (existingUser) {
       throw new BadRequestException('Ya existe un usuario con este email.');
     }

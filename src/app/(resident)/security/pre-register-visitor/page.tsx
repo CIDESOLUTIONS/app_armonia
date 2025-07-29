@@ -1,28 +1,50 @@
-
 "use client";
 
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { useAuthStore } from '@/store/authStore';
-import { Loader2 } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
-import { Button } from '@/components/ui/button';
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useAuthStore } from "@/store/authStore";
+import { Loader2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import QRCode from 'qrcode.react';
-import { createVisitor } from '@/services/visitorService'; // Assuming this service exists
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import QRCode from "qrcode.react";
+import { createVisitor } from "@/services/visitorService"; // Assuming this service exists
 
 const formSchema = z.object({
-  name: z.string().min(1, { message: 'El nombre del visitante es requerido.' }),
-  documentType: z.string().min(1, { message: 'El tipo de documento es requerido.' }),
-  documentNumber: z.string().min(1, { message: 'El número de documento es requerido.' }),
-  purpose: z.string().min(1, { message: 'El propósito de la visita es requerido.' }),
-  expectedDate: z.string().min(1, { message: 'La fecha esperada es requerida.' }),
-  expectedTime: z.string().min(1, { message: 'La hora esperada es requerida.' }),
+  name: z.string().min(1, { message: "El nombre del visitante es requerido." }),
+  documentType: z
+    .string()
+    .min(1, { message: "El tipo de documento es requerido." }),
+  documentNumber: z
+    .string()
+    .min(1, { message: "El número de documento es requerido." }),
+  purpose: z
+    .string()
+    .min(1, { message: "El propósito de la visita es requerido." }),
+  expectedDate: z
+    .string()
+    .min(1, { message: "La fecha esperada es requerida." }),
+  expectedTime: z
+    .string()
+    .min(1, { message: "La hora esperada es requerida." }),
 });
 
 export default function PreRegisterVisitorPage() {
@@ -34,12 +56,12 @@ export default function PreRegisterVisitorPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      documentType: '',
-      documentNumber: '',
-      purpose: '',
-      expectedDate: '',
-      expectedTime: '',
+      name: "",
+      documentType: "",
+      documentNumber: "",
+      purpose: "",
+      expectedDate: "",
+      expectedTime: "",
     },
   });
 
@@ -47,7 +69,11 @@ export default function PreRegisterVisitorPage() {
     setLoading(true);
     try {
       if (!user?.id || !user?.complexId || !user?.propertyId) {
-        toast({ title: "Error", description: "Información de usuario incompleta.", variant: "destructive" });
+        toast({
+          title: "Error",
+          description: "Información de usuario incompleta.",
+          variant: "destructive",
+        });
         setLoading(false);
         return;
       }
@@ -66,10 +92,17 @@ export default function PreRegisterVisitorPage() {
       // For now, we'll just use a dummy value or the visitor ID
       setQrCodeValue(`ARM-${newVisitor.id}-${Date.now()}`); // Example QR value
 
-      toast({ title: "Éxito", description: "Visitante preregistrado y QR generado." });
+      toast({
+        title: "Éxito",
+        description: "Visitante preregistrado y QR generado.",
+      });
     } catch (error: any) {
       console.error("Error preregistering visitor:", error);
-      toast({ title: "Error", description: error.message || "Error al preregistrar visitante.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: error.message || "Error al preregistrar visitante.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -126,7 +159,10 @@ export default function PreRegisterVisitorPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Tipo de Documento</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Seleccionar tipo" />
@@ -207,8 +243,15 @@ export default function PreRegisterVisitorPage() {
 
         {qrCodeValue && (
           <div className="mt-8 text-center">
-            <h2 className="text-xl font-bold mb-4">Código QR para el Visitante</h2>
-            <QRCode value={qrCodeValue} size={256} level="H" includeMargin={true} />
+            <h2 className="text-xl font-bold mb-4">
+              Código QR para el Visitante
+            </h2>
+            <QRCode
+              value={qrCodeValue}
+              size={256}
+              level="H"
+              includeMargin={true}
+            />
             <p className="mt-4 text-gray-600">
               Muestra este código QR al visitante para un acceso rápido.
             </p>

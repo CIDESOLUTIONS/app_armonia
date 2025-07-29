@@ -61,19 +61,20 @@ export async function resolveReport(
   reportId: number,
   action: "APPROVE" | "REJECT",
 ): Promise<any> {
-  return fetchApi(
-    `/marketplace/moderation/reports/${reportId}/resolve`,
-    { method: "POST", data: { action } },
-  );
+  return fetchApi(`/marketplace/moderation/reports/${reportId}/resolve`, {
+    method: "POST",
+    data: { action },
+  });
 }
 
 export async function uploadImage(file: File): Promise<{ url: string }> {
   const formData = new FormData();
   formData.append("file", file);
-  return fetchApi(
-    "/marketplace/upload-image",
-    { method: "POST", data: formData, headers: { 'Content-Type': 'multipart/form-data' } },
-  );
+  return fetchApi("/marketplace/upload-image", {
+    method: "POST",
+    data: formData,
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 }
 
 export async function getMarketplaceCategories(): Promise<string[]> {

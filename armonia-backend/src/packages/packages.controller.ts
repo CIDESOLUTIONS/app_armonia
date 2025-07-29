@@ -32,14 +32,17 @@ export class PackagesController {
     @GetUser() user: any,
     @Body() registerPackageDto: RegisterPackageDto,
   ): Promise<PackageDto> {
-    return this.packagesService.registerPackage(user.schemaName, registerPackageDto);
+    return this.packagesService.registerPackage(
+      user.schemaName,
+      registerPackageDto,
+    );
   }
 
   @Get()
   async getPackages(
     @GetUser() user: any,
     @Query() filters: PackageFilterParamsDto,
-  ): Promise<{ data: PackageDto[], total: number }> {
+  ): Promise<{ data: PackageDto[]; total: number }> {
     // Residents should only see their own packages
     if (user.role === UserRole.RESIDENT) {
       filters.residentId = user.residentId; // Assuming residentId is on the user object
@@ -62,6 +65,10 @@ export class PackagesController {
     @Param('id') id: string,
     @Body() updatePackageDto: UpdatePackageDto,
   ): Promise<PackageDto> {
-    return this.packagesService.updatePackageStatus(user.schemaName, +id, updatePackageDto);
+    return this.packagesService.updatePackageStatus(
+      user.schemaName,
+      +id,
+      updatePackageDto,
+    );
   }
 }

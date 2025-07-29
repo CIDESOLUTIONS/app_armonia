@@ -1,21 +1,28 @@
 "use client";
 
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { useQueryClient, useMutation } from '@tanstack/react-query';
-import { inventoryService } from '@/services/inventory.service';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { inventoryService } from "@/services/inventory.service";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useModal } from '@/hooks/useModal';
-import { toast } from '@/components/ui/use-toast';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useModal } from "@/hooks/useModal";
+import { toast } from "@/components/ui/use-toast";
 
 const formSchema = z.object({
-  name: z.string().min(1, { message: 'El nombre es requerido.' }),
-  email: z.string().email({ message: 'El email no es válido.' }),
+  name: z.string().min(1, { message: "El nombre es requerido." }),
+  email: z.string().email({ message: "El email no es válido." }),
   phone: z.string().optional(),
   propertyId: z.number(),
   isOwner: z.boolean(),
@@ -29,12 +36,12 @@ export default function ResidentForm({ resident }) {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: resident || {
-      name: '',
-      email: '',
-      phone: '',
+      name: "",
+      email: "",
+      phone: "",
       propertyId: undefined,
       isOwner: false,
-      biometricId: '',
+      biometricId: "",
     },
   });
 
@@ -44,12 +51,17 @@ export default function ResidentForm({ resident }) {
         ? inventoryService.updateResident(resident.id, data)
         : inventoryService.createResident(data),
     onSuccess: () => {
-      queryClient.invalidateQueries(['residents']);
-      toast({ title: `Residente ${resident ? 'actualizado' : 'creado'} con éxito` });
+      queryClient.invalidateQueries(["residents"]);
+      toast({
+        title: `Residente ${resident ? "actualizado" : "creado"} con éxito`,
+      });
       closeModal();
     },
     onError: () => {
-      toast({ title: `Error al ${resident ? 'actualizar' : 'crear'} el residente`, variant: 'destructive' });
+      toast({
+        title: `Error al ${resident ? "actualizar" : "crear"} el residente`,
+        variant: "destructive",
+      });
     },
   });
 
@@ -106,7 +118,11 @@ export default function ResidentForm({ resident }) {
             <FormItem>
               <FormLabel>ID de Inmueble</FormLabel>
               <FormControl>
-                <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value))}/>
+                <Input
+                  type="number"
+                  {...field}
+                  onChange={(e) => field.onChange(parseInt(e.target.value))}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -131,18 +147,19 @@ export default function ResidentForm({ resident }) {
           render={({ field }) => (
             <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
               <FormControl>
-                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
               </FormControl>
               <div className="space-y-1 leading-none">
-                <FormLabel>
-                  ¿Es propietario?
-                </FormLabel>
+                <FormLabel>¿Es propietario?</FormLabel>
               </div>
             </FormItem>
           )}
         />
         <Button type="submit" disabled={mutation.isLoading}>
-          {mutation.isLoading ? 'Guardando...' : 'Guardar'}
+          {mutation.isLoading ? "Guardando..." : "Guardar"}
         </Button>
       </form>
     </Form>

@@ -1,20 +1,23 @@
-
 "use client";
 
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { inventoryService } from '@/services/inventory.service';
-import VehiclesDataTable from '@/components/inventory/VehiclesDataTable';
-import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
-import { useModal } from '@/hooks/useModal';
-import VehicleForm from '@/components/inventory/VehicleForm';
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { inventoryService } from "@/services/inventory.service";
+import VehiclesDataTable from "@/components/inventory/VehiclesDataTable";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
+import { useModal } from "@/hooks/useModal";
+import VehicleForm from "@/components/inventory/VehicleForm";
 
 export default function VehiclesPage() {
   const { openModal } = useModal();
 
-  const { data: vehicles, isLoading, error } = useQuery({
-    queryKey: ['vehicles'],
+  const {
+    data: vehicles,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["vehicles"],
     queryFn: () => inventoryService.getVehicles(),
   });
 

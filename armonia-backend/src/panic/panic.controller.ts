@@ -27,35 +27,57 @@ export class PanicController {
 
   @Post('alert')
   @UseGuards(RolesGuard([UserRole.RESIDENT]))
-  async createAlert(@GetUser() user: any, @Body() createPanicAlertDto: CreatePanicAlertDto) {
-    return this.panicService.createAlert(user.schemaName, { ...createPanicAlertDto, userId: user.userId });
+  async createAlert(
+    @GetUser() user: any,
+    @Body() createPanicAlertDto: CreatePanicAlertDto,
+  ) {
+    return this.panicService.createAlert(user.schemaName, {
+      ...createPanicAlertDto,
+      userId: user.userId,
+    });
   }
 
   @Get('alerts')
-  @UseGuards(RolesGuard([UserRole.SECURITY, UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
+  @UseGuards(
+    RolesGuard([UserRole.SECURITY, UserRole.ADMIN, UserRole.COMPLEX_ADMIN]),
+  )
   async getAlerts(@GetUser() user: any, @Query() filters: any) {
     return this.panicService.getAlerts(user.schemaName, filters);
   }
 
   @Get('alerts/:id')
-  @UseGuards(RolesGuard([UserRole.SECURITY, UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
+  @UseGuards(
+    RolesGuard([UserRole.SECURITY, UserRole.ADMIN, UserRole.COMPLEX_ADMIN]),
+  )
   async getAlertById(@GetUser() user: any, @Param('id') id: string) {
     return this.panicService.getAlertById(user.schemaName, +id);
   }
 
   @Put('alerts/:id')
-  @UseGuards(RolesGuard([UserRole.SECURITY, UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
+  @UseGuards(
+    RolesGuard([UserRole.SECURITY, UserRole.ADMIN, UserRole.COMPLEX_ADMIN]),
+  )
   async updateAlert(
     @GetUser() user: any,
     @Param('id') id: string,
     @Body() updatePanicAlertDto: UpdatePanicAlertDto,
   ) {
-    return this.panicService.updateAlert(user.schemaName, +id, updatePanicAlertDto);
+    return this.panicService.updateAlert(
+      user.schemaName,
+      +id,
+      updatePanicAlertDto,
+    );
   }
 
   @Post('responses')
   @UseGuards(RolesGuard([UserRole.SECURITY]))
-  async createResponse(@GetUser() user: any, @Body() createPanicResponseDto: CreatePanicResponseDto) {
-    return this.panicService.createResponse(user.schemaName, { ...createPanicResponseDto, respondedBy: user.userId });
+  async createResponse(
+    @GetUser() user: any,
+    @Body() createPanicResponseDto: CreatePanicResponseDto,
+  ) {
+    return this.panicService.createResponse(user.schemaName, {
+      ...createPanicResponseDto,
+      respondedBy: user.userId,
+    });
   }
 }

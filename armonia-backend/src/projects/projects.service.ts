@@ -1,6 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { CreateProjectDto, UpdateProjectDto, CreateProjectTaskDto, UpdateProjectTaskDto, CreateProjectUpdateDto } from '../common/dto/projects.dto.js';
+import {
+  CreateProjectDto,
+  UpdateProjectDto,
+  CreateProjectTaskDto,
+  UpdateProjectTaskDto,
+  CreateProjectUpdateDto,
+} from '../common/dto/projects.dto.js';
 
 @Injectable()
 export class ProjectsService {
@@ -39,7 +45,11 @@ export class ProjectsService {
     });
   }
 
-  async createTask(schemaName: string, projectId: number, data: CreateProjectTaskDto) {
+  async createTask(
+    schemaName: string,
+    projectId: number,
+    data: CreateProjectTaskDto,
+  ) {
     const prisma = this.prisma;
     return prisma.projectTask.create({
       data: { ...data, projectId },
@@ -54,7 +64,12 @@ export class ProjectsService {
     });
   }
 
-  async createUpdate(schemaName: string, projectId: number, userId: number, data: CreateProjectUpdateDto) {
+  async createUpdate(
+    schemaName: string,
+    projectId: number,
+    userId: number,
+    data: CreateProjectUpdateDto,
+  ) {
     const prisma = this.prisma;
     return prisma.projectUpdate.create({
       data: { ...data, projectId, authorId: userId },

@@ -1,6 +1,15 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { CreatePQRDto, UpdatePQRDto, PQRCommentDto, GetPQRParamsDto } from '../common/dto/pqr.dto.js';
+import {
+  CreatePQRDto,
+  UpdatePQRDto,
+  PQRCommentDto,
+  GetPQRParamsDto,
+} from '../common/dto/pqr.dto.js';
 import { UserRole } from '../common/enums/user-role.enum.js';
 
 @Injectable()
@@ -14,7 +23,12 @@ export class PqrService {
     });
   }
 
-  async getPqrs(schemaName: string, userId: number, userRole: UserRole, filters: GetPQRParamsDto) {
+  async getPqrs(
+    schemaName: string,
+    userId: number,
+    userRole: UserRole,
+    filters: GetPQRParamsDto,
+  ) {
     const prisma = this.prisma;
     const where: any = {};
     if (userRole === UserRole.RESIDENT) {
@@ -31,17 +45,26 @@ export class PqrService {
     });
   }
 
-  async getPqrById(schemaName: string, userId: number, userRole: UserRole, id: number) {
+  async getPqrById(
+    schemaName: string,
+    userId: number,
+    userRole: UserRole,
+    id: number,
+  ) {
     const prisma = this.prisma;
     const pqr = await prisma.pQR.findUnique({
       where: { id },
-      include: { comments: { include: { author: { select: { name: true } } } } },
+      include: {
+        comments: { include: { author: { select: { name: true } } } },
+      },
     });
     if (!pqr) {
       throw new NotFoundException(`PQR with ID ${id} not found.`);
     }
     if (userRole === UserRole.RESIDENT && pqr.createdById !== userId) {
-      throw new UnauthorizedException('You are not authorized to view this PQR.');
+      throw new UnauthorizedException(
+        'You are not authorized to view this PQR.',
+      );
     }
     return pqr;
   }
@@ -54,7 +77,12 @@ export class PqrService {
     });
   }
 
-  async addComment(schemaName: string, userId: number, pqrId: number, data: PQRCommentDto) {
+  async addComment(
+    schemaName: string,
+    userId: number,
+    pqrId: number,
+    data: PQRCommentDto,
+  ) {
     const prisma = this.prisma;
     return prisma.pQRComment.create({
       data: { ...data, pqrId, authorId: userId },

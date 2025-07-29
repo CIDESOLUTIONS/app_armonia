@@ -1,13 +1,12 @@
-
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import { useAuthStore } from '@/store/authStore';
-import { Loader2, QrCode, CheckCircle, XCircle } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
-import { Button } from '@/components/ui/button';
-import { scanQrCode } from '@/services/visitorService'; // Assuming this service exists
-import { BrowserQRCodeReader } from '@zxing/browser';
+import React, { useState, useRef, useEffect } from "react";
+import { useAuthStore } from "@/store/authStore";
+import { Loader2, QrCode, CheckCircle, XCircle } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { scanQrCode } from "@/services/visitorService"; // Assuming this service exists
+import { BrowserQRCodeReader } from "@zxing/browser";
 
 export default function ScanQrPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -22,28 +21,41 @@ export default function ScanQrPage() {
 
     codeReader.current = new BrowserQRCodeReader();
     try {
-      const videoInputDevices = await BrowserQRCodeReader.listVideoInputDevices();
+      const videoInputDevices =
+        await BrowserQRCodeReader.listVideoInputDevices();
       if (videoInputDevices.length === 0) {
-        toast({ title: "Error", description: "No se encontraron cámaras disponibles.", variant: "destructive" });
+        toast({
+          title: "Error",
+          description: "No se encontraron cámaras disponibles.",
+          variant: "destructive",
+        });
         return;
       }
 
       const selectedDeviceId = videoInputDevices[0].deviceId; // Use the first camera found
 
-      codeReader.current.decodeFromVideoDevice(selectedDeviceId, videoRef.current, (result, err) => {
-        if (result) {
-          setScanResult(result.getText());
-          handleScan(result.getText());
-          codeReader.current?.reset(); // Stop scanning after a successful scan
-        }
-        if (err && !(err instanceof zxing.NotFoundException)) {
-          console.error(err);
-          // toast({ title: "Error de escaneo", description: err.message, variant: "destructive" });
-        }
-      });
+      codeReader.current.decodeFromVideoDevice(
+        selectedDeviceId,
+        videoRef.current,
+        (result, err) => {
+          if (result) {
+            setScanResult(result.getText());
+            handleScan(result.getText());
+            codeReader.current?.reset(); // Stop scanning after a successful scan
+          }
+          if (err && !(err instanceof zxing.NotFoundException)) {
+            console.error(err);
+            // toast({ title: "Error de escaneo", description: err.message, variant: "destructive" });
+          }
+        },
+      );
     } catch (error: any) {
       console.error("Error starting scanner:", error);
-      toast({ title: "Error", description: "Error al iniciar el escáner: " + error.message, variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Error al iniciar el escáner: " + error.message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -55,7 +67,11 @@ export default function ScanQrPage() {
       toast({ title: "Éxito", description: "Visitante registrado con éxito." });
     } catch (error: any) {
       console.error("Error scanning QR code:", error);
-      toast({ title: "Error", description: error.message || "Error al escanear el código QR.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: error.message || "Error al escanear el código QR.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }

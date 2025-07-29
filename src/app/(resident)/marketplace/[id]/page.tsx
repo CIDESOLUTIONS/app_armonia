@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { getListingById, reportListing, Listing } from "@/services/marketplaceService";
+import {
+  getListingById,
+  reportListing,
+  Listing,
+} from "@/services/marketplaceService";
 import {
   Loader2,
   MessageSquare,

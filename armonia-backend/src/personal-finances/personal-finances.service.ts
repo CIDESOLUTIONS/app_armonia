@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import {
   CreatePersonalTransactionDto,
@@ -11,20 +15,30 @@ import {
 export class PersonalFinancesService {
   constructor(private prisma: PrismaService) {}
 
-  async createTransaction(schemaName: string, userId: number, data: CreatePersonalTransactionDto): Promise<PersonalTransactionDto> {
+  async createTransaction(
+    schemaName: string,
+    userId: number,
+    data: CreatePersonalTransactionDto,
+  ): Promise<PersonalTransactionDto> {
     const prisma = this.prisma;
     return prisma.personalTransaction.create({
       data: { ...data, userId },
     });
   }
 
-  async getTransactions(schemaName: string, userId: number, filters: PersonalTransactionFilterParamsDto): Promise<PersonalTransactionDto[]> {
+  async getTransactions(
+    schemaName: string,
+    userId: number,
+    filters: PersonalTransactionFilterParamsDto,
+  ): Promise<PersonalTransactionDto[]> {
     const prisma = this.prisma;
     const where: any = { userId };
     if (filters.type) where.type = filters.type;
     if (filters.categoryId) where.categoryId = filters.categoryId;
-    if (filters.startDate) where.date = { ...where.date, gte: new Date(filters.startDate) };
-    if (filters.endDate) where.date = { ...where.date, lte: new Date(filters.endDate) };
+    if (filters.startDate)
+      where.date = { ...where.date, gte: new Date(filters.startDate) };
+    if (filters.endDate)
+      where.date = { ...where.date, lte: new Date(filters.endDate) };
 
     return prisma.personalTransaction.findMany({
       where,
@@ -32,9 +46,16 @@ export class PersonalFinancesService {
     });
   }
 
-  async updateTransaction(schemaName: string, userId: number, id: number, data: UpdatePersonalTransactionDto): Promise<PersonalTransactionDto> {
+  async updateTransaction(
+    schemaName: string,
+    userId: number,
+    id: number,
+    data: UpdatePersonalTransactionDto,
+  ): Promise<PersonalTransactionDto> {
     const prisma = this.prisma;
-    const transaction = await prisma.personalTransaction.findUnique({ where: { id } });
+    const transaction = await prisma.personalTransaction.findUnique({
+      where: { id },
+    });
     if (!transaction || transaction.userId !== userId) {
       throw new UnauthorizedException('Transaction not found or unauthorized');
     }
@@ -44,9 +65,15 @@ export class PersonalFinancesService {
     });
   }
 
-  async deleteTransaction(schemaName: string, userId: number, id: number): Promise<void> {
+  async deleteTransaction(
+    schemaName: string,
+    userId: number,
+    id: number,
+  ): Promise<void> {
     const prisma = this.prisma;
-    const transaction = await prisma.personalTransaction.findUnique({ where: { id } });
+    const transaction = await prisma.personalTransaction.findUnique({
+      where: { id },
+    });
     if (!transaction || transaction.userId !== userId) {
       throw new UnauthorizedException('Transaction not found or unauthorized');
     }

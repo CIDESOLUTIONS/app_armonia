@@ -66,14 +66,11 @@ export async function registerPackage(
   if (data.notes) formData.append("notes", data.notes);
   if (data.photo) formData.append("photo", data.photo);
 
-  return fetchApi(
-    "/packages",
-    {
-      method: "POST",
-      data: formData,
-      headers: { 'Content-Type': 'multipart/form-data' },
-    },
-  );
+  return fetchApi("/packages", {
+    method: "POST",
+    data: formData,
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 }
 
 export async function deliverPackage(

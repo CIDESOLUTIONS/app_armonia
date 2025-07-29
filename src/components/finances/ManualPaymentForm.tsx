@@ -1,1 +1,173 @@
-"use client";import React from 'react';import { useForm } from 'react-hook-form';import { zodResolver } from '@hookform/resolvers/zod';import * as z from 'zod';import { useQueryClient, useMutation } from '@tanstack/react-query';import { registerManualPayment } from '@/services/paymentService';import { Button } from '@/components/ui/button';import { Input } from '@/components/ui/input';import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';import { useModal } from '@/hooks/useModal';import { toast } from '@/components/ui/use-toast';const formSchema = z.object({  feeId: z.number(),  userId: z.number(),  amount: z.number(),  paymentDate: z.string(),  paymentMethod: z.string(),  transactionId: z.string().optional(),});export default function ManualPaymentForm() {  const { closeModal } = useModal();  const queryClient = useQueryClient();  const form = useForm({    resolver: zodResolver(formSchema),    defaultValues: {      feeId: undefined,      userId: undefined,      amount: undefined,      paymentDate: new Date().toISOString().slice(0, 10),      paymentMethod: '',      transactionId: '',    },  });  const mutation = useMutation({    mutationFn: (data) => registerManualPayment(data),    onSuccess: () => {      queryClient.invalidateQueries(['payments']);      toast({ title: 'Pago manual registrado con éxito' });      closeModal();    },    onError: () => {      toast({ title: 'Error al registrar el pago manual', variant: 'destructive' });    },  });  const onSubmit = (data) => {    mutation.mutate(data);  };  return (    <Form {...form}>      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">        <FormField          control={form.control}          name="feeId"          render={({ field }) => (            <FormItem>              <FormLabel>ID Cuota</FormLabel>              <FormControl>                <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value))}/>              </FormControl>              <FormMessage />            </FormItem>          )}        />        <FormField          control={form.control}          name="userId"          render={({ field }) => (            <FormItem>              <FormLabel>ID Usuario</FormLabel>              <FormControl>                <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value))}/>              </FormControl>              <FormMessage />            </FormItem>          )}        />        <FormField          control={form.control}          name="amount"          render={({ field }) => (            <FormItem>              <FormLabel>Monto</FormLabel>              <FormControl>                <Input type="number" {...field} onChange={e => field.onChange(parseFloat(e.target.value))}/>              </FormControl>              <FormMessage />            </FormItem>          )}        />        <FormField          control={form.control}          name="paymentDate"          render={({ field }) => (            <FormItem>              <FormLabel>Fecha de Pago</FormLabel>              <FormControl>                <Input type="date" {...field} />              </FormControl>              <FormMessage />            </FormItem>          )}        />        <FormField          control={form.control}          name="paymentMethod"          render={({ field }) => (            <FormItem>              <FormLabel>Método de Pago</FormLabel>              <FormControl>                <Input {...field} />              </FormControl>              <FormMessage />            </FormItem>          )}        />        <FormField          control={form.control}          name="transactionId"          render={({ field }) => (            <FormItem>              <FormLabel>ID de Transacción (Opcional)</FormLabel>              <FormControl>                <Input {...field} />              </FormControl>              <FormMessage />            </FormItem>          )}        />        <Button type="submit" disabled={mutation.isLoading}>          {mutation.isLoading ? 'Registrando...' : 'Registrar Pago'}        </Button>      </form>    </Form>  );}
+"use client";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { registerManualPayment } from "@/services/paymentService";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useModal } from "@/hooks/useModal";
+import { toast } from "@/components/ui/use-toast";
+const formSchema = z.object({
+  feeId: z.number(),
+  userId: z.number(),
+  amount: z.number(),
+  paymentDate: z.string(),
+  paymentMethod: z.string(),
+  transactionId: z.string().optional(),
+});
+export default function ManualPaymentForm() {
+  const { closeModal } = useModal();
+  const queryClient = useQueryClient();
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      feeId: undefined,
+      userId: undefined,
+      amount: undefined,
+      paymentDate: new Date().toISOString().slice(0, 10),
+      paymentMethod: "",
+      transactionId: "",
+    },
+  });
+  const mutation = useMutation({
+    mutationFn: (data) => registerManualPayment(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["payments"]);
+      toast({ title: "Pago manual registrado con éxito" });
+      closeModal();
+    },
+    onError: () => {
+      toast({
+        title: "Error al registrar el pago manual",
+        variant: "destructive",
+      });
+    },
+  });
+  const onSubmit = (data) => {
+    mutation.mutate(data);
+  };
+  return (
+    <Form {...form}>
+      {" "}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {" "}
+        <FormField
+          control={form.control}
+          name="feeId"
+          render={({ field }) => (
+            <FormItem>
+              {" "}
+              <FormLabel>ID Cuota</FormLabel>{" "}
+              <FormControl>
+                {" "}
+                <Input
+                  type="number"
+                  {...field}
+                  onChange={(e) => field.onChange(parseInt(e.target.value))}
+                />{" "}
+              </FormControl>{" "}
+              <FormMessage />{" "}
+            </FormItem>
+          )}
+        />{" "}
+        <FormField
+          control={form.control}
+          name="userId"
+          render={({ field }) => (
+            <FormItem>
+              {" "}
+              <FormLabel>ID Usuario</FormLabel>{" "}
+              <FormControl>
+                {" "}
+                <Input
+                  type="number"
+                  {...field}
+                  onChange={(e) => field.onChange(parseInt(e.target.value))}
+                />{" "}
+              </FormControl>{" "}
+              <FormMessage />{" "}
+            </FormItem>
+          )}
+        />{" "}
+        <FormField
+          control={form.control}
+          name="amount"
+          render={({ field }) => (
+            <FormItem>
+              {" "}
+              <FormLabel>Monto</FormLabel>{" "}
+              <FormControl>
+                {" "}
+                <Input
+                  type="number"
+                  {...field}
+                  onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                />{" "}
+              </FormControl>{" "}
+              <FormMessage />{" "}
+            </FormItem>
+          )}
+        />{" "}
+        <FormField
+          control={form.control}
+          name="paymentDate"
+          render={({ field }) => (
+            <FormItem>
+              {" "}
+              <FormLabel>Fecha de Pago</FormLabel>{" "}
+              <FormControl>
+                {" "}
+                <Input type="date" {...field} />{" "}
+              </FormControl>{" "}
+              <FormMessage />{" "}
+            </FormItem>
+          )}
+        />{" "}
+        <FormField
+          control={form.control}
+          name="paymentMethod"
+          render={({ field }) => (
+            <FormItem>
+              {" "}
+              <FormLabel>Método de Pago</FormLabel>{" "}
+              <FormControl>
+                {" "}
+                <Input {...field} />{" "}
+              </FormControl>{" "}
+              <FormMessage />{" "}
+            </FormItem>
+          )}
+        />{" "}
+        <FormField
+          control={form.control}
+          name="transactionId"
+          render={({ field }) => (
+            <FormItem>
+              {" "}
+              <FormLabel>ID de Transacción (Opcional)</FormLabel>{" "}
+              <FormControl>
+                {" "}
+                <Input {...field} />{" "}
+              </FormControl>{" "}
+              <FormMessage />{" "}
+            </FormItem>
+          )}
+        />{" "}
+        <Button type="submit" disabled={mutation.isLoading}>
+          {" "}
+          {mutation.isLoading ? "Registrando..." : "Registrar Pago"}{" "}
+        </Button>{" "}
+      </form>{" "}
+    </Form>
+  );
+}

@@ -1,23 +1,42 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { useAuthStore } from '@/store/authStore';
-import { Loader2 } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { createVisitor } from '@/services/visitorService';
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useAuthStore } from "@/store/authStore";
+import { Loader2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { createVisitor } from "@/services/visitorService";
 
 const formSchema = z.object({
-  name: z.string().min(1, { message: 'El nombre del visitante es requerido.' }),
-  documentType: z.string().min(1, { message: 'El tipo de documento es requerido.' }),
-  documentNumber: z.string().min(1, { message: 'El número de documento es requerido.' }),
-  visitedUnit: z.string().min(1, { message: 'La unidad a visitar es requerida.' }),
+  name: z.string().min(1, { message: "El nombre del visitante es requerido." }),
+  documentType: z
+    .string()
+    .min(1, { message: "El tipo de documento es requerido." }),
+  documentNumber: z
+    .string()
+    .min(1, { message: "El número de documento es requerido." }),
+  visitedUnit: z
+    .string()
+    .min(1, { message: "La unidad a visitar es requerida." }),
   purpose: z.string().optional(),
   plate: z.string().optional(),
 });
@@ -30,12 +49,12 @@ export default function ManualVisitorRegisterPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      documentType: '',
-      documentNumber: '',
-      visitedUnit: '',
-      purpose: '',
-      plate: '',
+      name: "",
+      documentType: "",
+      documentNumber: "",
+      visitedUnit: "",
+      purpose: "",
+      plate: "",
     },
   });
 
@@ -43,7 +62,11 @@ export default function ManualVisitorRegisterPage() {
     setLoading(true);
     try {
       if (!user?.complexId) {
-        toast({ title: "Error", description: "Información de complejo no disponible.", variant: "destructive" });
+        toast({
+          title: "Error",
+          description: "Información de complejo no disponible.",
+          variant: "destructive",
+        });
         setLoading(false);
         return;
       }
@@ -57,11 +80,19 @@ export default function ManualVisitorRegisterPage() {
 
       await createVisitor(visitorData);
 
-      toast({ title: "Éxito", description: "Visitante registrado manualmente." });
+      toast({
+        title: "Éxito",
+        description: "Visitante registrado manualmente.",
+      });
       form.reset();
     } catch (error: any) {
       console.error("Error registering visitor manually:", error);
-      toast({ title: "Error", description: error.message || "Error al registrar visitante manualmente.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description:
+          error.message || "Error al registrar visitante manualmente.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -118,7 +149,10 @@ export default function ManualVisitorRegisterPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Tipo de Documento</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Seleccionar tipo" />

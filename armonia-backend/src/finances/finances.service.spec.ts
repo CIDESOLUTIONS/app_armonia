@@ -79,7 +79,7 @@ describe('FinancesService', () => {
   let logger: Logger;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    const testModule: TestingModule = await Test.createTestingModule({
       providers: [
         FinancesService,
         {
@@ -104,10 +104,12 @@ describe('FinancesService', () => {
       ],
     }).compile();
 
-    service = module.get<FinancesService>(FinancesService);
-    prisma = module.get<PrismaService>(PrismaService);
-    communicationsService = module.get<CommunicationsService>(CommunicationsService);
-    logger = module.get<Logger>(Logger);
+    service = testModule.get<FinancesService>(FinancesService);
+    prisma = testModule.get<PrismaService>(PrismaService);
+    communicationsService = testModule.get<CommunicationsService>(
+      CommunicationsService,
+    );
+    logger = testModule.get<Logger>(Logger);
   });
 
   it('should be defined', () => {

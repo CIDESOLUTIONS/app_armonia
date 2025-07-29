@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import {
   CreateFeeDto,
@@ -119,7 +123,11 @@ export class FinancesService {
     const feesToCreate = properties.map((property) => ({
       name: `Cuota Ordinaria ${new Date().toLocaleString('es-CO', { month: 'long', year: 'numeric' })}`,
       amount: 100000, // Example fixed amount, this could be dynamic based on property type/size/coefficient
-      dueDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 5).toISOString(), // Next month, 5th day
+      dueDate: new Date(
+        new Date().getFullYear(),
+        new Date().getMonth() + 1,
+        5,
+      ).toISOString(), // Next month, 5th day
       status: PaymentStatus.PENDING,
       type: 'ORDINARY',
       propertyId: property.id,
@@ -239,10 +247,7 @@ export class FinancesService {
     const updatedPayment = await prisma.payment.update({ where: { id }, data });
 
     // Update fee status if payment is completed
-    if (
-      updatedPayment.status === PaymentStatus.PAID &&
-      updatedPayment.feeId
-    ) {
+    if (updatedPayment.status === PaymentStatus.PAID && updatedPayment.feeId) {
       await prisma.fee.update({
         where: { id: updatedPayment.feeId },
         data: { status: PaymentStatus.PAID },
@@ -374,7 +379,8 @@ export class FinancesService {
   async createExpense(
     schemaName: string,
     data: any, // CreateExpenseDto
-  ): Promise<any> { // ExpenseDto
+  ): Promise<any> {
+    // ExpenseDto
     const prisma = this.prisma;
     return prisma.expense.create({ data });
   }
@@ -382,7 +388,8 @@ export class FinancesService {
   async getExpenses(
     schemaName: string,
     filters: ExpenseFilterParamsDto,
-  ): Promise<{ data: any[]; total: number }> { // ExpenseDto
+  ): Promise<{ data: any[]; total: number }> {
+    // ExpenseDto
     const prisma = this.prisma;
     const where: any = {};
     if (filters.status) where.status = filters.status;
@@ -405,7 +412,8 @@ export class FinancesService {
     return { data, total };
   }
 
-  async getExpenseById(schemaName: string, id: number): Promise<any> { // ExpenseDto
+  async getExpenseById(schemaName: string, id: number): Promise<any> {
+    // ExpenseDto
     const prisma = this.prisma;
     const expense = await prisma.expense.findUnique({ where: { id } });
     if (!expense) {
@@ -418,7 +426,8 @@ export class FinancesService {
     schemaName: string,
     id: number,
     data: any, // UpdateExpenseDto
-  ): Promise<any> { // ExpenseDto
+  ): Promise<any> {
+    // ExpenseDto
     const prisma = this.prisma;
     const expense = await prisma.expense.findUnique({ where: { id } });
     if (!expense) {
@@ -542,15 +551,19 @@ export class FinancesService {
     doc.on('data', (chunk) => stream.push(chunk));
     doc.on('end', () => stream.push(null));
 
-    doc.fontSize(20).text(`Reporte Financiero: ${reportType}`, { align: 'center' });
-    doc.fontSize(12).text(`Desde: ${startDate} Hasta: ${endDate}`, { align: 'center' });
+    doc
+      .fontSize(20)
+      .text(`Reporte Financiero: ${reportType}`, { align: 'center' });
+    doc
+      .fontSize(12)
+      .text(`Desde: ${startDate} Hasta: ${endDate}`, { align: 'center' });
     doc.moveDown();
 
     let data: any[] = [];
     let title = '';
 
     switch (reportType) {
-      case 'BALANCE':
+      case 'BALANCE': {
         title = 'Balance General';
         const summary = await this.getFinancialSummary(schemaName);
         data = [
@@ -562,7 +575,8 @@ export class FinancesService {
           ['Monto Pendiente', summary.pendingBillsAmount],
         ];
         break;
-      case 'INCOME':
+      }
+      case 'INCOME': {
         title = 'Informe de Ingresos';
         const incomes = await prisma.payment.findMany({
           where: {
@@ -576,7 +590,7 @@ export class FinancesService {
         });
         data = [
           ['Fecha', 'Concepto', 'Monto', 'Residente', 'Cuota'],
-          ...incomes.map(i => [
+          ...incomes.map((i) => [
             i.paymentDate.toLocaleDateString(),
             `Pago de ${i.fee?.name || 'cuota'}`,
             i.amount,
@@ -585,7 +599,8 @@ export class FinancesService {
           ]),
         ];
         break;
-      case 'EXPENSE':
+      }
+      case 'EXPENSE': {
         title = 'Informe de Gastos';
         const expenses = await prisma.expense.findMany({
           where: {
@@ -598,7 +613,7 @@ export class FinancesService {
         });
         data = [
           ['Fecha', 'Concepto', 'Monto', 'Categoría'],
-          ...expenses.map(e => [
+          ...expenses.map((e) => [
             e.date.toLocaleDateString(),
             e.description,
             e.amount,
@@ -606,7 +621,8 @@ export class FinancesService {
           ]),
         ];
         break;
-      case 'DEBTORS':
+      }
+      case 'DEBTORS': {
         title = 'Estado de Cartera (Deudores)';
         const overdueFees = await prisma.fee.findMany({
           where: {
@@ -619,7 +635,7 @@ export class FinancesService {
         });
         data = [
           ['Cuota', 'Monto', 'Fecha Vencimiento', 'Unidad', 'Residente'],
-          ...overdueFees.map(f => [
+          ...overdueFees.map((f) => [
             f.name,
             f.amount,
             f.dueDate.toLocaleDateString(),
@@ -628,7 +644,8 @@ export class FinancesService {
           ]),
         ];
         break;
-      case 'PAYMENTS_REPORT':
+      }
+      case 'PAYMENTS_REPORT': {
         title = 'Informe de Pagos';
         const payments = await prisma.payment.findMany({
           where: {
@@ -641,7 +658,7 @@ export class FinancesService {
         });
         data = [
           ['Fecha', 'Monto', 'Método', 'Estado', 'Cuota', 'Residente'],
-          ...payments.map(p => [
+          ...payments.map((p) => [
             p.paymentDate.toLocaleDateString(),
             p.amount,
             p.paymentMethod,
@@ -651,7 +668,8 @@ export class FinancesService {
           ]),
         ];
         break;
-      case 'PEACE_AND_SAFE':
+      }
+      case 'PEACE_AND_SAFE': {
         title = 'Paz y Salvos';
         // This report type would typically require a residentId to generate a specific document
         // For a general report, we might list all residents with no pending fees
@@ -667,13 +685,14 @@ export class FinancesService {
         });
         data = [
           ['Residente', 'Unidad', 'Email'],
-          ...residentsWithoutPendingFees.map(r => [
+          ...residentsWithoutPendingFees.map((r) => [
             r.name,
             r.property?.unitNumber || 'N/A',
             r.email,
           ]),
         ];
         break;
+      }
       default:
         throw new BadRequestException('Tipo de reporte no válido.');
     }
@@ -696,7 +715,10 @@ export class FinancesService {
       });
     });
     doc.font('Helvetica');
-    doc.moveTo(startX, tableTop + rowHeight).lineTo(startX + data[0].length * colWidth, tableTop + rowHeight).stroke();
+    doc
+      .moveTo(startX, tableTop + rowHeight)
+      .lineTo(startX + data[0].length * colWidth, tableTop + rowHeight)
+      .stroke();
 
     // Draw table rows
     let currentY = tableTop + rowHeight + 5;
@@ -708,7 +730,8 @@ export class FinancesService {
         });
       });
       currentY += rowHeight;
-      if (currentY > doc.page.height - 50) { // Check for page overflow
+      if (currentY > doc.page.height - 50) {
+        // Check for page overflow
         doc.addPage();
         currentY = 50; // Reset Y for new page
         // Redraw headers on new page
@@ -720,7 +743,10 @@ export class FinancesService {
           });
         });
         doc.font('Helvetica');
-        doc.moveTo(startX, currentY + rowHeight).lineTo(startX + data[0].length * colWidth, currentY + rowHeight).stroke();
+        doc
+          .moveTo(startX, currentY + rowHeight)
+          .lineTo(startX + data[0].length * colWidth, currentY + rowHeight)
+          .stroke();
         currentY += rowHeight + 5;
       }
     }
@@ -807,10 +833,7 @@ export class FinancesService {
     });
 
     // Update fee status if payment is completed
-    if (
-      updatedPayment.status === PaymentStatus.PAID &&
-      updatedPayment.feeId
-    ) {
+    if (updatedPayment.status === PaymentStatus.PAID && updatedPayment.feeId) {
       await prisma.fee.update({
         where: { id: updatedPayment.feeId },
         data: { status: PaymentStatus.PAID },

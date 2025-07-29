@@ -7,11 +7,7 @@ import { PrismaModule } from '../prisma/prisma.module.js';
 
 @Module({
   imports: [PrismaModule],
-  providers: [
-    FinancesService,
-    PrismaService,
-    CommunicationsService,
-  ],
+  providers: [FinancesService, PrismaService, CommunicationsService],
   controllers: [FinancesController],
 })
 export class FinancesModule {}

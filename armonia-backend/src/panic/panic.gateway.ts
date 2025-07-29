@@ -8,7 +8,10 @@ import {
 import { Server } from 'socket.io';
 import { PanicService } from './panic.service.js';
 import { CreatePanicAlertDto } from '../common/dto/panic.dto.js';
-import { NotificationType, NotificationSourceType, } from '../common/dto/communications.dto.js';
+import {
+  NotificationType,
+  NotificationSourceType,
+} from '../common/dto/communications.dto.js';
 import { PanicStatus } from '../common/enums/panic.enum.js';
 
 interface NotificationPayload {
@@ -34,10 +37,7 @@ export class PanicGateway {
   async handleTriggerPanic(
     @MessageBody() data: CreatePanicAlertDto & { schemaName: string },
   ): Promise<void> {
-    const newAlert = await this.panicService.createAlert(
-      data.schemaName,
-      data,
-    );
+    const newAlert = await this.panicService.createAlert(data.schemaName, data);
     // Emitir la nueva alerta a todos los clientes conectados en el esquema
     this.server
       .to(`security-${data.schemaName}`)

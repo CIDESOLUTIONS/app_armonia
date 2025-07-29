@@ -17,7 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { reconcileTransactions } from "@/services/bankReconciliationService";
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 interface BankTransaction {
   date: string;
@@ -30,7 +30,7 @@ interface BankTransaction {
 interface ReconciliationResult {
   bankTransaction: BankTransaction;
   systemPayment: any; // Replace with actual PaymentDto if available
-  status: 'MATCHED' | 'UNMATCHED';
+  status: "MATCHED" | "UNMATCHED";
 }
 
 export default function BankReconciliationPage() {
@@ -38,7 +38,9 @@ export default function BankReconciliationPage() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-  const [reconciliationResults, setReconciliationResults] = useState<ReconciliationResult[]>([]);
+  const [reconciliationResults, setReconciliationResults] = useState<
+    ReconciliationResult[]
+  >([]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -63,7 +65,7 @@ export default function BankReconciliationPage() {
       const reader = new FileReader();
       reader.onload = async (e) => {
         const data = new Uint8Array(e.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: 'array' });
+        const workbook = XLSX.read(data, { type: "array" });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         const json = XLSX.utils.sheet_to_json(worksheet);
@@ -87,7 +89,10 @@ export default function BankReconciliationPage() {
           return;
         }
 
-        const results = await reconcileTransactions(user.schemaName, bankTransactions);
+        const results = await reconcileTransactions(
+          user.schemaName,
+          bankTransactions,
+        );
         setReconciliationResults(results);
         toast({
           title: "Éxito",
@@ -137,10 +142,14 @@ export default function BankReconciliationPage() {
       </h1>
 
       <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">Importar Extracto Bancario</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          Importar Extracto Bancario
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
           <div>
-            <Label htmlFor="bankStatementFile">Seleccionar Archivo (CSV/Excel)</Label>
+            <Label htmlFor="bankStatementFile">
+              Seleccionar Archivo (CSV/Excel)
+            </Label>
             <Input
               id="bankStatementFile"
               type="file"
@@ -161,7 +170,9 @@ export default function BankReconciliationPage() {
 
       {reconciliationResults.length > 0 && (
         <div className="bg-white shadow-md rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">Resultados de la Conciliación</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            Resultados de la Conciliación
+          </h2>
           <Table>
             <TableHeader>
               <TableRow>
@@ -181,15 +192,16 @@ export default function BankReconciliationPage() {
                   <TableCell>{result.bankTransaction.amount}</TableCell>
                   <TableCell>{result.bankTransaction.reference}</TableCell>
                   <TableCell>
-                    {result.systemPayment ? (
-                      `ID: ${result.systemPayment.id} - Monto: ${result.systemPayment.amount}`
-                    ) : (
-                      "N/A"
-                    )}
+                    {result.systemPayment
+                      ? `ID: ${result.systemPayment.id} - Monto: ${result.systemPayment.amount}`
+                      : "N/A"}
                   </TableCell>
                   <TableCell>
                     {result.status === "MATCHED" ? (
-                      <Badge variant="default" className="bg-green-100 text-green-800">
+                      <Badge
+                        variant="default"
+                        className="bg-green-100 text-green-800"
+                      >
                         <CheckCircle className="h-4 w-4 mr-1" /> Conciliado
                       </Badge>
                     ) : (

@@ -29,8 +29,14 @@ export class ProjectsController {
 
   @Post()
   @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
-  createProject(@GetUser() user: any, @Body() createProjectDto: CreateProjectDto) {
-    return this.projectsService.createProject(user.schemaName, createProjectDto);
+  createProject(
+    @GetUser() user: any,
+    @Body() createProjectDto: CreateProjectDto,
+  ) {
+    return this.projectsService.createProject(
+      user.schemaName,
+      createProjectDto,
+    );
   }
 
   @Get()
@@ -45,24 +51,53 @@ export class ProjectsController {
 
   @Put(':id')
   @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
-  updateProject(@GetUser() user: any, @Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
-    return this.projectsService.updateProject(user.schemaName, +id, updateProjectDto);
+  updateProject(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() updateProjectDto: UpdateProjectDto,
+  ) {
+    return this.projectsService.updateProject(
+      user.schemaName,
+      +id,
+      updateProjectDto,
+    );
   }
 
   @Post(':id/tasks')
   @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
-  createTask(@GetUser() user: any, @Param('id') id: string, @Body() createTaskDto: CreateProjectTaskDto) {
+  createTask(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() createTaskDto: CreateProjectTaskDto,
+  ) {
     return this.projectsService.createTask(user.schemaName, +id, createTaskDto);
   }
 
   @Put('tasks/:taskId')
   @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
-  updateTask(@GetUser() user: any, @Param('taskId') taskId: string, @Body() updateTaskDto: UpdateProjectTaskDto) {
-    return this.projectsService.updateTask(user.schemaName, +taskId, updateTaskDto);
+  updateTask(
+    @GetUser() user: any,
+    @Param('taskId') taskId: string,
+    @Body() updateTaskDto: UpdateProjectTaskDto,
+  ) {
+    return this.projectsService.updateTask(
+      user.schemaName,
+      +taskId,
+      updateTaskDto,
+    );
   }
 
   @Post(':id/updates')
-  createUpdate(@GetUser() user: any, @Param('id') id: string, @Body() createUpdateDto: CreateProjectUpdateDto) {
-    return this.projectsService.createUpdate(user.schemaName, +id, user.userId, createUpdateDto);
+  createUpdate(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() createUpdateDto: CreateProjectUpdateDto,
+  ) {
+    return this.projectsService.createUpdate(
+      user.schemaName,
+      +id,
+      user.userId,
+      createUpdateDto,
+    );
   }
 }

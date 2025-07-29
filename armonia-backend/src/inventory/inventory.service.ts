@@ -20,9 +20,7 @@ import {
 
 @Injectable()
 export class InventoryService {
-  constructor(
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   // PROPIEDADES
   async getProperties(

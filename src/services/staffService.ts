@@ -26,15 +26,18 @@ export interface UpdateStaffUserData {
 
 export const staffService = {
   getStaffUsers: async (): Promise<StaffUser[]> => {
-    return fetchApi('/user-management/staff');
+    return fetchApi("/user-management/staff");
   },
   createStaffUser: async (data: CreateStaffUserData): Promise<StaffUser> => {
-    return fetchApi('/user-management/staff', { method: 'POST', data });
+    return fetchApi("/user-management/staff", { method: "POST", data });
   },
-  updateStaffUser: async (id: number, data: UpdateStaffUserData): Promise<StaffUser> => {
-    return fetchApi(`/user-management/staff/${id}`, { method: 'PUT', data });
+  updateStaffUser: async (
+    id: number,
+    data: UpdateStaffUserData,
+  ): Promise<StaffUser> => {
+    return fetchApi(`/user-management/staff/${id}`, { method: "PUT", data });
   },
   deleteStaffUser: async (id: number): Promise<void> => {
-    await fetchApi(`/user-management/staff/${id}`, { method: 'DELETE' });
+    await fetchApi(`/user-management/staff/${id}`, { method: "DELETE" });
   },
 };

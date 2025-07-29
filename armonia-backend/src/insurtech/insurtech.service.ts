@@ -3,9 +3,7 @@ import { PrismaService } from '../prisma/prisma.service.js';
 
 @Injectable()
 export class InsurtechService {
-  constructor(
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async getInsuranceQuote(schemaName: string, data: any): Promise<any> {
     // Simulate API call to an external InsurTech provider

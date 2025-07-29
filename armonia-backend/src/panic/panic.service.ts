@@ -1,8 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CommunicationsService } from '../communications/communications.service.js';
-import { CreatePanicAlertDto, UpdatePanicAlertDto, CreatePanicResponseDto } from '../common/dto/panic.dto.js';
-import { NotificationType, NotificationSourceType } from '../common/dto/communications.dto.js';
+import {
+  CreatePanicAlertDto,
+  UpdatePanicAlertDto,
+  CreatePanicResponseDto,
+} from '../common/dto/panic.dto.js';
+import {
+  NotificationType,
+  NotificationSourceType,
+} from '../common/dto/communications.dto.js';
 import { UserRole } from '../common/enums/user-role.enum.js';
 
 @Injectable()
@@ -12,21 +19,28 @@ export class PanicService {
     private communicationsService: CommunicationsService,
   ) {}
 
-  async createAlert(schemaName: string, createPanicAlertDto: CreatePanicAlertDto) {
+  async createAlert(
+    schemaName: string,
+    createPanicAlertDto: CreatePanicAlertDto,
+  ) {
     const prisma = this.prisma;
     const alert = await prisma.panicAlert.create({
       data: createPanicAlertDto,
     });
 
     // Notify security personnel
-    await this.communicationsService.notifyByRole(schemaName, UserRole.SECURITY, {
-      type: NotificationType.ERROR,
-      title: '¡Alerta de Pánico!',
-      message: `Alerta de pánico activada por un residente. Tipo: ${alert.type}.`,
-      link: `/security/panic/${alert.id}`,
-      sourceType: NotificationSourceType.PANIC,
-      sourceId: alert.id.toString(),
-    });
+    await this.communicationsService.notifyByRole(
+      schemaName,
+      UserRole.SECURITY,
+      {
+        type: NotificationType.ERROR,
+        title: '¡Alerta de Pánico!',
+        message: `Alerta de pánico activada por un residente. Tipo: ${alert.type}.`,
+        link: `/security/panic/${alert.id}`,
+        sourceType: NotificationSourceType.PANIC,
+        sourceId: alert.id.toString(),
+      },
+    );
 
     return alert;
   }
@@ -43,12 +57,18 @@ export class PanicService {
     const prisma = this.prisma;
     const alert = await prisma.panicAlert.findUnique({ where: { id } });
     if (!alert) {
-      throw new NotFoundException(`Alerta de pánico con ID ${id} no encontrada.`);
+      throw new NotFoundException(
+        `Alerta de pánico con ID ${id} no encontrada.`,
+      );
     }
     return alert;
   }
 
-  async updateAlert(schemaName: string, id: number, updatePanicAlertDto: UpdatePanicAlertDto) {
+  async updateAlert(
+    schemaName: string,
+    id: number,
+    updatePanicAlertDto: UpdatePanicAlertDto,
+  ) {
     const prisma = this.prisma;
     return prisma.panicAlert.update({
       where: { id },
@@ -56,7 +76,10 @@ export class PanicService {
     });
   }
 
-  async createResponse(schemaName: string, createPanicResponseDto: CreatePanicResponseDto) {
+  async createResponse(
+    schemaName: string,
+    createPanicResponseDto: CreatePanicResponseDto,
+  ) {
     const prisma = this.prisma;
     return prisma.panicResponse.create({
       data: createPanicResponseDto,

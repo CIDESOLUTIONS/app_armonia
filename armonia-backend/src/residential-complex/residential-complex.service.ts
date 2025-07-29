@@ -8,9 +8,7 @@ import {
 
 @Injectable()
 export class ResidentialComplexService {
-  constructor(
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async createComplexAndSchema(
     data: CreateResidentialComplexDto,

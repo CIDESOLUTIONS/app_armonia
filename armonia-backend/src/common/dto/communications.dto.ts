@@ -76,7 +76,7 @@ export class NotificationDataDto {
 
   @IsOptional()
   @IsString()
-  recipientType?: "ALL" | "RESIDENT" | "PROPERTY" | "USER";
+  recipientType?: 'ALL' | 'RESIDENT' | 'PROPERTY' | 'USER';
 
   @IsOptional()
   @IsString()

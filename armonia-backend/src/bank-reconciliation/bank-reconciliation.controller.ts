@@ -9,7 +9,9 @@ import { GetUser } from '../common/decorators/user.decorator.js';
 @UseGuards(JwtAuthGuard, RolesGuard([UserRole.COMPLEX_ADMIN, UserRole.ADMIN]))
 @Controller('bank-reconciliation')
 export class BankReconciliationController {
-  constructor(private readonly bankReconciliationService: BankReconciliationService) {}
+  constructor(
+    private readonly bankReconciliationService: BankReconciliationService,
+  ) {}
 
   @Post('reconcile')
   async reconcileBankStatement(

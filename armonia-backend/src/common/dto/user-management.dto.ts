@@ -1,5 +1,11 @@
-
-import { IsString, IsEmail, IsOptional, IsBoolean, IsEnum, IsNumber } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsBoolean,
+  IsEnum,
+  IsNumber,
+} from 'class-validator';
 import { UserRole } from '../enums/user-role.enum.js';
 
 export class CreateUserDto {

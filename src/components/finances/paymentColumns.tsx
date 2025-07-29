@@ -1,9 +1,14 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const paymentColumns = ({ onDelete }) => [
   { accessorKey: "id", header: "ID" },
@@ -27,7 +32,9 @@ export const paymentColumns = ({ onDelete }) => [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => onDelete(payment.id)}>Eliminar</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onDelete(payment.id)}>
+              Eliminar
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

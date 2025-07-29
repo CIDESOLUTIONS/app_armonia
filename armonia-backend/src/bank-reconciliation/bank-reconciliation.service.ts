@@ -5,9 +5,7 @@ import { FeeStatus } from '../common/enums/fee-status.enum.js';
 
 @Injectable()
 export class BankReconciliationService {
-  constructor(
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async reconcileBankStatement(
     schemaName: string,

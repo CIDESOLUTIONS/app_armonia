@@ -36,9 +36,10 @@ export default function ResidentAnnouncementsPage() {
     try {
       const data = await getAnnouncements();
       // Filter announcements to show only those relevant to the resident's role or public ones
-      const filteredData = data.filter(announcement => 
-        announcement.targetRoles.includes("RESIDENT") || 
-        announcement.targetRoles.includes("ALL") // Assuming "ALL" is a possible target role
+      const filteredData = data.filter(
+        (announcement) =>
+          announcement.targetRoles.includes("RESIDENT") ||
+          announcement.targetRoles.includes("ALL"), // Assuming "ALL" is a possible target role
       );
       setAnnouncements(filteredData);
     } catch (error: Error) {
@@ -84,9 +85,7 @@ export default function ResidentAnnouncementsPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">
-        Mis Comunicados
-      </h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">Mis Comunicados</h1>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <Table>
@@ -103,12 +102,24 @@ export default function ResidentAnnouncementsPage() {
             {announcements.length > 0 ? (
               announcements.map((announcement) => (
                 <TableRow key={announcement.id}>
-                  <TableCell className="font-medium">{announcement.title}</TableCell>
+                  <TableCell className="font-medium">
+                    {announcement.title}
+                  </TableCell>
                   <TableCell>{announcement.content}</TableCell>
-                  <TableCell>{new Date(announcement.publishedAt).toLocaleDateString()}</TableCell>
-                  <TableCell>{announcement.expiresAt ? new Date(announcement.expiresAt).toLocaleDateString() : "N/A"}</TableCell>
                   <TableCell>
-                    <Badge variant={announcement.isActive ? "default" : "destructive"}>
+                    {new Date(announcement.publishedAt).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    {announcement.expiresAt
+                      ? new Date(announcement.expiresAt).toLocaleDateString()
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        announcement.isActive ? "default" : "destructive"
+                      }
+                    >
                       {announcement.isActive ? "Activo" : "Inactivo"}
                     </Badge>
                   </TableCell>

@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { PortfolioMetricDto, ComplexMetricDto, } from '../common/dto/portfolio.dto.js';
+import {
+  PortfolioMetricDto,
+  ComplexMetricDto,
+} from '../common/dto/portfolio.dto.js';
 import { format } from 'date-fns';
 
 @Injectable()
 export class PortfolioService {
-  constructor(
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async getPortfolioMetrics(userId: number): Promise<PortfolioMetricDto> {
     // Para un APP_ADMIN, obtener todos los schemas de los complejos residenciales
@@ -180,8 +181,7 @@ export class PortfolioService {
       startDate,
       endDate,
       totalIncomeAllComplexes,
-      totalExpensesAllComplexes:
-        totalExpensesAllComplexes,
+      totalExpensesAllComplexes: totalExpensesAllComplexes,
       netBalanceAllComplexes:
         totalIncomeAllComplexes - totalExpensesAllComplexes,
       complexReports: reportData,

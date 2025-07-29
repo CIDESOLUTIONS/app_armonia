@@ -8,10 +8,6 @@ import { PrismaModule } from '../prisma/prisma.module.js';
 @Module({
   imports: [PrismaModule],
   controllers: [MarketplaceController],
-  providers: [
-    MarketplaceService,
-    PrismaService,
-    MarketplaceGateway,
-  ],
+  providers: [MarketplaceService, PrismaService, MarketplaceGateway],
 })
 export class MarketplaceModule {}

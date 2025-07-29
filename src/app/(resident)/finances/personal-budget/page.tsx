@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
@@ -95,7 +94,8 @@ export default function PersonalBudgetPage() {
       console.error("Error fetching transactions:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las transacciones: " + error.message,
+        description:
+          "No se pudieron cargar las transacciones: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -159,7 +159,9 @@ export default function PersonalBudgetPage() {
   };
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [transactionToDelete, setTransactionToDelete] = useState<number | null>(null);
+  const [transactionToDelete, setTransactionToDelete] = useState<number | null>(
+    null,
+  );
 
   const handleDeleteTransaction = (id: number) => {
     setTransactionToDelete(id);
@@ -229,16 +231,26 @@ export default function PersonalBudgetPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-white shadow-md rounded-lg p-4 text-center">
-          <h2 className="text-lg font-semibold text-gray-600">Ingresos Totales</h2>
-          <p className="text-3xl font-bold text-green-600">${totalIncome.toFixed(2)}</p>
+          <h2 className="text-lg font-semibold text-gray-600">
+            Ingresos Totales
+          </h2>
+          <p className="text-3xl font-bold text-green-600">
+            ${totalIncome.toFixed(2)}
+          </p>
         </div>
         <div className="bg-white shadow-md rounded-lg p-4 text-center">
-          <h2 className="text-lg font-semibold text-gray-600">Gastos Totales</h2>
-          <p className="text-3xl font-bold text-red-600">${totalExpense.toFixed(2)}</p>
+          <h2 className="text-lg font-semibold text-gray-600">
+            Gastos Totales
+          </h2>
+          <p className="text-3xl font-bold text-red-600">
+            ${totalExpense.toFixed(2)}
+          </p>
         </div>
         <div className="bg-white shadow-md rounded-lg p-4 text-center">
           <h2 className="text-lg font-semibold text-gray-600">Balance</h2>
-          <p className={`text-3xl font-bold ${balance >= 0 ? "text-green-600" : "text-red-600"}`}>
+          <p
+            className={`text-3xl font-bold ${balance >= 0 ? "text-green-600" : "text-red-600"}`}
+          >
             ${balance.toFixed(2)}
           </p>
         </div>
@@ -313,7 +325,9 @@ export default function PersonalBudgetPage() {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>
-              {currentTransaction ? "Editar Transacción" : "Añadir Nueva Transacción"}
+              {currentTransaction
+                ? "Editar Transacción"
+                : "Añadir Nueva Transacción"}
             </DialogTitle>
           </DialogHeader>
           <Form {...form}>
@@ -393,7 +407,9 @@ export default function PersonalBudgetPage() {
                   {isSubmitting ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : null}{" "}
-                  {currentTransaction ? "Guardar Cambios" : "Añadir Transacción"}
+                  {currentTransaction
+                    ? "Guardar Cambios"
+                    : "Añadir Transacción"}
                 </Button>
               </DialogFooter>
             </form>
@@ -406,8 +422,8 @@ export default function PersonalBudgetPage() {
           <DialogHeader>
             <DialogTitle>Confirmar Eliminación</DialogTitle>
             <DialogDescription>
-              ¿Estás seguro de que quieres eliminar esta transacción? Esta acción no
-              se puede deshacer.
+              ¿Estás seguro de que quieres eliminar esta transacción? Esta
+              acción no se puede deshacer.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

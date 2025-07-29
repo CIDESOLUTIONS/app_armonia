@@ -41,8 +41,12 @@ export default function ConsolidatedReportsPage() {
     setLoading(true);
     try {
       if (reportType === "financial-summary") {
-        const schemaNames = allComplexes.map(c => c.schemaName); // Get all schema names from the store
-        const reportBlob = await getConsolidatedFinancialReport(schemaNames, startDate, endDate);
+        const schemaNames = allComplexes.map((c) => c.schemaName); // Get all schema names from the store
+        const reportBlob = await getConsolidatedFinancialReport(
+          schemaNames,
+          startDate,
+          endDate,
+        );
         const url = window.URL.createObjectURL(reportBlob);
         const a = document.createElement("a");
         a.href = url;
@@ -53,7 +57,8 @@ export default function ConsolidatedReportsPage() {
         window.URL.revokeObjectURL(url);
         toast({
           title: "Éxito",
-          description: "Reporte financiero consolidado generado y descargado correctamente.",
+          description:
+            "Reporte financiero consolidado generado y descargado correctamente.",
         });
       } else {
         toast({

@@ -14,7 +14,8 @@ export class AuthService {
     private jwtService: JwtService,
     private tenantService: TenantService,
     private prismaService: PrismaService,
-    @Inject(ResidentialComplexService) private residentialComplexService: ResidentialComplexService,
+    @Inject(ResidentialComplexService)
+    private residentialComplexService: ResidentialComplexService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
@@ -50,12 +51,19 @@ export class AuthService {
     const defaultPrisma = this.prismaService;
 
     return defaultPrisma.$transaction(async (txPrisma) => {
-      const existingUser = await this.userService.findByEmail(adminData.email, txPrisma);
+      const existingUser = await this.userService.findByEmail(
+        adminData.email,
+        txPrisma,
+      );
       if (existingUser) {
         throw new UnauthorizedException('User with this email already exists');
       }
 
-      const newComplex = await this.residentialComplexService.createComplexAndSchema(complexData, txPrisma);
+      const newComplex =
+        await this.residentialComplexService.createComplexAndSchema(
+          complexData,
+          txPrisma,
+        );
 
       const adminPayload = {
         ...adminData,
@@ -63,7 +71,11 @@ export class AuthService {
         complexId: newComplex.id,
       };
 
-      const newAdmin = await this.userService.createUser(newComplex.schemaName, adminPayload, txPrisma);
+      const newAdmin = await this.userService.createUser(
+        newComplex.schemaName,
+        adminPayload,
+        txPrisma,
+      );
 
       return this.login(newAdmin);
     });
@@ -85,7 +97,9 @@ export class AuthService {
 
     // Here you would typically send an email to the sales team
     // For this example, we'll just log it to the console
-    console.log(`New demo request: ${name} <${email}> for ${complexName} with ${units} units`);
+    console.log(
+      `New demo request: ${name} <${email}> for ${complexName} with ${units} units`,
+    );
 
     return { message: 'Demo request received successfully' };
   }

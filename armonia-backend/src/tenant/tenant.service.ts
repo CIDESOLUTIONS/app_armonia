@@ -3,9 +3,7 @@ import { PrismaService } from '../prisma/prisma.service.js';
 
 @Injectable()
 export class TenantService {
-  constructor(
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async getTenantSchemaName(complexId: number): Promise<string | null> {
     const prisma = this.prisma;

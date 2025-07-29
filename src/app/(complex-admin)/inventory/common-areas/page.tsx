@@ -1,20 +1,23 @@
-
 "use client";
 
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { inventoryService } from '@/services/inventory.service';
-import CommonAreasDataTable from '@/components/inventory/CommonAreasDataTable';
-import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
-import { useModal } from '@/hooks/useModal';
-import CommonAreaForm from '@/components/inventory/CommonAreaForm';
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { inventoryService } from "@/services/inventory.service";
+import CommonAreasDataTable from "@/components/inventory/CommonAreasDataTable";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
+import { useModal } from "@/hooks/useModal";
+import CommonAreaForm from "@/components/inventory/CommonAreaForm";
 
 export default function CommonAreasPage() {
   const { openModal } = useModal();
 
-  const { data: commonAreas, isLoading, error } = useQuery({
-    queryKey: ['commonAreas'],
+  const {
+    data: commonAreas,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["commonAreas"],
     queryFn: () => inventoryService.getCommonAreas(),
   });
 

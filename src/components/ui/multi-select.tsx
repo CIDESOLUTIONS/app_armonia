@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -7,7 +6,11 @@ import { X, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
 import { Command as CommandPrimitive } from "cmdk";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 type Option = Record<"value" | "label", string>;
 
@@ -28,29 +31,38 @@ export function MultiSelect({
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState("");
 
-  const handleUnselect = React.useCallback((option: Option) => {
-    onSelectChange(selected.filter((s) => s !== option.value));
-  }, [selected, onSelectChange]);
+  const handleUnselect = React.useCallback(
+    (option: Option) => {
+      onSelectChange(selected.filter((s) => s !== option.value));
+    },
+    [selected, onSelectChange],
+  );
 
-  const handleKeyDown = React.useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
-    const input = inputRef.current;
-    if (input) {
-      if (e.key === "Delete" || e.key === "Backspace") {
-        if (input.value === "") {
-          onSelectChange(selected.slice(0, -1));
+  const handleKeyDown = React.useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      const input = inputRef.current;
+      if (input) {
+        if (e.key === "Delete" || e.key === "Backspace") {
+          if (input.value === "") {
+            onSelectChange(selected.slice(0, -1));
+          }
         }
+        // This is not a perfect solution, but it is a good start.
+        // Add your own keydown handlers for your use case.
       }
-      // This is not a perfect solution, but it is a good start.
-      // Add your own keydown handlers for your use case.
-    }
-  }, [selected, onSelectChange]);
+    },
+    [selected, onSelectChange],
+  );
 
   const selectables = options.filter(
     (option) => !selected.includes(option.value),
   );
 
   return (
-    <Command onKeyDown={handleKeyDown} className="overflow-visible bg-transparent">
+    <Command
+      onKeyDown={handleKeyDown}
+      className="overflow-visible bg-transparent"
+    >
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <div className="group border border-input px-3 py-2 text-sm ring-offset-background rounded-md focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
@@ -84,7 +96,10 @@ export function MultiSelect({
             </div>
           </div>
         </PopoverTrigger>
-        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+        <PopoverContent
+          className="w-[var(--radix-popover-trigger-width)] p-0"
+          align="start"
+        >
           <Command>
             <CommandGroup className="h-full overflow-auto">
               {selectables.map((option) => {

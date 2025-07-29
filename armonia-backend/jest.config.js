@@ -1,4 +1,5 @@
-const { pathsToModuleNameMapper } = require('ts-jest');
+import { pathsToModuleNameMapper } from 'ts-jest';
+import { compilerOptions } from './tsconfig.json';
 const { readFileSync } = require('fs');
 const { join } = require('path');
 
@@ -25,4 +26,4 @@ const jestConfig = {
   transformIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/'],
 };
 
-module.exports = jestConfig;
+export default {

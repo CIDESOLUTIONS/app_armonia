@@ -1,25 +1,43 @@
-
 "use client";
 
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { useQueryClient, useMutation } from '@tanstack/react-query';
-import { staffService } from '@/services/staffService';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useModal } from '@/hooks/useModal';
-import { toast } from '@/components/ui/use-toast';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { staffService } from "@/services/staffService";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useModal } from "@/hooks/useModal";
+import { toast } from "@/components/ui/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const formSchema = z.object({
-  name: z.string().min(1, { message: 'El nombre es requerido.' }),
-  email: z.string().email({ message: 'El email no es válido.' }),
-  password: z.string().min(6, { message: 'La contraseña debe tener al menos 6 caracteres.' }).optional().or(z.literal('')),
-  role: z.enum(["STAFF", "RECEPTION", "SECURITY"], { message: "El rol es requerido." }),
+  name: z.string().min(1, { message: "El nombre es requerido." }),
+  email: z.string().email({ message: "El email no es válido." }),
+  password: z
+    .string()
+    .min(6, { message: "La contraseña debe tener al menos 6 caracteres." })
+    .optional()
+    .or(z.literal("")),
+  role: z.enum(["STAFF", "RECEPTION", "SECURITY"], {
+    message: "El rol es requerido.",
+  }),
   active: z.boolean(),
 });
 
@@ -30,9 +48,9 @@ export default function StaffForm({ staffUser }) {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: staffUser || {
-      name: '',
-      email: '',
-      password: '',
+      name: "",
+      email: "",
+      password: "",
       role: "STAFF",
       active: true,
     },
@@ -44,12 +62,17 @@ export default function StaffForm({ staffUser }) {
         ? staffService.updateStaffUser(staffUser.id, data)
         : staffService.createStaffUser(data),
     onSuccess: () => {
-      queryClient.invalidateQueries(['staffUsers']);
-      toast({ title: `Usuario de personal ${staffUser ? 'actualizado' : 'creado'} con éxito` });
+      queryClient.invalidateQueries(["staffUsers"]);
+      toast({
+        title: `Usuario de personal ${staffUser ? "actualizado" : "creado"} con éxito`,
+      });
       closeModal();
     },
     onError: () => {
-      toast({ title: `Error al ${staffUser ? 'actualizar' : 'crear'} el usuario de personal`, variant: 'destructive' });
+      toast({
+        title: `Error al ${staffUser ? "actualizar" : "crear"} el usuario de personal`,
+        variant: "destructive",
+      });
     },
   });
 
@@ -127,18 +150,19 @@ export default function StaffForm({ staffUser }) {
           render={({ field }) => (
             <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
               <FormControl>
-                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
               </FormControl>
               <div className="space-y-1 leading-none">
-                <FormLabel>
-                  Activo
-                </FormLabel>
+                <FormLabel>Activo</FormLabel>
               </div>
             </FormItem>
           )}
         />
         <Button type="submit" disabled={mutation.isLoading}>
-          {mutation.isLoading ? 'Guardando...' : 'Guardar'}
+          {mutation.isLoading ? "Guardando..." : "Guardar"}
         </Button>
       </form>
     </Form>

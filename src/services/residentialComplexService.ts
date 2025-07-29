@@ -16,11 +16,15 @@ export interface UpdateResidentialComplexData {
   secondaryColor?: string;
 }
 
-export const getResidentialComplexes = async (): Promise<ResidentialComplex[]> => {
-  return fetchApi('/residential-complexes');
+export const getResidentialComplexes = async (): Promise<
+  ResidentialComplex[]
+> => {
+  return fetchApi("/residential-complexes");
 };
 
-export const getResidentialComplexById = async (id: number): Promise<ResidentialComplex> => {
+export const getResidentialComplexById = async (
+  id: number,
+): Promise<ResidentialComplex> => {
   return fetchApi(`/residential-complexes/${id}`);
 };
 
@@ -28,5 +32,5 @@ export const updateResidentialComplex = async (
   id: number,
   data: UpdateResidentialComplexData,
 ): Promise<ResidentialComplex> => {
-  return fetchApi(`/residential-complexes/${id}`, { method: 'PUT', data });
+  return fetchApi(`/residential-complexes/${id}`, { method: "PUT", data });
 };

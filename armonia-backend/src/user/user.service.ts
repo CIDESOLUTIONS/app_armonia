@@ -4,9 +4,7 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-  constructor(
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async findByEmail(email: string, prismaClient?: any) {
     const prisma = prismaClient || this.prisma;

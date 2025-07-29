@@ -51,7 +51,10 @@ export class PlansService {
     });
   }
 
-  async updateSubscription(id: number, updateSubscriptionDto: UpdateSubscriptionDto) {
+  async updateSubscription(
+    id: number,
+    updateSubscriptionDto: UpdateSubscriptionDto,
+  ) {
     return this.prisma.subscription.update({
       where: { id },
       data: updateSubscriptionDto,
@@ -59,7 +62,10 @@ export class PlansService {
   }
 
   // Feature Access Check
-  async checkFeatureAccess(complexId: number, feature: string): Promise<boolean> {
+  async checkFeatureAccess(
+    complexId: number,
+    feature: string,
+  ): Promise<boolean> {
     const subscription = await this.prisma.subscription.findFirst({
       where: {
         complexId,

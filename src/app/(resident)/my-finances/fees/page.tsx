@@ -1,20 +1,30 @@
-
 "use client";
 
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { getFees, initiatePayment } from '@/services/feeService';
-import { useAuthStore } from '@/store/authStore';
-import { Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { toast } from '@/components/ui/use-toast';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getFees, initiatePayment } from "@/services/feeService";
+import { useAuthStore } from "@/store/authStore";
+import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export default function ResidentFeesPage() {
   const { user, loading: authLoading } = useAuthStore();
 
-  const { data: fees, isLoading, error } = useQuery({
-    queryKey: ['residentFees', user?.id],
+  const {
+    data: fees,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["residentFees", user?.id],
     queryFn: () => getFees({ residentId: user?.id }),
     enabled: !!user?.id, // Only fetch if user ID is available
   });

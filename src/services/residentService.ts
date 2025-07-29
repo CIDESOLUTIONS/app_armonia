@@ -32,15 +32,15 @@ export const updateResident = async (
   id: number,
   data: UpdateResidentData,
 ): Promise<ResidentData> => {
-  return fetchApi(`/inventory/residents/${id}`, { method: 'PUT', data });
+  return fetchApi(`/inventory/residents/${id}`, { method: "PUT", data });
 };
 
 export const createResident = async (
   data: CreateResidentData,
 ): Promise<ResidentData> => {
-  return fetchApi("/inventory/residents", { method: 'POST', data });
+  return fetchApi("/inventory/residents", { method: "POST", data });
 };
 
 export const deleteResident = async (id: number): Promise<void> => {
-  await fetchApi(`/inventory/residents/${id}`, { method: 'DELETE' });
+  await fetchApi(`/inventory/residents/${id}`, { method: "DELETE" });
 };

@@ -20,14 +20,19 @@ export class PackagesService {
     private communicationsService: CommunicationsService,
   ) {}
 
-  async registerPackage(schemaName: string, data: RegisterPackageDto): Promise<PackageDto> {
+  async registerPackage(
+    schemaName: string,
+    data: RegisterPackageDto,
+  ): Promise<PackageDto> {
     const prisma = this.prisma;
     const pkg = await prisma.package.create({
       data: { ...data, status: PackageStatus.PENDING },
     });
 
     // Notify resident
-    const resident = await prisma.resident.findUnique({ where: { id: pkg.residentId } });
+    const resident = await prisma.resident.findUnique({
+      where: { id: pkg.residentId },
+    });
     if (resident && resident.userId) {
       await this.communicationsService.notifyUser(schemaName, resident.userId, {
         type: NotificationType.INFO,
@@ -42,7 +47,10 @@ export class PackagesService {
     return pkg;
   }
 
-  async getPackages(schemaName: string, filters: PackageFilterParamsDto): Promise<{ data: PackageDto[], total: number }> {
+  async getPackages(
+    schemaName: string,
+    filters: PackageFilterParamsDto,
+  ): Promise<{ data: PackageDto[]; total: number }> {
     const prisma = this.prisma;
     const where: any = {};
     if (filters.status) where.status = filters.status;
@@ -74,7 +82,11 @@ export class PackagesService {
     return pkg;
   }
 
-  async updatePackageStatus(schemaName: string, id: number, data: UpdatePackageDto): Promise<PackageDto> {
+  async updatePackageStatus(
+    schemaName: string,
+    id: number,
+    data: UpdatePackageDto,
+  ): Promise<PackageDto> {
     const prisma = this.prisma;
     const pkg = await prisma.package.findUnique({ where: { id } });
     if (!pkg) {

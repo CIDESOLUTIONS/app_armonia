@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -72,7 +71,9 @@ export default function ConsolidatedFinancialReportsPage() {
         startDate,
         endDate,
       );
-      const url = window.URL.createObjectURL(new Blob([pdfBlob], { type: "application/pdf" }));
+      const url = window.URL.createObjectURL(
+        new Blob([pdfBlob], { type: "application/pdf" }),
+      );
       window.open(url, "_blank");
       toast({ title: "Éxito", description: "Reporte generado correctamente." });
     } catch (error: any) {
