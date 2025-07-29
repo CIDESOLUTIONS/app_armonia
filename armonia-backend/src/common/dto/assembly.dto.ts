@@ -39,7 +39,12 @@ export class CreateAssemblyDto {
 
   @IsString()
   agenda: string;
+
+  constructor(partial: Partial<CreateAssemblyDto>) {
+    Object.assign(this, partial);
+  }
 }
+
 
 export class UpdateAssemblyDto extends CreateAssemblyDto {
   @IsOptional()
@@ -89,6 +94,10 @@ export class CreateVoteDto {
   @IsOptional()
   @IsBoolean()
   weightedVoting?: boolean;
+
+  constructor(partial: Partial<CreateVoteDto>) {
+    Object.assign(this, partial);
+  }
 }
 
 export class SubmitVoteDto {
