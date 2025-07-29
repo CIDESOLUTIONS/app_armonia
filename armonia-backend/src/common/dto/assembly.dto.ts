@@ -40,11 +40,15 @@ export class CreateAssemblyDto {
   @IsString()
   agenda: string;
 
-  constructor(partial: Partial<CreateAssemblyDto>) {
-    Object.assign(this, partial);
+  constructor(title: string, description: string, scheduledDate: string, location: string, type: AssemblyType, agenda: string) {
+    this.title = title;
+    this.description = description;
+    this.scheduledDate = scheduledDate;
+    this.location = location;
+    this.type = type;
+    this.agenda = agenda;
   }
 }
-
 
 export class UpdateAssemblyDto extends CreateAssemblyDto {
   @IsOptional()
@@ -53,16 +57,16 @@ export class UpdateAssemblyDto extends CreateAssemblyDto {
 }
 
 export class AssemblyDto {
-  id: number;
-  title: string;
-  description: string;
-  scheduledDate: Date;
-  location: string;
-  type: AssemblyType;
-  status: AssemblyStatus;
-  agenda: string;
-  createdAt: Date;
-  updatedAt: Date;
+  id?: number;
+  title?: string;
+  description?: string;
+  scheduledDate?: Date;
+  location?: string;
+  type?: AssemblyType;
+  status?: AssemblyStatus;
+  agenda?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export class RegisterAttendanceDto {
@@ -78,6 +82,13 @@ export class RegisterAttendanceDto {
   @IsOptional()
   @IsBoolean()
   present?: boolean;
+
+  constructor(assemblyId: number, userId: number, unitId: number, present?: boolean) {
+    this.assemblyId = assemblyId;
+    this.userId = userId;
+    this.unitId = unitId;
+    this.present = present;
+  }
 }
 
 export class CreateVoteDto {
@@ -95,8 +106,11 @@ export class CreateVoteDto {
   @IsBoolean()
   weightedVoting?: boolean;
 
-  constructor(partial: Partial<CreateVoteDto>) {
-    Object.assign(this, partial);
+  constructor(title: string, description: string, options: string[], weightedVoting?: boolean) {
+    this.title = title;
+    this.description = description;
+    this.options = options;
+    this.weightedVoting = weightedVoting;
   }
 }
 
@@ -112,4 +126,11 @@ export class SubmitVoteDto {
 
   @IsString()
   option: string;
+
+  constructor(voteId: number, userId: number, unitId: number, option: string) {
+    this.voteId = voteId;
+    this.userId = userId;
+    this.unitId = unitId;
+    this.option = option;
+  }
 }
