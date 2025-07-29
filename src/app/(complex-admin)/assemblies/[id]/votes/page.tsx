@@ -19,7 +19,7 @@ import { useToast } from "@/components/ui/use-toast";
 import {
   getAssemblyById,
   createVote,
-  getVotingResults,
+  getVoteResults,
   AssemblyVoteDto,
   Assembly,
   VoteResult,

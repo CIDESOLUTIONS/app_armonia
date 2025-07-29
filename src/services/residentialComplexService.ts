@@ -1,4 +1,4 @@
-import { apiClient } from "@/lib/apiClient";
+import { fetchApi } from "@/lib/apiClient";
 
 export interface ResidentialComplex {
   id: number;
@@ -17,19 +17,16 @@ export interface UpdateResidentialComplexData {
 }
 
 export const getResidentialComplexes = async (): Promise<ResidentialComplex[]> => {
-  const response = await apiClient.get('/residential-complexes');
-  return response.data;
+  return fetchApi('/residential-complexes');
 };
 
 export const getResidentialComplexById = async (id: number): Promise<ResidentialComplex> => {
-  const response = await apiClient.get(`/residential-complexes/${id}`);
-  return response.data;
+  return fetchApi(`/residential-complexes/${id}`);
 };
 
 export const updateResidentialComplex = async (
   id: number,
   data: UpdateResidentialComplexData,
 ): Promise<ResidentialComplex> => {
-  const response = await apiClient.put(`/residential-complexes/${id}`, data);
-  return response.data;
+  return fetchApi(`/residential-complexes/${id}`, { method: 'PUT', data });
 };

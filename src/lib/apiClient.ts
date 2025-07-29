@@ -1,20 +1,38 @@
-import axios from "axios";
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { getSession } from 'next-auth/react';
 
-const apiClient = axios.create({
-  baseURL: "/api", // Adjust this to your API's base URL
+const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+
+const apiClient: AxiosInstance = axios.create({
+  baseURL,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
 });
 
-// You can add interceptors for handling tokens or errors globally
-apiClient.interceptors.request.use((config) => {
-  // e.g., get token from localStorage or a store
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+apiClient.interceptors.request.use(async (config) => {
+  if (typeof window !== 'undefined') {
+    const session = await getSession();
+    if (session?.accessToken) {
+      config.headers.Authorization = `Bearer ${session.accessToken}`;
+    }
   }
   return config;
 });
 
+export const fetchApi = async <T>(
+  url: string,
+  options: AxiosRequestConfig = {}
+): Promise<T> => {
+  try {
+    const response: AxiosResponse<T> = await apiClient(url, options);
+    return response.data;
+  } catch (error) {
+    // Handle or throw error as needed
+    console.error('API call failed:', error);
+    throw error;
+  }
+};
+
+export { apiClient };
 export default apiClient;

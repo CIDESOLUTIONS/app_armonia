@@ -1,4 +1,4 @@
-import { apiClient } from "@/lib/apiClient";
+import { fetchApi } from "@/lib/apiClient";
 
 export interface PersonalTransaction {
   id: number;
@@ -21,20 +21,17 @@ export interface CreatePersonalTransactionData {
 export interface UpdatePersonalTransactionData extends Partial<CreatePersonalTransactionData> {}
 
 export const getPersonalTransactions = async (): Promise<PersonalTransaction[]> => {
-  const response = await apiClient.get('/personal-finances');
-  return response.data;
+  return fetchApi('/personal-finances');
 };
 
 export const createPersonalTransaction = async (data: CreatePersonalTransactionData): Promise<PersonalTransaction> => {
-  const response = await apiClient.post('/personal-finances', data);
-  return response.data;
+  return fetchApi('/personal-finances', { method: 'POST', data });
 };
 
 export const updatePersonalTransaction = async (id: number, data: UpdatePersonalTransactionData): Promise<PersonalTransaction> => {
-  const response = await apiClient.put(`/personal-finances/${id}`, data);
-  return response.data;
+  return fetchApi(`/personal-finances/${id}`, { method: 'PUT', data });
 };
 
 export const deletePersonalTransaction = async (id: number): Promise<void> => {
-  await apiClient.delete(`/personal-finances/${id}`);
+  await fetchApi(`/personal-finances/${id}`, { method: 'DELETE' });
 };

@@ -136,6 +136,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     <ToastContext.Provider value={{ toast: addToast, toasts, removeToast }}>
       {children}
       <ToastContainer />
+      <ToastHelper />
     </ToastContext.Provider>
   );
 }
@@ -222,3 +223,16 @@ function ToastContainer() {
     </div>
   );
 }
+
+let toast: (options: ToastOptions) => void;
+
+const ToastConsumer = () => {
+  const toastContext = useToast();
+  toast = toastContext.toast;
+  return null;
+};
+
+export { toast };
+
+// Helper component to make toast available globally
+export const ToastHelper = () => <ToastConsumer />;

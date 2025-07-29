@@ -19,3 +19,7 @@ export const getPrisma = (tenantId?: string) => {
   const databaseUrl = process.env.DATABASE_URL.replace("public", tenantId);
   return new PrismaClient({ datasources: { db: { url: databaseUrl } } });
 };
+
+export const getPublicPrismaClient = () => {
+  return prisma;
+};

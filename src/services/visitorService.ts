@@ -57,3 +57,8 @@ export const getPackageById = async (packageId: number): Promise<Package> => {
     const response = await apiClient.get(`/packages/${packageId}`);
     return response.data;
 };
+
+export const createVisitor = async (visitorData: Omit<Visitor, 'id' | 'entryTime' | 'exitTime'>): Promise<Visitor> => {
+  const response = await apiClient.post('/visitors', visitorData);
+  return response.data;
+};

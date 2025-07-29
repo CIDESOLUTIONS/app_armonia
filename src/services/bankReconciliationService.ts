@@ -1,12 +1,11 @@
-import { apiClient } from "@/lib/apiClient";
+import { fetchApi } from "@/lib/apiClient";
 
 export const reconcileTransactions = async (
   schemaName: string,
   transactions: any[],
 ) => {
-  const response = await apiClient.post(
+  return fetchApi(
     `/bank-reconciliation/reconcile`,
-    { transactions, schemaName },
+    { method: 'POST', data: { transactions, schemaName } },
   );
-  return response.data;
 };

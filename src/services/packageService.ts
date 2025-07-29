@@ -50,8 +50,7 @@ export async function getPackages(
       }
     }
   }
-  const response = await fetchApi(`/packages?${query.toString()}`);
-  return response;
+  return fetchApi(`/packages?${query.toString()}`);
 }
 
 export async function registerPackage(
@@ -67,31 +66,28 @@ export async function registerPackage(
   if (data.notes) formData.append("notes", data.notes);
   if (data.photo) formData.append("photo", data.photo);
 
-  const response = await fetchApi(
+  return fetchApi(
     "/packages",
     {
       method: "POST",
-      body: formData,
+      data: formData,
+      headers: { 'Content-Type': 'multipart/form-data' },
     },
-    true,
-  ); // El tercer parámetro indica que no se debe añadir Content-Type automáticamente
-  return response;
+  );
 }
 
 export async function deliverPackage(
   id: string,
   data: DeliverPackageDto,
 ): Promise<PackageItem> {
-  const response = await fetchApi(`/packages/${id}/deliver`, {
+  return fetchApi(`/packages/${id}/deliver`, {
     method: "PUT",
-    body: JSON.stringify(data),
+    data,
   });
-  return response;
 }
 
 export async function returnPackage(id: string): Promise<PackageItem> {
-  const response = await fetchApi(`/packages/${id}/return`, {
+  return fetchApi(`/packages/${id}/return`, {
     method: "PUT",
   });
-  return response;
 }
