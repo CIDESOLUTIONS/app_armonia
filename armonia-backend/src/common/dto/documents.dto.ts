@@ -26,7 +26,11 @@ export class CreateDocumentDto {
   @IsEnum(DocumentType)
   type: DocumentType;
 
-  // file will be handled separately via multipart/form-data
+  constructor(name: string, type: DocumentType, description?: string) {
+    this.name = name;
+    this.type = type;
+    this.description = description;
+  }
 }
 
 export class DocumentDto {
