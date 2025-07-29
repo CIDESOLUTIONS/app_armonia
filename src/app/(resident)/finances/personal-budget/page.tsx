@@ -4,6 +4,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2, PlusCircle, Edit, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
