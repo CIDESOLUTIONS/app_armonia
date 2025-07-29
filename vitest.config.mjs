@@ -34,6 +34,7 @@ export default defineConfig({
       inline: ["armonia-backend"], // Forzar a Vitest a procesar módulos de armonia-backend
     },
     transform: {
+      // eslint-disable-next-line no-useless-escape
       '^.+\.(t|j)sx?$': ['@swc/jest', { 
         jsc: {
           transform: {

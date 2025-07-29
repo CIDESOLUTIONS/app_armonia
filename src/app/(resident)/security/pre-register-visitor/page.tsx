@@ -246,7 +246,7 @@ export default function PreRegisterVisitorPage() {
             <h2 className="text-xl font-bold mb-4">
               Código QR para el Visitante
             </h2>
-            <QRCode
+            <QRCodeSVG
               value={qrCodeValue}
               size={256}
               level="H"

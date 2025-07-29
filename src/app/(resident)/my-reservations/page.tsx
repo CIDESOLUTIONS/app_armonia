@@ -14,7 +14,7 @@ import {
 import { useModal } from "@/hooks/useModal";
 import ResidentReservationForm from "@/components/reservations/ResidentReservationForm";
 import ResidentReservationsList from "@/components/reservations/ResidentReservationsList";
-import ResidentCommonAreasList from "@/components/reservations/ResidentCommonAreasList";
+import * as ResidentCommonAreasListModule from "@/components/reservations/ResidentCommonAreasList";
 
 export default function ResidentReservationsPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -100,7 +100,7 @@ export default function ResidentReservationsPage() {
       <h2 className="text-2xl font-bold text-gray-900 mb-4">
         Áreas Comunes Disponibles
       </h2>
-      <ResidentCommonAreasList
+      <ResidentCommonAreasListModule.default
         commonAreas={commonAreas}
         onCreateReservation={handleCreateReservation}
       />
