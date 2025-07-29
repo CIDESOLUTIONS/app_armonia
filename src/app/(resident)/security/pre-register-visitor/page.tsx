@@ -9,10 +9,11 @@ import { useAuthStore } from '@/store/authStore';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
+import { Textarea } from "@/components/ui/textarea";
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { QRCode } from 'qrcode.react';
+import QRCode from 'qrcode.react';
 import { createVisitor } from '@/services/visitorService'; // Assuming this service exists
 
 const formSchema = z.object({

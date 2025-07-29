@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/authStore';
 import { Loader2, Siren } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
-import { createPanicAlert } from '@/services/panicService'; // Assuming this service exists
+import { triggerPanicAlert } from '@/services/panicService'; // Assuming this service exists
 
 export default function PanicButtonPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -25,7 +25,7 @@ export default function PanicButtonPage() {
       // For simplicity, location can be hardcoded or derived from user's property
       const location = user.propertyId ? `Unidad ${user.propertyId}` : "Ubicación Desconocida";
 
-      await createPanicAlert({
+      await triggerPanicAlert({
         userId: user.id,
         complexId: user.complexId,
         location: location,

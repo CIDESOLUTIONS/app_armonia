@@ -70,3 +70,19 @@ export const uploadBankStatement = async (file: File): Promise<ReconciliationSug
 export const approveReconciliation = async (reconciliationId: number): Promise<{ message: string }> => {
   return fetchApi(`/finances/reconciliation/${reconciliationId}/approve`, { method: 'POST' });
 };
+
+export const getPaymentGatewaysConfig = async (complexId: number): Promise<any[]> => {
+  return fetchApi(`/payment-gateways`, { params: { complexId } });
+};
+
+export const createPaymentGatewayConfig = async (data: any): Promise<any> => {
+  return fetchApi('/payment-gateways', { method: 'POST', data });
+};
+
+export const updatePaymentGatewayConfig = async (id: number, data: any): Promise<any> => {
+  return fetchApi(`/payment-gateways/${id}`, { method: 'PUT', data });
+};
+
+export const deletePaymentGatewayConfig = async (id: number): Promise<void> => {
+  await fetchApi(`/payment-gateways/${id}`, { method: 'DELETE' });
+};
