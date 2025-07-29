@@ -97,6 +97,10 @@ export class GetPQRParamsDto {
 
   @IsOptional()
   @IsString()
+  type?: string;
+
+  @IsOptional()
+  @IsString()
   search?: string;
 }
 

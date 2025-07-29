@@ -63,6 +63,10 @@ export class PersonalTransactionFilterParamsDto {
   type?: PersonalTransactionType;
 
   @IsOptional()
+  @IsNumber()
+  categoryId?: number;
+
+  @IsOptional()
   @IsDateString()
   startDate?: string;
 

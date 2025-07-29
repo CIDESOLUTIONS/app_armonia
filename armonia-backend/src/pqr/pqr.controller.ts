@@ -3,12 +3,10 @@ import {
   Get,
   Post,
   Put,
-  Delete,
   Body,
   Param,
   UseGuards,
   Query,
-  Request,
 } from '@nestjs/common';
 import { PqrService } from './pqr.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
@@ -20,3 +18,42 @@ import {
   UpdatePQRDto,
   PQRCommentDto,
 } from '../common/dto/pqr.dto.js';
+import { RolesGuard } from '../auth/roles.guard.js';
+import { Roles } from '../auth/roles.decorator.js';
+import { UserRole } from '../common/enums/user-role.enum.js';
+
+@UseGuards(JwtAuthGuard)
+@Controller('pqr')
+export class PqrController {
+  constructor(private readonly pqrService: PqrService) {}
+
+  @Post()
+  async createPqr(@GetUser() user: any, @Body() createPQRDto: CreatePQRDto) {
+    return this.pqrService.createPqr(user.schemaName, user.userId, createPQRDto);
+  }
+
+  @Get()
+  async getPqrs(@GetUser() user: any, @Query() filters: GetPQRParamsDto) {
+    return this.pqrService.getPqrs(user.schemaName, user.userId, user.role, filters);
+  }
+
+  @Get(':id')
+  async getPqrById(@GetUser() user: any, @Param('id') id: string) {
+    return this.pqrService.getPqrById(user.schemaName, user.userId, user.role, +id);
+  }
+
+  @Put(':id')
+  @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
+  async updatePqr(@GetUser() user: any, @Param('id') id: string, @Body() updatePQRDto: UpdatePQRDto) {
+    return this.pqrService.updatePqr(user.schemaName, +id, updatePQRDto);
+  }
+
+  @Post(':id/comments')
+  async addComment(
+    @GetUser() user: any,
+    @Param('id') id: string,
+    @Body() pqrCommentDto: PQRCommentDto,
+  ) {
+    return this.pqrService.addComment(user.schemaName, user.userId, +id, pqrCommentDto);
+  }
+}

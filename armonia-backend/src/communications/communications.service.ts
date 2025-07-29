@@ -231,6 +231,20 @@ export class CommunicationsService {
     });
   }
 
+  async markAllNotificationsAsRead(schemaName: string, userId: number) {
+    const prisma: any = this.prisma;
+    return await prisma.notification.updateMany({
+      where: {
+        recipientId: userId,
+        read: false,
+      },
+      data: {
+        read: true,
+        readAt: new Date(),
+      },
+    });
+  }
+
   async confirmNotificationReading(
     schemaName: string,
     notificationId: string,
@@ -432,7 +446,7 @@ export class CommunicationsService {
             await this.sendPushNotification(
               user.deviceToken,
               `Alerta de emergencia: ${completeAnnouncement.title}`,
-              completeEvent.content,
+              completeAnnouncement.content,
             );
           }
         }
@@ -446,24 +460,24 @@ export class CommunicationsService {
         select: { id: true, phoneNumber: true, deviceToken: true },
       });
       targetUserIds = users.map((user) => user.id);
-      if (completeEvent.type === 'emergency') {
+      if (completeAnnouncement.type === 'emergency') {
         for (const user of users) {
           if (user.phoneNumber) {
             await this.sendSms(
               user.phoneNumber,
-              `Alerta de emergencia: ${completeEvent.title}. ${completeEvent.content.substring(0, 100)}...`,
+              `Alerta de emergencia: ${completeAnnouncement.title}. ${completeAnnouncement.content.substring(0, 100)}...`,
             );
           }
         }
       }
       // Send push notifications for emergency announcements to targeted roles
-      if (completeEvent.type === 'emergency') {
+      if (completeAnnouncement.type === 'emergency') {
         for (const user of users) {
           if (user.deviceToken) {
             await this.sendPushNotification(
               user.deviceToken,
-              `Alerta de emergencia: ${completeEvent.title}`,
-              completeEvent.content,
+              `Alerta de emergencia: ${completeAnnouncement.title}`,
+              completeAnnouncement.content,
             );
           }
         }

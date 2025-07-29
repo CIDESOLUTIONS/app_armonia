@@ -34,7 +34,7 @@ export class PanicGateway {
   async handleTriggerPanic(
     @MessageBody() data: CreatePanicAlertDto & { schemaName: string },
   ): Promise<void> {
-    const newAlert = await this.panicService.createPanicAlert(
+    const newAlert = await this.panicService.createAlert(
       data.schemaName,
       data,
     );
@@ -53,7 +53,7 @@ export class PanicGateway {
       status: 'RESOLVED' | 'DISMISSED';
     },
   ): Promise<void> {
-    const updatedAlert = await this.panicService.updatePanicAlert(
+    const updatedAlert = await this.panicService.updateAlert(
       data.schemaName,
       data.alertId,
       { status: data.status as PanicStatus },

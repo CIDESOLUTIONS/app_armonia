@@ -8,6 +8,7 @@ import {
 import { Type } from 'class-transformer';
 
 export enum PackageStatus {
+  PENDING = 'PENDING',
   REGISTERED = 'REGISTERED',
   DELIVERED = 'DELIVERED',
   RETURNED = 'RETURNED',
@@ -118,6 +119,10 @@ export class PackageFilterParamsDto {
   @IsOptional()
   @IsString()
   sender?: string;
+
+  @IsOptional()
+  @IsNumber()
+  residentId?: number;
 
   @IsOptional()
   @Type(() => Number)

@@ -7,7 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
-import { MarketplaceService } from './marketplace.service';
+import { MarketplaceService } from './marketplace.service.js';
 
 @WebSocketGateway({ namespace: '/marketplace', cors: { origin: '*' } })
 export class MarketplaceGateway {

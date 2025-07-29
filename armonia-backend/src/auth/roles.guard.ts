@@ -6,7 +6,7 @@ import {
   Type,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { UserRole } from '../common/enums/user-role.enum';
+import { UserRole } from '../common/enums/user-role.enum.js';
 import { ROLES_KEY } from './roles.decorator.js';
 
 export const RolesGuard = (roles: UserRole[]): Type<CanActivate> => {

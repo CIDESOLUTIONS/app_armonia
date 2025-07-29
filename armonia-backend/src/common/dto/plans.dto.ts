@@ -1,7 +1,7 @@
 import { IsString, IsNumber, IsOptional, IsBoolean, IsArray, IsDateString, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PartialType } from '@nestjs/swagger';
-import { PlanType } from '@backend/common/enums/plan-type.enum';
+import { PlanType } from '../enums/plan-type.enum.js';
 
 export class CreatePlanDto {
   @IsString()
