@@ -86,7 +86,9 @@ export class InvoiceRuleService {
       logger.info(`Recuperadas ${rules.length} reglas de facturación`);
       return rules;
     } catch (error: unknown) {
-      logger.error(`Error al obtener reglas de facturación: ${error instanceof Error ? error.message : "Error desconocido"}`);
+      logger.error(
+        `Error al obtener reglas de facturación: ${error instanceof Error ? error.message : "Error desconocido"}`,
+      );
       throw error;
     }
   }
@@ -150,7 +152,9 @@ export class InvoiceRuleService {
       logger.info(`Creada nueva regla de facturación: ${rule.id}`);
       return rule;
     } catch (error: unknown) {
-      logger.error(`Error al crear regla de facturación: ${error instanceof Error ? error.message : "Error desconocido"}`);
+      logger.error(
+        `Error al crear regla de facturación: ${error instanceof Error ? error.message : "Error desconocido"}`,
+      );
       throw error;
     }
   }
@@ -275,12 +279,17 @@ export class InvoiceRuleService {
         );
         return {
           success: false,
-          error: evalError instanceof Error ? evalError.message : "Error desconocido",
+          error:
+            evalError instanceof Error
+              ? evalError.message
+              : "Error desconocido",
           result: null,
         };
       }
     } catch (error: unknown) {
-      logger.error(`Error al evaluar regla ${ruleId}: ${error instanceof Error ? error.message : "Error desconocido"}`);
+      logger.error(
+        `Error al evaluar regla ${ruleId}: ${error instanceof Error ? error.message : "Error desconocido"}`,
+      );
       throw error;
     }
   }

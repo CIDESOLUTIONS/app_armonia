@@ -69,7 +69,10 @@ export const FinancialReportsSection = () => {
       console.error("Error generating report:", error);
       toast({
         title: "Error",
-        description: (error instanceof Error ? error.message : "Error al generar el informe."),
+        description:
+          error instanceof Error
+            ? error.message
+            : "Error al generar el informe.",
         variant: "destructive",
       });
     } finally {

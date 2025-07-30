@@ -68,7 +68,10 @@ class SeoOptimizationService {
       logger.info(`Image optimized: ${inputPath} -> ${outputPath}`);
       return true;
     } catch (error: unknown) {
-      logger.error(`Error optimizing image: ${error instanceof Error ? error.message : "Error desconocido"}`, { inputPath });
+      logger.error(
+        `Error optimizing image: ${error instanceof Error ? error.message : "Error desconocido"}`,
+        { inputPath },
+      );
       return false;
     }
   }

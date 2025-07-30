@@ -4,7 +4,7 @@
  */
 
 import {
-  PrismaClient,
+  _PrismaClient,
   PQRCategory,
   PQRStatus,
   PQRPriority,

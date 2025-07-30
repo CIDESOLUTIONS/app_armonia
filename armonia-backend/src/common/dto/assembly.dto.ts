@@ -40,7 +40,14 @@ export class CreateAssemblyDto {
   @IsString()
   agenda: string;
 
-  constructor(title: string, description: string, scheduledDate: string, location: string, type: AssemblyType, agenda: string) {
+  constructor(
+    title: string,
+    description: string,
+    scheduledDate: string,
+    location: string,
+    type: AssemblyType,
+    agenda: string,
+  ) {
     this.title = title;
     this.description = description;
     this.scheduledDate = scheduledDate;
@@ -83,7 +90,12 @@ export class RegisterAttendanceDto {
   @IsBoolean()
   present?: boolean;
 
-  constructor(assemblyId: number, userId: number, unitId: number, present?: boolean) {
+  constructor(
+    assemblyId: number,
+    userId: number,
+    unitId: number,
+    present?: boolean,
+  ) {
     this.assemblyId = assemblyId;
     this.userId = userId;
     this.unitId = unitId;
@@ -106,7 +118,12 @@ export class CreateVoteDto {
   @IsBoolean()
   weightedVoting?: boolean;
 
-  constructor(title: string, description: string, options: string[], weightedVoting?: boolean) {
+  constructor(
+    title: string,
+    description: string,
+    options: string[],
+    weightedVoting?: boolean,
+  ) {
     this.title = title;
     this.description = description;
     this.options = options;

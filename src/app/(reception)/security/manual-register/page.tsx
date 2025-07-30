@@ -90,7 +90,9 @@ export default function ManualVisitorRegisterPage() {
       toast({
         title: "Error",
         description:
-          (error instanceof Error ? error.message : "Error al registrar visitante manualmente."),
+          error instanceof Error
+            ? error.message
+            : "Error al registrar visitante manualmente.",
         variant: "destructive",
       });
     } finally {

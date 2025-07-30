@@ -100,7 +100,10 @@ export default function PreRegisterVisitorPage() {
       console.error("Error preregistering visitor:", error);
       toast({
         title: "Error",
-        description: (error instanceof Error ? error.message : "Error al preregistrar visitante."),
+        description:
+          error instanceof Error
+            ? error.message
+            : "Error al preregistrar visitante.",
         variant: "destructive",
       });
     } finally {

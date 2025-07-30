@@ -38,7 +38,9 @@ export default function ConsolidatedFinancialReportsPage() {
       } catch (error: unknown) {
         toast({
           title: "Error",
-          description: "No se pudieron cargar los complejos: " + (error instanceof Error ? error.message : "Error desconocido"),
+          description:
+            "No se pudieron cargar los complejos: " +
+            (error instanceof Error ? error.message : "Error desconocido"),
           variant: "destructive",
         });
       }
@@ -80,7 +82,9 @@ export default function ConsolidatedFinancialReportsPage() {
       console.error("Error generating report:", error);
       toast({
         title: "Error",
-        description: "Error al generar el reporte: " + (error instanceof Error ? error.message : "Error desconocido"),
+        description:
+          "Error al generar el reporte: " +
+          (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     } finally {

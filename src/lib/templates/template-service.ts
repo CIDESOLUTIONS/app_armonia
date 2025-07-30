@@ -33,7 +33,10 @@ class TemplateService {
       logger.info(`Template registered: ${name}`);
       return true;
     } catch (error: unknown) {
-      logger.error(`Error registering template: ${error instanceof Error ? error.message : "Error desconocido"}`, { error });
+      logger.error(
+        `Error registering template: ${error instanceof Error ? error.message : "Error desconocido"}`,
+        { error },
+      );
       return false;
     }
   }

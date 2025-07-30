@@ -92,7 +92,12 @@ export class CreateMessageDto {
   @IsString()
   content: string;
 
-  constructor(listingId: number, senderId: number, receiverId: number, content: string) {
+  constructor(
+    listingId: number,
+    senderId: number,
+    receiverId: number,
+    content: string,
+  ) {
     this.listingId = listingId;
     this.senderId = senderId;
     this.receiverId = receiverId;

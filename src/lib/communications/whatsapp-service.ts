@@ -70,7 +70,9 @@ export async function sendWhatsAppMessage(options: {
     logger.info(`WhatsApp enviado correctamente: ${result.messageId}`);
     return result;
   } catch (error: unknown) {
-    logger.error(`Error al enviar WhatsApp: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    logger.error(
+      `Error al enviar WhatsApp: ${error instanceof Error ? error.message : "Error desconocido"}`,
+    );
     return {
       success: false,
       error: error instanceof Error ? error.message : "Error desconocido",
@@ -141,7 +143,10 @@ export async function sendBulkWhatsAppMessage(
         results.results.push({
           phoneNumber,
           success: false,
-          error: phoneError instanceof Error ? phoneError.message : "Error desconocido",
+          error:
+            phoneError instanceof Error
+              ? phoneError.message
+              : "Error desconocido",
         });
       }
     }
@@ -153,7 +158,9 @@ export async function sendBulkWhatsAppMessage(
     );
     return results;
   } catch (error: unknown) {
-    logger.error(`Error al enviar WhatsApp masivo: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    logger.error(
+      `Error al enviar WhatsApp masivo: ${error instanceof Error ? error.message : "Error desconocido"}`,
+    );
     return {
       success: false,
       error: error instanceof Error ? error.message : "Error desconocido",

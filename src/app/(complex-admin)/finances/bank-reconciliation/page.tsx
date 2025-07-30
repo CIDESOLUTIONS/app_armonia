@@ -104,7 +104,9 @@ export default function BankReconciliationPage() {
       console.error("Error during reconciliation:", error);
       toast({
         title: "Error",
-        description: "Error al realizar la conciliación: " + (error instanceof Error ? error.message : "Error desconocido"),
+        description:
+          "Error al realizar la conciliación: " +
+          (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     } finally {

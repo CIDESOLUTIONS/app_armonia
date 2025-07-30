@@ -43,7 +43,8 @@ export default function BrandingPage() {
       console.error("Error fetching complexes:", error);
       const description =
         error instanceof Error
-          ? "No se pudieron cargar los complejos residenciales: " + error.message
+          ? "No se pudieron cargar los complejos residenciales: " +
+            error.message
           : "No se pudieron cargar los complejos residenciales.";
       toast({
         title: "Error",

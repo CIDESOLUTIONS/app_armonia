@@ -72,7 +72,7 @@ export default function BrandingSettingsPage() {
         logoUrl: complex.logoUrl || "",
         primaryColor: complex.primaryColor || "",
         secondaryColor: complex.secondaryColor || "",
-      });
+      } as BrandingFormValues);
     } catch (error: unknown) {
       console.error("Error fetching branding settings:", error);
       toast({

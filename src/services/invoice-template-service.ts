@@ -56,7 +56,9 @@ export class InvoiceTemplateService {
       logger.info(`Recuperadas ${templates.length} plantillas de facturas`);
       return templates;
     } catch (error: unknown) {
-      logger.error(`Error al obtener plantillas de facturas: ${error instanceof Error ? error.message : "Error desconocido"}`);
+      logger.error(
+        `Error al obtener plantillas de facturas: ${error instanceof Error ? error.message : "Error desconocido"}`,
+      );
       throw error;
     }
   }
@@ -124,7 +126,9 @@ export class InvoiceTemplateService {
       logger.info(`Creada nueva plantilla de factura: ${template.id}`);
       return template;
     } catch (error: unknown) {
-      logger.error(`Error al crear plantilla de factura: ${error instanceof Error ? error.message : "Error desconocido"}`);
+      logger.error(
+        `Error al crear plantilla de factura: ${error instanceof Error ? error.message : "Error desconocido"}`,
+      );
       throw error;
     }
   }
@@ -255,7 +259,9 @@ export class InvoiceTemplateService {
       logger.info(`Factura renderizada con plantilla: ${template.id}`);
       return renderedContent;
     } catch (error: unknown) {
-      logger.error(`Error al renderizar factura: ${error instanceof Error ? error.message : "Error desconocido"}`);
+      logger.error(
+        `Error al renderizar factura: ${error instanceof Error ? error.message : "Error desconocido"}`,
+      );
       throw error;
     }
   }

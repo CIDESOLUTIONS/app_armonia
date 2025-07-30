@@ -5,7 +5,9 @@ interface ComplexState {
   selectedComplexName: string | null;
   allComplexes: { id: number; name: string; schemaName: string }[];
   setSelectedComplex: (id: string, name: string) => void;
-  setAllComplexes: (complexes: { id: number; name: string; schemaName: string }[]) => void;
+  setAllComplexes: (
+    complexes: { id: number; name: string; schemaName: string }[],
+  ) => void;
 }
 
 export const useComplexStore = create<ComplexState>((set) => ({

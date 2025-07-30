@@ -21,7 +21,9 @@ function generateKey(password: string, salt?: string): Buffer {
 
     return derivedKey;
   } catch (error: unknown) {
-    logger.error(`Error al generar clave de encriptación: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    logger.error(
+      `Error al generar clave de encriptación: ${error instanceof Error ? error.message : "Error desconocido"}`,
+    );
     throw error;
   }
 }
@@ -49,7 +51,9 @@ export function encryptData(data: string | object, password?: string): string {
 
     return `${iv.toString("hex")}:${encrypted}:${authTag.toString("hex")}`;
   } catch (error: unknown) {
-    logger.error(`Error al encriptar datos: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    logger.error(
+      `Error al encriptar datos: ${error instanceof Error ? error.message : "Error desconocido"}`,
+    );
     throw error;
   }
 }
@@ -89,7 +93,9 @@ export function decryptData(
       return decrypted;
     }
   } catch (error: unknown) {
-    logger.error(`Error al desencriptar datos: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    logger.error(
+      `Error al desencriptar datos: ${error instanceof Error ? error.message : "Error desconocido"}`,
+    );
     throw error;
   }
 }
@@ -105,7 +111,9 @@ export function hashPassword(password: string, salt?: string): string {
       .toString("hex");
     return `${passwordSalt}:${hash}`;
   } catch (error: unknown) {
-    logger.error(`Error al generar hash de contraseña: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    logger.error(
+      `Error al generar hash de contraseña: ${error instanceof Error ? error.message : "Error desconocido"}`,
+    );
     throw error;
   }
 }
@@ -124,7 +132,9 @@ export function verifyPassword(
       .toString("hex");
     return hash === originalHash;
   } catch (error: unknown) {
-    logger.error(`Error al verificar contraseña: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    logger.error(
+      `Error al verificar contraseña: ${error instanceof Error ? error.message : "Error desconocido"}`,
+    );
     return false;
   }
 }
@@ -133,7 +143,9 @@ export function generateSecureToken(length: number = 32): string {
   try {
     return crypto.randomBytes(length).toString("hex");
   } catch (error: unknown) {
-    logger.error(`Error al generar token seguro: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    logger.error(
+      `Error al generar token seguro: ${error instanceof Error ? error.message : "Error desconocido"}`,
+    );
     throw error;
   }
 }

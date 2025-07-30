@@ -11,8 +11,8 @@
  */
 export async function getTemplateByType(
   type: string,
-  schema: string = "public",
-): Promise<any> {
+  _schema: string = "public",
+): Promise<unknown> {
   // Plantillas predefinidas para pruebas
   const templates: Record<string, any> = {
     PQR_STATUS_CHANGE: {
@@ -58,8 +58,8 @@ export async function getTemplateByType(
  * @returns Plantilla con variables aplicadas
  */
 export function applyTemplateVariables(
-  template: any,
-  variables: Record<string, any>,
+  template: Record<string, unknown>,
+  variables: Record<string, string>,
 ): { subject: string; content: string } {
   if (!template || !template.subject || !template.content) {
     return {
@@ -90,9 +90,9 @@ export function applyTemplateVariables(
  */
 export async function saveTemplate(
   type: string,
-  template: any,
-  schema: string = "public",
-): Promise<any> {
+  template: unknown,
+  _schema: string = "public",
+): Promise<unknown> {
   return Promise.resolve({
     type,
     ...template,
@@ -108,8 +108,8 @@ export async function saveTemplate(
  * @returns Lista de plantillas
  */
 export async function getAllTemplates(
-  schema: string = "public",
-): Promise<any[]> {
+  _schema: string = "public",
+): Promise<unknown[]> {
   return Promise.resolve([
     {
       type: "PQR_STATUS_CHANGE",
