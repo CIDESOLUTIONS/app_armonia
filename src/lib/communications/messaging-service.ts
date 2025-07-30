@@ -26,8 +26,8 @@ export class MessagingService {
       //   mediaUrl: options.mediaUrl
       // });
       return true;
-    } catch (error: any) {
-      logger.error(`Error sending WhatsApp message: ${error.message}`);
+    } catch (error: unknown) {
+      logger.error(`Error sending WhatsApp message: ${error instanceof Error ? error.message : "Error desconocido"}`);
       return false;
     }
   }
@@ -39,8 +39,8 @@ export class MessagingService {
       // const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN);
       // await bot.sendMessage(options.to, options.body);
       return true;
-    } catch (error: any) {
-      logger.error(`Error sending Telegram message: ${error.message}`);
+    } catch (error: unknown) {
+      logger.error(`Error sending Telegram message: ${error instanceof Error ? error.message : "Error desconocido"}`);
       return false;
     }
   }

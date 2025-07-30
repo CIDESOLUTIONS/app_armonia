@@ -69,11 +69,11 @@ export async function sendWhatsAppMessage(options: {
 
     logger.info(`WhatsApp enviado correctamente: ${result.messageId}`);
     return result;
-  } catch (error: any) {
-    logger.error(`Error al enviar WhatsApp: ${error.message}`);
+  } catch (error: unknown) {
+    logger.error(`Error al enviar WhatsApp: ${error instanceof Error ? error.message : "Error desconocido"}`);
     return {
       success: false,
-      error: error.message,
+      error: error instanceof Error ? error.message : "Error desconocido",
     };
   }
 }
@@ -133,15 +133,15 @@ export async function sendBulkWhatsAppMessage(
         } else {
           results.failed++;
         }
-      } catch (phoneError: any) {
+      } catch (phoneError: unknown) {
         logger.error(
-          `Error al enviar a número ${phoneNumber}: ${phoneError.message}`,
+          `Error al enviar a número ${phoneNumber}: ${phoneError instanceof Error ? phoneError.message : "Error desconocido"}`,
         );
         results.failed++;
         results.results.push({
           phoneNumber,
           success: false,
-          error: phoneError.message,
+          error: phoneError instanceof Error ? phoneError.message : "Error desconocido",
         });
       }
     }
@@ -152,11 +152,11 @@ export async function sendBulkWhatsAppMessage(
       `WhatsApp masivo enviado a ${results.sent}/${results.total} números`,
     );
     return results;
-  } catch (error: any) {
-    logger.error(`Error al enviar WhatsApp masivo: ${error.message}`);
+  } catch (error: unknown) {
+    logger.error(`Error al enviar WhatsApp masivo: ${error instanceof Error ? error.message : "Error desconocido"}`);
     return {
       success: false,
-      error: error.message,
+      error: error instanceof Error ? error.message : "Error desconocido",
       total: phoneNumbers ? phoneNumbers.length : 0,
       sent: 0,
       failed: phoneNumbers ? phoneNumbers.length : 0,

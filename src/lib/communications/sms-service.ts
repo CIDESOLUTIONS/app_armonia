@@ -63,11 +63,11 @@ export async function sendSMS(options: {
 
     logger.info(`SMS enviado correctamente: ${result.messageId}`);
     return result;
-  } catch (error: any) {
-    logger.error(`Error al enviar SMS: ${error.message}`);
+  } catch (error: unknown) {
+    logger.error(`Error al enviar SMS: ${error instanceof Error ? error.message : "Error desconocido"}`);
     return {
       success: false,
-      error: error.message,
+      error: error instanceof Error ? error.message : "Error desconocido",
     };
   }
 }
@@ -127,15 +127,15 @@ export async function sendBulkSMS(
         } else {
           results.failed++;
         }
-      } catch (phoneError: any) {
+      } catch (phoneError: unknown) {
         logger.error(
-          `Error al enviar a número ${phoneNumber}: ${phoneError.message}`,
+          `Error al enviar a número ${phoneNumber}: ${phoneError instanceof Error ? phoneError.message : "Error desconocido"}`,
         );
         results.failed++;
         results.results.push({
           phoneNumber,
           success: false,
-          error: phoneError.message,
+          error: phoneError instanceof Error ? phoneError.message : "Error desconocido",
         });
       }
     }
@@ -146,11 +146,11 @@ export async function sendBulkSMS(
       `SMS masivo enviado a ${results.sent}/${results.total} números`,
     );
     return results;
-  } catch (error: any) {
-    logger.error(`Error al enviar SMS masivo: ${error.message}`);
+  } catch (error: unknown) {
+    logger.error(`Error al enviar SMS masivo: ${error instanceof Error ? error.message : "Error desconocido"}`);
     return {
       success: false,
-      error: error.message,
+      error: error instanceof Error ? error.message : "Error desconocido",
       total: phoneNumbers ? phoneNumbers.length : 0,
       sent: 0,
       failed: phoneNumbers ? phoneNumbers.length : 0,

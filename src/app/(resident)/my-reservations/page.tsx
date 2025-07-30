@@ -34,12 +34,12 @@ export default function ResidentReservationsPage() {
       ]);
       setCommonAreas(commonAreasData);
       setReservations(reservationsData);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching data:", error);
       toast({
         title: "Error",
         description:
-          "No se pudieron cargar los datos de reservas: " + error.message,
+          "No se pudieron cargar los datos de reservas: " + (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     } finally {
