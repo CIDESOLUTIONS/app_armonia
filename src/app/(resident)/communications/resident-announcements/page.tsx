@@ -42,11 +42,15 @@ export default function ResidentAnnouncementsPage() {
           announcement.targetRoles.includes("ALL"), // Assuming "ALL" is a possible target role
       );
       setAnnouncements(filteredData);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching announcements:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar los comunicados: " + error.message
+          : "No se pudieron cargar los comunicados.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar los comunicados: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

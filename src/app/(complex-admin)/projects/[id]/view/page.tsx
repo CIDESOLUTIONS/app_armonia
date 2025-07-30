@@ -60,11 +60,15 @@ export default function ViewProjectPage() {
         });
         router.push("/admin/projects/list");
       }
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching project:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo cargar el proyecto: " + error.message
+          : "No se pudo cargar el proyecto.";
       toast({
         title: "Error",
-        description: "No se pudo cargar el proyecto: " + error.message,
+        description,
         variant: "destructive",
       });
       router.push("/admin/projects/list");

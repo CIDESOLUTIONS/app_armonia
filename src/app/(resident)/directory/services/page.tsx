@@ -67,13 +67,15 @@ export default function HomeServicesDirectoryPage() {
     try {
       const fetchedProviders = await getServiceProviders();
       setServiceProviders(fetchedProviders);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching service providers:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar los proveedores de servicios: " + error.message
+          : "No se pudieron cargar los proveedores de servicios.";
       toast({
         title: "Error",
-        description:
-          "No se pudieron cargar los proveedores de servicios: " +
-          error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -124,11 +126,15 @@ export default function HomeServicesDirectoryPage() {
       setIsReviewDialogOpen(false);
       setReviewForm({ rating: 0, comment: "" });
       fetchServiceProviders(); // Refresh list to show updated ratings
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error submitting review:", error);
+      const description =
+        error instanceof Error
+          ? "Error al enviar la reseña: " + error.message
+          : "Error al enviar la reseña.";
       toast({
         title: "Error",
-        description: "Error al enviar la reseña: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

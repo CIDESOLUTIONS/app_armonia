@@ -68,11 +68,15 @@ export default function ViewResidentPQRPage() {
     try {
       const data = await getPQRById(pqrId as number);
       setPqr(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching PQR:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo cargar la PQR: " + error.message
+          : "No se pudo cargar la PQR.";
       toast({
         title: "Error",
-        description: "No se pudo cargar la PQR: " + error.message,
+        description,
         variant: "destructive",
       });
       router.push("/resident/pqr");
@@ -97,11 +101,15 @@ export default function ViewResidentPQRPage() {
         description: "Comentario añadido correctamente.",
       });
       fetchPQR();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error adding comment:", error);
+      const description =
+        error instanceof Error
+          ? "Error al añadir comentario: " + error.message
+          : "Error al añadir comentario.";
       toast({
         title: "Error",
-        description: "Error al añadir comentario: " + error.message,
+        description,
         variant: "destructive",
       });
     }

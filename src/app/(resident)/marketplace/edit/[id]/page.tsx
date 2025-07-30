@@ -113,11 +113,15 @@ export default function EditListingPage() {
 
       const fetchedCategories = await getMarketplaceCategories();
       setCategories(fetchedCategories);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching listing data:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo cargar el anuncio: " + error.message
+          : "No se pudo cargar el anuncio.";
       toast({
         title: "Error",
-        description: "No se pudo cargar el anuncio: " + error.message,
+        description,
         variant: "destructive",
       });
       router.push("/resident/marketplace/my-listings");
@@ -185,11 +189,15 @@ export default function EditListingPage() {
         description: "Anuncio actualizado correctamente.",
       });
       router.push("/resident/marketplace/my-listings");
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error updating listing:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo actualizar el anuncio: " + error.message
+          : "No se pudo actualizar el anuncio.";
       toast({
         title: "Error",
-        description: "No se pudo actualizar el anuncio: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
