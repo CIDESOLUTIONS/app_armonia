@@ -358,6 +358,9 @@ export default function ReceptionVisitorsPage() {
         "Error al registrar la salida. Por favor, inténtelo de nuevo: " +
           (error instanceof Error ? error.message : "Error desconocido"),
       );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleScanQrCode = async () => {

@@ -78,12 +78,13 @@ export default function AuthLayout({
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("[AuthLayout] Error en logout:", error);
       toast({
         title: "Error",
         description:
-          "Error en el proceso de cierre de sesión: " + error.message,
+          "Error en el proceso de cierre de sesión: " +
+          (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     }
@@ -124,12 +125,6 @@ export default function AuthLayout({
         className={`flex-1 ${isSidebarCollapsed ? "ml-16" : "ml-64"} transition-all duration-300 flex flex-col min-h-screen`}
       >
         <Header
-          theme={theme}
-          setTheme={setTheme}
-          language={language}
-          setLanguage={setLanguage}
-          currency={currency}
-          setCurrency={setCurrency}
           logout={handleLogout}
           isLoggedIn={isLoggedIn}
           complexName={complexName}
