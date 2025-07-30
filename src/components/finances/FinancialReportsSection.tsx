@@ -35,13 +35,13 @@ export const FinancialReportsSection = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<BrandingFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       reportType: "",
       startDate: "",
       endDate: "",
-    },
+    } as BrandingFormValues,
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -65,11 +65,11 @@ export const FinancialReportsSection = () => {
         title: "Éxito",
         description: `Informe de ${values.reportType} generado correctamente.`,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error generating report:", error);
       toast({
         title: "Error",
-        description: "Error al generar el informe.",
+        description: (error instanceof Error ? error.message : "Error al generar el informe."),
         variant: "destructive",
       });
     } finally {

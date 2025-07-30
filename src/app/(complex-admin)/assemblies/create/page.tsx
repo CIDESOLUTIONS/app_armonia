@@ -44,7 +44,7 @@ export default function CreateAssemblyPage() {
   const { toast } = useToast();
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<BrandingFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
@@ -52,7 +52,7 @@ export default function CreateAssemblyPage() {
       scheduledDate: "",
       location: "",
       status: "SCHEDULED",
-    },
+    } as BrandingFormValues,
   });
 
   const {
@@ -69,7 +69,7 @@ export default function CreateAssemblyPage() {
         description: "Asamblea creada correctamente.",
       });
       router.push("/complex-admin/assemblies");
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error creating assembly:", error);
       const description =
         error instanceof Error

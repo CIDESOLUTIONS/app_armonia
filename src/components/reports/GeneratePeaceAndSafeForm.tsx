@@ -27,11 +27,11 @@ export default function GeneratePeaceAndSafeForm() {
   const { closeModal } = useModal();
   const queryClient = useQueryClient();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<BrandingFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       residentId: undefined,
-    },
+    } as BrandingFormValues,
   });
 
   const mutation = useMutation({
@@ -44,10 +44,10 @@ export default function GeneratePeaceAndSafeForm() {
       toast({ title: "Paz y Salvo generado con éxito" });
       closeModal();
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       toast({
         title: "Error al generar Paz y Salvo",
-        description: error.message || "Ocurrió un error",
+        description: (error instanceof Error ? error.message : "Ocurrió un error"),
         variant: "destructive",
       });
     },

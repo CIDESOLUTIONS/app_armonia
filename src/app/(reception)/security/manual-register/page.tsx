@@ -46,7 +46,7 @@ export default function ManualVisitorRegisterPage() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<BrandingFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -55,7 +55,7 @@ export default function ManualVisitorRegisterPage() {
       visitedUnit: "",
       purpose: "",
       plate: "",
-    },
+    } as BrandingFormValues,
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -85,12 +85,12 @@ export default function ManualVisitorRegisterPage() {
         description: "Visitante registrado manualmente.",
       });
       form.reset();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error registering visitor manually:", error);
       toast({
         title: "Error",
         description:
-          error.message || "Error al registrar visitante manualmente.",
+          (error instanceof Error ? error.message : "Error al registrar visitante manualmente."),
         variant: "destructive",
       });
     } finally {

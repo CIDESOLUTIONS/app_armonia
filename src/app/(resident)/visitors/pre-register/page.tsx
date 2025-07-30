@@ -81,7 +81,7 @@ export default function PreRegisterVisitorPage() {
     fetchUserUnitId();
   }, [user?.id, toast]);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<BrandingFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -92,7 +92,7 @@ export default function PreRegisterVisitorPage() {
       validUntil: "",
       purpose: "",
       photo: undefined, // Keep as undefined for file input
-    },
+    } as BrandingFormValues,
   });
 
   const generateQrCode = async (visitorData: any) => {
@@ -100,7 +100,7 @@ export default function PreRegisterVisitorPage() {
       const qrData = JSON.stringify(visitorData);
       const url = await QRCode.toDataURL(qrData);
       setQrCodeDataUrl(url);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Error generating QR code:", err);
       const description =
         err instanceof Error
@@ -156,7 +156,7 @@ export default function PreRegisterVisitorPage() {
       });
       // Optionally, clear the form after successful submission and QR generation
       // form.reset();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error pre-registering visitor:", error);
       const description =
         error instanceof Error

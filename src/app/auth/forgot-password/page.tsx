@@ -27,9 +27,9 @@ export default function ForgotPasswordPage() {
     email: z.string().email({ message: t("validation.emailInvalid") }),
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<BrandingFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { email: "" },
+    defaultValues: { email: "" } as BrandingFormValues,
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -41,7 +41,7 @@ export default function ForgotPasswordPage() {
         title: t("toast.requestSentTitle"),
         description: t("toast.requestSentDescription"),
       });
-    } catch (error) {
+    } catch (error: unknown) {
       toast({
         title: t("toast.errorTitle"),
         description:

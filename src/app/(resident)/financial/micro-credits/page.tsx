@@ -54,12 +54,12 @@ export default function MicroCreditsPage() {
     [],
   );
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<BrandingFormValues>({
     resolver: zodResolver(formSchema),
     defaultDefaults: {
       amount: 0,
       purpose: "",
-    },
+    } as BrandingFormValues,
   });
 
   const fetchApplications = useCallback(async () => {
@@ -91,7 +91,7 @@ export default function MicroCreditsPage() {
         },
       ];
       setApplications(fetchedApplications);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error fetching applications:", error);
       const description =
         error instanceof Error
@@ -135,7 +135,7 @@ export default function MicroCreditsPage() {
       });
       form.reset();
       fetchApplications(); // Refresh list
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error submitting application:", error);
       const description =
         error instanceof Error

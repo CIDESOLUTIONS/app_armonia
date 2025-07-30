@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -47,12 +47,14 @@ const formSchema = z.object({
     .or(z.literal("")),
 });
 
+type BrandingFormValues = z.infer<typeof formSchema>;
+
 export default function BrandingSettingsPage() {
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<BrandingFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       logoUrl: "",
@@ -61,7 +63,7 @@ export default function BrandingSettingsPage() {
     },
   });
 
-  const fetchBrandingSettings = async () => {
+  const fetchBrandingSettings = useCallback(async () => {
     if (!user?.complexId) return;
     setLoading(true);
     try {
@@ -71,27 +73,27 @@ export default function BrandingSettingsPage() {
         primaryColor: complex.primaryColor || "",
         secondaryColor: complex.secondaryColor || "",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching branding settings:", error);
       toast({
         title: "Error",
         description:
           "No se pudieron cargar las configuraciones de marca: " +
-          error.message,
+          (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.complexId, form, toast]);
 
   useEffect(() => {
     if (!authLoading && user && user.complexId) {
       fetchBrandingSettings();
     }
-  }, [authLoading, user]);
+  }, [authLoading, user, fetchBrandingSettings]);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: BrandingFormValues) => {
     if (!user?.complexId) return;
     setLoading(true);
     try {
@@ -100,12 +102,13 @@ export default function BrandingSettingsPage() {
         title: "Éxito",
         description: "Configuración de marca actualizada.",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error updating branding settings:", error);
       toast({
         title: "Error",
         description:
-          "Error al actualizar la configuración de marca: " + error.message,
+          "Error al actualizar la configuración de marca: " +
+          (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     } finally {

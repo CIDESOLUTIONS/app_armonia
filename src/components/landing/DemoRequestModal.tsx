@@ -45,14 +45,14 @@ export function DemoRequestModal({ children }: DemoRequestModalProps) {
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<BrandingFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       email: "",
       complexName: "",
       units: 1,
-    },
+    } as BrandingFormValues,
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -65,10 +65,10 @@ export function DemoRequestModal({ children }: DemoRequestModalProps) {
       });
       setOpen(false);
       form.reset();
-    } catch (error) {
+    } catch (error: unknown) {
       toast({
         title: t("toast.errorTitle"),
-        description: t("toast.errorDescription"),
+        description: (error instanceof Error ? error.message : t("toast.errorDescription")),
         variant: "destructive",
       });
     } finally {

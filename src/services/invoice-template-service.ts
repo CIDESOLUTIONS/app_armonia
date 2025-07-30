@@ -55,8 +55,8 @@ export class InvoiceTemplateService {
 
       logger.info(`Recuperadas ${templates.length} plantillas de facturas`);
       return templates;
-    } catch (error: any) {
-      logger.error(`Error al obtener plantillas de facturas: ${error.message}`);
+    } catch (error: unknown) {
+      logger.error(`Error al obtener plantillas de facturas: ${error instanceof Error ? error.message : "Error desconocido"}`);
       throw error;
     }
   }
@@ -83,9 +83,9 @@ export class InvoiceTemplateService {
 
       logger.info(`Recuperada plantilla de factura: ${id}`);
       return template;
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error(
-        `Error al obtener plantilla de factura ${id}: ${error.message}`,
+        `Error al obtener plantilla de factura ${id}: ${error instanceof Error ? error.message : "Error desconocido"}`,
       );
       throw error;
     }
@@ -123,8 +123,8 @@ export class InvoiceTemplateService {
 
       logger.info(`Creada nueva plantilla de factura: ${template.id}`);
       return template;
-    } catch (error: any) {
-      logger.error(`Error al crear plantilla de factura: ${error.message}`);
+    } catch (error: unknown) {
+      logger.error(`Error al crear plantilla de factura: ${error instanceof Error ? error.message : "Error desconocido"}`);
       throw error;
     }
   }
@@ -175,9 +175,9 @@ export class InvoiceTemplateService {
 
       logger.info(`Actualizada plantilla de factura: ${id}`);
       return updatedTemplate;
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error(
-        `Error al actualizar plantilla de factura ${id}: ${error.message}`,
+        `Error al actualizar plantilla de factura ${id}: ${error instanceof Error ? error.message : "Error desconocido"}`,
       );
       throw error;
     }
@@ -212,9 +212,9 @@ export class InvoiceTemplateService {
 
       logger.info(`Eliminada plantilla de factura: ${id}`);
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error(
-        `Error al eliminar plantilla de factura ${id}: ${error.message}`,
+        `Error al eliminar plantilla de factura ${id}: ${error instanceof Error ? error.message : "Error desconocido"}`,
       );
       throw error;
     }
@@ -254,8 +254,8 @@ export class InvoiceTemplateService {
 
       logger.info(`Factura renderizada con plantilla: ${template.id}`);
       return renderedContent;
-    } catch (error: any) {
-      logger.error(`Error al renderizar factura: ${error.message}`);
+    } catch (error: unknown) {
+      logger.error(`Error al renderizar factura: ${error instanceof Error ? error.message : "Error desconocido"}`);
       throw error;
     }
   }
@@ -267,9 +267,9 @@ export class InvoiceTemplateService {
     try {
       await this.prisma.$disconnect();
       logger.info("Conexión a base de datos cerrada");
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error(
-        `Error al cerrar conexión a base de datos: ${error.message}`,
+        `Error al cerrar conexión a base de datos: ${error instanceof Error ? error.message : "Error desconocido"}`,
       );
     }
   }
