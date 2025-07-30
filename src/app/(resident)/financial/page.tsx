@@ -70,12 +70,15 @@ export default function ResidentFinancialPage() {
       setSummary(fetchedSummary);
       setPayments(fetchedPayments);
       setPendingFees(fetchedPendingFees);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching resident financial data:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar los datos financieros: " + error.message
+          : "No se pudieron cargar los datos financieros.";
       toast({
         title: "Error",
-        description:
-          "No se pudieron cargar los datos financieros: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -88,12 +91,15 @@ export default function ResidentFinancialPage() {
     try {
       const paymentUrl = await initiatePayment(feeId);
       window.location.href = paymentUrl; // Redirect to payment gateway
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error initiating payment:", error);
+      const description =
+        error instanceof Error
+          ? "Error al iniciar el pago. Intente de nuevo: " + error.message
+          : "Error al iniciar el pago. Intente de nuevo.";
       toast({
         title: "Error",
-        description:
-          "Error al iniciar el pago. Intente de nuevo: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

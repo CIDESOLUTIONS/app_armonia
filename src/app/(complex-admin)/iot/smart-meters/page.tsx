@@ -44,12 +44,15 @@ export default function SmartMetersPage() {
         reading: 0,
         unit: "kWh",
       });
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error recording reading:", error);
+      const description =
+        error instanceof Error
+          ? "Error al registrar la lectura del medidor: " + error.message
+          : "Error al registrar la lectura del medidor.";
       toast({
         title: "Error",
-        description:
-          "Error al registrar la lectura del medidor: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -80,12 +83,15 @@ export default function SmartMetersPage() {
         billingPeriodStart: "",
         billingPeriodEnd: "",
       });
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error triggering billing:", error);
+      const description =
+        error instanceof Error
+          ? "Error al iniciar la facturación automatizada: " + error.message
+          : "Error al iniciar la facturación automatizada.";
       toast({
         title: "Error",
-        description:
-          "Error al iniciar la facturación automatizada: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

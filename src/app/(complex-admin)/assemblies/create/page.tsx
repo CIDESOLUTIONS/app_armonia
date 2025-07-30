@@ -69,11 +69,15 @@ export default function CreateAssemblyPage() {
         description: "Asamblea creada correctamente.",
       });
       router.push("/complex-admin/assemblies");
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error creating assembly:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo crear la asamblea: " + error.message
+          : "No se pudo crear la asamblea.";
       toast({
         title: "Error",
-        description: "No se pudo crear la asamblea: " + error.message,
+        description,
         variant: "destructive",
       });
     }

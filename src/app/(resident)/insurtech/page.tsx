@@ -34,11 +34,15 @@ export default function InsurtechPage() {
         title: "Cotización Obtenida",
         description: `Cotización de ${result.provider} por ${result.premium} ${result.currency}.`,
       });
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error getting quote:", error);
+      const description =
+        error instanceof Error
+          ? "Error al obtener la cotización: " + error.message
+          : "Error al obtener la cotización.";
       toast({
         title: "Error",
-        description: "Error al obtener la cotización: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -55,11 +59,15 @@ export default function InsurtechPage() {
         title: "Póliza Registrada",
         description: `Póliza ${result.policyId} registrada con estado ${result.status}.`,
       });
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error registering policy:", error);
+      const description =
+        error instanceof Error
+          ? "Error al registrar la póliza: " + error.message
+          : "Error al registrar la póliza.";
       toast({
         title: "Error",
-        description: "Error al registrar la póliza: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

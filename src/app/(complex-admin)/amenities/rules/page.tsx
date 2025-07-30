@@ -78,12 +78,15 @@ export default function ReservationRulesPage() {
     try {
       const data = await getReservationRules();
       setRules(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching reservation rules:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar las reglas de reserva: " + error.message
+          : "No se pudieron cargar las reglas de reserva.";
       toast({
         title: "Error",
-        description:
-          "No se pudieron cargar las reglas de reserva: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -165,11 +168,15 @@ export default function ReservationRulesPage() {
       }
       setIsModalOpen(false);
       fetchRules();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error saving reservation rule:", error);
+      const description =
+        error instanceof Error
+          ? "Error al guardar la regla de reserva: " + error.message
+          : "Error al guardar la regla de reserva.";
       toast({
         title: "Error",
-        description: "Error al guardar la regla de reserva: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -186,12 +193,15 @@ export default function ReservationRulesPage() {
           description: "Regla de reserva eliminada correctamente.",
         });
         fetchRules();
-      } catch (error: Error) {
+      } catch (error) {
         console.error("Error deleting reservation rule:", error);
+        const description =
+          error instanceof Error
+            ? "Error al eliminar la regla de reserva: " + error.message
+            : "Error al eliminar la regla de reserva.";
         toast({
           title: "Error",
-          description:
-            "Error al eliminar la regla de reserva: " + error.message,
+          description,
           variant: "destructive",
         });
       }

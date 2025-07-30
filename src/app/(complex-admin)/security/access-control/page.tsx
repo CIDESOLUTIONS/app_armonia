@@ -22,12 +22,15 @@ export default function AccessControlPage() {
         title: "Éxito",
         description: "Proceso de enrolamiento biométrico iniciado (simulado).",
       });
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error during biometric enrollment:", error);
+      const description =
+        error instanceof Error
+          ? "Error al iniciar el enrolamiento biométrico: " + error.message
+          : "Error al iniciar el enrolamiento biométrico.";
       toast({
         title: "Error",
-        description:
-          "Error al iniciar el enrolamiento biométrico: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -46,11 +49,15 @@ export default function AccessControlPage() {
         title: "Éxito",
         description: "Zona restringida añadida (simulado).",
       });
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error adding restricted zone:", error);
+      const description =
+        error instanceof Error
+          ? "Error al añadir zona restringida: " + error.message
+          : "Error al añadir zona restringida.";
       toast({
         title: "Error",
-        description: "Error al añadir zona restringida: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

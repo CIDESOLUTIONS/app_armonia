@@ -33,12 +33,15 @@ export default function FinancialSettingsPage() {
     try {
       const data = await getFinancialSettings();
       setFormData(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching financial settings:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo cargar la configuración financiera: " + error.message
+          : "No se pudo cargar la configuración financiera.";
       toast({
         title: "Error",
-        description:
-          "No se pudo cargar la configuración financiera: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -72,12 +75,15 @@ export default function FinancialSettingsPage() {
         description: "Configuración financiera guardada correctamente.",
       });
       fetchFinancialSettings(); // Re-fetch para asegurar que los datos estén actualizados
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error saving financial settings:", error);
+      const description =
+        error instanceof Error
+          ? "Error al guardar la configuración financiera: " + error.message
+          : "Error al guardar la configuración financiera.";
       toast({
         title: "Error",
-        description:
-          "Error al guardar la configuración financiera: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

@@ -56,13 +56,15 @@ export const ContactForm = () => {
         description: "Gracias por contactarnos. Te responderemos pronto.",
       });
       form.reset();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error sending contact form:", error);
+      const description =
+        error instanceof Error
+          ? error.message
+          : "No se pudo enviar el mensaje. Por favor, inténtalo de nuevo.";
       toast({
         title: "Error en el Envío",
-        description:
-          error.message ||
-          "No se pudo enviar el mensaje. Por favor, inténtalo de nuevo.",
+        description,
         variant: "destructive",
       });
     }

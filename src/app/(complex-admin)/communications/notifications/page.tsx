@@ -86,12 +86,15 @@ export default function NotificationsPage() {
     try {
       const data = await getUserNotifications();
       setNotifications(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching notifications:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar las notificaciones: " + error.message
+          : "No se pudieron cargar las notificaciones.";
       toast({
         title: "Error",
-        description:
-          "No se pudieron cargar las notificaciones: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -119,11 +122,15 @@ export default function NotificationsPage() {
         recipientId: "",
       });
       fetchNotifications(); // Refresh list
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error sending notification:", error);
+      const description =
+        error instanceof Error
+          ? "Error al enviar la notificación: " + error.message
+          : "Error al enviar la notificación.";
       toast({
         title: "Error",
-        description: "Error al enviar la notificación: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -137,11 +144,15 @@ export default function NotificationsPage() {
         description: "Notificación marcada como leída.",
       });
       fetchNotifications();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error marking as read:", error);
+      const description =
+        error instanceof Error
+          ? "Error al marcar como leída: " + error.message
+          : "Error al marcar como leída.";
       toast({
         title: "Error",
-        description: "Error al marcar como leída: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -155,11 +166,15 @@ export default function NotificationsPage() {
         description: "Todas las notificaciones marcadas como leídas.",
       });
       fetchNotifications();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error marking all as read:", error);
+      const description =
+        error instanceof Error
+          ? "Error al marcar todas como leídas: " + error.message
+          : "Error al marcar todas como leídas.";
       toast({
         title: "Error",
-        description: "Error al marcar todas como leídas: " + error.message,
+        description,
         variant: "destructive",
       });
     }

@@ -61,16 +61,18 @@ export default function PreRegisterVisitorPage() {
               variant: "warning",
             });
           }
-        } catch (error: Error) {
+        } catch (error) {
           console.error("Error fetching user unitId:", error);
+          const description =
+            error instanceof Error
+              ? "No se pudo obtener la información de la unidad del usuario: " +
+                error.message
+              : "No se pudo obtener la información de la unidad del usuario.";
           toast({
             title: "Error",
-            description:
-              "No se pudo obtener la información de la unidad del usuario: " +
-              error.message,
+            description,
             variant: "destructive",
           });
-        }
       }
     };
     fetchUserUnitId();
@@ -95,11 +97,15 @@ export default function PreRegisterVisitorPage() {
       const qrData = JSON.stringify(visitorData);
       const url = await QRCode.toDataURL(qrData);
       setQrCodeDataUrl(url);
-    } catch (err: Error) {
+    } catch (err) {
       console.error("Error generating QR code:", err);
+      const description =
+        err instanceof Error
+          ? "No se pudo generar el código QR: " + err.message
+          : "No se pudo generar el código QR.";
       toast({
         title: "Error",
-        description: "No se pudo generar el código QR: " + err.message,
+        description,
         variant: "destructive",
       });
     }
@@ -147,11 +153,15 @@ export default function PreRegisterVisitorPage() {
       });
       // Optionally, clear the form after successful submission and QR generation
       // form.reset();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error pre-registering visitor:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo pre-registrar al visitante: " + error.message
+          : "No se pudo pre-registrar al visitante.";
       toast({
         title: "Error",
-        description: "No se pudo pre-registrar al visitante: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

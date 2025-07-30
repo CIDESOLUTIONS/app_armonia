@@ -65,11 +65,15 @@ export default function CamerasPage() {
     try {
       const data = await getCameras();
       setCameras(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching cameras:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar las cámaras: " + error.message
+          : "No se pudieron cargar las cámaras.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar las cámaras: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -140,11 +144,15 @@ export default function CamerasPage() {
       }
       setIsModalOpen(false);
       fetchCameras();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error saving camera:", error);
+      const description =
+        error instanceof Error
+          ? "Error al guardar la cámara: " + error.message
+          : "Error al guardar la cámara.";
       toast({
         title: "Error",
-        description: "Error al guardar la cámara: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -159,11 +167,15 @@ export default function CamerasPage() {
           description: "Cámara eliminada correctamente.",
         });
         fetchCameras();
-      } catch (error: Error) {
+      } catch (error) {
         console.error("Error deleting camera:", error);
+        const description =
+          error instanceof Error
+            ? "Error al eliminar la cámara: " + error.message
+            : "Error al eliminar la cámara.";
         toast({
           title: "Error",
-          description: "Error al eliminar la cámara: " + error.message,
+          description,
           variant: "destructive",
         });
       }

@@ -119,11 +119,15 @@ export default function BudgetsPage() {
     try {
       const data = await getBudgetsByYear(selectedYear);
       setBudgets(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching budgets:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar los presupuestos: " + error.message
+          : "No se pudieron cargar los presupuestos.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar los presupuestos.",
+        description,
         variant: "destructive",
       });
     } finally {
@@ -176,11 +180,15 @@ export default function BudgetsPage() {
       }
       setIsModalOpen(false);
       fetchBudgets();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error saving budget:", error);
+      const description =
+        error instanceof Error
+          ? "Error al guardar el presupuesto: " + error.message
+          : "Error al guardar el presupuesto.";
       toast({
         title: "Error",
-        description: "Error al guardar el presupuesto.",
+        description,
         variant: "destructive",
       });
     }
@@ -195,11 +203,15 @@ export default function BudgetsPage() {
         description: "Presupuesto aprobado correctamente.",
       });
       fetchBudgets();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error approving budget:", error);
+      const description =
+        error instanceof Error
+          ? "Error al aprobar el presupuesto: " + error.message
+          : "Error al aprobar el presupuesto.";
       toast({
         title: "Error",
-        description: "Error al aprobar el presupuesto.",
+        description,
         variant: "destructive",
       });
     }

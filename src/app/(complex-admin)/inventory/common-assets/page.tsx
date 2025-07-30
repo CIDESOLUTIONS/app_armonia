@@ -91,11 +91,15 @@ export default function CommonAssetsPage() {
     try {
       const data = await getCommonAssets();
       setCommonAssets(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching common assets:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar los bienes comunes: " + error.message
+          : "No se pudieron cargar los bienes comunes.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar los bienes comunes.",
+        description,
         variant: "destructive",
       });
     } finally {
@@ -154,11 +158,15 @@ export default function CommonAssetsPage() {
       }
       setIsModalOpen(false);
       fetchCommonAssets();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error saving common asset:", error);
+      const description =
+        error instanceof Error
+          ? "Error al guardar el bien común: " + error.message
+          : "Error al guardar el bien común.";
       toast({
         title: "Error",
-        description: "Error al guardar el bien común.",
+        description,
         variant: "destructive",
       });
     }
@@ -183,11 +191,15 @@ export default function CommonAssetsPage() {
         description: "Bien común eliminado correctamente.",
       });
       fetchCommonAssets();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error deleting common asset:", error);
+      const description =
+        error instanceof Error
+          ? "Error al eliminar el bien común: " + error.message
+          : "Error al eliminar el bien común.";
       toast({
         title: "Error",
-        description: "Error al eliminar el bien común.",
+        description,
         variant: "destructive",
       });
     } finally {

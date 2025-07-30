@@ -62,12 +62,15 @@ export default function ServiceUsageReportsPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error generating service usage report:", error);
+      const description =
+        error instanceof Error
+          ? "Error al generar el reporte de uso de servicios: " + error.message
+          : "Error al generar el reporte de uso de servicios.";
       toast({
         title: "Error",
-        description:
-          "Error al generar el reporte de uso de servicios: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

@@ -93,13 +93,16 @@ export default function FamilyBudgetPage() {
       if (!user?.id) return;
       const data = await getFamilyBudgetEntries(user.id);
       setEntries(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching budget entries:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar las entradas del presupuesto: " +
+            error.message
+          : "No se pudieron cargar las entradas del presupuesto.";
       toast({
         title: "Error",
-        description:
-          "No se pudieron cargar las entradas del presupuesto: " +
-          error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -123,12 +126,15 @@ export default function FamilyBudgetPage() {
       setIsModalOpen(false);
       reset();
       fetchEntries();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error creating budget entry:", error);
+      const description =
+        error instanceof Error
+          ? "Error al crear la entrada de presupuesto: " + error.message
+          : "Error al crear la entrada de presupuesto.";
       toast({
         title: "Error",
-        description:
-          "Error al crear la entrada de presupuesto: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -143,11 +149,15 @@ export default function FamilyBudgetPage() {
         description: "Entrada eliminada correctamente.",
       });
       fetchEntries();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error deleting budget entry:", error);
+      const description =
+        error instanceof Error
+          ? "Error al eliminar la entrada: " + error.message
+          : "Error al eliminar la entrada.";
       toast({
         title: "Error",
-        description: "Error al eliminar la entrada: " + error.message,
+        description,
         variant: "destructive",
       });
     }

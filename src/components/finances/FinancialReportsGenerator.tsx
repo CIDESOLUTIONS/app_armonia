@@ -64,11 +64,15 @@ export function FinancialReportsGenerator() {
         title: "Informe Generado",
         description: `El informe de ${reportType} para el rango seleccionado ha sido generado y descargado.`,
       });
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error generating report:", error);
+      const description =
+        error instanceof Error
+          ? "Error al generar el informe: " + error.message
+          : "Error al generar el informe.";
       toast({
         title: "Error",
-        description: "Error al generar el informe: " + error.message,
+        description,
         variant: "destructive",
       });
     }

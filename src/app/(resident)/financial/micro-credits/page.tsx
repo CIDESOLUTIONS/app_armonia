@@ -91,13 +91,16 @@ export default function MicroCreditsPage() {
         },
       ];
       setApplications(fetchedApplications);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching applications:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar las solicitudes de micro-créditos: " +
+            error.message
+          : "No se pudieron cargar las solicitudes de micro-créditos.";
       toast({
         title: "Error",
-        description:
-          "No se pudieron cargar las solicitudes de micro-créditos: " +
-          error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -132,12 +135,15 @@ export default function MicroCreditsPage() {
       });
       form.reset();
       fetchApplications(); // Refresh list
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error submitting application:", error);
+      const description =
+        error instanceof Error
+          ? "Error al enviar la solicitud de micro-crédito: " + error.message
+          : "Error al enviar la solicitud de micro-crédito.";
       toast({
         title: "Error",
-        description:
-          "Error al enviar la solicitud de micro-crédito: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

@@ -31,11 +31,15 @@ export default function MarketplaceModerationPage() {
       try {
         const data = await getReportedListings();
         setReportedListings(data);
-      } catch (error: Error) {
+      } catch (error) {
         console.error("Error fetching reported listings:", error);
+        const description =
+          error instanceof Error
+            ? "No se pudieron cargar los anuncios reportados: " + error.message
+            : "No se pudieron cargar los anuncios reportados.";
         toast({
           title: "Error",
-          description: "No se pudieron cargar los anuncios reportados.",
+          description,
           variant: "destructive",
         });
       } finally {
@@ -61,11 +65,15 @@ export default function MarketplaceModerationPage() {
       setReportedListings((prev) =>
         prev.filter((report) => report.id !== reportId),
       );
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error resolving report:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo resolver el reporte: " + error.message
+          : "No se pudo resolver el reporte.";
       toast({
         title: "Error",
-        description: "No se pudo resolver el reporte.",
+        description,
         variant: "destructive",
       });
     } finally {

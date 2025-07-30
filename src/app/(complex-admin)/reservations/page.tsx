@@ -115,11 +115,15 @@ export default function ReservationsPage() {
       setReservations(reservationsData);
       setCommonAreas(commonAreasData);
       setResidents(residentsData.map((r) => ({ id: r.id, name: r.name })));
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching data:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar los datos de reservas: " + error.message
+          : "No se pudieron cargar los datos de reservas.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar los datos de reservas.",
+        description,
         variant: "destructive",
       });
     } finally {
@@ -182,11 +186,15 @@ export default function ReservationsPage() {
       }
       setIsModalOpen(false);
       fetchReservationsAndData();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error saving reservation:", error);
+      const description =
+        error instanceof Error
+          ? "Error al guardar la reserva: " + error.message
+          : "Error al guardar la reserva.";
       toast({
         title: "Error",
-        description: "Error al guardar la reserva.",
+        description,
         variant: "destructive",
       });
     }
@@ -203,11 +211,15 @@ export default function ReservationsPage() {
         description: `Reserva ${status === "APPROVED" ? "aprobada" : "rechazada"} correctamente.`,
       });
       fetchReservationsAndData();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error updating reservation status:", error);
+      const description =
+        error instanceof Error
+          ? "Error al actualizar el estado de la reserva: " + error.message
+          : "Error al actualizar el estado de la reserva.";
       toast({
         title: "Error",
-        description: "Error al actualizar el estado de la reserva.",
+        description,
         variant: "destructive",
       });
     }
@@ -222,11 +234,15 @@ export default function ReservationsPage() {
           description: "Reserva eliminada correctamente.",
         });
         fetchReservationsAndData();
-      } catch (error: Error) {
+      } catch (error) {
         console.error("Error deleting reservation:", error);
+        const description =
+          error instanceof Error
+            ? "Error al eliminar la reserva: " + error.message
+            : "Error al eliminar la reserva.";
         toast({
           title: "Error",
-          description: "Error al eliminar la reserva.",
+          description,
           variant: "destructive",
         });
       }

@@ -76,11 +76,15 @@ export default function FinesPage() {
     try {
       const data = await getFees({ type: "FINE" });
       setFines(data.data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching fines:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar las multas: " + error.message
+          : "No se pudieron cargar las multas.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar las multas: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -141,11 +145,15 @@ export default function FinesPage() {
       }
       setIsModalOpen(false);
       fetchFines();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error saving fine:", error);
+      const description =
+        error instanceof Error
+          ? "Error al guardar la multa: " + error.message
+          : "Error al guardar la multa.";
       toast({
         title: "Error",
-        description: "Error al guardar la multa: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -160,11 +168,15 @@ export default function FinesPage() {
         description: "Multa eliminada correctamente.",
       });
       fetchFines();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error deleting fine:", error);
+      const description =
+        error instanceof Error
+          ? "Error al eliminar la multa: " + error.message
+          : "Error al eliminar la multa.";
       toast({
         title: "Error",
-        description: "Error al eliminar la multa: " + error.message,
+        description,
         variant: "destructive",
       });
     }
