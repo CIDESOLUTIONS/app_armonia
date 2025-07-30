@@ -75,12 +75,15 @@ export default function MessagesPage() {
       if (data.length > 0 && !selectedConversation) {
         setSelectedConversation(data[0]);
       }
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching conversations:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar las conversaciones: " + error.message
+          : "No se pudieron cargar las conversaciones.";
       toast({
         title: "Error",
-        description:
-          "No se pudieron cargar las conversaciones: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -94,11 +97,15 @@ export default function MessagesPage() {
     try {
       const data = await getConversationMessages(selectedConversation.id);
       setMessages(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching messages:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar los mensajes: " + error.message
+          : "No se pudieron cargar los mensajes.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar los mensajes: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -127,11 +134,15 @@ export default function MessagesPage() {
       const sentMessage = await sendMessage(selectedConversation.id, data);
       setMessages((prev) => [...prev, sentMessage]);
       reset();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error sending message:", error);
+      const description =
+        error instanceof Error
+          ? "Error al enviar el mensaje: " + error.message
+          : "Error al enviar el mensaje.";
       toast({
         title: "Error",
-        description: "Error al enviar el mensaje: " + error.message,
+        description,
         variant: "destructive",
       });
     }

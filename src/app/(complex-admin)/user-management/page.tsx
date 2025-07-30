@@ -103,11 +103,15 @@ export default function UserManagementPage() {
     try {
       const data = await getAllUsers();
       setUsers(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching users:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar los usuarios: " + error.message
+          : "No se pudieron cargar los usuarios.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar los usuarios.",
+        description,
         variant: "destructive",
       });
     } finally {
@@ -169,11 +173,15 @@ export default function UserManagementPage() {
       }
       setIsModalOpen(false);
       fetchUsers();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error saving user:", error);
+      const description =
+        error instanceof Error
+          ? "Error al guardar el usuario: " + error.message
+          : "Error al guardar el usuario.";
       toast({
         title: "Error",
-        description: "Error al guardar el usuario.",
+        description,
         variant: "destructive",
       });
     }
@@ -188,11 +196,15 @@ export default function UserManagementPage() {
         description: "Usuario eliminado correctamente.",
       });
       fetchUsers();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error deleting user:", error);
+      const description =
+        error instanceof Error
+          ? "Error al eliminar el usuario: " + error.message
+          : "Error al eliminar el usuario.";
       toast({
         title: "Error",
-        description: "Error al eliminar el usuario.",
+        description,
         variant: "destructive",
       });
     }

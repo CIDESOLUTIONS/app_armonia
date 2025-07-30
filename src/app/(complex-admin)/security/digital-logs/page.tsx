@@ -57,11 +57,15 @@ export default function DigitalLogsPage() {
     try {
       const data = await getDigitalLogs();
       setLogs(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching digital logs:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar las minutas digitales: " + error.message
+          : "No se pudieron cargar las minutas digitales.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar las minutas digitales.",
+        description,
         variant: "destructive",
       });
     } finally {
@@ -123,11 +127,15 @@ export default function DigitalLogsPage() {
       }
       setIsModalOpen(false);
       fetchLogs();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error saving digital log:", error);
+      const description =
+        error instanceof Error
+          ? "Error al guardar la minuta digital: " + error.message
+          : "Error al guardar la minuta digital.";
       toast({
         title: "Error",
-        description: "Error al guardar la minuta digital.",
+        description,
         variant: "destructive",
       });
     }
@@ -142,11 +150,15 @@ export default function DigitalLogsPage() {
           description: "Minuta digital eliminada correctamente.",
         });
         fetchLogs();
-      } catch (error: Error) {
+      } catch (error) {
         console.error("Error deleting digital log:", error);
+        const description =
+          error instanceof Error
+            ? "Error al eliminar la minuta digital: " + error.message
+            : "Error al eliminar la minuta digital.";
         toast({
           title: "Error",
-          description: "Error al eliminar la minuta digital.",
+          description,
           variant: "destructive",
         });
       }

@@ -195,9 +195,9 @@ export default function ReceptionVisitorsPage() {
       setVisitors(fetchedVisitors);
       setPreRegisteredVisitors(preRegistered);
       setPackages(fetchedPackages);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("[ReceptionVisitors] Error:", error);
-      setError(error.message || "Error al cargar datos de visitantes");
+      setError(error instanceof Error ? error.message : "Error al cargar datos de visitantes");
     } finally {
       setLoading(false);
     }
@@ -329,11 +329,11 @@ export default function ReceptionVisitorsPage() {
       setSuccessMessage("Visitante registrado exitosamente.");
       setIsRegisterDialogOpen(false);
       resetNewVisitorForm();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("[ReceptionVisitors] Error:", error);
       setError(
         "Error al registrar el visitante. Por favor, inténtelo de nuevo: " +
-          error.message,
+          (error instanceof Error ? error.message : "Error desconocido"),
       );
     }
   };
@@ -352,13 +352,12 @@ export default function ReceptionVisitorsPage() {
       await updateVisitorStatus(visitorId, "departed");
       setSuccessMessage("Salida registrada exitosamente.");
       fetchData(); // Refresh data
-    } catch (error: Error) {
+    } catch (error) {
       console.error("[ReceptionVisitors] Error:", error);
       setError(
         "Error al registrar la salida. Por favor, inténtelo de nuevo: " +
-          error.message,
+          (error instanceof Error ? error.message : "Error desconocido"),
       );
-    }
   };
 
   const handleScanQrCode = async () => {
@@ -375,8 +374,8 @@ export default function ReceptionVisitorsPage() {
       } else {
         setError(result.message || "QR Code inválido.");
       }
-    } catch (error: Error) {
-      setError(error.message || "Error al escanear el código QR.");
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Error al escanear el código QR.");
     } finally {
       setLoading(false);
     }
@@ -394,8 +393,8 @@ export default function ReceptionVisitorsPage() {
       setIsPackageRegisterDialogOpen(false);
       resetNewPackageForm();
       fetchData(); // Refresh packages list
-    } catch (error: Error) {
-      setError(error.message || "Error al registrar el paquete.");
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Error al registrar el paquete.");
     }
   };
 

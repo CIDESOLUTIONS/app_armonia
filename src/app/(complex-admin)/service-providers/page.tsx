@@ -96,11 +96,15 @@ export default function ServiceProvidersPage() {
       };
       const fetchedProviders = await getServiceProviders(filters);
       setProviders(fetchedProviders);
-    } catch (err: Error) {
+    } catch (err) {
       console.error("Error fetching service providers:", err);
+      const description =
+        err instanceof Error
+          ? "No se pudieron cargar los proveedores de servicios: " + err.message
+          : "No se pudieron cargar los proveedores de servicios.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar los proveedores de servicios.",
+        description,
         variant: "destructive",
       });
     } finally {
@@ -155,11 +159,15 @@ export default function ServiceProvidersPage() {
       }
       setIsModalOpen(false);
       fetchServiceProviders();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error saving service provider:", error);
+      const description =
+        error instanceof Error
+          ? "Error al guardar el proveedor de servicios: " + error.message
+          : "Error al guardar el proveedor de servicios.";
       toast({
         title: "Error",
-        description: "Error al guardar el proveedor de servicios.",
+        description,
         variant: "destructive",
       });
     }
@@ -175,11 +183,15 @@ export default function ServiceProvidersPage() {
         description: "Proveedor de servicios eliminado correctamente.",
       });
       fetchServiceProviders();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error deleting service provider:", error);
+      const description =
+        error instanceof Error
+          ? "Error al eliminar el proveedor de servicios: " + error.message
+          : "Error al eliminar el proveedor de servicios.";
       toast({
         title: "Error",
-        description: "Error al eliminar el proveedor de servicios.",
+        description,
         variant: "destructive",
       });
     }

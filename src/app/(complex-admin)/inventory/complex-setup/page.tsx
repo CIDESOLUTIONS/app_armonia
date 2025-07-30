@@ -96,12 +96,15 @@ export default function ComplexSetupPage() {
           ? data.registrationDate.split("T")[0]
           : "",
       });
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching complex info:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo cargar la información del conjunto: " + error.message
+          : "No se pudo cargar la información del conjunto.";
       toast({
         title: "Error",
-        description:
-          "No se pudo cargar la información del conjunto: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -126,12 +129,15 @@ export default function ComplexSetupPage() {
         description: "Información del conjunto actualizada correctamente.",
       });
       fetchComplexInfo(); // Re-fetch para asegurar que los datos estén actualizados
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error saving complex info:", error);
+      const description =
+        error instanceof Error
+          ? "Error al guardar la información del conjunto: " + error.message
+          : "Error al guardar la información del conjunto.";
       toast({
         title: "Error",
-        description:
-          "Error al guardar la información del conjunto: " + error.message,
+        description,
         variant: "destructive",
       });
     }

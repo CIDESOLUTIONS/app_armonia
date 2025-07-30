@@ -48,12 +48,15 @@ export default function SurveillancePage() {
         },
       ];
       setCameraFeeds(mockFeeds);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching camera feeds:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar las cámaras de vigilancia: " + error.message
+          : "No se pudieron cargar las cámaras de vigilancia.";
       toast({
         title: "Error",
-        description:
-          "No se pudieron cargar las cámaras de vigilancia: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

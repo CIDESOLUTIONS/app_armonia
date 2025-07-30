@@ -89,11 +89,15 @@ export default function AmenitiesPage() {
     try {
       const data = await getAmenities();
       setAmenities(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching amenities:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar las amenidades: " + error.message
+          : "No se pudieron cargar las amenidades.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar las amenidades.",
+        description,
         variant: "destructive",
       });
     } finally {
@@ -154,11 +158,15 @@ export default function AmenitiesPage() {
       }
       setIsModalOpen(false);
       fetchAmenities();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error saving amenity:", error);
+      const description =
+        error instanceof Error
+          ? "Error al guardar la amenidad: " + error.message
+          : "Error al guardar la amenidad.";
       toast({
         title: "Error",
-        description: "Error al guardar la amenidad.",
+        description,
         variant: "destructive",
       });
     }
@@ -181,11 +189,15 @@ export default function AmenitiesPage() {
         description: "Amenidad eliminada correctamente.",
       });
       fetchAmenities();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error deleting amenity:", error);
+      const description =
+        error instanceof Error
+          ? "Error al eliminar la amenidad: " + error.message
+          : "Error al eliminar la amenidad.";
       toast({
         title: "Error",
-        description: "Error al eliminar la amenidad.",
+        description,
         variant: "destructive",
       });
     } finally {

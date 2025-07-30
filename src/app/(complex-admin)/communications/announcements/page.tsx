@@ -90,11 +90,15 @@ export default function AnnouncementsPage() {
     try {
       const data = await getAnnouncements();
       setAnnouncements(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching announcements:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar los anuncios: " + error.message
+          : "No se pudieron cargar los anuncios.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar los anuncios: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -155,11 +159,15 @@ export default function AnnouncementsPage() {
       }
       setIsModalOpen(false);
       fetchAnnouncements();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error saving announcement:", error);
+      const description =
+        error instanceof Error
+          ? "Error al guardar el anuncio: " + error.message
+          : "Error al guardar el anuncio.";
       toast({
         title: "Error",
-        description: "Error al guardar el anuncio: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -184,11 +192,15 @@ export default function AnnouncementsPage() {
         description: "Anuncio eliminado correctamente.",
       });
       fetchAnnouncements();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error deleting announcement:", error);
+      const description =
+        error instanceof Error
+          ? "Error al eliminar el anuncio: " + error.message
+          : "Error al eliminar el anuncio.";
       toast({
         title: "Error",
-        description: "Error al eliminar el anuncio: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

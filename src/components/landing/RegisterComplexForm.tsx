@@ -59,13 +59,15 @@ export function RegisterComplexForm() {
           "Hemos recibido tu solicitud. Pronto nos pondremos en contacto contigo.",
       });
       form.reset();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error registering complex:", error);
+      const description =
+        error instanceof Error
+          ? error.message
+          : "No pudimos procesar tu solicitud. Por favor, inténtalo de nuevo.";
       toast({
         title: "Error en el Registro",
-        description:
-          error.message ||
-          "No pudimos procesar tu solicitud. Por favor, inténtalo de nuevo.",
+        description,
         variant: "destructive",
       });
     } finally {

@@ -96,11 +96,15 @@ export default function ResidentReservationsPage() {
       ]);
       setCommonAreas(commonAreasData);
       setReservations(reservationsData);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching data:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar los datos de reservas: " + error.message
+          : "No se pudieron cargar los datos de reservas.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar los datos de reservas.",
+        description,
         variant: "destructive",
       });
     } finally {
@@ -145,11 +149,15 @@ export default function ResidentReservationsPage() {
       });
       setIsModalOpen(false);
       fetchCommonAreasAndReservations();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error saving reservation:", error);
+      const description =
+        error instanceof Error
+          ? "Error al guardar la reserva: " + error.message
+          : "Error al guardar la reserva.";
       toast({
         title: "Error",
-        description: "Error al guardar la reserva.",
+        description,
         variant: "destructive",
       });
     }

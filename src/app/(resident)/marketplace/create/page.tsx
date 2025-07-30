@@ -78,13 +78,16 @@ export default function CreateListingPage() {
         if (fetchedCategories.length > 0 && !form.getValues("category")) {
           form.setValue("category", fetchedCategories[0]);
         }
-      } catch (error: Error) {
+      } catch (error) {
         console.error("Error fetching categories:", error);
+        const description =
+          error instanceof Error
+            ? "No se pudieron cargar las categorías del Marketplace: " +
+              error.message
+            : "No se pudieron cargar las categorías del Marketplace.";
         toast({
           title: "Error",
-          description:
-            "No se pudieron cargar las categorías del Marketplace: " +
-            error.message,
+          description,
           variant: "destructive",
         });
       }
@@ -146,11 +149,15 @@ export default function CreateListingPage() {
         description: "Anuncio publicado correctamente.",
       });
       router.push("/resident/marketplace");
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error creating listing:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo publicar el anuncio: " + error.message
+          : "No se pudo publicar el anuncio.";
       toast({
         title: "Error",
-        description: "No se pudo publicar el anuncio: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

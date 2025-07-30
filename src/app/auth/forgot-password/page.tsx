@@ -41,10 +41,13 @@ export default function ForgotPasswordPage() {
         title: t("toast.requestSentTitle"),
         description: t("toast.requestSentDescription"),
       });
-    } catch (error: Error) {
+    } catch (error) {
       toast({
         title: t("toast.errorTitle"),
-        description: error.message || t("toast.defaultErrorDescription"),
+        description:
+          error instanceof Error
+            ? error.message
+            : t("toast.defaultErrorDescription"),
         variant: "destructive",
       });
     } finally {

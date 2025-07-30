@@ -59,11 +59,15 @@ export default function CreatePQRPage() {
         description: "PQR creada correctamente.",
       });
       router.push("/admin/pqr/list");
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error creating PQR:", error);
+      const description =
+        error instanceof Error
+          ? "Error al crear la PQR: " + error.message
+          : "Error al crear la PQR.";
       toast({
         title: "Error",
-        description: "Error al crear la PQR: " + error.message,
+        description,
         variant: "destructive",
       });
     }

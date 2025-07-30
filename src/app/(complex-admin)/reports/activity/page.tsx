@@ -62,12 +62,15 @@ export default function ActivityReportsPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error generating activity report:", error);
+      const description =
+        error instanceof Error
+          ? "Error al generar el reporte de actividad: " + error.message
+          : "Error al generar el reporte de actividad.";
       toast({
         title: "Error",
-        description:
-          "Error al generar el reporte de actividad: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

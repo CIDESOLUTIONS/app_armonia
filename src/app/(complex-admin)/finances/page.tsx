@@ -64,12 +64,15 @@ export default function FinancesPage() {
         ]);
         setSummary(summaryData);
         setTransactions(transactionsData);
-      } catch (error: Error) {
+      } catch (error) {
         console.error("Error fetching financial data:", error);
+        const description =
+          error instanceof Error
+            ? "No se pudieron cargar los datos financieros: " + error.message
+            : "No se pudieron cargar los datos financieros.";
         toast({
           title: "Error",
-          description:
-            "No se pudieron cargar los datos financieros: " + error.message,
+          description,
           variant: "destructive",
         });
       } finally {

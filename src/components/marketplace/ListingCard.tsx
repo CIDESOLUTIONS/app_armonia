@@ -85,11 +85,15 @@ export function ListingCard({ listing }: ListingCardProps) {
       });
       setIsReportModalOpen(false);
       reset();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error reporting listing:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo reportar el anuncio: " + error.message
+          : "No se pudo reportar el anuncio.";
       toast({
         title: "Error",
-        description: "No se pudo reportar el anuncio: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -120,13 +124,16 @@ export function ListingCard({ listing }: ListingCardProps) {
         type: "direct",
       });
       router.push(`/resident/marketplace/chat/${conversation.id}`);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error creating/fetching conversation:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo iniciar la conversación con el vendedor: " +
+            error.message
+          : "No se pudo iniciar la conversación con el vendedor.";
       toast({
         title: "Error",
-        description:
-          "No se pudo iniciar la conversación con el vendedor: " +
-          error.message,
+        description,
         variant: "destructive",
       });
     }

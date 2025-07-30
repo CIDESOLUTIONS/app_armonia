@@ -39,11 +39,15 @@ export default function MarketplacePage() {
       };
       const data = await getListings(filters);
       setListings(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching listings:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar los anuncios: " + error.message
+          : "No se pudieron cargar los anuncios.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar los anuncios: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

@@ -51,11 +51,15 @@ export default function MyListingsPage() {
       if (!user?.id) return; // Ensure user ID is available
       const data = await getListings({ authorId: user.id });
       setListings(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching my listings:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar tus anuncios: " + error.message
+          : "No se pudieron cargar tus anuncios.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar tus anuncios: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -81,12 +85,15 @@ export default function MyListingsPage() {
         description: "Anuncio marcado como vendido correctamente.",
       });
       fetchMyListings();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error marking listing as sold:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo marcar el anuncio como vendido: " + error.message
+          : "No se pudo marcar el anuncio como vendido.";
       toast({
         title: "Error",
-        description:
-          "No se pudo marcar el anuncio como vendido: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -106,11 +113,15 @@ export default function MyListingsPage() {
         description: "Anuncio eliminado correctamente.",
       });
       fetchMyListings();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error deleting listing:", error);
+      const description =
+        error instanceof Error
+          ? "Error al eliminar el anuncio: " + error.message
+          : "Error al eliminar el anuncio.";
       toast({
         title: "Error",
-        description: "Error al eliminar el anuncio: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

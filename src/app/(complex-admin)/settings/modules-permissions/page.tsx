@@ -30,13 +30,16 @@ export default function ModulesPermissionsPage() {
     try {
       const data = await getModulePermissions();
       setModules(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching module permissions:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo cargar la configuración de módulos y permisos: " +
+            error.message
+          : "No se pudo cargar la configuración de módulos y permisos.";
       toast({
         title: "Error",
-        description:
-          "No se pudo cargar la configuración de módulos y permisos: " +
-          error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -62,11 +65,15 @@ export default function ModulesPermissionsPage() {
         title: "Éxito",
         description: "Configuración de módulo actualizada correctamente.",
       });
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error toggling module:", error);
+      const description =
+        error instanceof Error
+          ? "Error al actualizar el módulo: " + error.message
+          : "Error al actualizar el módulo.";
       toast({
         title: "Error",
-        description: "Error al actualizar el módulo: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -98,11 +105,15 @@ export default function ModulesPermissionsPage() {
         title: "Éxito",
         description: "Permisos actualizados correctamente.",
       });
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error updating permissions:", error);
+      const description =
+        error instanceof Error
+          ? "Error al actualizar permisos: " + error.message
+          : "Error al actualizar permisos.";
       toast({
         title: "Error",
-        description: "Error al actualizar permisos: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

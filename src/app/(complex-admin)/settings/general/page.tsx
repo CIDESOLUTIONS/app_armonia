@@ -39,12 +39,15 @@ export default function GeneralSettingsPage() {
       const data = await getComplexInfo();
       setComplexInfo(data);
       setFormData(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching complex info:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo cargar la información del conjunto: " + error.message
+          : "No se pudo cargar la información del conjunto.";
       toast({
         title: "Error",
-        description:
-          "No se pudo cargar la información del conjunto: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -80,13 +83,16 @@ export default function GeneralSettingsPage() {
           "Información general del conjunto actualizada correctamente.",
       });
       fetchComplexInfo();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error saving complex info:", error);
+      const description =
+        error instanceof Error
+          ? "Error al guardar la información general del conjunto: " +
+            error.message
+          : "Error al guardar la información general del conjunto.";
       toast({
         title: "Error",
-        description:
-          "Error al guardar la información general del conjunto: " +
-          error.message,
+        description,
         variant: "destructive",
       });
     } finally {

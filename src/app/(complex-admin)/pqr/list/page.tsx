@@ -60,11 +60,15 @@ export default function PQRListPage() {
     try {
       const data = await getPQRs(filters);
       setPqrs(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching PQRs:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar las PQRs: " + error.message
+          : "No se pudieron cargar las PQRs.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar las PQRs: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -102,11 +106,15 @@ export default function PQRListPage() {
         description: "PQR eliminada correctamente.",
       });
       fetchPQRs();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error deleting PQR:", error);
+      const description =
+        error instanceof Error
+          ? "Error al eliminar la PQR: " + error.message
+          : "Error al eliminar la PQR.";
       toast({
         title: "Error",
-        description: "Error al eliminar la PQR: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

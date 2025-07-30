@@ -78,11 +78,15 @@ export default function DocumentsPage() {
         },
       ];
       setDocuments(fetchedDocuments);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching documents:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar los documentos: " + error.message
+          : "No se pudieron cargar los documentos.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar los documentos: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -105,11 +109,15 @@ export default function DocumentsPage() {
       });
       reset();
       fetchDocuments(); // Refresh list
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error uploading document:", error);
+      const description =
+        error instanceof Error
+          ? "Error al subir el documento: " + error.message
+          : "Error al subir el documento.";
       toast({
         title: "Error",
-        description: "Error al subir el documento: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -126,11 +134,15 @@ export default function DocumentsPage() {
         description: "Documento eliminado correctamente.",
       });
       fetchDocuments(); // Refresh list
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error deleting document:", error);
+      const description =
+        error instanceof Error
+          ? "Error al eliminar el documento: " + error.message
+          : "Error al eliminar el documento.";
       toast({
         title: "Error",
-        description: "Error al eliminar el documento: " + error.message,
+        description,
         variant: "destructive",
       });
     }

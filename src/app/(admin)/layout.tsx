@@ -78,7 +78,7 @@ export default function AuthLayout({
           variant: "destructive",
         });
       }
-    } catch (error: Error) {
+    } catch (error) {
       console.error("[AuthLayout] Error en logout:", error);
       toast({
         title: "Error",

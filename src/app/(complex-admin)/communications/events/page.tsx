@@ -90,12 +90,15 @@ export default function CommunityEventsPage() {
     try {
       const data = await getCommunityEvents();
       setEvents(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching community events:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar los eventos comunitarios: " + error.message
+          : "No se pudieron cargar los eventos comunitarios.";
       toast({
         title: "Error",
-        description:
-          "No se pudieron cargar los eventos comunitarios: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -152,11 +155,15 @@ export default function CommunityEventsPage() {
       }
       setIsModalOpen(false);
       fetchEvents();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error saving community event:", error);
+      const description =
+        error instanceof Error
+          ? "Error al guardar el evento comunitario: " + error.message
+          : "Error al guardar el evento comunitario.";
       toast({
         title: "Error",
-        description: "Error al guardar el evento comunitario: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -179,12 +186,15 @@ export default function CommunityEventsPage() {
         description: "Evento comunitario eliminado correctamente.",
       });
       fetchEvents();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error deleting community event:", error);
+      const description =
+        error instanceof Error
+          ? "Error al eliminar el evento comunitario: " + error.message
+          : "Error al eliminar el evento comunitario.";
       toast({
         title: "Error",
-        description:
-          "Error al eliminar el evento comunitario: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

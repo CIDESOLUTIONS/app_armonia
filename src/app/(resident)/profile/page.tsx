@@ -65,12 +65,15 @@ export default function ProfilePage() {
         phone: data.phone || "",
         address: data.address || "",
       });
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching profile info:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo cargar la información del perfil: " + error.message
+          : "No se pudo cargar la información del perfil.";
       toast({
         title: "Error",
-        description:
-          "No se pudo cargar la información del perfil: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -95,12 +98,15 @@ export default function ProfilePage() {
         description: "Información del perfil actualizada correctamente.",
       });
       fetchProfileInfo();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error updating profile info:", error);
+      const description =
+        error instanceof Error
+          ? "Error al actualizar la información del perfil: " + error.message
+          : "Error al actualizar la información del perfil.";
       toast({
         title: "Error",
-        description:
-          "Error al actualizar la información del perfil: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

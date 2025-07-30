@@ -147,12 +147,15 @@ export default function SurveysPage() {
         },
       ];
       setSurveys(fetchedSurveys);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching surveys:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar las encuestas/votaciones: " + error.message
+          : "No se pudieron cargar las encuestas/votaciones.";
       toast({
         title: "Error",
-        description:
-          "No se pudieron cargar las encuestas/votaciones: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -200,11 +203,15 @@ export default function SurveysPage() {
       setIsFormDialogOpen(false);
       form.reset();
       fetchSurveys();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error saving survey:", error);
+      const description =
+        error instanceof Error
+          ? "Error al guardar la encuesta/votación: " + error.message
+          : "Error al guardar la encuesta/votación.";
       toast({
         title: "Error",
-        description: "Error al guardar la encuesta/votación: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -240,11 +247,15 @@ export default function SurveysPage() {
         description: "Encuesta/Votación eliminada correctamente.",
       });
       fetchSurveys();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error deleting survey:", error);
+      const description =
+        error instanceof Error
+          ? "Error al eliminar la encuesta/votación: " + error.message
+          : "Error al eliminar la encuesta/votación.";
       toast({
         title: "Error",
-        description: "Error al eliminar la encuesta/votación: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

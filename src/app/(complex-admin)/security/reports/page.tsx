@@ -60,11 +60,15 @@ export default function SecurityReportsPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error generating report:", error);
+      const description =
+        error instanceof Error
+          ? "Error al generar el reporte: " + error.message
+          : "Error al generar el reporte.";
       toast({
         title: "Error",
-        description: "Error al generar el reporte: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

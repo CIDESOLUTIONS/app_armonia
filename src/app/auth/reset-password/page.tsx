@@ -58,10 +58,13 @@ export default function ResetPasswordPage() {
         title: t("toast.passwordUpdatedTitle"),
         description: t("toast.passwordUpdatedDescription"),
       });
-    } catch (error: Error) {
+    } catch (error) {
       toast({
         title: t("toast.errorTitle"),
-        description: error.message || t("toast.updateErrorDescription"),
+        description:
+          error instanceof Error
+            ? error.message
+            : t("toast.updateErrorDescription"),
         variant: "destructive",
       });
     } finally {

@@ -45,12 +45,15 @@ export default function PanicAlertsPage() {
     try {
       const fetchedAlerts = await getActivePanicAlerts();
       setAlerts(fetchedAlerts);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching panic alerts:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar las alertas de pánico: " + error.message
+          : "No se pudieron cargar las alertas de pánico.";
       toast({
         title: "Error",
-        description:
-          "No se pudieron cargar las alertas de pánico: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -72,11 +75,15 @@ export default function PanicAlertsPage() {
         description: `Alerta ${status === "RESOLVED" ? "resuelta" : "descartada"} correctamente.`,
       });
       fetchPanicAlerts(); // Refrescar la lista
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error resolving panic alert:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo actualizar la alerta: " + error.message
+          : "No se pudo actualizar la alerta.";
       toast({
         title: "Error",
-        description: "No se pudo actualizar la alerta: " + error.message,
+        description,
         variant: "destructive",
       });
     }

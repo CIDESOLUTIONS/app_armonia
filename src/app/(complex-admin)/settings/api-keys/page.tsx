@@ -81,11 +81,15 @@ export default function ApiKeysPage() {
         title: "Éxito",
         description: "Clave API generada correctamente (simulado).",
       });
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error generating API key:", error);
+      const description =
+        error instanceof Error
+          ? "Error al generar la clave API: " + error.message
+          : "Error al generar la clave API.";
       toast({
         title: "Error",
-        description: "Error al generar la clave API: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -106,11 +110,15 @@ export default function ApiKeysPage() {
           title: "Éxito",
           description: "Clave API eliminada correctamente (simulado).",
         });
-      } catch (error: Error) {
+      } catch (error) {
         console.error("Error deleting API key:", error);
+        const description =
+          error instanceof Error
+            ? "Error al eliminar la clave API: " + error.message
+            : "Error al eliminar la clave API.";
         toast({
           title: "Error",
-          description: "Error al eliminar la clave API: " + error.message,
+          description,
           variant: "destructive",
         });
       } finally {

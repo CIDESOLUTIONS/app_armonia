@@ -95,12 +95,13 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         title: "Pago creado",
         description: "Se ha generado el enlace de pago exitosamente",
       });
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error creando pago:", error);
+      const description =
+        error instanceof Error ? error.message : "Error al crear el pago";
       toast({
         title: "Error",
-        description:
-          error instanceof Error ? error.message : "Error al crear el pago",
+        description,
         variant: "destructive",
       });
     } finally {

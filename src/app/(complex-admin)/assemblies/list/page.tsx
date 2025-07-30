@@ -47,11 +47,15 @@ export default function AssembliesPage() {
     try {
       const data = await getAssemblies();
       setAssemblies(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching assemblies:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar las asambleas: " + error.message
+          : "No se pudieron cargar las asambleas.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar las asambleas: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -79,11 +83,15 @@ export default function AssembliesPage() {
         description: "Asamblea eliminada correctamente.",
       });
       fetchAssemblies();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error deleting assembly:", error);
+      const description =
+        error instanceof Error
+          ? "Error al eliminar la asamblea: " + error.message
+          : "Error al eliminar la asamblea.";
       toast({
         title: "Error",
-        description: "Error al eliminar la asamblea: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

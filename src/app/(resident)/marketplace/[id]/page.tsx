@@ -37,12 +37,15 @@ export default function ListingDetailPage() {
         try {
           const data = await getListingById(listingId);
           setListing(data);
-        } catch (error: Error) {
+        } catch (error) {
           console.error("Error fetching listing details:", error);
+          const description =
+            error instanceof Error
+              ? "No se pudo cargar los detalles del anuncio: " + error.message
+              : "No se pudo cargar los detalles del anuncio.";
           toast({
             title: "Error",
-            description:
-              "No se pudo cargar los detalles del anuncio: " + error.message,
+            description,
             variant: "destructive",
           });
         } finally {
@@ -67,11 +70,15 @@ export default function ListingDetailPage() {
           title: "Anuncio Reportado",
           description: "Gracias por tu reporte. Lo revisaremos pronto.",
         });
-      } catch (error: Error) {
+      } catch (error) {
         console.error("Error reporting listing:", error);
+        const description =
+          error instanceof Error
+            ? "No se pudo reportar el anuncio: " + error.message
+            : "No se pudo reportar el anuncio.";
         toast({
           title: "Error",
-          description: "No se pudo reportar el anuncio: " + error.message,
+          description,
           variant: "destructive",
         });
       }

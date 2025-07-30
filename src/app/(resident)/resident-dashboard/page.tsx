@@ -67,12 +67,15 @@ export default function ResidentDashboardPage() {
             )
           : [];
         setProjects(relevantProjects);
-      } catch (error: Error) {
+      } catch (error) {
         console.error("Error fetching resident dashboard data:", error);
+        const description =
+          error instanceof Error
+            ? "No se pudieron cargar los datos del dashboard: " + error.message
+            : "No se pudieron cargar los datos del dashboard.";
         toast({
           title: "Error",
-          description:
-            "No se pudieron cargar los datos del dashboard: " + error.message,
+          description,
           variant: "destructive",
         });
       } finally {
@@ -124,12 +127,15 @@ export default function ResidentDashboardPage() {
           description: "El personal de seguridad ha sido notificado.",
           variant: "default",
         });
-      } catch (error: Error) {
+      } catch (error) {
         console.error("Error triggering panic alert:", error);
+        const description =
+          error instanceof Error
+            ? "No se pudo activar la alerta de pánico: " + error.message
+            : "No se pudo activar la alerta de pánico.";
         toast({
           title: "Error",
-          description:
-            "No se pudo activar la alerta de pánico: " + error.message,
+          description,
           variant: "destructive",
         });
       }

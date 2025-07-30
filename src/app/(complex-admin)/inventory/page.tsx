@@ -35,11 +35,15 @@ export default function InventoryPage() {
     try {
       const fetchedStats = await getDashboardStats();
       setStats(fetchedStats);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching inventory stats:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar las estadísticas del inventario: " + error.message
+          : "No se pudieron cargar las estadísticas del inventario.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar las estadísticas del inventario.",
+        description,
         variant: "destructive",
       });
     } finally {

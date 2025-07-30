@@ -101,11 +101,15 @@ export default function FeesPage() {
     try {
       const data = await getFees();
       setFees(data);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching fees:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar las cuotas: " + error.message
+          : "No se pudieron cargar las cuotas.";
       toast({
         title: "Error",
-        description: "No se pudieron cargar las cuotas: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -166,11 +170,15 @@ export default function FeesPage() {
       }
       setIsModalOpen(false);
       fetchFees();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error saving fee:", error);
+      const description =
+        error instanceof Error
+          ? "Error al guardar la cuota: " + error.message
+          : "Error al guardar la cuota.";
       toast({
         title: "Error",
-        description: "Error al guardar la cuota: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -193,11 +201,15 @@ export default function FeesPage() {
         description: "Cuota eliminada correctamente.",
       });
       fetchFees();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error deleting fee:", error);
+      const description =
+        error instanceof Error
+          ? "Error al eliminar la cuota: " + error.message
+          : "Error al eliminar la cuota.";
       toast({
         title: "Error",
-        description: "Error al eliminar la cuota: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -220,11 +232,15 @@ export default function FeesPage() {
         description: "Cuotas generadas para el próximo período.",
       });
       fetchFees();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error generating fees:", error);
+      const description =
+        error instanceof Error
+          ? "Error al generar las cuotas: " + error.message
+          : "Error al generar las cuotas.";
       toast({
         title: "Error",
-        description: "Error al generar las cuotas: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
