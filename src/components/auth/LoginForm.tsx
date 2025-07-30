@@ -39,20 +39,20 @@ export default function LoginForm({ portalType = null }: LoginFormProps) {
   const t = useTranslations("Login");
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<BrandingFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
       rememberMe: false,
-    },
+    } as BrandingFormValues,
   });
 
   useEffect(() => {
     if (error) {
       toast({
         title: t("toast.authErrorTitle"),
-        description: error,
+        description: (error instanceof Error ? error.message : "Ocurrió un error"),
         variant: "destructive",
       });
     }

@@ -55,9 +55,9 @@ export class FreemiumService {
         select: { planType: true },
       });
       return complex?.planType || "BASIC";
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error(
-        `Error getting complex plan for ${complexId}: ${error.message}`,
+        `Error getting complex plan for ${complexId}: ${error instanceof Error ? error.message : "Error desconocido"}`,
       );
       return "BASIC"; // Default to basic on error
     }
@@ -91,9 +91,9 @@ export class FreemiumService {
       const maxUnits = planDetails.maxUnits;
 
       return { withinLimit: currentUnits <= maxUnits, currentUnits, maxUnits };
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error(
-        `Error checking unit limit for complex ${complexId}: ${error.message}`,
+        `Error checking unit limit for complex ${complexId}: ${error instanceof Error ? error.message : "Error desconocido"}`,
       );
       return { withinLimit: false, currentUnits: 0, maxUnits: 0 }; // Assume not within limit on error
     }

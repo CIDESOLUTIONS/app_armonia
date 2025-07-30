@@ -36,7 +36,7 @@ export default function RegisterComplexForm() {
   const { toast } = useToast();
   const t = useTranslations("RegisterComplex");
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<BrandingFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       complexName: "",
@@ -44,7 +44,7 @@ export default function RegisterComplexForm() {
       adminName: "",
       email: "",
       password: "",
-    },
+    } as BrandingFormValues,
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {

@@ -53,7 +53,7 @@ export default function PreRegisterVisitorPage() {
   const [qrCodeValue, setQrCodeValue] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<BrandingFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -62,7 +62,7 @@ export default function PreRegisterVisitorPage() {
       purpose: "",
       expectedDate: "",
       expectedTime: "",
-    },
+    } as BrandingFormValues,
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -96,11 +96,11 @@ export default function PreRegisterVisitorPage() {
         title: "Éxito",
         description: "Visitante preregistrado y QR generado.",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error preregistering visitor:", error);
       toast({
         title: "Error",
-        description: error.message || "Error al preregistrar visitante.",
+        description: (error instanceof Error ? error.message : "Error al preregistrar visitante."),
         variant: "destructive",
       });
     } finally {

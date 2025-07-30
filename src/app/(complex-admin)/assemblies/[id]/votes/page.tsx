@@ -82,14 +82,14 @@ export default function AssemblyVotesPage() {
   const [isResultsModalOpen, setIsResultsModalOpen] = useState(false);
   const [voteResults, setVoteResults] = useState<VoteResult | null>(null);
 
-  const form = useForm<z.infer<typeof voteSchema>>({
+  const form = useForm<BrandingFormValues>({
     resolver: zodResolver(voteSchema),
     defaultValues: {
       title: "",
       description: "",
       options: ["A favor", "En contra", "Abstención"],
       weightedVoting: true,
-    },
+    } as BrandingFormValues,
   });
 
   const {
@@ -122,7 +122,7 @@ export default function AssemblyVotesPage() {
       setAssembly(fetchedAssembly);
       // Assuming assembly object includes votes
       setVotes(fetchedAssembly.votes || []);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error fetching assembly and votes:", error);
       const description =
         error instanceof Error
@@ -186,7 +186,7 @@ export default function AssemblyVotesPage() {
       }
       setIsModalOpen(false);
       fetchAssemblyAndVotes();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error saving vote:", error);
       const description =
         error instanceof Error
@@ -206,7 +206,7 @@ export default function AssemblyVotesPage() {
       const results = await getVotingResults(voteId, user.complexId);
       setVoteResults(results);
       setIsResultsModalOpen(true);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error fetching vote results:", error);
       const description =
         error instanceof Error

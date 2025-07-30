@@ -36,9 +36,9 @@ export default function ResetPasswordPage() {
       path: ["confirmPassword"],
     });
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<BrandingFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { password: "", confirmPassword: "" },
+    defaultValues: { password: "", confirmPassword: "" } as BrandingFormValues,
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -58,7 +58,7 @@ export default function ResetPasswordPage() {
         title: t("toast.passwordUpdatedTitle"),
         description: t("toast.passwordUpdatedDescription"),
       });
-    } catch (error) {
+    } catch (error: unknown) {
       toast({
         title: t("toast.errorTitle"),
         description:

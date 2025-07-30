@@ -85,8 +85,8 @@ export class InvoiceRuleService {
 
       logger.info(`Recuperadas ${rules.length} reglas de facturación`);
       return rules;
-    } catch (error: any) {
-      logger.error(`Error al obtener reglas de facturación: ${error.message}`);
+    } catch (error: unknown) {
+      logger.error(`Error al obtener reglas de facturación: ${error instanceof Error ? error.message : "Error desconocido"}`);
       throw error;
     }
   }
@@ -113,9 +113,9 @@ export class InvoiceRuleService {
 
       logger.info(`Recuperada regla de facturación: ${id}`);
       return rule;
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error(
-        `Error al obtener regla de facturación ${id}: ${error.message}`,
+        `Error al obtener regla de facturación ${id}: ${error instanceof Error ? error.message : "Error desconocido"}`,
       );
       throw error;
     }
@@ -149,8 +149,8 @@ export class InvoiceRuleService {
 
       logger.info(`Creada nueva regla de facturación: ${rule.id}`);
       return rule;
-    } catch (error: any) {
-      logger.error(`Error al crear regla de facturación: ${error.message}`);
+    } catch (error: unknown) {
+      logger.error(`Error al crear regla de facturación: ${error instanceof Error ? error.message : "Error desconocido"}`);
       throw error;
     }
   }
@@ -191,9 +191,9 @@ export class InvoiceRuleService {
 
       logger.info(`Actualizada regla de facturación: ${id}`);
       return updatedRule;
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error(
-        `Error al actualizar regla de facturación ${id}: ${error.message}`,
+        `Error al actualizar regla de facturación ${id}: ${error instanceof Error ? error.message : "Error desconocido"}`,
       );
       throw error;
     }
@@ -216,9 +216,9 @@ export class InvoiceRuleService {
 
       logger.info(`Eliminada regla de facturación: ${id}`);
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error(
-        `Error al eliminar regla de facturación ${id}: ${error.message}`,
+        `Error al eliminar regla de facturación ${id}: ${error instanceof Error ? error.message : "Error desconocido"}`,
       );
       throw error;
     }
@@ -269,18 +269,18 @@ export class InvoiceRuleService {
           ruleId,
           ruleName: rule.name,
         };
-      } catch (evalError: any) {
+      } catch (evalError: unknown) {
         logger.error(
-          `Error al evaluar fórmula de regla ${ruleId}: ${evalError.message}`,
+          `Error al evaluar fórmula de regla ${ruleId}: ${evalError instanceof Error ? evalError.message : "Error desconocido"}`,
         );
         return {
           success: false,
-          error: evalError.message,
+          error: evalError instanceof Error ? evalError.message : "Error desconocido",
           result: null,
         };
       }
-    } catch (error: any) {
-      logger.error(`Error al evaluar regla ${ruleId}: ${error.message}`);
+    } catch (error: unknown) {
+      logger.error(`Error al evaluar regla ${ruleId}: ${error instanceof Error ? error.message : "Error desconocido"}`);
       throw error;
     }
   }
@@ -292,9 +292,9 @@ export class InvoiceRuleService {
     try {
       await this.prisma.$disconnect();
       logger.info("Conexión a base de datos cerrada");
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error(
-        `Error al cerrar conexión a base de datos: ${error.message}`,
+        `Error al cerrar conexión a base de datos: ${error instanceof Error ? error.message : "Error desconocido"}`,
       );
     }
   }

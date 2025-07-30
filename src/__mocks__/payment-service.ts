@@ -116,10 +116,10 @@ class PaymentService {
         success: true,
         transaction: updatedTransaction,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : "Error desconocido",
       };
     }
   }
@@ -147,10 +147,10 @@ class PaymentService {
         success: true,
         message: "Webhook procesado correctamente",
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : "Error desconocido",
       };
     }
   }

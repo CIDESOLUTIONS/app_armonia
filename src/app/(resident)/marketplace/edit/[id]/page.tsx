@@ -64,7 +64,7 @@ export default function EditListingPage() {
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<BrandingFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
@@ -74,7 +74,7 @@ export default function EditListingPage() {
       images: [],
       newImages: [],
       status: "ACTIVE",
-    },
+    } as BrandingFormValues,
   });
 
   const {
@@ -113,7 +113,7 @@ export default function EditListingPage() {
 
       const fetchedCategories = await getMarketplaceCategories();
       setCategories(fetchedCategories);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error fetching listing data:", error);
       const description =
         error instanceof Error
@@ -189,7 +189,7 @@ export default function EditListingPage() {
         description: "Anuncio actualizado correctamente.",
       });
       router.push("/resident/marketplace/my-listings");
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error updating listing:", error);
       const description =
         error instanceof Error

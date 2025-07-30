@@ -72,6 +72,8 @@ const userFormSchema = z.object({
   active: z.boolean().default(true),
 });
 
+type UserFormValues = z.infer<typeof userFormSchema>;
+
 export default function UserManagementPage() {
   const { user: currentUser, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
@@ -80,7 +82,7 @@ export default function UserManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  const form = useForm<z.infer<typeof userFormSchema>>({
+  const form = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema),
     defaultValues: {
       name: "",
@@ -103,7 +105,7 @@ export default function UserManagementPage() {
     try {
       const data = await getAllUsers();
       setUsers(data);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error fetching users:", error);
       const description =
         error instanceof Error
@@ -156,7 +158,7 @@ export default function UserManagementPage() {
     setIsModalOpen(true);
   };
 
-  const onSubmit = async (data: z.infer<typeof userFormSchema>) => {
+  const onSubmit = async (data: UserFormValues) => {
     try {
       if (selectedUser) {
         await updateUser(selectedUser.id, data);
@@ -173,7 +175,7 @@ export default function UserManagementPage() {
       }
       setIsModalOpen(false);
       fetchUsers();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error saving user:", error);
       const description =
         error instanceof Error
@@ -196,7 +198,7 @@ export default function UserManagementPage() {
         description: "Usuario eliminado correctamente.",
       });
       fetchUsers();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error deleting user:", error);
       const description =
         error instanceof Error

@@ -91,8 +91,8 @@ class ThemeService {
       if (userPreference?.value && PREDEFINED_THEMES[userPreference.value]) {
         return PREDEFINED_THEMES[userPreference.value];
       }
-    } catch (error: any) {
-      logger.error(`Error getting user theme: ${error.message}`, { userId });
+    } catch (error: unknown) {
+      logger.error(`Error getting user theme: ${error instanceof Error ? error.message : "Error desconocido"}`, { userId });
     }
     return PREDEFINED_THEMES[this.defaultTheme];
   }
@@ -109,8 +109,8 @@ class ThemeService {
       });
       logger.info(`User theme set: ${userId} -> ${themeId}`);
       return true;
-    } catch (error: any) {
-      logger.error(`Error setting user theme: ${error.message}`, {
+    } catch (error: unknown) {
+      logger.error(`Error setting user theme: ${error instanceof Error ? error.message : "Error desconocido"}`, {
         userId,
         themeId,
       });

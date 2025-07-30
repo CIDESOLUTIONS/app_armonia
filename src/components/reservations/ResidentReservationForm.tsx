@@ -52,7 +52,7 @@ export default function ResidentReservationForm({
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<BrandingFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       commonAreaId: commonArea?.id || undefined,
@@ -61,7 +61,7 @@ export default function ResidentReservationForm({
       startDateTime: "",
       endDateTime: "",
       attendees: 0,
-    },
+    } as BrandingFormValues,
   });
 
   const mutation = useMutation({
@@ -72,10 +72,10 @@ export default function ResidentReservationForm({
       onReservationSuccess();
       closeModal();
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       toast({
         title: "Error al crear la reserva",
-        description: error.message || "Ocurrió un error",
+        description: (error instanceof Error ? error.message : "Ocurrió un error"),
         variant: "destructive",
       });
     },

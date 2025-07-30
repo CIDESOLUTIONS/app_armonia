@@ -58,7 +58,7 @@ export default function CreateListingPage() {
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]); // State for dynamic categories
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<BrandingFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
@@ -66,7 +66,7 @@ export default function CreateListingPage() {
       price: 0,
       category: "",
       images: [],
-    },
+    } as BrandingFormValues,
   });
 
   useEffect(() => {
@@ -78,7 +78,7 @@ export default function CreateListingPage() {
         if (fetchedCategories.length > 0 && !form.getValues("category")) {
           form.setValue("category", fetchedCategories[0]);
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error("Error fetching categories:", error);
         const description =
           error instanceof Error
@@ -149,7 +149,7 @@ export default function CreateListingPage() {
         description: "Anuncio publicado correctamente.",
       });
       router.push("/resident/marketplace");
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error creating listing:", error);
       const description =
         error instanceof Error

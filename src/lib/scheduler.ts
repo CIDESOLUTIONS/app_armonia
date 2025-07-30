@@ -38,9 +38,9 @@ export function scheduleTask(
     try {
       taskFn();
       executionCount++;
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error(
-        `Error en ejecución inmediata de tarea "${taskId}": ${error.message}`,
+        `Error en ejecución inmediata de tarea "${taskId}": ${error instanceof Error ? error.message : "Error desconocido"}`,
       );
     }
   }
@@ -55,8 +55,8 @@ export function scheduleTask(
           `Tarea "${taskId}" completada después de ${maxExecutions} ejecuciones`,
         );
       }
-    } catch (error: any) {
-      logger.error(`Error en ejecución de tarea "${taskId}": ${error.message}`);
+    } catch (error: unknown) {
+      logger.error(`Error en ejecución de tarea "${taskId}": ${error instanceof Error ? error.message : "Error desconocido"}`);
     }
   }, intervalMs);
 
