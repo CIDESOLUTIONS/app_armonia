@@ -71,11 +71,15 @@ export default function ChatPage() {
         user.id,
       );
       setMessages(fetchedMessages);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching data:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo cargar el chat: " + error.message
+          : "No se pudo cargar el chat.";
       toast({
         title: "Error",
-        description: "No se pudo cargar el chat: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -142,11 +146,15 @@ export default function ChatPage() {
       await sendMarketplaceMessage(messageData);
       socket.emit("sendMarketplaceMessage", messageData);
       setNewMessage("");
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error sending message:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo enviar el mensaje: " + error.message
+          : "No se pudo enviar el mensaje.";
       toast({
         title: "Error",
-        description: "No se pudo enviar el mensaje: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -166,11 +174,15 @@ export default function ChatPage() {
           title: "Anuncio Reportado",
           description: "Gracias por tu reporte. Lo revisaremos pronto.",
         });
-      } catch (error: Error) {
+      } catch (error) {
         console.error("Error reporting listing:", error);
+        const description =
+          error instanceof Error
+            ? "No se pudo reportar el anuncio: " + error.message
+            : "No se pudo reportar el anuncio.";
         toast({
           title: "Error",
-          description: "No se pudo reportar el anuncio: " + error.message,
+          description,
           variant: "destructive",
         });
       }

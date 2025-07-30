@@ -122,12 +122,15 @@ export default function AssemblyVotesPage() {
       setAssembly(fetchedAssembly);
       // Assuming assembly object includes votes
       setVotes(fetchedAssembly.votes || []);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching assembly and votes:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo cargar la asamblea o las votaciones: " + error.message
+          : "No se pudo cargar la asamblea o las votaciones.";
       toast({
         title: "Error",
-        description:
-          "No se pudo cargar la asamblea o las votaciones: " + error.message,
+        description,
         variant: "destructive",
       });
       router.push("/complex-admin/assemblies");
@@ -183,11 +186,15 @@ export default function AssemblyVotesPage() {
       }
       setIsModalOpen(false);
       fetchAssemblyAndVotes();
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error saving vote:", error);
+      const description =
+        error instanceof Error
+          ? "Error al guardar la votación: " + error.message
+          : "Error al guardar la votación.";
       toast({
         title: "Error",
-        description: "Error al guardar la votación: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -199,13 +206,16 @@ export default function AssemblyVotesPage() {
       const results = await getVotingResults(voteId, user.complexId);
       setVoteResults(results);
       setIsResultsModalOpen(true);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching vote results:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudieron cargar los resultados de la votación: " +
+            error.message
+          : "No se pudieron cargar los resultados de la votación.";
       toast({
         title: "Error",
-        description:
-          "No se pudieron cargar los resultados de la votación: " +
-          error.message,
+        description,
         variant: "destructive",
       });
     }

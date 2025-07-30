@@ -92,12 +92,15 @@ export default function AssemblyDetailPage() {
       // For now, mock votes or fetch all and filter
       // const fetchedVotes = await getVotesByAssemblyId(assemblyId);
       // setVotes(fetchedVotes);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching assembly data:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo cargar la información de la asamblea: " + error.message
+          : "No se pudo cargar la información de la asamblea.";
       toast({
         title: "Error",
-        description:
-          "No se pudo cargar la información de la asamblea: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {
@@ -121,11 +124,15 @@ export default function AssemblyDetailPage() {
         description: `Asistencia registrada para la unidad ${userId}.`,
       });
       fetchAssemblyData(); // Refresh data
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error registering attendance:", error);
+      const description =
+        error instanceof Error
+          ? "Error al registrar asistencia: " + error.message
+          : "Error al registrar asistencia.";
       toast({
         title: "Error",
-        description: "Error al registrar asistencia: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -150,11 +157,15 @@ export default function AssemblyDetailPage() {
         options: ["", ""],
         isWeighted: false,
       });
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error creating vote:", error);
+      const description =
+        error instanceof Error
+          ? "Error al crear votación: " + error.message
+          : "Error al crear votación.";
       toast({
         title: "Error",
-        description: "Error al crear votación: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -169,11 +180,15 @@ export default function AssemblyDetailPage() {
         title: "Éxito",
         description: "Resultados de votación cargados.",
       });
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching vote results:", error);
+      const description =
+        error instanceof Error
+          ? "Error al cargar resultados de votación: " + error.message
+          : "Error al cargar resultados de votación.";
       toast({
         title: "Error",
-        description: "Error al cargar resultados de votación: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -192,11 +207,15 @@ export default function AssemblyDetailPage() {
         description: "Voto registrado correctamente.",
       });
       handleGetVoteResults(voteId); // Refresh results after voting
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error submitting vote:", error);
+      const description =
+        error instanceof Error
+          ? "Error al registrar el voto: " + error.message
+          : "Error al registrar el voto.";
       toast({
         title: "Error",
-        description: "Error al registrar el voto: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -218,12 +237,15 @@ export default function AssemblyDetailPage() {
         title: "Éxito",
         description: "Acta generada y descargada correctamente.",
       });
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error generating meeting minutes:", error);
+      const description =
+        error instanceof Error
+          ? "Error al generar el acta de la asamblea: " + error.message
+          : "Error al generar el acta de la asamblea.";
       toast({
         title: "Error",
-        description:
-          "Error al generar el acta de la asamblea: " + error.message,
+        description,
         variant: "destructive",
       });
     }

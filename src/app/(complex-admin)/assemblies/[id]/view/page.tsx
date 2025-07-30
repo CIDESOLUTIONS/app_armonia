@@ -102,11 +102,15 @@ export default function ViewAssemblyPage() {
         user?.complexId || "",
       );
       setQuorumStatus(fetchedQuorumStatus);
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching assembly data:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo cargar la asamblea: " + error.message
+          : "No se pudo cargar la asamblea.";
       toast({
         title: "Error",
-        description: "No se pudo cargar la asamblea: " + error.message,
+        description,
         variant: "destructive",
       });
       router.push("/complex-admin/assemblies");
@@ -139,11 +143,15 @@ export default function ViewAssemblyPage() {
       setIsAttendanceModalOpen(false);
       setUnitIdToRegister(null);
       fetchAssemblyData(); // Refresh data
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error registering attendance:", error);
+      const description =
+        error instanceof Error
+          ? "Error al registrar asistencia: " + error.message
+          : "Error al registrar asistencia.";
       toast({
         title: "Error",
-        description: "Error al registrar asistencia: " + error.message,
+        description,
         variant: "destructive",
       });
     }
@@ -165,11 +173,15 @@ export default function ViewAssemblyPage() {
         title: "Éxito",
         description: "Acta generada y descargada correctamente.",
       });
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error generating minutes:", error);
+      const description =
+        error instanceof Error
+          ? "Error al generar el acta: " + error.message
+          : "Error al generar el acta.";
       toast({
         title: "Error",
-        description: "Error al generar el acta: " + error.message,
+        description,
         variant: "destructive",
       });
     }

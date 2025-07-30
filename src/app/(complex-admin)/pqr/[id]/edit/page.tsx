@@ -78,11 +78,15 @@ export default function EditPQRPage() {
         });
         router.push("/complex-admin/pqr");
       }
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching PQR:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo cargar la PQR: " + error.message
+          : "No se pudo cargar la PQR.";
       toast({
         title: "Error",
-        description: "No se pudo cargar la PQR: " + error.message,
+        description,
         variant: "destructive",
       });
       router.push("/complex-admin/pqr");
@@ -108,11 +112,15 @@ export default function EditPQRPage() {
         description: "PQR actualizada correctamente.",
       });
       router.push("/complex-admin/pqr");
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error updating PQR:", error);
+      const description =
+        error instanceof Error
+          ? "Error al actualizar la PQR: " + error.message
+          : "Error al actualizar la PQR.";
       toast({
         title: "Error",
-        description: "Error al actualizar la PQR: " + error.message,
+        description,
         variant: "destructive",
       });
     } finally {

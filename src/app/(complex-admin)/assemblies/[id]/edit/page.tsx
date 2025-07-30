@@ -84,11 +84,15 @@ export default function EditAssemblyPage() {
         });
         router.push("/complex-admin/assemblies");
       }
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error fetching assembly:", error);
+      const description =
+        error instanceof Error
+          ? "No se pudo cargar la asamblea: " + error.message
+          : "No se pudo cargar la asamblea.";
       toast({
         title: "Error",
-        description: "No se pudo cargar la asamblea: " + error.message,
+        description,
         variant: "destructive",
       });
       router.push("/complex-admin/assemblies");
@@ -113,11 +117,15 @@ export default function EditAssemblyPage() {
         description: "Asamblea actualizada correctamente.",
       });
       router.push("/complex-admin/assemblies");
-    } catch (error: Error) {
+    } catch (error) {
       console.error("Error updating assembly:", error);
+      const description =
+        error instanceof Error
+          ? "Error al actualizar la asamblea: " + error.message
+          : "Error al actualizar la asamblea.";
       toast({
         title: "Error",
-        description: "Error al actualizar la asamblea: " + error.message,
+        description,
         variant: "destructive",
       });
     }
