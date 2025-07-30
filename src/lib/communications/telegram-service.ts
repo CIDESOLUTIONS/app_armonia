@@ -27,9 +27,9 @@ export const sendTelegramMessage = async (message: string) => {
     await bot.sendMessage(chatId, message);
     logger.info("Mensaje de Telegram enviado con éxito.");
     return { success: true };
-  } catch (error: any) {
-    logger.error(`Error al enviar el mensaje de Telegram: ${error.message}`);
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    logger.error(`Error al enviar el mensaje de Telegram: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    return { success: false, error: error instanceof Error ? error.message : "Error desconocido" };
   }
 };
 */

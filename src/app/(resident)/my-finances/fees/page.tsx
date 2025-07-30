@@ -34,10 +34,10 @@ export default function ResidentFeesPage() {
       const response = await initiatePayment(feeId);
       // Redirect to payment gateway URL
       window.location.href = response.paymentUrl;
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error al iniciar pago",
-        description: error.message || "Ocurrió un error al iniciar el pago.",
+        description: (error instanceof Error ? error.message : "Ocurrió un error al iniciar el pago."),
         variant: "destructive",
       });
     }

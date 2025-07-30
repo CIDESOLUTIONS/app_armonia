@@ -35,10 +35,10 @@ export default function ConsolidatedFinancialReportsPage() {
             label: c.name,
           })),
         );
-      } catch (error: any) {
+      } catch (error: unknown) {
         toast({
           title: "Error",
-          description: "No se pudieron cargar los complejos: " + error.message,
+          description: "No se pudieron cargar los complejos: " + (error instanceof Error ? error.message : "Error desconocido"),
           variant: "destructive",
         });
       }
@@ -76,11 +76,11 @@ export default function ConsolidatedFinancialReportsPage() {
       );
       window.open(url, "_blank");
       toast({ title: "Éxito", description: "Reporte generado correctamente." });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error generating report:", error);
       toast({
         title: "Error",
-        description: "Error al generar el reporte: " + error.message,
+        description: "Error al generar el reporte: " + (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     } finally {

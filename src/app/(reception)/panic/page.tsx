@@ -84,12 +84,12 @@ export default function PanicAlertsPage() {
     try {
       const data = await getPanicAlerts();
       setAlerts(data);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching panic alerts:", error);
       toast({
         title: "Error",
         description:
-          "No se pudieron cargar las alertas de pánico: " + error.message,
+          "No se pudieron cargar las alertas de pánico: " + (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     } finally {
@@ -108,12 +108,12 @@ export default function PanicAlertsPage() {
       const alert = await getPanicAlertById(alertId);
       setSelectedAlert(alert);
       setIsDetailModalOpen(true);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching alert details:", error);
       toast({
         title: "Error",
         description:
-          "No se pudo cargar el detalle de la alerta: " + error.message,
+          "No se pudo cargar el detalle de la alerta: " + (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     }
@@ -127,11 +127,11 @@ export default function PanicAlertsPage() {
       await updatePanicAlert(alertId, { status });
       toast({ title: "Éxito", description: "Estado de alerta actualizado." });
       fetchAlerts();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error updating alert status:", error);
       toast({
         title: "Error",
-        description: "Error al actualizar el estado de la alerta.",
+        description: (error instanceof Error ? error.message : "Error al actualizar el estado de la alerta."),
         variant: "destructive",
       });
     }
@@ -158,11 +158,11 @@ export default function PanicAlertsPage() {
       setIsResponseModalOpen(false);
       setIsDetailModalOpen(false); // Close detail modal if open
       fetchAlerts();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error adding response:", error);
       toast({
         title: "Error",
-        description: "Error al añadir respuesta: " + error.message,
+        description: "Error al añadir respuesta: " + (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     }

@@ -42,11 +42,11 @@ export default function PanicButtonPage() {
         title: "Alerta Enviada",
         description: "Se ha enviado una alerta de pánico a seguridad.",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error sending panic alert:", error);
       toast({
         title: "Error",
-        description: error.message || "Error al enviar la alerta de pánico.",
+        description: (error instanceof Error ? error.message : "Error al enviar la alerta de pánico."),
         variant: "destructive",
       });
     } finally {

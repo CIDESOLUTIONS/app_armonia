@@ -49,11 +49,11 @@ export default function ScanQrPage() {
           }
         },
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error starting scanner:", error);
       toast({
         title: "Error",
-        description: "Error al iniciar el escáner: " + error.message,
+        description: "Error al iniciar el escáner: " + (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     }
@@ -65,11 +65,11 @@ export default function ScanQrPage() {
       const visitorData = await scanQrCode(qrCode);
       setScanResult(visitorData);
       toast({ title: "Éxito", description: "Visitante registrado con éxito." });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error scanning QR code:", error);
       toast({
         title: "Error",
-        description: error.message || "Error al escanear el código QR.",
+        description: (error instanceof Error ? error.message : "Error al escanear el código QR."),
         variant: "destructive",
       });
     } finally {

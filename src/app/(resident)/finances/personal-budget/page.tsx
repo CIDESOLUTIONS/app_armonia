@@ -90,12 +90,13 @@ export default function PersonalBudgetPage() {
     try {
       const data = await getPersonalTransactions();
       setTransactions(data);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching transactions:", error);
       toast({
         title: "Error",
         description:
-          "No se pudieron cargar las transacciones: " + error.message,
+          "No se pudieron cargar las transacciones: " +
+          (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     } finally {
@@ -148,11 +149,13 @@ export default function PersonalBudgetPage() {
       }
       setIsModalOpen(false);
       fetchTransactions();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error saving transaction:", error);
       toast({
         title: "Error",
-        description: "Error al guardar la transacción: " + error.message,
+        description:
+          "Error al guardar la transacción: " +
+          (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     }
@@ -177,11 +180,13 @@ export default function PersonalBudgetPage() {
         description: "Transacción eliminada correctamente.",
       });
       fetchTransactions();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error deleting transaction:", error);
       toast({
         title: "Error",
-        description: "Error al eliminar la transacción: " + error.message,
+        description:
+          "Error al eliminar la transacción: " +
+          (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     } finally {
@@ -249,7 +254,9 @@ export default function PersonalBudgetPage() {
         <div className="bg-white shadow-md rounded-lg p-4 text-center">
           <h2 className="text-lg font-semibold text-gray-600">Balance</h2>
           <p
-            className={`text-3xl font-bold ${balance >= 0 ? "text-green-600" : "text-red-600"}`}
+            className={`text-3xl font-bold ${
+              balance >= 0 ? "text-green-600" : "text-red-600"
+            }`}
           >
             ${balance.toFixed(2)}
           </p>

@@ -100,11 +100,11 @@ export default function BankReconciliationPage() {
         });
       };
       reader.readAsArrayBuffer(file);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error during reconciliation:", error);
       toast({
         title: "Error",
-        description: "Error al realizar la conciliación: " + error.message,
+        description: "Error al realizar la conciliación: " + (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     } finally {
