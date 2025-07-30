@@ -56,7 +56,9 @@ export function scheduleTask(
         );
       }
     } catch (error: unknown) {
-      logger.error(`Error en ejecución de tarea "${taskId}": ${error instanceof Error ? error.message : "Error desconocido"}`);
+      logger.error(
+        `Error en ejecución de tarea "${taskId}": ${error instanceof Error ? error.message : "Error desconocido"}`,
+      );
     }
   }, intervalMs);
 

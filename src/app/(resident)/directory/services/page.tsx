@@ -71,7 +71,8 @@ export default function HomeServicesDirectoryPage() {
       console.error("Error fetching service providers:", error);
       const description =
         error instanceof Error
-          ? "No se pudieron cargar los proveedores de servicios: " + error.message
+          ? "No se pudieron cargar los proveedores de servicios: " +
+            error.message
           : "No se pudieron cargar los proveedores de servicios.";
       toast({
         title: "Error",

@@ -39,7 +39,8 @@ export default function ResidentReservationsPage() {
       toast({
         title: "Error",
         description:
-          "No se pudieron cargar los datos de reservas: " + (error instanceof Error ? error.message : "Error desconocido"),
+          "No se pudieron cargar los datos de reservas: " +
+          (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     } finally {

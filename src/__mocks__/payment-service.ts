@@ -5,7 +5,7 @@
 
 class PaymentService {
   private schema: string;
-  public prisma: any; // Mock Prisma client
+  public prisma: Record<string, any>; // Mock Prisma client
 
   constructor(schema: string = "public") {
     this.schema = schema;
@@ -130,7 +130,10 @@ class PaymentService {
    * @param signature - Firma del webhook
    * @returns Resultado del procesamiento
    */
-  async processWebhook(webhookData: any, signature: string): Promise<any> {
+  async processWebhook(
+    webhookData: unknown,
+    signature: string,
+  ): Promise<unknown> {
     try {
       // Validar firma
       if (!this.validateSignature(webhookData, signature)) {
@@ -161,7 +164,7 @@ class PaymentService {
    * @param signature - Firma a validar
    * @returns Resultado de la validación
    */
-  validateSignature(data: any, signature: string): boolean {
+  validateSignature(data: unknown, signature: string): boolean {
     // En un entorno real, aquí se validaría la firma criptográficamente
     // Para pruebas, simplemente verificamos que exista una firma
     return !!signature && signature.length > 10;
@@ -179,11 +182,11 @@ class PaymentService {
       userId?: number;
       status?: string;
     } = {},
-  ): Promise<any> {
+  ): Promise<unknown> {
     const { page = 1, limit = 10, userId, status } = options;
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Record<string, unknown> = {};
     if (userId) where.userId = userId;
     if (status) where.status = status;
 

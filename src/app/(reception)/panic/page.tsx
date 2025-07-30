@@ -89,7 +89,8 @@ export default function PanicAlertsPage() {
       toast({
         title: "Error",
         description:
-          "No se pudieron cargar las alertas de pánico: " + (error instanceof Error ? error.message : "Error desconocido"),
+          "No se pudieron cargar las alertas de pánico: " +
+          (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     } finally {
@@ -113,7 +114,8 @@ export default function PanicAlertsPage() {
       toast({
         title: "Error",
         description:
-          "No se pudo cargar el detalle de la alerta: " + (error instanceof Error ? error.message : "Error desconocido"),
+          "No se pudo cargar el detalle de la alerta: " +
+          (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     }
@@ -131,7 +133,10 @@ export default function PanicAlertsPage() {
       console.error("Error updating alert status:", error);
       toast({
         title: "Error",
-        description: (error instanceof Error ? error.message : "Error al actualizar el estado de la alerta."),
+        description:
+          error instanceof Error
+            ? error.message
+            : "Error al actualizar el estado de la alerta.",
         variant: "destructive",
       });
     }
@@ -162,7 +167,9 @@ export default function PanicAlertsPage() {
       console.error("Error adding response:", error);
       toast({
         title: "Error",
-        description: "Error al añadir respuesta: " + (error instanceof Error ? error.message : "Error desconocido"),
+        description:
+          "Error al añadir respuesta: " +
+          (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     }

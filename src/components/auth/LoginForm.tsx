@@ -52,7 +52,8 @@ export default function LoginForm({ portalType = null }: LoginFormProps) {
     if (error) {
       toast({
         title: t("toast.authErrorTitle"),
-        description: (error instanceof Error ? error.message : "Ocurrió un error"),
+        description:
+          error instanceof Error ? error.message : "Ocurrió un error",
         variant: "destructive",
       });
     }

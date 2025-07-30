@@ -27,7 +27,9 @@ export class MessagingService {
       // });
       return true;
     } catch (error: unknown) {
-      logger.error(`Error sending WhatsApp message: ${error instanceof Error ? error.message : "Error desconocido"}`);
+      logger.error(
+        `Error sending WhatsApp message: ${error instanceof Error ? error.message : "Error desconocido"}`,
+      );
       return false;
     }
   }
@@ -40,7 +42,9 @@ export class MessagingService {
       // await bot.sendMessage(options.to, options.body);
       return true;
     } catch (error: unknown) {
-      logger.error(`Error sending Telegram message: ${error instanceof Error ? error.message : "Error desconocido"}`);
+      logger.error(
+        `Error sending Telegram message: ${error instanceof Error ? error.message : "Error desconocido"}`,
+      );
       return false;
     }
   }

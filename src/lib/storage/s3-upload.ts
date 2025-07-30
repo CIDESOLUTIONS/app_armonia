@@ -51,7 +51,9 @@ export async function uploadFileToS3(
     logger.info(`Archivo ${fileName} cargado a S3: ${fileUrl}`);
     return fileUrl;
   } catch (error: unknown) {
-    logger.error(`Error al cargar el archivo a S3: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    logger.error(
+      `Error al cargar el archivo a S3: ${error instanceof Error ? error.message : "Error desconocido"}`,
+    );
     throw error;
   }
 }

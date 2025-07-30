@@ -10,7 +10,7 @@
  */
 export function replaceTemplateVars(
   template: string,
-  data: Record<string, any>,
+  data: Record<string, unknown>,
 ): string {
   if (!template) return "";
 

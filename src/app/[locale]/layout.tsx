@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Providers } from "@/components/providers";
 import { RealTimeNotificationProvider } from "@/context/RealTimeNotificationContext";

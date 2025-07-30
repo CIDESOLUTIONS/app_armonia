@@ -58,7 +58,6 @@ export default function ConsolidatedReportsPage() {
     }
   }, [allComplexes, setAllComplexes, toast]);
 
-
   const handleGenerateReport = async () => {
     if (!reportType || !startDate || !endDate) {
       toast({
@@ -100,7 +99,8 @@ export default function ConsolidatedReportsPage() {
           variant: "default", // Changed from "info" to "default"
         });
       }
-    } catch (error) { // Removed : Error type annotation
+    } catch (error) {
+      // Removed : Error type annotation
       console.error("Error generating consolidated report:", error);
       const description =
         error instanceof Error

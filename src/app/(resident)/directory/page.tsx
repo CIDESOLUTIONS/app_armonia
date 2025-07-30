@@ -30,20 +30,22 @@ export default function ResidentDirectoryPage() {
         const data = await getResidents(term);
         setResidents(data);
       } catch (error) {
-      console.error("Error fetching residents for directory:", error);
-      const description =
-        error instanceof Error
-          ? "No se pudo cargar el directorio de residentes: " + error.message
-          : "No se pudo cargar el directorio de residentes.";
-      toast({
-        title: "Error",
-        description,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+        console.error("Error fetching residents for directory:", error);
+        const description =
+          error instanceof Error
+            ? "No se pudo cargar el directorio de residentes: " + error.message
+            : "No se pudo cargar el directorio de residentes.";
+        toast({
+          title: "Error",
+          description,
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast],
+  );
 
   useEffect(() => {
     if (!authLoading && user) {

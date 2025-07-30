@@ -64,7 +64,9 @@ export async function sendSMS(options: {
     logger.info(`SMS enviado correctamente: ${result.messageId}`);
     return result;
   } catch (error: unknown) {
-    logger.error(`Error al enviar SMS: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    logger.error(
+      `Error al enviar SMS: ${error instanceof Error ? error.message : "Error desconocido"}`,
+    );
     return {
       success: false,
       error: error instanceof Error ? error.message : "Error desconocido",
@@ -135,7 +137,10 @@ export async function sendBulkSMS(
         results.results.push({
           phoneNumber,
           success: false,
-          error: phoneError instanceof Error ? phoneError.message : "Error desconocido",
+          error:
+            phoneError instanceof Error
+              ? phoneError.message
+              : "Error desconocido",
         });
       }
     }
@@ -147,7 +152,9 @@ export async function sendBulkSMS(
     );
     return results;
   } catch (error: unknown) {
-    logger.error(`Error al enviar SMS masivo: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    logger.error(
+      `Error al enviar SMS masivo: ${error instanceof Error ? error.message : "Error desconocido"}`,
+    );
     return {
       success: false,
       error: error instanceof Error ? error.message : "Error desconocido",

@@ -68,7 +68,8 @@ export function DemoRequestModal({ children }: DemoRequestModalProps) {
     } catch (error: unknown) {
       toast({
         title: t("toast.errorTitle"),
-        description: (error instanceof Error ? error.message : t("toast.errorDescription")),
+        description:
+          error instanceof Error ? error.message : t("toast.errorDescription"),
         variant: "destructive",
       });
     } finally {

@@ -47,7 +47,8 @@ export default function GeneratePeaceAndSafeForm() {
     onError: (error: unknown) => {
       toast({
         title: "Error al generar Paz y Salvo",
-        description: (error instanceof Error ? error.message : "Ocurrió un error"),
+        description:
+          error instanceof Error ? error.message : "Ocurrió un error",
         variant: "destructive",
       });
     },

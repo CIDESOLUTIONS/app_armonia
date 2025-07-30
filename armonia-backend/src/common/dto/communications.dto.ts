@@ -82,7 +82,13 @@ export class NotificationDataDto {
   @IsString()
   recipientId?: string;
 
-  constructor(type: NotificationType, title: string, message: string, sourceType: NotificationSourceType, partial?: Partial<NotificationDataDto>) {
+  constructor(
+    type: NotificationType,
+    title: string,
+    message: string,
+    sourceType: NotificationSourceType,
+    partial?: Partial<NotificationDataDto>,
+  ) {
     this.type = type;
     this.title = title;
     this.message = message;
@@ -146,7 +152,11 @@ export class AnnouncementDataDto {
   @Type(() => AttachmentDto)
   attachments?: AttachmentDto[];
 
-  constructor(title: string, content: string, partial?: Partial<AnnouncementDataDto>) {
+  constructor(
+    title: string,
+    content: string,
+    partial?: Partial<AnnouncementDataDto>,
+  ) {
     this.title = title;
     this.content = content;
     Object.assign(this, partial);
@@ -206,7 +216,14 @@ export class EventDataDto {
   @Type(() => AttachmentDto)
   attachments?: AttachmentDto[];
 
-  constructor(title: string, description: string, location: string, startDateTime: Date, endDateTime: Date, partial?: Partial<EventDataDto>) {
+  constructor(
+    title: string,
+    description: string,
+    location: string,
+    startDateTime: Date,
+    endDateTime: Date,
+    partial?: Partial<EventDataDto>,
+  ) {
     this.title = title;
     this.description = description;
     this.location = location;

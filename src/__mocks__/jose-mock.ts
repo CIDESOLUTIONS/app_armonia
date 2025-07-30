@@ -15,7 +15,7 @@ interface MockJWTPayload extends JWTPayload {
 // Mock de jwtVerify
 export const jwtVerify = async (
   token: string,
-  secret: Uint8Array,
+  _secret: Uint8Array,
 ): Promise<{ payload: MockJWTPayload }> => {
   // Simulación simple para pruebas
   if (!token || token === "invalid_token") {
@@ -51,11 +51,11 @@ export class SignJWT {
     return this;
   }
 
-  setExpirationTime(time: string | number): this {
+  setExpirationTime(_time: string | number): this {
     return this;
   }
 
-  async sign(secret: Uint8Array): Promise<string> {
+  async sign(_secret: Uint8Array): Promise<string> {
     return "mock_jwt_token_for_testing";
   }
 }

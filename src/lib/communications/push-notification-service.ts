@@ -54,7 +54,9 @@ export async function sendPushNotification(
       timestamp: new Date().toISOString(),
     };
   } catch (error: unknown) {
-    logger.error(`Error al enviar notificación push: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    logger.error(
+      `Error al enviar notificación push: ${error instanceof Error ? error.message : "Error desconocido"}`,
+    );
     return {
       success: false,
       error: error instanceof Error ? error.message : "Error desconocido",
@@ -131,7 +133,10 @@ export async function sendMulticastPushNotification(
         results.responses.push({
           deviceToken: token,
           success: false,
-          error: tokenError instanceof Error ? tokenError.message : "Error desconocido",
+          error:
+            tokenError instanceof Error
+              ? tokenError.message
+              : "Error desconocido",
         });
       }
     }
@@ -213,7 +218,9 @@ export async function sendPQRPushNotification(
       channel: "pqr_notifications",
     });
   } catch (error: unknown) {
-    logger.error(`Error al enviar notificación push de PQR: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    logger.error(
+      `Error al enviar notificación push de PQR: ${error instanceof Error ? error.message : "Error desconocido"}`,
+    );
     return {
       success: false,
       error: error instanceof Error ? error.message : "Error desconocido",
@@ -361,7 +368,9 @@ export async function sendPaymentPushNotification(
       channel: "payment_notifications",
     });
   } catch (error: unknown) {
-    logger.error(`Error al enviar notificación push de pago: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    logger.error(
+      `Error al enviar notificación push de pago: ${error instanceof Error ? error.message : "Error desconocido"}`,
+    );
     return {
       success: false,
       error: error instanceof Error ? error.message : "Error desconocido",
@@ -401,7 +410,9 @@ export async function registerDeviceToken(
       timestamp: new Date().toISOString(),
     };
   } catch (error: unknown) {
-    logger.error(`Error al registrar token de dispositivo: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    logger.error(
+      `Error al registrar token de dispositivo: ${error instanceof Error ? error.message : "Error desconocido"}`,
+    );
     return {
       success: false,
       error: error instanceof Error ? error.message : "Error desconocido",
@@ -439,7 +450,9 @@ export async function unregisterDeviceToken(
       timestamp: new Date().toISOString(),
     };
   } catch (error: unknown) {
-    logger.error(`Error al eliminar token de dispositivo: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    logger.error(
+      `Error al eliminar token de dispositivo: ${error instanceof Error ? error.message : "Error desconocido"}`,
+    );
     return {
       success: false,
       error: error instanceof Error ? error.message : "Error desconocido",

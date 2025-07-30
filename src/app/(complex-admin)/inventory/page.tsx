@@ -39,7 +39,8 @@ export default function InventoryPage() {
       console.error("Error fetching inventory stats:", error);
       const description =
         error instanceof Error
-          ? "No se pudieron cargar las estadísticas del inventario: " + error.message
+          ? "No se pudieron cargar las estadísticas del inventario: " +
+            error.message
           : "No se pudieron cargar las estadísticas del inventario.";
       toast({
         title: "Error",

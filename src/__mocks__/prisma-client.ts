@@ -11,7 +11,7 @@ export { PQRCategory, PQRStatus, PQRPriority, PQRType };
 
 // Mock básico de PrismaClient
 export class PrismaClient {
-  constructor(options = {}) {
+  constructor(_options = {}) {
     // No hacer nada en el constructor para pruebas
   }
 

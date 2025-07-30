@@ -46,7 +46,10 @@ export default function PanicButtonPage() {
       console.error("Error sending panic alert:", error);
       toast({
         title: "Error",
-        description: (error instanceof Error ? error.message : "Error al enviar la alerta de pánico."),
+        description:
+          error instanceof Error
+            ? error.message
+            : "Error al enviar la alerta de pánico.",
         variant: "destructive",
       });
     } finally {

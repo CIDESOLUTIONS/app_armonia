@@ -53,7 +53,9 @@ export default function ScanQrPage() {
       console.error("Error starting scanner:", error);
       toast({
         title: "Error",
-        description: "Error al iniciar el escáner: " + (error instanceof Error ? error.message : "Error desconocido"),
+        description:
+          "Error al iniciar el escáner: " +
+          (error instanceof Error ? error.message : "Error desconocido"),
         variant: "destructive",
       });
     }
@@ -69,7 +71,10 @@ export default function ScanQrPage() {
       console.error("Error scanning QR code:", error);
       toast({
         title: "Error",
-        description: (error instanceof Error ? error.message : "Error al escanear el código QR."),
+        description:
+          error instanceof Error
+            ? error.message
+            : "Error al escanear el código QR.",
         variant: "destructive",
       });
     } finally {

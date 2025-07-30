@@ -197,7 +197,11 @@ export default function ReceptionVisitorsPage() {
       setPackages(fetchedPackages);
     } catch (error) {
       console.error("[ReceptionVisitors] Error:", error);
-      setError(error instanceof Error ? error.message : "Error al cargar datos de visitantes");
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Error al cargar datos de visitantes",
+      );
     } finally {
       setLoading(false);
     }
@@ -378,7 +382,11 @@ export default function ReceptionVisitorsPage() {
         setError(result.message || "QR Code inválido.");
       }
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Error al escanear el código QR.");
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Error al escanear el código QR.",
+      );
     } finally {
       setLoading(false);
     }
@@ -397,7 +405,11 @@ export default function ReceptionVisitorsPage() {
       resetNewPackageForm();
       fetchData(); // Refresh packages list
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Error al registrar el paquete.");
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Error al registrar el paquete.",
+      );
     }
   };
 
