@@ -39,12 +39,11 @@ export default function ResidentDirectoryPage() {
         title: "Error",
         description,
         variant: "destructive",
-      }); finally {
-        setLoading(false);
-      }
-    },
-    [toast],
-  );
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
 
   useEffect(() => {
     if (!authLoading && user) {

@@ -73,6 +73,9 @@ export default function PreRegisterVisitorPage() {
             description,
             variant: "destructive",
           });
+        } finally {
+          setLoading(false);
+        }
       }
     };
     fetchUserUnitId();
