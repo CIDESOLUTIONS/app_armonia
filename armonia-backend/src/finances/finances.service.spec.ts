@@ -1,9 +1,9 @@
 import '@test/jest-setup';
 import { Test, TestingModule } from '@nestjs/testing';
-import { FinancesService } from './finances.service.js';
-import { CommunicationsService } from '../communications/communications.service.js';
+import { FinancesService } from './finances.service';
+import { CommunicationsService } from '../communications/communications.service';
 import { Logger } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service.js';
+import { PrismaService } from '../prisma/prisma.service';
 
 // Mock PrismaClient methods that FinancesService uses
 const mockPrismaClientMethods = {

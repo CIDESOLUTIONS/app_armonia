@@ -9,15 +9,15 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { CommunicationsService } from './communications.service.js';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
-import { GetUser } from '../common/decorators/user.decorator.js';
+import { CommunicationsService } from './communications.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GetUser } from '../common/decorators/user.decorator';
 import {
   NotificationDataDto,
   AnnouncementDataDto,
   MessageDataDto,
   EventDataDto,
-} from '../common/dto/communications.dto.js';
+} from '../common/dto/communications.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('communications')

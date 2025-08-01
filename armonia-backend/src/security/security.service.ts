@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service.js';
+import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateSecurityEventDto,
   CreateAccessAttemptDto,
-} from '../common/dto/security.dto.js';
+} from '../common/dto/security.dto';
 
 @Injectable()
 export class SecurityService {

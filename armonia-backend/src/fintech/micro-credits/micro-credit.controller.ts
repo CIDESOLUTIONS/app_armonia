@@ -7,13 +7,13 @@ import {
   Param,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../../auth/jwt-auth.guard.js';
-import { GetUser } from '../../common/decorators/user.decorator.js';
-import { MicroCreditService } from './micro-credit.service.js';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { GetUser } from '../../common/decorators/user.decorator';
+import { MicroCreditService } from './micro-credit.service';
 import {
   CreateMicroCreditApplicationDto,
   UpdateMicroCreditApplicationDto,
-} from '../../common/dto/fintech.dto.js';
+} from '../../common/dto/fintech.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('fintech/micro-credits')

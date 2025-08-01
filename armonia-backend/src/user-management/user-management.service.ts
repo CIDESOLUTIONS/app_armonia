@@ -3,12 +3,12 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service.js';
+import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateUserDto,
   UpdateUserDto,
-} from '../common/dto/user-management.dto.js';
-import { UserRole } from '../common/enums/user-role.enum.js';
+} from '../common/dto/user-management.dto';
+import { UserRole } from '../common/enums/user-role.enum';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()

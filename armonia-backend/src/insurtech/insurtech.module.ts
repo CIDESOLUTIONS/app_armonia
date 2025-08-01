@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { InsurtechService } from './insurtech.service.js';
-import { InsurtechController } from './insurtech.controller.js';
-import { PrismaModule } from '../prisma/prisma.module.js';
+import { InsurtechService } from './insurtech.service';
+import { InsurtechController } from './insurtech.controller';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [PrismaModule],

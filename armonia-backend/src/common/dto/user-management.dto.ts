@@ -6,7 +6,7 @@ import {
   IsEnum,
   IsNumber,
 } from 'class-validator';
-import { UserRole } from '../enums/user-role.enum.js';
+import { UserRole } from '../enums/user-role.enum';
 
 export class CreateUserDto {
   @IsString()

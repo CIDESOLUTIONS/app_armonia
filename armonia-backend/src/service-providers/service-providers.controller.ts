@@ -9,9 +9,9 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
-import { GetUser } from '../common/decorators/user.decorator.js';
-import { ServiceProvidersService } from './service-providers.service.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GetUser } from '../common/decorators/user.decorator';
+import { ServiceProvidersService } from './service-providers.service';
 import {
   CreateServiceProviderDto,
   UpdateServiceProviderDto,
@@ -19,7 +19,7 @@ import {
   ServiceProviderFilterParamsDto,
   CreateReviewDto,
   ReviewDto,
-} from '../common/dto/service-providers.dto.js';
+} from '../common/dto/service-providers.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('service-providers')

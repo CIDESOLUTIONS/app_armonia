@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service.js';
+import { PrismaService } from '../prisma/prisma.service';
 import {
   NotificationType,
   NotificationDataDto,
@@ -8,7 +8,7 @@ import {
   EventDataDto,
   NotificationPriority,
   NotificationSourceType,
-} from '../common/dto/communications.dto.js';
+} from '../common/dto/communications.dto';
 import { ConfigService } from '@nestjs/config';
 import twilio from 'twilio';
 import * as admin from 'firebase-admin';

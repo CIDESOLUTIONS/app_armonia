@@ -6,13 +6,13 @@ import {
   MessageBody,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { PanicService } from './panic.service.js';
-import { CreatePanicAlertDto } from '../common/dto/panic.dto.js';
+import { PanicService } from './panic.service';
+import { CreatePanicAlertDto } from '../common/dto/panic.dto';
 import {
   NotificationType,
   NotificationSourceType,
-} from '../common/dto/communications.dto.js';
-import { PanicStatus } from '../common/enums/panic.enum.js';
+} from '../common/dto/communications.dto';
+import { PanicStatus } from '../common/enums/panic.enum';
 
 interface NotificationPayload {
   id: string;

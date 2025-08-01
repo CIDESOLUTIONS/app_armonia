@@ -3,14 +3,14 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service.js';
+import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateIncidentDto,
   UpdateIncidentDto,
   IncidentDto,
   IncidentFilterParamsDto,
   IncidentStatus,
-} from './incidents.dto.js';
+} from './incidents.dto';
 
 @Injectable()
 export class IncidentsService {

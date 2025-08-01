@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { MarketplaceController } from './marketplace.controller.js';
-import { MarketplaceService } from './marketplace.service.js';
-import { PrismaService } from '../prisma/prisma.service.js';
-import { MarketplaceGateway } from './marketplace.gateway.js';
-import { PrismaModule } from '../prisma/prisma.module.js';
+import { MarketplaceController } from './marketplace.controller';
+import { MarketplaceService } from './marketplace.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { MarketplaceGateway } from './marketplace.gateway';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [PrismaModule],

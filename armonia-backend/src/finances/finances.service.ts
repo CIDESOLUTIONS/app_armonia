@@ -3,7 +3,7 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service.js';
+import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateFeeDto,
   UpdateFeeDto,
@@ -19,12 +19,12 @@ import {
   BudgetFilterParamsDto,
   BudgetStatus,
   ExpenseFilterParamsDto,
-} from '../common/dto/finances.dto.js';
-import { CommunicationsService } from '../communications/communications.service.js';
+} from '../common/dto/finances.dto';
+import { CommunicationsService } from '../communications/communications.service';
 import {
   NotificationType,
   NotificationSourceType,
-} from '../common/dto/communications.dto.js';
+} from '../common/dto/communications.dto';
 import PDFDocument from 'pdfkit';
 import { Readable } from 'stream';
 

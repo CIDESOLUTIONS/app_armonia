@@ -8,19 +8,19 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { PqrService } from './pqr.service.js';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
-import { GetUser } from '../common/decorators/user.decorator.js';
+import { PqrService } from './pqr.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GetUser } from '../common/decorators/user.decorator';
 import {
   PQRDto,
   GetPQRParamsDto,
   CreatePQRDto,
   UpdatePQRDto,
   PQRCommentDto,
-} from '../common/dto/pqr.dto.js';
-import { RolesGuard } from '../auth/roles.guard.js';
-import { Roles } from '../auth/roles.decorator.js';
-import { UserRole } from '../common/enums/user-role.enum.js';
+} from '../common/dto/pqr.dto';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { UserRole } from '../common/enums/user-role.enum';
 
 @UseGuards(JwtAuthGuard)
 @Controller('pqr')
