@@ -53,7 +53,7 @@ export class FinancesController {
   @Get('fees/:id')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RESIDENT)
   async getFeeById(@GetUser() user: any, @Param('id') id: string) {
-    return this.financesService.getFeeById(user.schemaName, +id);
+    return this.financesService.getFeeById(user.schemaName, id);
   }
 
   @Put('fees/:id')
@@ -63,13 +63,13 @@ export class FinancesController {
     @Param('id') id: string,
     @Body() updateFeeDto: UpdateFeeDto,
   ) {
-    return this.financesService.updateFee(user.schemaName, +id, updateFeeDto);
+    return this.financesService.updateFee(user.schemaName, id, updateFeeDto);
   }
 
   @Delete('fees/:id')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
   async deleteFee(@GetUser() user: any, @Param('id') id: string) {
-    return this.financesService.deleteFee(user.schemaName, +id);
+    return this.financesService.deleteFee(user.schemaName, id);
   }
 
   @Post('fees/generate-ordinary')
@@ -99,8 +99,8 @@ export class FinancesController {
   ) {
     return this.financesService.registerManualPayment(
       user.schemaName,
-      registerManualPaymentDto.feeId,
-      registerManualPaymentDto.userId,
+      registerManualPaymentDto.feeId.toString(),
+      registerManualPaymentDto.userId.toString(),
       registerManualPaymentDto.amount,
       new Date(registerManualPaymentDto.paymentDate),
       registerManualPaymentDto.paymentMethod,
@@ -120,7 +120,7 @@ export class FinancesController {
   @Get('payments/:id')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN, UserRole.RESIDENT)
   async getPaymentById(@GetUser() user: any, @Param('id') id: string) {
-    return this.financesService.getPaymentById(user.schemaName, +id);
+    return this.financesService.getPaymentById(user.schemaName, id);
   }
 
   @Put('payments/:id')
@@ -132,7 +132,7 @@ export class FinancesController {
   ) {
     return this.financesService.updatePayment(
       user.schemaName,
-      +id,
+      id,
       updatePaymentDto,
     );
   }
@@ -140,7 +140,7 @@ export class FinancesController {
   @Delete('payments/:id')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
   async deletePayment(@GetUser() user: any, @Param('id') id: string) {
-    return this.financesService.deletePayment(user.schemaName, +id);
+    return this.financesService.deletePayment(user.schemaName, id);
   }
 
   // Budgets
@@ -165,7 +165,7 @@ export class FinancesController {
   @Get('budgets/:id')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
   async getBudgetById(@GetUser() user: any, @Param('id') id: string) {
-    return this.financesService.getBudgetById(user.schemaName, +id);
+    return this.financesService.getBudgetById(user.schemaName, id);
   }
 
   @Put('budgets/:id')
@@ -177,7 +177,7 @@ export class FinancesController {
   ) {
     return this.financesService.updateBudget(
       user.schemaName,
-      +id,
+      id,
       updateBudgetDto,
     );
   }
@@ -185,7 +185,7 @@ export class FinancesController {
   @Delete('budgets/:id')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
   async deleteBudget(@GetUser() user: any, @Param('id') id: string) {
-    return this.financesService.deleteBudget(user.schemaName, +id);
+    return this.financesService.deleteBudget(user.schemaName, id);
   }
 
   @Post('budgets/:id/approve')
@@ -193,8 +193,8 @@ export class FinancesController {
   async approveBudget(@GetUser() user: any, @Param('id') id: string) {
     return this.financesService.approveBudget(
       user.schemaName,
-      +id,
-      user.userId,
+      id,
+      user.userId.toString(),
     );
   }
 
@@ -223,7 +223,7 @@ export class FinancesController {
   @Get('expenses/:id')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
   async getExpenseById(@GetUser() user: any, @Param('id') id: string) {
-    return this.financesService.getExpenseById(user.schemaName, +id);
+    return this.financesService.getExpenseById(user.schemaName, id);
   }
 
   @Put('expenses/:id')
@@ -235,7 +235,7 @@ export class FinancesController {
   ) {
     return this.financesService.updateExpense(
       user.schemaName,
-      +id,
+      id,
       updateExpenseDto,
     );
   }
@@ -243,7 +243,7 @@ export class FinancesController {
   @Delete('expenses/:id')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
   async deleteExpense(@GetUser() user: any, @Param('id') id: string) {
-    return this.financesService.deleteExpense(user.schemaName, +id);
+    return this.financesService.deleteExpense(user.schemaName, id);
   }
 
   @Get('summary')
@@ -260,11 +260,11 @@ export class FinancesController {
 
   @Post('payments/initiate')
   @Roles(UserRole.RESIDENT)
-  async initiatePayment(@GetUser() user: any, @Body('feeId') feeId: number) {
+  async initiatePayment(@GetUser() user: any, @Body('feeId') feeId: string) {
     return this.financesService.initiatePayment(
       user.schemaName,
       feeId,
-      user.userId,
+      user.userId.toString(),
     );
   }
 
