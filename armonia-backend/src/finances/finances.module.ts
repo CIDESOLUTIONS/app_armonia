@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { FinancesService } from './finances.service.js';
-import { FinancesController } from './finances.controller.js';
-import { PrismaService } from '../prisma/prisma.service.js';
-import { CommunicationsService } from '../communications/communications.service.js';
-import { PrismaModule } from '../prisma/prisma.module.js';
+import { FinancesService } from './finances.service';
+import { FinancesController } from './finances.controller';
+import { PrismaService } from '../prisma/prisma.service';
+import { CommunicationsService } from '../communications/communications.service';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [PrismaModule],

@@ -3,14 +3,14 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service.js';
+import { PrismaService } from '../prisma/prisma.service';
 import {
   CreatePQRDto,
   UpdatePQRDto,
   PQRCommentDto,
   GetPQRParamsDto,
-} from '../common/dto/pqr.dto.js';
-import { UserRole } from '../common/enums/user-role.enum.js';
+} from '../common/dto/pqr.dto';
+import { UserRole } from '../common/enums/user-role.enum';
 
 @Injectable()
 export class PqrService {

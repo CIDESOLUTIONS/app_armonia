@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { FintechService } from './fintech.service.js';
-import { FintechController } from './fintech.controller.js';
-import { PrismaModule } from '../prisma/prisma.module.js';
+import { FintechService } from './fintech.service';
+import { FintechController } from './fintech.controller';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [PrismaModule],

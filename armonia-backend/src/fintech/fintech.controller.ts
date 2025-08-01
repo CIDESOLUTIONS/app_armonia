@@ -7,11 +7,11 @@ import {
   Get,
   Param,
 } from '@nestjs/common';
-import { FintechService } from './fintech.service.js';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
-import { RolesGuard } from '../auth/roles.guard.js';
-import { Roles } from '../auth/roles.decorator.js';
-import { UserRole } from '../common/enums/user-role.enum.js';
+import { FintechService } from './fintech.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { UserRole } from '../common/enums/user-role.enum';
 
 @UseGuards(
   JwtAuthGuard,

@@ -1,9 +1,9 @@
 import '@test/jest-setup';
 import { Test, TestingModule } from '@nestjs/testing';
-import { SurveyService } from './survey.service.js';
-import { PrismaService } from '../prisma/prisma.service.js';
+import { SurveyService } from './survey.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
-import { SurveyStatus, QuestionType } from '../common/dto/surveys.dto.js';
+import { SurveyStatus, QuestionType } from '../common/dto/surveys.dto';
 
 // Mock dependencies
 const mockPrismaClient = {
@@ -231,9 +231,9 @@ describe('SurveyService', () => {
         data: [
           {
             surveyId: 1,
-            text: 'Q1',
-            type: QuestionType.SINGLE_CHOICE,
-            options: ['A', 'B'],
+            text: 'New Q',
+            type: QuestionType.TEXT,
+            options: [],
             order: 0,
           },
         ],

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { PersonalFinancesController } from './personal-finances.controller.js';
-import { PersonalFinancesService } from './personal-finances.service.js';
+import { PersonalFinancesController } from './personal-finances.controller';
+import { PersonalFinancesService } from './personal-finances.service';
 
 @Module({
   controllers: [PersonalFinancesController],

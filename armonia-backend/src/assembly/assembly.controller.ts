@@ -8,21 +8,21 @@ import {
   Param,
   UseGuards,
 } from '@nestjs/common';
-import { AssemblyService } from './assembly.service.js';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
-import { GetUser } from '../common/decorators/user.decorator.js';
+import { AssemblyService } from './assembly.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GetUser } from '../common/decorators/user.decorator';
 import {
   CreateAssemblyDto,
   UpdateAssemblyDto,
   CreateVoteDto,
   SubmitVoteDto,
-} from '../common/dto/assembly.dto.js';
+} from '../common/dto/assembly.dto';
 import {
   AssemblyAttendance,
   AssemblyVote,
   AssemblyVoteRecord,
   CalculateVoteResultsResult,
-} from './assembly.service.js';
+} from './assembly.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('assemblies')

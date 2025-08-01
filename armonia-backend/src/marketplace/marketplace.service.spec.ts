@@ -1,14 +1,14 @@
 import '@test/jest-setup';
 import { Test, TestingModule } from '@nestjs/testing';
-import { MarketplaceService } from './marketplace.service.js';
-import { PrismaService } from '../prisma/prisma.service.js';
+import { MarketplaceService } from './marketplace.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
 import {
   ListingCategory,
   ListingStatus,
   CreateListingDto,
   UpdateListingDto,
-} from '../common/dto/marketplace.dto.js';
+} from '../common/dto/marketplace.dto';
 
 describe('MarketplaceService', () => {
   let service: MarketplaceService;

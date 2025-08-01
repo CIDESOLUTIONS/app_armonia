@@ -1,16 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service.js';
-import { CommunicationsService } from '../communications/communications.service.js';
+import { PrismaService } from '../prisma/prisma.service';
+import { CommunicationsService } from '../communications/communications.service';
 import {
   CreatePanicAlertDto,
   UpdatePanicAlertDto,
   CreatePanicResponseDto,
-} from '../common/dto/panic.dto.js';
+} from '../common/dto/panic.dto';
 import {
   NotificationType,
   NotificationSourceType,
-} from '../common/dto/communications.dto.js';
-import { UserRole } from '../common/enums/user-role.enum.js';
+} from '../common/dto/communications.dto';
+import { UserRole } from '../common/enums/user-role.enum';
 
 @Injectable()
 export class PanicService {

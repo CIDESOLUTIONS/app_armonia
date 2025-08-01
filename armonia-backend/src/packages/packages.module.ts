@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { PackagesController } from './packages.controller.js';
-import { PackagesService } from './packages.service.js';
-import { CommunicationsModule } from '../communications/communications.module.js';
+import { PackagesController } from './packages.controller';
+import { PackagesService } from './packages.service';
+import { CommunicationsModule } from '../communications/communications.module';
 
 @Module({
   imports: [CommunicationsModule],

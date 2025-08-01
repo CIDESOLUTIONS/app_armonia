@@ -12,9 +12,9 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { MarketplaceService } from './marketplace.service.js';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
-import { GetUser } from '../common/decorators/user.decorator.js';
+import { MarketplaceService } from './marketplace.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GetUser } from '../common/decorators/user.decorator';
 import {
   CreateListingDto,
   UpdateListingDto,
@@ -23,7 +23,7 @@ import {
   ResolveReportDto,
   CreateMessageDto,
   MessageDto,
-} from '../common/dto/marketplace.dto.js';
+} from '../common/dto/marketplace.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('marketplace')

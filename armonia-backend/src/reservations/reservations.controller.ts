@@ -9,16 +9,16 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
-import { GetUser } from '../common/decorators/user.decorator.js';
-import { ReservationsService } from './reservations.service.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GetUser } from '../common/decorators/user.decorator';
+import { ReservationsService } from './reservations.service';
 import {
   CreateReservationDto,
   UpdateReservationDto,
   ReservationDto,
   ReservationFilterParamsDto,
   ReservationStatus,
-} from '../common/dto/reservations.dto.js';
+} from '../common/dto/reservations.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('reservations')

@@ -5,7 +5,7 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { TenantService } from '../../tenant/tenant.service.js';
+import { TenantService } from '../../tenant/tenant.service';
 
 @Injectable()
 export class TenantInterceptor implements NestInterceptor {

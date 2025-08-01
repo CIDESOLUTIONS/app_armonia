@@ -5,7 +5,7 @@ import {
   IsDateString,
   IsEnum,
 } from 'class-validator';
-import { PanicStatus, PanicType } from '../enums/panic.enum.js';
+import { PanicStatus, PanicType } from '../enums/panic.enum';
 
 export class CreatePanicAlertDto {
   @IsNumber()

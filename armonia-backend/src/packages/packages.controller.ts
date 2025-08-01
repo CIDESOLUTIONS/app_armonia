@@ -8,18 +8,18 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
-import { GetUser } from '../common/decorators/user.decorator.js';
-import { PackagesService } from './packages.service.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GetUser } from '../common/decorators/user.decorator';
+import { PackagesService } from './packages.service';
 import {
   RegisterPackageDto,
   UpdatePackageDto,
   PackageDto,
   PackageFilterParamsDto,
-} from '../common/dto/packages.dto.js';
-import { RolesGuard } from '../auth/roles.guard.js';
-import { Roles } from '../auth/roles.decorator.js';
-import { UserRole } from '../common/enums/user-role.enum.js';
+} from '../common/dto/packages.dto';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { UserRole } from '../common/enums/user-role.enum';
 
 @UseGuards(JwtAuthGuard)
 @Controller('packages')

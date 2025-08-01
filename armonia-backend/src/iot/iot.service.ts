@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service.js';
+import { PrismaService } from '../prisma/prisma.service';
 import {
   SmartMeterReadingDto,
   SmartMeterFilterParamsDto,
   AutomatedBillingDto,
-} from '../common/dto/iot.dto.js';
-import { FeeType } from '../common/dto/finances.dto.js';
+} from '../common/dto/iot.dto';
+import { FeeType } from '../common/dto/finances.dto';
 
 interface FeeCreateInput {
   title: string;

@@ -1,11 +1,11 @@
 import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
-import { UserService } from '../user/user.service.js';
+import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { TenantService } from '../tenant/tenant.service.js';
-import { ResidentialComplexService } from '../residential-complex/residential-complex.service.js';
-import { UserRole } from '../common/enums/user-role.enum.js';
-import { PrismaService } from '../prisma/prisma.service.js';
+import { TenantService } from '../tenant/tenant.service';
+import { ResidentialComplexService } from '../residential-complex/residential-complex.service';
+import { UserRole } from '../common/enums/user-role.enum';
+import { PrismaService } from '../prisma/prisma.service';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()

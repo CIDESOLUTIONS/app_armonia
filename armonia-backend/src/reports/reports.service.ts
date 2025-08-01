@@ -9,7 +9,7 @@ import * as XLSX from 'xlsx';
 import { format } from 'date-fns';
 import { PaymentStatus } from '../common/enums/payment-status.enum.js';
 import { ExpenseStatus } from '../common/enums/expense-status.enum.js';
-import { FeeStatus } from '../common/enums/fee-status.enum.js';
+import { FeeStatus } from '../common/enums/fee-status.enum';
 
 @Injectable()
 export class ReportsService {

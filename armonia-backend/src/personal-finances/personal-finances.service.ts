@@ -3,13 +3,13 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service.js';
+import { PrismaService } from '../prisma/prisma.service';
 import {
   CreatePersonalTransactionDto,
   UpdatePersonalTransactionDto,
   PersonalTransactionDto,
   PersonalTransactionFilterParamsDto,
-} from '../common/dto/personal-finances.dto.js';
+} from '../common/dto/personal-finances.dto';
 
 @Injectable()
 export class PersonalFinancesService {

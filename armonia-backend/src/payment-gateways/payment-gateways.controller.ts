@@ -23,7 +23,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard.js';
 import { Roles } from '../auth/roles.decorator.js';
-import { UserRole } from '../common/enums/user-role.enum.js';
+import { UserRole } from '../common/enums/user-role.enum';
 
 @ApiTags('payment-gateways')
 @Controller('payment-gateways')

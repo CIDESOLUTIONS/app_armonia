@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PartialType } from '@nestjs/swagger';
-import { PlanType } from '../enums/plan-type.enum.js';
+import { PlanType } from '../enums/plan-type.enum';
 
 export class CreatePlanDto {
   @IsString()

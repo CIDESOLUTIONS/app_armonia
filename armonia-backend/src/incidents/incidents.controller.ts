@@ -12,16 +12,16 @@ import {
   UploadedFiles,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
-import { GetUser } from '../common/decorators/user.decorator.js';
-import { IncidentsService } from './incidents.service.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GetUser } from '../common/decorators/user.decorator';
+import { IncidentsService } from './incidents.service';
 import {
   CreateIncidentDto,
   UpdateIncidentDto,
   IncidentDto,
   IncidentFilterParamsDto,
   IncidentStatus,
-} from './incidents.dto.js';
+} from './incidents.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('incidents')

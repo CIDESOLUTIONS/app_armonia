@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module.js';
+import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
-import { TenantInterceptor } from './common/interceptors/tenant.interceptor.js';
-import { TenantService } from './tenant/tenant.service.js';
+import { TenantInterceptor } from './common/interceptors/tenant.interceptor';
+import { TenantService } from './tenant/tenant.service';
 
 dotenv.config();
 
