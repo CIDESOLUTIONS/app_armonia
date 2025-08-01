@@ -29,7 +29,7 @@ export class CommunicationsController {
   async getUserNotifications(@GetUser() user: any, @Query() filters: any) {
     return this.communicationsService.getUserNotifications(
       user.schemaName,
-      user.userId,
+      user.userId.toString(),
       filters,
     );
   }
@@ -39,7 +39,7 @@ export class CommunicationsController {
     return this.communicationsService.markNotificationAsRead(
       user.schemaName,
       id,
-      user.userId,
+      user.userId.toString(),
     );
   }
 
@@ -47,7 +47,7 @@ export class CommunicationsController {
   async markAllNotificationsAsRead(@GetUser() user: any) {
     return this.communicationsService.markAllNotificationsAsRead(
       user.schemaName,
-      user.userId,
+      user.userId.toString(),
     );
   }
 
@@ -59,7 +59,7 @@ export class CommunicationsController {
     return this.communicationsService.confirmNotificationReading(
       user.schemaName,
       id,
-      user.userId,
+      user.userId.toString(),
     );
   }
 
@@ -70,7 +70,7 @@ export class CommunicationsController {
   ) {
     return this.communicationsService.sendNotification(
       user.schemaName,
-      user.userId,
+      user.userId.toString(),
       notificationData,
     );
   }
@@ -80,7 +80,7 @@ export class CommunicationsController {
   async getAnnouncements(@GetUser() user: any, @Query() filters: any) {
     return this.communicationsService.getAnnouncements(
       user.schemaName,
-      user.userId,
+      user.userId.toString(),
       user.role,
       filters,
     );
@@ -93,7 +93,7 @@ export class CommunicationsController {
   ) {
     return this.communicationsService.createAnnouncement(
       user.schemaName,
-      user.userId,
+      user.userId.toString(),
       createAnnouncementDto,
     );
   }
@@ -106,14 +106,14 @@ export class CommunicationsController {
   ) {
     return this.communicationsService.updateAnnouncement(
       user.schemaName,
-      +id,
+      id,
       updateAnnouncementDto,
     );
   }
 
   @Delete('announcements/:id')
   async deleteAnnouncement(@GetUser() user: any, @Param('id') id: string) {
-    return this.communicationsService.deleteAnnouncement(user.schemaName, +id);
+    return this.communicationsService.deleteAnnouncement(user.schemaName, id);
   }
 
   // MENSAJES
@@ -126,7 +126,7 @@ export class CommunicationsController {
     return this.communicationsService.getConversationMessages(
       user.schemaName,
       conversationId,
-      user.userId,
+      user.userId.toString(),
       options,
     );
   }
@@ -140,7 +140,8 @@ export class CommunicationsController {
     return this.communicationsService.sendMessage(
       user.schemaName,
       conversationId,
-      user.userId,
+      user.userId.toString(),
+      messageDto.recipientId,
       messageDto,
     );
   }
@@ -153,7 +154,7 @@ export class CommunicationsController {
     return this.communicationsService.markMessageAsRead(
       user.schemaName,
       messageId,
-      user.userId,
+      user.userId.toString(),
     );
   }
 
@@ -162,7 +163,7 @@ export class CommunicationsController {
   async getEvents(@GetUser() user: any, @Query() filters: any) {
     return this.communicationsService.getEvents(
       user.schemaName,
-      user.userId,
+      user.userId.toString(),
       user.role,
       filters,
     );
@@ -175,7 +176,7 @@ export class CommunicationsController {
   ) {
     return this.communicationsService.createEvent(
       user.schemaName,
-      user.userId,
+      user.userId.toString(),
       createEventDto,
     );
   }
@@ -188,13 +189,13 @@ export class CommunicationsController {
   ) {
     return this.communicationsService.updateEvent(
       user.schemaName,
-      +id,
+      id,
       updateEventDto,
     );
   }
 
   @Delete('events/:id')
   async deleteEvent(@GetUser() user: any, @Param('id') id: string) {
-    return this.communicationsService.deleteEvent(user.schemaName, +id);
+    return this.communicationsService.deleteEvent(user.schemaName, id);
   }
 }

@@ -22,20 +22,21 @@ export class BankReconciliationService {
           // Add more sophisticated matching logic here (e.g., date range, reference number)
           status: PaymentStatus.PENDING, // Only match pending payments
         },
+        include: { fees: true },
       });
 
       if (matchingPayment) {
         // If a match is found, update the payment status to COMPLETED
         await prisma.payment.update({
           where: { id: matchingPayment.id },
-          data: { status: PaymentStatus.COMPLETED, paymentDate: new Date() },
+          data: { status: PaymentStatus.COMPLETED, date: new Date() },
         });
 
         // Update the associated fee status
-        if (matchingPayment.feeId) {
+        for (const fee of matchingPayment.fees) {
           await prisma.fee.update({
-            where: { id: matchingPayment.feeId },
-            data: { status: FeeStatus.PAID },
+            where: { id: fee.id },
+            data: { paid: true },
           });
         }
 

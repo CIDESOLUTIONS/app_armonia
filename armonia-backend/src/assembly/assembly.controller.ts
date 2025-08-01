@@ -16,13 +16,12 @@ import {
   UpdateAssemblyDto,
   CreateVoteDto,
   SubmitVoteDto,
+  AssemblyAttendanceDto,
+  AssemblyVoteDto,
+  AssemblyVoteRecordDto,
+  CalculateQuorumResultDto,
+  CalculateVoteResultsResultDto,
 } from '../common/dto/assembly.dto';
-import {
-  AssemblyAttendance,
-  AssemblyVote,
-  AssemblyVoteRecord,
-  CalculateVoteResultsResult,
-} from './assembly.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('assemblies')
@@ -48,7 +47,7 @@ export class AssemblyController {
 
   @Get(':id')
   async getAssemblyById(@GetUser() user: any, @Param('id') id: string) {
-    return this.assemblyService.getAssemblyById(user.schemaName, +id);
+    return this.assemblyService.getAssemblyById(user.schemaName, id);
   }
 
   @Put(':id')
@@ -59,36 +58,36 @@ export class AssemblyController {
   ) {
     return this.assemblyService.updateAssembly(
       user.schemaName,
-      +id,
+      id,
       updateAssemblyDto,
     );
   }
 
   @Delete(':id')
   async deleteAssembly(@GetUser() user: any, @Param('id') id: string) {
-    return this.assemblyService.deleteAssembly(user.schemaName, +id);
+    return this.assemblyService.deleteAssembly(user.schemaName, id);
   }
 
   @Post(':id/attendance')
   async registerAttendance(
     @GetUser() user: any,
     @Param('id') assemblyId: string,
-    @Body() body: { unitId: number; present: boolean }, // Added unitId to body
-  ) {
+    @Body() body: { unitId: string; present: boolean }, // unitId is now string
+  ): Promise<AssemblyAttendanceDto> {
     return this.assemblyService.registerAttendance(
       user.schemaName,
-      +assemblyId,
+      assemblyId,
       user.userId,
       body.unitId,
     );
   }
 
   @Get(':id/quorum-status') // New endpoint for quorum status
-  async getQuorumStatus(@GetUser() user: any, @Param('id') assemblyId: string) {
-    return this.assemblyService.getAssemblyQuorumStatus(
-      user.schemaName,
-      +assemblyId,
-    );
+  async getQuorumStatus(
+    @GetUser() user: any,
+    @Param('id') assemblyId: string,
+  ): Promise<CalculateQuorumResultDto> {
+    return this.assemblyService.calculateQuorum(user.schemaName, assemblyId);
   }
 
   @Post(':id/votes')
@@ -96,10 +95,10 @@ export class AssemblyController {
     @GetUser() user: any,
     @Param('id') assemblyId: string,
     @Body() createVoteDto: CreateVoteDto,
-  ) {
+  ): Promise<AssemblyVoteDto> {
     return this.assemblyService.createVote(
       user.schemaName,
-      +assemblyId,
+      assemblyId,
       createVoteDto,
     );
   }
@@ -109,10 +108,10 @@ export class AssemblyController {
     @GetUser() user: any,
     @Param('voteId') voteId: string,
     @Body() submitVoteDto: SubmitVoteDto,
-  ) {
+  ): Promise<AssemblyVoteRecordDto> {
     return this.assemblyService.castVote(
       user.schemaName,
-      +voteId,
+      voteId,
       user.userId,
       submitVoteDto.unitId,
       submitVoteDto.option,
@@ -120,18 +119,29 @@ export class AssemblyController {
   }
 
   @Get(':voteId/results')
-  async getVoteResults(@GetUser() user: any, @Param('voteId') voteId: string) {
-    return this.assemblyService.calculateVoteResults(user.schemaName, +voteId);
+  async getVoteResults(
+    @GetUser() user: any,
+    @Param('voteId') voteId: string,
+  ): Promise<CalculateVoteResultsResultDto> {
+    return this.assemblyService.calculateVoteResults(user.schemaName, voteId);
   }
 
   @Post(':id/generate-minutes')
   async generateMeetingMinutes(
     @GetUser() user: any,
     @Param('id') assemblyId: string,
-  ) {
+  ): Promise<Buffer> {
     return this.assemblyService.generateMeetingMinutes(
       user.schemaName,
-      +assemblyId,
+      assemblyId,
     );
+  }
+
+  @Post(':voteId/end-vote')
+  async endVote(
+    @GetUser() user: any,
+    @Param('voteId') voteId: string,
+  ): Promise<{ vote: AssemblyVoteDto; results: CalculateVoteResultsResultDto }> {
+    return this.assemblyService.endVote(user.schemaName, voteId);
   }
 }

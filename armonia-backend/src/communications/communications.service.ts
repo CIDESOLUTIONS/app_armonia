@@ -103,12 +103,11 @@ export class CommunicationsService {
   // NOTIFICACIONES (Modelos de tenant)
   async notifyUser(
     schemaName: string,
-    userId: number,
+    userId: string,
     notification: NotificationDataDto,
   ) {
-    const prisma: any = this.prisma;
     try {
-      const user = await prisma.user.findUnique({ where: { id: userId } });
+      const user = await this.prisma.user.findUnique({ where: { id: userId } });
       if (!user) {
         throw new Error(`Usuario con ID ${userId} no encontrado`);
       }
@@ -129,7 +128,7 @@ export class CommunicationsService {
       }
 
       // Create database notification
-      const dbNotification = await prisma.notification.create({
+      const dbNotification = await this.prisma.notification.create({
         data: {
           recipientId: userId,
           type: notification.type,
@@ -153,7 +152,7 @@ export class CommunicationsService {
 
   async notifyUsers(
     schemaName: string,
-    userIds: number[],
+    userIds: string[],
     notification: NotificationDataDto,
   ) {
     const results: any[] = [];
@@ -176,23 +175,21 @@ export class CommunicationsService {
     role: string,
     notification: NotificationDataDto,
   ) {
-    const prisma: any = this.prisma;
-    const users = await prisma.user.findMany({
+    const users = await this.prisma.user.findMany({
       where: { role },
       select: { id: true, phoneNumber: true, deviceToken: true }, // Select phoneNumber and deviceToken
     });
-    const userIds = users.map((user) => user.id);
+    const userIds = users.map((user) => user.id.toString());
     return await this.notifyUsers(schemaName, userIds, notification);
   }
 
   async getUserNotifications(
     schemaName: string,
-    userId: number,
+    userId: string,
     filters: any = {},
   ) {
-    const prisma: any = this.prisma;
     const { read, type, sourceType, priority, limit } = filters;
-    return await prisma.notification.findMany({
+    return await this.prisma.notification.findMany({
       where: {
         recipientId: userId,
         ...(read !== undefined && { read }),
@@ -210,10 +207,9 @@ export class CommunicationsService {
   async markNotificationAsRead(
     schemaName: string,
     notificationId: string,
-    userId: number,
+    userId: string,
   ) {
-    const prisma: any = this.prisma;
-    const notification = await prisma.notification.findFirst({
+    const notification = await this.prisma.notification.findFirst({
       where: {
         id: notificationId,
         recipientId: userId,
@@ -222,7 +218,7 @@ export class CommunicationsService {
     if (!notification) {
       throw new Error('Notificación no encontrada o no pertenece al usuario');
     }
-    return await prisma.notification.update({
+    return await this.prisma.notification.update({
       where: { id: notificationId },
       data: {
         read: true,
@@ -231,9 +227,8 @@ export class CommunicationsService {
     });
   }
 
-  async markAllNotificationsAsRead(schemaName: string, userId: number) {
-    const prisma: any = this.prisma;
-    return await prisma.notification.updateMany({
+  async markAllNotificationsAsRead(schemaName: string, userId: string) {
+    return await this.prisma.notification.updateMany({
       where: {
         recipientId: userId,
         read: false,
@@ -248,10 +243,9 @@ export class CommunicationsService {
   async confirmNotificationReading(
     schemaName: string,
     notificationId: string,
-    userId: number,
+    userId: string,
   ) {
-    const prisma: any = this.prisma;
-    const notification = await prisma.notification.findFirst({
+    const notification = await this.prisma.notification.findFirst({
       where: {
         id: notificationId,
         recipientId: userId,
@@ -263,13 +257,13 @@ export class CommunicationsService {
         'Notificación no encontrada, no pertenece o no requiere confirmación de usurio',
       );
     }
-    await prisma.notificationConfirmation.create({
+    await this.prisma.notificationConfirmation.create({
       data: {
         notificationId,
         userId,
       },
     });
-    return await prisma.notification.update({
+    return await this.prisma.notification.update({
       where: { id: notificationId },
       data: {
         read: true,
@@ -280,25 +274,24 @@ export class CommunicationsService {
 
   async sendNotification(
     schemaName: string,
-    senderId: number,
+    senderId: string,
     notificationData: NotificationDataDto,
   ) {
-    const prisma: any = this.prisma;
     const { recipientType, recipientId, ...data } = notificationData;
 
-    let targetUserIds: number[] = [];
+    let targetUserIds: string[] = [];
 
     switch (recipientType) {
       case 'ALL': {
-        const allUsers = await prisma.user.findMany({ select: { id: true } });
+        const allUsers = await this.prisma.user.findMany({ select: { id: true } });
         targetUserIds = allUsers.map((user) => user.id);
         break;
       }
       case 'RESIDENT': {
         if (!recipientId)
           throw new Error('Recipient ID is required for RESIDENT type.');
-        const resident = await prisma.resident.findUnique({
-          where: { id: parseInt(recipientId) },
+        const resident = await this.prisma.resident.findUnique({
+          where: { id: recipientId },
           select: { userId: true },
         });
         if (resident && resident.userId) targetUserIds.push(resident.userId);
@@ -307,19 +300,19 @@ export class CommunicationsService {
       case 'PROPERTY': {
         if (!recipientId)
           throw new Error('Recipient ID is required for PROPERTY type.');
-        const propertyResidents = await prisma.resident.findMany({
-          where: { propertyId: parseInt(recipientId) },
+        const propertyResidents = await this.prisma.resident.findMany({
+          where: { propertyId: recipientId },
           select: { userId: true },
         });
         targetUserIds = propertyResidents
           .map((resident) => resident.userId)
-          .filter(Boolean) as number[];
+          .filter(Boolean) as string[];
         break;
       }
       case 'USER':
         if (!recipientId)
           throw new Error('Recipient ID is required for USER type.');
-        targetUserIds.push(parseInt(recipientId));
+        targetUserIds.push(recipientId);
         break;
       default:
         throw new Error('Invalid recipient type.');
@@ -336,11 +329,10 @@ export class CommunicationsService {
   // ANUNCIOS (Modelos de tenant)
   async getAnnouncements(
     schemaName: string,
-    userId: number,
+    userId: string,
     userRole: string,
     filters: any = {},
   ) {
-    const prisma: any = this.prisma;
     const { type, read, limit } = filters;
     const queryOptions: any = {
       where: {},
@@ -348,7 +340,7 @@ export class CommunicationsService {
         createdAt: 'desc',
       },
       include: {
-        createdBy: { select: { id: true, name: true, image: true } },
+        createdBy: { select: { id: true, name: true } },
         readBy: {
           where: {
             userId,
@@ -396,17 +388,16 @@ export class CommunicationsService {
       })),
       readBy: announcement.readBy,
       isRead: announcement.readBy.length > 0,
-      requireConfirmation: announcement.requireConfirmation, // Corregido
+      requireConfirmation: announcement.requireConfirmation,
     }));
   }
 
   async createAnnouncement(
     schemaName: string,
-    userId: number,
+    userId: string,
     data: AnnouncementDataDto,
   ) {
-    const prisma: any = this.prisma;
-    const announcement = await prisma.announcement.create({
+    const announcement = await this.prisma.announcement.create({
       data: {
         title: data.title,
         content: data.content,
@@ -415,7 +406,8 @@ export class CommunicationsService {
         targetRoles: data.targetRoles || [],
         requireConfirmation: data.requireConfirmation || false, // Corregido
         expiresAt: data.expiresAt,
-        createdById: userId,
+        createdBy: { connect: { id: userId } },
+        residentialComplex: { connect: { id: schemaName } },
       },
     });
     if (data.attachments && data.attachments.length > 0) {
@@ -426,20 +418,20 @@ export class CommunicationsService {
         type: attachment.type,
         size: attachment.size,
       }));
-      await prisma.announcementAttachment.createMany({
+      await this.prisma.announcementAttachment.createMany({
         data: attachmentRecords,
       });
     }
-    const completeAnnouncement = await prisma.announcement.findUnique({
+    const completeAnnouncement = await this.prisma.announcement.findUnique({
       where: { id: announcement.id },
       include: {
-        createdBy: { select: { id: true, name: true, image: true } },
+        createdBy: { select: { id: true, name: true } },
         attachments: true,
       },
     });
-    let targetUserIds: number[] = [];
+    let targetUserIds: string[] = [];
     if (completeAnnouncement.visibility === 'public') {
-      const users = await prisma.user.findMany({
+      const users = await this.prisma.user.findMany({
         select: { id: true, phoneNumber: true, deviceToken: true },
       });
       targetUserIds = users.map((user) => user.id);
@@ -469,7 +461,7 @@ export class CommunicationsService {
       completeAnnouncement.visibility === 'role-based' &&
       completeAnnouncement.targetRoles.length > 0
     ) {
-      const users = await prisma.user.findMany({
+      const users = await this.prisma.user.findMany({
         where: { role: { in: completeAnnouncement.targetRoles } },
         select: { id: true, phoneNumber: true, deviceToken: true },
       });
@@ -523,12 +515,11 @@ export class CommunicationsService {
 
   async updateAnnouncement(
     schemaName: string,
-    id: number,
+    id: string,
     data: AnnouncementDataDto,
   ) {
-    const prisma: any = this.prisma;
     try {
-      const announcement = await prisma.announcement.update({
+      const announcement = await this.prisma.announcement.update({
         where: { id },
         data: {
           title: data.title,
@@ -547,10 +538,9 @@ export class CommunicationsService {
     }
   }
 
-  async deleteAnnouncement(schemaName: string, id: number) {
-    const prisma: any = this.prisma;
+  async deleteAnnouncement(schemaName: string, id: string) {
     try {
-      await prisma.announcement.delete({ where: { id } });
+      await this.prisma.announcement.delete({ where: { id } });
       return { message: 'Anuncio eliminado correctamente' };
     } catch (error) {
       console.error('Error al eliminar anuncio:', error);
@@ -561,10 +551,9 @@ export class CommunicationsService {
   async markAnnouncementAsRead(
     schemaName: string,
     announcementId: string,
-    userId: number,
+    userId: string,
   ) {
-    const prisma = this.prisma;
-    const existingRead = await prisma.announcementRead.findUnique({
+    const existingRead = await this.prisma.announcementRead.findUnique({
       where: {
         announcementId_userId: { announcementId, userId },
       },
@@ -572,7 +561,7 @@ export class CommunicationsService {
     if (existingRead) {
       return existingRead;
     }
-    return await prisma.announcementRead.create({
+    return await this.prisma.announcementRead.create({
       data: { announcementId, userId },
     });
   }
@@ -580,11 +569,10 @@ export class CommunicationsService {
   // MENSAJES (Modelos de tenant)
   async getOrCreateDirectConversation(
     schemaName: string,
-    userId1: number,
-    userId2: number,
+    userId1: string,
+    userId2: string,
   ) {
-    const prisma: any = this.prisma;
-    const existingConversation = await prisma.conversation.findFirst({
+    const existingConversation = await this.prisma.conversation.findFirst({
       where: {
         type: 'direct',
         participants: {
@@ -600,7 +588,7 @@ export class CommunicationsService {
     if (existingConversation) {
       return existingConversation;
     }
-    const newConversation = await prisma.conversation.create({
+    const newConversation = await this.prisma.conversation.create({
       data: {
         type: 'direct',
         participants: {
@@ -618,19 +606,19 @@ export class CommunicationsService {
   async sendMessage(
     schemaName: string,
     conversationId: string,
-    senderId: number,
+    senderId: string,
+    recipientId: string,
     data: MessageDataDto,
   ) {
-    const prisma: any = this.prisma;
-    const participant = await prisma.conversationParticipant.findFirst({
+    const participant = await this.prisma.conversationParticipant.findFirst({
       where: { conversationId, userId: senderId },
     });
     if (!participant) {
       throw new Error('El usuario no pertenece a esta conversación');
     }
-    const message = await prisma.message.create({
-      data: { conversationId, senderId, content: data.content, status: 'sent' },
-      include: { sender: { select: { id: true, name: true, image: true } } },
+    const message: any = await this.prisma.message.create({
+      data: { conversation: { connect: { id: conversationId } }, sender: { connect: { id: senderId } }, recipient: { connect: { id: recipientId } }, content: data.content, status: 'sent' },
+      include: { sender: { select: { id: true, name: true } } },
     });
     if (data.attachments && data.attachments.length > 0) {
       const attachmentRecords = data.attachments.map((attachment) => ({
@@ -640,13 +628,13 @@ export class CommunicationsService {
         type: attachment.type,
         size: attachment.size,
       }));
-      await prisma.messageAttachment.createMany({ data: attachmentRecords });
+      await this.prisma.messageAttachment.createMany({ data: attachmentRecords });
     }
-    await prisma.conversation.update({
+    await this.prisma.conversation.update({
       where: { id: conversationId },
       data: { updatedAt: new Date() },
     });
-    const otherParticipants = await prisma.conversationParticipant.findMany({
+    const otherParticipants = await this.prisma.conversationParticipant.findMany({
       where: { conversationId, userId: { not: senderId } },
     });
     for (const participant of otherParticipants) {
@@ -666,11 +654,10 @@ export class CommunicationsService {
   async getConversationMessages(
     schemaName: string,
     conversationId: string,
-    userId: number,
+    userId: string,
     options: any = {},
   ) {
-    const prisma: any = this.prisma;
-    const participant = await prisma.conversationParticipant.findFirst({
+    const participant = await this.prisma.conversationParticipant.findFirst({
       where: { conversationId, userId },
     });
     if (!participant) {
@@ -680,7 +667,7 @@ export class CommunicationsService {
       where: { conversationId },
       orderBy: { createdAt: 'desc' },
       include: {
-        sender: { select: { id: true, name: true, image: true } },
+        sender: { select: { id: true, name: true } },
         attachments: true,
         readBy: { where: { userId } },
       },
@@ -691,12 +678,12 @@ export class CommunicationsService {
     if (options.limit) {
       queryOptions.take = options.limit;
     }
-    const messages = await prisma.message.findMany(queryOptions);
+    const messages = await this.prisma.message.findMany(queryOptions);
     const messagesToUpdate = messages.filter(
       (m) => m.senderId !== userId && m.status === 'sent',
     );
     if (messagesToUpdate.length > 0) {
-      await prisma.message.updateMany({
+      await this.prisma.message.updateMany({
         where: { id: { in: messagesToUpdate.map((m) => m.id) } },
         data: { status: 'delivered' },
       });
@@ -706,11 +693,10 @@ export class CommunicationsService {
   async markMessageAsRead(
     schemaName: string,
     messageId: string,
-    userId: number,
+    userId: string,
   ) {
-    const prisma: any = this.prisma;
-    const message = await prisma.message.findUnique({
-      where: { id: parseInt(messageId) },
+    const message = await this.prisma.message.findUnique({
+      where: { id: messageId },
       include: {
         conversation: { include: { participants: { where: { userId } } } },
       },
@@ -721,27 +707,27 @@ export class CommunicationsService {
     if (message.conversation.participants.length === 0) {
       throw new Error('El usuario no pertenece a esta conversación');
     }
-    const existingRead = await prisma.messageRead.findUnique({
+    const existingRead = await this.prisma.messageRead.findUnique({
       where: { messageId_userId: { messageId, userId } },
     });
     if (existingRead) {
       return existingRead;
     }
-    const messageRead = await prisma.messageRead.create({
+    const messageRead = await this.prisma.messageRead.create({
       data: { messageId, userId },
     });
-    const allParticipants = await prisma.conversationParticipant.findMany({
+    const allParticipants = await this.prisma.conversationParticipant.findMany({
       where: {
         conversationId: message.conversationId,
         userId: { not: message.senderId },
       },
     });
-    const allReads = await prisma.messageRead.findMany({
+    const allReads = await this.prisma.messageRead.findMany({
       where: { messageId },
     });
     if (allReads.length >= allParticipants.length) {
-      await prisma.message.update({
-        where: { id: +messageId },
+      await this.prisma.message.update({
+        where: { id: messageId },
         data: { status: 'read' },
       });
     }
@@ -751,11 +737,10 @@ export class CommunicationsService {
   // EVENTOS COMUNITARIOS (Modelos de tenant)
   async createEvent(
     schemaName: string,
-    organizerId: number,
+    organizerId: string,
     data: EventDataDto,
   ) {
-    const prisma: any = this.prisma;
-    const event = await prisma.communityEvent.create({
+    const event = await this.prisma.communityEvent.create({
       data: {
         title: data.title,
         description: data.description,
@@ -766,7 +751,8 @@ export class CommunicationsService {
         visibility: data.visibility || 'public',
         targetRoles: data.targetRoles || [],
         maxAttendees: data.maxAttendees,
-        organizerId,
+        organizer: { connect: { id: organizerId } },
+        residentialComplex: { connect: { id: schemaName } },
       },
     });
     if (data.attachments && data.attachments.length > 0) {
@@ -777,18 +763,18 @@ export class CommunicationsService {
         type: attachment.type,
         size: attachment.size,
       }));
-      await prisma.eventAttachment.createMany({ data: attachmentRecords });
+      await this.prisma.eventAttachment.createMany({ data: attachmentRecords });
     }
-    const completeEvent = await prisma.communityEvent.findUnique({
+    const completeEvent = await this.prisma.communityEvent.findUnique({
       where: { id: event.id },
       include: {
-        organizer: { select: { id: true, name: true, image: true } },
+        organizer: { select: { id: true, name: true } },
         attachments: true,
       },
     });
-    let targetUserIds: number[] = [];
+    let targetUserIds: string[] = [];
     if (completeEvent.visibility === 'public') {
-      const users = await prisma.user.findMany({
+      const users = await this.prisma.user.findMany({
         select: { id: true, phoneNumber: true, deviceToken: true },
       });
       targetUserIds = users.map((user) => user.id);
@@ -797,7 +783,7 @@ export class CommunicationsService {
           if (user.phoneNumber) {
             await this.sendSms(
               user.phoneNumber,
-              `Alerta de emergencia: ${completeEvent.title}. ${completeEvent.content.substring(0, 100)}...`,
+              `Alerta de emergencia: ${completeEvent.title}. ${completeEvent.description.substring(0, 100)}...`,
             );
           }
         }
@@ -808,7 +794,7 @@ export class CommunicationsService {
             await this.sendPushNotification(
               user.deviceToken,
               `Alerta de emergencia: ${completeEvent.title}`,
-              completeEvent.content,
+              completeEvent.description,
             );
           }
         }
@@ -817,7 +803,7 @@ export class CommunicationsService {
       completeEvent.visibility === 'role-based' &&
       completeEvent.targetRoles.length > 0
     ) {
-      const users = await prisma.user.findMany({
+      const users = await this.prisma.user.findMany({
         where: { role: { in: completeEvent.targetRoles } },
         select: { id: true, phoneNumber: true, deviceToken: true },
       });
@@ -827,7 +813,7 @@ export class CommunicationsService {
           if (user.phoneNumber) {
             await this.sendSms(
               user.phoneNumber,
-              `Alerta de emergencia: ${completeEvent.title}. ${completeEvent.content.substring(0, 100)}...`,
+              `Alerta de emergencia: ${completeEvent.title}. ${completeEvent.description.substring(0, 100)}...`,
             );
           }
         }
@@ -838,7 +824,7 @@ export class CommunicationsService {
             await this.sendPushNotification(
               user.deviceToken,
               `Alerta de emergencia: ${completeEvent.title}`,
-              completeEvent.content,
+              completeEvent.description,
             );
           }
         }
@@ -868,10 +854,9 @@ export class CommunicationsService {
     return completeEvent;
   }
 
-  async updateEvent(schemaName: string, id: number, data: EventDataDto) {
-    const prisma: any = this.prisma;
+  async updateEvent(schemaName: string, id: string, data: EventDataDto) {
     try {
-      const event = await prisma.communityEvent.update({
+      const event = await this.prisma.communityEvent.update({
         where: { id },
         data: {
           title: data.title,
@@ -892,10 +877,9 @@ export class CommunicationsService {
     }
   }
 
-  async deleteEvent(schemaName: string, id: number) {
-    const prisma: any = this.prisma;
+  async deleteEvent(schemaName: string, id: string) {
     try {
-      await prisma.communityEvent.delete({ where: { id } });
+      await this.prisma.communityEvent.delete({ where: { id } });
       return { message: 'Evento eliminado correctamente' };
     } catch (error) {
       console.error('Error al eliminar evento:', error);
@@ -905,11 +889,10 @@ export class CommunicationsService {
 
   async getEvents(
     schemaName: string,
-    userId: number,
+    userId: string,
     userRole: string,
     filters: any = {},
   ) {
-    const prisma: any = this.prisma;
     const { type, upcoming, limit, startDate, endDate } = filters;
     const queryOptions: any = {
       where: {},
@@ -917,7 +900,7 @@ export class CommunicationsService {
         startDateTime: upcoming ? 'asc' : 'desc',
       },
       include: {
-        organizer: { select: { id: true, name: true, image: true } },
+        organizer: { select: { id: true, name: true } },
         attendees: { where: { userId } },
         attachments: true,
       },
@@ -972,11 +955,10 @@ export class CommunicationsService {
   async registerEventAttendance(
     schemaName: string,
     eventId: string,
-    userId: number,
+    userId: string,
     status: 'confirmed' | 'tentative' | 'declined',
   ) {
-    const prisma = this.prisma;
-    const event = await prisma.communityEvent.findUnique({
+    const event = await this.prisma.communityEvent.findUnique({
       where: { id: eventId },
       include: { attendees: { where: { userId } } },
     });
@@ -984,7 +966,7 @@ export class CommunicationsService {
       throw new Error('Evento no encontrado');
     }
     if (status === 'confirmed' && event.maxAttendees) {
-      const confirmedCount = await prisma.eventAttendee.count({
+      const confirmedCount = await this.prisma.eventAttendee.count({
         where: { eventId, status: 'confirmed' },
       });
       if (
@@ -995,12 +977,12 @@ export class CommunicationsService {
       }
     }
     if (event.attendees.length > 0) {
-      return await prisma.eventAttendee.update({
-        where: { id: event.attendees[0].id },
+      return await this.prisma.eventAttendee.update({
+        where: { eventId_userId: { eventId: event.attendees[0].eventId, userId: event.attendees[0].userId } },
         data: { status },
       });
     } else {
-      return await prisma.eventAttendee.create({
+      return await this.prisma.eventAttendee.create({
         data: { eventId, userId, status },
       });
     }
@@ -1008,25 +990,18 @@ export class CommunicationsService {
 
   // UTILIDADES (Modelos globales y de tenant)
   async cleanupExpiredItems(schemaName: string) {
-    const prismaTenant = this.prisma;
     const now = new Date();
-    const deletedNotifications = await prismaTenant.notification.deleteMany({
+    const deletedNotifications = await this.prisma.notification.deleteMany({
       where: { expiresAt: { lt: now } },
-    });
-    const updatedAnnouncements = await prismaTenant.announcement.updateMany({
-      where: { expiresAt: { lt: now } },
-      data: { data: { expired: true } },
     });
     return {
       deletedNotifications: deletedNotifications.count,
-      updatedAnnouncements: updatedAnnouncements.count,
     };
   }
 
   async migrateReservationNotifications(schemaName: string) {
-    const prisma = this.prisma;
     const reservationNotifications =
-      await prisma.reservationNotification.findMany({
+      await this.prisma.reservationNotification.findMany({
         where: { migrated: false },
         include: { reservation: true },
       });
@@ -1037,15 +1012,15 @@ export class CommunicationsService {
         if (oldNotification.type === 'rejection') type = NotificationType.ERROR;
         if (oldNotification.type === 'cancellation')
           type = NotificationType.WARNING;
-        const prisma = this.prisma;
-        await prisma.notification.create({
+        await this.prisma.notification.create({
           data: {
-            recipientId: oldNotification.userId,
+            recipient: { connect: { id: oldNotification.userId } },
             type,
             title: 'Notificación de reserva',
             message: oldNotification.message,
             sourceType: NotificationSourceType.RESERVATION,
             sourceId: oldNotification.reservationId?.toString(),
+            priority: NotificationPriority.MEDIUM,
             read: oldNotification.isRead || false,
             readAt: oldNotification.readAt,
             data: {
@@ -1054,7 +1029,7 @@ export class CommunicationsService {
             },
           },
         });
-        await prisma.reservationNotification.update({
+        await this.prisma.reservationNotification.update({
           where: { id: oldNotification.id },
           data: { migrated: true },
         });

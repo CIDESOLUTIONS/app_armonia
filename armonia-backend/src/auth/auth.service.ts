@@ -83,7 +83,7 @@ export class AuthService {
   }
 
   async handleDemoRequest(data: any) {
-    const { name, email, complexName, units } = data;
+    const { name, email, complexName, phone, message } = data;
 
     // Save the demo request to the database using the default client
     const defaultPrisma = this.prismaService;
@@ -92,14 +92,15 @@ export class AuthService {
         name,
         email,
         complexName,
-        units,
+        phone,
+        message,
       },
     });
 
     // Here you would typically send an email to the sales team
     // For this example, we'll just log it to the console
     console.log(
-      `New demo request: ${name} <${email}> for ${complexName} with ${units} units`,
+      `New demo request: ${name} <${email}> for ${complexName} (Phone: ${phone}, Message: ${message})`,
     );
 
     return { message: 'Demo request received successfully' };

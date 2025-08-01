@@ -22,7 +22,7 @@ export class AssemblyGateway {
   @SubscribeMessage('joinAssembly')
   async handleJoinAssembly(
     @MessageBody()
-    data: { assemblyId: number; schemaName: string; userId: number },
+    data: { assemblyId: string; schemaName: string; userId: string },
     @ConnectedSocket() client: Socket,
   ): Promise<void> {
     client.join(`assembly-${data.assemblyId}-${data.schemaName}`);
@@ -52,7 +52,7 @@ export class AssemblyGateway {
       unitId,
     );
     const { currentAttendance, quorumMet } =
-      await this.assemblyService.getAssemblyQuorumStatus(
+      await this.assemblyService.calculateQuorum(
         data.schemaName,
         data.assemblyId,
       );
@@ -65,7 +65,7 @@ export class AssemblyGateway {
   @SubscribeMessage('submitVote')
   async handleSubmitVote(
     @MessageBody()
-    data: SubmitVoteDto & { schemaName: string; assemblyId: number },
+    data: SubmitVoteDto & { schemaName: string; assemblyId: string },
     @ConnectedSocket() client: Socket,
   ): Promise<void> {
     await this.assemblyService.castVote(

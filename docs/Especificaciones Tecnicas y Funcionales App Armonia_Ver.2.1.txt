@@ -20,7 +20,7 @@ Nuestra misión es transformar radicalmente la gestión y la experiencia de vida
 * Frontend: Next.js 15+, React 19+ (con Server Components y Actions), TypeScript
 * Backend: Node.js, NestJS
 * Base de Datos: PostgreSQL 17+
-* ORM: Prisma 6+ (schema.prisma con enrutamientos a schemas por funcionalidad en backend)
+* ORM: Prisma 6+ (schema.prisma en backend)
 * Autenticación: JWT (JSON Web Tokens)
 * Almacenamiento: PostgreSQL
 * Validación: Zod 
