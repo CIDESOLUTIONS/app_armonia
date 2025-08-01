@@ -111,11 +111,18 @@ model BudgetItem {
 
 model Budget {
   id          String   @id @default(cuid())
+  title       String
+  month       Int
+  status      String // DRAFT, APPROVED, REJECTED
   year        Int
   totalAmount Float
   items       BudgetItem[]
+  expenses    Expense[]
   residentialComplexId String
   residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  approvedById String?
+  approvedBy  User?    @relation(fields: [approvedById], references: [id])
+  approvedAt  DateTime?
 }
 
 model Camera {
@@ -221,8 +228,30 @@ model Document {
   residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
 }
 
+model Expense {
+  id                   String               @id @default(cuid())
+  description          String
+  amount               Float
+  category             String
+  expenseDate          DateTime
+  vendor               String?
+  invoiceNumber        String?
+  notes                String?
+  residentialComplexId String
+  residentialComplex   ResidentialComplex   @relation(fields: [residentialComplexId], references: [id])
+  budgetId             String?
+  budget               Budget?              @relation(fields: [budgetId], references: [id])
+  approvedById         String?
+  approvedBy           User?                @relation(fields: [approvedById], references: [id])
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+}
+
 model Fee {
   id          String   @id @default(cuid())
+  title       String
+  description String?
+  type        String
   propertyId  String
   property    Property @relation(fields: [propertyId], references: [id])
   amount      Float
@@ -231,6 +260,9 @@ model Fee {
   paidAt      DateTime?
   paymentId   String?
   payment     Payment? @relation(fields: [paymentId], references: [id])
+  createdAt   DateTime @default(now())
+  isRecurring Boolean  @default(false)
+  frequency   String?
 }
 
 model Financials {
@@ -419,6 +451,8 @@ model Payment {
   date        DateTime
   method      String // PSE, CREDIT_CARD
   status      String // PENDING, COMPLETED, FAILED
+  transactionId String? @unique
+  paymentMethod String?
   fees        Fee[]
   attempts    PaymentAttempt[]
 }
@@ -598,6 +632,7 @@ model ResidentialComplex {
   utilityRates UtilityRate[]
   announcements Announcement[]
   communityEvents CommunityEvent[]
+  expenses Expense[]
 }
 
 model Review {
@@ -696,6 +731,8 @@ model User {
   deviceToken String?
   conversationParticipants ConversationParticipant[]
   messageReads MessageRead[]
+  approvedBudgets Budget[]
+  approvedExpenses Expense[]
 }
 
 model UtilityRate {

@@ -1,10 +1,11 @@
 import {
   IsString,
-  IsNumber,
   IsOptional,
-  IsEnum,
-  IsDateString,
+  IsNumber,
+  IsBoolean,
   IsArray,
+  IsDateString,
+  IsEnum,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -34,143 +35,61 @@ export enum BudgetStatus {
 }
 
 export class FeeDto {
-  @IsNumber()
-  id: number;
-
-  @IsString()
+  id: string;
   title: string;
-
-  @IsString()
-  description: string;
-
-  @IsNumber()
+  description?: string;
+  type: string;
+  propertyId: string;
   amount: number;
-
-  @IsEnum(FeeType)
-  type: FeeType;
-
-  @IsDateString()
-  dueDate: string;
-
-  @IsString()
-  createdAt: string;
-
-  @IsString()
-  updatedAt: string;
-
-  @IsNumber()
-  propertyId: number;
-
-  @IsEnum(PaymentStatus)
-  status: PaymentStatus;
-
-  @IsOptional()
-  @IsDateString()
-  paymentDate?: string;
-
-  @IsOptional()
-  @IsString()
-  receiptNumber?: string;
-
-  @IsOptional()
-  @IsString()
-  paymentMethod?: string;
-
-  @IsOptional()
-  @IsString()
-  paymentReference?: string;
+  dueDate: Date;
+  paid: boolean;
+  paidAt?: Date;
+  paymentId?: string;
+  createdAt: Date;
+  isRecurring: boolean;
+  frequency?: string;
 }
 
 export class PaymentDto {
-  @IsNumber()
-  id: number;
-
-  @IsNumber()
+  id: string;
+  userId: string;
+  status: PaymentStatus;
   amount: number;
-
-  @IsDateString()
-  date: string;
-
-  @IsString()
+  date: Date;
   method: string;
-
-  @IsString()
-  reference: string;
-
-  @IsString()
-  receiptNumber: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @IsNumber()
-  feeId: number;
-
-  @IsNumber()
-  propertyId: number;
-
-  @IsString()
-  createdAt: string;
-
-  @IsString()
-  updatedAt: string;
-
-  @IsNumber()
-  createdBy: number;
+  feeId?: string;
+  transactionId?: string;
+  paymentMethod?: string;
 }
 
 export class BudgetItemDto {
-  @IsNumber()
-  id: number;
+  @IsString()
+  id: string;
 
-  @IsNumber()
-  budgetId: number;
+  @IsString()
+  budgetId: string;
+
+  @IsString()
+  name: string;
 
   @IsString()
   description: string;
 
   @IsNumber()
   amount: number;
-
-  @IsString()
-  category: string;
-
-  @IsNumber()
-  order: number;
 }
 
 export class BudgetDto {
-  @IsNumber()
-  id: number;
-
-  @IsNumber()
-  year: number;
-
-  @IsNumber()
-  month: number;
-
-  @IsString()
+  id: string;
   title: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @IsNumber()
-  totalAmount: number;
-
-  @IsOptional()
-  @IsDateString()
-  approvedDate?: string;
-
-  @IsEnum(BudgetStatus)
+  month: number;
   status: BudgetStatus;
-
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => BudgetItemDto)
-  items: Omit<BudgetItemDto, 'id' | 'budgetId'>[];
+  year: number;
+  totalAmount: number;
+  items: BudgetItemDto[];
+  residentialComplexId: string;
+  approvedById?: string;
+  approvedAt?: Date;
 }
 
 export class FeeListResponseDto {
@@ -193,20 +112,29 @@ export class CreateFeeDto {
   @IsString()
   title: string;
 
+  @IsOptional()
   @IsString()
-  description: string;
+  description?: string;
+
+  @IsString()
+  type: string;
+
+  @IsString()
+  propertyId: string;
 
   @IsNumber()
   amount: number;
 
-  @IsEnum(FeeType)
-  type: FeeType;
-
   @IsDateString()
-  dueDate: string;
+  dueDate: Date;
 
-  @IsNumber()
-  propertyId: number;
+  @IsOptional()
+  @IsBoolean()
+  isRecurring?: boolean;
+
+  @IsOptional()
+  @IsString()
+  frequency?: string;
 }
 
 export class UpdateFeeDto {
@@ -219,86 +147,111 @@ export class UpdateFeeDto {
   description?: string;
 
   @IsOptional()
+  @IsString()
+  type?: string;
+
+  @IsOptional()
+  @IsString()
+  propertyId?: string;
+
+  @IsOptional()
   @IsNumber()
   amount?: number;
 
   @IsOptional()
-  @IsEnum(FeeType)
-  type?: FeeType;
+  @IsDateString()
+  dueDate?: Date;
+
+  @IsOptional()
+  @IsBoolean()
+  paid?: boolean;
 
   @IsOptional()
   @IsDateString()
-  dueDate?: string;
+  paidAt?: Date;
 
   @IsOptional()
-  @IsEnum(PaymentStatus)
-  status?: PaymentStatus;
+  @IsString()
+  paymentId?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isRecurring?: boolean;
+
+  @IsOptional()
+  @IsString()
+  frequency?: string;
 }
 
 export class CreatePaymentDto {
+  @IsString()
+  userId: string;
+
   @IsNumber()
   amount: number;
 
   @IsDateString()
-  date: string;
+  date: Date;
 
   @IsString()
   method: string;
 
-  @IsString()
-  reference: string;
+  @IsEnum(PaymentStatus)
+  status: PaymentStatus;
 
   @IsOptional()
   @IsString()
-  description?: string;
+  feeId?: string;
 
-  @IsNumber()
-  feeId: number;
+  @IsOptional()
+  @IsString()
+  transactionId?: string;
 
-  @IsNumber()
-  propertyId: number;
+  @IsOptional()
+  @IsString()
+  paymentMethod?: string;
 }
 
 export class UpdatePaymentDto {
+  @IsOptional()
+  @IsString()
+  userId?: string;
+
   @IsOptional()
   @IsNumber()
   amount?: number;
 
   @IsOptional()
   @IsDateString()
-  date?: string;
+  date?: Date;
 
   @IsOptional()
   @IsString()
   method?: string;
 
   @IsOptional()
-  @IsString()
-  reference?: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @IsOptional()
-  @IsNumber()
-  feeId?: number;
-
-  @IsOptional()
-  @IsNumber()
-  propertyId?: number;
-
-  @IsOptional()
   @IsEnum(PaymentStatus)
   status?: PaymentStatus;
+
+  @IsOptional()
+  @IsString()
+  feeId?: string;
+
+  @IsOptional()
+  @IsString()
+  transactionId?: string;
+
+  @IsOptional()
+  @IsString()
+  paymentMethod?: string;
 }
 
 export class RegisterManualPaymentDto {
-  @IsNumber()
-  feeId: number;
+  @IsString()
+  feeId: string;
 
-  @IsNumber()
-  userId: number;
+  @IsString()
+  userId: string;
 
   @IsNumber()
   amount: number;
@@ -315,26 +268,25 @@ export class RegisterManualPaymentDto {
 }
 
 export class CreateBudgetDto {
-  @IsNumber()
-  year: number;
+  @IsString()
+  title: string;
 
   @IsNumber()
   month: number;
 
-  @IsString()
-  title: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
+  @IsNumber()
+  year: number;
 
   @IsNumber()
   totalAmount: number;
 
+  @IsString()
+  residentialComplexId: string;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => BudgetItemDto)
-  items: Omit<BudgetItemDto, 'id' | 'budgetId'>[];
+  items: BudgetItemDto[];
 }
 
 export class UpdateBudgetDto {
@@ -362,16 +314,24 @@ export class UpdateBudgetDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => BudgetItemDto)
-  items?: Omit<BudgetItemDto, 'id' | 'budgetId'>[];
+  items?: BudgetItemDto[];
 
   @IsOptional()
   @IsEnum(BudgetStatus)
   status?: BudgetStatus;
+
+  @IsOptional()
+  @IsString()
+  approvedById?: string;
+
+  @IsOptional()
+  @IsDateString()
+  approvedAt?: Date;
 }
 
 export class InitiatePaymentDto {
-  @IsNumber()
-  feeId: number;
+  @IsString()
+  feeId: string;
 
   @IsString()
   paymentMethod: string;
@@ -436,8 +396,8 @@ export class FeeFilterParamsDto {
   type?: FeeType;
 
   @IsOptional()
-  @IsNumber()
-  propertyId?: number;
+  @IsString()
+  propertyId?: string;
 
   @IsOptional()
   @IsDateString()
@@ -456,6 +416,20 @@ export class BudgetFilterParamsDto extends FeeFilterParamsDto {
   @IsOptional()
   @IsNumber()
   year?: number;
+}
+
+export class ExpenseDto {
+  id: string;
+  description: string;
+  amount: number;
+  category: string;
+  expenseDate: Date;
+  vendor?: string;
+  invoiceNumber?: string;
+  notes?: string;
+  complexId: string;
+  budgetId?: string;
+  approvedById?: string;
 }
 
 export class CreateExpenseDto {
@@ -483,16 +457,16 @@ export class CreateExpenseDto {
   @IsOptional()
   notes?: string;
 
-  @IsNumber()
-  complexId: number;
+  @IsString()
+  complexId: string;
 
-  @IsNumber()
   @IsOptional()
-  budgetId?: number;
+  @IsString()
+  budgetId?: string;
 
-  @IsNumber()
   @IsOptional()
-  approvedById?: number;
+  @IsString()
+  approvedById?: string;
 }
 
 export class UpdateExpenseDto extends PartialType(CreateExpenseDto) {}
