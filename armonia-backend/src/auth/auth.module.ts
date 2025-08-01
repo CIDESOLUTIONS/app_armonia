@@ -21,17 +21,7 @@ import { ResidentialComplexModule } from '../residential-complex/residential-com
       signOptions: { expiresIn: '60m' },
     }),
   ],
-  providers: [
-    AuthService,
-    {
-      provide: JwtStrategy,
-      useFactory: () =>
-        new JwtStrategy(
-          process.env.JWT_SECRET_KEY ||
-            'superSecretKeyThatShouldBeLongAndRandom',
-        ),
-    },
-  ],
+  providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
   exports: [AuthService],
 })

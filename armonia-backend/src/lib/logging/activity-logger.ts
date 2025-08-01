@@ -3,10 +3,10 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class ActivityLogger {
   logActivity(data: {
-    userId: number;
+    userId: string;
     action: string;
     resourceType: string;
-    resourceId: number;
+    resourceId: string;
     details: any;
   }) {
     console.log('Activity logged:', data);

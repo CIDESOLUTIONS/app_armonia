@@ -167,6 +167,9 @@ export class MessageDataDto {
   @IsString()
   content: string;
 
+  @IsString()
+  recipientId: string;
+
   @IsOptional()
   @IsArray()
   @Type(() => AttachmentDto)

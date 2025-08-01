@@ -5,52 +5,757 @@ datasource db {
 
 generator client {
   provider        = "prisma-client-js"
-  output          = "../../node_modules/.prisma/client"
+  output          = "../node_modules/.prisma/client"
   previewFeatures = ["multiSchema"]
+  binaryTargets   = ["native", "debian-openssl-3.0.x"]
 }
 
-/// @prisma.schema ./schema_residential_complex.prisma
-/// @prisma.schema ./schema_pet.prisma
-/// @prisma.schema ./schema_vehicle.prisma
-/// @prisma.schema ./schema_resident.prisma
-/// @prisma.schema ./schema_assembly.prisma
-/// @prisma.schema ./schema_attendance.prisma
-/// @prisma.schema ./schema_budget_item.prisma
-/// @prisma.schema ./schema_budget.prisma
-/// @prisma.schema ./schema_cameras.prisma
-/// @prisma.schema ./schema_communications.prisma
-/// @prisma.schema ./schema_correspondence.prisma
-/// @prisma.schema ./schema_documents.prisma
-/// @prisma.schema ./schema_fee.prisma
-/// @prisma.schema ./schema_financial.prisma
-/// @prisma.schema ./schema_incidents_complete.prisma
-/// @prisma.schema ./schema_intercom.prisma
-/// @prisma.schema ./schema_listing.prisma
-/// @prisma.schema ./schema_message.prisma
-/// @prisma.schema ./schema_micro_credit_application.prisma
-/// @prisma.schema ./schema_monitoring.prisma
-/// @prisma.schema ./schema_option.prisma
-/// @prisma.schema ./schema_package.prisma
-/// @prisma.schema ./schema_personal_finance.prisma
-/// @prisma.schema ./schema_payment_attempt.prisma
-/// @prisma.schema ./schema_payment.prisma
-/// @prisma.schema ./schema_payments.prisma
-/// @prisma.schema ./schema_pqr_advanced.prisma
-/// @prisma.schema ./schema_property.prisma
-/// @prisma.schema ./schema_question.prisma
-/// @prisma.schema ./schema_report.prisma
-/// @prisma.schema ./schema_reported_listing.prisma
-/// @prisma.schema ./schema_reservations.prisma
-/// @prisma.schema ./schema_review.prisma
-/// @prisma.schema ./schema_security.prisma
-/// @prisma.schema ./schema_service_provider.prisma
-/// @prisma.schema ./schema_smart_meter_reading.prisma
-/// @prisma.schema ./schema_survey.prisma
-/// @prisma.schema ./schema_user_vote.prisma
-/// @prisma.schema ./schema_user.prisma
-/// @prisma.schema ./schema_visitor.prisma
-/// @prisma.schema ./schema_visitors.prisma
-/// @prisma.schema ./schema_vote.prisma
-/// @prisma.schema ./schema_amenities.prisma
-/// @prisma.schema ./schema_parking.prisma
-/// @prisma.schema ./schema_demo_request.prisma
+model Amenity {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  rules       String?
+  reservations Reservation[]
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model Announcement {
+  id                  String              @id @default(cuid())
+  title               String
+  content             String
+  type                String // general, emergency, important
+  visibility          String // public, role-based
+  targetRoles         String[]
+  requireConfirmation Boolean
+  expiresAt           DateTime?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  createdById         String
+  createdBy           User                @relation(fields: [createdById], references: [id])
+  attachments         AnnouncementAttachment[]
+  readBy              AnnouncementRead[]
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model AnnouncementAttachment {
+  id             String   @id @default(cuid())
+  announcementId String
+  announcement   Announcement @relation(fields: [announcementId], references: [id])
+  name           String
+  url            String
+  type           String
+  size           Int
+}
+
+model AnnouncementRead {
+  announcementId String
+  userId         String
+  announcement   Announcement @relation(fields: [announcementId], references: [id])
+  user           User         @relation(fields: [userId], references: [id])
+  readAt         DateTime     @default(now())
+
+  @@id([announcementId, userId])
+}
+
+model Assembly {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  date        DateTime
+  type        String // ORDINARY, EXTRAORDINARY
+  status      String // SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED
+  quorum      Float
+  attendance  AssemblyAttendance[]
+  votes       AssemblyVote[]
+  minutes     AssemblyMinutes[]
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model AssemblyMinutes {
+  id          String   @id @default(cuid())
+  assemblyId  String
+  assembly    Assembly @relation(fields: [assemblyId], references: [id])
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AssemblyAttendance {
+  id          String   @id @default(cuid())
+  assemblyId  String
+  assembly    Assembly @relation(fields: [assemblyId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  attended    Boolean  @default(false)
+  attendedAt  DateTime?
+  unitId      String // Added missing field
+  checkInTime DateTime? // Added missing field
+  notes       String? // Added missing field
+  proxyName   String? // Added missing field
+  proxyDocument String? // Added missing field
+  isDelegate  Boolean // Added missing field
+  isOwner     Boolean // Added missing field
+}
+
+model BudgetItem {
+  id          String   @id @default(cuid())
+  budgetId    String
+  budget      Budget   @relation(fields: [budgetId], references: [id])
+  name        String
+  amount      Float
+  description String?
+}
+
+model Budget {
+  id          String   @id @default(cuid())
+  year        Int
+  totalAmount Float
+  items       BudgetItem[]
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model Camera {
+  id          String   @id @default(cuid())
+  name        String
+  url         String
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model Communication {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  type        String // ANNOUNCEMENT, MESSAGE
+  senderId    String
+  sender      User     @relation("SentCommunications", fields: [senderId], references: [id])
+  recipientId String?
+  recipient   User?    @relation("ReceivedCommunications", fields: [recipientId], references: [id])
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CommunityEvent {
+  id           String    @id @default(cuid())
+  title        String
+  description  String?
+  location     String?
+  startDateTime DateTime
+  endDateTime  DateTime
+  type         String // general, emergency, important
+  visibility   String // public, role-based
+  targetRoles  String[]
+  maxAttendees Int?
+  organizerId  String
+  organizer    User      @relation(fields: [organizerId], references: [id])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  attachments  EventAttachment[]
+  attendees    EventAttendee[]
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model EventAttachment {
+  id      String   @id @default(cuid())
+  eventId String
+  event   CommunityEvent @relation(fields: [eventId], references: [id])
+  name    String
+  url     String
+  type    String
+  size    Int
+}
+
+model EventAttendee {
+  eventId String
+  userId  String
+  event   CommunityEvent @relation(fields: [eventId], references: [id])
+  user    User           @relation(fields: [userId], references: [id])
+  status  String // confirmed, tentative, declined
+  registeredAt DateTime @default(now())
+
+  @@id([eventId, userId])
+}
+
+model Conversation {
+  id           String @id @default(cuid())
+  type         String // direct, group
+  participants ConversationParticipant[]
+  messages     Message[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model ConversationParticipant {
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  role           String // member, admin
+  joinedAt       DateTime     @default(now())
+
+  @@id([conversationId, userId])
+}
+
+model DemoRequest {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  phone       String
+  complexName String
+  message     String?
+  createdAt   DateTime @default(now())
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  name        String
+  url         String
+  type        String // REGULATION, MINUTES, MANUAL
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model Fee {
+  id          String   @id @default(cuid())
+  propertyId  String
+  property    Property @relation(fields: [propertyId], references: [id])
+  amount      Float
+  dueDate     DateTime
+  paid        Boolean  @default(false)
+  paidAt      DateTime?
+  paymentId   String?
+  payment     Payment? @relation(fields: [paymentId], references: [id])
+}
+
+model Financials {
+  id          String   @id @default(cuid())
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  // Add fields for financial data
+}
+
+model Incident {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  status      String // OPEN, IN_PROGRESS, RESOLVED, CLOSED
+  reportedById String
+  reportedBy  User     @relation(fields: [reportedById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model Intercom {
+  id          String   @id @default(cuid())
+  propertyId  String
+  property    Property @relation(fields: [propertyId], references: [id])
+  number      String
+}
+
+model IoTDevice {
+  id          String   @id @default(cuid())
+  type        String // SMART_METER, CAMERA
+  status      String // ONLINE, OFFLINE
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model Listing {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  price       Float
+  sellerId    String
+  seller      User     @relation(fields: [sellerId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  reportedListings ReportedListing[]
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  content     String
+  senderId    String
+  sender      User     @relation("Sender", fields: [senderId], references: [id])
+  recipientId String
+  recipient   User     @relation("Recipient", fields: [recipientId], references: [id])
+  status      String // sent, delivered, read
+  createdAt   DateTime @default(now())
+  attachments MessageAttachment[]
+  readBy      MessageRead[]
+}
+
+model MessageAttachment {
+  id        String   @id @default(cuid())
+  messageId String
+  message   Message  @relation(fields: [messageId], references: [id])
+  name      String
+  url       String
+  type      String
+  size      Int
+}
+
+model MessageRead {
+  messageId String
+  userId    String
+  message   Message  @relation(fields: [messageId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  readAt    DateTime @default(now())
+
+  @@id([messageId, userId])
+}
+
+model MicroCreditApplication {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  amount      Float
+  status      String // PENDING, APPROVED, REJECTED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Monitoring {
+  id          String   @id @default(cuid())
+  // Add fields for monitoring data
+}
+
+model Notification {
+  id                  String    @id @default(cuid())
+  recipientId         String
+  recipient           User      @relation("RecipientNotifications", fields: [recipientId], references: [id])
+  type                String // INFO, WARNING, ERROR, SUCCESS
+  title               String
+  message             String
+  link                String?
+  data                Json?
+  sourceType          String // SYSTEM, MESSAGE, RESERVATION, ANNOUNCEMENT, EVENT
+  sourceId            String?
+  priority            String // LOW, MEDIUM, HIGH, URGENT
+  read                Boolean   @default(false)
+  readAt              DateTime?
+  requireConfirmation Boolean   @default(false)
+  expiresAt           DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  confirmations       NotificationConfirmation[]
+}
+
+model NotificationConfirmation {
+  id             String   @id @default(cuid())
+  notificationId String
+  notification   Notification @relation(fields: [notificationId], references: [id])
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  confirmedAt    DateTime @default(now())
+}
+
+model Option {
+  id          String   @id @default(cuid())
+  questionId  String
+  question    Question @relation(fields: [questionId], references: [id])
+  text        String
+  votes       UserVote[]
+  Vote        Vote[]
+}
+
+model Package {
+  id          String   @id @default(cuid())
+  residentId  String
+  resident    User     @relation(fields: [residentId], references: [id])
+  receivedAt  DateTime @default(now())
+  deliveredAt DateTime?
+  notes       String?
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model PanicAlert {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  location    String?
+  createdAt   DateTime @default(now())
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model Parking {
+  id          String   @id @default(cuid())
+  number      String
+  propertyId  String?
+  property    Property? @relation(fields: [propertyId], references: [id])
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model PaymentAttempt {
+  id          String   @id @default(cuid())
+  paymentId   String
+  payment     Payment  @relation(fields: [paymentId], references: [id])
+  status      String // PENDING, SUCCESS, FAILED
+  gateway     String
+  gatewayId   String?
+  createdAt   DateTime @default(now())
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  amount      Float
+  date        DateTime
+  method      String // PSE, CREDIT_CARD
+  status      String // PENDING, COMPLETED, FAILED
+  fees        Fee[]
+  attempts    PaymentAttempt[]
+}
+
+model Payments {
+  id          String   @id @default(cuid())
+  // Add fields for payments data
+}
+
+model PersonalFinance {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  // Add fields for personal finance data
+}
+
+model Pet {
+  id          String   @id @default(cuid())
+  name        String
+  breed       String?
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id])
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model Plan {
+  id          String   @id @default(cuid())
+  name        String
+  price       Float
+  features    String[]
+  residentialComplexes ResidentialComplex[]
+}
+
+model PQR {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  type        String // PETITION, COMPLAINT, CLAIM
+  status      String // OPEN, IN_PROGRESS, RESOLVED, CLOSED
+  reportedById String
+  reportedBy  User     @relation(fields: [reportedById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  status      String // PLANNING, IN_PROGRESS, COMPLETED
+  startDate   DateTime?
+  endDate   DateTime?
+  budget      Float?
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model Property {
+  id          String   @id @default(cuid())
+  type        String // APARTMENT, HOUSE, OFFICE
+  number      String
+  ownerId     String
+  owner       User     @relation("Owner", fields: [ownerId], references: [id])
+  residentId  String?
+  resident    User?    @relation("Resident", fields: [residentId], references: [id])
+  fees        Fee[]
+  intercoms   Intercom[]
+  parkings    Parking[]
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  residents   Resident[]
+  visitors    Visitor[]
+}
+
+model Question {
+  id          String   @id @default(cuid())
+  surveyId    String
+  survey      Survey   @relation(fields: [surveyId], references: [id])
+  text        String
+  options     Option[]
+  votes       Vote[]
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  name        String
+  data        Json
+  generatedById String
+  generatedBy User     @relation(fields: [generatedById], references: [id])
+  createdAt   DateTime @default(now())
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model ReportedListing {
+  id          String   @id @default(cuid())
+  listingId   String
+  listing     Listing  @relation(fields: [listingId], references: [id])
+  reportedById String
+  reportedBy  User     @relation(fields: [reportedById], references: [id])
+  reason      String
+  createdAt   DateTime @default(now())
+}
+
+model Reservation {
+  id          String   @id @default(cuid())
+  amenityId   String
+  amenity     Amenity  @relation(fields: [amenityId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  startTime   DateTime
+  endTime     DateTime
+  status      String // PENDING, CONFIRMED, CANCELLED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  reservationNotifications ReservationNotification[]
+}
+
+model ReservationNotification {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  reservationId String?
+  reservation   Reservation? @relation(fields: [reservationId], references: [id])
+  type          String // confirmation, cancellation, rejection
+  message       String
+  isRead        Boolean   @default(false)
+  readAt        DateTime?
+  migrated      Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+}
+
+model Resident {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  phone       String?
+  propertyId  String
+  property    Property @relation(fields: [propertyId], references: [id])
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+}
+
+model ResidentialComplex {
+  id          String   @id @default(cuid())
+  name        String
+  address     String
+  city        String
+  country     String
+  planId      String
+  plan        Plan     @relation(fields: [planId], references: [id])
+  users       User[]
+  properties  Property[]
+  amenities   Amenity[]
+  pets        Pet[]
+  vehicles    Vehicle[]
+  parkings    Parking[]
+  assemblies  Assembly[]
+  budgets     Budget[]
+  cameras     Camera[]
+  documents   Document[]
+  iotDevices  IoTDevice[]
+  listings    Listing[]
+  packages    Package[]
+  panicAlerts PanicAlert[]
+  pqrs        PQR[]
+  projects    Project[]
+  reports     Report[]
+  serviceProviders ServiceProvider[]
+  surveys     Survey[]
+  visitors    Visitor[]
+  financials  Financials[]
+  incidents   Incident[]
+  utilityRates UtilityRate[]
+  announcements Announcement[]
+  communityEvents CommunityEvent[]
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  rating      Int
+  comment     String?
+  serviceProviderId String
+  serviceProvider ServiceProvider @relation(fields: [serviceProviderId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model Security {
+  id          String   @id @default(cuid())
+  // Add fields for security data
+}
+
+model ServiceProvider {
+  id          String   @id @default(cuid())
+  name        String
+  service     String
+  phone       String?
+  email       String?
+  reviews     Review[]
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model SmartMeterReading {
+  id          String   @id @default(cuid())
+  deviceId    String
+  // device      SmartMeterDevice @relation(fields: [deviceId], references: [id])
+  reading     Float
+  timestamp   DateTime
+}
+
+model Survey {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  questions   Question[]
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model UserVote {
+  id          String   @id @default(cuid())
+  optionId    String
+  option      Option   @relation(fields: [optionId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String?
+  password    String
+  role        String   // ADMIN, RESIDENT, GUARD
+  residentialComplexId String?
+  residentialComplex ResidentialComplex? @relation(fields: [residentialComplexId], references: [id])
+  ownedProperties  Property[] @relation("Owner")
+  residentOf  Property[] @relation("Resident")
+  reservations Reservation[]
+  userVotes       UserVote[]
+  pqrs        PQR[]
+  incidents   Incident[]
+  packages    Package[]
+  panicAlerts PanicAlert[]
+  listings    Listing[]
+  reportedListings ReportedListing[]
+  reviews     Review[]
+  assemblyAttendance AssemblyAttendance[]
+  payments    Payment[]
+  microCreditApplications MicroCreditApplication[]
+  personalFinances PersonalFinance[]
+  sentCommunications Communication[] @relation("SentCommunications")
+  receivedCommunications Communication[] @relation("ReceivedCommunications")
+  messagesSent Message[] @relation("Sender")
+  messagesReceived Message[] @relation("Recipient")
+  reportsGenerated Report[]
+  pets        Pet[]
+  vehicles    Vehicle[]
+  Resident    Resident[]
+  assemblyVoteRecords AssemblyVoteRecord[]
+  votes       Vote[]
+  announcementReads AnnouncementRead[]
+  eventAttendees EventAttendee[]
+  notifications Notification[] @relation("RecipientNotifications")
+  notificationConfirmations NotificationConfirmation[]
+  reservationNotifications ReservationNotification[]
+  createdAnnouncements Announcement[]
+  organizedEvents CommunityEvent[]
+  phoneNumber String?
+  deviceToken String?
+  conversationParticipants ConversationParticipant[]
+  messageReads MessageRead[]
+}
+
+model UtilityRate {
+  id          String   @id @default(cuid())
+  name        String
+  rate        Float
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model Vehicle {
+  id          String   @id @default(cuid())
+  plate       String
+  brand       String?
+  model       String?
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id])
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model Visitor {
+  id          String   @id @default(cuid())
+  name        String
+  idNumber    String?
+  entryTime   DateTime
+  exitTime    DateTime?
+  propertyId  String
+  property    Property @relation(fields: [propertyId], references: [id])
+  residentialComplexId String
+  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+model Vote {
+  id          String   @id @default(cuid())
+  questionId  String
+  question    Question @relation(fields: [questionId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  optionId    String
+  option      Option   @relation(fields: [optionId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model AssemblyVote {
+  id          String   @id @default(cuid())
+  assemblyId  String
+  assembly    Assembly @relation(fields: [assemblyId], references: [id])
+  question    String
+  options     String[]
+  votes       AssemblyVoteRecord[]
+}
+
+model AssemblyVoteRecord {
+  id          String   @id @default(cuid())
+  assemblyVoteId String
+  assemblyVote   AssemblyVote @relation(fields: [assemblyVoteId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  option      String
+  coefficient Float? // Added missing field
+  createdAt   DateTime @default(now())
+}

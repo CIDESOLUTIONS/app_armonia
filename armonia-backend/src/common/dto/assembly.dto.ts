@@ -1,13 +1,12 @@
 import {
   IsString,
-  IsNumber,
   IsDateString,
   IsArray,
   IsOptional,
   IsBoolean,
   IsEnum,
+  IsNumber,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 
 export enum AssemblyType {
   ORDINARY = 'ORDINARY',
@@ -29,32 +28,13 @@ export class CreateAssemblyDto {
   description: string;
 
   @IsDateString()
-  scheduledDate: string;
-
-  @IsString()
-  location: string;
+  date: string;
 
   @IsEnum(AssemblyType)
   type: AssemblyType;
 
-  @IsString()
-  agenda: string;
-
-  constructor(
-    title: string,
-    description: string,
-    scheduledDate: string,
-    location: string,
-    type: AssemblyType,
-    agenda: string,
-  ) {
-    this.title = title;
-    this.description = description;
-    this.scheduledDate = scheduledDate;
-    this.location = location;
-    this.type = type;
-    this.agenda = agenda;
-  }
+  @IsNumber()
+  quorum: number;
 }
 
 export class UpdateAssemblyDto extends CreateAssemblyDto {
@@ -64,43 +44,30 @@ export class UpdateAssemblyDto extends CreateAssemblyDto {
 }
 
 export class AssemblyDto {
-  id?: number;
+  id?: string;
   title?: string;
   description?: string;
-  scheduledDate?: Date;
-  location?: string;
+  date?: Date;
   type?: AssemblyType;
   status?: AssemblyStatus;
-  agenda?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  quorum?: number;
 }
 
 export class RegisterAttendanceDto {
-  @IsNumber()
-  assemblyId: number;
+  @IsString()
+  assemblyId: string;
 
-  @IsNumber()
-  userId: number;
+  @IsString()
+  userId: string;
 
-  @IsNumber()
-  unitId: number;
+  @IsString()
+  unitId: string;
 
   @IsOptional()
   @IsBoolean()
   present?: boolean;
-
-  constructor(
-    assemblyId: number,
-    userId: number,
-    unitId: number,
-    present?: boolean,
-  ) {
-    this.assemblyId = assemblyId;
-    this.userId = userId;
-    this.unitId = unitId;
-    this.present = present;
-  }
 }
 
 export class CreateVoteDto {
@@ -117,37 +84,86 @@ export class CreateVoteDto {
   @IsOptional()
   @IsBoolean()
   weightedVoting?: boolean;
-
-  constructor(
-    title: string,
-    description: string,
-    options: string[],
-    weightedVoting?: boolean,
-  ) {
-    this.title = title;
-    this.description = description;
-    this.options = options;
-    this.weightedVoting = weightedVoting;
-  }
 }
 
 export class SubmitVoteDto {
-  @IsNumber()
-  voteId: number;
+  @IsString()
+  voteId: string;
 
-  @IsNumber()
-  userId: number;
+  @IsString()
+  userId: string;
 
-  @IsNumber()
-  unitId: number;
+  @IsString()
+  unitId: string;
 
   @IsString()
   option: string;
+}
 
-  constructor(voteId: number, userId: number, unitId: number, option: string) {
-    this.voteId = voteId;
-    this.userId = userId;
-    this.unitId = unitId;
-    this.option = option;
-  }
+export interface AssemblyAttendanceDto {
+  id: string;
+  assemblyId: string;
+  userId: string;
+  attended: boolean;
+  attendedAt?: Date;
+  unitId: string;
+  checkInTime: Date;
+  notes: string | null;
+  proxyName: string | null;
+  proxyDocument: string | null;
+  isDelegate: boolean;
+  isOwner: boolean;
+  updatedAt?: Date;
+}
+
+export interface AssemblyVoteDto {
+  id: string;
+  question: string;
+  options: string[];
+  // Properties from schema but not in DTO
+  // title: string;
+  // description: string;
+  // weightedVoting: boolean;
+  // startTime: Date;
+  // endTime?: Date;
+  // status: string;
+  // voteRecords: AssemblyVoteRecordDto[];
+}
+
+export interface AssemblyVoteRecordDto {
+  id: string;
+  assemblyVoteId: string;
+  userId: string;
+  option: string;
+  coefficient?: number;
+  createdAt: Date;
+}
+
+export interface CalculateQuorumResultDto {
+  assemblyId: string;
+  totalUnits: number;
+  presentUnits: number;
+  totalCoefficients: number;
+  presentCoefficients: number;
+  quorumPercentage: number;
+  requiredQuorum: number;
+  quorumReached: boolean;
+  timestamp: string;
+  currentAttendance: number;
+  quorumMet: boolean;
+}
+
+export interface CalculateVoteResultsResultDto {
+  voteId: string;
+  title: string;
+  totalVotes: number;
+  totalWeight: number;
+  options: {
+    [key: string]: {
+      count: number;
+      weight: number;
+      percentage: number;
+    };
+  };
+  timestamp: string;
 }
