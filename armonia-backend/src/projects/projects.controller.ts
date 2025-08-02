@@ -46,7 +46,7 @@ export class ProjectsController {
 
   @Get(':id')
   getProjectById(@GetUser() user: any, @Param('id') id: string) {
-    return this.projectsService.getProjectById(user.schemaName, +id);
+    return this.projectsService.getProjectById(user.schemaName, id);
   }
 
   @Put(':id')
@@ -58,7 +58,7 @@ export class ProjectsController {
   ) {
     return this.projectsService.updateProject(
       user.schemaName,
-      +id,
+      id,
       updateProjectDto,
     );
   }
@@ -70,7 +70,7 @@ export class ProjectsController {
     @Param('id') id: string,
     @Body() createTaskDto: CreateProjectTaskDto,
   ) {
-    return this.projectsService.createTask(user.schemaName, +id, createTaskDto);
+    return this.projectsService.createTask(user.schemaName, id, createTaskDto);
   }
 
   @Put('tasks/:taskId')
@@ -82,7 +82,7 @@ export class ProjectsController {
   ) {
     return this.projectsService.updateTask(
       user.schemaName,
-      +taskId,
+      taskId,
       updateTaskDto,
     );
   }
@@ -95,7 +95,7 @@ export class ProjectsController {
   ) {
     return this.projectsService.createUpdate(
       user.schemaName,
-      +id,
+      id,
       user.userId,
       createUpdateDto,
     );

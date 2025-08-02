@@ -57,7 +57,7 @@ export class ServiceProvidersController {
   ): Promise<ServiceProviderDto> {
     return this.serviceProvidersService.getServiceProviderById(
       user.schemaName,
-      +id,
+      id,
     );
   }
 
@@ -69,7 +69,7 @@ export class ServiceProvidersController {
   ): Promise<ServiceProviderDto> {
     return this.serviceProvidersService.updateServiceProvider(
       user.schemaName,
-      +id,
+      id,
       updateServiceProviderDto,
     );
   }
@@ -81,7 +81,7 @@ export class ServiceProvidersController {
   ): Promise<void> {
     return this.serviceProvidersService.deleteServiceProvider(
       user.schemaName,
-      +id,
+      id,
     );
   }
 
@@ -93,7 +93,7 @@ export class ServiceProvidersController {
   ): Promise<ReviewDto> {
     return this.serviceProvidersService.addReview(
       user.schemaName,
-      +id,
+      id,
       user.userId,
       createReviewDto,
     );
@@ -106,7 +106,7 @@ export class ServiceProvidersController {
   ): Promise<ReviewDto[]> {
     return this.serviceProvidersService.getReviewsByServiceProvider(
       user.schemaName,
-      +id,
+      id,
     );
   }
 }

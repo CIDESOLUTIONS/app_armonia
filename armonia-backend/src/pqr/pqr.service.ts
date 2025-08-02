@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreatePQRDto,
@@ -19,7 +15,14 @@ export class PqrService {
   async createPqr(schemaName: string, userId: string, data: CreatePQRDto) {
     const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.pQR.create({
-      data: { ...data, reportedById: userId },
+      data: {
+        title: data.title,
+        description: data.description,
+        type: data.type,
+        status: data.status,
+        reportedBy: { connect: { id: userId } }, // Connect to User model
+        residentialComplex: { connect: { id: data.residentialComplexId } }, // Connect to ResidentialComplex
+      },
     });
   }
 
@@ -58,7 +61,7 @@ export class PqrService {
       },
     });
     if (!pqr) {
-      throw new NotFoundException(`PQR with ID ${id} not found.`);
+      throw new NotFoundException(`PQR with ID ${id} no encontrada.`);
     }
     if (userRole === UserRole.RESIDENT && pqr.reportedById !== userId) {
       throw new UnauthorizedException(
@@ -72,10 +75,20 @@ export class PqrService {
     const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.pQR.update({
       where: { id },
-      data,
+      data: {
+        title: data.title,
+        description: data.description,
+        type: data.type,
+        status: data.status,
+        ...(data.reportedById && { reportedBy: { connect: { id: data.reportedById } } }),
+        ...(data.residentialComplexId && { residentialComplex: { connect: { id: data.residentialComplexId } } }),
+      },
     });
   }
 
+  // The addComment method is commented out because there is no 'comments' relation in the PQR model in schema.prisma.
+  // If comments are needed, a new model (e.g., PQRComment) should be added to schema.prisma with a relation to PQR.
+  /*
   async addComment(
     schemaName: string,
     userId: string,
@@ -86,7 +99,7 @@ export class PqrService {
     return prisma.pQR.update({
       where: { id: pqrId },
       data: {
-        comments: {
+        comments: { // This field does not exist in schema.prisma for PQR
           create: {
             content: data.content,
             authorId: userId,
@@ -95,4 +108,5 @@ export class PqrService {
       },
     });
   }
+  */
 }

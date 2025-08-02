@@ -349,7 +349,7 @@ export class FinancesService {
       prisma.budget.count({ where }),
     ]);
 
-    return { data: budgets.map(b => ({ ...b, status: b.status as BudgetStatus })), total };
+    return { data: budgets.map(b => ({ ...b, status: b.status as BudgetStatus, items: b.items })), total };
   }
 
   async getBudgetById(schemaName: string, id: string): Promise<BudgetDto> {
@@ -361,7 +361,7 @@ export class FinancesService {
     if (!budget) {
       throw new NotFoundException(`Presupuesto con ID ${id} no encontrado.`);
     }
-    return { ...budget, status: budget.status as BudgetStatus };
+    return { ...budget, status: budget.status as BudgetStatus, items: budget.items };
   }
 
   async updateBudget(
@@ -396,7 +396,7 @@ export class FinancesService {
         },
       },
     });
-    return { ...updatedBudget, status: updatedBudget.status as BudgetStatus };
+    return { ...updatedBudget, status: updatedBudget.status as BudgetStatus, items: updatedBudget.items };
   }
 
   async deleteBudget(schemaName: string, id: string): Promise<void> {
@@ -419,8 +419,9 @@ export class FinancesService {
     const prisma = this.prisma.getTenantDB(schemaName);
     const budget = await prisma.budget.findUnique({
       where: { id },
-      include: { approvedBy: true },
+      include: { approvedBy: true, items: true }, // Added items include
     });
+
     if (!budget) {
       throw new NotFoundException(`Presupuesto con ID ${id} no encontrado.`);
     }
@@ -436,8 +437,9 @@ export class FinancesService {
         approvedById,
         approvedAt: new Date(),
       },
+      include: { items: true }, // Added items include
     });
-    return { ...updatedBudget, status: updatedBudget.status as BudgetStatus };
+    return { ...updatedBudget, status: updatedBudget.status as BudgetStatus, items: updatedBudget.items };
   }
 
   // Expenses
@@ -456,8 +458,8 @@ export class FinancesService {
         invoiceNumber: data.invoiceNumber,
         notes: data.notes,
         residentialComplex: { connect: { id: data.residentialComplexId } },
-        budgetId: data.budgetId, // Direct assignment
-        approvedById: data.approvedById, // Direct assignment
+        ...(data.budgetId && { budget: { connect: { id: data.budgetId } } }), // Use connect for budgetId
+        ...(data.approvedById && { approvedBy: { connect: { id: data.approvedById } } }), // Use connect for approvedById
       },
     });
     return { ...expense, residentialComplexId: expense.residentialComplexId };
@@ -507,7 +509,21 @@ export class FinancesService {
     if (!expense) {
       throw new NotFoundException(`Gasto con ID ${id} no encontrado.`);
     }
-    const updatedExpense = await prisma.expense.update({ where: { id }, data });
+    const updatedExpense = await prisma.expense.update({
+      where: { id },
+      data: {
+        description: data.description,
+        amount: data.amount,
+        category: data.category,
+        expenseDate: data.expenseDate ? new Date(data.expenseDate) : undefined,
+        vendor: data.vendor,
+        invoiceNumber: data.invoiceNumber,
+        notes: data.notes,
+        ...(data.residentialComplexId && { residentialComplex: { connect: { id: data.residentialComplexId } } }),
+        ...(data.budgetId && { budget: { connect: { id: data.budgetId } } }),
+        ...(data.approvedById && { approvedBy: { connect: { id: data.approvedById } } }),
+      },
+    });
     return { ...updatedExpense, residentialComplexId: updatedExpense.residentialComplexId };
   }
 

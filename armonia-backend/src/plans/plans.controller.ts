@@ -39,19 +39,19 @@ export class PlansController {
 
   @Get(':id')
   findPlanById(@Param('id') id: string) {
-    return this.plansService.findPlanById(+id);
+    return this.plansService.findPlanById(id);
   }
 
   @Put(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard([UserRole.ADMIN]))
+  @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
   updatePlan(@Param('id') id: string, @Body() updatePlanDto: UpdatePlanDto) {
-    return this.plansService.updatePlan(+id, updatePlanDto);
+    return this.plansService.updatePlan(id, updatePlanDto);
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard([UserRole.ADMIN]))
+  @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
   removePlan(@Param('id') id: string) {
-    return this.plansService.removePlan(+id);
+    return this.plansService.removePlan(id);
   }
 
   // Subscription Management
@@ -67,11 +67,11 @@ export class PlansController {
   }
 
   @Put('subscriptions/:id')
-  @UseGuards(JwtAuthGuard, RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
+  @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
   updateSubscription(
     @Param('id') id: string,
     @Body() updateSubscriptionDto: UpdateSubscriptionDto,
   ) {
-    return this.plansService.updateSubscription(+id, updateSubscriptionDto);
+    return this.plansService.updateSubscription(id, updateSubscriptionDto);
   }
 }

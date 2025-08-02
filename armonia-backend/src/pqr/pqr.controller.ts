@@ -52,7 +52,7 @@ export class PqrController {
       user.schemaName,
       user.userId,
       user.role,
-      +id,
+      id,
     );
   }
 
@@ -63,9 +63,11 @@ export class PqrController {
     @Param('id') id: string,
     @Body() updatePQRDto: UpdatePQRDto,
   ) {
-    return this.pqrService.updatePqr(user.schemaName, +id, updatePQRDto);
+    return this.pqrService.updatePqr(user.schemaName, id, updatePQRDto);
   }
 
+  // Commented out as addComment is not implemented in PqrService
+  /*
   @Post(':id/comments')
   async addComment(
     @GetUser() user: any,
@@ -75,8 +77,9 @@ export class PqrController {
     return this.pqrService.addComment(
       user.schemaName,
       user.userId,
-      +id,
+      id,
       pqrCommentDto,
     );
   }
+  */
 }

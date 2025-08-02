@@ -54,12 +54,12 @@ export class UserController {
     @Param('id') id: string,
     @Body() userData: any,
   ) {
-    return this.userService.updateUser(user.schemaName, +id, userData);
+    return this.userService.updateUser(user.schemaName, id, userData);
   }
 
   @Delete(':id')
   @Roles(UserRole.ADMIN, UserRole.COMPLEX_ADMIN)
   async deleteUser(@GetUser() user: any, @Param('id') id: string) {
-    return this.userService.deleteUser(user.schemaName, +id);
+    return this.userService.deleteUser(user.schemaName, id);
   }
 }

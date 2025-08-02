@@ -10,19 +10,38 @@ import {
 export class PaymentGatewaysService {
   constructor(private prisma: PrismaService) {}
 
+  private mapToPaymentGatewayConfigDto(gateway: any): PaymentGatewayConfigDto {
+    return {
+      id: gateway.id,
+      name: gateway.name,
+      config: gateway.config,
+      isActive: gateway.isActive,
+      createdAt: gateway.createdAt,
+      updatedAt: gateway.updatedAt,
+    };
+  }
+
   async createPaymentGateway(
     schemaName: string,
     data: CreatePaymentGatewayDto,
   ): Promise<PaymentGatewayConfigDto> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    return prisma.paymentGatewayConfig.create({ data });
+    const gateway = await prisma.paymentGatewayConfig.create({
+      data: {
+        name: data.name,
+        config: data.config,
+        isActive: data.isActive,
+      },
+    });
+    return this.mapToPaymentGatewayConfigDto(gateway);
   }
 
   async getPaymentGateways(
     schemaName: string,
   ): Promise<PaymentGatewayConfigDto[]> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    return prisma.paymentGatewayConfig.findMany();
+    const gateways = await prisma.paymentGatewayConfig.findMany();
+    return gateways.map(this.mapToPaymentGatewayConfigDto);
   }
 
   async getPaymentGatewayById(
@@ -36,7 +55,7 @@ export class PaymentGatewaysService {
     if (!gateway) {
       throw new NotFoundException(`Payment gateway with ID ${id} not found.`);
     }
-    return gateway;
+    return this.mapToPaymentGatewayConfigDto(gateway);
   }
 
   async updatePaymentGateway(
@@ -46,10 +65,15 @@ export class PaymentGatewaysService {
   ): Promise<PaymentGatewayConfigDto> {
     const prisma = this.prisma.getTenantDB(schemaName);
     await this.getPaymentGatewayById(schemaName, id); // Check if exists
-    return prisma.paymentGatewayConfig.update({
+    const updatedGateway = await prisma.paymentGatewayConfig.update({
       where: { id },
-      data,
+      data: {
+        name: data.name,
+        config: data.config,
+        isActive: data.isActive,
+      },
     });
+    return this.mapToPaymentGatewayConfigDto(updatedGateway);
   }
 
   async deletePaymentGateway(schemaName: string, id: string): Promise<void> {

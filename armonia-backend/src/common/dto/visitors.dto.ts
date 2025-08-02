@@ -37,7 +37,14 @@ export class CreateVisitorDto {
   documentNumber: string;
 
   @IsString()
-  destination: string;
+  propertyId: string; // Added propertyId as per schema.prisma
+
+  @IsString()
+  residentialComplexId: string; // Added residentialComplexId
+
+  @IsString()
+  @IsOptional()
+  destination?: string;
 
   @IsOptional()
   @IsString()
@@ -50,6 +57,14 @@ export class CreateVisitorDto {
   @IsOptional()
   @IsString()
   photoUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  purpose?: string; // Added purpose as per schema.prisma
+
+  @IsOptional()
+  @IsString()
+  registeredBy?: string; // Added registeredBy as per schema.prisma
 }
 
 export class UpdateVisitorDto {
@@ -64,6 +79,14 @@ export class UpdateVisitorDto {
   @IsOptional()
   @IsString()
   documentNumber?: string;
+
+  @IsOptional()
+  @IsString()
+  propertyId?: string; // Added propertyId as per schema.prisma
+
+  @IsOptional()
+  @IsString()
+  residentialComplexId?: string; // Added residentialComplexId
 
   @IsOptional()
   @IsString()
@@ -87,52 +110,35 @@ export class UpdateVisitorDto {
 
   @IsOptional()
   @IsDateString()
-  exitTime?: string;
+  exitTime?: Date; // Changed to Date
+
+  @IsOptional()
+  @IsString()
+  purpose?: string; // Added purpose as per schema.prisma
+
+  @IsOptional()
+  @IsString()
+  registeredBy?: string; // Added registeredBy as per schema.prisma
 }
 
 export class VisitorDto {
-  @IsNumber()
-  id: number;
-
-  @IsString()
+  id: string; // Changed to string
   name: string;
-
-  @IsEnum(VisitorDocumentType)
   documentType: VisitorDocumentType;
-
-  @IsString()
   documentNumber: string;
-
-  @IsString()
-  destination: string;
-
-  @IsOptional()
-  @IsString()
+  propertyId: string; // Added propertyId as per schema.prisma
+  residentialComplexId: string; // Added residentialComplexId
+  destination?: string;
   residentName?: string;
-
-  @IsOptional()
-  @IsString()
   plate?: string;
-
-  @IsOptional()
-  @IsString()
   photoUrl?: string;
-
-  @IsDateString()
-  entryTime: string;
-
-  @IsOptional()
-  @IsDateString()
-  exitTime?: string;
-
-  @IsEnum(VisitorStatus)
+  entryTime: Date; // Changed to Date
+  exitTime?: Date; // Changed to Date
   status: VisitorStatus;
-
-  @IsString()
-  createdAt: string;
-
-  @IsString()
-  updatedAt: string;
+  createdAt: Date; // Changed to Date
+  updatedAt: Date; // Changed to Date
+  purpose?: string; // Added purpose as per schema.prisma
+  registeredBy?: string; // Added registeredBy as per schema.prisma
 }
 
 export class VisitorFilterParamsDto {

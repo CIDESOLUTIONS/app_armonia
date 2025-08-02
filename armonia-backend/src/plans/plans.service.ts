@@ -44,42 +44,57 @@ export class PlansService {
     return prisma.plan.delete({ where: { id } });
   }
 
-  // Subscription Management
+  // Subscription Management (Updated to use ResidentialComplex directly)
   async createSubscription(createSubscriptionDto: CreateSubscriptionDto) {
-    const prisma = this.prisma.getTenantDB(createSubscriptionDto.residentialComplexId); // Use residentialComplexId
-    return prisma.subscription.create({ data: createSubscriptionDto });
+    const prisma = this.prisma.getTenantDB('public'); // Always use public schema for ResidentialComplex
+    // Update the residential complex to associate it with a plan
+    const updatedComplex = await prisma.residentialComplex.update({
+      where: { id: createSubscriptionDto.residentialComplexId },
+      data: {
+        plan: { connect: { id: createSubscriptionDto.planId } },
+      },
+    });
+    // Return a simplified DTO or the updated complex itself
+    return updatedComplex; // You might want to map this to a more specific DTO
   }
 
-  async findSubscriptionsByComplex(residentialComplexId: string) { // Changed parameter name
-    const prisma = this.prisma.getTenantDB(residentialComplexId);
-    return prisma.subscription.findMany({
-      where: { residentialComplexId: residentialComplexId },
+  async findSubscriptionsByComplex(residentialComplexId: string) {
+    const prisma = this.prisma.getTenantDB('public'); // Always use public schema for ResidentialComplex
+    const complex = await prisma.residentialComplex.findUnique({
+      where: { id: residentialComplexId },
       include: { plan: true },
     });
+
+    if (!complex) {
+      throw new NotFoundException(`Residential Complex with ID ${residentialComplexId} not found.`);
+    }
+
+    // Return the complex with its plan details, or map to a simplified DTO
+    return complex; // You might want to map this to a more appropriate DTO
   }
 
   async updateSubscription(
-    id: string,
+    id: string, // This ID would refer to the ResidentialComplex ID now
     updateSubscriptionDto: UpdateSubscriptionDto,
   ) {
-    const prisma = this.prisma.getTenantDB(updateSubscriptionDto.residentialComplexId); // Use residentialComplexId
-    return prisma.subscription.update({
-      where: { id },
-      data: updateSubscriptionDto,
+    const prisma = this.prisma.getTenantDB('public'); // Always use public schema for ResidentialComplex
+    const updatedComplex = await prisma.residentialComplex.update({
+      where: { id: updateSubscriptionDto.residentialComplexId }, // Use residentialComplexId from DTO
+      data: {
+        ...(updateSubscriptionDto.planId && { plan: { connect: { id: updateSubscriptionDto.planId } } }),
+      },
     });
+    return updatedComplex; // You might want to map this to a more appropriate DTO
   }
 
   // Feature Access Check
   async checkFeatureAccess(
-    residentialComplexId: string, // Changed parameter name
+    residentialComplexId: string,
     feature: string,
   ): Promise<boolean> {
-    const prisma = this.prisma.getTenantDB(residentialComplexId);
-    const subscription = await prisma.subscription.findFirst({
-      where: {
-        residentialComplexId: residentialComplexId,
-        isActive: true,
-      },
+    const prisma = this.prisma.getTenantDB('public'); // Always use public schema for ResidentialComplex
+    const complex = await prisma.residentialComplex.findUnique({
+      where: { id: residentialComplexId },
       include: {
         plan: {
           select: {
@@ -89,10 +104,10 @@ export class PlansService {
       },
     });
 
-    if (!subscription || !subscription.plan) {
-      return false; // No active subscription or plan
+    if (!complex || !complex.plan) {
+      return false; // No associated plan
     }
 
-    return subscription.plan.features.includes(feature);
+    return complex.plan.features.includes(feature);
   }
 }

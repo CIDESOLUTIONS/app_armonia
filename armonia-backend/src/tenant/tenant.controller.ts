@@ -1,4 +1,9 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import { TenantService } from './tenant.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -12,6 +17,6 @@ export class TenantController {
 
   @Get(':id/schema')
   getTenantSchemaName(@Param('id') id: string): Promise<string | null> {
-    return this.tenantService.getTenantSchemaName(+id);
+    return this.tenantService.getTenantSchemaName(id);
   }
 }

@@ -46,13 +46,13 @@ export class UserManagementController {
   ) {
     return this.userManagementService.updateStaffUser(
       user.schemaName,
-      +id,
+      id,
       updateUserDto,
     );
   }
 
   @Delete('staff/:id')
   deleteStaffUser(@GetUser() user: any, @Param('id') id: string) {
-    return this.userManagementService.deleteStaffUser(user.schemaName, +id);
+    return this.userManagementService.deleteStaffUser(user.schemaName, id);
   }
 }

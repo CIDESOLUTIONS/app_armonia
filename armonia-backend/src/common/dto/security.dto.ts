@@ -81,3 +81,22 @@ export class SecurityEventFilterParamsDto {
   @IsNumber()
   limit?: number;
 }
+
+export class CreateAccessAttemptDto {
+  @IsString()
+  ipAddress: string;
+
+  @IsString()
+  username: string;
+
+  @IsBoolean()
+  isSuccess: boolean;
+
+  @IsString()
+  @IsOptional()
+  reason?: string;
+
+  @IsString() // Changed to string
+  @IsOptional()
+  userId?: string;
+}
