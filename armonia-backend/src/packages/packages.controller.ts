@@ -55,7 +55,7 @@ export class PackagesController {
     @GetUser() user: any,
     @Param('id') id: string,
   ): Promise<PackageDto> {
-    return this.packagesService.getPackageById(user.schemaName, +id);
+    return this.packagesService.getPackageById(user.schemaName, id);
   }
 
   @Put(':id/status')
@@ -67,7 +67,7 @@ export class PackagesController {
   ): Promise<PackageDto> {
     return this.packagesService.updatePackageStatus(
       user.schemaName,
-      +id,
+      id,
       updatePackageDto,
     );
   }

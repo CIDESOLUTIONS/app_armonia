@@ -8,7 +8,7 @@ export class TenantService {
   async getTenantSchemaName(residentialComplexId: string): Promise<string | null> {
     const prisma = this.prisma.getTenantDB('public');
     const complex = await prisma.residentialComplex.findUnique({
-      where: { id: complexId },
+      where: { id: residentialComplexId },
     });
     return complex ? complex.id : null;
   }

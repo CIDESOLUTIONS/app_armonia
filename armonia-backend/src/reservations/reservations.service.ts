@@ -16,16 +16,36 @@ import {
   NotificationType,
   NotificationSourceType,
 } from '../common/dto/communications.dto';
-import { InventoryService } from '../inventory/inventory.service'; // Import InventoryService
-import { CommonAreaDto } from '../common/dto/inventory.dto'; // Import CommonAreaDto
+import { InventoryService } from '../inventory/inventory.service';
+import { CommonAreaDto } from '../common/dto/inventory.dto';
 
 @Injectable()
 export class ReservationsService {
   constructor(
     private prisma: PrismaService,
     private communicationsService: CommunicationsService,
-    private inventoryService: InventoryService, // Inject InventoryService
+    private inventoryService: InventoryService,
   ) {}
+
+  private mapToReservationDto(reservation: any): ReservationDto {
+    return {
+      id: reservation.id,
+      amenityId: reservation.amenityId,
+      userId: reservation.userId,
+      startTime: reservation.startTime,
+      endTime: reservation.endTime,
+      status: reservation.status as ReservationStatus,
+      createdAt: reservation.createdAt,
+      updatedAt: reservation.updatedAt,
+      commonArea: reservation.amenity ? { ...reservation.amenity, residentialComplexId: reservation.amenity.residentialComplexId, createdAt: reservation.amenity.createdAt, updatedAt: reservation.amenity.updatedAt } : undefined,
+      user: reservation.user ? { ...reservation.user } : undefined,
+      title: reservation.title, // Assuming title is part of the reservation model
+      description: reservation.description, // Assuming description is part of the reservation model
+      attendees: reservation.attendees, // Assuming attendees is part of the reservation model
+      requiresPayment: reservation.requiresPayment, // Assuming requiresPayment is part of the reservation model
+      paymentAmount: reservation.paymentAmount, // Assuming paymentAmount is part of the reservation model
+    };
+  }
 
   // Reservation Management
   async createReservation(
@@ -36,7 +56,7 @@ export class ReservationsService {
     const commonArea = await this.inventoryService.getCommonAreaById(
       schemaName,
       data.amenityId,
-    ); // Use InventoryService
+    );
 
     if (!commonArea) {
       throw new NotFoundException(
@@ -47,7 +67,7 @@ export class ReservationsService {
     const start = new Date(data.startTime);
     const end = new Date(data.endTime);
 
-    // 4. Check for overlapping reservations
+    // Check for overlapping reservations
     const overlappingReservations = await prisma.reservation.findMany({
       where: {
         amenityId: data.amenityId,
@@ -72,7 +92,19 @@ export class ReservationsService {
     }
 
     const reservation = await prisma.reservation.create({
-      data: { ...data, status: ReservationStatus.PENDING },
+      data: {
+        amenity: { connect: { id: data.amenityId } },
+        user: { connect: { id: data.userId } },
+        startTime: start,
+        endTime: end,
+        status: ReservationStatus.PENDING,
+        title: data.title,
+        description: data.description,
+        attendees: data.attendees,
+        requiresPayment: data.requiresPayment,
+        paymentAmount: data.paymentAmount,
+      },
+      include: { amenity: true, user: true },
     });
 
     // Notify user about reservation status
@@ -88,7 +120,7 @@ export class ReservationsService {
       });
     }
 
-    return reservation;
+    return this.mapToReservationDto(reservation);
   }
 
   async getReservations(
@@ -114,11 +146,12 @@ export class ReservationsService {
       where.endTime = { lte: new Date(filters.endDate) };
     }
 
-    return prisma.reservation.findMany({
+    const reservations = await prisma.reservation.findMany({
       where,
       include: { amenity: true, user: true },
       orderBy: { startTime: 'desc' },
     });
+    return reservations.map(this.mapToReservationDto);
   }
 
   async getReservationById(
@@ -133,7 +166,7 @@ export class ReservationsService {
     if (!reservation) {
       throw new NotFoundException(`Reserva con ID ${id} no encontrada.`);
     }
-    return reservation;
+    return this.mapToReservationDto(reservation);
   }
 
   async updateReservation(
@@ -147,7 +180,23 @@ export class ReservationsService {
       throw new NotFoundException(`Reserva con ID ${id} no encontrada.`);
     }
     // TODO: Re-validate rules on update if start/end times or amenityId change
-    return prisma.reservation.update({ where: { id }, data });
+    const updatedReservation = await prisma.reservation.update({
+      where: { id },
+      data: {
+        startTime: data.startTime ? new Date(data.startTime) : undefined,
+        endTime: data.endTime ? new Date(data.endTime) : undefined,
+        status: data.status,
+        title: data.title,
+        description: data.description,
+        attendees: data.attendees,
+        requiresPayment: data.requiresPayment,
+        paymentAmount: data.paymentAmount,
+        ...(data.amenityId && { amenity: { connect: { id: data.amenityId } } }),
+        ...(data.userId && { user: { connect: { id: data.userId } } }),
+      },
+      include: { amenity: true, user: true },
+    });
+    return this.mapToReservationDto(updatedReservation);
   }
 
   async updateReservationStatus(
@@ -160,7 +209,8 @@ export class ReservationsService {
     if (!reservation) {
       throw new NotFoundException(`Reserva con ID ${id} no encontrada.`);
     }
-    return prisma.reservation.update({ where: { id }, data: { status } });
+    const updatedReservation = await prisma.reservation.update({ where: { id }, data: { status } });
+    return this.mapToReservationDto(updatedReservation);
   }
 
   async deleteReservation(schemaName: string, id: string): Promise<void> {
@@ -180,7 +230,7 @@ export class ReservationsService {
     const prisma = this.prisma.getTenantDB(schemaName);
     const reservation = await prisma.reservation.findUnique({
       where: { id: reservationId },
-      include: { amenity: true },
+      include: { amenity: true, user: true },
     });
 
     if (!reservation) {
@@ -199,7 +249,7 @@ export class ReservationsService {
       data: {
         status: ReservationStatus.APPROVED,
       },
-      include: { amenity: true },
+      include: { amenity: true, user: true },
     });
 
     const user = await prisma.user.findUnique({
@@ -216,7 +266,7 @@ export class ReservationsService {
       });
     }
 
-    return updatedReservation;
+    return this.mapToReservationDto(updatedReservation);
   }
 
   async rejectReservation(
@@ -228,7 +278,7 @@ export class ReservationsService {
     const prisma = this.prisma.getTenantDB(schemaName);
     const reservation = await prisma.reservation.findUnique({
       where: { id: reservationId },
-      include: { amenity: true },
+      include: { amenity: true, user: true },
     });
 
     if (!reservation) {
@@ -247,7 +297,7 @@ export class ReservationsService {
       data: {
         status: ReservationStatus.REJECTED,
       },
-      include: { amenity: true },
+      include: { amenity: true, user: true },
     });
 
     const user = await prisma.user.findUnique({
@@ -264,6 +314,6 @@ export class ReservationsService {
       });
     }
 
-    return updatedReservation;
+    return this.mapToReservationDto(updatedReservation);
   }
 }

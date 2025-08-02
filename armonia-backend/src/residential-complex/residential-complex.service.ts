@@ -10,18 +10,46 @@ import {
 export class ResidentialComplexService {
   constructor(private prisma: PrismaService) {}
 
+  private mapToResidentialComplexDto(complex: any): ResidentialComplexDto {
+    return {
+      id: complex.id,
+      name: complex.name,
+      address: complex.address,
+      city: complex.city,
+      country: complex.country,
+      planId: complex.planId,
+      schemaName: complex.id, // Assuming schemaName is the complex ID
+      adminId: complex.adminId, // Assuming adminId exists in the model
+      contactEmail: complex.contactEmail, // Assuming contactEmail exists in the model
+      contactPhone: complex.contactPhone, // Assuming contactPhone exists in the model
+      status: complex.status, // Assuming status exists in the model
+      createdAt: complex.createdAt,
+      updatedAt: complex.updatedAt,
+    };
+  }
+
   async createComplexAndSchema(
     data: CreateResidentialComplexDto,
     prismaClient?: any,
   ): Promise<ResidentialComplexDto> {
     const prisma = this.prisma.getTenantDB('public');
-    const newComplex = await prisma.residentialComplex.create({ data });
-    return newComplex;
+    const newComplex = await prisma.residentialComplex.create({
+      data: {
+        name: data.name,
+        address: data.address,
+        city: data.city,
+        country: data.country,
+        plan: { connect: { id: data.planId } },
+        // Assuming adminId, contactEmail, contactPhone, status are handled elsewhere or are optional
+      },
+    });
+    return this.mapToResidentialComplexDto(newComplex);
   }
 
   async getResidentialComplexes(): Promise<ResidentialComplexDto[]> {
     const prisma = this.prisma.getTenantDB('public');
-    return prisma.residentialComplex.findMany();
+    const complexes = await prisma.residentialComplex.findMany();
+    return complexes.map(this.mapToResidentialComplexDto);
   }
 
   async getResidentialComplexById(id: string): Promise<ResidentialComplexDto> {
@@ -34,7 +62,7 @@ export class ResidentialComplexService {
         `Residential Complex with ID ${id} not found`,
       );
     }
-    return complex;
+    return this.mapToResidentialComplexDto(complex);
   }
 
   async updateResidentialComplex(
@@ -50,7 +78,18 @@ export class ResidentialComplexService {
         `Residential Complex with ID ${id} not found`,
       );
     }
-    return prisma.residentialComplex.update({ where: { id }, data });
+    const updatedComplex = await prisma.residentialComplex.update({
+      where: { id },
+      data: {
+        name: data.name,
+        address: data.address,
+        city: data.city,
+        country: data.country,
+        ...(data.planId && { plan: { connect: { id: data.planId } } }),
+        // Assuming adminId, contactEmail, contactPhone, status are handled elsewhere or are optional
+      },
+    });
+    return this.mapToResidentialComplexDto(updatedComplex);
   }
 
   async deleteResidentialComplex(id: string): Promise<void> {

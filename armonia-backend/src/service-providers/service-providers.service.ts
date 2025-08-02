@@ -13,14 +13,46 @@ import {
 export class ServiceProvidersService {
   constructor(private prisma: PrismaService) {}
 
+  private mapToServiceProviderDto(provider: any): ServiceProviderDto {
+    return {
+      id: provider.id,
+      name: provider.name,
+      service: provider.service,
+      phone: provider.phone,
+      email: provider.email,
+      residentialComplexId: provider.residentialComplexId,
+      createdAt: provider.createdAt,
+      updatedAt: provider.updatedAt,
+    };
+  }
+
+  private mapToReviewDto(review: any): ReviewDto {
+    return {
+      id: review.id,
+      rating: review.rating,
+      comment: review.comment,
+      serviceProviderId: review.serviceProviderId,
+      userId: review.userId,
+      createdAt: review.createdAt,
+      userName: review.user?.name, // Assuming user relation is included and has a name field
+    };
+  }
+
   async createServiceProvider(
     schemaName: string,
     data: CreateServiceProviderDto,
   ): Promise<ServiceProviderDto> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    return prisma.serviceProvider.create({
-      data: { ...data, rating: 0, reviewCount: 0 },
+    const serviceProvider = await prisma.serviceProvider.create({
+      data: {
+        name: data.name,
+        service: data.service,
+        phone: data.phone,
+        email: data.email,
+        residentialComplex: { connect: { id: data.residentialComplexId } },
+      },
     });
+    return this.mapToServiceProviderDto(serviceProvider);
   }
 
   async getServiceProviders(
@@ -39,16 +71,14 @@ export class ServiceProvidersService {
     if (filters.category) {
       where.category = filters.category;
     }
-    if (filters.minRating) {
-      where.rating = { gte: filters.minRating };
-    }
 
-    return prisma.serviceProvider.findMany({
+    const serviceProviders = await prisma.serviceProvider.findMany({
       where,
       skip: ((filters.page ?? 1) - 1) * (filters.limit ?? 10),
       take: filters.limit ?? 10,
       orderBy: { name: 'asc' },
     });
+    return serviceProviders.map(this.mapToServiceProviderDto);
   }
 
   async getServiceProviderById(
@@ -62,7 +92,7 @@ export class ServiceProvidersService {
         `Proveedor de servicios con ID ${id} no encontrado.`,
       );
     }
-    return provider;
+    return this.mapToServiceProviderDto(provider);
   }
 
   async updateServiceProvider(
@@ -79,10 +109,17 @@ export class ServiceProvidersService {
       );
     }
 
-    return prisma.serviceProvider.update({
+    const updatedProvider = await prisma.serviceProvider.update({
       where: { id },
-      data,
+      data: {
+        name: data.name,
+        service: data.service,
+        phone: data.phone,
+        email: data.email,
+        ...(data.residentialComplexId && { residentialComplex: { connect: { id: data.residentialComplexId } } }),
+      },
     });
+    return this.mapToServiceProviderDto(updatedProvider);
   }
 
   async deleteServiceProvider(schemaName: string, id: string): Promise<void> {
@@ -99,29 +136,15 @@ export class ServiceProvidersService {
     const prisma = this.prisma.getTenantDB(schemaName);
     const review = await prisma.review.create({
       data: {
-        serviceProviderId,
-        userId,
+        serviceProvider: { connect: { id: serviceProviderId } },
+        user: { connect: { id: userId } },
         rating: data.rating,
         comment: data.comment,
       },
+      include: { user: true }, // Include user to map userName
     });
 
-    // Recalculate average rating and update review count
-    const aggregate = await prisma.review.aggregate({
-      _avg: { rating: true },
-      _count: { rating: true },
-      where: { serviceProviderId },
-    });
-
-    await prisma.serviceProvider.update({
-      where: { id: serviceProviderId },
-      data: {
-        rating: aggregate._avg.rating || 0,
-        reviewCount: aggregate._count.rating || 0,
-      },
-    });
-
-    return review;
+    return this.mapToReviewDto(review);
   }
 
   async getReviewsByServiceProvider(
@@ -129,9 +152,11 @@ export class ServiceProvidersService {
     serviceProviderId: string,
   ): Promise<ReviewDto[]> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    return prisma.review.findMany({
+    const reviews = await prisma.review.findMany({
       where: { serviceProviderId },
+      include: { user: true }, // Include user to map userName
       orderBy: { createdAt: 'desc' },
     });
+    return reviews.map(this.mapToReviewDto);
   }
 }

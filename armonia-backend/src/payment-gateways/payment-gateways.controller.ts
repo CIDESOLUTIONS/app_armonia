@@ -74,7 +74,7 @@ export class PaymentGatewaysController {
   @ApiBearerAuth()
   findOne(@Req() req, @Param('id') id: string) {
     const schemaName = req.user.schemaName;
-    return this.paymentGatewaysService.getPaymentGatewayById(schemaName, +id);
+    return this.paymentGatewaysService.getPaymentGatewayById(schemaName, id);
   }
 
   @Put(':id')
@@ -94,7 +94,7 @@ export class PaymentGatewaysController {
     const schemaName = req.user.schemaName;
     return this.paymentGatewaysService.updatePaymentGateway(
       schemaName,
-      +id,
+      id,
       updatePaymentGatewayDto,
     );
   }
@@ -110,6 +110,6 @@ export class PaymentGatewaysController {
   @ApiBearerAuth()
   remove(@Req() req, @Param('id') id: string) {
     const schemaName = req.user.schemaName;
-    return this.paymentGatewaysService.deletePaymentGateway(schemaName, +id);
+    return this.paymentGatewaysService.deletePaymentGateway(schemaName, id);
   }
 }

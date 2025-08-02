@@ -44,7 +44,7 @@ export class ResidentialComplexController {
   @Get(':id')
   @Roles(UserRole.ADMIN, UserRole.COMPLEX_ADMIN)
   async findOne(@Param('id') id: string) {
-    return this.residentialComplexService.getResidentialComplexById(+id);
+    return this.residentialComplexService.getResidentialComplexById(id);
   }
 
   @Put(':id')
@@ -54,7 +54,7 @@ export class ResidentialComplexController {
     @Body() updateResidentialComplexDto: UpdateResidentialComplexDto,
   ) {
     return this.residentialComplexService.updateResidentialComplex(
-      +id,
+      id,
       updateResidentialComplexDto,
     );
   }
@@ -62,6 +62,6 @@ export class ResidentialComplexController {
   @Delete(':id')
   @Roles(UserRole.ADMIN)
   async remove(@Param('id') id: string) {
-    return this.residentialComplexService.deleteResidentialComplex(+id);
+    return this.residentialComplexService.deleteResidentialComplex(id);
   }
 }

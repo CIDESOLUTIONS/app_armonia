@@ -50,7 +50,7 @@ export class ReservationsController {
     @GetUser() user: any,
     @Param('id') id: string,
   ): Promise<ReservationDto> {
-    return this.reservationsService.getReservationById(user.schemaName, +id);
+    return this.reservationsService.getReservationById(user.schemaName, id);
   }
 
   @Put(':id')
@@ -61,7 +61,7 @@ export class ReservationsController {
   ): Promise<ReservationDto> {
     return this.reservationsService.updateReservation(
       user.schemaName,
-      +id,
+      id,
       updateReservationDto,
     );
   }
@@ -74,7 +74,7 @@ export class ReservationsController {
   ): Promise<ReservationDto> {
     return this.reservationsService.updateReservationStatus(
       user.schemaName,
-      +id,
+      id,
       status,
     );
   }
@@ -84,7 +84,7 @@ export class ReservationsController {
     @GetUser() user: any,
     @Param('id') id: string,
   ): Promise<void> {
-    return this.reservationsService.deleteReservation(user.schemaName, +id);
+    return this.reservationsService.deleteReservation(user.schemaName, id);
   }
 
   @Post(':id/approve')
@@ -94,7 +94,7 @@ export class ReservationsController {
   ): Promise<ReservationDto> {
     return this.reservationsService.approveReservation(
       user.schemaName,
-      +id,
+      id,
       user.userId,
     );
   }
@@ -107,7 +107,7 @@ export class ReservationsController {
   ): Promise<ReservationDto> {
     return this.reservationsService.rejectReservation(
       user.schemaName,
-      +id,
+      id,
       user.userId,
       reason,
     );

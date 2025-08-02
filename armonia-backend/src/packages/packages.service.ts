@@ -20,13 +20,35 @@ export class PackagesService {
     private communicationsService: CommunicationsService,
   ) {}
 
+  private mapToPackageDto(pkg: any): PackageDto {
+    return {
+      id: pkg.id,
+      residentId: pkg.residentId,
+      receivedAt: pkg.receivedAt,
+      deliveredAt: pkg.deliveredAt,
+      notes: pkg.notes,
+      residentialComplexId: pkg.residentialComplexId,
+      // Properties not in schema.prisma, so not mapped directly
+      // trackingNumber: pkg.trackingNumber,
+      // recipientUnit: pkg.recipientUnit,
+      // status: pkg.status,
+      // registrationDate: pkg.registrationDate,
+    };
+  }
+
   async registerPackage(
     schemaName: string,
     data: RegisterPackageDto,
   ): Promise<PackageDto> {
     const prisma = this.prisma.getTenantDB(schemaName);
     const pkg = await prisma.package.create({
-      data: { ...data, status: PackageStatus.PENDING },
+      data: {
+        resident: { connect: { id: data.residentId } },
+        receivedAt: data.receivedAt ? new Date(data.receivedAt) : new Date(),
+        deliveredAt: data.deliveredAt ? new Date(data.deliveredAt) : null,
+        notes: data.notes,
+        residentialComplex: { connect: { id: data.residentialComplexId } },
+      },
     });
 
     // Notify resident
@@ -44,7 +66,7 @@ export class PackagesService {
       });
     }
 
-    return pkg;
+    return this.mapToPackageDto(pkg);
   }
 
   async getPackages(
@@ -53,14 +75,13 @@ export class PackagesService {
   ): Promise<{ data: PackageDto[]; total: number }> {
     const prisma = this.prisma.getTenantDB(schemaName);
     const where: any = {};
-    if (filters.status) where.status = filters.status;
     if (filters.residentId) where.residentId = filters.residentId;
 
     const page = filters.page || 1;
     const limit = filters.limit || 10;
     const skip = (page - 1) * limit;
 
-    const [data, total] = await Promise.all([
+    const [packages, total] = await Promise.all([
       prisma.package.findMany({
         where,
         skip,
@@ -70,7 +91,7 @@ export class PackagesService {
       prisma.package.count({ where }),
     ]);
 
-    return { data, total };
+    return { data: packages.map(this.mapToPackageDto), total };
   }
 
   async getPackageById(schemaName: string, id: string): Promise<PackageDto> {
@@ -79,7 +100,7 @@ export class PackagesService {
     if (!pkg) {
       throw new NotFoundException(`Paquete con ID ${id} no encontrado.`);
     }
-    return pkg;
+    return this.mapToPackageDto(pkg);
   }
 
   async updatePackageStatus(
@@ -92,6 +113,13 @@ export class PackagesService {
     if (!pkg) {
       throw new NotFoundException(`Paquete con ID ${id} no encontrado.`);
     }
-    return prisma.package.update({ where: { id }, data });
+    const updatedPkg = await prisma.package.update({
+      where: { id },
+      data: {
+        deliveredAt: data.deliveredAt ? new Date(data.deliveredAt) : undefined,
+        notes: data.notes,
+      },
+    });
+    return this.mapToPackageDto(updatedPkg);
   }
 }

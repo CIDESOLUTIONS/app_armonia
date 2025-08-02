@@ -220,7 +220,7 @@ export class ReportsController {
   ) {
     const buffer = await this.reportsService.generatePeaceAndSafePdf(
       req.user.schemaName,
-      +residentId,
+      residentId,
     );
     res.set({
       'Content-Type': 'application/pdf',

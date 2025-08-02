@@ -98,7 +98,9 @@ export class PortfolioService {
 
       const income = await tenantPrisma.payment.aggregate({
         _sum: { amount: true },
-        where: { status: 'COMPLETED' },
+        where: {
+          status: 'COMPLETED',
+        },
       });
 
       const openPqrs = await tenantPrisma.pQR.count({

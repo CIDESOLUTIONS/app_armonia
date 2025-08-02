@@ -59,7 +59,7 @@ export class PersonalFinancesController {
     return this.personalFinancesService.updateTransaction(
       user.schemaName,
       user.id,
-      +id,
+      id,
       updatePersonalTransactionDto,
     );
   }
@@ -72,7 +72,7 @@ export class PersonalFinancesController {
     return this.personalFinancesService.deleteTransaction(
       user.schemaName,
       user.id,
-      +id,
+      id,
     );
   }
 }

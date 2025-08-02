@@ -11,7 +11,15 @@ export class SecurityService {
 
   async createSecurityEvent(schemaName: string, data: CreateSecurityEventDto) {
     const prisma = this.prisma.getTenantDB(schemaName);
-    return prisma.securityEvent.create({ data });
+    return prisma.securityEvent.create({
+      data: {
+        type: data.type,
+        description: data.description,
+        location: data.location,
+        reportedBy: data.reportedByUserId ? { connect: { id: data.reportedByUserId } } : undefined,
+        residentialComplex: { connect: { id: data.residentialComplexId } },
+      },
+    });
   }
 
   async getSecurityEvents(schemaName: string, filters: any) {
@@ -24,7 +32,15 @@ export class SecurityService {
 
   async createAccessAttempt(schemaName: string, data: CreateAccessAttemptDto) {
     const prisma = this.prisma.getTenantDB(schemaName);
-    return prisma.accessAttempt.create({ data });
+    return prisma.accessAttempt.create({
+      data: {
+        ipAddress: data.ipAddress,
+        username: data.username,
+        isSuccess: data.isSuccess,
+        reason: data.reason,
+        user: data.userId ? { connect: { id: data.userId } } : undefined,
+      },
+    });
   }
 
   async getAccessAttempts(schemaName: string, filters: any) {

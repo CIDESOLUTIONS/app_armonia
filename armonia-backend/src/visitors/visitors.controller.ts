@@ -57,7 +57,7 @@ export class VisitorsController {
 
   @Get(':id')
   getVisitorById(@GetUser() user: any, @Param('id') id: string) {
-    return this.visitorsService.getVisitorById(user.schemaName, +id);
+    return this.visitorsService.getVisitorById(user.schemaName, id);
   }
 
   @Put(':id')
@@ -69,7 +69,7 @@ export class VisitorsController {
   ) {
     return this.visitorsService.updateVisitor(
       user.schemaName,
-      +id,
+      id,
       updateVisitorDto,
     );
   }
@@ -77,6 +77,6 @@ export class VisitorsController {
   @Delete(':id')
   @UseGuards(RolesGuard([UserRole.SECURITY, UserRole.RECEPTION]))
   deleteVisitor(@GetUser() user: any, @Param('id') id: string) {
-    return this.visitorsService.deleteVisitor(user.schemaName, +id);
+    return this.visitorsService.deleteVisitor(user.schemaName, id);
   }
 }

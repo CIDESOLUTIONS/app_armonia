@@ -14,7 +14,19 @@ export class ProjectsService {
 
   async createProject(schemaName: string, data: CreateProjectDto) {
     const prisma = this.prisma.getTenantDB(schemaName);
-    return prisma.project.create({ data });
+    return prisma.project.create({
+      data: {
+        name: data.title, // Map title from DTO to name in Prisma model
+        description: data.description,
+        startDate: data.startDate ? new Date(data.startDate) : undefined,
+        endDate: data.endDate ? new Date(data.endDate) : undefined,
+        status: data.status,
+        budget: data.budget,
+        residentialComplex: { connect: { id: data.residentialComplexId } },
+        // Assuming createdBy is a relation to User model
+        createdBy: { connect: { id: data.createdById } },
+      },
+    });
   }
 
   async getProjects(schemaName: string, filters: any) {
@@ -29,7 +41,7 @@ export class ProjectsService {
     const prisma = this.prisma.getTenantDB(schemaName);
     const project = await prisma.project.findUnique({
       where: { id },
-      include: { tasks: true, updates: true },
+      // Removed 'tasks' and 'updates' includes as they are separate models
     });
     if (!project) {
       throw new NotFoundException(`Project with ID ${id} not found.`);
@@ -41,7 +53,14 @@ export class ProjectsService {
     const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.project.update({
       where: { id },
-      data,
+      data: {
+        name: data.title,
+        description: data.description,
+        startDate: data.startDate ? new Date(data.startDate) : undefined,
+        endDate: data.endDate ? new Date(data.endDate) : undefined,
+        status: data.status,
+        budget: data.budget,
+      },
     });
   }
 
@@ -52,7 +71,14 @@ export class ProjectsService {
   ) {
     const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.projectTask.create({
-      data: { ...data, projectId },
+      data: {
+        projectId: projectId,
+        title: data.title,
+        description: data.description,
+        status: data.status,
+        assignedToId: data.assignedToId,
+        dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
+      },
     });
   }
 
@@ -60,7 +86,13 @@ export class ProjectsService {
     const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.projectTask.update({
       where: { id },
-      data,
+      data: {
+        title: data.title,
+        description: data.description,
+        status: data.status,
+        assignedToId: data.assignedToId,
+        dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
+      },
     });
   }
 
@@ -72,7 +104,13 @@ export class ProjectsService {
   ) {
     const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.projectUpdate.create({
-      data: { ...data, projectId, authorId: userId },
+      data: {
+        projectId: projectId,
+        title: data.title,
+        description: data.description,
+        progress: data.progress,
+        authorId: userId, // Assuming authorId is the userId
+      },
     });
   }
 }
