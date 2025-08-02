@@ -30,6 +30,7 @@ export class PanicService {
         residentialComplexId: createPanicAlertDto.residentialComplexId,
         location: createPanicAlertDto.location,
         description: createPanicAlertDto.description,
+        // status: createPanicAlertDto.status, // Assuming status is set on creation or defaults in schema
       },
     });
 
@@ -123,8 +124,6 @@ export class PanicService {
         // Based on schema.prisma, PanicAlert does not have a 'responses' field.
         // This part of the code is likely incorrect based on the provided schema.
         // I will remove the 'responses' part and leave a placeholder for further investigation.
-        // This will likely cause an error if 'responses' is not a valid field.
-        // For now, I will assume that the 'responses' field is not directly updatable this way.
         // If there's a separate PanicResponse model, it should be created directly.
         // If not, the schema needs to be updated to reflect how responses are stored.
       },

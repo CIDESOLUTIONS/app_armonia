@@ -6,6 +6,7 @@ import {
   IsEnum,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { PartialType } from '@nestjs/swagger';
 
 export enum PackageStatus {
   PENDING = 'PENDING',
@@ -16,113 +17,49 @@ export enum PackageStatus {
 
 export class RegisterPackageDto {
   @IsString()
-  trackingNumber: string;
+  residentId: string;
 
-  @IsString()
-  recipientUnit: string;
+  @IsOptional()
+  @IsDateString()
+  receivedAt?: string;
+
+  @IsOptional()
+  @IsDateString()
+  deliveredAt?: string;
 
   @IsOptional()
   @IsString()
-  sender?: string;
+  notes?: string;
 
-  @IsOptional()
   @IsString()
-  description?: string;
-
-  @IsOptional()
-  @IsString()
-  deliveryPersonName?: string;
+  residentialComplexId: string;
 }
 
-export class UpdatePackageDto {
-  @IsOptional()
-  @IsString()
-  trackingNumber?: string;
-
-  @IsOptional()
-  @IsString()
-  recipientUnit?: string;
-
-  @IsOptional()
-  @IsString()
-  sender?: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @IsOptional()
-  @IsString()
-  deliveryPersonName?: string;
-
+export class UpdatePackageDto extends PartialType(RegisterPackageDto) {
   @IsOptional()
   @IsEnum(PackageStatus)
   status?: PackageStatus;
-
-  @IsOptional()
-  @IsDateString()
-  deliveryDate?: string;
 }
 
 export class PackageDto {
-  @IsNumber()
-  id: number;
-
-  @IsString()
-  trackingNumber: string;
-
-  @IsString()
-  recipientUnit: string;
-
-  @IsOptional()
-  @IsString()
-  sender?: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @IsOptional()
-  @IsString()
-  deliveryPersonName?: string;
-
-  @IsEnum(PackageStatus)
-  status: PackageStatus;
-
-  @IsDateString()
-  registrationDate: string;
-
-  @IsOptional()
-  @IsDateString()
-  deliveryDate?: string;
-
-  @IsString()
-  createdAt: string;
-
-  @IsString()
-  updatedAt: string;
+  id: string;
+  residentId: string;
+  receivedAt: Date;
+  deliveredAt?: Date;
+  notes?: string;
+  residentialComplexId: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export class PackageFilterParamsDto {
   @IsOptional()
   @IsString()
-  search?: string;
+  residentId?: string;
 
   @IsOptional()
   @IsEnum(PackageStatus)
   status?: PackageStatus;
-
-  @IsOptional()
-  @IsString()
-  recipientUnit?: string;
-
-  @IsOptional()
-  @IsString()
-  sender?: string;
-
-  @IsOptional()
-  @IsNumber()
-  residentId?: number;
 
   @IsOptional()
   @Type(() => Number)

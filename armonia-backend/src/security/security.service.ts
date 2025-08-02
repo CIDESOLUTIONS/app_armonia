@@ -39,6 +39,7 @@ export class SecurityService {
         isSuccess: data.isSuccess,
         reason: data.reason,
         user: data.userId ? { connect: { id: data.userId } } : undefined,
+        residentialComplex: { connect: { id: data.residentialComplexId } }, // Added
       },
     });
   }

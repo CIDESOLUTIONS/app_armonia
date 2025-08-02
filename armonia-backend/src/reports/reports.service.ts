@@ -53,7 +53,7 @@ export class ReportsService {
     doc.font('Helvetica').fontSize(9);
     visitors.forEach((visitor) => {
       doc.text(visitor.name, 50, doc.y, { width: 100, align: 'left' });
-      doc.text(visitor.documentNumber, 150, doc.y, { // Corrected from idNumber
+      doc.text(visitor.idNumber, 150, doc.y, { // Corrected from idNumber
         width: 100,
         align: 'left',
       });
@@ -95,7 +95,7 @@ export class ReportsService {
       ['Nombre', 'Identificación', 'Visitado', 'Entrada', 'Salida'],
       ...visitors.map((visitor) => [
         visitor.name,
-        visitor.documentNumber, // Corrected from idNumber
+        visitor.idNumber, // Corrected from idNumber
         visitor.propertyId,
         format(visitor.entryTime, 'dd/MM/yyyy HH:mm'),
         visitor.exitTime ? format(visitor.exitTime, 'dd/MM/yyyy HH:mm') : 'N/A',

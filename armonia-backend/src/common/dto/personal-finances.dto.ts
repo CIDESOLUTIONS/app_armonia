@@ -47,8 +47,8 @@ export class UpdatePersonalTransactionDto {
 }
 
 export class PersonalTransactionDto {
-  id: number;
-  userId: number;
+  id: string; // Changed to string
+  userId: string; // Changed to string
   type: PersonalTransactionType;
   description: string;
   amount: number;
@@ -61,10 +61,6 @@ export class PersonalTransactionFilterParamsDto {
   @IsOptional()
   @IsEnum(PersonalTransactionType)
   type?: PersonalTransactionType;
-
-  @IsOptional()
-  @IsNumber()
-  categoryId?: number;
 
   @IsOptional()
   @IsDateString()

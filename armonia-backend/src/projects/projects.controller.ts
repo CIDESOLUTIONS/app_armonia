@@ -29,29 +29,31 @@ export class ProjectsController {
 
   @Post()
   @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
-  createProject(
+  async createProject(
     @GetUser() user: any,
     @Body() createProjectDto: CreateProjectDto,
   ) {
-    return this.projectsService.createProject(
-      user.schemaName,
-      createProjectDto,
-    );
+    return this.projectsService.createProject(user.schemaName, {
+      ...createProjectDto,
+      createdById: user.userId,
+    });
   }
 
   @Get()
-  getProjects(@GetUser() user: any, @Query() filters: any) {
+  @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
+  async getProjects(@GetUser() user: any, @Query() filters: any) {
     return this.projectsService.getProjects(user.schemaName, filters);
   }
 
   @Get(':id')
-  getProjectById(@GetUser() user: any, @Param('id') id: string) {
+  @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
+  async getProjectById(@GetUser() user: any, @Param('id') id: string) {
     return this.projectsService.getProjectById(user.schemaName, id);
   }
 
   @Put(':id')
   @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
-  updateProject(
+  async updateProject(
     @GetUser() user: any,
     @Param('id') id: string,
     @Body() updateProjectDto: UpdateProjectDto,
@@ -63,41 +65,46 @@ export class ProjectsController {
     );
   }
 
-  @Post(':id/tasks')
-  @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
-  createTask(
-    @GetUser() user: any,
-    @Param('id') id: string,
-    @Body() createTaskDto: CreateProjectTaskDto,
-  ) {
-    return this.projectsService.createTask(user.schemaName, id, createTaskDto);
-  }
+  // @Post(':projectId/tasks')
+  // @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
+  // async createTask(
+  //   @GetUser() user: any,
+  //   @Param('projectId') projectId: string,
+  //   @Body() createTaskDto: CreateProjectTaskDto,
+  // ) {
+  //   return this.projectsService.createTask(
+  //     user.schemaName,
+  //     projectId,
+  //     createTaskDto,
+  //   );
+  // }
 
-  @Put('tasks/:taskId')
-  @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
-  updateTask(
-    @GetUser() user: any,
-    @Param('taskId') taskId: string,
-    @Body() updateTaskDto: UpdateProjectTaskDto,
-  ) {
-    return this.projectsService.updateTask(
-      user.schemaName,
-      taskId,
-      updateTaskDto,
-    );
-  }
+  // @Put(':projectId/tasks/:taskId')
+  // @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
+  // async updateTask(
+  //   @GetUser() user: any,
+  //   @Param('taskId') taskId: string,
+  //   @Body() updateTaskDto: UpdateProjectTaskDto,
+  // ) {
+  //   return this.projectsService.updateTask(
+  //     user.schemaName,
+  //     taskId,
+  //     updateTaskDto,
+  //   );
+  // }
 
-  @Post(':id/updates')
-  createUpdate(
-    @GetUser() user: any,
-    @Param('id') id: string,
-    @Body() createUpdateDto: CreateProjectUpdateDto,
-  ) {
-    return this.projectsService.createUpdate(
-      user.schemaName,
-      id,
-      user.userId,
-      createUpdateDto,
-    );
-  }
+  // @Post(':projectId/updates')
+  // @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
+  // async createUpdate(
+  //   @GetUser() user: any,
+  //   @Param('projectId') projectId: string,
+  //   @Body() createUpdateDto: CreateProjectUpdateDto,
+  // ) {
+  //   return this.projectsService.createUpdate(
+  //     user.schemaName,
+  //     projectId,
+  //     user.userId,
+  //     createUpdateDto,
+  //   );
+  // }
 }

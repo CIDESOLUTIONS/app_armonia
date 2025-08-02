@@ -3,9 +3,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateProjectDto,
   UpdateProjectDto,
-  CreateProjectTaskDto,
-  UpdateProjectTaskDto,
-  CreateProjectUpdateDto,
+  // CreateProjectTaskDto,
+  // UpdateProjectTaskDto,
+  // CreateProjectUpdateDto,
 } from '../common/dto/projects.dto';
 
 @Injectable()
@@ -23,7 +23,6 @@ export class ProjectsService {
         status: data.status,
         budget: data.budget,
         residentialComplex: { connect: { id: data.residentialComplexId } },
-        // Assuming createdBy is a relation to User model
         createdBy: { connect: { id: data.createdById } },
       },
     });
@@ -41,7 +40,7 @@ export class ProjectsService {
     const prisma = this.prisma.getTenantDB(schemaName);
     const project = await prisma.project.findUnique({
       where: { id },
-      // Removed 'tasks' and 'updates' includes as they are separate models
+      // include: { tasks: true, updates: true }, // Include tasks and updates
     });
     if (!project) {
       throw new NotFoundException(`Project with ID ${id} not found.`);
@@ -64,53 +63,53 @@ export class ProjectsService {
     });
   }
 
-  async createTask(
-    schemaName: string,
-    projectId: string,
-    data: CreateProjectTaskDto,
-  ) {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    return prisma.projectTask.create({
-      data: {
-        projectId: projectId,
-        title: data.title,
-        description: data.description,
-        status: data.status,
-        assignedToId: data.assignedToId,
-        dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
-      },
-    });
-  }
+  // async createTask(
+  //   schemaName: string,
+  //   projectId: string,
+  //   data: CreateProjectTaskDto,
+  // ) {
+  //   const prisma = this.prisma.getTenantDB(schemaName);
+  //   return prisma.projectTask.create({
+  //     data: {
+  //       projectId: projectId,
+  //       title: data.title,
+  //       description: data.description,
+  //       status: data.status,
+  //       assignedTo: data.assignedToId ? { connect: { id: data.assignedToId } } : undefined,
+  //       dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
+  //     },
+  //   });
+  // }
 
-  async updateTask(schemaName: string, id: string, data: UpdateProjectTaskDto) {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    return prisma.projectTask.update({
-      where: { id },
-      data: {
-        title: data.title,
-        description: data.description,
-        status: data.status,
-        assignedToId: data.assignedToId,
-        dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
-      },
-    });
-  }
+  // async updateTask(schemaName: string, id: string, data: UpdateProjectTaskDto) {
+  //   const prisma = this.prisma.getTenantDB(schemaName);
+  //   return prisma.projectTask.update({
+  //     where: { id },
+  //     data: {
+  //       title: data.title,
+  //       description: data.description,
+  //       status: data.status,
+  //       assignedTo: data.assignedToId ? { connect: { id: data.assignedToId } } : undefined,
+  //       dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
+  //     },
+  //   });
+  // }
 
-  async createUpdate(
-    schemaName: string,
-    projectId: string,
-    userId: string,
-    data: CreateProjectUpdateDto,
-  ) {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    return prisma.projectUpdate.create({
-      data: {
-        projectId: projectId,
-        title: data.title,
-        description: data.description,
-        progress: data.progress,
-        authorId: userId, // Assuming authorId is the userId
-      },
-    });
-  }
+  // async createUpdate(
+  //   schemaName: string,
+  //   projectId: string,
+  //   userId: string,
+  //   data: CreateProjectUpdateDto,
+  // ) {
+  //   const prisma = this.prisma.getTenantDB(schemaName);
+  //   return prisma.projectUpdate.create({
+  //     data: {
+  //       projectId: projectId,
+  //       title: data.title,
+  //       description: data.description,
+  //       progress: data.progress,
+  //       author: { connect: { id: userId } },
+  //     },
+  //   });
+  // }
 }

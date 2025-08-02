@@ -99,4 +99,7 @@ export class CreateAccessAttemptDto {
   @IsString() // Changed to string
   @IsOptional()
   userId?: string;
+
+  @IsString()
+  residentialComplexId: string; // Added
 }

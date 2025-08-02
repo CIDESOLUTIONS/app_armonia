@@ -19,8 +19,6 @@ export class PersonalFinancesService {
       description: transaction.description,
       amount: transaction.amount,
       date: transaction.date,
-      // categoryId: transaction.categoryId, // Not in schema.prisma
-      // notes: transaction.notes, // Not in schema.prisma
       createdAt: transaction.createdAt,
       updatedAt: transaction.updatedAt,
     };
@@ -39,8 +37,6 @@ export class PersonalFinancesService {
         description: data.description,
         amount: data.amount,
         date: new Date(data.date),
-        // categoryId: data.categoryId, // Not in schema.prisma
-        // notes: data.notes, // Not in schema.prisma
       },
     });
     return this.mapToPersonalTransactionDto(transaction);
@@ -54,7 +50,6 @@ export class PersonalFinancesService {
     const prisma = this.prisma.getTenantDB(schemaName);
     const where: any = { userId };
     if (filters.type) where.type = filters.type;
-    // if (filters.categoryId) where.categoryId = filters.categoryId; // Not in schema.prisma
     if (filters.startDate)
       where.date = { ...where.date, gte: new Date(filters.startDate) };
     if (filters.endDate)
@@ -87,8 +82,6 @@ export class PersonalFinancesService {
         description: data.description,
         amount: data.amount,
         date: data.date ? new Date(data.date) : undefined,
-        // categoryId: data.categoryId, // Not in schema.prisma
-        // notes: data.notes, // Not in schema.prisma
       },
     });
     return this.mapToPersonalTransactionDto(updatedTransaction);

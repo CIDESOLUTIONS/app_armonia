@@ -50,7 +50,7 @@ export class PanicController {
     RolesGuard([UserRole.SECURITY, UserRole.ADMIN, UserRole.COMPLEX_ADMIN]),
   )
   async getAlertById(@GetUser() user: any, @Param('id') id: string) {
-    return this.panicService.getAlertById(user.schemaName, +id);
+    return this.panicService.getAlertById(user.schemaName, id);
   }
 
   @Put('alerts/:id')
@@ -64,7 +64,7 @@ export class PanicController {
   ) {
     return this.panicService.updateAlert(
       user.schemaName,
-      +id,
+      id,
       updatePanicAlertDto,
     );
   }

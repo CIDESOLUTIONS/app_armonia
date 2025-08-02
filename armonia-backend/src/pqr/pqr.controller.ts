@@ -10,17 +10,15 @@ import {
 } from '@nestjs/common';
 import { PqrService } from './pqr.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { GetUser } from '../common/decorators/user.decorator';
-import {
-  PQRDto,
-  GetPQRParamsDto,
-  CreatePQRDto,
-  UpdatePQRDto,
-  PQRCommentDto,
-} from '../common/dto/pqr.dto';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '../common/enums/user-role.enum';
+import { GetUser } from '../common/decorators/user.decorator';
+import {
+  CreatePQRDto,
+  UpdatePQRDto,
+  GetPQRParamsDto,
+} from '../common/dto/pqr.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('pqr')
@@ -28,16 +26,22 @@ export class PqrController {
   constructor(private readonly pqrService: PqrService) {}
 
   @Post()
+  @UseGuards(RolesGuard([UserRole.RESIDENT]))
   async createPqr(@GetUser() user: any, @Body() createPQRDto: CreatePQRDto) {
-    return this.pqrService.createPqr(
-      user.schemaName,
-      user.userId,
-      createPQRDto,
-    );
+    return this.pqrService.createPqr(user.schemaName, user.userId, {
+      ...createPQRDto,
+      residentialComplexId: user.residentialComplexId,
+    });
   }
 
   @Get()
-  async getPqrs(@GetUser() user: any, @Query() filters: GetPQRParamsDto) {
+  @UseGuards(
+    RolesGuard([UserRole.RESIDENT, UserRole.ADMIN, UserRole.COMPLEX_ADMIN]),
+  )
+  async getPqrs(
+    @GetUser() user: any,
+    @Query() filters: GetPQRParamsDto,
+  ) {
     return this.pqrService.getPqrs(
       user.schemaName,
       user.userId,
@@ -47,7 +51,13 @@ export class PqrController {
   }
 
   @Get(':id')
-  async getPqrById(@GetUser() user: any, @Param('id') id: string) {
+  @UseGuards(
+    RolesGuard([UserRole.RESIDENT, UserRole.ADMIN, UserRole.COMPLEX_ADMIN]),
+  )
+  async getPqrById(
+    @GetUser() user: any,
+    @Param('id') id: string,
+  ) {
     return this.pqrService.getPqrById(
       user.schemaName,
       user.userId,
@@ -57,7 +67,9 @@ export class PqrController {
   }
 
   @Put(':id')
-  @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
+  @UseGuards(
+    RolesGuard([UserRole.RESIDENT, UserRole.ADMIN, UserRole.COMPLEX_ADMIN]),
+  )
   async updatePqr(
     @GetUser() user: any,
     @Param('id') id: string,
@@ -65,21 +77,4 @@ export class PqrController {
   ) {
     return this.pqrService.updatePqr(user.schemaName, id, updatePQRDto);
   }
-
-  // Commented out as addComment is not implemented in PqrService
-  /*
-  @Post(':id/comments')
-  async addComment(
-    @GetUser() user: any,
-    @Param('id') id: string,
-    @Body() pqrCommentDto: PQRCommentDto,
-  ) {
-    return this.pqrService.addComment(
-      user.schemaName,
-      user.userId,
-      id,
-      pqrCommentDto,
-    );
-  }
-  */
 }

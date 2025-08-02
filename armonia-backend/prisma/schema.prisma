@@ -11,13 +11,16 @@ generator client {
 }
 
 model Amenity {
-  id          String      @id @default(cuid())
-  name        String
-  description String?
-  rules       String?
-  reservations Reservation[]
+  id                   String        @id @default(cuid())
+  name                 String
+  description          String?
+  rules                String?
+  type                 String? // Added: type for common area
+  reservations         Reservation[]
   residentialComplexId String
-  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  residentialComplex   ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
 }
 
 model Announcement {
@@ -415,22 +418,32 @@ model Package {
 }
 
 model PanicAlert {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  location    String?
-  createdAt   DateTime @default(now())
+  id                   String    @id @default(cuid())
+  userId               String
+  user                 User      @relation(fields: [userId], references: [id])
+  location             String?
+  description          String? // Added
+  status               String? // Added
+  resolvedTime         DateTime? // Added
+  resolvedById         String? // Added
+  resolvedBy           User?     @relation("ResolvedPanicAlerts", fields: [resolvedById], references: [id]) // Added
+  createdAt            DateTime  @default(now())
   residentialComplexId String
-  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  residentialComplex   ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
 }
 
 model Parking {
-  id          String   @id @default(cuid())
-  number      String
-  propertyId  String?
-  property    Property? @relation(fields: [propertyId], references: [id])
+  id                   String    @id @default(cuid())
+  number               String
+  propertyId           String?
+  property             Property? @relation(fields: [propertyId], references: [id])
   residentialComplexId String
-  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  residentialComplex   ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  type                 String? // Added
+  status               String? // Added
+  notes                String? // Added
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 }
 
 model PaymentAttempt {
@@ -457,6 +470,18 @@ model Payment {
   attempts    PaymentAttempt[]
 }
 
+model PaymentGatewayConfig {
+  id                   String             @id @default(cuid())
+  name                 String
+  type                 String // Added
+  apiKey               String // Added
+  secretKey            String // Added
+  supportedCurrencies  String[] // Added
+  isActive             Boolean            @default(true)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+}
+
 model Payments {
   id          String   @id @default(cuid())
   // Add fields for payments data
@@ -466,17 +491,25 @@ model PersonalFinance {
   id          String   @id @default(cuid())
   userId      String
   user        User     @relation(fields: [userId], references: [id])
-  // Add fields for personal finance data
+  type        String // Added
+  description String // Added
+  amount      Float // Added
+  date        DateTime // Added
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Pet {
-  id          String   @id @default(cuid())
-  name        String
-  breed       String?
-  ownerId     String
-  owner       User     @relation(fields: [ownerId], references: [id])
+  id                   String    @id @default(cuid())
+  name                 String
+  breed                String?
+  ownerId              String
+  owner                User      @relation(fields: [ownerId], references: [id])
   residentialComplexId String
-  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  residentialComplex   ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  type                 String? // Added: type for pet
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 }
 
 model Plan {
@@ -502,32 +535,66 @@ model PQR {
 }
 
 model Project {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  status      String // PLANNING, IN_PROGRESS, COMPLETED
-  startDate   DateTime?
-  endDate   DateTime?
-  budget      Float?
+  id                   String    @id @default(cuid())
+  name                 String
+  description          String?
+  status               String // PLANNING, IN_PROGRESS, COMPLETED
+  startDate            DateTime?
+  endDate              DateTime?
+  budget               Float?
   residentialComplexId String
-  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  residentialComplex   ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  createdById          String // Added
+  createdBy            User      @relation("CreatedProjects", fields: [createdById], references: [id]) // Added
+  // tasks                ProjectTask[] // Added
+  // updates              ProjectUpdate[] // Added
 }
 
+// model ProjectTask {
+//   id           String    @id @default(cuid())
+//   projectId    String
+//   project      Project   @relation(fields: [projectId], references: [id])
+//   title        String
+//   description  String?
+//   status       String // TO_DO, IN_PROGRESS, DONE
+//   assignedToId String?
+//   assignedTo   User?     @relation("AssignedTasks") // Removed fields and references
+//   dueDate      DateTime?
+//   createdAt    DateTime  @default(now())
+//   updatedAt    DateTime  @updatedAt
+// }
+
+// model ProjectUpdate {
+//   id          String   @id @default(cuid())
+//   projectId   String
+//   project     Project  @relation(fields: [projectId], references: [id])
+//   title       String
+//   description String?
+//   progress    Float
+//   authorId    String
+//   author      User     @relation("ProjectUpdates") // Removed fields and references
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+// }
+
 model Property {
-  id          String   @id @default(cuid())
-  type        String // APARTMENT, HOUSE, OFFICE
-  number      String
-  ownerId     String
-  owner       User     @relation("Owner", fields: [ownerId], references: [id])
-  residentId  String?
-  resident    User?    @relation("Resident", fields: [residentId], references: [id])
-  fees        Fee[]
-  intercoms   Intercom[]
-  parkings    Parking[]
+  id                   String    @id @default(cuid())
+  type                 String // APARTMENT, HOUSE, OFFICE
+  number               String // Changed from unitNumber to number for consistency
+  ownerId              String
+  owner                User      @relation("Owner", fields: [ownerId], references: [id])
+  residentId           String?
+  resident             User?     @relation("Resident", fields: [residentId], references: [id])
+  fees                 Fee[]
+  intercoms            Intercom[]
+  parkings             Parking[]
   residentialComplexId String
-  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
-  residents   Resident[]
-  visitors    Visitor[]
+  residentialComplex   ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  residents            Resident[]
+  visitors             Visitor[]
+  status               String? // Added
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 }
 
 model Question {
@@ -561,17 +628,22 @@ model ReportedListing {
 }
 
 model Reservation {
-  id          String   @id @default(cuid())
-  amenityId   String
-  amenity     Amenity  @relation(fields: [amenityId], references: [id])
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  startTime   DateTime
-  endTime     DateTime
-  status      String // PENDING, CONFIRMED, CANCELLED
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                   String    @id @default(cuid())
+  amenityId            String
+  amenity              Amenity   @relation(fields: [amenityId], references: [id])
+  userId               String
+  user                 User      @relation(fields: [userId], references: [id])
+  startTime            DateTime
+  endTime              DateTime
+  status               String // PENDING, CONFIRMED, CANCELLED
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
   reservationNotifications ReservationNotification[]
+  title                String? // Added
+  description          String? // Added
+  attendees            String[] // Changed from String[]? to String[]
+  requiresPayment      Boolean? // Added
+  paymentAmount        Float? // Added
 }
 
 model ReservationNotification {
@@ -633,6 +705,17 @@ model ResidentialComplex {
   announcements Announcement[]
   communityEvents CommunityEvent[]
   expenses Expense[]
+  status       String? // Added
+  adminId      String? // Added
+  admin        User?     @relation("AdministeredComplexes", fields: [adminId], references: [id]) // Added
+  contactEmail String? // Added
+  contactPhone String? // Added
+  logoUrl      String? // Added
+  primaryColor String? // Added
+  secondaryColor String? // Added
+  isActive     Boolean @default(true) // Added
+  securityEvents SecurityEvent[] // Added
+  accessAttempts AccessAttempt[] // Added
 }
 
 model Review {
@@ -646,9 +729,38 @@ model Review {
   createdAt   DateTime @default(now())
 }
 
-model Security {
-  id          String   @id @default(cuid())
-  // Add fields for security data
+// model Security {
+//   id          String   @id @default(cuid())
+//   // Add fields for security data
+//   securityEvents SecurityEvent[]
+//   accessAttempts AccessAttempt[]
+// }
+
+model SecurityEvent {
+  id                   String    @id @default(cuid())
+  type                 String
+  description          String
+  location             String?
+  reportedByUserId     String?
+  reportedBy           User?     @relation("ReportedSecurityEvents", fields: [reportedByUserId], references: [id])
+  residentialComplexId String
+  residentialComplex   ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt // Added
+}
+
+model AccessAttempt {
+  id                   String    @id @default(cuid())
+  ipAddress            String
+  username             String
+  isSuccess            Boolean
+  reason               String?
+  userId               String?
+  user                 User?     @relation("UserAccessAttempts", fields: [userId], references: [id])
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt // Added
+  residentialComplexId String
+  residentialComplex   ResidentialComplex @relation(fields: [residentialComplexId], references: [id]) // Added
 }
 
 model ServiceProvider {
@@ -733,6 +845,13 @@ model User {
   messageReads MessageRead[]
   approvedBudgets Budget[]
   approvedExpenses Expense[]
+  ResolvedPanicAlerts PanicAlert[] @relation("ResolvedPanicAlerts")
+  // assignedTasks ProjectTask[] @relation("AssignedTasks")
+  // projectUpdates ProjectUpdate[] @relation("ProjectUpdates")
+  createdProjects Project[] @relation("CreatedProjects")
+  administeredComplexes ResidentialComplex[] @relation("AdministeredComplexes") // Added
+  reportedSecurityEvents SecurityEvent[] @relation("ReportedSecurityEvents") // Added
+  userAccessAttempts AccessAttempt[] @relation("UserAccessAttempts") // Added
 }
 
 model UtilityRate {
@@ -744,14 +863,16 @@ model UtilityRate {
 }
 
 model Vehicle {
-  id          String   @id @default(cuid())
-  plate       String
-  brand       String?
-  model       String?
-  ownerId     String
-  owner       User     @relation(fields: [ownerId], references: [id])
+  id                   String    @id @default(cuid())
+  plate                String // Changed from licensePlate to plate for consistency
+  brand                String?
+  model                String?
+  ownerId              String
+  owner                User      @relation(fields: [ownerId], references: [id])
   residentialComplexId String
-  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  residentialComplex   ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 }
 
 model Visitor {

@@ -41,15 +41,17 @@ export class InventoryController {
     @GetUser() user: any,
     @Body() createCommonAreaDto: CreateCommonAreaDto,
   ): Promise<CommonAreaDto> {
-    return this.inventoryService.createCommonArea(user.schemaName, {
+    const createdCommonArea = await this.inventoryService.createCommonArea(user.schemaName, {
       ...createCommonAreaDto,
       residentialComplexId: user.residentialComplexId,
     });
+    return createdCommonArea;
   }
 
   @Get('common-areas')
   async getCommonAreas(@GetUser() user: any): Promise<CommonAreaDto[]> {
-    return this.inventoryService.getCommonAreas(user.schemaName);
+    const commonAreas = await this.inventoryService.getCommonAreas(user.schemaName);
+    return commonAreas;
   }
 
   @Get('common-areas/:id')
@@ -57,7 +59,8 @@ export class InventoryController {
     @GetUser() user: any,
     @Param('id') id: string,
   ): Promise<CommonAreaDto> {
-    return this.inventoryService.getCommonAreaById(user.schemaName, id);
+    const commonArea = await this.inventoryService.getCommonAreaById(user.schemaName, id);
+    return commonArea;
   }
 
   @Put('common-areas/:id')
@@ -66,11 +69,12 @@ export class InventoryController {
     @Param('id') id: string,
     @Body() updateCommonAreaDto: UpdateCommonAreaDto,
   ): Promise<CommonAreaDto> {
-    return this.inventoryService.updateCommonArea(
+    const updatedCommonArea = await this.inventoryService.updateCommonArea(
       user.schemaName,
       id,
       updateCommonAreaDto,
     );
+    return updatedCommonArea;
   }
 
   @Delete('common-areas/:id')
@@ -78,7 +82,7 @@ export class InventoryController {
     @GetUser() user: any,
     @Param('id') id: string,
   ): Promise<void> {
-    return this.inventoryService.deleteCommonArea(user.schemaName, id);
+    await this.inventoryService.deleteCommonArea(user.schemaName, id);
   }
 
   // Parking Spot Endpoints
@@ -87,18 +91,20 @@ export class InventoryController {
     @GetUser() user: any,
     @Body() createParkingSpotDto: CreateParkingSpotDto,
   ): Promise<ParkingSpotDto> {
-    return this.inventoryService.createParkingSpot(user.schemaName, {
+    const createdParkingSpot = await this.inventoryService.createParkingSpot(user.schemaName, {
       ...createParkingSpotDto,
       residentialComplexId: user.residentialComplexId,
     });
+    return createdParkingSpot;
   }
 
   @Get('parking-spots')
   async getParkingSpots(@GetUser() user: any): Promise<ParkingSpotDto[]> {
-    return this.inventoryService.getParkingSpots(
+    const parkingSpots = await this.inventoryService.getParkingSpots(
       user.schemaName,
       user.residentialComplexId,
     );
+    return parkingSpots;
   }
 
   @Get('parking-spots/:id')
@@ -106,7 +112,8 @@ export class InventoryController {
     @GetUser() user: any,
     @Param('id') id: string,
   ): Promise<ParkingSpotDto> {
-    return this.inventoryService.getParkingSpotById(user.schemaName, id);
+    const parkingSpot = await this.inventoryService.getParkingSpotById(user.schemaName, id);
+    return parkingSpot;
   }
 
   @Put('parking-spots/:id')
@@ -115,11 +122,12 @@ export class InventoryController {
     @Param('id') id: string,
     @Body() updateParkingSpotDto: UpdateParkingSpotDto,
   ): Promise<ParkingSpotDto> {
-    return this.inventoryService.updateParkingSpot(
+    const updatedParkingSpot = await this.inventoryService.updateParkingSpot(
       user.schemaName,
       id,
       updateParkingSpotDto,
     );
+    return updatedParkingSpot;
   }
 
   @Delete('parking-spots/:id')
@@ -127,13 +135,14 @@ export class InventoryController {
     @GetUser() user: any,
     @Param('id') id: string,
   ): Promise<void> {
-    return this.inventoryService.deleteParkingSpot(user.schemaName, id);
+    await this.inventoryService.deleteParkingSpot(user.schemaName, id);
   }
 
   // PROPIEDADES
   @Get('properties')
   async getProperties(@GetUser() user: any): Promise<PropertyWithDetailsDto[]> {
-    return this.inventoryService.getProperties(user.schemaName, user.residentialComplexId);
+    const properties = await this.inventoryService.getProperties(user.schemaName, user.residentialComplexId);
+    return properties.map(p => ({ ...p, unitNumber: p.number }));
   }
 
   @Post('properties')
@@ -141,10 +150,11 @@ export class InventoryController {
     @GetUser() user: any,
     @Body() createPropertyDto: CreatePropertyDto,
   ) {
-    return this.inventoryService.createProperty(user.schemaName, {
+    const createdProperty = await this.inventoryService.createProperty(user.schemaName, {
       ...createPropertyDto,
       residentialComplexId: user.residentialComplexId,
     });
+    return { ...createdProperty, unitNumber: createdProperty.number };
   }
 
   @Put('properties/:id')
@@ -153,29 +163,33 @@ export class InventoryController {
     @Param('id') id: string,
     @Body() updatePropertyDto: UpdatePropertyDto,
   ) {
-    return this.inventoryService.updateProperty(
+    const updatedProperty = await this.inventoryService.updateProperty(
       user.schemaName,
       id,
       updatePropertyDto,
     );
+    return { ...updatedProperty, unitNumber: updatedProperty.number };
   }
 
   @Get('pets')
   async getPets(@GetUser() user: any): Promise<PetWithDetailsDto[]> {
-    return this.inventoryService.getPets(user.schemaName, user.residentialComplexId);
+    const pets = await this.inventoryService.getPets(user.schemaName, user.residentialComplexId);
+    return pets.map(p => ({ ...p, ownerName: p.owner.name }));
   }
 
   @Post('pets')
   async createPet(@GetUser() user: any, @Body() createPetDto: CreatePetDto) {
-    return this.inventoryService.createPet(user.schemaName, {
+    const createdPet = await this.inventoryService.createPet(user.schemaName, {
       ...createPetDto,
       residentialComplexId: user.residentialComplexId,
     });
+    return createdPet;
   }
 
   @Get('vehicles')
   async getVehicles(@GetUser() user: any): Promise<VehicleWithDetailsDto[]> {
-    return this.inventoryService.getVehicles(user.schemaName, user.residentialComplexId);
+    const vehicles = await this.inventoryService.getVehicles(user.schemaName, user.residentialComplexId);
+    return vehicles.map(v => ({ ...v, licensePlate: v.plate, ownerName: v.owner.name }));
   }
 
   @Post('vehicles')
@@ -183,10 +197,11 @@ export class InventoryController {
     @GetUser() user: any,
     @Body() createVehicleDto: CreateVehicleDto,
   ) {
-    return this.inventoryService.createVehicle(
+    const createdVehicle = await this.inventoryService.createVehicle(
       user.schemaName,
       createVehicleDto,
     );
+    return { ...createdVehicle, licensePlate: createdVehicle.plate };
   }
 
   @Get('residents')

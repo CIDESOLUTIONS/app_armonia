@@ -3,7 +3,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import {
   CreatePQRDto,
   UpdatePQRDto,
-  PQRCommentDto,
   GetPQRParamsDto,
 } from '../common/dto/pqr.dto';
 import { UserRole } from '../common/enums/user-role.enum';
@@ -85,28 +84,4 @@ export class PqrService {
       },
     });
   }
-
-  // The addComment method is commented out because there is no 'comments' relation in the PQR model in schema.prisma.
-  // If comments are needed, a new model (e.g., PQRComment) should be added to schema.prisma with a relation to PQR.
-  /*
-  async addComment(
-    schemaName: string,
-    userId: string,
-    pqrId: string,
-    data: PQRCommentDto,
-  ) {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    return prisma.pQR.update({
-      where: { id: pqrId },
-      data: {
-        comments: { // This field does not exist in schema.prisma for PQR
-          create: {
-            content: data.content,
-            authorId: userId,
-          },
-        },
-      },
-    });
-  }
-  */
 }

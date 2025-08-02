@@ -1,520 +1,276 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
-  PropertyWithDetailsDto,
-  PetWithDetailsDto,
-  VehicleWithDetailsDto,
+  CreateCommonAreaDto,
+  UpdateCommonAreaDto,
+  CreateParkingSpotDto,
+  UpdateParkingSpotDto,
   CreatePropertyDto,
   UpdatePropertyDto,
   CreatePetDto,
   CreateVehicleDto,
-  UpdateResidentDto,
   CreateResidentDto,
-  CreateCommonAreaDto,
-  UpdateCommonAreaDto,
-  CommonAreaDto,
-  CreateParkingSpotDto,
-  UpdateParkingSpotDto,
-  ParkingSpotDto,
+  UpdateResidentDto,
 } from '../common/dto/inventory.dto';
 
 @Injectable()
 export class InventoryService {
   constructor(private prisma: PrismaService) {}
 
-  // PROPIEDADES
-  async getProperties(
-    schemaName: string,
-    residentialComplexId?: string,
-  ): Promise<PropertyWithDetailsDto[]> {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    try {
-      const whereClause: any = {};
-      if (residentialComplexId) {
-        whereClause.residentialComplexId = residentialComplexId;
-      }
-      const properties = await prisma.property.findMany({
-        where: whereClause,
-        include: {
-          owner: {
-            select: { id: true, name: true, email: true },
-          },
-          residents: {
-            select: { id: true },
-          },
-        },
-        orderBy: { number: 'asc' },
-      });
-
-      return properties.map((property) => ({
-        id: property.id,
-        unitNumber: property.number,
-        type: property.type,
-        status: 'Active', // Placeholder, assuming active status
-        ownerId: property.ownerId,
-        ownerName: property.owner?.name || undefined,
-        ownerEmail: property.owner?.email || undefined,
-        totalResidents: property.residents.length,
-        residentialComplexId: property.residentialComplexId,
-        createdAt: property.createdAt,
-        updatedAt: property.updatedAt,
-      }));
-    } catch (error) {
-      console.error('[INVENTORY SERVICE] Error obteniendo propiedades:', error);
-      throw new Error('Error obteniendo propiedades');
-    }
+  // Common Area Methods
+  async createCommonArea(schemaName: string, createCommonAreaDto: CreateCommonAreaDto) {
+    return this.prisma.getTenantDB(schemaName).amenity.create({
+      data: {
+        name: createCommonAreaDto.name,
+        description: createCommonAreaDto.description,
+        type: createCommonAreaDto.type,
+        rules: createCommonAreaDto.rules,
+        residentialComplexId: createCommonAreaDto.residentialComplexId,
+      },
+    });
   }
 
-  async createProperty(schemaName: string, data: CreatePropertyDto) {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    try {
-      const property = await prisma.property.create({
-        data: {
-          number: data.unitNumber,
-          type: data.type,
-          status: data.status,
-          owner: { connect: { id: data.ownerId } },
-          residentialComplex: { connect: { id: data.residentialComplexId } },
-        },
-        include: {
-          owner: {
-            select: { id: true, name: true, email: true },
-          },
-        },
-      });
-
-      return property;
-    } catch (error) {
-      console.error('[INVENTORY SERVICE] Error creando propiedad:', error);
-      throw new Error('Error creando propiedad');
-    }
+  async getCommonAreas(schemaName: string) {
+    return this.prisma.getTenantDB(schemaName).amenity.findMany();
   }
 
-  async updateProperty(
-    schemaName: string,
-    id: string,
-    data: UpdatePropertyDto,
-  ) {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    try {
-      const property = await prisma.property.update({
-        where: { id },
-        data: {
-          number: data.unitNumber,
-          type: data.type,
-          status: data.status,
-          ...(data.ownerId && { owner: { connect: { id: data.ownerId } } }),
-          ...(data.residentialComplexId && { residentialComplex: { connect: { id: data.residentialComplexId } } }),
-        },
-        include: {
-          owner: {
-            select: { id: true, name: true, email: true },
-          },
-        },
-      });
-
-      return property;
-    } catch (error) {
-      console.error('[INVENTORY SERVICE] Error actualizando propiedad:', error);
-      throw new Error('Error actualizando propiedad');
+  async getCommonAreaById(schemaName: string, id: string) {
+    const commonArea = await this.prisma.getTenantDB(schemaName).amenity.findUnique({
+      where: { id },
+    });
+    if (!commonArea) {
+      throw new NotFoundException(`Common Area with ID ${id} not found`);
     }
+    return commonArea;
   }
 
-  // MASCOTAS
-  async getPets(
-    schemaName: string,
-    residentialComplexId?: string,
-  ): Promise<PetWithDetailsDto[]> {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    try {
-      const whereClause: any = {};
-      if (residentialComplexId) {
-        whereClause.residentialComplexId = residentialComplexId;
-      }
-      const pets = await prisma.pet.findMany({
-        where: whereClause,
-        include: {
-          owner: {
-            select: { id: true, name: true },
-          },
-        },
-        orderBy: { name: 'asc' },
-      });
-      return pets.map((pet) => ({
-        id: pet.id,
-        name: pet.name,
-        breed: pet.breed || undefined,
-        ownerId: pet.ownerId,
-        ownerName: pet.owner.name,
-        type: pet.type,
-        residentialComplexId: pet.residentialComplexId,
-        createdAt: pet.createdAt,
-        updatedAt: pet.updatedAt,
-      }));
-    } catch (error) {
-      console.error('[INVENTORY SERVICE] Error obteniendo mascotas:', error);
-      throw new Error('Error obteniendo mascotas');
+  async updateCommonArea(schemaName: string, id: string, updateCommonAreaDto: UpdateCommonAreaDto) {
+    const existingCommonArea = await this.prisma.getTenantDB(schemaName).amenity.findUnique({
+      where: { id },
+    });
+
+    if (!existingCommonArea) {
+      throw new NotFoundException(`Common Area with ID ${id} not found`);
     }
+
+    return this.prisma.getTenantDB(schemaName).amenity.update({
+      where: { id },
+      data: updateCommonAreaDto,
+    });
   }
 
-  async createPet(schemaName: string, data: CreatePetDto) {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    try {
-      const pet = await prisma.pet.create({
-        data: {
-          name: data.name,
-          breed: data.breed,
-          type: data.type,
-          owner: { connect: { id: data.ownerId } },
-          residentialComplex: { connect: { id: data.residentialComplexId } },
-        },
-        include: {
-          owner: {
-            select: { name: true },
-          },
-        },
-      });
+  async deleteCommonArea(schemaName: string, id: string) {
+    const existingCommonArea = await this.prisma.getTenantDB(schemaName).amenity.findUnique({
+      where: { id },
+    });
 
-      return pet;
-    } catch (error) {
-      console.error('[INVENTORY SERVICE] Error creando mascota:', error);
-      throw new Error('Error creando mascota');
+    if (!existingCommonArea) {
+      throw new NotFoundException(`Common Area with ID ${id} not found`);
     }
+
+    return this.prisma.getTenantDB(schemaName).amenity.delete({
+      where: { id },
+    });
   }
 
-  // VEHÍCULOS
-  async getVehicles(
-    schemaName: string,
-    residentialComplexId?: string,
-  ): Promise<VehicleWithDetailsDto[]> {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    try {
-      const whereClause: any = {};
-      if (residentialComplexId) {
-        whereClause.residentialComplexId = residentialComplexId;
-      }
-      const vehicles = await prisma.vehicle.findMany({
-        where: whereClause,
-        include: {
-          owner: {
-            select: { id: true, name: true },
-          },
-        },
-        orderBy: { plate: 'asc' },
-      });
-      return vehicles.map((vehicle) => ({
-        id: vehicle.id,
-        licensePlate: vehicle.plate,
-        brand: vehicle.brand,
-        model: vehicle.model,
-        ownerId: vehicle.ownerId,
-        ownerName: vehicle.owner.name,
-        residentialComplexId: vehicle.residentialComplexId,
-        createdAt: vehicle.createdAt,
-        updatedAt: vehicle.updatedAt,
-      }));
-    } catch (error) {
-      console.error('[INVENTORY SERVICE] Error obteniendo vehículos:', error);
-      throw new Error('Error obteniendo vehículos');
-    }
+  // Parking Spot Methods
+  async createParkingSpot(schemaName: string, createParkingSpotDto: CreateParkingSpotDto) {
+    return this.prisma.getTenantDB(schemaName).parking.create({
+      data: {
+        number: createParkingSpotDto.number,
+        type: createParkingSpotDto.type,
+        residentialComplexId: createParkingSpotDto.residentialComplexId,
+        propertyId: createParkingSpotDto.propertyId,
+      },
+    });
   }
 
-  async createVehicle(schemaName: string, data: CreateVehicleDto) {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    try {
-      const vehicle = await prisma.vehicle.create({
-        data: {
-          plate: data.licensePlate.toUpperCase(),
-          brand: data.brand,
-          model: data.model,
-          owner: { connect: { id: data.ownerId } },
-          residentialComplex: { connect: { id: data.residentialComplexId } },
-        },
-        include: {
-          owner: {
-            select: { name: true },
-          },
-        },
-      });
-
-      return vehicle;
-    } catch (error) {
-      console.error('[INVENTORY SERVICE] Error creando vehículo:', error);
-      throw new Error('Error creando vehículo');
-    }
+  async getParkingSpots(schemaName: string, residentialComplexId: string) {
+    return this.prisma.getTenantDB(schemaName).parking.findMany({
+      where: { residentialComplexId },
+    });
   }
 
-  // RESIDENTES
-  async getResidents(
-    schemaName: string,
-    residentialComplexId?: string,
-  ) {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    try {
-      const whereClause: any = {};
-      if (residentialComplexId) {
-        whereClause.residentialComplexId = residentialComplexId;
-      }
-      const residents = await prisma.resident.findMany({
-        where: whereClause,
-        include: {
-          property: {
-            select: { id: true, number: true, type: true },
-          },
-        },
-        orderBy: { name: 'asc' },
-      });
-
-      return residents;
-    } catch (error) {
-      console.error('[INVENTORY SERVICE] Error obteniendo residentes:', error);
-      throw new Error('Error obteniendo residentes');
+  async getParkingSpotById(schemaName: string, id: string) {
+    const parkingSpot = await this.prisma.getTenantDB(schemaName).parking.findUnique({
+      where: { id },
+    });
+    if (!parkingSpot) {
+      throw new NotFoundException(`Parking Spot with ID ${id} not found`);
     }
+    return parkingSpot;
   }
 
-  async updateResident(
-    schemaName: string,
-    id: string,
-    data: UpdateResidentDto,
-  ) {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    try {
-      const resident = await prisma.resident.update({
-        where: { id },
-        data: {
-          name: data.name,
-          email: data.email,
-          phone: data.phone,
-          role: data.role,
-          isActive: data.isActive,
-          idNumber: data.idNumber,
-          idType: data.idType,
-          isOwner: data.isOwner,
-          relationshipWithOwner: data.relationshipWithOwner,
-          biometricId: data.biometricId,
-          ...(data.propertyId && { property: { connect: { id: data.propertyId } } }),
-          ...(data.residentialComplexId && { residentialComplex: { connect: { id: data.residentialComplexId } } }),
-        },
-        include: {
-          property: {
-            select: { number: true },
-          },
-        },
-      });
+  async updateParkingSpot(schemaName: string, id: string, updateParkingSpotDto: UpdateParkingSpotDto) {
+    const existingParkingSpot = await this.prisma.getTenantDB(schemaName).parking.findUnique({
+      where: { id },
+    });
 
-      return resident;
-    } catch (error) {
-      console.error('[INVENTORY SERVICE] Error actualizando residente:', error);
-      throw new Error('Error actualizando residente');
+    if (!existingParkingSpot) {
+      throw new NotFoundException(`Parking Spot with ID ${id} not found`);
     }
+
+    return this.prisma.getTenantDB(schemaName).parking.update({
+      where: { id },
+      data: updateParkingSpotDto,
+    });
   }
 
-  async createResident(schemaName: string, data: CreateResidentDto) {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    try {
-      const resident = await prisma.resident.create({
-        data: {
-          name: data.name,
-          email: data.email,
-          phone: data.phone,
-          role: data.role,
-          isActive: data.isActive,
-          idNumber: data.idNumber,
-          idType: data.idType,
-          isOwner: data.isOwner,
-          relationshipWithOwner: data.relationshipWithOwner,
-          biometricId: data.biometricId,
-          property: { connect: { id: data.propertyId } },
-          residentialComplex: { connect: { id: data.residentialComplexId } },
-        },
-      });
-      return resident;
-    } catch (error) {
-      console.error('[INVENTORY SERVICE] Error creando residente:', error);
-      throw new Error('Error creando residente');
+  async deleteParkingSpot(schemaName: string, id: string) {
+    const existingParkingSpot = await this.prisma.getTenantDB(schemaName).parking.findUnique({
+      where: { id },
+    });
+
+    if (!existingParkingSpot) {
+      throw new NotFoundException(`Parking Spot with ID ${id} not found`);
     }
+
+    return this.prisma.getTenantDB(schemaName).parking.delete({
+      where: { id },
+    });
+  }
+
+  // Property Methods
+  async getProperties(schemaName: string, residentialComplexId: string) {
+    return this.prisma.getTenantDB(schemaName).property.findMany({
+      where: { residentialComplexId },
+      include: { residents: true, parkings: true, intercoms: true },
+    });
+  }
+
+  async createProperty(schemaName: string, createPropertyDto: CreatePropertyDto) {
+    return this.prisma.getTenantDB(schemaName).property.create({
+      data: {
+        type: createPropertyDto.type,
+        number: createPropertyDto.unitNumber,
+        ownerId: createPropertyDto.ownerId,
+        residentialComplexId: createPropertyDto.residentialComplexId,
+      },
+    });
+  }
+
+  async updateProperty(schemaName: string, id: string, updatePropertyDto: UpdatePropertyDto) {
+    const existingProperty = await this.prisma.getTenantDB(schemaName).property.findUnique({
+      where: { id },
+    });
+
+    if (!existingProperty) {
+      throw new NotFoundException(`Property with ID ${id} not found`);
+    }
+
+    return this.prisma.getTenantDB(schemaName).property.update({
+      where: { id },
+      data: updatePropertyDto,
+    });
+  }
+
+  // Pet Methods
+  async getPets(schemaName: string, residentialComplexId: string) {
+    return this.prisma.getTenantDB(schemaName).pet.findMany({
+      where: { residentialComplexId },
+      include: { owner: true },
+    });
+  }
+
+  async createPet(schemaName: string, createPetDto: CreatePetDto) {
+    return this.prisma.getTenantDB(schemaName).pet.create({
+      data: {
+        name: createPetDto.name,
+        breed: createPetDto.breed,
+        ownerId: createPetDto.ownerId,
+        residentialComplexId: createPetDto.residentialComplexId,
+      },
+    });
+  }
+
+  // Vehicle Methods
+  async getVehicles(schemaName: string, residentialComplexId: string) {
+    return this.prisma.getTenantDB(schemaName).vehicle.findMany({
+      where: { residentialComplexId },
+      include: { owner: true },
+    });
+  }
+
+  async createVehicle(schemaName: string, createVehicleDto: CreateVehicleDto) {
+    return this.prisma.getTenantDB(schemaName).vehicle.create({
+      data: {
+        plate: createVehicleDto.licensePlate,
+        brand: createVehicleDto.brand,
+        model: createVehicleDto.model,
+        ownerId: createVehicleDto.ownerId,
+        residentialComplexId: createVehicleDto.residentialComplexId,
+      },
+    });
+  }
+
+  // Resident Methods
+  async getResidents(schemaName: string, residentialComplexId: string) {
+    return this.prisma.getTenantDB(schemaName).resident.findMany({
+      where: { property: { residentialComplexId } },
+      include: { property: true, user: true },
+    });
+  }
+
+  async createResident(schemaName: string, createResidentDto: CreateResidentDto) {
+    return this.prisma.getTenantDB(schemaName).resident.create({
+      data: {
+        name: createResidentDto.name,
+        email: createResidentDto.email,
+        phone: createResidentDto.phone,
+        propertyId: createResidentDto.propertyId,
+        userId: createResidentDto.userId,
+      },
+    });
+  }
+
+  async updateResident(schemaName: string, id: string, updateResidentDto: UpdateResidentDto) {
+    const existingResident = await this.prisma.getTenantDB(schemaName).resident.findUnique({
+      where: { id },
+    });
+
+    if (!existingResident) {
+      throw new NotFoundException(`Resident with ID ${id} not found`);
+    }
+
+    return this.prisma.getTenantDB(schemaName).resident.update({
+      where: { id },
+      data: updateResidentDto,
+    });
   }
 
   async deleteResident(schemaName: string, id: string) {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    try {
-      await prisma.resident.delete({ where: { id } });
-    } catch (error) {
-      console.error('[INVENTORY SERVICE] Error eliminando residente:', error);
-      throw new Error('Error eliminando residente');
-    }
-  }
-
-  // Common Area Management
-  async createCommonArea(
-    schemaName: string,
-    data: CreateCommonAreaDto,
-  ): Promise<CommonAreaDto> {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    const commonArea = await prisma.amenity.create({
-      data: {
-        name: data.name,
-        description: data.description,
-        type: data.type,
-        rules: data.rules,
-        residentialComplex: { connect: { id: data.residentialComplexId } },
-      },
-    });
-    return { ...commonArea, residentialComplexId: commonArea.residentialComplexId, createdAt: commonArea.createdAt, updatedAt: commonArea.updatedAt };
-  }
-
-  async getCommonAreas(schemaName: string): Promise<CommonAreaDto[]> {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    const commonAreas = await prisma.amenity.findMany();
-    return commonAreas.map(ca => ({ ...ca, residentialComplexId: ca.residentialComplexId, createdAt: ca.createdAt, updatedAt: ca.updatedAt }));
-  }
-
-  async getCommonAreaById(
-    schemaName: string,
-    id: string,
-  ): Promise<CommonAreaDto> {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    const commonArea = await prisma.amenity.findUnique({ where: { id } });
-    if (!commonArea) {
-      throw new NotFoundException(`Área común con ID ${id} no encontrada.`);
-    }
-    return { ...commonArea, residentialComplexId: commonArea.residentialComplexId, createdAt: commonArea.createdAt, updatedAt: commonArea.updatedAt };
-  }
-
-  async updateCommonArea(
-    schemaName: string,
-    id: string,
-    data: UpdateCommonAreaDto,
-  ): Promise<CommonAreaDto> {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    const commonArea = await prisma.amenity.findUnique({ where: { id } });
-    if (!commonArea) {
-      throw new NotFoundException(`Área común con ID ${id} no encontrada.`);
-    }
-    const updatedCommonArea = await prisma.amenity.update({
+    const existingResident = await this.prisma.getTenantDB(schemaName).resident.findUnique({
       where: { id },
-      data: {
-        name: data.name,
-        description: data.description,
-        type: data.type,
-        rules: data.rules,
-        ...(data.residentialComplexId && { residentialComplex: { connect: { id: data.residentialComplexId } } }),
-      },
     });
-    return { ...updatedCommonArea, residentialComplexId: updatedCommonArea.residentialComplexId, createdAt: updatedCommonArea.createdAt, updatedAt: updatedCommonArea.updatedAt };
-  }
 
-  async deleteCommonArea(schemaName: string, id: string): Promise<void> {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    const commonArea = await prisma.amenity.findUnique({ where: { id } });
-    if (!commonArea) {
-      throw new NotFoundException(`Área común con ID ${id} no encontrada.`);
+    if (!existingResident) {
+      throw new NotFoundException(`Resident with ID ${id} not found`);
     }
-    await prisma.amenity.delete({ where: { id } });
-  }
 
-  // Parking Spot Management
-  async createParkingSpot(
-    schemaName: string,
-    data: CreateParkingSpotDto,
-  ): Promise<ParkingSpotDto> {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    const parkingSpot = await prisma.parking.create({
-      data: {
-        number: data.number,
-        type: data.type,
-        status: data.status,
-        notes: data.notes,
-        ...(data.propertyId && { property: { connect: { id: data.propertyId } } }),
-        residentialComplex: { connect: { id: data.residentialComplexId } },
-      },
-    });
-    return { ...parkingSpot, residentialComplexId: parkingSpot.residentialComplexId, createdAt: parkingSpot.createdAt, updatedAt: parkingSpot.updatedAt };
-  }
-
-  async getParkingSpots(
-    schemaName: string,
-  ): Promise<ParkingSpotDto[]> {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    const parkingSpots = await prisma.parking.findMany();
-    return parkingSpots.map(ps => ({ ...ps, residentialComplexId: ps.residentialComplexId, createdAt: ps.createdAt, updatedAt: ps.updatedAt }));
-  }
-
-  async getParkingSpotById(
-    schemaName: string,
-    id: string,
-  ): Promise<ParkingSpotDto> {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    const parkingSpot = await prisma.parking.findUnique({ where: { id } });
-    if (!parkingSpot) {
-      throw new NotFoundException(
-        `Espacio de estacionamiento con ID ${id} no encontrado.`,
-      );
-    }
-    return { ...parkingSpot, residentialComplexId: parkingSpot.residentialComplexId, createdAt: parkingSpot.createdAt, updatedAt: parkingSpot.updatedAt };
-  }
-
-  async updateParkingSpot(
-    schemaName: string,
-    id: string,
-    data: UpdateParkingSpotDto,
-  ): Promise<ParkingSpotDto> {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    const parkingSpot = await prisma.parking.findUnique({ where: { id } });
-    if (!parkingSpot) {
-      throw new NotFoundException(
-        `Espacio de estacionamiento con ID ${id} no encontrado.`,
-      );
-    }
-    const updatedParkingSpot = await prisma.parking.update({
+    return this.prisma.getTenantDB(schemaName).resident.delete({
       where: { id },
-      data: {
-        number: data.number,
-        type: data.type,
-        status: data.status,
-        notes: data.notes,
-        ...(data.propertyId && { property: { connect: { id: data.propertyId } } }),
-        ...(data.residentialComplexId && { residentialComplex: { connect: { id: data.residentialComplexId } } }),
-      },
     });
-    return { ...updatedParkingSpot, residentialComplexId: updatedParkingSpot.residentialComplexId, createdAt: updatedParkingSpot.createdAt, updatedAt: updatedParkingSpot.updatedAt };
   }
 
-  async deleteParkingSpot(schemaName: string, id: string): Promise<void> {
-    const prisma = this.prisma.getTenantDB(schemaName);
-    const parkingSpot = await prisma.parking.findUnique({ where: { id } });
-    if (!parkingSpot) {
-      throw new NotFoundException(
-        `Espacio de estacionamiento con ID ${id} no encontrado.`,
-      );
-    }
-    await prisma.parking.delete({ where: { id } });
+  // Service Provider Methods (assuming 'services' refers to ServiceProviders)
+  async getServices(schemaName: string, residentialComplexId: string) {
+    return this.prisma.getTenantDB(schemaName).serviceProvider.findMany({
+      where: { residentialComplexId },
+    });
   }
 
-  async getServices(schemaName: string, residentialComplexId: string): Promise<any[]> {
-    // Placeholder implementation for getServices
-    // In a real scenario, this would fetch actual services related to the complex
-    return [];
-  }
-
-  async getInventoryStats(schemaName: string, residentialComplexId: string): Promise<any> {
-    // Placeholder implementation for getInventoryStats
-    // In a real scenario, this would fetch aggregated inventory statistics
-    const prisma = this.prisma.getTenantDB(schemaName);
-    const totalProperties = await prisma.property.count({ where: { residentialComplexId: residentialComplexId } });
-    const totalResidents = await prisma.resident.count({ where: { residentialComplexId: residentialComplexId } });
-    const totalPets = await prisma.pet.count({ where: { residentialComplexId: residentialComplexId } });
-    const totalVehicles = await prisma.vehicle.count({ where: { residentialComplexId: residentialComplexId } });
-    const totalCommonAreas = await prisma.amenity.count({ where: { residentialComplexId: residentialComplexId } });
-    const totalParkingSpots = await prisma.parking.count({ where: { residentialComplexId: residentialComplexId } });
-
+  // Placeholder for getInventoryStats - needs more context on what stats are expected
+  async getInventoryStats(schemaName: string, residentialComplexId: string) {
+    // This method would typically aggregate data from various inventory models.
+    // For now, returning a placeholder.
     return {
-      totalProperties,
-      totalResidents,
-      totalPets,
-      totalVehicles,
-      totalCommonAreas,
-      totalParkingSpots,
+      commonAreasCount: await this.prisma.getTenantDB(schemaName).amenity.count({ where: { residentialComplexId } }),
+      parkingSpotsCount: await this.prisma.getTenantDB(schemaName).parking.count({ where: { residentialComplexId } }),
+      propertiesCount: await this.prisma.getTenantDB(schemaName).property.count({ where: { residentialComplexId } }),
+      petsCount: await this.prisma.getTenantDB(schemaName).pet.count({ where: { residentialComplexId } }),
+      vehiclesCount: await this.prisma.getTenantDB(schemaName).vehicle.count({ where: { residentialComplexId } }),
+      residentsCount: await this.prisma.getTenantDB(schemaName).resident.count({ where: { property: { residentialComplexId } } }),
+      serviceProvidersCount: await this.prisma.getTenantDB(schemaName).serviceProvider.count({ where: { residentialComplexId } }),
     };
   }
 }

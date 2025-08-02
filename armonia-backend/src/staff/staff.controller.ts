@@ -46,7 +46,7 @@ export class StaffController {
   @Get(':id')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
   async findOneStaffUser(@GetUser() user: any, @Param('id') id: string) {
-    const staffUser = await this.userService.findById(id);
+    const staffUser = await this.userService.findById(user.schemaName, id);
     if (staffUser && staffUser.role !== UserRole.STAFF) {
       throw new Error('User is not a STAFF member.');
     }
@@ -60,7 +60,7 @@ export class StaffController {
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    const existingUser = await this.userService.findById(id);
+    const existingUser = await this.userService.findById(user.schemaName, id);
     if (existingUser && existingUser.role !== UserRole.STAFF) {
       throw new Error('User is not a STAFF member.');
     }
@@ -77,7 +77,7 @@ export class StaffController {
   @Delete(':id')
   @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
   async deleteStaffUser(@GetUser() user: any, @Param('id') id: string) {
-    const existingUser = await this.userService.findById(id);
+    const existingUser = await this.userService.findById(user.schemaName, id);
     if (existingUser && existingUser.role !== UserRole.STAFF) {
       throw new Error('User is not a STAFF member.');
     }
