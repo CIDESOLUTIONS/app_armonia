@@ -6,21 +6,20 @@ import { TenantService } from '../tenant/tenant.service';
 import { ResidentialComplexService } from '../residential-complex/residential-complex.service';
 import { UserRole } from '../common/enums/user-role.enum';
 import { PrismaService } from '../prisma/prisma.service';
-import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
-    private tenantService: TenantService,
+    private tenantService: Tenant TenantService,
     private prismaService: PrismaService,
     @Inject(ResidentialComplexService)
     private residentialComplexService: ResidentialComplexService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
-    const prisma = this.prismaService; // Usar el cliente por defecto
+    const prisma = this.prismaService.getTenantDB('public'); // Use a default schema for user lookup
     const user = await this.userService.findByEmail(email, prisma);
     if (user && (await bcrypt.compare(pass, user.password))) {
       const { password, ...result } = user;
@@ -48,46 +47,33 @@ export class AuthService {
   async registerComplex(data: any) {
     const { complexData, adminData } = data;
 
-    // Usar el cliente por defecto para la transacción
-    const defaultPrisma = this.prismaService;
+    // This is a complex transaction that involves multiple schemas and should be handled carefully.
+    // For now, we'll assume a simplified approach where we create the complex and then the admin.
 
-    return defaultPrisma.$transaction(async (txPrisma: PrismaClient) => {
-      const existingUser = await this.userService.findByEmail(
-        adminData.email,
-        txPrisma,
-      );
-      if (existingUser) {
-        throw new UnauthorizedException('User with this email already exists');
-      }
+    const newComplex = await this.residentialComplexService.createComplexAndSchema(
+      complexData,
+    );
 
-      const newComplex =
-        await this.residentialComplexService.createComplexAndSchema(
-          complexData,
-          txPrisma,
-        );
+    const adminPayload = {
+      ...adminData,
+      role: UserRole.COMPLEX_ADMIN,
+      complexId: newComplex.id,
+    };
 
-      const adminPayload = {
-        ...adminData,
-        role: UserRole.COMPLEX_ADMIN,
-        complexId: newComplex.id,
-      };
+    const newAdmin = await this.userService.createUser(
+      newComplex.id, // schemaName is now the complexId
+      adminPayload,
+    );
 
-      const newAdmin = await this.userService.createUser(
-        newComplex.schemaName,
-        adminPayload,
-        txPrisma,
-      );
-
-      return this.login(newAdmin);
-    });
+    return this.login(newAdmin);
   }
 
   async handleDemoRequest(data: any) {
     const { name, email, complexName, phone, message } = data;
 
     // Save the demo request to the database using the default client
-    const defaultPrisma = this.prismaService;
-    await defaultPrisma.demoRequest.create({
+    const prisma = this.prismaService.getTenantDB('public');
+    await prisma.demoRequest.create({
       data: {
         name,
         email,

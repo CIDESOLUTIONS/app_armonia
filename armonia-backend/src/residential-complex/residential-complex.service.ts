@@ -14,22 +14,18 @@ export class ResidentialComplexService {
     data: CreateResidentialComplexDto,
     prismaClient?: any,
   ): Promise<ResidentialComplexDto> {
-    const prisma = prismaClient || this.prisma;
+    const prisma = this.prisma.getTenantDB('public');
     const newComplex = await prisma.residentialComplex.create({ data });
-    const schemaName = `complex_${newComplex.id}`;
-    return prisma.residentialComplex.update({
-      where: { id: newComplex.id },
-      data: { schemaName },
-    });
+    return newComplex;
   }
 
   async getResidentialComplexes(): Promise<ResidentialComplexDto[]> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB('public');
     return prisma.residentialComplex.findMany();
   }
 
-  async getResidentialComplexById(id: number): Promise<ResidentialComplexDto> {
-    const prisma = this.prisma;
+  async getResidentialComplexById(id: string): Promise<ResidentialComplexDto> {
+    const prisma = this.prisma.getTenantDB('public');
     const complex = await prisma.residentialComplex.findUnique({
       where: { id },
     });
@@ -42,10 +38,10 @@ export class ResidentialComplexService {
   }
 
   async updateResidentialComplex(
-    id: number,
+    id: string,
     data: UpdateResidentialComplexDto,
   ): Promise<ResidentialComplexDto> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB('public');
     const complex = await prisma.residentialComplex.findUnique({
       where: { id },
     });
@@ -57,8 +53,8 @@ export class ResidentialComplexService {
     return prisma.residentialComplex.update({ where: { id }, data });
   }
 
-  async deleteResidentialComplex(id: number): Promise<void> {
-    const prisma = this.prisma;
+  async deleteResidentialComplex(id: string): Promise<void> {
+    const prisma = this.prisma.getTenantDB('public');
     const complex = await prisma.residentialComplex.findUnique({
       where: { id },
     });

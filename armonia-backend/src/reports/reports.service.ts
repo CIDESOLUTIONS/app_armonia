@@ -3,13 +3,11 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service.js';
+import { PrismaService } from '../prisma/prisma.service';
 import PDFDocument from 'pdfkit';
 import * as XLSX from 'xlsx';
 import { format } from 'date-fns';
-import { PaymentStatus } from '../common/enums/payment-status.enum.js';
-import { ExpenseStatus } from '../common/enums/expense-status.enum.js';
-import { FeeStatus } from '../common/enums/fee-status.enum';
+import { PaymentStatus } from '../common/enums/payment-status.enum';
 
 @Injectable()
 export class ReportsService {
@@ -20,7 +18,7 @@ export class ReportsService {
     startDate: Date,
     endDate: Date,
   ): Promise<Buffer> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const visitors = await prisma.visitor.findMany({
       where: {
         entryTime: { gte: startDate, lte: endDate },
@@ -55,11 +53,11 @@ export class ReportsService {
     doc.font('Helvetica').fontSize(9);
     visitors.forEach((visitor) => {
       doc.text(visitor.name, 50, doc.y, { width: 100, align: 'left' });
-      doc.text(visitor.identification, 150, doc.y, {
+      doc.text(visitor.idNumber, 150, doc.y, {
         width: 100,
         align: 'left',
       });
-      doc.text(visitor.visitedUnit, 250, doc.y, { width: 100, align: 'left' });
+      doc.text(visitor.propertyId, 250, doc.y, { width: 100, align: 'left' });
       doc.text(format(visitor.entryTime, 'dd/MM/yyyy HH:mm'), 350, doc.y, {
         width: 100,
         align: 'left',
@@ -85,7 +83,7 @@ export class ReportsService {
     startDate: Date,
     endDate: Date,
   ): Promise<Buffer> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const visitors = await prisma.visitor.findMany({
       where: {
         entryTime: { gte: startDate, lte: endDate },
@@ -97,8 +95,8 @@ export class ReportsService {
       ['Nombre', 'Identificación', 'Visitado', 'Entrada', 'Salida'],
       ...visitors.map((visitor) => [
         visitor.name,
-        visitor.identification,
-        visitor.visitedUnit,
+        visitor.idNumber,
+        visitor.propertyId,
         format(visitor.entryTime, 'dd/MM/yyyy HH:mm'),
         visitor.exitTime ? format(visitor.exitTime, 'dd/MM/yyyy HH:mm') : 'N/A',
       ]),
@@ -116,12 +114,12 @@ export class ReportsService {
     startDate: Date,
     endDate: Date,
   ): Promise<Buffer> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const packages = await prisma.package.findMany({
       where: {
-        registrationDate: { gte: startDate, lte: endDate },
+        receivedAt: { gte: startDate, lte: endDate },
       },
-      orderBy: { registrationDate: 'asc' },
+      orderBy: { receivedAt: 'asc' },
     });
 
     const doc = new PDFDocument();
@@ -140,36 +138,25 @@ export class ReportsService {
 
     // Table Header
     doc.font('Helvetica-Bold').fontSize(10);
-    doc.text('Tipo', 50, doc.y, { width: 80, align: 'left' });
-    doc.text('Seguimiento', 130, doc.y, { width: 80, align: 'left' });
     doc.text('Destino', 210, doc.y, { width: 80, align: 'left' });
-    doc.text('Remitente', 290, doc.y, { width: 80, align: 'left' });
     doc.text('Registro', 370, doc.y, { width: 80, align: 'left' });
     doc.text('Entrega', 450, doc.y, { width: 80, align: 'left' });
-    doc.text('Estado', 530, doc.y, { width: 80, align: 'left' });
     doc.moveDown();
 
     // Table Rows
     doc.font('Helvetica').fontSize(9);
     packages.forEach((pkg) => {
-      doc.text(pkg.type, 50, doc.y, { width: 80, align: 'left' });
-      doc.text(pkg.trackingNumber || 'N/A', 130, doc.y, {
-        width: 80,
-        align: 'left',
-      });
-      doc.text(pkg.recipientUnit, 210, doc.y, { width: 80, align: 'left' });
-      doc.text(pkg.sender || 'N/A', 290, doc.y, { width: 80, align: 'left' });
-      doc.text(format(pkg.registrationDate, 'dd/MM/yyyy HH:mm'), 370, doc.y, {
+      doc.text(pkg.residentId, 210, doc.y, { width: 80, align: 'left' });
+      doc.text(format(pkg.receivedAt, 'dd/MM/yyyy HH:mm'), 370, doc.y, {
         width: 80,
         align: 'left',
       });
       doc.text(
-        pkg.deliveryDate ? format(pkg.deliveryDate, 'dd/MM/yyyy HH:mm') : 'N/A',
+        pkg.deliveredAt ? format(pkg.deliveredAt, 'dd/MM/yyyy HH:mm') : 'N/A',
         450,
         doc.y,
         { width: 80, align: 'left' },
       );
-      doc.text(pkg.status, 530, doc.y, { width: 80, align: 'left' });
       doc.moveDown();
     });
 
@@ -185,32 +172,24 @@ export class ReportsService {
     startDate: Date,
     endDate: Date,
   ): Promise<Buffer> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const packages = await prisma.package.findMany({
       where: {
-        registrationDate: { gte: startDate, lte: endDate },
+        receivedAt: { gte: startDate, lte: endDate },
       },
-      orderBy: { registrationDate: 'asc' },
+      orderBy: { receivedAt: 'asc' },
     });
 
     const data = [
       [
-        'Tipo',
-        'Seguimiento',
         'Destino',
-        'Remitente',
         'Registro',
         'Entrega',
-        'Estado',
       ],
       ...packages.map((pkg) => [
-        pkg.type,
-        pkg.trackingNumber || 'N/A',
-        pkg.recipientUnit,
-        pkg.sender || 'N/A',
-        format(pkg.registrationDate, 'dd/MM/yyyy HH:mm'),
-        pkg.deliveryDate ? format(pkg.deliveryDate, 'dd/MM/yyyy HH:mm') : 'N/A',
-        pkg.status,
+        pkg.residentId,
+        format(pkg.receivedAt, 'dd/MM/yyyy HH:mm'),
+        pkg.deliveredAt ? format(pkg.deliveredAt, 'dd/MM/yyyy HH:mm') : 'N/A',
       ]),
     ];
 
@@ -226,7 +205,7 @@ export class ReportsService {
     startDate: Date,
     endDate: Date,
   ): Promise<Buffer> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const incidents = await prisma.pQR.findMany({
       where: {
         createdAt: { gte: startDate, lte: endDate },
@@ -251,9 +230,6 @@ export class ReportsService {
     // Table Header
     doc.font('Helvetica-Bold').fontSize(10);
     doc.text('Título', 50, doc.y, { width: 100, align: 'left' });
-    doc.text('Categoría', 150, doc.y, { width: 80, align: 'left' });
-    doc.text('Prioridad', 230, doc.y, { width: 80, align: 'left' });
-    doc.text('Ubicación', 310, doc.y, { width: 100, align: 'left' });
     doc.text('Reportado Por', 410, doc.y, { width: 100, align: 'left' });
     doc.text('Estado', 510, doc.y, { width: 80, align: 'left' });
     doc.moveDown();
@@ -261,11 +237,8 @@ export class ReportsService {
     // Table Rows
     doc.font('Helvetica').fontSize(9);
     incidents.forEach((incident) => {
-      doc.text(incident.subject, 50, doc.y, { width: 100, align: 'left' });
-      doc.text(incident.category, 150, doc.y, { width: 80, align: 'left' });
-      doc.text(incident.priority, 230, doc.y, { width: 80, align: 'left' });
-      doc.text(incident.location, 310, doc.y, { width: 100, align: 'left' });
-      doc.text(incident.reportedBy, 410, doc.y, { width: 100, align: 'left' });
+      doc.text(incident.title, 50, doc.y, { width: 100, align: 'left' });
+      doc.text(incident.reportedById, 410, doc.y, { width: 100, align: 'left' });
       doc.text(incident.status, 510, doc.y, { width: 80, align: 'left' });
       doc.moveDown();
     });
@@ -282,7 +255,7 @@ export class ReportsService {
     startDate: Date,
     endDate: Date,
   ): Promise<Buffer> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const incidents = await prisma.pQR.findMany({
       where: {
         createdAt: { gte: startDate, lte: endDate },
@@ -293,18 +266,12 @@ export class ReportsService {
     const data = [
       [
         'Título',
-        'Categoría',
-        'Prioridad',
-        'Ubicación',
         'Reportado Por',
         'Estado',
       ],
       ...incidents.map((incident) => [
-        incident.subject,
-        incident.category,
-        incident.priority,
-        incident.location,
-        incident.reportedBy,
+        incident.title,
+        incident.reportedById,
         incident.status,
       ]),
     ];
@@ -326,9 +293,9 @@ export class ReportsService {
 
   async generatePeaceAndSafePdf(
     schemaName: string,
-    residentId: number,
+    residentId: string,
   ): Promise<Buffer> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
 
     const resident = await prisma.resident.findUnique({
       where: { id: residentId },
@@ -343,8 +310,8 @@ export class ReportsService {
 
     const outstandingFees = await prisma.fee.count({
       where: {
-        residentId: resident.id,
-        status: { in: [FeeStatus.PENDING, FeeStatus.OVERDUE] },
+        propertyId: resident.propertyId,
+        paid: false,
       },
     });
 
@@ -364,7 +331,7 @@ export class ReportsService {
 
     doc.fontSize(12).text(
       `Por medio del presente, se certifica que el residente ${resident.name},
-      identificado con ID ${resident.id}, de la unidad ${resident.property.unitNumber},
+      identificado con ID ${resident.id}, de la unidad ${resident.property.number},
       se encuentra a PAZ Y SALVO por todo concepto con la administración del conjunto residencial.
       `,
       { align: 'justify' },

@@ -11,10 +11,10 @@ interface FeeCreateInput {
   title: string;
   description: string;
   amount: number;
-  type: string; // Changed from FeeType to string
+  type: string;
   dueDate: string;
-  propertyId: number;
-  createdById: number;
+  propertyId: string;
+  createdById: string;
 }
 
 @Injectable()
@@ -25,20 +25,14 @@ export class IotService {
     schemaName: string,
     data: SmartMeterReadingDto,
   ): Promise<SmartMeterReadingDto> {
-    const prisma = this.prisma;
-    const device = await prisma.smartMeterDevice.findUnique({
-      where: { meterId: data.meterId },
+    const prisma = this.prisma.getTenantDB(schemaName);
+    const device = await prisma.iOTDevice.findUnique({
+      where: { id: data.meterId },
     });
 
     if (!device) {
       throw new NotFoundException(
         `Dispositivo de medidor inteligente con ID ${data.meterId} no encontrado.`,
-      );
-    }
-
-    if (device.propertyId !== data.propertyId) {
-      throw new Error(
-        `El medidor ${data.meterId} no está asociado a la propiedad ${data.propertyId}.`,
       );
     }
 
@@ -51,7 +45,7 @@ export class IotService {
     schemaName: string,
     filters: SmartMeterFilterParamsDto,
   ): Promise<SmartMeterReadingDto[]> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const where: any = {};
 
     if (filters.meterId) {
@@ -79,7 +73,7 @@ export class IotService {
     schemaName: string,
     data: AutomatedBillingDto,
   ): Promise<any> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
 
     if (!data.billingPeriodStart || !data.billingPeriodEnd) {
       throw new Error(
@@ -102,7 +96,7 @@ export class IotService {
 
     // Group readings by propertyId and calculate consumption
     const consumptionByProperty: {
-      [propertyId: number]: {
+      [propertyId: string]: {
         minReading: number;
         maxReading: number;
         unit: string;
@@ -111,25 +105,25 @@ export class IotService {
     } = {};
 
     for (const reading of readings) {
-      const device = await prisma.smartMeterDevice.findUnique({
-        where: { meterId: reading.meterId },
+      const device = await prisma.iOTDevice.findUnique({
+        where: { id: reading.deviceId },
       });
       if (!device) continue; // Skip if device not found
 
-      if (!consumptionByProperty[reading.propertyId]) {
-        consumptionByProperty[reading.propertyId] = {
+      if (!consumptionByProperty[device.id]) {
+        consumptionByProperty[device.id] = {
           minReading: reading.reading,
           maxReading: reading.reading,
-          unit: reading.unit,
+          unit: 'kWh', // Assuming kWh for now
           type: device.type,
         };
       } else {
-        consumptionByProperty[reading.propertyId].minReading = Math.min(
-          consumptionByProperty[reading.propertyId].minReading,
+        consumptionByProperty[device.id].minReading = Math.min(
+          consumptionByProperty[device.id].minReading,
           reading.reading,
         );
-        consumptionByProperty[reading.propertyId].maxReading = Math.max(
-          consumptionByProperty[reading.propertyId].maxReading,
+        consumptionByProperty[device.id].maxReading = Math.max(
+          consumptionByProperty[device.id].maxReading,
           reading.reading,
         );
       }
@@ -142,13 +136,9 @@ export class IotService {
     )) {
       const rate = await prisma.utilityRate.findFirst({
         where: {
-          complexId: data.complexId, // Assuming complexId is passed in AutomatedBillingDto
-          type: consumptionData.type,
-          unit: consumptionData.unit,
-          effectiveDate: { lte: billingPeriodEnd },
-          isActive: true,
+          name: consumptionData.type,
         },
-        orderBy: { effectiveDate: 'desc' },
+        orderBy: { id: 'desc' },
       });
 
       if (!rate) {
@@ -158,22 +148,22 @@ export class IotService {
 
       const consumedAmount =
         consumptionData.maxReading - consumptionData.minReading;
-      const calculatedAmount = consumedAmount * rate.rate.toNumber();
+      const calculatedAmount = consumedAmount * rate.rate;
 
       feesToCreate.push({
         title: `Factura de Consumo ${consumptionData.type} - ${new Date(billingPeriodStart).toLocaleDateString()} a ${new Date(billingPeriodEnd).toLocaleDateString()}`,
         description: `Consumo de ${consumedAmount} ${consumptionData.unit}`,
         amount: calculatedAmount,
-        type: FeeType.UTILITY, // Still using FeeType enum here
+        type: FeeType.UTILITY,
         dueDate: new Date(
           new Date().setMonth(new Date().getMonth() + 1),
         ).toISOString(),
-        propertyId: parseInt(propertyId),
-        createdById: 1, // Assuming a system user with ID 1 for automated billing
+        propertyId: propertyId,
+        createdById: '1', // Assuming a system user with ID 1 for automated billing
       });
     }
 
-    await prisma.fee.createMany({ data: feesToCreate });
+    await prisma.fee.createMany({ data: feesToCreate as any });
 
     return {
       message: 'Facturación automatizada iniciada y fees generados.',

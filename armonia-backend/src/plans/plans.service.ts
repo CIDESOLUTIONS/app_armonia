@@ -13,49 +13,57 @@ export class PlansService {
 
   // Plan Management
   async createPlan(createPlanDto: CreatePlanDto) {
-    return this.prisma.plan.create({ data: createPlanDto });
+    const prisma = this.prisma.getTenantDB('public');
+    return prisma.plan.create({ data: createPlanDto });
   }
 
   async findAllPlans() {
-    return this.prisma.plan.findMany();
+    const prisma = this.prisma.getTenantDB('public');
+    return prisma.plan.findMany();
   }
 
-  async findPlanById(id: number) {
-    const plan = await this.prisma.plan.findUnique({ where: { id } });
+  async findPlanById(id: string) {
+    const prisma = this.prisma.getTenantDB('public');
+    const plan = await prisma.plan.findUnique({ where: { id } });
     if (!plan) {
       throw new NotFoundException(`Plan with ID ${id} not found`);
     }
     return plan;
   }
 
-  async updatePlan(id: number, updatePlanDto: UpdatePlanDto) {
-    return this.prisma.plan.update({
+  async updatePlan(id: string, updatePlanDto: UpdatePlanDto) {
+    const prisma = this.prisma.getTenantDB('public');
+    return prisma.plan.update({
       where: { id },
       data: updatePlanDto,
     });
   }
 
-  async removePlan(id: number) {
-    return this.prisma.plan.delete({ where: { id } });
+  async removePlan(id: string) {
+    const prisma = this.prisma.getTenantDB('public');
+    return prisma.plan.delete({ where: { id } });
   }
 
   // Subscription Management
   async createSubscription(createSubscriptionDto: CreateSubscriptionDto) {
-    return this.prisma.subscription.create({ data: createSubscriptionDto });
+    const prisma = this.prisma.getTenantDB(createSubscriptionDto.schemaName);
+    return prisma.subscription.create({ data: createSubscriptionDto });
   }
 
-  async findSubscriptionsByComplex(complexId: number) {
-    return this.prisma.subscription.findMany({
-      where: { complexId },
+  async findSubscriptionsByComplex(complexId: string) {
+    const prisma = this.prisma.getTenantDB(complexId);
+    return prisma.subscription.findMany({
+      where: { residentialComplexId: complexId },
       include: { plan: true },
     });
   }
 
   async updateSubscription(
-    id: number,
+    id: string,
     updateSubscriptionDto: UpdateSubscriptionDto,
   ) {
-    return this.prisma.subscription.update({
+    const prisma = this.prisma.getTenantDB(updateSubscriptionDto.schemaName);
+    return prisma.subscription.update({
       where: { id },
       data: updateSubscriptionDto,
     });
@@ -63,12 +71,13 @@ export class PlansService {
 
   // Feature Access Check
   async checkFeatureAccess(
-    complexId: number,
+    complexId: string,
     feature: string,
   ): Promise<boolean> {
-    const subscription = await this.prisma.subscription.findFirst({
+    const prisma = this.prisma.getTenantDB(complexId);
+    const subscription = await prisma.subscription.findFirst({
       where: {
-        complexId,
+        residentialComplexId: complexId,
         isActive: true,
       },
       include: {

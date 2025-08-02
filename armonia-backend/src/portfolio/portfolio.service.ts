@@ -10,11 +10,11 @@ import { format } from 'date-fns';
 export class PortfolioService {
   constructor(private prisma: PrismaService) {}
 
-  async getPortfolioMetrics(userId: number): Promise<PortfolioMetricDto> {
+  async getPortfolioMetrics(userId: string): Promise<PortfolioMetricDto> {
     // Para un APP_ADMIN, obtener todos los schemas de los complejos residenciales
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB('public');
     const complexes = await prisma.residentialComplex.findMany({
-      select: { schemaName: true, id: true, name: true },
+      select: { id: true, name: true },
     });
 
     let totalProperties = 0;
@@ -26,7 +26,7 @@ export class PortfolioService {
     let totalExpenses = 0;
 
     for (const complex of complexes) {
-      const tenantPrisma = this.prisma;
+      const tenantPrisma = this.prisma.getTenantDB(complex.id);
       // Obtener métricas de cada tenant
       const propertiesCount = await tenantPrisma.property.count();
       totalProperties += propertiesCount;
@@ -38,7 +38,7 @@ export class PortfolioService {
 
       const pendingFees = await tenantPrisma.fee.aggregate({
         _sum: { amount: true },
-        where: { status: 'PENDING' },
+        where: { paid: false },
       });
       totalPendingFees += pendingFees._sum.amount || 0;
 
@@ -61,7 +61,6 @@ export class PortfolioService {
 
       const expenses = await tenantPrisma.expense.aggregate({
         _sum: { amount: true },
-        where: { status: 'PAID' },
       });
       totalExpenses += expenses._sum.amount || 0;
     }
@@ -77,16 +76,16 @@ export class PortfolioService {
     };
   }
 
-  async getComplexMetrics(userId: number): Promise<ComplexMetricDto[]> {
-    const prisma = this.prisma;
+  async getComplexMetrics(userId: string): Promise<ComplexMetricDto[]> {
+    const prisma = this.prisma.getTenantDB('public');
     const complexes = await prisma.residentialComplex.findMany({
-      select: { schemaName: true, id: true, name: true },
+      select: { id: true, name: true },
     });
 
     const complexMetrics: ComplexMetricDto[] = [];
 
     for (const complex of complexes) {
-      const tenantPrisma = this.prisma;
+      const tenantPrisma = this.prisma.getTenantDB(complex.id);
 
       const residents = await tenantPrisma.user.count({
         where: { role: 'RESIDENT' },
@@ -94,7 +93,7 @@ export class PortfolioService {
 
       const pendingFees = await tenantPrisma.fee.aggregate({
         _sum: { amount: true },
-        where: { status: 'PENDING' },
+        where: { paid: false },
       });
 
       const income = await tenantPrisma.payment.aggregate({
@@ -113,7 +112,6 @@ export class PortfolioService {
 
       const expenses = await tenantPrisma.expense.aggregate({
         _sum: { amount: true },
-        where: { status: 'PAID' },
       });
 
       complexMetrics.push({
@@ -135,9 +133,9 @@ export class PortfolioService {
     startDate: string,
     endDate: string,
   ): Promise<any> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB('public');
     const complexes = await prisma.residentialComplex.findMany({
-      select: { schemaName: true, name: true },
+      select: { id: true, name: true },
     });
 
     const reportData: any = [];
@@ -145,7 +143,7 @@ export class PortfolioService {
     let totalExpensesAllComplexes = 0;
 
     for (const complex of complexes) {
-      const tenantPrisma = this.prisma;
+      const tenantPrisma = this.prisma.getTenantDB(complex.id);
 
       const income = await tenantPrisma.payment.aggregate({
         _sum: { amount: true },
@@ -158,8 +156,7 @@ export class PortfolioService {
       const expenses = await tenantPrisma.expense.aggregate({
         _sum: { amount: true },
         where: {
-          date: { gte: new Date(startDate), lte: new Date(endDate) },
-          status: 'PAID',
+          expenseDate: { gte: new Date(startDate), lte: new Date(endDate) },
         },
       });
 

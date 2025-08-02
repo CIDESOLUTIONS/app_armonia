@@ -32,7 +32,7 @@ export class AssemblyService {
     data: CreateAssemblyDto,
     userId: string,
   ): Promise<AssemblyDto> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     try {
       const assembly = await prisma.assembly.create({
         data: {
@@ -78,8 +78,8 @@ export class AssemblyService {
   }
 
   async getAssemblies(schemaName: string): Promise<AssemblyDto[]> {
-    const prisma = this.prisma;
-    const assemblies = await prisma.assembly.findMany({ where: { residentialComplexId: schemaName }, orderBy: { date: 'desc' } });
+    const prisma = this.prisma.getTenantDB(schemaName);
+    const assemblies = await prisma.assembly.findMany({ orderBy: { date: 'desc' } });
     return assemblies.map(assembly => ({
       ...assembly,
       type: assembly.type as AssemblyType,
@@ -88,7 +88,7 @@ export class AssemblyService {
   }
 
   async getAssemblyById(schemaName: string, id: string): Promise<AssemblyDto> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const assembly = await prisma.assembly.findUnique({ where: { id } });
     if (!assembly) {
       throw new NotFoundException(`Asamblea con ID ${id} no encontrada.`);
@@ -105,7 +105,7 @@ export class AssemblyService {
     id: string,
     data: UpdateAssemblyDto,
   ): Promise<AssemblyDto> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const updatedAssembly = await prisma.assembly.update({ where: { id }, data });
     return {
       ...updatedAssembly,
@@ -115,7 +115,7 @@ export class AssemblyService {
   }
 
   async deleteAssembly(schemaName: string, id: string): Promise<void> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     await prisma.assembly.delete({ where: { id } });
   }
 
@@ -125,7 +125,7 @@ export class AssemblyService {
     userId: string,
     unitId: string,
   ): Promise<AssemblyAttendanceDto> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     try {
       if (!assemblyId || !userId || !unitId) {
         throw new Error(
@@ -263,7 +263,7 @@ export class AssemblyService {
     schemaName: string,
     assemblyId: string,
   ): Promise<CalculateQuorumResultDto> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     try {
       if (!assemblyId) {
         throw new Error('Se requiere un ID de asamblea para calcular quórum');
@@ -352,7 +352,7 @@ export class AssemblyService {
       createdBy?: string;
     },
   ): Promise<AssemblyVoteDto> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     try {
       if (!assemblyId) {
         throw new Error('Se requiere un ID de asamblea para crear votación');
@@ -417,7 +417,7 @@ export class AssemblyService {
     unitId: string,
     option: string,
   ): Promise<AssemblyVoteRecordDto> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     try {
       if (!voteId || !userId || !unitId || !option) {
         throw new Error(
@@ -535,7 +535,7 @@ export class AssemblyService {
     schemaName: string,
     voteId: string,
   ): Promise<CalculateVoteResultsResultDto> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     try {
       if (!voteId) {
         throw new Error(
@@ -617,7 +617,7 @@ export class AssemblyService {
     schemaName: string,
     voteId: string,
   ): Promise<{ vote: AssemblyVoteDto; results: CalculateVoteResultsResultDto }> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     try {
       if (!voteId) {
         throw new Error('Se requiere un ID de votación para finalizar');
@@ -684,7 +684,7 @@ export class AssemblyService {
     schemaName: string,
     assemblyId: string,
   ): Promise<Buffer> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     try {
       if (!assemblyId) {
         throw new Error('Se requiere un ID de asamblea para generar acta');
@@ -798,7 +798,7 @@ export class AssemblyService {
     schemaName: string,
     assemblyId: string,
   ): Promise<{ currentAttendance: number; quorumMet: boolean }> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const assembly = await prisma.assembly.findUnique({
       where: { id: assemblyId },
     });
