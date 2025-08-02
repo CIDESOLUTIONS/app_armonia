@@ -48,7 +48,7 @@ export class PanicGateway {
   async handleResolvePanic(
     @MessageBody()
     data: {
-      alertId: number;
+      alertId: string; // Changed to string
       schemaName: string;
       status: 'RESOLVED' | 'DISMISSED';
     },

@@ -546,36 +546,36 @@ model Project {
   residentialComplex   ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
   createdById          String // Added
   createdBy            User      @relation("CreatedProjects", fields: [createdById], references: [id]) // Added
-  // tasks                ProjectTask[] // Added
-  // updates              ProjectUpdate[] // Added
+  tasks                ProjectTask[] // Added
+  updates              ProjectUpdate[] // Added
 }
 
-// model ProjectTask {
-//   id           String    @id @default(cuid())
-//   projectId    String
-//   project      Project   @relation(fields: [projectId], references: [id])
-//   title        String
-//   description  String?
-//   status       String // TO_DO, IN_PROGRESS, DONE
-//   assignedToId String?
-//   assignedTo   User?     @relation("AssignedTasks") // Removed fields and references
-//   dueDate      DateTime?
-//   createdAt    DateTime  @default(now())
-//   updatedAt    DateTime  @updatedAt
-// }
+model ProjectTask {
+  id           String    @id @default(cuid())
+  projectId    String
+  project      Project   @relation(fields: [projectId], references: [id])
+  title        String
+  description  String?
+  status       String // TO_DO, IN_PROGRESS, DONE
+  assignedToId String?
+  assignedTo   User?     @relation("AssignedTasks", fields: [assignedToId], references: [id]) // Re-added fields and references
+  dueDate      DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
 
-// model ProjectUpdate {
-//   id          String   @id @default(cuid())
-//   projectId   String
-//   project     Project  @relation(fields: [projectId], references: [id])
-//   title       String
-//   description String?
-//   progress    Float
-//   authorId    String
-//   author      User     @relation("ProjectUpdates") // Removed fields and references
-//   createdAt   DateTime @default(now())
-//   updatedAt   DateTime @updatedAt
-// }
+model ProjectUpdate {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id])
+  title       String
+  description String?
+  progress    Float
+  authorId    String
+  author      User     @relation("ProjectUpdates", fields: [authorId], references: [id]) // Re-added fields and references
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
 
 model Property {
   id                   String    @id @default(cuid())
@@ -602,6 +602,7 @@ model Question {
   surveyId    String
   survey      Survey   @relation(fields: [surveyId], references: [id])
   text        String
+  type        String // Added
   options     Option[]
   votes       Vote[]
 }
@@ -729,13 +730,6 @@ model Review {
   createdAt   DateTime @default(now())
 }
 
-// model Security {
-//   id          String   @id @default(cuid())
-//   // Add fields for security data
-//   securityEvents SecurityEvent[]
-//   accessAttempts AccessAttempt[]
-// }
-
 model SecurityEvent {
   id                   String    @id @default(cuid())
   type                 String
@@ -846,8 +840,8 @@ model User {
   approvedBudgets Budget[]
   approvedExpenses Expense[]
   ResolvedPanicAlerts PanicAlert[] @relation("ResolvedPanicAlerts")
-  // assignedTasks ProjectTask[] @relation("AssignedTasks")
-  // projectUpdates ProjectUpdate[] @relation("ProjectUpdates")
+  assignedTasks ProjectTask[] @relation("AssignedTasks") // Re-added fields and references
+  projectUpdates ProjectUpdate[] @relation("ProjectUpdates") // Re-added fields and references
   createdProjects Project[] @relation("CreatedProjects")
   administeredComplexes ResidentialComplex[] @relation("AdministeredComplexes") // Added
   reportedSecurityEvents SecurityEvent[] @relation("ReportedSecurityEvents") // Added

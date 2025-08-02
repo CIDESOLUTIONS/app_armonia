@@ -198,7 +198,7 @@ export class FinancesService {
         amount: amount,
         date: paymentDate,
         status: PaymentStatus.PAID,
-        transactionId: transactionId || `MANUAL_${Date.now()}`,
+        transactionId: `MANUAL_${Date.now()}`,
         method: paymentMethod,
       },
     });
@@ -291,7 +291,10 @@ export class FinancesService {
 
   async deletePayment(schemaName: string, id: string): Promise<void> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    const payment = await prisma.payment.findUnique({ where: { id } });
+    const payment = await prisma.payment.findUnique({
+      where: { id },
+      include: { fees: true },
+    });
     if (!payment) {
       throw new NotFoundException(`Pago con ID ${id} no encontrado.`);
     }
@@ -321,8 +324,8 @@ export class FinancesService {
         },
       },
       include: { items: true }, // Ensure items are included in the returned object
-    });
-    return { ...budget, status: budget.status as BudgetStatus };
+    }) as BudgetDto; // Explicit cast to BudgetDto
+    return { ...budget, status: budget.status as BudgetStatus, items: budget.items };
   }
 
   async getBudgets(
@@ -395,11 +398,14 @@ export class FinancesService {
           })),
         },
       },
-    });
+    }) as BudgetDto; // Explicit cast to BudgetDto
     return { ...updatedBudget, status: updatedBudget.status as BudgetStatus, items: updatedBudget.items };
   }
 
-  async deleteBudget(schemaName: string, id: string): Promise<void> {
+  async deleteBudget(
+    schemaName: string,
+    id: string,
+  ): Promise<void> {
     const prisma = this.prisma.getTenantDB(schemaName);
     const budget = await prisma.budget.findUnique({
       where: { id },
@@ -438,7 +444,7 @@ export class FinancesService {
         approvedAt: new Date(),
       },
       include: { items: true }, // Added items include
-    });
+    }) as BudgetDto; // Explicit cast to BudgetDto
     return { ...updatedBudget, status: updatedBudget.status as BudgetStatus, items: updatedBudget.items };
   }
 
@@ -492,7 +498,10 @@ export class FinancesService {
 
   async getExpenseById(schemaName: string, id: string): Promise<ExpenseDto> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    const expense = await prisma.expense.findUnique({ where: { id } });
+    const expense = await prisma.expense.findUnique({
+      where: { id },
+      // Removed include: { items: true },
+    });
     if (!expense) {
       throw new NotFoundException(`Gasto con ID ${id} no encontrado.`);
     }
@@ -505,7 +514,10 @@ export class FinancesService {
     data: UpdateExpenseDto,
   ): Promise<ExpenseDto> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    const expense = await prisma.expense.findUnique({ where: { id } });
+    const expense = await prisma.expense.findUnique({
+      where: { id },
+      // Removed include: { items: true },
+    });
     if (!expense) {
       throw new NotFoundException(`Gasto con ID ${id} no encontrado.`);
     }
@@ -527,9 +539,15 @@ export class FinancesService {
     return { ...updatedExpense, residentialComplexId: updatedExpense.residentialComplexId };
   }
 
-  async deleteExpense(schemaName: string, id: string): Promise<void> {
+  async deleteExpense(
+    schemaName: string,
+    id: string,
+  ): Promise<void> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    const expense = await prisma.expense.findUnique({ where: { id } });
+    const expense = await prisma.expense.findUnique({
+      where: { id },
+      // Removed include: { items: true },
+    });
     if (!expense) {
       throw new NotFoundException(`Gasto con ID ${id} no encontrado.`);
     }

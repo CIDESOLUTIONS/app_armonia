@@ -9,7 +9,7 @@ export class PortfolioMetricDto {
 }
 
 export class ComplexMetricDto {
-  id: number;
+  id: string; // Changed to string
   name: string;
   residents: number;
   pendingFees: number;

@@ -33,9 +33,8 @@ export class UserManagementController {
   createStaffUser(@GetUser() user: any, @Body() createUserDto: CreateUserDto) {
     return this.userManagementService.createStaffUser(
       user.schemaName,
-      user.residentialComplexId,
       createUserDto,
-    );
+    ); // Removed user.residentialComplexId
   }
 
   @Put('staff/:id')
