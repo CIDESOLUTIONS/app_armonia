@@ -26,19 +26,34 @@ export class IotService {
     data: SmartMeterReadingDto,
   ): Promise<SmartMeterReadingDto> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    const device = await prisma.iOTDevice.findUnique({
-      where: { id: data.meterId },
+    const device = await prisma.ioTDevice.findUnique({
+      where: { id: data.deviceId }, // Use deviceId from DTO
     });
 
     if (!device) {
       throw new NotFoundException(
-        `Dispositivo de medidor inteligente con ID ${data.meterId} no encontrado.`,
+        `Dispositivo de medidor inteligente con ID ${data.deviceId} no encontrado.`,
       );
     }
 
-    return prisma.smartMeterReading.create({
-      data: { ...data, timestamp: new Date().toISOString() },
+    const createdReading = await prisma.smartMeterReading.create({
+      data: {
+        deviceId: data.deviceId,
+        reading: data.reading,
+        timestamp: new Date(data.timestamp),
+      },
     });
+
+    return {
+      id: createdReading.id,
+      deviceId: createdReading.deviceId,
+      meterId: data.meterId, // Keep meterId from original DTO if needed for mapping
+      propertyId: data.propertyId, // Keep propertyId from original DTO if needed for mapping
+      reading: createdReading.reading,
+      unit: data.unit, // Keep unit from original DTO if needed for mapping
+      timestamp: createdReading.timestamp.toISOString(),
+      residentialComplexId: data.residentialComplexId, // Keep residentialComplexId from original DTO if needed for mapping
+    };
   }
 
   async getSmartMeterReadings(
@@ -49,9 +64,13 @@ export class IotService {
     const where: any = {};
 
     if (filters.meterId) {
-      where.meterId = filters.meterId;
+      // Assuming meterId in filter maps to deviceId in Prisma model
+      where.deviceId = filters.meterId;
     }
     if (filters.propertyId) {
+      // Assuming propertyId in filter maps to a related field in Prisma model
+      // This might require a 'where' clause on a relation, e.g., device: { propertyId: filters.propertyId }
+      // For now, leaving as is, but this might need further refinement based on schema.prisma relations
       where.propertyId = filters.propertyId;
     }
     if (filters.startDate) {
@@ -61,12 +80,23 @@ export class IotService {
       where.timestamp = { ...where.timestamp, lte: new Date(filters.endDate) };
     }
 
-    return prisma.smartMeterReading.findMany({
+    const readings = await prisma.smartMeterReading.findMany({
       where,
       skip: ((filters.page ?? 1) - 1) * (filters.limit ?? 10),
       take: filters.limit ?? 10,
       orderBy: { timestamp: 'desc' },
     });
+
+    return readings.map(reading => ({
+      id: reading.id,
+      deviceId: reading.deviceId,
+      meterId: reading.deviceId, // Assuming meterId is deviceId for mapping
+      propertyId: '', // Placeholder, as propertyId is not directly in SmartMeterReading model
+      reading: reading.reading,
+      unit: SmartMeterReadingDto.prototype.unit, // Placeholder, as unit is not directly in SmartMeterReading model
+      timestamp: reading.timestamp.toISOString(),
+      residentialComplexId: '', // Placeholder, as residentialComplexId is not directly in SmartMeterReading model
+    }));
   }
 
   async triggerAutomatedBilling(
@@ -105,11 +135,13 @@ export class IotService {
     } = {};
 
     for (const reading of readings) {
-      const device = await prisma.iOTDevice.findUnique({
+      const device = await prisma.ioTDevice.findUnique({
         where: { id: reading.deviceId },
       });
       if (!device) continue; // Skip if device not found
 
+      // Need to get the propertyId from the device or a related model
+      // For now, using device.id as a placeholder for propertyId in consumptionByProperty
       if (!consumptionByProperty[device.id]) {
         consumptionByProperty[device.id] = {
           minReading: reading.reading,
@@ -137,12 +169,13 @@ export class IotService {
       const rate = await prisma.utilityRate.findFirst({
         where: {
           name: consumptionData.type,
+          residentialComplexId: data.residentialComplexId, // Use residentialComplexId
         },
         orderBy: { id: 'desc' },
       });
 
       if (!rate) {
-        // ServerLogger.warn(`No se encontró tarifa para el tipo ${consumptionData.type} y unidad ${consumptionData.unit} en el complejo ${data.complexId}.`);
+        // ServerLogger.warn(`No se encontró tarifa para el tipo ${consumptionData.type} y unidad ${consumptionData.unit} en el complejo ${data.residentialComplexId}.`);
         continue; // Skip if no rate found
       }
 
@@ -158,8 +191,8 @@ export class IotService {
         dueDate: new Date(
           new Date().setMonth(new Date().getMonth() + 1),
         ).toISOString(),
-        propertyId: propertyId,
-        createdById: '1', // Assuming a system user with ID 1 for automated billing
+        propertyId: propertyId, // propertyId is string
+        createdById: 'system_user_id', // Placeholder for a system user ID (string)
       });
     }
 

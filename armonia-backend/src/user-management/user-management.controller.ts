@@ -33,7 +33,7 @@ export class UserManagementController {
   createStaffUser(@GetUser() user: any, @Body() createUserDto: CreateUserDto) {
     return this.userManagementService.createStaffUser(
       user.schemaName,
-      user.complexId,
+      user.residentialComplexId,
       createUserDto,
     );
   }

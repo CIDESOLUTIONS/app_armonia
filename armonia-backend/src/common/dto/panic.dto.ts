@@ -8,15 +8,15 @@ import {
 import { PanicStatus, PanicType } from '../enums/panic.enum';
 
 export class CreatePanicAlertDto {
-  @IsNumber()
-  userId: number;
+  @IsString()
+  userId: string;
 
-  @IsNumber()
-  complexId: number;
+  @IsString()
+  residentialComplexId: string; // Renamed from complexId and changed to string
 
   @IsOptional()
-  @IsNumber()
-  propertyId?: number;
+  @IsString()
+  propertyId?: string; // Changed to string
 
   @IsEnum(PanicType)
   type: PanicType;
@@ -40,8 +40,8 @@ export class UpdatePanicAlertDto {
   resolvedTime?: Date;
 
   @IsOptional()
-  @IsNumber()
-  resolvedById?: number;
+  @IsString()
+  resolvedById?: string; // Changed to string
 
   @IsOptional()
   @IsString()
@@ -53,11 +53,11 @@ export class UpdatePanicAlertDto {
 }
 
 export class CreatePanicResponseDto {
-  @IsNumber()
-  alertId: number;
+  @IsString()
+  alertId: string; // Changed to string
 
-  @IsNumber()
-  respondedBy: number;
+  @IsString()
+  respondedBy: string; // Changed to string
 
   @IsString()
   actionTaken: string;

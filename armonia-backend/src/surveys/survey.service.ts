@@ -15,8 +15,8 @@ export class SurveyService {
 
   async createSurvey(
     schemaName: string,
-    userId: number,
-    complexId: number,
+    userId: string, // Changed to string
+    residentialComplexId: string, // Renamed from complexId and changed to string
     data: CreateSurveyDto,
   ): Promise<SurveyDto> {
     const prisma: any = this.prisma;
@@ -24,8 +24,8 @@ export class SurveyService {
     const survey = await prisma.survey.create({
       data: {
         ...surveyData,
-        complexId,
-        createdBy: userId,
+        residentialComplexId, // Use residentialComplexId
+        createdById: userId, // Use createdById
         status: SurveyStatus.DRAFT,
         questions: {
           create: questions.map((q, index) => ({
@@ -43,17 +43,17 @@ export class SurveyService {
 
   async getSurveys(
     schemaName: string,
-    complexId: number,
+    residentialComplexId: string, // Renamed from complexId
   ): Promise<SurveyDto[]> {
     const prisma: any = this.prisma;
     return prisma.survey.findMany({
-      where: { complexId },
+      where: { residentialComplexId }, // Use residentialComplexId
       include: { questions: true },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  async getSurveyById(schemaName: string, id: number): Promise<SurveyDto> {
+  async getSurveyById(schemaName: string, id: string): Promise<SurveyDto> { // Changed id to string
     const prisma: any = this.prisma;
     const survey = await prisma.survey.findUnique({
       where: { id },
@@ -67,7 +67,7 @@ export class SurveyService {
 
   async updateSurvey(
     schemaName: string,
-    id: number,
+    id: string, // Changed id to string
     data: UpdateSurveyDto,
   ): Promise<SurveyDto> {
     const prisma: any = this.prisma;
@@ -100,7 +100,7 @@ export class SurveyService {
     return updatedSurvey;
   }
 
-  async deleteSurvey(schemaName: string, id: number): Promise<void> {
+  async deleteSurvey(schemaName: string, id: string): Promise<void> { // Changed id to string
     const prisma: any = this.prisma;
     const survey = await prisma.survey.findUnique({ where: { id } });
     if (!survey) {
@@ -113,8 +113,8 @@ export class SurveyService {
 
   async submitAnswer(
     schemaName: string,
-    surveyId: number,
-    userId: number,
+    surveyId: string, // Changed surveyId to string
+    userId: string, // Changed userId to string
     data: CreateAnswerDto,
   ): Promise<any> {
     const prisma: any = this.prisma;
@@ -173,7 +173,7 @@ export class SurveyService {
     return answer;
   }
 
-  async getSurveyResults(schemaName: string, surveyId: number): Promise<any> {
+  async getSurveyResults(schemaName: string, surveyId: string): Promise<any> { // Changed surveyId to string
     const prisma: any = this.prisma;
     const survey = await prisma.survey.findUnique({
       where: { id: surveyId },

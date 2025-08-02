@@ -50,7 +50,7 @@ export class MicroCreditController {
     // Se debería añadir un RolesGuard aquí
     return this.microCreditService.updateApplication(
       user.schemaName,
-      +id,
+      id,
       updateDto,
     );
   }

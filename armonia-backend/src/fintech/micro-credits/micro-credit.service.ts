@@ -11,6 +11,17 @@ import {
 export class MicroCreditService {
   constructor(private prisma: PrismaService) {}
 
+  private mapToMicroCreditApplicationDto(application: any): MicroCreditApplicationDto {
+    return {
+      id: application.id,
+      userId: application.userId,
+      amount: application.amount,
+      status: application.status as MicroCreditStatus,
+      createdAt: application.createdAt,
+      updatedAt: application.updatedAt,
+    };
+  }
+
   async createApplication(
     schemaName: string,
     userId: string,
@@ -24,7 +35,7 @@ export class MicroCreditService {
         status: MicroCreditStatus.PENDING,
       },
     });
-    return application;
+    return this.mapToMicroCreditApplicationDto(application);
   }
 
   async getApplications(
@@ -32,10 +43,11 @@ export class MicroCreditService {
     userId: string,
   ): Promise<MicroCreditApplicationDto[]> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    return prisma.microCreditApplication.findMany({
+    const applications = await prisma.microCreditApplication.findMany({
       where: { userId: userId },
       orderBy: { createdAt: 'desc' },
     });
+    return applications.map(this.mapToMicroCreditApplicationDto);
   }
 
   async updateApplication(
@@ -60,6 +72,6 @@ export class MicroCreditService {
         status: data.status,
       },
     });
-    return updatedApplication;
+    return this.mapToMicroCreditApplicationDto(updatedApplication);
   }
 }

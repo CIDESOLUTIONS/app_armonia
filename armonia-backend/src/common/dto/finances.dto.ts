@@ -48,6 +48,7 @@ export class FeeDto {
   createdAt: Date;
   isRecurring: boolean;
   frequency?: string;
+  status: PaymentStatus; // Added status to FeeDto
 }
 
 export class PaymentDto {
@@ -287,6 +288,9 @@ export class CreateBudgetDto {
   @ValidateNested({ each: true })
   @Type(() => BudgetItemDto)
   items: BudgetItemDto[];
+
+  @IsEnum(BudgetStatus) // Added status to CreateBudgetDto
+  status: BudgetStatus;
 }
 
 export class UpdateBudgetDto {
@@ -427,7 +431,7 @@ export class ExpenseDto {
   vendor?: string;
   invoiceNumber?: string;
   notes?: string;
-  complexId: string;
+  residentialComplexId: string; // Changed from complexId
   budgetId?: string;
   approvedById?: string;
 }
@@ -458,7 +462,7 @@ export class CreateExpenseDto {
   notes?: string;
 
   @IsString()
-  complexId: string;
+  residentialComplexId: string; // Changed from complexId
 
   @IsOptional()
   @IsString()

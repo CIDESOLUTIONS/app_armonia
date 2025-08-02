@@ -19,12 +19,12 @@ export class CreateSecurityEventDto {
   @IsOptional()
   location?: string;
 
-  @IsNumber()
+  @IsString() // Changed to string
   @IsOptional()
-  reportedByUserId?: number;
+  reportedByUserId?: string;
 
-  @IsNumber()
-  complexId: number;
+  @IsString() // Changed to string
+  residentialComplexId: string; // Renamed from complexId
 }
 
 export class UpdateSecurityEventDto {
@@ -41,17 +41,17 @@ export class UpdateSecurityEventDto {
   location?: string;
 
   @IsOptional()
-  @IsNumber()
-  reportedByUserId?: number;
+  @IsString() // Changed to string
+  reportedByUserId?: string;
 }
 
 export class SecurityEventDto {
-  id: number;
+  id: string; // Changed to string
   type: SecurityEventType;
   description: string;
   location?: string;
-  reportedByUserId?: number;
-  complexId: number;
+  reportedByUserId?: string; // Changed to string
+  residentialComplexId: string; // Renamed from complexId
   createdAt: Date;
   updatedAt: Date;
 }
@@ -80,23 +80,4 @@ export class SecurityEventFilterParamsDto {
   @IsOptional()
   @IsNumber()
   limit?: number;
-}
-
-export class CreateAccessAttemptDto {
-  @IsString()
-  ipAddress: string;
-
-  @IsString()
-  username: string;
-
-  @IsBoolean()
-  isSuccess: boolean;
-
-  @IsString()
-  @IsOptional()
-  reason?: string;
-
-  @IsNumber()
-  @IsOptional()
-  userId?: number;
 }

@@ -62,8 +62,8 @@ export class PlansController {
   }
 
   @Get('subscriptions/:complexId')
-  findSubscriptionsByComplex(@Param('complexId') complexId: string) {
-    return this.plansService.findSubscriptionsByComplex(+complexId);
+  findSubscriptionsByComplex(@Param('complexId') residentialComplexId: string) {
+    return this.plansService.findSubscriptionsByComplex(residentialComplexId);
   }
 
   @Put('subscriptions/:id')

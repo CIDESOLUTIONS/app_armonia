@@ -44,7 +44,7 @@ export class FinancesService {
     const fee = await prisma.fee.create({
       data,
     });
-    return fee;
+    return { ...fee, status: fee.paid ? PaymentStatus.PAID : PaymentStatus.PENDING };
   }
 
   async getFees(
@@ -72,7 +72,7 @@ export class FinancesService {
         prisma.fee.count({ where }),
       ]);
 
-      return { fees, total };
+      return { fees: fees.map(fee => ({ ...fee, status: fee.paid ? PaymentStatus.PAID : PaymentStatus.PENDING })), total };
     } catch (error) {
       throw new BadRequestException('Error al obtener cuotas');
     }
@@ -84,14 +84,17 @@ export class FinancesService {
     if (!fee) {
       throw new NotFoundException(`Cuota con ID ${id} no encontrada.`);
     }
-    return fee;
+    return {
+      ...fee,
+      status: fee.paid ? PaymentStatus.PAID : PaymentStatus.PENDING,
+    };
   }
 
   async getFee(schemaName: string, id: string): Promise<FeeDto | null> {
     try {
       const prisma = this.prisma.getTenantDB(schemaName);
       const fee = await prisma.fee.findUnique({ where: { id } });
-      return fee;
+      return fee ? { ...fee, status: fee.paid ? PaymentStatus.PAID : PaymentStatus.PENDING } : null;
     } catch (error) {
       throw new BadRequestException('Error al obtener cuota');
     }
@@ -107,7 +110,11 @@ export class FinancesService {
     if (!fee) {
       throw new NotFoundException(`Cuota con ID ${id} no encontrada.`);
     }
-    return prisma.fee.update({ where: { id }, data });
+    const updatedFee = await prisma.fee.update({ where: { id }, data });
+    return {
+      ...updatedFee,
+      status: updatedFee.paid ? PaymentStatus.PAID : PaymentStatus.PENDING,
+    };
   }
 
   async deleteFee(schemaName: string, id: string): Promise<void> {
@@ -162,7 +169,7 @@ export class FinancesService {
         data: { paid: true, paidAt: new Date() },
       });
     }
-    return payment;
+    return { ...payment, status: payment.status as PaymentStatus };
   }
 
   async registerManualPayment(
@@ -201,7 +208,7 @@ export class FinancesService {
       data: { paid: true, paidAt: new Date(), paymentId: payment.id },
     });
 
-    return payment;
+    return { ...payment, status: payment.status as PaymentStatus };
   }
 
   async getPayments(
@@ -216,7 +223,7 @@ export class FinancesService {
     const limit = filters.limit || 10;
     const skip = (page - 1) * limit;
 
-    const [data, total] = await Promise.all([
+    const [payments, total] = await Promise.all([
       prisma.payment.findMany({
         where,
         skip,
@@ -227,7 +234,7 @@ export class FinancesService {
       prisma.payment.count({ where }),
     ]);
 
-    return { data, total };
+    return { data: payments.map(p => ({ ...p, status: p.status as PaymentStatus })), total };
   }
 
   async getPaymentById(schemaName: string, id: string): Promise<PaymentDto> {
@@ -236,7 +243,7 @@ export class FinancesService {
     if (!payment) {
       throw new NotFoundException(`Pago con ID ${id} no encontrado.`);
     }
-    return payment;
+    return { ...payment, status: payment.status as PaymentStatus };
   }
 
   async updatePayment(
@@ -279,7 +286,7 @@ export class FinancesService {
         });
       }
     }
-    return updatedPayment;
+    return { ...updatedPayment, status: updatedPayment.status as PaymentStatus };
   }
 
   async deletePayment(schemaName: string, id: string): Promise<void> {
@@ -297,9 +304,14 @@ export class FinancesService {
     data: CreateBudgetDto,
   ): Promise<BudgetDto> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    return prisma.budget.create({
+    const budget = await prisma.budget.create({
       data: {
-        ...data,
+        title: data.title,
+        month: data.month,
+        year: data.year,
+        totalAmount: data.totalAmount,
+        status: data.status,
+        residentialComplex: { connect: { id: data.residentialComplexId } },
         items: {
           create: data.items.map((item) => ({
             name: item.name,
@@ -308,7 +320,9 @@ export class FinancesService {
           })),
         },
       },
+      include: { items: true }, // Ensure items are included in the returned object
     });
+    return { ...budget, status: budget.status as BudgetStatus };
   }
 
   async getBudgets(
@@ -324,7 +338,7 @@ export class FinancesService {
     const limit = filters.limit || 10;
     const skip = (page - 1) * limit;
 
-    const [data, total] = await Promise.all([
+    const [budgets, total] = await Promise.all([
       prisma.budget.findMany({
         where,
         include: { items: true },
@@ -335,7 +349,7 @@ export class FinancesService {
       prisma.budget.count({ where }),
     ]);
 
-    return { data, total };
+    return { data: budgets.map(b => ({ ...b, status: b.status as BudgetStatus })), total };
   }
 
   async getBudgetById(schemaName: string, id: string): Promise<BudgetDto> {
@@ -347,7 +361,7 @@ export class FinancesService {
     if (!budget) {
       throw new NotFoundException(`Presupuesto con ID ${id} no encontrado.`);
     }
-    return budget;
+    return { ...budget, status: budget.status as BudgetStatus };
   }
 
   async updateBudget(
@@ -363,10 +377,16 @@ export class FinancesService {
     if (!budget) {
       throw new NotFoundException(`Presupuesto con ID ${id} no encontrado.`);
     }
-    return prisma.budget.update({
+    const updatedBudget = await prisma.budget.update({
       where: { id },
       data: {
-        ...data,
+        title: data.title,
+        month: data.month,
+        year: data.year,
+        totalAmount: data.totalAmount,
+        status: data.status,
+        approvedById: data.approvedById,
+        approvedAt: data.approvedAt,
         items: {
           upsert: data.items?.map((item) => ({
             where: { id: item.id || '' }, // Provide a default empty string if id is undefined
@@ -376,6 +396,7 @@ export class FinancesService {
         },
       },
     });
+    return { ...updatedBudget, status: updatedBudget.status as BudgetStatus };
   }
 
   async deleteBudget(schemaName: string, id: string): Promise<void> {
@@ -408,7 +429,7 @@ export class FinancesService {
         `El presupuesto no está en estado BORRADOR y no puede ser aprobado.`,
       );
     }
-    return prisma.budget.update({
+    const updatedBudget = await prisma.budget.update({
       where: { id },
       data: {
         status: BudgetStatus.APPROVED,
@@ -416,6 +437,7 @@ export class FinancesService {
         approvedAt: new Date(),
       },
     });
+    return { ...updatedBudget, status: updatedBudget.status as BudgetStatus };
   }
 
   // Expenses
@@ -424,7 +446,21 @@ export class FinancesService {
     data: CreateExpenseDto,
   ): Promise<ExpenseDto> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    return prisma.expense.create({ data });
+    const expense = await prisma.expense.create({
+      data: {
+        description: data.description,
+        amount: data.amount,
+        category: data.category,
+        expenseDate: new Date(data.expenseDate),
+        vendor: data.vendor,
+        invoiceNumber: data.invoiceNumber,
+        notes: data.notes,
+        residentialComplex: { connect: { id: data.residentialComplexId } },
+        budgetId: data.budgetId, // Direct assignment
+        approvedById: data.approvedById, // Direct assignment
+      },
+    });
+    return { ...expense, residentialComplexId: expense.residentialComplexId };
   }
 
   async getExpenses(
@@ -439,7 +475,7 @@ export class FinancesService {
     const limit = filters.limit || 10;
     const skip = (page - 1) * limit;
 
-    const [data, total] = await Promise.all([
+    const [expenses, total] = await Promise.all([
       prisma.expense.findMany({
         where,
         skip,
@@ -449,7 +485,7 @@ export class FinancesService {
       prisma.expense.count({ where }),
     ]);
 
-    return { data, total };
+    return { data: expenses.map(e => ({ ...e, residentialComplexId: e.residentialComplexId })), total };
   }
 
   async getExpenseById(schemaName: string, id: string): Promise<ExpenseDto> {
@@ -458,7 +494,7 @@ export class FinancesService {
     if (!expense) {
       throw new NotFoundException(`Gasto con ID ${id} no encontrado.`);
     }
-    return expense;
+    return { ...expense, residentialComplexId: expense.residentialComplexId };
   }
 
   async updateExpense(
@@ -471,7 +507,8 @@ export class FinancesService {
     if (!expense) {
       throw new NotFoundException(`Gasto con ID ${id} no encontrado.`);
     }
-    return prisma.expense.update({ where: { id }, data });
+    const updatedExpense = await prisma.expense.update({ where: { id }, data });
+    return { ...updatedExpense, residentialComplexId: updatedExpense.residentialComplexId };
   }
 
   async deleteExpense(schemaName: string, id: string): Promise<void> {
@@ -697,7 +734,7 @@ export class FinancesService {
           ...payments.map((p) => [
             p.date.toLocaleDateString(),
             p.amount,
-            p.paymentMethod,
+            p.method,
             p.status,
             p.fees[0]?.title || 'N/A',
             p.user?.name || 'N/A',
@@ -839,9 +876,9 @@ export class FinancesService {
         type: NotificationType.INFO,
         title: 'Pago Iniciado',
         message: `Se ha iniciado el pago de tu cuota ${fee.title}. Por favor, completa la transacción.`,
-        link: simulatedPaymentUrl,
+        link: `/resident/finances/payments/${payment.id}`,
         sourceType: NotificationSourceType.FINANCIAL,
-        sourceId: fee.id.toString(),
+        sourceId: payment.id.toString(),
       });
     }
 
@@ -866,7 +903,7 @@ export class FinancesService {
     }
 
     if (payment.status === PaymentStatus.PAID) {
-      return payment; // Already completed, no action needed
+      return { ...payment, status: payment.status as PaymentStatus }; // Already completed, no action needed
     }
 
     const updatedPayment = await prisma.payment.update({
@@ -899,6 +936,6 @@ export class FinancesService {
         });
       }
     }
-    return updatedPayment;
+    return { ...updatedPayment, status: updatedPayment.status as PaymentStatus };
   }
 }
