@@ -14,22 +14,22 @@ export class PaymentGatewaysService {
     schemaName: string,
     data: CreatePaymentGatewayDto,
   ): Promise<PaymentGatewayConfigDto> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.paymentGatewayConfig.create({ data });
   }
 
   async getPaymentGateways(
     schemaName: string,
   ): Promise<PaymentGatewayConfigDto[]> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.paymentGatewayConfig.findMany();
   }
 
   async getPaymentGatewayById(
     schemaName: string,
-    id: number,
+    id: string,
   ): Promise<PaymentGatewayConfigDto> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const gateway = await prisma.paymentGatewayConfig.findUnique({
       where: { id },
     });
@@ -41,10 +41,10 @@ export class PaymentGatewaysService {
 
   async updatePaymentGateway(
     schemaName: string,
-    id: number,
+    id: string,
     data: UpdatePaymentGatewayDto,
   ): Promise<PaymentGatewayConfigDto> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     await this.getPaymentGatewayById(schemaName, id); // Check if exists
     return prisma.paymentGatewayConfig.update({
       where: { id },
@@ -52,8 +52,8 @@ export class PaymentGatewaysService {
     });
   }
 
-  async deletePaymentGateway(schemaName: string, id: number): Promise<void> {
-    const prisma = this.prisma;
+  async deletePaymentGateway(schemaName: string, id: string): Promise<void> {
+    const prisma = this.prisma.getTenantDB(schemaName);
     await this.getPaymentGatewayById(schemaName, id); // Check if exists
     await prisma.paymentGatewayConfig.delete({ where: { id } });
   }

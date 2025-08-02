@@ -25,16 +25,13 @@ export class InventoryService {
   // PROPIEDADES
   async getProperties(
     schemaName: string,
-    complexId: number,
-    propertyId?: number, // Added propertyId as an optional parameter
+    propertyId?: string, // Added propertyId as an optional parameter
   ): Promise<PropertyWithDetailsDto[]> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     try {
-      const whereClause: any = {
-        property: { complexId },
-      };
+      const whereClause: any = {};
       if (propertyId) {
-        whereClause.propertyId = propertyId;
+        whereClause.id = propertyId;
       }
       const properties = await prisma.property.findMany({
         where: whereClause,
@@ -44,27 +41,19 @@ export class InventoryService {
           },
           residents: {
             select: { id: true },
-            where: { status: 'ACTIVE' },
           },
         },
-        orderBy: { unitNumber: 'asc' },
+        orderBy: { number: 'asc' },
       });
 
       return properties.map((property) => ({
         id: property.id,
-        complexId: property.complexId,
-        unitNumber: property.unitNumber,
+        unitNumber: property.number,
         type: property.type,
-        status: property.status,
-        area: property.area || undefined,
-        block: property.block || undefined,
-        zone: property.zone || undefined,
         ownerId: property.ownerId || undefined,
         ownerName: property.owner?.name || undefined,
         ownerEmail: property.owner?.email || undefined,
         totalResidents: property.residents.length,
-        createdAt: property.createdAt,
-        updatedAt: property.updatedAt,
       }));
     } catch (error) {
       console.error('[INVENTORY SERVICE] Error obteniendo propiedades:', error);
@@ -73,19 +62,10 @@ export class InventoryService {
   }
 
   async createProperty(schemaName: string, data: CreatePropertyDto) {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     try {
       const property = await prisma.property.create({
-        data: {
-          complexId: data.complexId,
-          unitNumber: data.unitNumber,
-          type: data.type,
-          status: data.status,
-          area: data.area,
-          block: data.block,
-          zone: data.zone,
-          ownerId: data.ownerId,
-        },
+        data,
         include: {
           owner: {
             select: { id: true, name: true, email: true },
@@ -102,10 +82,10 @@ export class InventoryService {
 
   async updateProperty(
     schemaName: string,
-    id: number,
+    id: string,
     data: UpdatePropertyDto,
   ) {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     try {
       const property = await prisma.property.update({
         where: { id },
@@ -127,24 +107,18 @@ export class InventoryService {
   // MASCOTAS
   async getPets(
     schemaName: string,
-    complexId: number,
-    propertyId?: number, // Added propertyId as an optional parameter
+    propertyId?: string, // Added propertyId as an optional parameter
   ): Promise<PetWithDetailsDto[]> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     try {
-      const whereClause: any = {
-        property: { complexId },
-      };
+      const whereClause: any = {};
       if (propertyId) {
         whereClause.propertyId = propertyId;
       }
       const pets = await prisma.pet.findMany({
         where: whereClause,
         include: {
-          property: {
-            select: { id: true, unitNumber: true },
-          },
-          resident: {
+          owner: {
             select: { id: true, name: true },
           },
         },
@@ -153,19 +127,9 @@ export class InventoryService {
       return pets.map((pet) => ({
         id: pet.id,
         name: pet.name,
-        type: pet.type,
         breed: pet.breed || undefined,
-        age: pet.age || undefined,
-        weight: pet.weight || undefined,
-        color: pet.color || undefined,
-        vaccinated: pet.vaccinated,
-        vaccineExpiryDate: pet.vaccineExpiryDate || undefined,
-        notes: pet.notes || undefined,
-        propertyId: pet.propertyId,
-        residentId: pet.residentId,
-        unitNumber: pet.property.unitNumber,
-        residentName: pet.resident.name,
-        createdAt: pet.createdAt,
+        ownerId: pet.ownerId,
+        ownerName: pet.owner.name,
       }));
     } catch (error) {
       console.error('[INVENTORY SERVICE] Error obteniendo mascotas:', error);
@@ -174,29 +138,12 @@ export class InventoryService {
   }
 
   async createPet(schemaName: string, data: CreatePetDto) {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     try {
       const pet = await prisma.pet.create({
-        data: {
-          name: data.name,
-          type: data.type,
-          breed: data.breed,
-          age: data.age,
-          weight: data.weight,
-          color: data.color,
-          propertyId: data.propertyId,
-          residentId: data.residentId,
-          vaccinated: data.vaccinated,
-          vaccineExpiryDate: data.vaccineExpiryDate
-            ? new Date(data.vaccineExpiryDate)
-            : null,
-          notes: data.notes,
-        },
+        data,
         include: {
-          property: {
-            select: { unitNumber: true },
-          },
-          resident: {
+          owner: {
             select: { name: true },
           },
         },
@@ -212,44 +159,30 @@ export class InventoryService {
   // VEHÍCULOS
   async getVehicles(
     schemaName: string,
-    complexId: number,
-    propertyId?: number, // Added propertyId as an optional parameter
+    propertyId?: string, // Added propertyId as an optional parameter
   ): Promise<VehicleWithDetailsDto[]> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     try {
-      const whereClause: any = {
-        property: { complexId },
-      };
+      const whereClause: any = {};
       if (propertyId) {
         whereClause.propertyId = propertyId;
       }
       const vehicles = await prisma.vehicle.findMany({
         where: whereClause,
         include: {
-          property: {
-            select: { id: true, unitNumber: true },
-          },
-          resident: {
+          owner: {
             select: { id: true, name: true },
           },
         },
-        orderBy: { licensePlate: 'asc' },
+        orderBy: { plate: 'asc' },
       });
       return vehicles.map((vehicle) => ({
         id: vehicle.id,
-        licensePlate: vehicle.licensePlate,
+        licensePlate: vehicle.plate,
         brand: vehicle.brand,
         model: vehicle.model,
-        year: vehicle.year,
-        color: vehicle.color,
-        type: vehicle.type,
-        parkingSpot: vehicle.parkingSpot || undefined,
-        notes: vehicle.notes || undefined,
-        propertyId: vehicle.propertyId,
-        residentId: vehicle.residentId,
-        unitNumber: vehicle.property.unitNumber,
-        residentName: vehicle.resident.name,
-        createdAt: vehicle.createdAt,
+        ownerId: vehicle.ownerId,
+        ownerName: vehicle.owner.name,
       }));
     } catch (error) {
       console.error('[INVENTORY SERVICE] Error obteniendo vehículos:', error);
@@ -258,26 +191,17 @@ export class InventoryService {
   }
 
   async createVehicle(schemaName: string, data: CreateVehicleDto) {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     try {
       const vehicle = await prisma.vehicle.create({
         data: {
-          licensePlate: data.licensePlate.toUpperCase(),
+          plate: data.licensePlate.toUpperCase(),
           brand: data.brand,
           model: data.model,
-          year: data.year,
-          color: data.color,
-          type: data.type,
-          parkingSpot: data.parkingSpot,
-          notes: data.notes,
-          propertyId: data.propertyId,
-          residentId: data.residentId,
+          ownerId: data.ownerId,
         },
         include: {
-          property: {
-            select: { unitNumber: true },
-          },
-          resident: {
+          owner: {
             select: { name: true },
           },
         },
@@ -293,14 +217,11 @@ export class InventoryService {
   // RESIDENTES
   async getResidents(
     schemaName: string,
-    complexId: number,
-    propertyId?: number, // Added propertyId as an optional parameter
+    propertyId?: string, // Added propertyId as an optional parameter
   ) {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     try {
-      const whereClause: any = {
-        property: { complexId },
-      };
+      const whereClause: any = {};
       if (propertyId) {
         whereClause.propertyId = propertyId;
       }
@@ -308,13 +229,7 @@ export class InventoryService {
         where: whereClause,
         include: {
           property: {
-            select: { id: true, unitNumber: true, type: true },
-          },
-          pets: {
-            select: { id: true, name: true, type: true },
-          },
-          vehicles: {
-            select: { id: true, licensePlate: true, brand: true, model: true },
+            select: { id: true, number: true, type: true },
           },
         },
         orderBy: { name: 'asc' },
@@ -329,17 +244,17 @@ export class InventoryService {
 
   async updateResident(
     schemaName: string,
-    id: number,
+    id: string,
     data: UpdateResidentDto,
   ) {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     try {
       const resident = await prisma.resident.update({
         where: { id },
         data,
         include: {
           property: {
-            select: { unitNumber: true },
+            select: { number: true },
           },
         },
       });
@@ -352,14 +267,10 @@ export class InventoryService {
   }
 
   async createResident(schemaName: string, data: CreateResidentDto) {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     try {
       const resident = await prisma.resident.create({
-        data: {
-          ...data,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
+        data,
       });
       return resident;
     } catch (error) {
@@ -368,8 +279,8 @@ export class InventoryService {
     }
   }
 
-  async deleteResident(schemaName: string, id: number) {
-    const prisma = this.prisma;
+  async deleteResident(schemaName: string, id: string) {
+    const prisma = this.prisma.getTenantDB(schemaName);
     try {
       await prisma.resident.delete({ where: { id } });
     } catch (error) {
@@ -378,116 +289,26 @@ export class InventoryService {
     }
   }
 
-  // SERVICIOS COMUNES
-  async getServices(schemaName: string, complexId: number) {
-    const prisma = this.prisma;
-    try {
-      const services = await prisma.commonService.findMany({
-        where: { complexId },
-        include: {
-          _count: {
-            select: { reservations: true },
-          },
-        },
-        orderBy: { name: 'asc' },
-      });
-
-      return services;
-    } catch (error) {
-      console.error('[INVENTORY SERVICE] Error obteniendo servicios:', error);
-      throw new Error('Error obteniendo servicios');
-    }
-  }
-
-  // ESTADÍSTICAS GENERALES
-  async getInventoryStats(schemaName: string, complexId: number) {
-    const prisma = this.prisma;
-    try {
-      const [
-        totalProperties,
-        occupiedProperties,
-        totalResidents,
-        totalPets,
-        totalVehicles,
-        totalServices,
-      ] = await Promise.all([
-        prisma.property.count({ where: { complexId } }),
-        prisma.property.count({ where: { complexId, status: 'OCCUPIED' } }),
-        prisma.resident.count({
-          where: {
-            property: { complexId },
-            status: 'ACTIVE',
-          },
-        }),
-        prisma.pet.count({ where: { property: { complexId } } }),
-        prisma.vehicle.count({ where: { property: { complexId } } }),
-        prisma.commonService.count({ where: { complexId } }),
-      ]);
-
-      const occupancyRate =
-        totalProperties > 0 ? (occupiedProperties / totalProperties) * 100 : 0;
-
-      return {
-        properties: {
-          total: totalProperties,
-          occupied: occupiedProperties,
-          available: totalProperties - occupiedProperties,
-          occupancyRate: Math.round(occupancyRate * 100) / 100,
-        },
-        residents: {
-          total: totalResidents,
-          averagePerProperty:
-            totalProperties > 0
-              ? Math.round((totalResidents / totalProperties) * 100) / 100
-              : 0,
-        },
-        pets: {
-          total: totalPets,
-          averagePerProperty:
-            totalProperties > 0
-              ? Math.round((totalPets / totalProperties) * 100) / 100
-              : 0,
-        },
-        vehicles: {
-          total: totalVehicles,
-          averagePerProperty:
-            totalProperties > 0
-              ? Math.round((totalVehicles / totalProperties) * 100) / 100
-              : 0,
-        },
-        services: {
-          total: totalServices,
-        },
-      };
-    } catch (error) {
-      console.error(
-        '[INVENTORY SERVICE] Error obteniendo estadísticas:',
-        error,
-      );
-      throw new Error('Error obteniendo estadísticas de inventario');
-    }
-  }
-
   // Common Area Management
   async createCommonArea(
     schemaName: string,
     data: CreateCommonAreaDto,
   ): Promise<CommonAreaDto> {
-    const prisma = this.prisma;
-    return prisma.commonArea.create({ data });
+    const prisma = this.prisma.getTenantDB(schemaName);
+    return prisma.amenity.create({ data });
   }
 
   async getCommonAreas(schemaName: string): Promise<CommonAreaDto[]> {
-    const prisma = this.prisma;
-    return prisma.commonArea.findMany();
+    const prisma = this.prisma.getTenantDB(schemaName);
+    return prisma.amenity.findMany();
   }
 
   async getCommonAreaById(
     schemaName: string,
-    id: number,
+    id: string,
   ): Promise<CommonAreaDto> {
-    const prisma = this.prisma;
-    const commonArea = await prisma.commonArea.findUnique({ where: { id } });
+    const prisma = this.prisma.getTenantDB(schemaName);
+    const commonArea = await prisma.amenity.findUnique({ where: { id } });
     if (!commonArea) {
       throw new NotFoundException(`Área común con ID ${id} no encontrada.`);
     }
@@ -496,24 +317,24 @@ export class InventoryService {
 
   async updateCommonArea(
     schemaName: string,
-    id: number,
+    id: string,
     data: UpdateCommonAreaDto,
   ): Promise<CommonAreaDto> {
-    const prisma = this.prisma;
-    const commonArea = await prisma.commonArea.findUnique({ where: { id } });
+    const prisma = this.prisma.getTenantDB(schemaName);
+    const commonArea = await prisma.amenity.findUnique({ where: { id } });
     if (!commonArea) {
       throw new NotFoundException(`Área común con ID ${id} no encontrada.`);
     }
-    return prisma.commonArea.update({ where: { id }, data });
+    return prisma.amenity.update({ where: { id }, data });
   }
 
-  async deleteCommonArea(schemaName: string, id: number): Promise<void> {
-    const prisma = this.prisma;
-    const commonArea = await prisma.commonArea.findUnique({ where: { id } });
+  async deleteCommonArea(schemaName: string, id: string): Promise<void> {
+    const prisma = this.prisma.getTenantDB(schemaName);
+    const commonArea = await prisma.amenity.findUnique({ where: { id } });
     if (!commonArea) {
       throw new NotFoundException(`Área común con ID ${id} no encontrada.`);
     }
-    await prisma.commonArea.delete({ where: { id } });
+    await prisma.amenity.delete({ where: { id } });
   }
 
   // Parking Spot Management
@@ -521,24 +342,23 @@ export class InventoryService {
     schemaName: string,
     data: CreateParkingSpotDto,
   ): Promise<ParkingSpotDto> {
-    const prisma = this.prisma;
-    return prisma.parkingSpot.create({ data });
+    const prisma = this.prisma.getTenantDB(schemaName);
+    return prisma.parking.create({ data });
   }
 
   async getParkingSpots(
     schemaName: string,
-    complexId: number,
   ): Promise<ParkingSpotDto[]> {
-    const prisma = this.prisma;
-    return prisma.parkingSpot.findMany({ where: { complexId } });
+    const prisma = this.prisma.getTenantDB(schemaName);
+    return prisma.parking.findMany();
   }
 
   async getParkingSpotById(
     schemaName: string,
-    id: number,
+    id: string,
   ): Promise<ParkingSpotDto> {
-    const prisma = this.prisma;
-    const parkingSpot = await prisma.parkingSpot.findUnique({ where: { id } });
+    const prisma = this.prisma.getTenantDB(schemaName);
+    const parkingSpot = await prisma.parking.findUnique({ where: { id } });
     if (!parkingSpot) {
       throw new NotFoundException(
         `Espacio de estacionamiento con ID ${id} no encontrado.`,
@@ -549,27 +369,27 @@ export class InventoryService {
 
   async updateParkingSpot(
     schemaName: string,
-    id: number,
+    id: string,
     data: UpdateParkingSpotDto,
   ): Promise<ParkingSpotDto> {
-    const prisma = this.prisma;
-    const parkingSpot = await prisma.parkingSpot.findUnique({ where: { id } });
+    const prisma = this.prisma.getTenantDB(schemaName);
+    const parkingSpot = await prisma.parking.findUnique({ where: { id } });
     if (!parkingSpot) {
       throw new NotFoundException(
         `Espacio de estacionamiento con ID ${id} no encontrado.`,
       );
     }
-    return prisma.parkingSpot.update({ where: { id }, data });
+    return prisma.parking.update({ where: { id }, data });
   }
 
-  async deleteParkingSpot(schemaName: string, id: number): Promise<void> {
-    const prisma = this.prisma;
-    const parkingSpot = await prisma.parkingSpot.findUnique({ where: { id } });
+  async deleteParkingSpot(schemaName: string, id: string): Promise<void> {
+    const prisma = this.prisma.getTenantDB(schemaName);
+    const parkingSpot = await prisma.parking.findUnique({ where: { id } });
     if (!parkingSpot) {
       throw new NotFoundException(
         `Espacio de estacionamiento con ID ${id} no encontrado.`,
       );
     }
-    await prisma.parkingSpot.delete({ where: { id } });
+    await prisma.parking.delete({ where: { id } });
   }
 }

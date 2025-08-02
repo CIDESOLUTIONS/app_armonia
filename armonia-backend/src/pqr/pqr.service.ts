@@ -16,52 +16,51 @@ import { UserRole } from '../common/enums/user-role.enum';
 export class PqrService {
   constructor(private prisma: PrismaService) {}
 
-  async createPqr(schemaName: string, userId: number, data: CreatePQRDto) {
-    const prisma = this.prisma;
+  async createPqr(schemaName: string, userId: string, data: CreatePQRDto) {
+    const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.pQR.create({
-      data: { ...data, createdById: userId },
+      data: { ...data, reportedById: userId },
     });
   }
 
   async getPqrs(
     schemaName: string,
-    userId: number,
+    userId: string,
     userRole: UserRole,
     filters: GetPQRParamsDto,
   ) {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const where: any = {};
     if (userRole === UserRole.RESIDENT) {
-      where.createdById = userId;
+      where.reportedById = userId;
     }
     if (filters.status) where.status = filters.status;
     if (filters.type) where.type = filters.type;
-    if (filters.priority) where.priority = filters.priority;
 
     return prisma.pQR.findMany({
       where,
-      include: { createdBy: { select: { name: true } } },
+      include: { reportedBy: { select: { name: true } } },
       orderBy: { createdAt: 'desc' },
     });
   }
 
   async getPqrById(
     schemaName: string,
-    userId: number,
+    userId: string,
     userRole: UserRole,
-    id: number,
+    id: string,
   ) {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const pqr = await prisma.pQR.findUnique({
       where: { id },
       include: {
-        comments: { include: { author: { select: { name: true } } } },
+        reportedBy: { select: { name: true } },
       },
     });
     if (!pqr) {
       throw new NotFoundException(`PQR with ID ${id} not found.`);
     }
-    if (userRole === UserRole.RESIDENT && pqr.createdById !== userId) {
+    if (userRole === UserRole.RESIDENT && pqr.reportedById !== userId) {
       throw new UnauthorizedException(
         'You are not authorized to view this PQR.',
       );
@@ -69,8 +68,8 @@ export class PqrService {
     return pqr;
   }
 
-  async updatePqr(schemaName: string, id: number, data: UpdatePQRDto) {
-    const prisma = this.prisma;
+  async updatePqr(schemaName: string, id: string, data: UpdatePQRDto) {
+    const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.pQR.update({
       where: { id },
       data,
@@ -79,13 +78,21 @@ export class PqrService {
 
   async addComment(
     schemaName: string,
-    userId: number,
-    pqrId: number,
+    userId: string,
+    pqrId: string,
     data: PQRCommentDto,
   ) {
-    const prisma = this.prisma;
-    return prisma.pQRComment.create({
-      data: { ...data, pqrId, authorId: userId },
+    const prisma = this.prisma.getTenantDB(schemaName);
+    return prisma.pQR.update({
+      where: { id: pqrId },
+      data: {
+        comments: {
+          create: {
+            content: data.content,
+            authorId: userId,
+          },
+        },
+      },
     });
   }
 }

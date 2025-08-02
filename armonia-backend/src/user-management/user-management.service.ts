@@ -16,21 +16,20 @@ export class UserManagementService {
   constructor(private prisma: PrismaService) {}
 
   async getStaffUsers(schemaName: string) {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.user.findMany({
       where: {
         role: { in: [UserRole.STAFF, UserRole.RECEPTION, UserRole.SECURITY] },
       },
-      select: { id: true, name: true, email: true, role: true, active: true },
+      select: { id: true, name: true, email: true, role: true },
     });
   }
 
   async createStaffUser(
     schemaName: string,
-    complexId: number,
     data: CreateUserDto,
   ) {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const existingUser = await prisma.user.findUnique({
       where: { email: data.email },
     });
@@ -44,15 +43,14 @@ export class UserManagementService {
       data: {
         ...data,
         password: hashedPassword,
-        complexId: complexId,
         role: data.role || UserRole.STAFF, // Default to STAFF if not provided
       },
-      select: { id: true, name: true, email: true, role: true, active: true },
+      select: { id: true, name: true, email: true, role: true },
     });
   }
 
-  async updateStaffUser(schemaName: string, id: number, data: UpdateUserDto) {
-    const prisma = this.prisma;
+  async updateStaffUser(schemaName: string, id: string, data: UpdateUserDto) {
+    const prisma = this.prisma.getTenantDB(schemaName);
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado.`);
@@ -65,12 +63,12 @@ export class UserManagementService {
     return prisma.user.update({
       where: { id },
       data,
-      select: { id: true, name: true, email: true, role: true, active: true },
+      select: { id: true, name: true, email: true, role: true },
     });
   }
 
-  async deleteStaffUser(schemaName: string, id: number) {
-    const prisma = this.prisma;
+  async deleteStaffUser(schemaName: string, id: string) {
+    const prisma = this.prisma.getTenantDB(schemaName);
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado.`);

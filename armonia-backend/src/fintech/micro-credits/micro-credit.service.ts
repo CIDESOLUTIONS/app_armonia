@@ -13,17 +13,15 @@ export class MicroCreditService {
 
   async createApplication(
     schemaName: string,
-    userId: number,
+    userId: string,
     data: CreateMicroCreditApplicationDto,
   ): Promise<MicroCreditApplicationDto> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const application = await prisma.microCreditApplication.create({
       data: {
         amount: data.amount,
-        purpose: data.purpose,
         userId: userId,
         status: MicroCreditStatus.PENDING,
-        applicationDate: new Date(),
       },
     });
     return application;
@@ -31,21 +29,21 @@ export class MicroCreditService {
 
   async getApplications(
     schemaName: string,
-    userId: number,
+    userId: string,
   ): Promise<MicroCreditApplicationDto[]> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.microCreditApplication.findMany({
       where: { userId: userId },
-      orderBy: { applicationDate: 'desc' },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
   async updateApplication(
     schemaName: string,
-    id: number,
+    id: string,
     data: UpdateMicroCreditApplicationDto,
   ): Promise<MicroCreditApplicationDto> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const application = await prisma.microCreditApplication.findUnique({
       where: { id },
     });
@@ -60,8 +58,6 @@ export class MicroCreditService {
       where: { id },
       data: {
         status: data.status,
-        approvalDate:
-          data.status === MicroCreditStatus.APPROVED ? new Date() : undefined,
       },
     });
     return updatedApplication;

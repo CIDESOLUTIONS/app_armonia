@@ -1,26 +1,35 @@
-import { INestApplication, Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
-  public expense: Prisma.ExpenseDelegate;
+export class PrismaService implements OnModuleDestroy {
+  private readonly clients: Map<string, PrismaClient> = new Map();
 
-  constructor() {
-    super();
-    this.expense = this.$extends({}).expense;
-  }
+  public getTenantDB(schemaName: string): PrismaClient {
+    if (!schemaName) {
+      throw new Error('Schema name must be provided');
+    }
 
-  async onModuleInit() {
-    await this.$connect();
+    let client = this.clients.get(schemaName);
+
+    if (!client) {
+      const databaseUrl = `${process.env.DATABASE_URL}?schema=${schemaName}`;
+      client = new PrismaClient({
+        datasources: {
+          db: {
+            url: databaseUrl,
+          },
+        },
+      });
+      this.clients.set(schemaName, client);
+    }
+
+    return client;
   }
 
   async onModuleDestroy() {
-    await this.$disconnect();
-  }
-
-  async enableShutdownHooks(app: INestApplication) {
-    this.$on('beforeExit', async () => {
-      await app.close();
-    });
+    for (const client of this.clients.values()) {
+      await client.$disconnect();
+    }
   }
 }

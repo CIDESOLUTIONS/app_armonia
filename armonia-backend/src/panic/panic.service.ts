@@ -23,7 +23,7 @@ export class PanicService {
     schemaName: string,
     createPanicAlertDto: CreatePanicAlertDto,
   ) {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const alert = await prisma.panicAlert.create({
       data: createPanicAlertDto,
     });
@@ -35,7 +35,7 @@ export class PanicService {
       {
         type: NotificationType.ERROR,
         title: '¡Alerta de Pánico!',
-        message: `Alerta de pánico activada por un residente. Tipo: ${alert.type}.`,
+        message: `Alerta de pánico activada por un residente.`,
         link: `/security/panic/${alert.id}`,
         sourceType: NotificationSourceType.PANIC,
         sourceId: alert.id.toString(),
@@ -46,15 +46,15 @@ export class PanicService {
   }
 
   async getAlerts(schemaName: string, filters: any) {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.panicAlert.findMany({
       where: filters,
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  async getAlertById(schemaName: string, id: number) {
-    const prisma = this.prisma;
+  async getAlertById(schemaName: string, id: string) {
+    const prisma = this.prisma.getTenantDB(schemaName);
     const alert = await prisma.panicAlert.findUnique({ where: { id } });
     if (!alert) {
       throw new NotFoundException(
@@ -66,10 +66,10 @@ export class PanicService {
 
   async updateAlert(
     schemaName: string,
-    id: number,
+    id: string,
     updatePanicAlertDto: UpdatePanicAlertDto,
   ) {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.panicAlert.update({
       where: { id },
       data: updatePanicAlertDto,
@@ -80,9 +80,17 @@ export class PanicService {
     schemaName: string,
     createPanicResponseDto: CreatePanicResponseDto,
   ) {
-    const prisma = this.prisma;
-    return prisma.panicResponse.create({
-      data: createPanicResponseDto,
+    const prisma = this.prisma.getTenantDB(schemaName);
+    return prisma.panicAlert.update({
+      where: { id: createPanicResponseDto.alertId },
+      data: {
+        responses: {
+          create: {
+            responderId: createPanicResponseDto.responderId,
+            notes: createPanicResponseDto.notes,
+          },
+        },
+      },
     });
   }
 }

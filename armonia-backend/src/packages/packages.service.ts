@@ -24,7 +24,7 @@ export class PackagesService {
     schemaName: string,
     data: RegisterPackageDto,
   ): Promise<PackageDto> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const pkg = await prisma.package.create({
       data: { ...data, status: PackageStatus.PENDING },
     });
@@ -37,7 +37,7 @@ export class PackagesService {
       await this.communicationsService.notifyUser(schemaName, resident.userId, {
         type: NotificationType.INFO,
         title: 'Paquete Recibido',
-        message: `Has recibido un paquete de ${pkg.sender}. Por favor, recógelo en la recepción.`,
+        message: `Has recibido un paquete. Por favor, recógelo en la recepción.`,
         link: `/resident/packages/${pkg.id}`,
         sourceType: NotificationSourceType.PACKAGE,
         sourceId: pkg.id.toString(),
@@ -51,7 +51,7 @@ export class PackagesService {
     schemaName: string,
     filters: PackageFilterParamsDto,
   ): Promise<{ data: PackageDto[]; total: number }> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const where: any = {};
     if (filters.status) where.status = filters.status;
     if (filters.residentId) where.residentId = filters.residentId;
@@ -65,7 +65,7 @@ export class PackagesService {
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { receivedAt: 'desc' },
       }),
       prisma.package.count({ where }),
     ]);
@@ -73,8 +73,8 @@ export class PackagesService {
     return { data, total };
   }
 
-  async getPackageById(schemaName: string, id: number): Promise<PackageDto> {
-    const prisma = this.prisma;
+  async getPackageById(schemaName: string, id: string): Promise<PackageDto> {
+    const prisma = this.prisma.getTenantDB(schemaName);
     const pkg = await prisma.package.findUnique({ where: { id } });
     if (!pkg) {
       throw new NotFoundException(`Paquete con ID ${id} no encontrado.`);
@@ -84,10 +84,10 @@ export class PackagesService {
 
   async updatePackageStatus(
     schemaName: string,
-    id: number,
+    id: string,
     data: UpdatePackageDto,
   ): Promise<PackageDto> {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const pkg = await prisma.package.findUnique({ where: { id } });
     if (!pkg) {
       throw new NotFoundException(`Paquete con ID ${id} no encontrado.`);

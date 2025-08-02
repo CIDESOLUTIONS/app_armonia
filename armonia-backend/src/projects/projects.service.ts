@@ -13,20 +13,20 @@ export class ProjectsService {
   constructor(private prisma: PrismaService) {}
 
   async createProject(schemaName: string, data: CreateProjectDto) {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.project.create({ data });
   }
 
   async getProjects(schemaName: string, filters: any) {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.project.findMany({
       where: filters,
       orderBy: { startDate: 'desc' },
     });
   }
 
-  async getProjectById(schemaName: string, id: number) {
-    const prisma = this.prisma;
+  async getProjectById(schemaName: string, id: string) {
+    const prisma = this.prisma.getTenantDB(schemaName);
     const project = await prisma.project.findUnique({
       where: { id },
       include: { tasks: true, updates: true },
@@ -37,8 +37,8 @@ export class ProjectsService {
     return project;
   }
 
-  async updateProject(schemaName: string, id: number, data: UpdateProjectDto) {
-    const prisma = this.prisma;
+  async updateProject(schemaName: string, id: string, data: UpdateProjectDto) {
+    const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.project.update({
       where: { id },
       data,
@@ -47,17 +47,17 @@ export class ProjectsService {
 
   async createTask(
     schemaName: string,
-    projectId: number,
+    projectId: string,
     data: CreateProjectTaskDto,
   ) {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.projectTask.create({
       data: { ...data, projectId },
     });
   }
 
-  async updateTask(schemaName: string, id: number, data: UpdateProjectTaskDto) {
-    const prisma = this.prisma;
+  async updateTask(schemaName: string, id: string, data: UpdateProjectTaskDto) {
+    const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.projectTask.update({
       where: { id },
       data,
@@ -66,11 +66,11 @@ export class ProjectsService {
 
   async createUpdate(
     schemaName: string,
-    projectId: number,
-    userId: number,
+    projectId: string,
+    userId: string,
     data: CreateProjectUpdateDto,
   ) {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.projectUpdate.create({
       data: { ...data, projectId, authorId: userId },
     });
