@@ -84,6 +84,6 @@ export class SurveyController {
   @Get(':id/results')
   @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
   getSurveyResults(@GetUser() user: any, @Param('id') id: string) {
-    return this.surveyService.getSurveyResults(user.schemaName, +id);
+    return this.surveyService.getSurveyResults(user.schemaName, id);
   }
 }

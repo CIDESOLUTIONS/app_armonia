@@ -30,13 +30,13 @@ export class FeatureGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user; // Assuming user is attached by JwtAuthGuard and TenantInterceptor
 
-    if (!user || !user.complexId) {
+    if (!user || !user.residentialComplexId) {
       throw new ForbiddenException('Authentication required for this feature.');
     }
 
     // Check if the user's plan supports all required features
     const hasAccess = requiredFeatures.every((feature) =>
-      this.plansService.checkFeatureAccess(user.complexId, feature),
+      this.plansService.checkFeatureAccess(user.residentialComplexId, feature),
     );
 
     if (!hasAccess) {

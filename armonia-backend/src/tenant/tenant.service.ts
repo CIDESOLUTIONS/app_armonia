@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class TenantService {
   constructor(private prisma: PrismaService) {}
 
-  async getTenantSchemaName(complexId: string): Promise<string | null> {
+  async getTenantSchemaName(residentialComplexId: string): Promise<string | null> {
     const prisma = this.prisma.getTenantDB('public');
     const complex = await prisma.residentialComplex.findUnique({
       where: { id: complexId },

@@ -31,10 +31,10 @@ export class CreateProjectDto {
   description?: string;
 
   @IsDateString()
-  startDate: Date;
+  startDate: string; // Changed to string
 
   @IsDateString()
-  endDate: Date;
+  endDate: string; // Changed to string
 
   @IsEnum(ProjectStatus)
   @IsOptional()
@@ -43,11 +43,11 @@ export class CreateProjectDto {
   @IsNumber()
   budget: number;
 
-  @IsNumber()
-  complexId: number;
+  @IsString() // Changed to string
+  residentialComplexId: string; // Renamed from complexId
 
-  @IsNumber()
-  createdById: number;
+  @IsString() // Changed to string
+  createdById: string;
 }
 
 export class UpdateProjectDto {
@@ -61,11 +61,11 @@ export class UpdateProjectDto {
 
   @IsOptional()
   @IsDateString()
-  startDate?: Date;
+  startDate?: string; // Changed to string
 
   @IsOptional()
   @IsDateString()
-  endDate?: Date;
+  endDate?: string; // Changed to string
 
   @IsOptional()
   @IsEnum(ProjectStatus)
@@ -77,8 +77,8 @@ export class UpdateProjectDto {
 }
 
 export class CreateProjectTaskDto {
-  @IsNumber()
-  projectId: number;
+  @IsString() // Changed to string
+  projectId: string;
 
   @IsString()
   title: string;
@@ -92,12 +92,12 @@ export class CreateProjectTaskDto {
   status?: ProjectTaskStatus;
 
   @IsOptional()
-  @IsNumber()
-  assignedToId?: number;
+  @IsString() // Changed to string
+  assignedToId?: string;
 
   @IsOptional()
   @IsDateString()
-  dueDate?: Date;
+  dueDate?: string; // Changed to string
 }
 
 export class UpdateProjectTaskDto {
@@ -114,17 +114,17 @@ export class UpdateProjectTaskDto {
   status?: ProjectTaskStatus;
 
   @IsOptional()
-  @IsNumber()
-  assignedToId?: number;
+  @IsString() // Changed to string
+  assignedToId?: string;
 
   @IsOptional()
   @IsDateString()
-  dueDate?: Date;
+  dueDate?: string; // Changed to string
 }
 
 export class CreateProjectUpdateDto {
-  @IsNumber()
-  projectId: number;
+  @IsString() // Changed to string
+  projectId: string;
 
   @IsString()
   title: string;

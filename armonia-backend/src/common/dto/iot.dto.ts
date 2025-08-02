@@ -16,10 +16,16 @@ export enum SmartMeterUnit {
 
 export class SmartMeterReadingDto {
   @IsString()
+  id: string; // Added id
+
+  @IsString()
+  deviceId: string; // Added deviceId
+
+  @IsString()
   meterId: string;
 
-  @IsNumber()
-  propertyId: number; // Relacionar con Property
+  @IsString() // Changed to string
+  propertyId: string; // Relacionar con Property
 
   @IsNumber()
   reading: number;
@@ -29,6 +35,9 @@ export class SmartMeterReadingDto {
 
   @IsDateString()
   timestamp: string;
+
+  @IsString()
+  residentialComplexId: string; // Added residentialComplexId
 }
 
 export class SmartMeterFilterParamsDto {
@@ -37,8 +46,8 @@ export class SmartMeterFilterParamsDto {
   meterId?: string;
 
   @IsOptional()
-  @IsNumber()
-  propertyId?: number;
+  @IsString() // Changed to string
+  propertyId?: string;
 
   @IsOptional()
   @IsEnum(SmartMeterUnit)
@@ -64,8 +73,8 @@ export class SmartMeterFilterParamsDto {
 }
 
 export class AutomatedBillingDto {
-  @IsNumber()
-  complexId: number;
+  @IsString() // Changed to string
+  residentialComplexId: string; // Renamed from complexId
 
   @IsOptional()
   @IsDateString()

@@ -18,9 +18,9 @@ export class TenantInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
     const user = request.user; // Asumimos que el usuario ya está adjunto por el guardia JWT
 
-    if (user && user.complexId) {
+    if (user && user.residentialComplexId) {
       const schemaName = await this.tenantService.getTenantSchemaName(
-        user.complexId,
+        user.residentialComplexId,
       );
       if (schemaName) {
         request.user.schemaName = schemaName; // Adjuntar schemaName al objeto de usuario en la solicitud

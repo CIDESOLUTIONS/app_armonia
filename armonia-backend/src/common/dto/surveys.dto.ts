@@ -23,36 +23,30 @@ export enum QuestionType {
 }
 
 export class QuestionDto {
-  @IsNumber()
-  id: number;
+  @IsString()
+  id: string;
 
-  @IsNumber()
-  surveyId: number;
+  @IsString()
+  surveyId: string;
 
   @IsString()
   text: string;
-
-  @IsEnum(QuestionType)
-  type: QuestionType;
 
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   options?: string[];
-
-  @IsNumber()
-  order: number;
 }
 
 export class AnswerDto {
-  @IsNumber()
-  id: number;
+  @IsString()
+  id: string;
 
-  @IsNumber()
-  questionId: number;
+  @IsString()
+  questionId: string;
 
-  @IsNumber()
-  userId: number;
+  @IsString()
+  userId: string;
 
   @IsOptional()
   @IsString()
@@ -65,14 +59,11 @@ export class AnswerDto {
   @IsOptional()
   @IsNumber()
   rating?: number;
-
-  @IsDateString()
-  answeredAt: Date;
 }
 
 export class SurveyDto {
-  @IsNumber()
-  id: number;
+  @IsString()
+  id: string;
 
   @IsString()
   title: string;
@@ -95,11 +86,11 @@ export class SurveyDto {
   @Type(() => QuestionDto)
   questions: QuestionDto[];
 
-  @IsNumber()
-  complexId: number;
+  @IsString()
+  residentialComplexId: string; // Renamed from complexId
 
-  @IsNumber()
-  createdBy: number;
+  @IsString()
+  createdById: string; // Renamed from createdBy
 
   @IsDateString()
   createdAt: Date;
@@ -126,6 +117,12 @@ export class CreateSurveyDto {
   @ValidateNested({ each: true })
   @Type(() => QuestionDto)
   questions: Omit<QuestionDto, 'id' | 'surveyId'>[];
+
+  @IsString()
+  residentialComplexId: string;
+
+  @IsString()
+  createdById: string;
 }
 
 export class UpdateSurveyDto {
@@ -157,8 +154,8 @@ export class UpdateSurveyDto {
 }
 
 export class CreateAnswerDto {
-  @IsNumber()
-  questionId: number;
+  @IsString()
+  questionId: string;
 
   @IsOptional()
   @IsString()

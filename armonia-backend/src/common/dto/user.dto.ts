@@ -1,4 +1,9 @@
-import { IsString, IsOptional, IsBoolean, IsNumber } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsBoolean,
+  IsNumber
+} from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -18,9 +23,9 @@ export class CreateUserDto {
   @IsOptional()
   active?: boolean;
 
-  @IsNumber()
+  @IsString() // Changed to string
   @IsOptional()
-  complexId?: number;
+  residentialComplexId?: string; // Renamed from complexId
 }
 
 export class UpdateUserDto {

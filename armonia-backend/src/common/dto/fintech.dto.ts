@@ -1,10 +1,10 @@
-import { IsString, IsNumber, IsEnum, IsOptional } from 'class-validator';
+import { IsString, IsNumber, IsEnum, IsOptional, IsDateString } from 'class-validator';
 
 export enum MicroCreditStatus {
-  PENDING = 'pending',
-  APPROVED = 'approved',
-  REJECTED = 'rejected',
-  PAID = 'paid',
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+  PAID = 'PAID',
 }
 
 export class CreateMicroCreditApplicationDto {
@@ -12,7 +12,19 @@ export class CreateMicroCreditApplicationDto {
   amount: number;
 
   @IsString()
-  purpose: string;
+  userId: string; // Changed to string
+
+  @IsString()
+  @IsOptional()
+  purpose?: string; // Made optional as per schema.prisma
+
+  @IsDateString()
+  @IsOptional()
+  applicationDate?: Date; // Made optional as per schema.prisma
+
+  @IsString()
+  @IsOptional()
+  complexId?: string; // Made optional as per schema.prisma
 }
 
 export class UpdateMicroCreditApplicationDto {
@@ -21,17 +33,18 @@ export class UpdateMicroCreditApplicationDto {
   status?: MicroCreditStatus;
 
   @IsOptional()
-  @IsString()
-  approvalDate?: string;
+  @IsDateString()
+  approvalDate?: Date; // Changed to Date
 }
 
 export class MicroCreditApplicationDto {
-  id: number;
+  id: string; // Changed to string
   amount: number;
-  purpose: string;
   status: MicroCreditStatus;
-  applicationDate: Date;
-  approvalDate?: Date;
-  userId: number;
-  complexId: number;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string; // Changed to string
+  purpose?: string; // Made optional as per schema.prisma
+  applicationDate?: Date; // Made optional as per schema.prisma
+  complexId?: string; // Made optional as per schema.prisma
 }

@@ -12,7 +12,7 @@ export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
-    private tenantService: Tenant TenantService,
+    private tenantService: TenantService,
     private prismaService: PrismaService,
     @Inject(ResidentialComplexService)
     private residentialComplexService: ResidentialComplexService,
@@ -29,8 +29,10 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const schemaName = user.complexId
-      ? await this.tenantService.getTenantSchemaName(user.complexId)
+    const schemaName = user.residentialComplexId
+      ? await this.tenantService.getTenantSchemaName(
+        user.residentialComplexId,
+      )
       : null;
     const payload = {
       email: user.email,
@@ -61,7 +63,7 @@ export class AuthService {
     };
 
     const newAdmin = await this.userService.createUser(
-      newComplex.id, // schemaName is now the complexId
+      newComplex.id.toString(), // schemaName is now the complexId, convert to string
       adminPayload,
     );
 

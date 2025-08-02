@@ -23,13 +23,15 @@ export class VisitorsService {
     data: CreateVisitorDto,
   ): Promise<VisitorDto> {
     const prisma: any = this.prisma;
-    return prisma.visitor.create({
+    const visitor = await prisma.visitor.create({
       data: {
         ...data,
         entryTime: new Date().toISOString(),
         status: VisitorStatus.ACTIVE,
+        residentialComplexId: data.residentialComplexId, // Use residentialComplexId from DTO
       },
     });
+    return { ...visitor, residentialComplexId: visitor.residentialComplexId };
   }
 
   async getVisitors(
@@ -67,26 +69,28 @@ export class VisitorsService {
       where.plate = filters.plate;
     }
 
-    return prisma.visitor.findMany({
+    const visitors = await prisma.visitor.findMany({
       where,
       skip: ((filters.page ?? 1) - 1) * (filters.limit ?? 10),
       take: filters.limit ?? 10,
       orderBy: { entryTime: 'desc' },
     });
+
+    return visitors.map(visitor => ({ ...visitor, residentialComplexId: visitor.residentialComplexId }));
   }
 
-  async getVisitorById(schemaName: string, id: number): Promise<VisitorDto> {
+  async getVisitorById(schemaName: string, id: string): Promise<VisitorDto> {
     const prisma: any = this.prisma;
     const visitor = await prisma.visitor.findUnique({ where: { id } });
     if (!visitor) {
       throw new NotFoundException(`Visitante con ID ${id} no encontrado.`);
     }
-    return visitor;
+    return { ...visitor, residentialComplexId: visitor.residentialComplexId };
   }
 
   async updateVisitor(
     schemaName: string,
-    id: number,
+    id: string,
     data: UpdateVisitorDto,
   ): Promise<VisitorDto> {
     const prisma: any = this.prisma;
@@ -96,13 +100,14 @@ export class VisitorsService {
       throw new NotFoundException(`Visitante con ID ${id} no encontrado.`);
     }
 
-    return prisma.visitor.update({
+    const updatedVisitor = await prisma.visitor.update({
       where: { id },
       data,
     });
+    return { ...updatedVisitor, residentialComplexId: updatedVisitor.residentialComplexId };
   }
 
-  async deleteVisitor(schemaName: string, id: number): Promise<void> {
+  async deleteVisitor(schemaName: string, id: string): Promise<void> {
     const prisma: any = this.prisma;
     await prisma.visitor.delete({ where: { id } });
   }
@@ -130,7 +135,7 @@ export class VisitorsService {
           documentType:
             preRegisteredVisitor.documentType || VisitorDocumentType.OTHER,
           documentNumber: preRegisteredVisitor.documentNumber || 'N/A',
-          complexId: preRegisteredVisitor.complexId,
+          residentialComplexId: preRegisteredVisitor.residentialComplexId, // Use residentialComplexId
           propertyId: preRegisteredVisitor.propertyId,
           residentId: preRegisteredVisitor.residentId,
           entryTime: now.toISOString(),
@@ -148,7 +153,7 @@ export class VisitorsService {
         data: { status: PreRegistrationStatus.USED },
       });
 
-      return newVisitor;
+      return { ...newVisitor, residentialComplexId: newVisitor.residentialComplexId };
     }
 
     // Try to find an access pass
@@ -170,13 +175,13 @@ export class VisitorsService {
           documentType:
             accessPass.preRegister?.documentType || VisitorDocumentType.OTHER,
           documentNumber: accessPass.preRegister?.documentNumber || 'N/A',
-          complexId: accessPass.preRegister?.complexId || 0, // Adjust as needed
-          propertyId: accessPass.preRegister?.propertyId || 0, // Adjust as needed
+          residentialComplexId: accessPass.preRegister?.residentialComplexId || '', // Use residentialComplexId
+          propertyId: accessPass.preRegister?.propertyId || '', // Use string
           residentId: accessPass.preRegister?.residentId,
           entryTime: now.toISOString(),
           status: VisitorStatus.ACTIVE,
           accessPassId: accessPass.id,
-          registeredBy: accessPass.preRegister?.residentId || 0, // Assuming resident who pre-registered is the one registering
+          registeredBy: accessPass.preRegister?.residentId || '', // Use string
         },
       });
 
@@ -189,7 +194,7 @@ export class VisitorsService {
         },
       });
 
-      return newVisitor;
+      return { ...newVisitor, residentialComplexId: newVisitor.residentialComplexId };
     }
 
     throw new NotFoundException(
@@ -213,7 +218,7 @@ export class VisitorsService {
       name: pr.name,
       documentType: pr.documentType || VisitorDocumentType.OTHER,
       documentNumber: pr.documentNumber || 'N/A',
-      destination: pr.property.unitNumber, // Assuming property unitNumber is the destination
+      destination: pr.property.number, // Assuming property unitNumber is the destination
       residentName: pr.resident.name, // Assuming resident name
       entryTime: pr.expectedDate.toISOString(), // Using expectedDate as entryTime for pre-registered
       status: VisitorStatus.ACTIVE, // Or a specific pre-registered status
@@ -230,6 +235,7 @@ export class VisitorsService {
       registeredBy: pr.residentId,
       createdAt: pr.createdAt.toISOString(),
       updatedAt: pr.updatedAt.toISOString(),
+      residentialComplexId: pr.residentialComplexId, // Added missing property
     }));
   }
 }

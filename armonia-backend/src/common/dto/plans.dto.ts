@@ -35,11 +35,11 @@ export class CreatePlanDto {
 export class UpdatePlanDto extends PartialType(CreatePlanDto) {}
 
 export class CreateSubscriptionDto {
-  @IsNumber()
-  planId: number;
+  @IsString() // Changed to string
+  planId: string;
 
-  @IsNumber()
-  complexId: number;
+  @IsString() // Changed to string
+  residentialComplexId: string;
 
   @IsDateString()
   startDate: string;

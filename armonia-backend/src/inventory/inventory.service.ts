@@ -54,6 +54,10 @@ export class InventoryService {
         ownerName: property.owner?.name || undefined,
         ownerEmail: property.owner?.email || undefined,
         totalResidents: property.residents.length,
+        residentialComplexId: property.residentialComplexId, // Corrected property name
+        status: 'Active', // Placeholder, assuming active status
+        createdAt: property.createdAt, // Added missing property
+        updatedAt: property.updatedAt, // Added missing property
       }));
     } catch (error) {
       console.error('[INVENTORY SERVICE] Error obteniendo propiedades:', error);
@@ -65,7 +69,13 @@ export class InventoryService {
     const prisma = this.prisma.getTenantDB(schemaName);
     try {
       const property = await prisma.property.create({
-        data,
+        data: {
+          unitNumber: data.unitNumber,
+          type: data.type,
+          status: data.status,
+          owner: { connect: { id: data.ownerId } },
+          residentialComplex: { connect: { id: data.residentialComplexId } }, // Corrected property name
+        },
         include: {
           owner: {
             select: { id: true, name: true, email: true },
@@ -89,7 +99,13 @@ export class InventoryService {
     try {
       const property = await prisma.property.update({
         where: { id },
-        data,
+        data: {
+          unitNumber: data.unitNumber,
+          type: data.type,
+          status: data.status,
+          ...(data.ownerId && { owner: { connect: { id: data.ownerId } } }),
+          ...(data.residentialComplexId && { residentialComplex: { connect: { id: data.residentialComplexId } } }), // Corrected property name
+        },
         include: {
           owner: {
             select: { id: true, name: true, email: true },
@@ -130,6 +146,10 @@ export class InventoryService {
         breed: pet.breed || undefined,
         ownerId: pet.ownerId,
         ownerName: pet.owner.name,
+        type: pet.type, // Corrected property name
+        residentialComplexId: pet.residentialComplexId, // Corrected property name
+        createdAt: pet.createdAt, // Added missing property
+        updatedAt: pet.updatedAt, // Added missing property
       }));
     } catch (error) {
       console.error('[INVENTORY SERVICE] Error obteniendo mascotas:', error);
@@ -141,7 +161,13 @@ export class InventoryService {
     const prisma = this.prisma.getTenantDB(schemaName);
     try {
       const pet = await prisma.pet.create({
-        data,
+        data: {
+          name: data.name,
+          breed: data.breed,
+          type: data.type, // Corrected property name
+          owner: { connect: { id: data.ownerId } },
+          residentialComplex: { connect: { id: data.residentialComplexId } }, // Corrected property name
+        },
         include: {
           owner: {
             select: { name: true },
@@ -183,6 +209,9 @@ export class InventoryService {
         model: vehicle.model,
         ownerId: vehicle.ownerId,
         ownerName: vehicle.owner.name,
+        residentialComplexId: vehicle.residentialComplexId, // Corrected property name
+        createdAt: vehicle.createdAt, // Added missing property
+        updatedAt: vehicle.updatedAt, // Added missing property
       }));
     } catch (error) {
       console.error('[INVENTORY SERVICE] Error obteniendo vehículos:', error);
@@ -198,7 +227,8 @@ export class InventoryService {
           plate: data.licensePlate.toUpperCase(),
           brand: data.brand,
           model: data.model,
-          ownerId: data.ownerId,
+          owner: { connect: { id: data.ownerId } },
+          residentialComplex: { connect: { id: data.residentialComplexId } }, // Corrected property name
         },
         include: {
           owner: {
@@ -251,7 +281,20 @@ export class InventoryService {
     try {
       const resident = await prisma.resident.update({
         where: { id },
-        data,
+        data: {
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          role: data.role,
+          isActive: data.isActive,
+          idNumber: data.idNumber,
+          idType: data.idType,
+          isOwner: data.isOwner,
+          relationshipWithOwner: data.relationshipWithOwner,
+          biometricId: data.biometricId,
+          ...(data.propertyId && { property: { connect: { id: data.propertyId } } }),
+          ...(data.residentialComplexId && { residentialComplex: { connect: { id: data.residentialComplexId } } }),
+        },
         include: {
           property: {
             select: { number: true },
@@ -270,7 +313,20 @@ export class InventoryService {
     const prisma = this.prisma.getTenantDB(schemaName);
     try {
       const resident = await prisma.resident.create({
-        data,
+        data: {
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          role: data.role,
+          isActive: data.isActive,
+          idNumber: data.idNumber,
+          idType: data.idType,
+          isOwner: data.isOwner,
+          relationshipWithOwner: data.relationshipWithOwner,
+          biometricId: data.biometricId,
+          property: { connect: { id: data.propertyId } },
+          residentialComplex: { connect: { id: data.residentialComplexId } },
+        },
       });
       return resident;
     } catch (error) {
@@ -295,12 +351,22 @@ export class InventoryService {
     data: CreateCommonAreaDto,
   ): Promise<CommonAreaDto> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    return prisma.amenity.create({ data });
+    const commonArea = await prisma.amenity.create({
+      data: {
+        name: data.name,
+        description: data.description,
+        type: data.type,
+        rules: data.rules,
+        residentialComplex: { connect: { id: data.residentialComplexId } },
+      },
+    });
+    return { ...commonArea, type: commonArea.type, rules: commonArea.rules, residentialComplexId: commonArea.residentialComplexId, createdAt: commonArea.createdAt, updatedAt: commonArea.updatedAt };
   }
 
   async getCommonAreas(schemaName: string): Promise<CommonAreaDto[]> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    return prisma.amenity.findMany();
+    const commonAreas = await prisma.amenity.findMany();
+    return commonAreas.map(ca => ({ ...ca, type: ca.type, rules: ca.rules, residentialComplexId: ca.residentialComplexId, createdAt: ca.createdAt, updatedAt: ca.updatedAt }));
   }
 
   async getCommonAreaById(
@@ -312,7 +378,7 @@ export class InventoryService {
     if (!commonArea) {
       throw new NotFoundException(`Área común con ID ${id} no encontrada.`);
     }
-    return commonArea;
+    return { ...commonArea, type: commonArea.type, rules: commonArea.rules, residentialComplexId: commonArea.residentialComplexId, createdAt: commonArea.createdAt, updatedAt: commonArea.updatedAt };
   }
 
   async updateCommonArea(
@@ -325,7 +391,17 @@ export class InventoryService {
     if (!commonArea) {
       throw new NotFoundException(`Área común con ID ${id} no encontrada.`);
     }
-    return prisma.amenity.update({ where: { id }, data });
+    const updatedCommonArea = await prisma.amenity.update({
+      where: { id },
+      data: {
+        name: data.name,
+        description: data.description,
+        type: data.type,
+        rules: data.rules,
+        ...(data.residentialComplexId && { residentialComplex: { connect: { id: data.residentialComplexId } } }),
+      },
+    });
+    return { ...updatedCommonArea, type: updatedCommonArea.type, rules: updatedCommonArea.rules, residentialComplexId: updatedCommonArea.residentialComplexId, createdAt: updatedCommonArea.createdAt, updatedAt: updatedCommonArea.updatedAt };
   }
 
   async deleteCommonArea(schemaName: string, id: string): Promise<void> {
@@ -343,14 +419,25 @@ export class InventoryService {
     data: CreateParkingSpotDto,
   ): Promise<ParkingSpotDto> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    return prisma.parking.create({ data });
+    const parkingSpot = await prisma.parking.create({
+      data: {
+        number: data.number,
+        type: data.type,
+        status: data.status,
+        notes: data.notes,
+        ...(data.propertyId && { property: { connect: { id: data.propertyId } } }),
+        residentialComplex: { connect: { id: data.residentialComplexId } },
+      },
+    });
+    return { ...parkingSpot, type: parkingSpot.type, status: parkingSpot.status, residentialComplexId: parkingSpot.residentialComplexId, createdAt: parkingSpot.createdAt, updatedAt: parkingSpot.updatedAt };
   }
 
   async getParkingSpots(
     schemaName: string,
   ): Promise<ParkingSpotDto[]> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    return prisma.parking.findMany();
+    const parkingSpots = await prisma.parking.findMany();
+    return parkingSpots.map(ps => ({ ...ps, type: ps.type, status: ps.status, residentialComplexId: ps.residentialComplexId, createdAt: ps.createdAt, updatedAt: ps.updatedAt }));
   }
 
   async getParkingSpotById(
@@ -364,7 +451,7 @@ export class InventoryService {
         `Espacio de estacionamiento con ID ${id} no encontrado.`,
       );
     }
-    return parkingSpot;
+    return { ...parkingSpot, type: parkingSpot.type, status: parkingSpot.status, residentialComplexId: parkingSpot.residentialComplexId, createdAt: parkingSpot.createdAt, updatedAt: parkingSpot.updatedAt };
   }
 
   async updateParkingSpot(
@@ -379,7 +466,18 @@ export class InventoryService {
         `Espacio de estacionamiento con ID ${id} no encontrado.`,
       );
     }
-    return prisma.parking.update({ where: { id }, data });
+    const updatedParkingSpot = await prisma.parking.update({
+      where: { id },
+      data: {
+        number: data.number,
+        type: data.type,
+        status: data.status,
+        notes: data.notes,
+        ...(data.propertyId && { property: { connect: { id: data.propertyId } } }),
+        ...(data.residentialComplexId && { residentialComplex: { connect: { id: data.residentialComplexId } } }),
+      },
+    });
+    return { ...updatedParkingSpot, type: updatedParkingSpot.type, status: updatedParkingSpot.status, residentialComplexId: updatedParkingSpot.residentialComplexId, createdAt: updatedParkingSpot.createdAt, updatedAt: updatedParkingSpot.updatedAt };
   }
 
   async deleteParkingSpot(schemaName: string, id: string): Promise<void> {
@@ -391,5 +489,32 @@ export class InventoryService {
       );
     }
     await prisma.parking.delete({ where: { id } });
+  }
+
+  async getServices(schemaName: string, complexId: string): Promise<any[]> {
+    // Placeholder implementation for getServices
+    // In a real scenario, this would fetch actual services related to the complex
+    return [];
+  }
+
+  async getInventoryStats(schemaName: string, complexId: string): Promise<any> {
+    // Placeholder implementation for getInventoryStats
+    // In a real scenario, this would fetch aggregated inventory statistics
+    const prisma = this.prisma.getTenantDB(schemaName);
+    const totalProperties = await prisma.property.count({ where: { residentialComplexId: complexId } });
+    const totalResidents = await prisma.resident.count({ where: { residentialComplexId: complexId } });
+    const totalPets = await prisma.pet.count({ where: { residentialComplexId: complexId } });
+    const totalVehicles = await prisma.vehicle.count({ where: { residentialComplexId: complexId } });
+    const totalCommonAreas = await prisma.amenity.count({ where: { residentialComplexId: complexId } });
+    const totalParkingSpots = await prisma.parking.count({ where: { residentialComplexId: complexId } });
+
+    return {
+      totalProperties,
+      totalResidents,
+      totalPets,
+      totalVehicles,
+      totalCommonAreas,
+      totalParkingSpots,
+    };
   }
 }

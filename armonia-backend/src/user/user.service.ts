@@ -7,17 +7,17 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
 
   async findByEmail(email: string, prismaClient?: any) {
-    const prisma = prismaClient || this.prisma;
+    const prisma = prismaClient || this.prisma.getTenantDB('public');
     return prisma.user.findUnique({ where: { email } });
   }
 
-  async findById(id: number) {
-    const prisma = this.prisma;
+  async findById(schemaName: string, id: string) {
+    const prisma = this.prisma.getTenantDB(schemaName);
     return prisma.user.findUnique({ where: { id } });
   }
 
-  async createUser(schemaName: string, data: any, prismaClient?: any) {
-    const prisma = prismaClient || this.prisma;
+  async createUser(schemaName: string, data: any) {
+    const prisma = this.prisma.getTenantDB(schemaName);
     const hashedPassword = await bcrypt.hash(data.password, 10);
     return prisma.user.create({
       data: {
@@ -28,7 +28,7 @@ export class UserService {
   }
 
   async findAllUsers(schemaName: string, role?: string) {
-    const prisma = this.prisma;
+    const prisma = this.prisma.getTenantDB(schemaName);
     const where: any = {};
     if (role) {
       where.role = role;
@@ -36,8 +36,8 @@ export class UserService {
     return prisma.user.findMany({ where });
   }
 
-  async updateUser(schemaName: string, id: number, data: any) {
-    const prisma = this.prisma;
+  async updateUser(schemaName: string, id: string, data: any) {
+    const prisma = this.prisma.getTenantDB(schemaName);
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado.`);
@@ -48,8 +48,8 @@ export class UserService {
     return prisma.user.update({ where: { id }, data });
   }
 
-  async deleteUser(schemaName: string, id: number) {
-    const prisma = this.prisma;
+  async deleteUser(schemaName: string, id: string) {
+    const prisma = this.prisma.getTenantDB(schemaName);
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado.`);
