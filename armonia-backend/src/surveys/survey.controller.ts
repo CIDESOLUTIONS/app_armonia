@@ -32,19 +32,19 @@ export class SurveyController {
     return this.surveyService.createSurvey(
       user.schemaName,
       user.userId,
-      user.complexId,
+      user.residentialComplexId,
       createSurveyDto,
     );
   }
 
   @Get()
   getSurveys(@GetUser() user: any) {
-    return this.surveyService.getSurveys(user.schemaName, user.complexId);
+    return this.surveyService.getSurveys(user.schemaName, user.residentialComplexId);
   }
 
   @Get(':id')
   getSurveyById(@GetUser() user: any, @Param('id') id: string) {
-    return this.surveyService.getSurveyById(user.schemaName, +id);
+    return this.surveyService.getSurveyById(user.schemaName, id);
   }
 
   @Put(':id')
@@ -56,7 +56,7 @@ export class SurveyController {
   ) {
     return this.surveyService.updateSurvey(
       user.schemaName,
-      +id,
+      id,
       updateSurveyDto,
     );
   }
@@ -64,7 +64,7 @@ export class SurveyController {
   @Delete(':id')
   @UseGuards(RolesGuard([UserRole.ADMIN, UserRole.COMPLEX_ADMIN]))
   deleteSurvey(@GetUser() user: any, @Param('id') id: string) {
-    return this.surveyService.deleteSurvey(user.schemaName, +id);
+    return this.surveyService.deleteSurvey(user.schemaName, id);
   }
 
   @Post(':id/answers')
@@ -75,7 +75,7 @@ export class SurveyController {
   ) {
     return this.surveyService.submitAnswer(
       user.schemaName,
-      +id,
+      id,
       user.userId,
       createAnswerDto,
     );

@@ -32,6 +32,9 @@ export class QuestionDto {
   @IsString()
   text: string;
 
+  @IsEnum(QuestionType)
+  type: QuestionType; // Added
+
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
