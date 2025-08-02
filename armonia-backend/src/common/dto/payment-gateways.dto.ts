@@ -20,8 +20,8 @@ export class PaymentGatewayConfigDto {
   @ApiProperty({
     description: 'Unique identifier of the payment gateway configuration',
   })
-  @IsNumber()
-  id: number;
+  @IsString()
+  id: string;
 
   @ApiProperty({
     enum: PaymentGatewayType,
@@ -46,10 +46,6 @@ export class PaymentGatewayConfigDto {
   @IsString()
   secretKey: string;
 
-  @ApiProperty({ description: 'Indicates if the payment gateway is active' })
-  @IsBoolean()
-  isActive: boolean;
-
   @ApiProperty({
     type: [String],
     description: 'List of supported currencies (e.g., USD, COP)',
@@ -57,6 +53,10 @@ export class PaymentGatewayConfigDto {
   @IsArray()
   @IsString({ each: true })
   supportedCurrencies: string[];
+
+  @ApiProperty({ description: 'Indicates if the payment gateway is active' })
+  @IsBoolean()
+  isActive: boolean;
 
   @ApiProperty({
     description: 'Date of creation',

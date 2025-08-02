@@ -31,11 +31,12 @@ export class CreateCommonAreaDto {
   description?: string;
 
   @IsString()
-  type: string; // Changed to string as per schema.prisma
+  @IsOptional()
+  type?: string; // Changed to optional
 
   @IsString()
   @IsOptional()
-  rules?: string; // Added as per schema.prisma
+  rules?: string;
 }
 
 export class UpdateCommonAreaDto extends PartialType(CreateCommonAreaDto) {}
@@ -44,8 +45,8 @@ export class CommonAreaDto {
   id: string;
   name: string;
   description?: string;
-  type: string; // Changed to string as per schema.prisma
-  rules?: string; // Added as per schema.prisma
+  type?: string; // Changed to optional
+  rules?: string;
   residentialComplexId: string;
   createdAt: Date;
   updatedAt: Date;
@@ -70,11 +71,12 @@ export class CreateParkingSpotDto {
   number: string;
 
   @IsString()
-  type: string; // Changed to string as per schema.prisma
+  @IsOptional()
+  type?: string; // Changed to optional
 
   @IsString()
   @IsOptional()
-  status?: string; // Changed to string as per schema.prisma
+  status?: string; // Changed to optional
 
   @IsString()
   @IsOptional()
@@ -93,8 +95,8 @@ export class UpdateParkingSpotDto extends PartialType(CreateParkingSpotDto) {}
 export class ParkingSpotDto {
   id: string;
   number: string;
-  type: string; // Changed to string as per schema.prisma
-  status: string; // Changed to string as per schema.prisma
+  type?: string; // Changed to optional
+  status?: string; // Changed to optional
   propertyId?: string;
   residentialComplexId: string;
   notes?: string;
@@ -105,13 +107,12 @@ export class ParkingSpotDto {
 export class PropertyWithDetailsDto {
   id: string;
   residentialComplexId: string;
-  unitNumber: string;
+  number: string; // Changed from unitNumber
   type: string;
-  status: string; // Kept as per schema.prisma
+  status?: string; // Changed to optional
   ownerId?: string;
   ownerName?: string;
-  ownerEmail?: string;
-  totalResidents: number;
+  totalResidents?: number; // Changed to optional
   createdAt: Date;
   updatedAt: Date;
 }
@@ -127,7 +128,8 @@ export class CreatePropertyDto {
   type: string;
 
   @IsString()
-  status: string;
+  @IsOptional()
+  status?: string; // Changed to optional
 
   @IsOptional()
   @IsString()
@@ -149,7 +151,7 @@ export class UpdatePropertyDto {
 
   @IsOptional()
   @IsString()
-  status?: string;
+  status?: string; // Changed to optional
 
   @IsOptional()
   @IsString()
@@ -159,10 +161,10 @@ export class UpdatePropertyDto {
 export class PetWithDetailsDto {
   id: string;
   name: string;
-  type: string; // Added as per schema.prisma
+  type?: string; // Changed to optional
   breed?: string;
   ownerId: string;
-  ownerName: string;
+  ownerName?: string; // Changed to optional
   residentialComplexId: string;
   createdAt: Date;
   updatedAt: Date;
@@ -176,7 +178,8 @@ export class CreatePetDto {
   name: string;
 
   @IsString()
-  type: string; // Added as per schema.prisma
+  @IsOptional()
+  type?: string; // Changed to optional
 
   @IsOptional()
   @IsString()
@@ -188,11 +191,11 @@ export class CreatePetDto {
 
 export class VehicleWithDetailsDto {
   id: string;
-  licensePlate: string;
-  brand?: string; // Changed to optional as per schema.prisma
-  model?: string; // Changed to optional as per schema.prisma
+  plate: string; // Changed from licensePlate
+  brand?: string;
+  model?: string;
   ownerId: string;
-  ownerName: string;
+  ownerName?: string; // Changed to optional
   residentialComplexId: string;
   createdAt: Date;
   updatedAt: Date;
@@ -259,6 +262,10 @@ export class CreateResidentDto {
   @IsOptional()
   @IsString()
   biometricId?: string;
+
+  @IsString()
+  @IsOptional()
+  userId?: string;
 }
 
 export class UpdateResidentDto {
@@ -309,4 +316,8 @@ export class UpdateResidentDto {
   @IsOptional()
   @IsString()
   biometricId?: string;
+
+  @IsString()
+  @IsOptional()
+  userId?: string;
 }

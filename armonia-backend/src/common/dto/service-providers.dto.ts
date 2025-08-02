@@ -22,20 +22,19 @@ export class CreateServiceProviderDto {
   @IsString()
   name: string;
 
-  @IsEnum(ServiceProviderCategory)
-  category: ServiceProviderCategory;
+  @IsString()
+  service: string; // Changed from category
 
   @IsString()
-  description: string;
+  @IsOptional()
+  phone?: string; // Changed from contactPhone
 
   @IsString()
-  contactPhone: string;
+  @IsOptional()
+  email?: string; // Changed from contactEmail
 
   @IsString()
-  contactEmail: string;
-
-  @IsString()
-  address: string;
+  residentialComplexId: string;
 }
 
 export class UpdateServiceProviderDto {
@@ -44,59 +43,31 @@ export class UpdateServiceProviderDto {
   name?: string;
 
   @IsOptional()
-  @IsEnum(ServiceProviderCategory)
-  category?: ServiceProviderCategory;
+  @IsString()
+  service?: string; // Changed from category
 
   @IsOptional()
   @IsString()
-  description?: string;
+  phone?: string; // Changed from contactPhone
 
   @IsOptional()
   @IsString()
-  contactPhone?: string;
+  email?: string; // Changed from contactEmail
 
   @IsOptional()
   @IsString()
-  contactEmail?: string;
-
-  @IsOptional()
-  @IsString()
-  address?: string;
+  residentialComplexId?: string;
 }
 
 export class ServiceProviderDto {
-  @IsNumber()
-  id: number;
-
-  @IsString()
+  id: string; // Changed from number
   name: string;
-
-  @IsEnum(ServiceProviderCategory)
-  category: ServiceProviderCategory;
-
-  @IsString()
-  description: string;
-
-  @IsString()
-  contactPhone: string;
-
-  @IsString()
-  contactEmail: string;
-
-  @IsString()
-  address: string;
-
-  @IsNumber()
-  rating: number;
-
-  @IsNumber()
-  reviewCount: number;
-
-  @IsString()
-  createdAt: string;
-
-  @IsString()
-  updatedAt: string;
+  service: string; // Changed from category
+  phone?: string; // Changed from contactPhone
+  email?: string; // Changed from contactEmail
+  residentialComplexId: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export class ServiceProviderFilterParamsDto {
@@ -105,8 +76,8 @@ export class ServiceProviderFilterParamsDto {
   search?: string;
 
   @IsOptional()
-  @IsEnum(ServiceProviderCategory)
-  category?: ServiceProviderCategory;
+  @IsString()
+  service?: string; // Changed from category
 
   @IsOptional()
   @Type(() => Number)
@@ -125,8 +96,8 @@ export class ServiceProviderFilterParamsDto {
 }
 
 export class CreateReviewDto {
-  @IsNumber()
-  serviceProviderId: number;
+  @IsString() // Changed from number
+  serviceProviderId: string;
 
   @IsNumber()
   rating: number;
@@ -137,25 +108,13 @@ export class CreateReviewDto {
 }
 
 export class ReviewDto {
-  @IsNumber()
-  id: number;
-
-  @IsNumber()
-  serviceProviderId: number;
-
-  @IsNumber()
-  userId: number;
-
-  @IsString()
+  id: string; // Changed from number
+  serviceProviderId: string; // Changed from number
+  userId: string; // Changed from number
   userName: string;
-
-  @IsNumber()
   rating: number;
-
   @IsOptional()
   @IsString()
   comment?: string;
-
-  @IsDateString()
-  createdAt: string;
+  createdAt: Date;
 }

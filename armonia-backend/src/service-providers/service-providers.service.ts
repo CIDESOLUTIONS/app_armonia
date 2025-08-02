@@ -68,8 +68,8 @@ export class ServiceProvidersService {
         { service: { contains: filters.search, mode: 'insensitive' } },
       ];
     }
-    if (filters.category) {
-      where.category = filters.category;
+    if (filters.service) { // Changed from filters.category
+      where.service = filters.service; // Changed from filters.category
     }
 
     const serviceProviders = await prisma.serviceProvider.findMany({
@@ -101,7 +101,7 @@ export class ServiceProvidersService {
     data: UpdateServiceProviderDto,
   ): Promise<ServiceProviderDto> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    const provider = await prisma.serviceProvider.findUnique({ where: { id } });
+    const provider = await this.prisma.getTenantDB(schemaName).serviceProvider.findUnique({ where: { id } }); // Corrected
 
     if (!provider) {
       throw new NotFoundException(

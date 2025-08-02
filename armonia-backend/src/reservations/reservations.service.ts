@@ -37,8 +37,8 @@ export class ReservationsService {
       status: reservation.status as ReservationStatus,
       createdAt: reservation.createdAt,
       updatedAt: reservation.updatedAt,
-      commonArea: reservation.amenity ? { ...reservation.amenity, residentialComplexId: reservation.amenity.residentialComplexId, createdAt: reservation.amenity.createdAt, updatedAt: reservation.amenity.updatedAt } : undefined,
-      user: reservation.user ? { ...reservation.user } : undefined,
+      // commonArea: reservation.amenity ? { ...reservation.amenity, residentialComplexId: reservation.amenity.residentialComplexId, createdAt: reservation.amenity.createdAt, updatedAt: reservation.amenity.updatedAt } : undefined,
+      // user: reservation.user ? { ...reservation.user } : undefined,
       title: reservation.title, // Assuming title is part of the reservation model
       description: reservation.description, // Assuming description is part of the reservation model
       attendees: reservation.attendees, // Assuming attendees is part of the reservation model

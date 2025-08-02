@@ -19,28 +19,30 @@ export enum ReservationStatus {
 }
 
 export class CreateReservationDto {
-  @IsNumber()
-  commonAreaId: number;
-
-  @IsNumber()
-  userId: number;
+  @IsString()
+  amenityId: string;
 
   @IsString()
-  title: string;
+  userId: string;
+
+  @IsString()
+  @IsOptional()
+  title?: string;
 
   @IsString()
   @IsOptional()
   description?: string;
 
   @IsDateString()
-  startDateTime: string;
+  startTime: string;
 
   @IsDateString()
-  endDateTime: string;
+  endTime: string;
 
-  @IsNumber()
+  @IsArray()
+  @IsString({ each: true })
   @IsOptional()
-  attendees?: number;
+  attendees?: string[];
 
   @IsBoolean()
   @IsOptional()
@@ -66,39 +68,29 @@ export class UpdateReservationDto extends PartialType(CreateReservationDto) {
 }
 
 export class ReservationDto {
-  id: number;
-  commonAreaId: number;
-  commonArea: any; // Will be CommonAreaDto from inventory module
-  userId: number;
-  user: any; // Populated relation (UserDto)
-  title: string;
-  description?: string;
-  startDateTime: Date;
-  endDateTime: Date;
+  id: string;
+  amenityId: string;
+  userId: string;
+  startTime: Date;
+  endTime: Date;
   status: ReservationStatus;
-  attendees?: number;
-  requiresPayment?: boolean;
-  paymentAmount?: number;
-  paymentStatus?: string;
-  rejectionReason?: string;
-  approvedById?: number;
-  approvedAt?: Date;
-  cancellationReason?: string;
-  cancelledAt?: Date;
   createdAt: Date;
   updatedAt: Date;
+  title?: string;
+  description?: string;
+  attendees?: string[];
+  requiresPayment?: boolean;
+  paymentAmount?: number;
 }
 
 export class ReservationFilterParamsDto {
   @IsOptional()
-  @IsNumber()
-  @Type(() => Number)
-  commonAreaId?: number;
+  @IsString()
+  amenityId?: string;
 
   @IsOptional()
-  @IsNumber()
-  @Type(() => Number)
-  userId?: number;
+  @IsString()
+  userId?: string;
 
   @IsOptional()
   @IsEnum(ReservationStatus)

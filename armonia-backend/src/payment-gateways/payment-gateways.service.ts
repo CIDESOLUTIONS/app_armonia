@@ -14,8 +14,11 @@ export class PaymentGatewaysService {
     return {
       id: gateway.id,
       name: gateway.name,
-      config: gateway.config,
+      type: gateway.type,
+      apiKey: gateway.apiKey,
+      secretKey: gateway.secretKey,
       isActive: gateway.isActive,
+      supportedCurrencies: gateway.supportedCurrencies,
       createdAt: gateway.createdAt,
       updatedAt: gateway.updatedAt,
     };
@@ -29,8 +32,11 @@ export class PaymentGatewaysService {
     const gateway = await prisma.paymentGatewayConfig.create({
       data: {
         name: data.name,
-        config: data.config,
+        type: data.type,
+        apiKey: data.apiKey,
+        secretKey: data.secretKey,
         isActive: data.isActive,
+        supportedCurrencies: data.supportedCurrencies,
       },
     });
     return this.mapToPaymentGatewayConfigDto(gateway);
@@ -69,8 +75,11 @@ export class PaymentGatewaysService {
       where: { id },
       data: {
         name: data.name,
-        config: data.config,
+        type: data.type,
+        apiKey: data.apiKey,
+        secretKey: data.secretKey,
         isActive: data.isActive,
+        supportedCurrencies: data.supportedCurrencies,
       },
     });
     return this.mapToPaymentGatewayConfigDto(updatedGateway);

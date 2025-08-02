@@ -18,13 +18,16 @@ export class ResidentialComplexService {
       city: complex.city,
       country: complex.country,
       planId: complex.planId,
-      schemaName: complex.id, // Assuming schemaName is the complex ID
-      adminId: complex.adminId, // Assuming adminId exists in the model
-      contactEmail: complex.contactEmail, // Assuming contactEmail exists in the model
-      contactPhone: complex.contactPhone, // Assuming contactPhone exists in the model
-      status: complex.status, // Assuming status exists in the model
+      isActive: complex.isActive,
       createdAt: complex.createdAt,
-      updatedAt: complex.updatedAt,
+      updatedAt: complex.updated0At,
+      status: complex.status,
+      adminId: complex.adminId,
+      contactEmail: complex.contactEmail,
+      contactPhone: complex.contactPhone,
+      logoUrl: complex.logoUrl,
+      primaryColor: complex.primaryColor,
+      secondaryColor: complex.secondaryColor,
     };
   }
 
@@ -40,7 +43,14 @@ export class ResidentialComplexService {
         city: data.city,
         country: data.country,
         plan: { connect: { id: data.planId } },
-        // Assuming adminId, contactEmail, contactPhone, status are handled elsewhere or are optional
+        status: data.status,
+        admin: data.adminId ? { connect: { id: data.adminId } } : undefined,
+        contactEmail: data.contactEmail,
+        contactPhone: data.contactPhone,
+        logoUrl: data.logoUrl,
+        primaryColor: data.primaryColor,
+        secondaryColor: data.secondaryColor,
+        isActive: data.isActive,
       },
     });
     return this.mapToResidentialComplexDto(newComplex);
@@ -86,7 +96,14 @@ export class ResidentialComplexService {
         city: data.city,
         country: data.country,
         ...(data.planId && { plan: { connect: { id: data.planId } } }),
-        // Assuming adminId, contactEmail, contactPhone, status are handled elsewhere or are optional
+        status: data.status,
+        admin: data.adminId ? { connect: { id: data.adminId } } : undefined,
+        contactEmail: data.contactEmail,
+        contactPhone: data.contactPhone,
+        logoUrl: data.logoUrl,
+        primaryColor: data.primaryColor,
+        secondaryColor: data.secondaryColor,
+        isActive: data.isActive,
       },
     });
     return this.mapToResidentialComplexDto(updatedComplex);

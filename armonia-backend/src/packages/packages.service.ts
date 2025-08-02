@@ -28,11 +28,8 @@ export class PackagesService {
       deliveredAt: pkg.deliveredAt,
       notes: pkg.notes,
       residentialComplexId: pkg.residentialComplexId,
-      // Properties not in schema.prisma, so not mapped directly
-      // trackingNumber: pkg.trackingNumber,
-      // recipientUnit: pkg.recipientUnit,
-      // status: pkg.status,
-      // registrationDate: pkg.registrationDate,
+      createdAt: pkg.createdAt,
+      updatedAt: pkg.updatedAt,
     };
   }
 

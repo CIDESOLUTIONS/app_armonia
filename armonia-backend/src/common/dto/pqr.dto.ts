@@ -21,79 +21,22 @@ export enum PQRPriority {
   HIGH = 'HIGH',
 }
 
-export class PQRCommentDto {
-  @IsNumber()
-  id: number;
-
-  @IsNumber()
-  pqrId: number;
-
-  @IsNumber()
-  authorId: number;
-
-  @IsString()
-  authorName: string;
-
-  @IsString()
-  comment: string;
-
-  @IsString()
-  createdAt: string;
-}
-
 export class PQRDto {
-  @IsNumber()
-  id: number;
-
-  @IsString()
-  subject: string;
-
-  @IsString()
+  id: string;
+  title: string;
   description: string;
-
-  @IsEnum(PQRStatus)
+  type: string;
   status: PQRStatus;
-
-  @IsEnum(PQRPriority)
-  priority: PQRPriority;
-
-  @IsString()
-  category: string;
-
-  @IsNumber()
-  reportedById: number;
-
-  @IsString()
-  reportedByName: string;
-
-  @IsOptional()
-  @IsNumber()
-  assignedToId?: number;
-
-  @IsOptional()
-  @IsString()
-  assignedToName?: string;
-
-  @IsString()
+  reportedById: string;
+  residentialComplexId: string;
   createdAt: string;
-
-  @IsString()
   updatedAt: string;
-
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => PQRCommentDto)
-  comments: PQRCommentDto[];
 }
 
 export class GetPQRParamsDto {
   @IsOptional()
   @IsEnum(PQRStatus)
   status?: PQRStatus;
-
-  @IsOptional()
-  @IsEnum(PQRPriority)
-  priority?: PQRPriority;
 
   @IsOptional()
   @IsString()
@@ -106,44 +49,47 @@ export class GetPQRParamsDto {
 
 export class CreatePQRDto {
   @IsString()
-  subject: string;
+  title: string;
 
   @IsString()
   description: string;
 
   @IsString()
-  category: string;
+  type: string;
+
+  @IsString()
+  residentialComplexId: string;
+
+  @IsString()
+  reportedById: string;
 
   @IsOptional()
-  @IsEnum(PQRPriority)
-  priority?: PQRPriority;
-
-  @IsNumber()
-  reportedById: number;
+  @IsEnum(PQRStatus)
+  status?: PQRStatus;
 }
 
 export class UpdatePQRDto {
   @IsOptional()
   @IsString()
-  subject?: string;
+  title?: string;
 
   @IsOptional()
   @IsString()
   description?: string;
 
   @IsOptional()
+  @IsString()
+  type?: string;
+
+  @IsOptional()
   @IsEnum(PQRStatus)
   status?: PQRStatus;
 
   @IsOptional()
-  @IsEnum(PQRPriority)
-  priority?: PQRPriority;
+  @IsString()
+  residentialComplexId?: string;
 
   @IsOptional()
   @IsString()
-  category?: string;
-
-  @IsOptional()
-  @IsNumber()
-  assignedToId?: number;
+  reportedById?: string;
 }

@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class ResidentialComplexDto {
   @ApiProperty()
-  id: number;
+  id: string; // Changed to string
 
   @ApiProperty()
   name: string;
@@ -18,16 +18,23 @@ export class ResidentialComplexDto {
   country: string;
 
   @ApiProperty()
-  schemaName: string;
+  planId: string; // Changed to string
 
   @ApiProperty()
-  adminId: number;
+  @IsOptional()
+  status?: string; // Added
 
   @ApiProperty()
-  contactEmail: string;
+  @IsOptional()
+  adminId?: string; // Changed to string
 
   @ApiProperty()
-  contactPhone: string;
+  @IsOptional()
+  contactEmail?: string; // Added
+
+  @ApiProperty()
+  @IsOptional()
+  contactPhone?: string; // Added
 
   @ApiProperty({ required: false, nullable: true })
   logoUrl?: string;
@@ -37,9 +44,6 @@ export class ResidentialComplexDto {
 
   @ApiProperty({ required: false, nullable: true })
   secondaryColor?: string;
-
-  @ApiProperty()
-  planId: number;
 
   @ApiProperty()
   isActive: boolean;
@@ -70,19 +74,27 @@ export class CreateResidentialComplexDto {
 
   @ApiProperty()
   @IsString()
-  schemaName: string;
+  planId: string; // Changed to string
 
   @ApiProperty()
-  @IsInt()
-  adminId: number;
-
-  @ApiProperty()
+  @IsOptional()
   @IsString()
-  contactEmail: string;
+  status?: string; // Added
 
   @ApiProperty()
+  @IsOptional()
   @IsString()
-  contactPhone: string;
+  adminId?: string; // Changed to string
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  contactEmail?: string; // Added
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  contactPhone?: string; // Added
 
   @ApiProperty({ required: false, nullable: true })
   @IsOptional()
@@ -98,10 +110,6 @@ export class CreateResidentialComplexDto {
   @IsOptional()
   @IsString()
   secondaryColor?: string;
-
-  @ApiProperty()
-  @IsInt()
-  planId: number;
 
   @ApiProperty({ required: false, default: true })
   @IsOptional()
@@ -157,11 +165,21 @@ export class UpdateResidentialComplexDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
-  @IsInt()
-  planId?: number;
+  @IsString()
+  planId?: string; // Changed to string
 
   @ApiProperty({ required: false })
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  status?: string; // Added
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  adminId?: string; // Changed to string
 }
