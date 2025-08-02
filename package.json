@@ -7,7 +7,7 @@
     "build": "npx prisma generate --schema=./armonia-backend/prisma/schema.prisma && next build",
     "start": "next start",
     "lint": "eslint . --config eslint.config.mjs --fix",
-    "test": "vitest",
+    "test": "npx vitest",
     "test:e2e": "for pid in $(lsof -t -i:3000 -i:3001); do kill $pid; done || true && npm run build --prefix armonia-backend && (cd armonia-backend && npm run start:prod &) && npm run dev & sleep 10 && npx playwright test --config=playwright.config.ts && for pid in $(lsof -t -i:3000 -i:3001); do kill $pid; done || true"
   },
   "dependencies": {
@@ -39,7 +39,6 @@
     "@types/pdfkit": "^0.17.0",
     "@types/ws": "^8.18.1",
     "@vitejs/plugin-react": "^4.6.0",
-    "@zxing/browser": "^0.1.5",
     "axios": "^1.9.0",
     "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.1",

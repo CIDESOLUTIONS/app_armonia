@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { FinancesService } from './finances.service';
 import { FinancesController } from './finances.controller';
-import { PrismaService } from '../prisma/prisma.service';
-import { CommunicationsService } from '../communications/communications.service';
 import { PrismaModule } from '../prisma/prisma.module';
+import { CommunicationsModule } from '../communications/communications.module'; // Added
 
 @Module({
-  imports: [PrismaModule],
-  providers: [FinancesService, PrismaService, CommunicationsService],
+  imports: [PrismaModule, CommunicationsModule], // Added CommunicationsModule
+  providers: [FinancesService],
   controllers: [FinancesController],
+  exports: [FinancesService] // Added export for FinancesService if other modules need it
 })
 export class FinancesModule {}
