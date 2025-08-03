@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint . --config eslint.config.mjs --fix",
     "test": "npx vitest",
-    "test:e2e": "for pid in $(lsof -t -i:3000 -i:3001); do kill $pid; done || true && npm run build --prefix armonia-backend && (cd armonia-backend && npm run start:prod &) && npm run dev & sleep 10 && npx playwright test --config=playwright.config.ts && for pid in $(lsof -t -i:3000 -i:3001); do kill $pid; done || true"
+    "test:e2e": "for pid in $(lsof -t -i:3000 -i:3001); do kill $pid; done || true && npm run build --prefix armonia-backend && (cd armonia-backend && npm run start:prod &) && npm run dev & npx wait-on http://localhost:3000 http://localhost:3001 && npx playwright test --config=playwright.config.ts && for pid in $(lsof -t -i:3000 -i:3001); do kill $pid; done || true"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.844.0",
