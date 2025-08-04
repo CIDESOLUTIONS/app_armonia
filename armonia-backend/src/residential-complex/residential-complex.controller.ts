@@ -8,7 +8,7 @@ import {
   Param,
   UseGuards,
 } from '@nestjs/common';
-import { ResidentialComplexService } from './residential-complex.service';
+import { ResidentialComplexService } from './residential-complex.service'; // Restored original path
 import {
   CreateResidentialComplexDto,
   UpdateResidentialComplexDto,
