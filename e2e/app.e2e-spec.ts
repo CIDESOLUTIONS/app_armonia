@@ -248,7 +248,7 @@ test.describe("Armonía Application E2E Tests", () => {
     );
     await page.click('button:has-text("Publicar Anuncio")');
     await expect(
-      page.locator("text=Anuncio publicado correctamente"),
+      page.locator("text=Anuncio publicado correctamente."),
     ).toBeVisible();
   });
 
@@ -271,7 +271,6 @@ test.describe("Armonía Application E2E Tests", () => {
     page,
   }) => {
     await page.goto("/admin/pqr"); // Adjust to actual PQR URL
-    // Create PQR
     await page.click('button:has-text("Crear Nueva PQR")');
     await page.fill('input[name="subject"]', "PQR de Prueba E2E");
     await page.fill(
@@ -283,8 +282,7 @@ test.describe("Armonía Application E2E Tests", () => {
     await page.click('button:has-text("Crear PQR")');
     await expect(page.locator("text=PQR creada correctamente.")).toBeVisible();
 
-    // Add comment
-    await page.click('button:has-text("Ver")'); // Assuming a view button exists
+    await page.click('button:has-text("Ver")');
     await page.fill(
       'textarea[placeholder="Añadir un comentario..."]',
       "Este es un comentario de prueba.",
@@ -294,15 +292,13 @@ test.describe("Armonía Application E2E Tests", () => {
       page.locator("text=Comentario añadido correctamente."),
     ).toBeVisible();
 
-    // Assign PQR
-    await page.click('button:has-text("Asignar")'); // Assuming an assign button exists
-    await page.fill('input[name="assignedToUser"]', "1"); // Assuming user ID 1 exists
+    await page.click('button:has-text("Asignar")');
+    await page.fill('input[name="assignedToUser"]', "1");
     await page.click('button:has-text("Asignar")');
     await expect(
       page.locator("text=PQR asignada correctamente."),
     ).toBeVisible();
 
-    // Update PQR status
     await page.click('button:has-text("Editar")');
     await page.selectOption('select[name="status"]', "IN_PROGRESS");
     await page.click('button:has-text("Guardar Cambios")');
@@ -310,7 +306,6 @@ test.describe("Armonía Application E2E Tests", () => {
       page.locator("text=PQR actualizada correctamente."),
     ).toBeVisible();
 
-    // Delete PQR
     await page.click('button:has-text("Eliminar")');
     await page.click('button:has-text("Confirmar Eliminación")');
     await expect(
@@ -320,7 +315,7 @@ test.describe("Armonía Application E2E Tests", () => {
 
   // CP-210 - Generación de cuotas administrativas (por coeficiente)
   test("CP-210: should generate ordinary fees", async ({ page }) => {
-    await page.goto("/admin/finances/fees"); // Adjust to actual fees URL
+    await page.goto("/admin/finances/fees");
     await page.click('button:has-text("Generar Cuotas del Período")');
     await expect(
       page.locator("text=Cuotas generadas para el próximo período."),
@@ -329,10 +324,10 @@ test.describe("Armonía Application E2E Tests", () => {
 
   // CP-211 - Registro de pagos manuales
   test("CP-211: should register manual payments", async ({ page }) => {
-    await page.goto("/admin/finances/payments"); // Adjust to actual payments URL
+    await page.goto("/admin/finances/payments");
     await page.click('button:has-text("Registrar Pago Manual")');
-    await page.fill('input[name="feeId"]', "1"); // Assuming fee ID 1 exists
-    await page.fill('input[name="userId"]', "1"); // Assuming user ID 1 exists
+    await page.fill('input[name="feeId"]', "1");
+    await page.fill('input[name="userId"]', "1");
     await page.fill('input[name="amount"]', "100");
     await page.fill('input[name="paymentDate"]', "2025-07-26");
     await page.selectOption('select[name="paymentMethod"]', "Cash");
@@ -344,7 +339,7 @@ test.describe("Armonía Application E2E Tests", () => {
 
   // CP-213 - Generación de paz y salvo
   test("CP-213: should generate peace and safe report", async ({ page }) => {
-    await page.goto("/admin/finances/reports"); // Adjust to actual reports URL
+    await page.goto("/admin/finances/reports");
     await page.selectOption('select[name="reportType"]', "PEACE_AND_SAFE");
     await page.fill('input[name="startDate"]', "2025-01-01");
     await page.fill('input[name="endDate"]', "2025-12-31");
@@ -356,11 +351,11 @@ test.describe("Armonía Application E2E Tests", () => {
 
   // CP-214 - Conciliación Bancaria Automática
   test("CP-214: should perform bank reconciliation", async ({ page }) => {
-    await page.goto("/admin/finances/bank-reconciliation"); // Adjust to actual bank reconciliation URL
+    await page.goto("/admin/finances/bank-reconciliation");
     await page.setInputFiles(
       'input[type="file"]',
       "path/to/your/bank_statement.xlsx",
-    ); // Replace with a dummy file path
+    );
     await page.click('button:has-text("Conciliar Extracto")');
     await expect(
       page.locator("text=Conciliación bancaria completada."),
@@ -371,10 +366,10 @@ test.describe("Armonía Application E2E Tests", () => {
   test("CP-215: should manage amenity reservations (CRUD, approve/reject)", async ({
     page,
   }) => {
-    await page.goto("/admin/reservations"); // Adjust to actual reservations URL
+    await page.goto("/admin/reservations");
     await page.click('button:has-text("Crear Nueva Reserva")');
-    await page.selectOption('select[name="commonAreaId"]', "1"); // Assuming amenity ID 1 exists
-    await page.selectOption('select[name="userId"]', "1"); // Assuming user ID 1 exists
+    await page.selectOption('select[name="commonAreaId"]', "1");
+    await page.selectOption('select[name="userId"]', "1");
     await page.fill('input[name="title"]', "Reserva de Piscina E2E");
     await page.fill('input[name="startDateTime"]', "2025-08-01T10:00");
     await page.fill('input[name="endDateTime"]', "2025-08-01T12:00");
@@ -383,19 +378,16 @@ test.describe("Armonía Application E2E Tests", () => {
       page.locator("text=Reserva creada correctamente."),
     ).toBeVisible();
 
-    // Approve reservation
     await page.click('button:has-text("Aprobar")');
     await expect(
       page.locator("text=Reserva aprobada correctamente."),
     ).toBeVisible();
 
-    // Reject reservation
     await page.click('button:has-text("Rechazar")');
     await expect(
       page.locator("text=Reserva rechazada correctamente."),
     ).toBeVisible();
 
-    // Delete reservation
     await page.click('button:has-text("Eliminar")');
     await page.click('button:has-text("Confirmar Eliminación")');
     await expect(
@@ -405,7 +397,7 @@ test.describe("Armonía Application E2E Tests", () => {
 
   // CP-216 - Gestión de proyectos/obras (Crear, Actualizar, Eliminar)
   test("CP-216: should manage projects (CRUD)", async ({ page }) => {
-    await page.goto("/admin/projects/list"); // Adjust to actual projects list URL
+    await page.goto("/admin/projects/list");
     await page.click('button:has-text("Crear Nuevo Proyecto")');
     await page.fill('input[name="title"]', "Proyecto E2E");
     await page.fill(
@@ -422,7 +414,6 @@ test.describe("Armonía Application E2E Tests", () => {
       page.locator("text=Proyecto creado correctamente."),
     ).toBeVisible();
 
-    // Edit project
     await page.click('button:has-text("Editar")');
     await page.fill('input[name="collectedFunds"]', "5000");
     await page.click('button:has-text("Guardar Cambios")');
@@ -430,7 +421,6 @@ test.describe("Armonía Application E2E Tests", () => {
       page.locator("text=Proyecto actualizado correctamente."),
     ).toBeVisible();
 
-    // Delete project
     await page.click('button:has-text("Eliminar")');
     await page.click('button:has-text("Confirmar Eliminación")');
     await expect(
@@ -440,7 +430,7 @@ test.describe("Armonía Application E2E Tests", () => {
 
   // CP-217 - Registro y roles de personal operativo (Crear, Actualizar, Eliminar)
   test("CP-217: should manage staff users (CRUD)", async ({ page }) => {
-    await page.goto("/admin/user-management/staff"); // Adjust to actual staff management URL
+    await page.goto("/admin/user-management/staff");
     await page.click('button:has-text("Añadir Personal")');
     await page.fill('input[name="name"]', "Staff E2E");
     await page.fill('input[name="email"]', `staff.e2e.${Date.now()}@test.com`);
@@ -451,7 +441,6 @@ test.describe("Armonía Application E2E Tests", () => {
       page.locator("text=Usuario creado correctamente"),
     ).toBeVisible();
 
-    // Edit staff user
     await page.click('button:has-text("Editar")');
     await page.selectOption('select[name="role"]', "SECURITY");
     await page.click('button:has-text("Guardar")');
@@ -459,20 +448,19 @@ test.describe("Armonía Application E2E Tests", () => {
       page.locator("text=Usuario actualizado correctamente"),
     ).toBeVisible();
 
-    // Delete staff user
     await page.click('button:has-text("Eliminar")');
     await page.click('button:has-text("Confirmar Eliminación")');
     await expect(
-      page.locator("text=Usuario eliminado correctamente"),
+      page.locator("text=Usuario eliminado correctamente."),
     ).toBeVisible();
   });
 
-  // CP-300 - Login residente (already covered by CP-200 logic, but ensure resident specific redirect)
+  // CP-300 - Login residente
   test("CP-300: should allow resident login and redirect to resident dashboard", async ({
     page,
   }) => {
     const residentEmail = `resident.login.${Date.now()}@test.com`;
-    await page.goto("/register-complex"); // Assuming resident can register via complex registration
+    await page.goto("/register-complex");
     await page.fill('input[name="complexName"]', "Resident Test Complex");
     await page.fill('input[name="adminName"]', "Resident Admin");
     await page.fill('input[name="email"]', residentEmail);
@@ -480,22 +468,19 @@ test.describe("Armonía Application E2E Tests", () => {
     await page.click('button[type="submit"]');
     await expect(page.locator("text=¡Registro Exitoso!")).toBeVisible();
 
-    await page.goto("/login?portal=resident");
-    await page.fill('input[name="email"]', residentEmail);
-    await page.fill('input[name="password"]', "password123"); // Assuming default password
-    await page.click('button:has-text("Iniciar Sesión")');
-    await expect(page).toHaveURL(/.*resident\/resident-dashboard/); // Adjust to actual resident dashboard URL
+    await login(page, residentEmail, "password123", 'resident');
+    await expect(page).toHaveURL(/.*resident\/resident-dashboard/);
   });
 
   // CP-301 - Visualización de comunicados
   test("CP-301: should view announcements", async ({ page }) => {
-    await page.goto("/resident/communications/resident-announcements"); // Adjust to actual announcements URL
-    await expect(page.locator("text=Anuncio de Prueba E2E")).toBeVisible(); // Assuming an announcement was created by admin
+    await page.goto("/resident/communications/resident-announcements");
+    await expect(page.locator("text=Anuncio de Prueba E2E")).toBeVisible();
   });
 
   // CP-302 - Realizar pago en línea
   test("CP-302: should initiate online payment", async ({ page }) => {
-    await page.goto("/resident/financial/fees"); // Adjust to actual fees URL
+    await page.goto("/resident/financial/fees");
     await page.click('button:has-text("Pagar")');
     await expect(
       page.locator("text=Pago iniciado correctamente"),
@@ -504,10 +489,10 @@ test.describe("Armonía Application E2E Tests", () => {
 
   // CP-303 - Reserva de amenidad
   test("CP-303: should create amenity reservation", async ({ page }) => {
-    await page.goto("/resident/resident-reservations"); // Adjust to actual reservations URL
+    await page.goto("/resident/resident-reservations");
     await page.click('button:has-text("Crear Nueva Reserva")');
-    await page.selectOption('select[name="commonAreaId"]', "1"); // Assuming amenity ID 1 exists
-    await page.selectOption('select[name="userId"]', "1"); // Assuming user ID 1 exists
+    await page.selectOption('select[name="commonAreaId"]', "1");
+    await page.selectOption('select[name="userId"]', "1");
     await page.fill('input[name="title"]', "Reserva de Cancha E2E");
     await page.fill('input[name="startDateTime"]', "2025-08-02T10:00");
     await page.fill('input[name="endDateTime"]', "2025-08-02T12:00");
@@ -521,7 +506,7 @@ test.describe("Armonía Application E2E Tests", () => {
   test("CP-304: should pre-register visitor and generate QR", async ({
     page,
   }) => {
-    await page.goto("/resident/security/pre-register-visitor"); // Adjust to actual pre-register URL
+    await page.goto("/resident/security/pre-register-visitor");
     await page.fill('input[name="name"]', "Visitor E2E");
     await page.selectOption('select[name="documentType"]', "CC");
     await page.fill('input[name="documentNumber"]', "123456789");
@@ -532,12 +517,12 @@ test.describe("Armonía Application E2E Tests", () => {
     await expect(
       page.locator("text=Visitante preregistrado y QR generado."),
     ).toBeVisible();
-    await expect(page.locator("canvas")).toBeVisible(); // Expect QR code to be visible
+    await expect(page.locator("canvas")).toBeVisible();
   });
 
   // CP-305 - Botón de pánico (registro y notificación)
   test("CP-305: should trigger panic alert", async ({ page }) => {
-    await page.goto("/resident/security/panic-button"); // Adjust to actual panic button URL
+    await page.goto("/resident/security/panic-button");
     await page.click('button:has-text("PÁNICO")');
     await expect(
       page.locator("text=Se ha enviado una alerta de pánico a seguridad."),
@@ -546,7 +531,7 @@ test.describe("Armonía Application E2E Tests", () => {
 
   // CP-306 - Gestión de presupuesto familiar
   test("CP-306: should manage family budget", async ({ page }) => {
-    await page.goto("/resident/financial/family-budget"); // Adjust to actual family budget URL
+    await page.goto("/resident/financial/family-budget");
     await page.click('button:has-text("Añadir Entrada")');
     await page.fill('input[name="description"]', "Salario");
     await page.fill('input[name="amount"]', "2000");
