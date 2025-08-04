@@ -9,6 +9,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
   maxFailures: 1, // Added: Stop after first failure
+  globalSetup: require.resolve('./playwright.global-setup'), // Added globalSetup
   use: {
     baseURL: "http://localhost:3000",
     trace: "on-first-retry",
