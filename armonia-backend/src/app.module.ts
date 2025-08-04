@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -20,7 +20,7 @@ import { SecurityModule } from './security/security.module';
 import { PlansModule } from './plans/plans.module';
 import { BankReconciliationModule } from './bank-reconciliation/bank-reconciliation.module';
 import { DocumentsModule } from './documents/documents.module';
-import { PaymentGatewaysModule } from './payment-gateways/payment-gateways.module';
+import { PaymentGatewaysModule } from './payment-gateways/payment-gateways.module'; // Uncommented
 import { ResidentialComplexModule } from './residential-complex/residential-complex.module';
 import { InsurtechModule } from './insurtech/insurtech.module';
 import { ReportsModule } from './reports/reports.module';

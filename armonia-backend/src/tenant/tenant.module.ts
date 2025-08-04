@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TenantController } from './tenant.controller';
-import { TenantService } from './tenant.service';
+import { TenantService } from './tenant.service'; // Original path
 
 @Module({
   controllers: [TenantController],

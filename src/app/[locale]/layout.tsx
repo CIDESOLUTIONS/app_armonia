@@ -5,11 +5,15 @@ import { RealTimeNotificationProvider } from "@/context/RealTimeNotificationCont
 import { ModalProvider } from "@/hooks/useModal";
 import "../globals.css";
 
-export default function LocaleLayout({
+export default async function LocaleLayout({
   children,
+  params, // Await params before destructuring
 }: {
   children: React.ReactNode;
+  params: { locale: string };
 }) {
+  const { locale } = await params; // Destructure locale after awaiting params
+
   return (
     <html lang={locale}>
       <body className="font-sans">

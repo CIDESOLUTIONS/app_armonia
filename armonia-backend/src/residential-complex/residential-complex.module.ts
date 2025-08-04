@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ResidentialComplexService } from './residential-complex.service';
+import { ResidentialComplexService } from './residential-complex.service'; // Original path
 import { ResidentialComplexController } from './residential-complex.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 
