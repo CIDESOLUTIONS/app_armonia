@@ -4,8 +4,7 @@ import { Providers } from "@/components/providers";
 import { RealTimeNotificationProvider } from "@/context/RealTimeNotificationContext";
 import { ModalProvider } from "@/hooks/useModal";
 import "../globals.css";
-import { NextIntlClientProvider } from "next-intl"; // Import NextIntlClientProvider
-import { getMessages } from "@/i18n"; // Assuming this function exists to load messages
+import { NextIntlClientProvider } from "next-intl";
 
 export default async function LocaleLayout({
   children,
@@ -15,12 +14,20 @@ export default async function LocaleLayout({
   params: { locale: string };
 }) {
   const { locale } = await params;
-  const messages = await getMessages(locale); // Load messages for the current locale
+  
+  // Load messages dynamically
+  let messages;
+  try {
+    messages = (await import(`@/locales/${locale}.json`)).default;
+  } catch (error) {
+    // Fallback to Spanish if locale not found
+    messages = (await import(`@/locales/es.json`)).default;
+  }
 
   return (
     <html lang={locale}>
       <body className="font-sans">
-        <NextIntlClientProvider messages={messages} locale={locale}> {/* Wrap with NextIntlClientProvider */}
+        <NextIntlClientProvider messages={messages} locale={locale}>
           <Providers>
             <RealTimeNotificationProvider>
               <ModalProvider>{children}</ModalProvider>
