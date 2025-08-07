@@ -5,7 +5,7 @@
     "target": "ES2021",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./", // Reverted
+    "baseUrl": "./",
     "paths": {
       "@armonia-backend/*": ["src/*"],
       "@test/*": ["test/*"]
@@ -13,11 +13,6 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "skipLibCheck": true,
-    "skipLibCheck": true,
-    "skipLibCheck": true,
-    "skipLibCheck": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
