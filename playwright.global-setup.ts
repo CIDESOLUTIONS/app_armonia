@@ -10,7 +10,7 @@ async function globalSetup(config: FullConfig) {
   // Register complex and admin
   const browser = await chromium.launch();
   const page = await browser.newPage();
-  await page.goto(`${baseURL}/register-complex`);
+  await page.goto(`${baseURL}/es/register-complex`);
   await page.fill('input[name="complexName"]', "Global Setup Complex");
   await page.fill('input[name="adminName"]', "Global Admin");
   await page.fill('input[name="email"]', adminEmail);

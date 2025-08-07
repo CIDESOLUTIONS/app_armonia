@@ -2,17 +2,17 @@ import { test, expect, Page } from "@playwright/test";
 
 // Helper function for reliable login
 async function login(page: Page, email: string, password: string, portal: 'admin' | 'resident' | 'reception') {
-  await page.goto(`/login?portal=${portal}`);
+  await page.goto(`/es/login?portal=${portal}`);
   await page.fill('input[name="email"]', email);
   await page.fill('input[name="password"]', password);
   await page.click('button:has-text("Iniciar Sesión")');
   // Wait for navigation to complete and check for a common element on the dashboard
   if (portal === 'admin') {
-    await expect(page).toHaveURL(/.*admin\/app-admin\/dashboard/); // Adjust to actual admin dashboard URL
+    await expect(page).toHaveURL(/.*\/es\/admin/); // Adjust to actual admin dashboard URL
   } else if (portal === 'resident') {
-    await expect(page).toHaveURL(/.*resident\/resident-dashboard/); // Adjust to actual resident dashboard URL
+    await expect(page).toHaveURL(/.*\/es\/resident/); // Adjust to actual resident dashboard URL
   } else if (portal === 'reception') {
-    await expect(page).toHaveURL(/.*reception-portal\/reception-dashboard/); // Adjust to actual security dashboard URL
+    await expect(page).toHaveURL(/.*\/es\/reception/); // Adjust to actual security dashboard URL
   }
 }
 
@@ -34,7 +34,7 @@ test.describe("Armonía Application E2E Tests", () => {
   // For now, I'll keep it as is, but it might be redundant if globalSetup handles registration.
   test("CP-100: should allow new complex registration", async ({ page }) => {
     const newComplexEmail = `new.complex.${Date.now()}@test.com`;
-    await page.goto("/register-complex");
+    await page.goto("/es/register-complex");
     await page.fill('input[name="complexName"]', "New Complex E2E");
     await page.fill('input[name="adminName"]', "New Admin E2E");
     await page.fill('input[name="email"]', newComplexEmail);
@@ -60,7 +60,7 @@ test.describe("Armonía Application E2E Tests", () => {
   test("CP-200: should allow admin login", async ({ page }) => {
     // The beforeEach hook already handles the admin login.
     // This test now just verifies the URL after login.
-    await expect(page).toHaveURL(/.*admin\/app-admin\/dashboard/); // Adjust to actual admin dashboard URL
+    await expect(page).toHaveURL(/.*\/es\/admin/); // Adjust to actual admin dashboard URL
   });
 
   // CP-201 - Gestión de inmuebles (Crear, Editar, Eliminar)
@@ -460,7 +460,7 @@ test.describe("Armonía Application E2E Tests", () => {
     page,
   }) => {
     const residentEmail = `resident.login.${Date.now()}@test.com`;
-    await page.goto("/register-complex");
+    await page.goto("/es/register-complex");
     await page.fill('input[name="complexName"]', "Resident Test Complex");
     await page.fill('input[name="adminName"]', "Resident Admin");
     await page.fill('input[name="email"]', residentEmail);
