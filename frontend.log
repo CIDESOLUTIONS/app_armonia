@@ -3,30 +3,36 @@ nohup: ignoring input
 > armonia-frontend@0.1.0 dev
 > npx tsx server.ts
 
-Error: listen EADDRINUSE: address already in use :::3000
-    at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
-    at <unknown> (server.ts:39:13) {
-  code: 'EADDRINUSE',
-  errno: -98,
-  syscall: 'listen',
-  address: '::',
-  port: 3000
+> Ready on http://localhost:3000
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 1408ms (257 modules)
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 9.1s (847 modules)
+ GET /es/register-complex 404 in 9875ms
+ ✓ Compiled in 1107ms (329 modules)
+ GET /es/register-complex 404 in 75ms
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 1795ms (990 modules)
+ ⨯ Error: @prisma/client did not initialize yet. Please run "prisma generate" and try to import it again.
+    at eval (src/lib/prisma.ts:9:20)
+    at <unknown> (rsc)/./src/lib/prisma.ts (/home/ubuntu/app_armonia/.next/server/app/api/auth/[...nextauth]/route.js:76:1)
+    at eval (webpack-internal:///(rsc)/./src/lib/authOptions.ts:13:69)
+    at <unknown> (rsc)/./src/lib/authOptions.ts (/home/ubuntu/app_armonia/.next/server/app/api/auth/[...nextauth]/route.js:54:1)
+    at eval (webpack-internal:///(rsc)/./src/app/api/auth/[...nextauth]/route.ts:6:74)
+    at <unknown> (rsc)/./src/app/api/auth/[...nextauth]/route.ts (/home/ubuntu/app_armonia/.next/server/app/api/auth/[...nextauth]/route.js:43:1)
+    at __webpack_exec__ (.next/server/app/api/auth/[...nextauth]/route.js:217:39)
+    at <unknown> (.next/server/app/api/auth/[...nextauth]/route.js:218:298)
+    at <unknown> (.next/server/app/api/auth/[...nextauth]/route.js:218:47)
+    at Object.<anonymous> (.next/server/app/api/auth/[...nextauth]/route.js:221:3)
+   7 | } else {
+   8 |   if (!global.prisma) {
+>  9 |     global.prisma = new PrismaClient();
+     |                    ^
+  10 |   }
+  11 |   prisma = global.prisma;
+  12 | } {
+  page: '/api/auth/session'
 }
- ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use :::3000
-    at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
-    at <unknown> (server.ts:39:13) {
-  code: 'EADDRINUSE',
-  errno: -98,
-  syscall: 'listen',
-  address: '::',
-  port: 3000
-}
- ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use :::3000
-    at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
-    at <unknown> (server.ts:39:13) {
-  code: 'EADDRINUSE',
-  errno: -98,
-  syscall: 'listen',
-  address: '::',
-  port: 3000
-}
+ ○ Compiling /_error ...
+ GET /api/auth/session 500 in 18182ms
+ ✓ Compiled /_error in 23.6s (1319 modules)
