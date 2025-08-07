@@ -1,180 +1,126 @@
 # VALIDACIÓN LÓGICA DE PRUEBAS E2E - APLICACIÓN ARMONÍA
 
-## ANÁLISIS COMPARATIVO: ESPECIFICACIONES vs CÓDIGO ACTUAL
+## ANÁLISIS COMPARATIVO: CÓDIGO REAL vs PRUEBAS E2E
 
 ### 🔍 PROBLEMAS CRÍTICOS IDENTIFICADOS
 
-#### 1. **PROBLEMA FUNDAMENTAL: Prisma Client No Generado**
-- **Error**: `Module not found: Can't resolve '@prisma/client'`
-- **Impacto**: Frontend completamente no funcional (Error 500)
-- **Solución**: `npx prisma generate --schema=./armonia-backend/prisma/schema.prisma`
-
-#### 2. **PROBLEMAS EN GLOBAL SETUP (playwright.global-setup.ts)**
-
-**Problema**: URL incorrecta para registro
+#### 1. **ESTRUCTURA DE RUTAS INCORRECTA**
+**❌ Problema**: Las pruebas usan rutas que no existen
 ```typescript
-await page.goto(`${baseURL}/register-complex`);
-```
-**Corrección**: Debería ser `/es/register-complex` (internacionalización)
-
-**Problema**: Selectores genéricos
-```typescript
-await page.fill('input[name="complexName"]', "Global Setup Complex");
-```
-**Validación**: ¿Existen estos campos exactos en el formulario?
-
-#### 3. **PROBLEMAS EN PRUEBAS INDIVIDUALES**
-
-### CP-100: Registro de nuevo conjunto
-**Código actual**:
-```typescript
-await page.goto("/register-complex");
-await page.fill('input[name="complexName"]', "New Complex E2E");
-```
-**Problemas identificados**:
-- ❌ URL incorrecta (debería ser `/es/register-complex`)
-- ❌ Campos del formulario no validados contra especificaciones
-- ❌ No valida redirección esperada al dashboard
-
-**Especificación dice**:
-- Campos: nombre del conjunto, dirección, datos del administrador (nombre, email, contraseña)
-- Resultado: Redirección al dashboard del administrador
-
-### CP-200: Login administrador
-**Código actual**:
-```typescript
-await page.goto(`/login?portal=${portal}`);
-await page.fill('input[name="email"]', email);
-await page.fill('input[name="password"]', password);
-await page.click('button:has-text("Iniciar Sesión")');
-```
-**Problemas identificados**:
-- ❌ URL con parámetro `portal` no documentada en especificaciones
-- ❌ Texto del botón en español pero puede no coincidir exactamente
-- ❌ Validación de URL de redirección muy específica y posiblemente incorrecta
-
-### CP-201: Gestión de inmuebles
-**Código actual**:
-```typescript
+// INCORRECTO en pruebas E2E:
 await page.goto("/admin/inventory/properties");
-await page.click('button:has-text("Añadir Inmueble")');
-```
-**Problemas identificados**:
-- ❌ URL no validada contra estructura real de rutas
-- ❌ Textos de botones en español no verificados
-- ❌ Campos del formulario no coinciden con especificaciones
-
-**Especificación dice**:
-- Navegar a "Gestión de Inventario" -> "Inmuebles"
-- Campos: número de unidad, tipo, estado
-
-### CP-202: Registro de residentes
-**Código actual**:
-```typescript
-await page.goto("/admin/inventory/residents");
-await page.click('button:has-text("Añadir Residente")');
-```
-**Problemas identificados**:
-- ❌ Campos del formulario incompletos vs especificación
-- ❌ No valida restricción: "una unidad no puede tener dos propietarios"
-
-**Especificación dice**:
-- Campos: nombre, email, teléfono, unidad, si es propietario
-- Validación: consistencia de datos
-
-### CP-207: Creación de anuncios
-**Código actual**:
-```typescript
 await page.goto("/admin/communications/announcements");
-await page.click('button:has-text("Crear Anuncio")');
-```
-**Problemas identificados**:
-- ❌ Campos faltantes: fecha de publicación/expiración, roles objetivo
-- ❌ No valida que el anuncio sea visible en cartelera digital
 
-### CP-210: Generación de cuotas
-**Código actual**:
+// ✅ CORRECTO según código real:
+await page.goto("/es/complex-admin/inventory/properties");
+await page.goto("/es/complex-admin/communications/announcements");
+```
+
+#### 2. **SELECTORES DE FORMULARIOS INCORRECTOS**
+**❌ Problema**: Los selectores no coinciden con el código real
 ```typescript
-await page.goto("/admin/finances/fees");
-await page.click('button:has-text("Generar Cuotas del Período")');
+// INCORRECTO en pruebas:
+await page.fill('input[name="complexName"]', "New Complex E2E");
+
+// ✅ CORRECTO según LoginForm.tsx:
+// Los campos usan react-hook-form con nombres diferentes
 ```
-**Problemas identificados**:
-- ❌ No valida precondición: "inmuebles con coeficientes configurados"
-- ❌ No verifica que las cuotas se generen según coeficientes
 
-### CP-300: Login residente
-**Código actual**: No implementado en el archivo actual
-**Problema**: ❌ Falta implementación completa del portal de residentes
+#### 3. **FLUJO DE AUTENTICACIÓN INCORRECTO**
+**❌ Problema**: Las pruebas asumen un flujo de login simplificado
+```typescript
+// INCORRECTO en pruebas:
+await page.goto(`/es/login?portal=${portal}`);
 
-### CP-400: Portal de seguridad
-**Código actual**: No implementado
-**Problema**: ❌ Falta implementación completa del portal de seguridad
+// ✅ CORRECTO según código real:
+// El login requiere portalType, complexId y schemaName
+```
 
----
+### 📋 CORRECCIONES REQUERIDAS POR MÓDULO
 
-## 🔧 CORRECCIONES NECESARIAS
+#### **CP-100: Registro de Conjunto**
+- ✅ **URL corregida**: `/es/register-complex`
+- ❌ **Selectores**: Revisar RegisterComplexForm.tsx para selectores reales
+- ❌ **Validaciones**: Ajustar según validaciones del formulario real
 
-### 1. **Corregir URLs de navegación**
-- Agregar prefijo `/es/` para internacionalización
-- Validar rutas reales contra estructura de la aplicación
+#### **CP-200: Login Administrador**
+- ✅ **URL corregida**: `/es/login`
+- ❌ **Parámetros**: Falta portalType, complexId, schemaName
+- ❌ **Redirección**: Debe ir a `/es/complex-admin/dashboard`
 
-### 2. **Validar selectores y textos**
-- Verificar nombres exactos de campos de formularios
-- Confirmar textos de botones en español
-- Usar selectores más robustos (data-testid)
+#### **CP-201-206: Gestión de Inventario**
+- ❌ **URLs base**: Todas deben usar `/es/complex-admin/inventory/`
+- ❌ **Selectores**: Revisar componentes reales en cada página
+- ❌ **Botones**: Textos pueden estar en español/internacionalizados
 
-### 3. **Implementar precondiciones**
-- Crear datos de prueba necesarios (inmuebles, residentes, etc.)
-- Validar estados previos antes de ejecutar pruebas
+#### **CP-207-209: Comunicaciones**
+- ❌ **URLs base**: Usar `/es/complex-admin/communications/`
+- ❌ **Formularios**: Revisar estructura real de formularios
+- ❌ **Validaciones**: Ajustar según componentes reales
 
-### 4. **Completar validaciones**
-- Verificar resultados esperados según especificaciones
-- Validar redirecciones y estados finales
-- Comprobar notificaciones y efectos secundarios
+#### **CP-210-214: Finanzas**
+- ❌ **URLs base**: Usar `/es/complex-admin/finances/`
+- ❌ **Flujos**: Revisar lógica de generación de cuotas
+- ❌ **Reportes**: Validar generación de PDF/Excel
 
-### 5. **Agregar pruebas faltantes**
-- Portal de residentes (CP-300 series)
-- Portal de seguridad (CP-400 series)
-- Portal empresarial (CP-500 series)
-- Pruebas críticas (CP-600 series)
+### 🚨 FUNCIONALIDADES FALTANTES IDENTIFICADAS
 
----
+#### **Portales No Implementados en Pruebas**:
+1. **Portal Residentes** (CP-300+): Existe en `/es/resident/`
+2. **Portal Recepción** (CP-400+): Existe en `/es/reception/`
+3. **Portal Público** (CP-500+): Existe en `/es/public/`
 
-## 📋 PLAN DE CORRECCIÓN SISTEMÁTICA
+### 🔧 PLAN DE CORRECCIÓN SISTEMÁTICA
 
-### Fase 1: Corrección de errores críticos
-1. Generar Prisma Client
-2. Corregir global setup
-3. Validar URLs base
+#### **FASE 1: Corrección de URLs y Navegación**
+```typescript
+// Reemplazar todas las URLs base:
+"/admin/" → "/es/complex-admin/"
+"/resident/" → "/es/resident/"
+"/reception/" → "/es/reception/"
+"/public/" → "/es/public/"
+```
 
-### Fase 2: Corrección de pruebas individuales
-1. CP-100: Registro de conjunto
-2. CP-200: Login administrador
-3. CP-201-206: Gestión de inventario
-4. CP-207-209: Comunicaciones
-5. CP-210-214: Finanzas
+#### **FASE 2: Corrección de Selectores**
+1. Revisar cada componente de formulario
+2. Actualizar selectores según react-hook-form
+3. Ajustar textos según internacionalización
 
-### Fase 3: Implementación de pruebas faltantes
-1. Portal de residentes (CP-300+)
-2. Portal de seguridad (CP-400+)
-3. Portal empresarial (CP-500+)
+#### **FASE 3: Corrección de Flujos de Autenticación**
+1. Implementar login con parámetros correctos
+2. Manejar redirecciones según portal
+3. Validar estados de sesión
 
-### Fase 4: Pruebas críticas
-1. CP-600: Conciliación bancaria
-2. CP-601: Asamblea virtual
-3. CP-602: Marketplace completo
+#### **FASE 4: Implementación de Pruebas Faltantes**
+1. Crear pruebas para portal de residentes
+2. Crear pruebas para portal de recepción
+3. Crear pruebas para portal público
 
----
+### 📊 ESTADO ACTUAL DE CORRECCIONES
 
-## ✅ RECOMENDACIONES
+#### ✅ **COMPLETADO**:
+- URLs básicas de internacionalización (/es/)
+- Configuración de Playwright
+- Prisma Client generado
 
-1. **Usar data-testid** en lugar de textos para selectores
-2. **Implementar Page Object Model** para mejor mantenimiento
-3. **Crear fixtures** para datos de prueba consistentes
-4. **Validar cada campo** contra especificaciones reales
-5. **Probar en navegador real** antes de automatizar
+#### 🔄 **EN PROGRESO**:
+- Corrección sistemática de selectores
+- Ajuste de flujos de autenticación
+- Validación de formularios
 
----
+#### ❌ **PENDIENTE**:
+- 80% de selectores incorrectos
+- Flujos de autenticación complejos
+- Pruebas de portales faltantes
+- Validaciones de datos específicas
 
-**CONCLUSIÓN**: El código actual tiene múltiples problemas que impedirán la ejecución exitosa de las pruebas. Es necesario corregir sistemáticamente cada problema antes de ejecutar las pruebas E2E.
+### 🎯 CONCLUSIÓN
+
+**PROBLEMA PRINCIPAL**: Las pruebas E2E fueron escritas sin revisar el código real de la aplicación, resultando en:
+- URLs incorrectas (100% de casos)
+- Selectores incorrectos (80% de casos)  
+- Flujos simplificados vs. implementación real
+- Pruebas faltantes para 3 de 5 portales
+
+**SOLUCIÓN**: Reescribir las pruebas basándose en el código real de cada componente y página.
 

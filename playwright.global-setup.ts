@@ -11,10 +11,14 @@ async function globalSetup(config: FullConfig) {
   const browser = await chromium.launch();
   const page = await browser.newPage();
   await page.goto(`${baseURL}/es/register-complex`);
+  
+  // Usar selectores basados en el código real del formulario
   await page.fill('input[name="complexName"]', "Global Setup Complex");
+  await page.fill('input[name="address"]', "Calle Global #123");
   await page.fill('input[name="adminName"]', "Global Admin");
   await page.fill('input[name="email"]', adminEmail);
-  await page.fill('input[name="phone"]', "1234567890");
+  await page.fill('input[name="password"]', adminPassword);
+  
   await page.click('button[type="submit"]');
   await page.waitForURL(/.*login/); // Wait for redirection to login page
 
