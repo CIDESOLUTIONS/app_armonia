@@ -21,10 +21,68 @@
     "passwordLabel": "Contraseña",
     "passwordPlaceholder": "Ingresa tu contraseña",
     "rememberMeLabel": "Recordarme",
+    "loginButton": "Ingresar",
     "submit": "Ingresar",
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "forgotPasswordLink": "¿Olvidaste tu contraseña?",
     "noAccount": "¿No tienes cuenta?",
-    "register": "Registrarse"
+    "register": "Registrarse",
+    "registerLink": "Registrar Conjunto",
+    "orSeparator": "o",
+    "toast": {
+      "authErrorTitle": "Error de Autenticación",
+      "authError": "Credenciales incorrectas"
+    }
+  },
+  "RegisterComplex": {
+    "title": "Registrar Conjunto Residencial",
+    "subtitle": "Complete la información para crear su conjunto",
+    "complexNameLabel": "Nombre del Conjunto",
+    "complexNamePlaceholder": "Ingrese el nombre del conjunto",
+    "addressLabel": "Dirección",
+    "addressPlaceholder": "Ingrese la dirección completa",
+    "adminNameLabel": "Nombre del Administrador",
+    "adminNamePlaceholder": "Ingrese su nombre completo",
+    "emailLabel": "Correo Electrónico",
+    "emailPlaceholder": "Ingrese su correo electrónico",
+    "passwordLabel": "Contraseña",
+    "passwordPlaceholder": "Ingrese una contraseña segura",
+    "submitButton": "Registrar Conjunto",
+    "toast": {
+      "success": "Conjunto registrado exitosamente",
+      "error": "Error al registrar el conjunto"
+    }
+  },
+  "Dashboard": {
+    "welcome": "Bienvenido",
+    "overview": "Resumen",
+    "statistics": "Estadísticas"
+  },
+  "Navigation": {
+    "dashboard": "Dashboard",
+    "inventory": "Inventario",
+    "communications": "Comunicaciones",
+    "finances": "Finanzas",
+    "pqr": "PQR",
+    "reports": "Reportes",
+    "settings": "Configuración"
+  },
+  "Common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "add": "Añadir",
+    "create": "Crear",
+    "update": "Actualizar",
+    "confirm": "Confirmar",
+    "yes": "Sí",
+    "no": "No",
+    "loading": "Cargando...",
+    "success": "Éxito",
+    "error": "Error",
+    "warning": "Advertencia",
+    "info": "Información"
   }
 }
+
