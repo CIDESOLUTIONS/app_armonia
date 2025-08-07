@@ -11,5 +11,20 @@
     "registerTitle": "Registra tu Conjunto Residencial",
     "registerSubtitle": "Inicia hoy y descubre una nueva forma de administrar.",
     "freeTrialButton": "Iniciar Prueba Gratuita"
+  },
+  "Login": {
+    "title": "Iniciar Sesión",
+    "email": "Correo Electrónico",
+    "emailLabel": "Correo Electrónico",
+    "emailPlaceholder": "Ingresa tu correo electrónico",
+    "password": "Contraseña",
+    "passwordLabel": "Contraseña",
+    "passwordPlaceholder": "Ingresa tu contraseña",
+    "rememberMeLabel": "Recordarme",
+    "submit": "Ingresar",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "forgotPasswordLink": "¿Olvidaste tu contraseña?",
+    "noAccount": "¿No tienes cuenta?",
+    "register": "Registrarse"
   }
 }
