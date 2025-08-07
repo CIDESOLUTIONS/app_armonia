@@ -1,18 +1,17 @@
-nohup: ignoring input
 
 > armonia-frontend@0.1.0 dev
 > npx tsx server.ts
 
 > Ready on http://localhost:3000
  ○ Compiling /middleware ...
- ✓ Compiled /middleware in 1408ms (257 modules)
+ ✓ Compiled /middleware in 2.4s (257 modules)
  ○ Compiling /_not-found ...
- ✓ Compiled /_not-found in 9.1s (847 modules)
- GET /es/register-complex 404 in 9875ms
- ✓ Compiled in 1107ms (329 modules)
- GET /es/register-complex 404 in 75ms
+ ✓ Compiled /_not-found in 10.5s (847 modules)
+ GET /es/register-complex 404 in 11353ms
+ ✓ Compiled in 1145ms (329 modules)
+ GET /es/register-complex 404 in 114ms
  ○ Compiling /api/auth/[...nextauth] ...
- ✓ Compiled /api/auth/[...nextauth] in 1795ms (990 modules)
+ ✓ Compiled /api/auth/[...nextauth] in 14.3s (990 modules)
  ⨯ Error: @prisma/client did not initialize yet. Please run "prisma generate" and try to import it again.
     at eval (src/lib/prisma.ts:9:20)
     at <unknown> (rsc)/./src/lib/prisma.ts (/home/ubuntu/app_armonia/.next/server/app/api/auth/[...nextauth]/route.js:76:1)
@@ -33,6 +32,5 @@ nohup: ignoring input
   12 | } {
   page: '/api/auth/session'
 }
+ GET /api/auth/session 500 in 17617ms
  ○ Compiling /_error ...
- GET /api/auth/session 500 in 18182ms
- ✓ Compiled /_error in 23.6s (1319 modules)
