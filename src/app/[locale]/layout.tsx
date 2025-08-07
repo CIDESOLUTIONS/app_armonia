@@ -1,5 +1,3 @@
-"use client";
-
 import { Providers } from "@/components/providers";
 import { RealTimeNotificationProvider } from "@/context/RealTimeNotificationContext";
 import { ModalProvider } from "@/hooks/useModal";
@@ -15,7 +13,7 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
   
-  // Load messages dynamically
+  // Load messages manually to avoid getMessages() issues
   let messages;
   try {
     messages = (await import(`@/locales/${locale}.json`)).default;

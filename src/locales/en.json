@@ -11,5 +11,78 @@
     "registerTitle": "Register Your Residential Complex",
     "registerSubtitle": "Start today and discover a new way of management.",
     "freeTrialButton": "Start Free Trial"
+  },
+  "Login": {
+    "title": "Login",
+    "email": "Email",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "rememberMeLabel": "Remember me",
+    "loginButton": "Login",
+    "submit": "Login",
+    "forgotPassword": "Forgot your password?",
+    "forgotPasswordLink": "Forgot your password?",
+    "noAccount": "Don't have an account?",
+    "register": "Register",
+    "registerLink": "Register Complex",
+    "orSeparator": "or",
+    "toast": {
+      "authErrorTitle": "Authentication Error",
+      "authError": "Invalid credentials"
+    }
+  },
+  "RegisterComplex": {
+    "title": "Register Residential Complex",
+    "subtitle": "Complete the information to create your complex",
+    "complexNameLabel": "Complex Name",
+    "complexNamePlaceholder": "Enter the complex name",
+    "addressLabel": "Address",
+    "addressPlaceholder": "Enter the complete address",
+    "adminNameLabel": "Administrator Name",
+    "adminNamePlaceholder": "Enter your full name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter your email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter a secure password",
+    "submitButton": "Register Complex",
+    "toast": {
+      "success": "Complex registered successfully",
+      "error": "Error registering complex"
+    }
+  },
+  "Dashboard": {
+    "welcome": "Welcome",
+    "overview": "Overview",
+    "statistics": "Statistics"
+  },
+  "Navigation": {
+    "dashboard": "Dashboard",
+    "inventory": "Inventory",
+    "communications": "Communications",
+    "finances": "Finances",
+    "pqr": "PQR",
+    "reports": "Reports",
+    "settings": "Settings"
+  },
+  "Common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "create": "Create",
+    "update": "Update",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "loading": "Loading...",
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Information"
   }
 }
+
