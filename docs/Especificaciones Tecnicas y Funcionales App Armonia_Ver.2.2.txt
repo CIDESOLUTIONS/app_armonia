@@ -1,8 +1,8 @@
 ﻿Proyecto Armonía
 Especificaciones Técnicas 
 Sistema de Administración de Conjuntos Residenciales
-Versión: 2.1
-Fecha de Actualización: 26 de julio de 2025
+Versión: 2.2
+Fecha de Actualización: 7 de Agosto de 2025
 
 1. Introducción
 
@@ -16,10 +16,10 @@ Nuestra misión es transformar radicalmente la gestión y la experiencia de vida
 * Construir Ecosistemas de Valor: Ir más allá del software para crear un ecosistema de servicios integrados y alianzas estratégicas que aumenten el valor y la seguridad de la propiedad, construyendo barreras de salida y una ventaja competitiva sostenible.
 * Liderar con Innovación Tecnológica: Utilizar nuestra arquitectura técnica superior para ofrecer una plataforma más rápida, segura y fiable, estableciendo el nuevo estándar de lo que es posible en el sector PropTech.
 
-2. Arquitectura y Stack Tecnológico
-* Frontend: Next.js 15+, React 19+ (con Server Components y Actions), TypeScript
+2. Arquitectura y Stack Tecnológico (Usar el conjunto de versiones de las dependencias mas actualizadas pero estables)
+* Frontend: Next.js, React (con Server Components y Actions), TypeScript
 * Backend: Node.js, NestJS
-* Base de Datos: PostgreSQL 17+
+* Base de Datos: PostgreSQL 17,5+
 * ORM: Prisma 6+ (schema.prisma en backend)
 * Autenticación: JWT (JSON Web Tokens)
 * Almacenamiento: PostgreSQL
