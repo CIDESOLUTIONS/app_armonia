@@ -1,18 +1,40 @@
+import createMiddleware from 'next-intl/middleware';
 import { auth } from "@/lib/authOptions";
 import { NextResponse } from "next/server";
+
+// Configuración de internacionalización
+const intlMiddleware = createMiddleware({
+  locales: ['es', 'en'],
+  defaultLocale: 'es',
+  localePrefix: 'always'
+});
 
 export default auth((req) => {
   const session = req.auth;
   const { pathname } = req.nextUrl;
 
-  // Rutas públicas que no requieren autenticación
+  // Aplicar middleware de internacionalización primero
+  const intlResponse = intlMiddleware(req);
+  
+  // Si el middleware de internacionalización redirige, usar esa respuesta
+  if (intlResponse.status !== 200) {
+    return intlResponse;
+  }
+
+  // Rutas públicas que no requieren autenticación (con prefijo de locale)
   const publicPaths = [
-    "/public",
-    "/public/login",
-    "/public/register-complex",
-    "/public/checkout",
-    "/public/login/forgot-password",
-    "/public/login/reset-password",
+    "/es/public",
+    "/en/public", 
+    "/es/login",
+    "/en/login",
+    "/es/register-complex",
+    "/en/register-complex",
+    "/es/checkout",
+    "/en/checkout",
+    "/es/forgot-password",
+    "/en/forgot-password",
+    "/es/reset-password", 
+    "/en/reset-password",
     "/api/auth", // Rutas de NextAuth
   ];
 
@@ -23,36 +45,41 @@ export default auth((req) => {
 
   // Si no hay sesión (no autenticado) y la ruta no es pública, redirigir a login
   if (!session) {
-    return NextResponse.redirect(new URL("/public/login", req.url));
+    const locale = pathname.split('/')[1] || 'es';
+    return NextResponse.redirect(new URL(`/${locale}/login`, req.url));
   }
 
-  // Rutas protegidas por rol
-  const adminPaths = ["/(admin)"];
-  const complexAdminPaths = ["/(complex-admin)"];
-  const residentPaths = ["/(resident)"];
-  const receptionPaths = ["/(reception)"];
+  // Rutas protegidas por rol (con prefijo de locale)
+  const adminPaths = ["/es/(admin)", "/en/(admin)"];
+  const complexAdminPaths = ["/es/(complex-admin)", "/en/(complex-admin)"];
+  const residentPaths = ["/es/(resident)", "/en/(resident)"];
+  const receptionPaths = ["/es/(reception)", "/en/(reception)"];
 
-  if (adminPaths.some((path) => pathname.startsWith(path))) {
+  if (adminPaths.some((path) => pathname.includes(path))) {
     if (session.user?.role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/access-denied", req.url));
+      const locale = pathname.split('/')[1] || 'es';
+      return NextResponse.redirect(new URL(`/${locale}/access-denied`, req.url));
     }
   }
 
-  if (complexAdminPaths.some((path) => pathname.startsWith(path))) {
+  if (complexAdminPaths.some((path) => pathname.includes(path))) {
     if (session.user?.role !== "COMPLEX_ADMIN") {
-      return NextResponse.redirect(new URL("/access-denied", req.url));
+      const locale = pathname.split('/')[1] || 'es';
+      return NextResponse.redirect(new URL(`/${locale}/access-denied`, req.url));
     }
   }
 
-  if (residentPaths.some((path) => pathname.startsWith(path))) {
+  if (residentPaths.some((path) => pathname.includes(path))) {
     if (session.user?.role !== "RESIDENT") {
-      return NextResponse.redirect(new URL("/access-denied", req.url));
+      const locale = pathname.split('/')[1] || 'es';
+      return NextResponse.redirect(new URL(`/${locale}/access-denied`, req.url));
     }
   }
 
-  if (receptionPaths.some((path) => pathname.startsWith(path))) {
+  if (receptionPaths.some((path) => pathname.includes(path))) {
     if (session.user?.role !== "RECEPTION") {
-      return NextResponse.redirect(new URL("/access-denied", req.url));
+      const locale = pathname.split('/')[1] || 'es';
+      return NextResponse.redirect(new URL(`/${locale}/access-denied`, req.url));
     }
   }
 
@@ -60,5 +87,11 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*) "], // Excluir rutas de API, estáticas y favicon
+  matcher: [
+    // Aplicar a todas las rutas excepto API, archivos estáticos y favicon
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    // Incluir rutas de API de autenticación si es necesario
+    '/api/auth/:path*'
+  ]
 };
+
