@@ -1,10 +1,11 @@
+'use client';
 import React from "react";
 import { useTranslations } from "next-intl";
 import { Plans } from "@/components/landing/Plans"; // Assuming Plans component is already there
 import { FadeIn } from "@/components/animations/FadeIn";
 
 export function PricingPlans() {
-  const { t } = useTranslation("landing");
+  const t = useTranslations("landing");
 
   return (
     <FadeIn delay={0.4}>

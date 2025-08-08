@@ -1,11 +1,12 @@
+import { locales, defaultLocale } from './src/constants/i18n';
 import createMiddleware from 'next-intl/middleware';
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from "@/lib/authOptions";
 
 // Configuración de internacionalización
 const intlMiddleware = createMiddleware({
-  locales: ['es', 'en'],
-  defaultLocale: 'es',
+  locales,
+  defaultLocale,
   localePrefix: 'always'
 });
 
@@ -60,6 +61,13 @@ const authMiddleware = auth((req) => {
 });
 
 export default function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Si la ruta es la raíz y no tiene prefijo de idioma, redirigir a /es
+  if (pathname === '/') {
+    return NextResponse.redirect(new URL(`/${defaultLocale}`, request.url));
+  }
+
   // Aplicar middleware de internacionalización primero
   const intlResponse = intlMiddleware(request);
   
@@ -75,7 +83,7 @@ export default function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     // Aplicar a todas las rutas excepto archivos estáticos y API
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api).*)',
     // Incluir rutas de API de autenticación
     '/api/auth/:path*'
   ]
