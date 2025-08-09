@@ -7,10 +7,53 @@
     "logout": "Cerrar Sesión",
     "roleSelector": "Seleccionar Rol"
   },
-  "LandingPage": {
-    "registerTitle": "Registra tu Conjunto Residencial",
-    "registerSubtitle": "Inicia hoy y descubre una nueva forma de administrar.",
-    "freeTrialButton": "Iniciar Prueba Gratuita"
+  "landing": {
+    "hero": {
+      "title": "Gestión Inteligente de Conjuntos Residenciales",
+      "subtitle": "Transforma la administración de tu conjunto con Armonía",
+      "description": "Plataforma todo-en-uno para finanzas, asambleas, seguridad y comunicación",
+      "ctaButton": "Comenzar Ahora",
+      "demoButton": "Ver Demo"
+    },
+    "features": {
+      "title": "Funcionalidades Principales",
+      "description": "Todo lo que necesitas para administrar tu conjunto residencial",
+      "inventory": {
+        "title": "Gestión de Inventario",
+        "description": "Administra propiedades, residentes, vehículos y mascotas"
+      },
+      "communications": {
+        "title": "Comunicaciones",
+        "description": "Mantén informados a todos los residentes"
+      },
+      "finances": {
+        "title": "Finanzas",
+        "description": "Control total de ingresos, gastos y presupuestos"
+      }
+    },
+    "statistics": {
+      "title": "Resultados Comprobados",
+      "complexes": "Conjuntos Activos",
+      "residents": "Residentes Satisfechos",
+      "savings": "Ahorro Promedio",
+      "efficiency": "Mejora en Eficiencia"
+    },
+    "testimonials": {
+      "title": "Lo que dicen nuestros clientes",
+      "subtitle": "Testimonios reales de administradores satisfechos"
+    },
+    "pricing": {
+      "title": "Planes y Precios",
+      "subtitle": "Elige el plan perfecto para tu conjunto",
+      "monthly": "Mensual",
+      "yearly": "Anual",
+      "save": "Ahorra 20%"
+    },
+    "contact": {
+      "title": "¿Listo para comenzar?",
+      "subtitle": "Contáctanos y descubre cómo Armonía puede transformar tu conjunto",
+      "button": "Contactar Ahora"
+    }
   },
   "Login": {
     "title": "Iniciar Sesión",
