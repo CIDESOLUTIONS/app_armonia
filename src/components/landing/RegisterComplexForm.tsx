@@ -26,16 +26,9 @@ const formSchema = z.object({
 type RegisterComplexFormValues = z.infer<typeof formSchema>;
 
 export function RegisterComplexForm() {
+  const { toast } = useToast();
+  const t = useTranslations("LandingPage");
   const [loading, setLoading] = useState(false);
-  const form = useForm<RegisterComplexFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      complexName: "",
-      adminName: "",
-      email: "",
-      phone: "",
-    },
-  });
 
   const onSubmit = async (data: RegisterComplexFormValues) => {
     setLoading(true);
