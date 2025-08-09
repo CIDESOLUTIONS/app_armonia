@@ -1,21 +1,12 @@
-import { getRequestConfig } from "next-intl/server";
-
-// Lista de locales soportados
-export const locales = ['es', 'en'] as const;
-export type Locale = (typeof locales)[number];
-
-// Locale por defecto
-export const defaultLocale: Locale = 'es';
-
-export default getRequestConfig(async ({ locale }) => {
-  // Validar que el locale sea soportado
-  if (!locales.includes(locale as Locale)) {
-    locale = defaultLocale;
-  }
-
+import {notFound} from 'next/navigation';
+import {getRequestConfig} from 'next-intl/server';
+import { locales, defaultLocale } from '@/constants/i18n';
+ 
+export default getRequestConfig(async ({locale}) => {
+  // Validate that the incoming `locale` parameter is valid
+  if (!locales.includes(locale as any)) notFound();
+ 
   return {
-    messages: (await import(`./locales/${locale}.json`)).default,
-    timeZone: "America/Bogota"
+    messages: (await import(`./locales/${locale}.json`)).default
   };
 });
-
