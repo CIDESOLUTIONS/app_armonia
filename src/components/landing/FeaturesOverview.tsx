@@ -29,19 +29,19 @@ export function FeaturesOverview() {
             <div className="flex flex-col items-center p-6 bg-gray-50 rounded-lg shadow-md">
               <Users className="text-indigo-600 mb-4" size={48} />
               <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                {t("features.assemblies.title")}
+                {t("features.communications.title")}
               </h3>
               <p className="text-gray-600 text-center">
-                {t("features.assemblies.description")}
+                {t("features.communications.description")}
               </p>
             </div>
             <div className="flex flex-col items-center p-6 bg-gray-50 rounded-lg shadow-md">
               <DollarSign className="text-indigo-600 mb-4" size={48} />
               <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                {t("features.financial.title")}
+                {t("features.finances.title")}
               </h3>
               <p className="text-gray-600 text-center">
-                {t("features.financial.description")}
+                {t("features.finances.description")}
               </p>
             </div>
           </div>

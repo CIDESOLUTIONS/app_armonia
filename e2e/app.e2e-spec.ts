@@ -365,4 +365,3 @@ test.describe("Portal de Recepción", () => {
     await expect(page.locator("h1, h2")).toContainText(["Dashboard", "Recepción", "Bienvenido"]);
   });
 });
-

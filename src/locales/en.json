@@ -7,10 +7,88 @@
     "logout": "Logout",
     "roleSelector": "Select Role"
   },
-  "LandingPage": {
-    "registerTitle": "Register Your Residential Complex",
-    "registerSubtitle": "Start today and discover a new way of management.",
-    "freeTrialButton": "Start Free Trial"
+  "landing": {
+    "hero": {
+      "title": "Intelligent Management of Residential Complexes",
+      "subtitle": "Transform the administration of your complex with Armonía",
+      "description": "All-in-one platform for finances, assemblies, security, and communication",
+      "ctaButton": "Get Started Now",
+      "demoButton": "View Demo"
+    },
+    "features": {
+      "title": "Main Features",
+      "description": "Everything you need to manage your residential complex",
+      "inventory": {
+        "title": "Inventory Management",
+        "description": "Manage properties, residents, vehicles, and pets",
+        "feature1": "Property and Unit Management",
+        "feature2": "Resident and Owner Registration",
+        "feature3": "Vehicle and Parking Management",
+        "feature4": "Pet Management"
+      },
+      "communications": {
+        "title": "Communications",
+        "description": "Keep all residents informed"
+      },
+      "finances": {
+        "title": "Financial Management",
+        "description": "Full control of income, expenses, and budgets",
+        "feature1": "Automated Fee Generation",
+        "feature2": "Manual Payment Registration",
+        "feature3": "Bank Reconciliation",
+        "feature4": "Financial Reports"
+      },
+      "assemblies": {
+        "title": "Assembly Management",
+        "description": "Organize and manage virtual assemblies efficiently",
+        "feature1": "Virtual Assembly Platform",
+        "feature2": "Quorum Control",
+        "feature3": "Voting and Polls",
+        "feature4": "Meeting Minutes Generation"
+      },
+      "resident": {
+        "title": "Resident Portal",
+        "description": "Access to payments, reservations, and communications"
+      },
+      "pqr": {
+        "title": "PQR Management",
+        "description": "Efficient handling of requests, complaints, and claims"
+      },
+      "reception": {
+        "title": "Security and Reception",
+        "description": "Visitor pre-registration, package control, and panic button"
+      }
+    },
+    "statistics": {
+      "title": "Proven Results",
+      "complexesManaged": "Complexes Managed",
+      "satisfiedResidents": "Satisfied Residents",
+      "savings": "Average Savings",
+      "efficiency": "Efficiency Improvement",
+      "userSatisfaction": "User Satisfaction",
+      "timeReduction": "Time Reduction"
+    },
+    "testimonials": {
+      "title": "What our clients say",
+      "subtitle": "Real testimonials from satisfied administrators"
+    },
+    "pricing": {
+      "title": "Plans and Pricing",
+      "subtitle": "Choose the perfect plan for your complex",
+      "monthly": "Monthly",
+      "yearly": "Annual",
+      "save": "Save 20%"
+    },
+    "contact": {
+      "title": "Ready to get started?",
+      "subtitle": "Contact us and discover how Armonía can transform your complex",
+      "button": "Contact Now",
+      "description": "Fill out the form below and we will get back to you shortly."
+    },
+    "video": {
+      "title": "Discover Armonía in Action",
+      "description": "Watch a quick demo of our platform's key features."
+    }
   },
   "Login": {
     "title": "Login",
@@ -85,4 +163,3 @@
     "info": "Information"
   }
 }
-

@@ -7,7 +7,11 @@
     "logout": "Cerrar Sesión",
     "roleSelector": "Seleccionar Rol"
   },
+<<<<<<< HEAD
   "landing": {
+=======
+   "landing": {
+>>>>>>> bd1f6e45c82be9578f8acae398abe388b429bb0c
     "hero": {
       "title": "Gestión Inteligente de Conjuntos Residenciales",
       "subtitle": "Transforma la administración de tu conjunto con Armonía",
@@ -55,7 +59,7 @@
       "button": "Contactar Ahora"
     }
   },
-  "Login": {
+   "Login": {
     "title": "Iniciar Sesión",
     "email": "Correo Electrónico",
     "emailLabel": "Correo Electrónico",
