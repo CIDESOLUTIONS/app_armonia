@@ -11,7 +11,7 @@ export function AdditionalFeatures() {
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold text-gray-800 mb-12">
-            Más Funcionalidades
+            {t("features.additionalFeaturesTitle")}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md">

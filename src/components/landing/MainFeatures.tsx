@@ -93,27 +93,27 @@ export function MainFeatures() {
           <div className="flex flex-col lg:flex-row items-center">
             <div className="lg:w-1/2 mb-8 lg:mb-0 lg:pr-12">
               <h3 className="text-3xl font-bold text-gray-800 mb-4">
-                {t("features.financial.title")}
+                {t("features.finances.title")}
               </h3>
               <p className="text-lg text-gray-600 mb-6">
-                {t("features.financial.description")}
+                {t("features.finances.description")}
               </p>
               <ul className="space-y-3 text-gray-700">
                 <li className="flex items-center">
                   <Check className="text-green-500 mr-2" size={20} />
-                  {t("features.financial.feature1")}
+                  {t("features.finances.feature1")}
                 </li>
                 <li className="flex items-center">
                   <Check className="text-green-500 mr-2" size={20} />
-                  {t("features.financial.feature2")}
+                  {t("features.finances.feature2")}
                 </li>
                 <li className="flex items-center">
                   <Check className="text-green-500 mr-2" size={20} />
-                  {t("features.financial.feature3")}
+                  {t("features.finances.feature3")}
                 </li>
                 <li className="flex items-center">
                   <Check className="text-green-500 mr-2" size={20} />
-                  {t("features.financial.feature4")}
+                  {t("features.finances.feature4")}
                 </li>
               </ul>
             </div>

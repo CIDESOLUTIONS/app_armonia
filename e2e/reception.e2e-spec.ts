@@ -20,36 +20,45 @@ async function login(page: Page, email: string, password: string, portal: 'admin
 }
 
 test.describe("Reception Portal E2E Tests", () => {
-  test.beforeEach(async ({ page }) => {
-    const receptionEmail = process.env.E2E_RECEPTION_EMAIL || `reception.e2e.${Date.now()}@test.com`;
-    const receptionPassword = process.env.E2E_RECEPTION_PASSWORD || "password123";
-    await login(page, receptionEmail, receptionPassword, 'reception');
-  });
+  const residentEmail = process.env.E2E_RESIDENT_EMAIL || `resident.e2e.${Date.now()}@test.com`;
+  const residentPassword = process.env.E2E_RESIDENT_PASSWORD || "password123";
+  const receptionEmail = process.env.E2E_RECEPTION_EMAIL || `reception.e2e.${Date.now()}@test.com`;
+  const receptionPassword = process.env.E2E_RECEPTION_PASSWORD || "password123";
 
   // CP-400 - Login personal de seguridad
   test("CP-400: should allow reception login", async ({ page }) => {
+    await login(page, receptionEmail, receptionPassword, 'reception');
     await expect(page).toHaveURL(/.*\/es\/reception/);
     await expect(page.locator("h1, h2")).toContainText(["Dashboard", "Recepción", "Bienvenido"]);
   });
 
   // CP-401 - Registro entrada de visitante con QR
   test("CP-401: should register visitor entry with QR", async ({ page }) => {
+    // 1. Login as resident and create a pre-registered visitor with QR
+    await login(page, residentEmail, residentPassword, 'resident');
+    await page.goto("/es/resident/visitors/pre-register");
+    await page.fill('input[name="name"]', "QR Visitor E2E");
+    await page.fill('input[name="documentNumber"]', "1234567890");
+    await page.click('button:has-text("Pre-registrar Visitante")');
+    const qrCodeSrc = await page.locator("img[alt=\"Código QR del visitante\"]").getAttribute('src');
+    const qrCodeData = qrCodeSrc ? qrCodeSrc.split(',')[1] : '';
+
+    // 2. Login as reception and scan the QR code
+    await login(page, receptionEmail, receptionPassword, 'reception');
     await page.goto("/es/reception/visitors");
-    await page.waitForLoadState('networkidle');
-    
-    // Simulate QR code input (e.g., a pre-registered visitor's QR data)
-    await page.fill('input[placeholder="Escanear o introducir código QR"]', "dummy_qr_data_for_preregistered_visitor");
+    await page.fill('input[placeholder="Escanear o introducir código QR"]', qrCodeData);
     await page.click('button:has-text("Escanear QR")');
     
     // Verify success message and scan result display
     await expect(page.locator("text=QR Code escaneado con éxito.")).toBeVisible();
     await expect(page.locator("text=Resultado del Escaneo:")).toBeVisible();
+    await expect(page.locator("text=QR Visitor E2E")).toBeVisible();
   });
 
   // CP-402 - Registro manual de visitantes
   test("CP-402: should register visitor manually", async ({ page }) => {
+    await login(page, receptionEmail, receptionPassword, 'reception');
     await page.goto("/es/reception/visitors");
-    await page.waitForLoadState('networkidle');
     await page.locator('button:has-text("Registrar Nuevo Visitante")').click();
     
     await page.fill('input[name="name"]', "Manual Visitor E2E");
@@ -72,8 +81,8 @@ test.describe("Reception Portal E2E Tests", () => {
 
   // CP-403 - Registro y notificación de paquetería
   test("CP-403: should register package and notify resident", async ({ page }) => {
+    await login(page, receptionEmail, receptionPassword, 'reception');
     await page.goto("/es/reception/visitors"); // Packages are on the same page as visitors
-    await page.waitForLoadState('networkidle');
     
     await page.locator('button:has-text("Registrar Paquete")').click(); // Click the button in the package section
     await page.fill('input[name="trackingNumber"]', "PKG-E2E-123");
@@ -87,8 +96,8 @@ test.describe("Reception Portal E2E Tests", () => {
 
   // CP-404 - Bitácora de novedades
   test("CP-404: should log new incident", async ({ page }) => {
+    await login(page, receptionEmail, receptionPassword, 'reception');
     await page.goto("/es/reception/incidents");
-    await page.waitForLoadState('networkidle');
     
     await page.locator('button:has-text("Registrar Nuevo Incidente")').click();
     await page.fill('input[name="title"]', "Incidente de Prueba E2E");
@@ -109,13 +118,18 @@ test.describe("Reception Portal E2E Tests", () => {
 
   // CP-405 - Activación y respuesta al botón de pánico
   test("CP-405: should receive and respond to panic alert", async ({ page }) => {
+    // 1. Login as resident and trigger the panic button
+    await login(page, residentEmail, residentPassword, 'resident');
+    await page.goto("/es/resident/dashboard");
+    await page.locator('button:has-text("Botón de Pánico")').click();
+    page.on('dialog', dialog => dialog.accept());
+    await expect(page.locator("text=Alerta de Pánico Activada")).toBeVisible();
+
+    // 2. Login as reception and verify the alert, then resolve it
+    await login(page, receptionEmail, receptionPassword, 'reception');
     await page.goto("/es/reception/panic-alerts");
-    await page.waitForLoadState('networkidle');
-    
-    // Precondition: A panic alert must exist in the system for this test to pass.
-    // In a real E2E setup, you would trigger this via an API call or a resident test.
-    // For now, we assume an alert is visible.
     await expect(page.locator("text=Alertas de Pánico Activas")).toBeVisible();
+    await expect(page.locator(`text=${residentEmail}`)).toBeVisible();
     
     // Click the 'Resolver' button for the first alert
     await page.locator('button:has-text("Resolver")').first().click();
