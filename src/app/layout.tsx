@@ -7,14 +7,12 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  children,
-  params
+  children
 }: {
   children: React.ReactNode;
-  params: { locale: string };
 }) {
   return (
-    <html lang={params.locale}>
+    <html lang="es">
       <body className="font-sans">
         {children}
       </body>
