@@ -20,18 +20,21 @@ const authMiddleware = auth((req) => {
 
   // Rutas públicas que no requieren autenticación
   const publicPaths = [
+    `/${locale}`,
     `/${locale}/login`,
     `/${locale}/register-complex`,
-    `/${locale}/public`,
     `/${locale}/checkout`,
     `/${locale}/forgot-password`,
     `/${locale}/reset-password`,
-    '/api/auth', // Rutas de NextAuth
-    '/api/public', // APIs públicas
   ];
 
-  // Si la ruta es pública, permitir acceso
-  if (publicPaths.some((path) => pathname.startsWith(path))) {
+  const publicApiPaths = [
+    '/api/auth',
+    '/api/public'
+  ];
+
+  // Si la ruta es una de las públicas o empieza por una API pública, permitir acceso.
+  if (publicPaths.includes(pathname) || publicApiPaths.some(p => pathname.startsWith(p))) {
     return NextResponse.next();
   }
 
@@ -88,4 +91,3 @@ export const config = {
     '/api/auth/:path*'
   ]
 };
-

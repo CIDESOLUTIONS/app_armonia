@@ -1,7 +1,4 @@
 import type { Metadata } from "next";
-import { Providers } from "@/components/providers";
-import { RealTimeNotificationProvider } from "@/context/RealTimeNotificationContext";
-import { ModalProvider } from "@/hooks/useModal.tsx"; // Importar ModalProvider
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -9,19 +6,17 @@ export const metadata: Metadata = {
   description: "Sistema de gestión para conjuntos residenciales",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
+  params
 }: {
   children: React.ReactNode;
+  params: { locale: string };
 }) {
   return (
-    <html lang="es">
+    <html lang={params.locale}>
       <body className="font-sans">
-        <Providers>
-          <RealTimeNotificationProvider>
-            <ModalProvider>{children}</ModalProvider>
-          </RealTimeNotificationProvider>
-        </Providers>
+        {children}
       </body>
     </html>
   );
