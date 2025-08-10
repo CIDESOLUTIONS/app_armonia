@@ -1,38 +1,54 @@
+import { NextIntlClientProvider, useMessages } from 'next-intl';
 import { Providers } from "@/components/providers";
 import { RealTimeNotificationProvider } from "@/context/RealTimeNotificationContext";
 import { ModalProvider } from "@/hooks/useModal";
-import "../globals.css";
-import { NextIntlClientProvider } from "next-intl";
+import { ReactNode } from "react";
+import { Header } from "@/components/layout/header";
+import type { Metadata } from "next";
 
-export default async function LocaleLayout({
+export const metadata: Metadata = {
+  title: "Armonía | Gestión Integral de Conjuntos Residenciales",
+  description:
+    "Plataforma líder para la administración de conjuntos residenciales. Gestiona finanzas, asambleas, comunicación y seguridad en un solo lugar.",
+  keywords: [
+    "administración de conjuntos",
+    "software para conjuntos",
+    "gestión de propiedades",
+    "asambleas virtuales",
+    "app para residentes",
+  ],
+};
+
+export default function LocaleLayout({
   children,
-  params,
+  params
 }: {
   children: React.ReactNode;
-  params: any;
+  params: { locale: string };
 }) {
-  const { locale } = await params;
-  
-  // Load messages manually to avoid getMessages() issues
-  let messages;
-  try {
-    messages = (await import(`@/locales/${locale}.json`)).default;
-  } catch (error) {
-    // Fallback to Spanish if locale not found
-    messages = (await import(`@/locales/es.json`)).default;
-  }
+  const { locale } = params;
+  const messages = useMessages();
 
   return (
-    <html lang={locale}>
-      <body className="font-sans">
-        <NextIntlClientProvider messages={messages} locale={locale}>
-          <Providers>
-            <RealTimeNotificationProvider>
-              <ModalProvider>{children}</ModalProvider>
-            </RealTimeNotificationProvider>
-          </Providers>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <Providers>
+        <RealTimeNotificationProvider>
+          <ModalProvider>
+            <div className="public-layout">
+              <Header
+                theme="Claro"
+                setTheme={() => {}} // Placeholder for setTheme
+                language="Español"
+                setLanguage={() => {}} // Placeholder for setLanguage
+                currency="Pesos"
+                setCurrency={() => {}} // Placeholder for setCurrency
+                isLoggedIn={false}
+              />
+              <div className="pt-16">{children}</div>
+            </div>
+          </ModalProvider>
+        </RealTimeNotificationProvider>
+      </Providers>
+    </NextIntlClientProvider>
   );
 }
