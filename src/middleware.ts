@@ -1,21 +1,21 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
-import createIntlMiddleware from "next-intl/middleware";
+import createMiddleware from 'next-intl/middleware';
+import {NextRequest, NextResponse} from 'next/server';
+import {locales, pathnames, defaultLocale, localePrefix} from '@/constants/i18n';
+import {getToken} from 'next-auth/jwt';
 
-const locales = ["en", "es"];
-const publicPages = ["/login", "/register-complex"]; // Root '/' is handled separately
-
-const intlMiddleware = createIntlMiddleware({
+const intlMiddleware = createMiddleware({
+  defaultLocale,
   locales,
-  defaultLocale: "es",
+  pathnames,
+  localePrefix
 });
 
 export default async function middleware(req: NextRequest) {
-  // First, apply the i18n middleware to get the correct locale handling
   const response = intlMiddleware(req);
+
   const { pathname } = req.nextUrl;
 
-  // Create a regex to check for public paths, including the root
+  const publicPages = Object.values(pathnames);
   const publicPathnameRegex = RegExp(
     `^(/(${locales.join("|")}))?(${publicPages.join("|")}|/?)$`,
     "i",
@@ -23,23 +23,19 @@ export default async function middleware(req: NextRequest) {
 
   const isPublicPage = publicPathnameRegex.test(pathname);
 
-  // If the page is public, just return the response from the i18n middleware
   if (isPublicPage) {
     return response;
   }
 
-  // For all other pages, verify authentication
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-  // If no token, redirect to the login page, preserving the locale
   if (!token) {
-    const locale = locales.find((l) => pathname.startsWith(`/${l}/`)) || "es";
+    const locale = locales.find((l) => pathname.startsWith(`/${l}/`)) || defaultLocale;
     const url = req.nextUrl.clone();
     url.pathname = `/${locale}/login`;
     return NextResponse.redirect(url);
   }
 
-  // Role-based authorization logic
   const userRole = token.role as string;
 
   if (pathname.includes("/admin-portal") && userRole !== "ADMIN") {
@@ -54,14 +50,18 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
-  // If authorized, add the tenant schema header and return
   const schemaName = token.schemaName as string;
   if (schemaName) {
     response.headers.set("X-Tenant-Schema", schemaName);
   }
+
   return response;
 }
 
 export const config = {
-  matcher: ["/((?!api|_next|.*\\..*).*)"],
+  matcher: [
+    '/',
+    '/(es|en)/:path*',
+    '/((?!_next|_vercel|.*\..*).*)'
+  ]
 };

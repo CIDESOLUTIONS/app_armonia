@@ -42,13 +42,21 @@ test.describe("Resident Portal E2E Tests", () => {
   });
 
   // CP-302 - Realizar pago en línea
-  test("CP-302: should initiate online payment", async ({ page }) => {
+  test("CP-302: should simulate online payment and verify status", async ({ page }) => {
     await page.goto("/es/resident/my-finances/fees");
     await page.waitForLoadState('networkidle');
-    // Assuming there's a pending fee to pay
-    await page.locator('button:has-text("Pagar")').first().click();
-    // Verify that the payment modal or a redirection has occurred
-    await expect(page.locator("h2:has-text('Procesando pago')")).toBeVisible();
+    
+    // Assume there's a pending fee to pay
+    const feeToPay = page.locator('tr:has-text("Pendiente")').first();
+    await feeToPay.locator('button:has-text("Pagar")').click();
+
+    // In the payment modal/page
+    await expect(page.locator("h2:has-text('Confirmar Pago')")).toBeVisible();
+    await page.click('button:has-text("Confirmar y Pagar")'); // This would trigger the mock payment gateway
+
+    // Check for success message and updated status
+    await expect(page.locator("text=Pago procesado exitosamente")).toBeVisible();
+    await expect(feeToPay.locator('text=Pagada')).toBeVisible();
   });
 
   // CP-303 - Reserva de amenidad
