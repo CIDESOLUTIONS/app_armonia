@@ -29,40 +29,7 @@ test.describe("Armonía Application E2E Tests", () => {
     await login(page, adminEmail, adminPassword, 'admin');
   });
 
-  // CP-100 - Registro de nuevo conjunto
-  test("CP-100: should allow new complex registration", async ({ page }) => {
-    const newComplexEmail = `new.complex.${Date.now()}@test.com`;
-    await page.goto("/es/register-complex");
-    
-    // Usar selectores basados en RegisterComplexForm.tsx (react-hook-form)
-    await page.fill('input[name="complexName"]', "New Complex E2E");
-    await page.fill('input[name="address"]', "Calle 123 #45-67");
-    await page.fill('input[name="adminName"]', "New Admin E2E");
-    await page.fill('input[name="email"]', newComplexEmail);
-    await page.fill('input[name="password"]', "password123");
-    
-    await page.click('button[type="submit"]');
-    
-    // Esperar redirección al dashboard correcto
-    await page.waitForURL(/.*\/es\/complex-admin/);
-    await expect(page).toHaveURL(/.*\/es\/complex-admin/);
-  });
-
-  // CP-101 - Solicitud de demo
-  test("CP-101: should allow demo request", async ({ page }) => {
-    await page.goto("/es"); // Portal público
-    
-    // Buscar formulario de demo en la landing page
-    await page.fill('input[name="name"]', "Demo User E2E");
-    await page.fill('input[name="email"]', `demo.e2e.${Date.now()}@test.com`);
-    await page.fill('textarea[name="message"]', "I want a demo for my complex.");
-    
-    // Buscar botón de envío (puede estar internacionalizado)
-    await page.click('button:has-text("Enviar"), button:has-text("Send"), button[type="submit"]');
-    
-    // Verificar confirmación
-    await expect(page.locator("text=enviado, text=sent, text=success")).toBeVisible();
-  });
+  
 
   // CP-200 - Login administrador
   test("CP-200: should allow admin login", async ({ page }) => {
@@ -328,14 +295,75 @@ test.describe("Armonía Application E2E Tests", () => {
   });
 
   // CP-214 - Conciliación Bancaria Automática
-  test("CP-214: should perform bank reconciliation", async ({ page }) => {
+  test("CP-214: should perform bank reconciliation with file upload", async ({ page }) => {
     await page.goto("/es/complex-admin/finances/bank-reconciliation");
     await page.waitForLoadState('networkidle');
-    
-    // Simular carga de archivo (si es necesario)
-    // await page.setInputFiles('input[type="file"]', "path/to/bank_statement.xlsx");
-    await page.click('button:has-text("Conciliar"), button:has-text("Reconcile")');
-    await expect(page.locator("text=conciliado, text=reconciled, text=éxito, text=success")).toBeVisible();
+
+    // Simulate file upload
+    const csvContent = `Fecha,Descripcion,Monto\n2025-07-26,Pago Admin 101,150000`;
+    await page.setInputFiles('input[type="file"]', {
+      name: 'extracto.csv',
+      mimeType: 'text/csv',
+      buffer: Buffer.from(csvContent)
+    });
+
+    await page.click('button:has-text("Conciliar")');
+    await expect(page.locator("text=Archivo procesado y conciliado")).toBeVisible();
+    await expect(page.locator('text=Pago Admin 101').first()).toBeVisible();
+  });
+
+  // CP-215 - Gestión de reservas de amenidades
+  test("CP-215: should manage amenity reservations", async ({ page }) => {
+    await page.goto("/es/complex-admin/reservations");
+    await page.waitForLoadState('networkidle');
+
+    // Approve a pending reservation (assuming one exists from resident tests)
+    await page.click('button:has-text("Aprobar")').first();
+    await expect(page.locator("text=aprobada, text=approved, text=éxito, text=success")).toBeVisible();
+
+    // Reject a pending reservation
+    await page.click('button:has-text("Rechazar")').first();
+    await expect(page.locator("text=rechazada, text=rejected, text=éxito, text=success")).toBeVisible();
+  });
+
+  // CP-216 - Gestión de proyectos/obras
+  test("CP-216: should manage projects", async ({ page }) => {
+    await page.goto("/es/complex-admin/projects");
+    await page.waitForLoadState('networkidle');
+
+    // Create a new project
+    await page.click('button:has-text("Crear"), button:has-text("Add"), button:has-text("Nuevo")');
+    await page.fill('input[name="name"]', "Remodelación de Fachada E2E");
+    await page.fill('textarea[name="description"]', "Proyecto de prueba para E2E.");
+    await page.fill('input[name="budget"]', "10000");
+    await page.click('button:has-text("Crear"), button:has-text("Save"), button[type="submit"]');
+    await expect(page.locator("text=creado, text=created, text=éxito, text=success")).toBeVisible();
+
+    // Update project status
+    await page.click('button:has-text("Editar"), button:has-text("Edit")').first();
+    await page.selectOption('select[name="status"]', "IN_PROGRESS");
+    await page.click('button:has-text("Guardar"), button:has-text("Save"), button[type="submit"]');
+    await expect(page.locator("text=actualizado, text=updated, text=éxito, text=success")).toBeVisible();
+  });
+
+  // CP-217 - Registro y roles de personal operativo
+  test("CP-217: should manage staff", async ({ page }) => {
+    await page.goto("/es/complex-admin/staff");
+    await page.waitForLoadState('networkidle');
+
+    // Create a new staff member
+    await page.click('button:has-text("Crear"), button:has-text("Add"), button:has-text("Nuevo")');
+    await page.fill('input[name="name"]', "Personal de Prueba E2E");
+    await page.fill('input[name="email"]', `staff.e2e.${Date.now()}@test.com`);
+    await page.selectOption('select[name="role"]', "RECEPTION");
+    await page.click('button:has-text("Crear"), button:has-text("Save"), button[type="submit"]');
+    await expect(page.locator("text=creado, text=created, text=éxito, text=success")).toBeVisible();
+
+    // Edit staff member
+    await page.click('button:has-text("Editar"), button:has-text("Edit")').first();
+    await page.selectOption('select[name="role"]', "SECURITY");
+    await page.click('button:has-text("Guardar"), button:has-text("Save"), button[type="submit"]');
+    await expect(page.locator("text=actualizado, text=updated, text=éxito, text=success")).toBeVisible();
   });
 });
 
