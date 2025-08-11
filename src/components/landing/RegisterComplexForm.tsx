@@ -27,7 +27,7 @@ type RegisterComplexFormValues = z.infer<typeof formSchema>;
 
 export function RegisterComplexForm() {
   const { toast } = useToast();
-  const t = useTranslations("LandingPage");
+  const { t } = useTranslation("landing");
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async (data: RegisterComplexFormValues) => {

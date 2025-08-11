@@ -42,7 +42,7 @@ const headerTexts = {
   },
 };
 
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 
 interface HeaderProps {
   logout?: () => void;
@@ -63,8 +63,8 @@ export function Header({
   const [currency, setCurrency] = useState("Pesos");
   const router = useRouter();
   const pathname = usePathname();
-  const locale = useLocale();
-  const t = useTranslations("Header");
+  
+  
   const { user, changeUserRole } = useAuthStore();
   const { selectedComplexId, selectedComplexName, setSelectedComplex } =
     useComplexStore();
@@ -94,8 +94,23 @@ export function Header({
   }, [user?.isGlobalAdmin, selectedComplexId, setSelectedComplex]);
 
   const toggleLanguage = () => {
-    const nextLocale = locale === "es" ? "en" : "es";
+    
     router.replace(pathname, { locale: nextLocale });
+    i18n.changeLanguage(nextLocale);
+    i18n.changeLanguage(nextLocale);
+    i18n.changeLanguage(nextLocale);
+    i18n.changeLanguage(nextLocale);
+    i18n.changeLanguage(nextLocale);
+    i18n.changeLanguage(nextLocale);
+    i18n.changeLanguage(nextLocale);
+    i18n.changeLanguage(nextLocale);
+    i18n.changeLanguage(nextLocale);
+    i18n.changeLanguage(nextLocale);
+    i18n.changeLanguage(nextLocale);
+    i18n.changeLanguage(nextLocale);
+    i18n.changeLanguage(nextLocale);
+    i18n.changeLanguage(nextLocale);
+    i18n.changeLanguage(nextLocale);
   };
 
   const toggleTheme = () => {
@@ -190,10 +205,10 @@ export function Header({
             <button
               onClick={toggleLanguage}
               className="text-white hover:text-indigo-200 focus:outline-none flex items-center gap-1"
-              title={locale === "es" ? "Cambiar a Inglés" : "Switch to Spanish"}
+              title={i18n.language === "es" ? "Cambiar a Inglés" : "Switch to Spanish"}
             >
               <Globe className="w-5 h-5" />
-              <span className="text-xs">{locale.toUpperCase()}</span>
+              <span className="text-xs">{i18n.language.toUpperCase()}</span>
             </button>
             <button
               onClick={toggleTheme}
@@ -335,7 +350,7 @@ export function Header({
                 className="text-white hover:text-indigo-200 focus:outline-none flex items-center gap-1"
               >
                 <Globe className="w-5 h-5" />
-                <span className="text-xs">{locale.toUpperCase()}</span>
+                <span className="text-xs">{i18n.language.toUpperCase()}</span>
               </button>
               <button
                 onClick={toggleTheme}

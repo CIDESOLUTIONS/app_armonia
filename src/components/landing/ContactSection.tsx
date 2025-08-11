@@ -1,10 +1,12 @@
+"use client";
+
 import React from "react";
 import { useTranslations } from "next-intl";
 import { ContactForm } from "@/components/landing/ContactForm"; // Assuming ContactForm component is already there
 import { FadeIn } from "@/components/animations/FadeIn";
 
 export function ContactSection() {
-  const t = useTranslations("landing");
+  const { t } = useTranslation("landing");
 
   return (
     <FadeIn delay={0.2}>

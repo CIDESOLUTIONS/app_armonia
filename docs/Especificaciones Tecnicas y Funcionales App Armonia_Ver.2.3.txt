@@ -1,8 +1,8 @@
 ﻿Proyecto Armonía
 Especificaciones Técnicas 
 Sistema de Administración de Conjuntos Residenciales
-Versión: 2.2
-Fecha de Actualización: 7 de Agosto de 2025
+Versión: 2.3
+Fecha de Actualización: 11 de Agosto de 2025
 
 1. Introducción
 
@@ -23,6 +23,7 @@ Nuestra misión es transformar radicalmente la gestión y la experiencia de vida
 * ORM: Prisma 6+ (schema.prisma en backend)
 * Autenticación: JWT (JSON Web Tokens)
 * Almacenamiento: PostgreSQL
+* Inernacionalización: react-i18next (next-i18n-router)
 * Validación: Zod 
 * socket.io: Requerido para funcionalidades en tiempo real.
 * twilio: para comunicaciones.

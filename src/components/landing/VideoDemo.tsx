@@ -1,9 +1,11 @@
+"use client";
+
 import React from "react";
 import { useTranslations } from "next-intl";
 import { FadeIn } from "@/components/animations/FadeIn";
 
 export function VideoDemo() {
-  const t = useTranslations("landing");
+  const { t } = useTranslation("landing");
 
   return (
     <FadeIn delay={0.4}>
