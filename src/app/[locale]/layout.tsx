@@ -19,16 +19,9 @@ export const metadata: Metadata = {
   ],
 };
 
-export default function LocaleLayout({
-  children,
-  params
-}: {
-  children: React.ReactNode;
-  params: { locale: string };
-}) {
-  const { locale } = params;
-  const messages = useMessages();
-
+// Create a separate Client Component to handle NextIntlClientProvider and useMessages
+// This component will receive the locale and messages as props
+function IntlProviderWrapper({ children, locale, messages }: { children: ReactNode, locale: string, messages: any }) {
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <Providers>
@@ -50,5 +43,23 @@ export default function LocaleLayout({
         </RealTimeNotificationProvider>
       </Providers>
     </NextIntlClientProvider>
+  );
+}
+
+export default function LocaleLayout({
+  children,
+  params
+}: {
+  children: React.ReactNode;
+  params: { locale: string };
+}) {
+  // LocaleLayout is NOT async
+  const locale = params.locale; // Access locale directly
+  const messages = useMessages(); // This is now called in a non-async component
+
+  return (
+    <IntlProviderWrapper locale={locale} messages={messages}>
+      {children}
+    </IntlProviderWrapper>
   );
 }
