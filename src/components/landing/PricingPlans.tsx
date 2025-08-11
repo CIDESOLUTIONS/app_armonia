@@ -5,7 +5,7 @@ import { Plans } from "@/components/landing/Plans"; // Assuming Plans component 
 import { FadeIn } from "@/components/animations/FadeIn";
 
 export function PricingPlans() {
-  const t = useTranslations("landing");
+  const { t } = useTranslation("landing");
 
   return (
     <FadeIn delay={0.4}>

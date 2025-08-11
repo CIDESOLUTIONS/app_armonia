@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { DemoRequestModal } from "./DemoRequestModal";
 
 export function Plans() {
-  const t = useTranslations("landing.pricing");
+  const { t } = useTranslation("landing.pricing");
   const [currency, setCurrency] = useState("USD"); // Default to USD
 
   return (

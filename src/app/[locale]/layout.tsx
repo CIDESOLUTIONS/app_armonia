@@ -1,28 +1,28 @@
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import { ReactNode } from 'react';
+import React from 'react';
+import { I18nextProvider } from 'react-i18next';
+import i18n from '../../i18n'; // Import the new i18n config from root
 import { Providers } from "@/components/providers";
 import { RealTimeNotificationProvider } from "@/context/RealTimeNotificationContext";
 import { ModalProvider } from "@/hooks/useModal";
 
 type Props = {
-  children: ReactNode;
+  children: React.ReactNode;
   params: { locale: string };
 };
 
-// Metadata can be defined here
 export const metadata = {
   title: "Armonía | Gestión Integral de Conjuntos Residenciales",
   description: "Plataforma líder para la administración de conjuntos residenciales.",
 };
 
 export default async function LocaleLayout({ children, params: { locale } }: Props) {
-  const messages = await getMessages();
+  // i18next is initialized globally, so no need to pass messages here
+  // We just need to ensure the i18n instance is available to components
 
   return (
     <html lang={locale}>
       <body>
-        <NextIntlClientProvider locale={locale} messages={messages}>
+        <I18nextProvider i18n={i18n}>
           <Providers>
             <RealTimeNotificationProvider>
               <ModalProvider>
@@ -30,7 +30,7 @@ export default async function LocaleLayout({ children, params: { locale } }: Pro
               </ModalProvider>
             </RealTimeNotificationProvider>
           </Providers>
-        </NextIntlClientProvider>
+        </I18nextProvider>
       </body>
     </html>
   );

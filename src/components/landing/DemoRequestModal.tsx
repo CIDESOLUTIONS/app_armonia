@@ -41,7 +41,7 @@ interface DemoRequestModalProps {
 
 export function DemoRequestModal({ children }: DemoRequestModalProps) {
   const { toast } = useToast();
-  const t = useTranslations("DemoRequest");
+  const { t } = useTranslation("DemoRequest");
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
 
