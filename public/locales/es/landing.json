@@ -1,134 +1,115 @@
 {
   "hero": {
-    "title": "Gestión integral para conjuntos residenciales",
-    "description": "Armonía es la plataforma integral que revoluciona la administración de conjuntos residenciales, unificando en un solo sistema la gestión de propiedades, residentes, finanzas, asambleas y seguridad.",
-    "loginButton": "Iniciar Sesión",
-    "registerButton": "Registrar Conjunto",
-    "learnMore": "Conocer más",
-    "dashboardPreview": "Visualice toda la información de su conjunto"
+    "title": "La Revolución en la Administración de Propiedad Horizontal",
+    "subtitle": "Armonía es el ecosistema operativo todo-en-uno que centraliza la comunicación, automatiza las finanzas y optimiza la seguridad de tu conjunto residencial. Deja atrás el caos y descubre la eficiencia.",
+    "ctaButton": "Solicita una Demo Gratuita",
+    "secondaryButton": "Ver Planes"
   },
   "features": {
-    "title": "Funcionalidades Completas para su Conjunto",
-    "description": "Armonía proporciona una plataforma integral, diseñada específicamente para la administración eficiente de conjuntos residenciales.",
+    "title": "Una Plataforma, Control Total",
+    "description": "Descubre las herramientas que transformarán tu gestión y la vida de tus residentes.",
     "inventory": {
-      "title": "Gestión de Inventario",
-      "description": "Control digitalizado y centralizado de todos los activos y unidades de su conjunto residencial.",
-      "feature1": "Registro detallado de propiedades",
-      "feature2": "Base de datos de propietarios y residentes",
-      "feature3": "Control de vehículos y parqueaderos",
-      "feature4": "Registro y control de mascotas"
+      "title": "Inventario Inteligente",
+      "description": "Centraliza y gestiona inmuebles, propietarios, vehículos y hasta mascotas en un solo lugar.",
+      "feature1": "Base de datos completa de residentes.",
+      "feature2": "Registro de vehículos y parqueaderos.",
+      "feature3": "Fichas detalladas por inmueble.",
+      "feature4": "Control de mascotas y áreas comunes."
     },
     "assemblies": {
-      "title": "Gestión de Asambleas",
-      "description": "Transforme sus asambleas en eventos eficientes con herramientas digitales que agilizan todo el proceso.",
-      "feature1": "Programación y convocatoria automatizada",
-      "feature2": "Verificación digital de quórum",
-      "feature3": "Sistema de votaciones en tiempo real",
-      "feature4": "Elaboración y firma digital de actas"
+      "title": "Democracia Digital",
+      "description": "Realiza asambleas virtuales o híbridas con validez legal, quórum en tiempo real y votaciones ponderadas.",
+      "feature1": "Cálculo de quórum automático.",
+      "feature2": "Votaciones seguras y transparentes.",
+      "feature3": "Generación de actas al instante.",
+      "feature4": "Acceso desde cualquier dispositivo."
     },
-    "financial": {
-      "title": "Gestión Financiera",
-      "description": "Administre los recursos de su conjunto con transparencia y precisión mediante herramientas financieras avanzadas.",
-      "feature1": "Presupuestos y seguimiento en tiempo real",
-      "feature2": "Generación automática de cuotas",
-      "feature3": "Registro y seguimiento de pagos",
-      "feature4": "Reportes financieros detallados"
-    },
-    "resident": {
-      "title": "Portal de Residentes",
-      "description": "Brinde a los residentes una experiencia digital completa para gestionar todos sus asuntos relacionados con el conjunto."
-    },
-    "pqr": {
-      "title": "Sistema PQR",
-      "description": "Gestione eficientemente las peticiones, quejas y reclamos con un sistema organizado que mejora la comunicación."
-    },
-    "reception": {
-      "title": "Recepción y Vigilancia",
-      "description": "Optimice la seguridad y control de acceso con herramientas digitales diseñadas para el personal de vigilancia."
+    "finances": {
+      "title": "Finanzas Automatizadas",
+      "description": "Desde la generación de cuotas hasta la conciliación bancaria. La salud financiera de tu comunidad, sin esfuerzo.",
+      "feature1": "Generación masiva de cuotas de administración.",
+      "feature2": "Integración con pasarelas de pago en línea.",
+      "feature3": "Conciliación bancaria automática.",
+      "feature4": "Informes financieros en tiempo real."
     }
   },
-  "statistics": {
-    "complexesManaged": "Conjuntos gestionados",
-    "satisfiedResidents": "Residentes satisfechos",
-    "userSatisfaction": "Satisfacción de usuarios",
-    "timeReduction": "Reducción en tiempo administrativo"
-  },
-  "video": {
-    "title": "Vea Armonía en Acción",
-    "description": "Descubra cómo Armonía transforma la gestión de conjuntos residenciales a través de esta demostración completa."
-  },
-  "pricing": {
-    "title": "Planes Diseñados para su Conjunto",
-    "description": "Elija el plan que mejor se adapte a las necesidades de su conjunto residencial.",
-    "plans": {
-      "basic": {
-        "name": "Plan Básico",
-        "description": "Gestión esencial para conjuntos pequeños.",
-        "features": [
-          "Gestión de inventario (propiedades, residentes, vehículos, mascotas)",
-          "Sistema de PQR (Peticiones, Quejas, Reclamos)",
-          "Cartelera digital para anuncios oficiales",
-          "Módulo de encuestas y votaciones simples"
-        ],
-        "buttonText": "Comenzar Gratis"
-      },
-      "standard": {
-        "name": "Plan Estándar",
-        "priceSuffix": "/mes",
-        "description": "Solución completa para la administración diaria.",
-        "features": [
-          "Todo lo del Plan Básico",
-          "Módulo de Reservas de áreas comunes",
-          "Módulo Financiero (generación de cuotas, multas, intereses)",
-          "Integración con pasarelas de pago (PSE, Tarjeta de Crédito)",
-          "Gestión avanzada de visitantes con QR y paquetería"
-        ],
-        "buttonText": "Seleccionar Plan"
-      },
-      "premium": {
-        "name": "Plan Premium",
-        "priceSuffix": "/mes",
-        "description": "Máxima eficiencia y funcionalidades avanzadas.",
-        "features": [
-          "Todo lo del Plan Estándar",
-          "Conciliación Bancaria Automática",
-          "Acceso a API",
-          "Acceso al Marketplace Comunitario",
-          "Directorio de Servicios y Democracia Digital integrada"
-        ],
-        "buttonText": "Seleccionar Plan"
-      },
-      "portfolio": {
-        "name": "Plan Empresarial (Portafolio)",
-        "price": "Contactar Ventas",
-        "description": "Diseñado para empresas que gestionan múltiples propiedades.",
-        "features": [
-          "Todo lo del Plan Premium",
-          "Dashboard Multi-Propiedad",
-          "Gestión Centralizada de múltiples conjuntos",
-          "Informes Consolidados de portafolio",
-          "Personalización de Marca (White-Labeling)",
-          "Soporte prioritario"
-        ],
-        "buttonText": "Contactar Ventas"
-      },
-      "assembly": {
-        "name": "Módulo de Democracia Digital (Asambleas)",
-        "price": "Contactar Ventas",
-        "description": "Plataforma independiente para asambleas virtuales o híbridas.",
-        "features": [
-          "Registro de asistencia y cálculo de quórum en tiempo real",
-          "Sistema de votaciones ponderadas según coeficientes",
-          "Generación automática del borrador del acta",
-          "Puede ser contratado como servicio independiente"
-        ],
-        "buttonText": "Solicitar Demo"
-      }
+  "additionalFeatures": {
+    "title": "Mucho más que un software de gestión",
+    "marketplace": {
+      "title": "Marketplace Comunitario",
+      "description": "Fomenta la comunidad y el comercio local. Un espacio para que los residentes compren, vendan e intercambien bienes y servicios de forma segura."
     },
-    "recommended": "Recomendado"
+    "panicButton": {
+      "title": "Botón de Pánico",
+      "description": "Conexión directa con la central de seguridad ante cualquier emergencia. Tranquilidad para tus residentes, control para ti."
+    },
+    "accessControl": {
+      "title": "Control de Acceso con QR",
+      "description": "Moderniza tu portería. Permite a los residentes generar códigos QR temporales para visitantes, agilizando el acceso y mejorando la seguridad."
+    }
+  },
+  "testimonials": {
+    "title": "Administradores como tú confían en Armonía",
+    "ana": {
+      "quote": "Desde que usamos Armonía, la gestión de la cartera mejoró en un 80%. La conciliación bancaria automática nos ahorra días de trabajo cada mes.",
+      "name": "Ana Sofía Rincón",
+      "role": "Administradora, Conjunto El Roble"
+    },
+    "carlos": {
+      "quote": "La comunicación con los residentes es otra cosa. La cartelera digital y las notificaciones push nos aseguran que todos están informados. ¡Se acabaron las quejas!",
+      "name": "Carlos Valderrama",
+      "role": "Gerente, AdminTotal SAS"
+    },
+    "lucia": {
+      "quote": "Las asambleas virtuales son un éxito. Tuvimos una participación récord y todo el proceso de votación fue transparente y sin errores. Totalmente recomendado.",
+      "name": "Lucía Méndez",
+      "role": "Miembro del Consejo, Torres del Parque"
+    }
+  },
+  "plans": {
+    "title": "Un Plan para Cada Comunidad",
+    "subtitle": "Escoge el plan que mejor se adapte al tamaño y las necesidades de tu conjunto. Sin contratos de permanencia.",
+    "basic": {
+      "name": "Básico",
+      "price": "Gratis",
+      "period": "Hasta 40 unidades",
+      "feature1": "Gestión de inventario",
+      "feature2": "Sistema de PQR",
+      "feature3": "Cartelera digital",
+      "feature4": "Encuestas simples",
+      "cta": "Comienza Gratis"
+    },
+    "standard": {
+      "name": "Estándar",
+      "price": "$3,500",
+      "period": "/ unidad / mes",
+      "feature1": "Todo lo del plan Básico",
+      "feature2": "Módulo de Reservas",
+      "feature3": "Módulo Financiero Básico",
+      "feature4": "Gestión de Visitantes con QR",
+      "cta": "Elegir Estándar"
+    },
+    "premium": {
+      "name": "Premium",
+      "price": "$5,000",
+      "period": "/ unidad / mes",
+      "feature1": "Todo lo del plan Estándar",
+      "feature2": "Conciliación Bancaria Automática",
+      "feature3": "Marketplace y Directorio",
+      "feature4": "Módulo de Democracia Digital",
+      "cta": "Elegir Premium"
+    }
   },
   "contact": {
-    "title": "¿Listo para Transformar su Conjunto?",
-    "description": "Contáctenos hoy y descubra cómo Armonía puede revolucionar la administración de su conjunto residencial."
-  }
+    "title": "¿Listo para transformar tu conjunto residencial?",
+    "subtitle": "Hablemos. Déjanos tus datos y uno de nuestros especialistas te contactará para una demostración personalizada y sin compromiso.",
+    "form": {
+      "complexName": "Nombre del Conjunto",
+      "adminName": "Tu Nombre",
+      "email": "Tu Email",
+      "phone": "Tu Teléfono",
+      "submitButton": "Solicitar Demo"
+    }
+  },
+  "freeTrialButton": "Comienza tu Prueba Gratuita"
 }

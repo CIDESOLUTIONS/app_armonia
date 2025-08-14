@@ -19,29 +19,6 @@ import { ROUTES } from "@/constants/routes";
 import { useAuthStore } from "@/store/authStore";
 import { useComplexStore } from "@/store/complexStore";
 import { getAllComplexes, ComplexInfo } from "@/services/complexService";
-
-// Traducciones para el header
-const headerTexts = {
-  es: {
-    features: "Funcionalidades",
-    plans: "Planes",
-    contact: "Contáctenos",
-    login: "Iniciar Sesión",
-    logout: "Cerrar Sesión",
-    roleSelector: "Seleccionar Rol",
-    selectComplex: "Seleccionar Conjunto",
-  },
-  en: {
-    features: "Features",
-    plans: "Plans",
-    contact: "Contact Us",
-    login: "Login",
-    logout: "Logout",
-    roleSelector: "Select Role",
-    selectComplex: "Select Complex",
-  },
-};
-
 import { useTranslation } from "react-i18next";
 
 interface HeaderProps {
@@ -59,11 +36,10 @@ export function Header({
   adminName = null,
   hideNavLinks = false,
 }: HeaderProps) {
+  const { t, i18n } = useTranslation("header");
   const [theme, setTheme] = useState("Claro");
   const [currency, setCurrency] = useState("Pesos");
   const router = useRouter();
-  const pathname = usePathname();
-  
   
   const { user, changeUserRole } = useAuthStore();
   const { selectedComplexId, selectedComplexName, setSelectedComplex } =
@@ -94,22 +70,7 @@ export function Header({
   }, [user?.isGlobalAdmin, selectedComplexId, setSelectedComplex]);
 
   const toggleLanguage = () => {
-    
-    router.replace(pathname, { locale: nextLocale });
-    i18n.changeLanguage(nextLocale);
-    i18n.changeLanguage(nextLocale);
-    i18n.changeLanguage(nextLocale);
-    i18n.changeLanguage(nextLocale);
-    i18n.changeLanguage(nextLocale);
-    i18n.changeLanguage(nextLocale);
-    i18n.changeLanguage(nextLocale);
-    i18n.changeLanguage(nextLocale);
-    i18n.changeLanguage(nextLocale);
-    i18n.changeLanguage(nextLocale);
-    i18n.changeLanguage(nextLocale);
-    i18n.changeLanguage(nextLocale);
-    i18n.changeLanguage(nextLocale);
-    i18n.changeLanguage(nextLocale);
+    const nextLocale = i18n.language === "es" ? "en" : "es";
     i18n.changeLanguage(nextLocale);
   };
 
@@ -185,19 +146,19 @@ export function Header({
                 href="#funcionalidades"
                 className="text-white hover:text-indigo-200 focus:outline-none"
               >
-                {t.features}
+                {t("features")}
               </a>
               <a
                 href="#planes"
                 className="text-white hover:text-indigo-200 focus:outline-none"
               >
-                {t.plans}
+                {t("plans")}
               </a>
               <a
                 href="#contacto"
                 className="text-white hover:text-indigo-200 focus:outline-none"
               >
-                {t.contact}
+                {t("contact")}
               </a>
             </>
           )}
@@ -205,7 +166,7 @@ export function Header({
             <button
               onClick={toggleLanguage}
               className="text-white hover:text-indigo-200 focus:outline-none flex items-center gap-1"
-              title={i18n.language === "es" ? "Cambiar a Inglés" : "Switch to Spanish"}
+              title={t("toggleLanguage")}
             >
               <Globe className="w-5 h-5" />
               <span className="text-xs">{i18n.language.toUpperCase()}</span>
@@ -289,7 +250,7 @@ export function Header({
                       }}
                     >
                       <LogOut className="w-4 h-4 mr-2" />
-                      {t.logout}
+                      {t("logout")}
                     </button>
                   </div>
                 )}
@@ -300,7 +261,7 @@ export function Header({
               href={ROUTES.PORTAL_SELECTOR}
               className="text-white hover:text-indigo-200 transition-colors px-4 py-2 border border-white rounded hover:bg-indigo-700"
             >
-              {t.login}
+              {t("login")}
             </Link>
           )}
         </nav>
@@ -326,21 +287,21 @@ export function Header({
                   className="text-white hover:text-indigo-200 px-4"
                   onClick={() => scrollToSection("funcionalidades")}
                 >
-                  {t.features}
+                  {t("features")}
                 </a>
                 <a
                   href="#planes"
                   className="text-white hover:text-indigo-200 px-4"
                   onClick={() => scrollToSection("planes")}
                 >
-                  {t.plans}
+                  {t("plans")}
                 </a>
                 <a
                   href="#contacto"
                   className="text-white hover:text-indigo-200 px-4"
                   onClick={() => scrollToSection("contacto")}
                 >
-                  {t.contact}
+                  {t("contact")}
                 </a>
               </>
             )}
@@ -397,7 +358,7 @@ export function Header({
                 className="text-white hover:text-indigo-200 transition-colors px-4 py-2 border border-white rounded hover:bg-indigo-700 text-center"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                {t.login}
+                {t("login")}
               </Link>
             </div>
           </div>

@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { ROUTES } from "@/constants/routes";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
