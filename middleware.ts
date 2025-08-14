@@ -1,14 +1,7 @@
-import { locales, defaultLocale } from './src/constants/i18n';
-import createMiddleware from 'next-intl/middleware';
+import { i18nRouter } from 'next-i18n-router';
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from "@/lib/authOptions";
-
-// Configuración de internacionalización
-const intlMiddleware = createMiddleware({
-  locales,
-  defaultLocale,
-  localePrefix: 'always'
-});
+import { i18nConfig } from './i18nConfig';
 
 // Middleware de autenticación
 const authMiddleware = auth((req) => {
@@ -16,10 +9,11 @@ const authMiddleware = auth((req) => {
   const { pathname } = req.nextUrl;
 
   // Extraer locale de la URL
-  const locale = pathname.split('/')[1] || 'es';
+  const locale = pathname.split('/')[1] || i18nConfig.defaultLocale;
 
   // Rutas públicas que no requieren autenticación
   const publicPaths = [
+    `/`,
     `/${locale}`,
     `/${locale}/login`,
     `/${locale}/register-complex`,
@@ -35,7 +29,7 @@ const authMiddleware = auth((req) => {
 
   // Si la ruta es una de las públicas o empieza por una API pública, permitir acceso.
   if (publicPaths.includes(pathname) || publicApiPaths.some(p => pathname.startsWith(p))) {
-    return NextResponse.next();
+    return null; // No hacer nada, dejar que el siguiente middleware (i18n) se encargue
   }
 
   // Si no hay sesión y la ruta no es pública, redirigir a login
@@ -43,51 +37,42 @@ const authMiddleware = auth((req) => {
     return NextResponse.redirect(new URL(`/${locale}/login`, req.url));
   }
 
-  // Rutas protegidas por rol
-  const roleRoutes = {
-    ADMIN: [`/${locale}/(admin)`],
-    COMPLEX_ADMIN: [`/${locale}/(complex-admin)`],
-    RESIDENT: [`/${locale}/(resident)`],
-    RECEPTION: [`/${locale}/(reception)`]
+  // Rutas protegidas por rol (ejemplo, ajustar según la estructura real)
+  const roleProtectedPaths = {
+    ADMIN: `/${locale}/admin`,
+    RESIDENT: `/${locale}/resident`,
   };
 
-  // Verificar acceso por rol
-  for (const [role, paths] of Object.entries(roleRoutes)) {
-    if (paths.some(path => pathname.includes(path.replace(/[()]/g, '')))) {
-      if (session.user?.role !== role) {
-        return NextResponse.redirect(new URL(`/${locale}/access-denied`, req.url));
-      }
-    }
+  const userRole = session.user?.role;
+  
+  if (pathname.startsWith(roleProtectedPaths.ADMIN) && userRole !== 'ADMIN') {
+    return NextResponse.redirect(new URL(`/${locale}/access-denied`, req.url));
+  }
+  
+  if (pathname.startsWith(roleProtectedPaths.RESIDENT) && userRole !== 'RESIDENT') {
+    return NextResponse.redirect(new URL(`/${locale}/access-denied`, req.url));
   }
 
-  return NextResponse.next();
+  return null; // El usuario está autenticado y tiene el rol correcto
 });
 
-export default function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
 
-  // Si la ruta es la raíz y no tiene prefijo de idioma, redirigir a /es
-  if (pathname === '/') {
-    return NextResponse.redirect(new URL(`/${defaultLocale}`, request.url));
+export function middleware(request: NextRequest) {
+  // Ejecutar primero el middleware de autenticación
+  const authResponse = authMiddleware(request);
+  if (authResponse) {
+    return authResponse; // Si hay redirección de auth, aplicarla
   }
 
-  // Aplicar middleware de internacionalización primero
-  const intlResponse = intlMiddleware(request);
-  
-  // Si hay redirección de internacionalización, aplicarla
-  if (intlResponse.status !== 200) {
-    return intlResponse;
+  // Si la autenticación pasa, ejecutar el middleware de i18n
+  if (request.nextUrl.pathname.startsWith('/api')) {
+    return;
   }
-
-  // Luego aplicar middleware de autenticación
-  return authMiddleware(request);
+  return i18nRouter(request, i18nConfig);
 }
 
+
+// Aplica el middleware a todas las rutas excepto las estáticas.
 export const config = {
-  matcher: [
-    // Aplicar a todas las rutas excepto archivos estáticos y API
-    '/((?!_next/static|_next/image|favicon.ico|api).*)',
-    // Incluir rutas de API de autenticación
-    '/api/auth/:path*'
-  ]
+  matcher: '/((?!api|_next/static|_next/image|favicon.ico).*)'
 };

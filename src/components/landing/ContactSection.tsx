@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import { ContactForm } from "@/components/landing/ContactForm"; // Assuming ContactForm component is already there
 import { FadeIn } from "@/components/animations/FadeIn";
 

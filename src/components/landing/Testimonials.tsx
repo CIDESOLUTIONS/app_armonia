@@ -1,26 +1,25 @@
 // src/components/landing/Testimonials.tsx
-
 import Image from "next/image";
 
 const testimonials = [
   {
     name: "Ana García",
     role: "Administradora, Conjunto El Roble",
-    avatar: "/images/avatars/ana.png",
+    avatar: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
     testimonial:
       '"Armonía ha transformado nuestra gestión. La comunicación con los residentes es más fluida y hemos ahorrado incontables horas en tareas administrativas."',
   },
   {
     name: "Carlos Martínez",
     role: "Miembro del Consejo, Residencial Los Pinos",
-    avatar: "/images/avatars/carlos.png",
+    avatar: "https://images.pexels.com/photos/837358/pexels-photo-837358.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
     testimonial:
       '"La función de asambleas virtuales es excepcional. Tuvimos una participación récord y la toma de decisiones fue transparente y eficiente."',
   },
   {
     name: "Lucía Fernández",
     role: "Residente, Torres del Parque",
-    avatar: "/images/avatars/lucia.png",
+    avatar: "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
     testimonial:
       '"Reservar el salón comunal y pagar la administración desde mi celular es increíblemente cómodo. ¡La app es muy fácil de usar!"',
   },
@@ -44,12 +43,13 @@ export const Testimonials = () => {
               key={index}
               className="bg-gray-50 p-8 rounded-lg border border-gray-200 shadow-md hover:shadow-xl transition-all flex flex-col items-center text-center"
             >
-              <div className="w-24 h-24 mb-4 relative">
+              <div className="w-24 h-24 mb-4 relative overflow-hidden rounded-full">
                 <Image
                   src={item.avatar}
                   alt={`Avatar de ${item.name}`}
-                  layout="fill"
-                  className="rounded-full"
+                  fill
+                  sizes="96px"
+                  style={{ objectFit: 'cover' }}
                 />
               </div>
               <p className="text-gray-600 mb-4 italic">{item.testimonial}</p>

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import { FadeIn } from "@/components/animations/FadeIn";
 
 export function VideoDemo() {

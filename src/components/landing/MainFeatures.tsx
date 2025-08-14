@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import { Check } from "lucide-react";
 import { FadeIn } from "@/components/animations/FadeIn";
 

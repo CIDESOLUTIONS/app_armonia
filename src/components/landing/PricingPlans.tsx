@@ -1,6 +1,6 @@
 'use client';
 import React from "react";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import { Plans } from "@/components/landing/Plans"; // Assuming Plans component is already there
 import { FadeIn } from "@/components/animations/FadeIn";
 

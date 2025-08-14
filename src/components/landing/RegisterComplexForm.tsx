@@ -15,6 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
+import { useTranslation } from "react-i18next"; // <-- IMPORTACIÓN AÑADIDA
 
 const formSchema = z.object({
   complexName: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
@@ -29,6 +30,17 @@ export function RegisterComplexForm() {
   const { toast } = useToast();
   const { t } = useTranslation("landing");
   const [loading, setLoading] = useState(false);
+
+  // <-- FORMULARIO INICIALIZADO
+  const form = useForm<RegisterComplexFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      complexName: "",
+      adminName: "",
+      email: "",
+      phone: "",
+    },
+  });
 
   const onSubmit = async (data: RegisterComplexFormValues) => {
     setLoading(true);
