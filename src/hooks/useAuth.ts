@@ -12,7 +12,7 @@ export function useAuth() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -31,19 +31,19 @@ export function useAuth() {
       // Redirección basada en rol
       switch (result.user.role) {
         case "ADMIN":
-          router.push("/admin/app-admin/dashboard");
+          router.push(ROUTES.APP_ADMIN_DASHBOARD);
           break;
         case "COMPLEX_ADMIN":
-          router.push("/admin/complex-admin/admin-dashboard");
+          router.push(ROUTES.COMPLEX_ADMIN_DASHBOARD);
           break;
         case "RESIDENT":
-          router.push("/resident/resident-dashboard");
+          router.push(ROUTES.RESIDENT_DASHBOARD);
           break;
         case "RECEPTION":
-          router.push("/reception-portal/reception-dashboard");
+          router.push(ROUTES.RECEPTION_DASHBOARD);
           break;
         default:
-          router.push("/");
+          router.push(ROUTES.HOME);
       }
     } catch (err: any) {
       setError(err.message);
@@ -56,7 +56,7 @@ export function useAuth() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/auth/register-complex", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register-complex`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

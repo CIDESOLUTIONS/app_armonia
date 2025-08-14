@@ -36,7 +36,7 @@ interface LoginFormProps {
 export default function LoginForm({ portalType = null }: LoginFormProps) {
   const { login, loading, error } = useAuth();
   const { toast } = useToast();
-  const t = useTranslations("Login");
+  const { t } = useTranslation("Login");
   const router = useRouter();
 
   const form = useForm<BrandingFormValues>({
