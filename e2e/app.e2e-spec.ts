@@ -2,20 +2,39 @@ import { test, expect, Page } from "@playwright/test";
 
 // Helper function for reliable login
 async function login(page: Page, email: string, password: string, portal: 'admin' | 'resident' | 'reception') {
-  await page.goto(`/es/login?portal=${portal}`);
-  
-  // Usar selectores basados en el código real del formulario de login (react-hook-form)
+  // 1. Go to homepage
+  await page.goto('/es');
+
+  // 2. Click the main login button in the header
+  await page.locator('header >> a:has-text("Login")').click();
+
+  // 3. Assert we are on the portal selector page
+  await expect(page).toHaveURL(/.*\/portal-selector/);
+
+  // 4. Click the card corresponding to the correct portal
+  if (portal === 'admin') {
+    await page.locator('button:has-text("Acceder como Administrador")').click();
+  } else if (portal === 'resident') {
+    await page.locator('button:has-text("Acceder como Residente")').click();
+  } else if (portal === 'reception') {
+    await page.locator('button:has-text("Acceder como Recepción")').click();
+  }
+
+  // 5. Assert we are on the final login page
+  await expect(page).toHaveURL(new RegExp(`.*\/login\?portal=${portal}`));
+
+  // 6. Fill form and submit
   await page.fill('input[name="email"]', email);
   await page.fill('input[name="password"]', password);
   await page.click('button[type="submit"]');
   
-  // Wait for navigation to complete and check for correct portal URLs
+  // 7. Wait for navigation to complete and check for correct portal URLs
   if (portal === 'admin') {
-    await expect(page).toHaveURL(/.*\/es\/complex-admin/);
+    await expect(page).toHaveURL(/.*\/complex-admin/);
   } else if (portal === 'resident') {
-    await expect(page).toHaveURL(/.*\/es\/resident/);
+    await expect(page).toHaveURL(/.*\/resident/);
   } else if (portal === 'reception') {
-    await expect(page).toHaveURL(/.*\/es\/reception/);
+    await expect(page).toHaveURL(/.*\/reception/);
   }
 }
 
