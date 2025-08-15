@@ -80,7 +80,9 @@ export class PanicService {
       where: { id },
       data: {
         status: updatePanicAlertDto.status,
-        resolvedTime: updatePanicAlertDto.resolvedTime ? new Date(updatePanicAlertDto.resolvedTime) : undefined,
+        resolvedTime: updatePanicAlertDto.resolvedTime
+          ? new Date(updatePanicAlertDto.resolvedTime)
+          : undefined,
         resolvedById: updatePanicAlertDto.resolvedById,
         location: updatePanicAlertDto.location,
         description: updatePanicAlertDto.description,

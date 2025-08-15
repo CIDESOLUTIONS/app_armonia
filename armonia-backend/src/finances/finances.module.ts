@@ -8,6 +8,6 @@ import { CommunicationsModule } from '../communications/communications.module'; 
   imports: [PrismaModule, CommunicationsModule], // Added CommunicationsModule
   providers: [FinancesService],
   controllers: [FinancesController],
-  exports: [FinancesService] // Added export for FinancesService if other modules need it
+  exports: [FinancesService], // Added export for FinancesService if other modules need it
 })
 export class FinancesModule {}

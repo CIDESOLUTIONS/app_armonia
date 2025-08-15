@@ -121,8 +121,18 @@ describe('SurveyService', () => {
   describe('getSurveys', () => {
     it('should return a list of surveys for a complex', async () => {
       const mockSurveys = [
-        { id: '1', title: 'Survey 1', residentialComplexId: '123', questions: [] },
-        { id: '2', title: 'Survey 2', residentialComplexId: '123', questions: [] },
+        {
+          id: '1',
+          title: 'Survey 1',
+          residentialComplexId: '123',
+          questions: [],
+        },
+        {
+          id: '2',
+          title: 'Survey 2',
+          residentialComplexId: '123',
+          questions: [],
+        },
       ];
       mockPrismaClient.survey.findMany.mockResolvedValue(mockSurveys);
 
@@ -416,8 +426,18 @@ describe('SurveyService', () => {
             type: QuestionType.SINGLE_CHOICE,
             options: ['A', 'B'],
             answers: [
-              { id: '100', questionId: '10', userId: '1', selectedOptions: ['A'] },
-              { id: '101', questionId: '10', userId: '2', selectedOptions: ['A'] },
+              {
+                id: '100',
+                questionId: '10',
+                userId: '1',
+                selectedOptions: ['A'],
+              },
+              {
+                id: '101',
+                questionId: '10',
+                userId: '2',
+                selectedOptions: ['A'],
+              },
             ],
           },
           {
@@ -426,7 +446,12 @@ describe('SurveyService', () => {
             type: QuestionType.TEXT,
             options: [],
             answers: [
-              { id: '102', questionId: '11', userId: '1', textAnswer: 'Text Answer' },
+              {
+                id: '102',
+                questionId: '11',
+                userId: '1',
+                textAnswer: 'Text Answer',
+              },
             ],
           },
         ],

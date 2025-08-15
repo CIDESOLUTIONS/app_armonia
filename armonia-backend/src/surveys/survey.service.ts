@@ -53,7 +53,8 @@ export class SurveyService {
     });
   }
 
-  async getSurveyById(schemaName: string, id: string): Promise<SurveyDto> { // Changed id to string
+  async getSurveyById(schemaName: string, id: string): Promise<SurveyDto> {
+    // Changed id to string
     const prisma: any = this.prisma;
     const survey = await prisma.survey.findUnique({
       where: { id },
@@ -100,7 +101,8 @@ export class SurveyService {
     return updatedSurvey;
   }
 
-  async deleteSurvey(schemaName: string, id: string): Promise<void> { // Changed id to string
+  async deleteSurvey(schemaName: string, id: string): Promise<void> {
+    // Changed id to string
     const prisma: any = this.prisma;
     const survey = await prisma.survey.findUnique({ where: { id } });
     if (!survey) {
@@ -173,7 +175,8 @@ export class SurveyService {
     return answer;
   }
 
-  async getSurveyResults(schemaName: string, surveyId: string): Promise<any> { // Changed surveyId to string
+  async getSurveyResults(schemaName: string, surveyId: string): Promise<any> {
+    // Changed surveyId to string
     const prisma: any = this.prisma;
     const survey = await prisma.survey.findUnique({
       where: { id: surveyId },

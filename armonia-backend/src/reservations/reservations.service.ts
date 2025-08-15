@@ -76,10 +76,7 @@ export class ReservationsService {
           { startTime: { lt: end, gte: start } },
           { endTime: { lte: end, gt: start } },
           {
-            AND: [
-              { startTime: { lte: start } },
-              { endTime: { gte: end } },
-            ],
+            AND: [{ startTime: { lte: start } }, { endTime: { gte: end } }],
           },
         ],
       },
@@ -209,7 +206,10 @@ export class ReservationsService {
     if (!reservation) {
       throw new NotFoundException(`Reserva con ID ${id} no encontrada.`);
     }
-    const updatedReservation = await prisma.reservation.update({ where: { id }, data: { status } });
+    const updatedReservation = await prisma.reservation.update({
+      where: { id },
+      data: { status },
+    });
     return this.mapToReservationDto(updatedReservation);
   }
 

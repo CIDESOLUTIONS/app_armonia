@@ -25,10 +25,7 @@ export class UserManagementService {
     });
   }
 
-  async createStaffUser(
-    schemaName: string,
-    data: CreateUserDto,
-  ) {
+  async createStaffUser(schemaName: string, data: CreateUserDto) {
     const prisma = this.prisma.getTenantDB(schemaName);
     const existingUser = await prisma.user.findUnique({
       where: { email: data.email },

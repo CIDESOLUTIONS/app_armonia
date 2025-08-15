@@ -34,7 +34,7 @@ const formSchema = z.object({
 export default function RegisterComplexForm() {
   const { registerComplex, loading, error } = useAuth();
   const { toast } = useToast();
-  const t = useTranslations("RegisterComplex");
+  const { t } = useTranslation("RegisterComplex");
 
   const form = useForm<BrandingFormValues>({
     resolver: zodResolver(formSchema),

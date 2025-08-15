@@ -41,9 +41,7 @@ export class PaymentGatewaysController {
 
   @Get()
   @Roles(UserRole.ADMIN)
-  async findAll(
-    @GetUser() user: any,
-  ): Promise<PaymentGatewayConfigDto[]> {
+  async findAll(@GetUser() user: any): Promise<PaymentGatewayConfigDto[]> {
     return this.paymentGatewaysService.getPaymentGateways(user.schemaName);
   }
 
@@ -53,7 +51,10 @@ export class PaymentGatewaysController {
     @GetUser() user: any,
     @Param('id') id: string,
   ): Promise<PaymentGatewayConfigDto> {
-    return this.paymentGatewaysService.getPaymentGatewayById(user.schemaName, id);
+    return this.paymentGatewaysService.getPaymentGatewayById(
+      user.schemaName,
+      id,
+    );
   }
 
   @Put(':id')
@@ -72,10 +73,10 @@ export class PaymentGatewaysController {
 
   @Delete(':id')
   @Roles(UserRole.ADMIN)
-  async remove(
-    @GetUser() user: any,
-    @Param('id') id: string,
-  ): Promise<void> {
-    return this.paymentGatewaysService.deletePaymentGateway(user.schemaName, id);
+  async remove(@GetUser() user: any, @Param('id') id: string): Promise<void> {
+    return this.paymentGatewaysService.deletePaymentGateway(
+      user.schemaName,
+      id,
+    );
   }
 }

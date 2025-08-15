@@ -33,16 +33,15 @@ export const getPrisma = (tenantId?: string) => {
   if (!tenantId) return prisma;
 
   const databaseUrl = process.env.DATABASE_URL?.replace("public", tenantId);
-  return new PrismaClient({ 
-    datasources: { 
-      db: { 
-        url: databaseUrl 
-      } 
-    } 
+  return new PrismaClient({
+    datasources: {
+      db: {
+        url: databaseUrl,
+      },
+    },
   });
 };
 
 export const getPublicPrismaClient = () => {
   return prisma;
 };
-

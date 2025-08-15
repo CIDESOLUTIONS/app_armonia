@@ -5,21 +5,24 @@ const testimonials = [
   {
     name: "Ana García",
     role: "Administradora, Conjunto El Roble",
-    avatar: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    avatar:
+      "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
     testimonial:
       '"Armonía ha transformado nuestra gestión. La comunicación con los residentes es más fluida y hemos ahorrado incontables horas en tareas administrativas."',
   },
   {
     name: "Carlos Martínez",
     role: "Miembro del Consejo, Residencial Los Pinos",
-    avatar: "https://images.pexels.com/photos/837358/pexels-photo-837358.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    avatar:
+      "https://images.pexels.com/photos/837358/pexels-photo-837358.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
     testimonial:
       '"La función de asambleas virtuales es excepcional. Tuvimos una participación récord y la toma de decisiones fue transparente y eficiente."',
   },
   {
     name: "Lucía Fernández",
     role: "Residente, Torres del Parque",
-    avatar: "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    avatar:
+      "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
     testimonial:
       '"Reservar el salón comunal y pagar la administración desde mi celular es increíblemente cómodo. ¡La app es muy fácil de usar!"',
   },
@@ -49,7 +52,7 @@ export const Testimonials = () => {
                   alt={`Avatar de ${item.name}`}
                   fill
                   sizes="96px"
-                  style={{ objectFit: 'cover' }}
+                  style={{ objectFit: "cover" }}
                 />
               </div>
               <p className="text-gray-600 mb-4 italic">{item.testimonial}</p>

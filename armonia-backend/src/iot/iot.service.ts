@@ -87,7 +87,7 @@ export class IotService {
       orderBy: { timestamp: 'desc' },
     });
 
-    return readings.map(reading => ({
+    return readings.map((reading) => ({
       id: reading.id,
       deviceId: reading.deviceId,
       meterId: reading.deviceId, // Assuming meterId is deviceId for mapping

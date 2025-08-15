@@ -53,7 +53,8 @@ export class ReportsService {
     doc.font('Helvetica').fontSize(9);
     visitors.forEach((visitor) => {
       doc.text(visitor.name, 50, doc.y, { width: 100, align: 'left' });
-      doc.text(visitor.idNumber, 150, doc.y, { // Corrected from idNumber
+      doc.text(visitor.idNumber, 150, doc.y, {
+        // Corrected from idNumber
         width: 100,
         align: 'left',
       });
@@ -181,11 +182,7 @@ export class ReportsService {
     });
 
     const data = [
-      [
-        'Destino',
-        'Registro',
-        'Entrega',
-      ],
+      ['Destino', 'Registro', 'Entrega'],
       ...packages.map((pkg) => [
         pkg.residentId,
         format(pkg.receivedAt, 'dd/MM/yyyy HH:mm'),
@@ -238,7 +235,10 @@ export class ReportsService {
     doc.font('Helvetica').fontSize(9);
     incidents.forEach((incident) => {
       doc.text(incident.title, 50, doc.y, { width: 100, align: 'left' });
-      doc.text(incident.reportedById, 410, doc.y, { width: 100, align: 'left' });
+      doc.text(incident.reportedById, 410, doc.y, {
+        width: 100,
+        align: 'left',
+      });
       doc.text(incident.status, 510, doc.y, { width: 80, align: 'left' });
       doc.moveDown();
     });
@@ -264,11 +264,7 @@ export class ReportsService {
     });
 
     const data = [
-      [
-        'Título',
-        'Reportado Por',
-        'Estado',
-      ],
+      ['Título', 'Reportado Por', 'Estado'],
       ...incidents.map((incident) => [
         incident.title,
         incident.reportedById,

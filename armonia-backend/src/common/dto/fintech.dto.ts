@@ -1,4 +1,10 @@
-import { IsString, IsNumber, IsEnum, IsOptional, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsEnum,
+  IsOptional,
+  IsDateString,
+} from 'class-validator';
 
 export enum MicroCreditStatus {
   PENDING = 'PENDING',
