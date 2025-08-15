@@ -48,6 +48,18 @@
       "description": "Moderniza tu portería. Permite a los residentes generar códigos QR temporales para visitantes, agilizando el acceso y mejorando la seguridad."
     }
   },
+  "video": {
+    "title": "Vive la Experiencia Armonía",
+    "description": "Navega por nuestras funcionalidades clave y descubre por qué somos la solución definitiva para la gestión de tu conjunto residencial. Así de fácil, así de potente.",
+    "fallback": "Tu navegador no soporta la etiqueta de video.",
+    "features": {
+      "qrAccess": "Acceso con QR",
+      "assemblies": "Asambleas",
+      "payments": "Pagos de Cuotas",
+      "reservations": "Reservas",
+      "marketplace": "Marketplace"
+    }
+  },
   "testimonials": {
     "title": "Administradores como tú confían en Armonía",
     "ana": {

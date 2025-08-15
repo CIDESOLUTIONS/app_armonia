@@ -54,8 +54,16 @@
     "timeReduction": "Administrative Time Reduction"
   },
   "video": {
-    "title": "See Armonía in Action",
-    "description": "Discover how Armonía transforms residential complex management through this comprehensive demonstration."
+    "title": "Experience Armonía in Action",
+    "description": "Browse through our key features and discover why we are the definitive solution for managing your residential community. It's that easy, that powerful.",
+    "fallback": "Your browser does not support the video tag.",
+    "features": {
+      "qrAccess": "QR Access",
+      "assemblies": "Assemblies",
+      "payments": "Fee Payments",
+      "reservations": "Reservations",
+      "marketplace": "Marketplace"
+    }
   },
   "pricing": {
     "title": "Plans Designed for Your Complex",

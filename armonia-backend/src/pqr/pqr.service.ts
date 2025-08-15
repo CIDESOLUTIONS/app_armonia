@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreatePQRDto,
@@ -79,8 +83,12 @@ export class PqrService {
         description: data.description,
         type: data.type,
         status: data.status,
-        ...(data.reportedById && { reportedBy: { connect: { id: data.reportedById } } }),
-        ...(data.residentialComplexId && { residentialComplex: { connect: { id: data.residentialComplexId } } }),
+        ...(data.reportedById && {
+          reportedBy: { connect: { id: data.reportedById } },
+        }),
+        ...(data.residentialComplexId && {
+          residentialComplex: { connect: { id: data.residentialComplexId } },
+        }),
       },
     });
   }

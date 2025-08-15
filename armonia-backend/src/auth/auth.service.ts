@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException, Inject, forwardRef } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  Inject,
+  forwardRef,
+} from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -30,9 +35,7 @@ export class AuthService {
 
   async login(user: any) {
     const schemaName = user.residentialComplexId
-      ? await this.tenantService.getTenantSchemaName(
-        user.residentialComplexId,
-      )
+      ? await this.tenantService.getTenantSchemaName(user.residentialComplexId)
       : null;
     const payload = {
       email: user.email,
@@ -52,9 +55,8 @@ export class AuthService {
     // This is a complex transaction that involves multiple schemas and should be handled carefully.
     // For now, we'll assume a simplified approach where we create the complex and then the admin.
 
-    const newComplex = await this.residentialComplexService.createComplexAndSchema(
-      complexData,
-    );
+    const newComplex =
+      await this.residentialComplexService.createComplexAndSchema(complexData);
 
     const adminPayload = {
       ...adminData,

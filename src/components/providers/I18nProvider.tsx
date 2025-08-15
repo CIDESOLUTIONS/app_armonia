@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { I18nextProvider } from 'react-i18next';
-import initTranslations from '@/app/i18n';
-import { createInstance } from 'i18next';
-import { ReactNode } from 'react';
+import { I18nextProvider } from "react-i18next";
+import initTranslations from "@/app/i18n";
+import { createInstance } from "i18next";
+import { ReactNode } from "react";
 
 interface I18nProviderProps {
   children: ReactNode;
@@ -11,10 +11,10 @@ interface I18nProviderProps {
   namespaces: string[];
 }
 
-export default function I18nProvider({ 
-  children, 
-  locale, 
-  namespaces 
+export default function I18nProvider({
+  children,
+  locale,
+  namespaces,
 }: I18nProviderProps) {
   const i18n = createInstance();
   initTranslations(locale, namespaces, i18n);

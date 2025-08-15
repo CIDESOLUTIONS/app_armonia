@@ -137,8 +137,12 @@ export class VisitorsService {
         name: data.name,
         documentType: data.documentType,
         documentNumber: data.documentNumber,
-        ...(data.propertyId && { property: { connect: { id: data.propertyId } } }),
-        ...(data.residentialComplexId && { residentialComplex: { connect: { id: data.residentialComplexId } } }),
+        ...(data.propertyId && {
+          property: { connect: { id: data.propertyId } },
+        }),
+        ...(data.residentialComplexId && {
+          residentialComplex: { connect: { id: data.residentialComplexId } },
+        }),
         destination: data.destination,
         residentName: data.residentName,
         plate: data.plate,
@@ -180,7 +184,9 @@ export class VisitorsService {
           documentType:
             preRegisteredVisitor.documentType || VisitorDocumentType.OTHER,
           documentNumber: preRegisteredVisitor.documentNumber || 'N/A',
-          residentialComplex: { connect: { id: preRegisteredVisitor.residentialComplexId } },
+          residentialComplex: {
+            connect: { id: preRegisteredVisitor.residentialComplexId },
+          },
           property: { connect: { id: preRegisteredVisitor.propertyId } },
           resident: { connect: { id: preRegisteredVisitor.residentId } },
           entryTime: now,
@@ -220,9 +226,15 @@ export class VisitorsService {
           documentType:
             accessPass.preRegister?.documentType || VisitorDocumentType.OTHER,
           documentNumber: accessPass.preRegister?.documentNumber || 'N/A',
-          residentialComplex: { connect: { id: accessPass.preRegister?.residentialComplexId || '' } },
-          property: { connect: { id: accessPass.preRegister?.propertyId || '' } },
-          resident: { connect: { id: accessPass.preRegister?.residentId || '' } },
+          residentialComplex: {
+            connect: { id: accessPass.preRegister?.residentialComplexId || '' },
+          },
+          property: {
+            connect: { id: accessPass.preRegister?.propertyId || '' },
+          },
+          resident: {
+            connect: { id: accessPass.preRegister?.residentId || '' },
+          },
           entryTime: now,
           status: VisitorStatus.ACTIVE,
           accessPassId: accessPass.id,

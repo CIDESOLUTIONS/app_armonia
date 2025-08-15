@@ -68,7 +68,8 @@ export class ServiceProvidersService {
         { service: { contains: filters.search, mode: 'insensitive' } },
       ];
     }
-    if (filters.service) { // Changed from filters.category
+    if (filters.service) {
+      // Changed from filters.category
       where.service = filters.service; // Changed from filters.category
     }
 
@@ -101,7 +102,9 @@ export class ServiceProvidersService {
     data: UpdateServiceProviderDto,
   ): Promise<ServiceProviderDto> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    const provider = await this.prisma.getTenantDB(schemaName).serviceProvider.findUnique({ where: { id } }); // Corrected
+    const provider = await this.prisma
+      .getTenantDB(schemaName)
+      .serviceProvider.findUnique({ where: { id } }); // Corrected
 
     if (!provider) {
       throw new NotFoundException(
@@ -116,7 +119,9 @@ export class ServiceProvidersService {
         service: data.service,
         phone: data.phone,
         email: data.email,
-        ...(data.residentialComplexId && { residentialComplex: { connect: { id: data.residentialComplexId } } }),
+        ...(data.residentialComplexId && {
+          residentialComplex: { connect: { id: data.residentialComplexId } },
+        }),
       },
     });
     return this.mapToServiceProviderDto(updatedProvider);

@@ -79,8 +79,10 @@ export class AssemblyService {
 
   async getAssemblies(schemaName: string): Promise<AssemblyDto[]> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    const assemblies = await prisma.assembly.findMany({ orderBy: { date: 'desc' } });
-    return assemblies.map(assembly => ({
+    const assemblies = await prisma.assembly.findMany({
+      orderBy: { date: 'desc' },
+    });
+    return assemblies.map((assembly) => ({
       ...assembly,
       type: assembly.type as AssemblyType,
       status: assembly.status as AssemblyStatus,
@@ -106,7 +108,10 @@ export class AssemblyService {
     data: UpdateAssemblyDto,
   ): Promise<AssemblyDto> {
     const prisma = this.prisma.getTenantDB(schemaName);
-    const updatedAssembly = await prisma.assembly.update({ where: { id }, data });
+    const updatedAssembly = await prisma.assembly.update({
+      where: { id },
+      data,
+    });
     return {
       ...updatedAssembly,
       type: updatedAssembly.type as AssemblyType,
@@ -171,7 +176,8 @@ export class AssemblyService {
       }
 
       const isOwner = property.residents.some(
-        (resident) => resident.userId === userId && resident.propertyId === unitId,
+        (resident) =>
+          resident.userId === userId && resident.propertyId === unitId,
       );
 
       if (!isOwner) {
@@ -296,8 +302,8 @@ export class AssemblyService {
       const presentUnits = assembly.attendance.length;
 
       // Assuming all units have a coefficient of 1 for simplicity, or fetch from a more detailed property model if available
-      const totalCoefficients = totalUnits; 
-      const presentCoefficients = presentUnits; 
+      const totalCoefficients = totalUnits;
+      const presentCoefficients = presentUnits;
 
       const quorumPercentage =
         totalCoefficients > 0
@@ -494,7 +500,7 @@ export class AssemblyService {
         return updatedVote;
       }
 
-      let coefficient = 1;
+      const coefficient = 1;
 
       // if (vote.weightedVoting) { // weightedVoting is not in schema
       //   const unit = await prisma.unit.findUnique({
@@ -616,7 +622,10 @@ export class AssemblyService {
   async endVote(
     schemaName: string,
     voteId: string,
-  ): Promise<{ vote: AssemblyVoteDto; results: CalculateVoteResultsResultDto }> {
+  ): Promise<{
+    vote: AssemblyVoteDto;
+    results: CalculateVoteResultsResultDto;
+  }> {
     const prisma = this.prisma.getTenantDB(schemaName);
     try {
       if (!voteId) {

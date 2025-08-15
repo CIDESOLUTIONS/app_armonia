@@ -22,10 +22,7 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       <body className="font-sans">
-        <I18nProvider
-          namespaces={i18nNamespaces}
-          locale={locale}
-        >
+        <I18nProvider namespaces={i18nNamespaces} locale={locale}>
           {children}
         </I18nProvider>
       </body>

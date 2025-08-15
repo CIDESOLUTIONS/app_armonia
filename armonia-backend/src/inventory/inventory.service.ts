@@ -18,7 +18,10 @@ export class InventoryService {
   constructor(private prisma: PrismaService) {}
 
   // Common Area Methods
-  async createCommonArea(schemaName: string, createCommonAreaDto: CreateCommonAreaDto) {
+  async createCommonArea(
+    schemaName: string,
+    createCommonAreaDto: CreateCommonAreaDto,
+  ) {
     return this.prisma.getTenantDB(schemaName).amenity.create({
       data: {
         name: createCommonAreaDto.name,
@@ -35,19 +38,27 @@ export class InventoryService {
   }
 
   async getCommonAreaById(schemaName: string, id: string) {
-    const commonArea = await this.prisma.getTenantDB(schemaName).amenity.findUnique({
-      where: { id },
-    });
+    const commonArea = await this.prisma
+      .getTenantDB(schemaName)
+      .amenity.findUnique({
+        where: { id },
+      });
     if (!commonArea) {
       throw new NotFoundException(`Common Area with ID ${id} not found`);
     }
     return commonArea;
   }
 
-  async updateCommonArea(schemaName: string, id: string, updateCommonAreaDto: UpdateCommonAreaDto) {
-    const existingCommonArea = await this.prisma.getTenantDB(schemaName).amenity.findUnique({
-      where: { id },
-    });
+  async updateCommonArea(
+    schemaName: string,
+    id: string,
+    updateCommonAreaDto: UpdateCommonAreaDto,
+  ) {
+    const existingCommonArea = await this.prisma
+      .getTenantDB(schemaName)
+      .amenity.findUnique({
+        where: { id },
+      });
 
     if (!existingCommonArea) {
       throw new NotFoundException(`Common Area with ID ${id} not found`);
@@ -60,9 +71,11 @@ export class InventoryService {
   }
 
   async deleteCommonArea(schemaName: string, id: string) {
-    const existingCommonArea = await this.prisma.getTenantDB(schemaName).amenity.findUnique({
-      where: { id },
-    });
+    const existingCommonArea = await this.prisma
+      .getTenantDB(schemaName)
+      .amenity.findUnique({
+        where: { id },
+      });
 
     if (!existingCommonArea) {
       throw new NotFoundException(`Common Area with ID ${id} not found`);
@@ -74,7 +87,10 @@ export class InventoryService {
   }
 
   // Parking Spot Methods
-  async createParkingSpot(schemaName: string, createParkingSpotDto: CreateParkingSpotDto) {
+  async createParkingSpot(
+    schemaName: string,
+    createParkingSpotDto: CreateParkingSpotDto,
+  ) {
     return this.prisma.getTenantDB(schemaName).parking.create({
       data: {
         number: createParkingSpotDto.number,
@@ -92,19 +108,27 @@ export class InventoryService {
   }
 
   async getParkingSpotById(schemaName: string, id: string) {
-    const parkingSpot = await this.prisma.getTenantDB(schemaName).parking.findUnique({
-      where: { id },
-    });
+    const parkingSpot = await this.prisma
+      .getTenantDB(schemaName)
+      .parking.findUnique({
+        where: { id },
+      });
     if (!parkingSpot) {
       throw new NotFoundException(`Parking Spot with ID ${id} not found`);
     }
     return parkingSpot;
   }
 
-  async updateParkingSpot(schemaName: string, id: string, updateParkingSpotDto: UpdateParkingSpotDto) {
-    const existingParkingSpot = await this.prisma.getTenantDB(schemaName).parking.findUnique({
-      where: { id },
-    });
+  async updateParkingSpot(
+    schemaName: string,
+    id: string,
+    updateParkingSpotDto: UpdateParkingSpotDto,
+  ) {
+    const existingParkingSpot = await this.prisma
+      .getTenantDB(schemaName)
+      .parking.findUnique({
+        where: { id },
+      });
 
     if (!existingParkingSpot) {
       throw new NotFoundException(`Parking Spot with ID ${id} not found`);
@@ -117,9 +141,11 @@ export class InventoryService {
   }
 
   async deleteParkingSpot(schemaName: string, id: string) {
-    const existingParkingSpot = await this.prisma.getTenantDB(schemaName).parking.findUnique({
-      where: { id },
-    });
+    const existingParkingSpot = await this.prisma
+      .getTenantDB(schemaName)
+      .parking.findUnique({
+        where: { id },
+      });
 
     if (!existingParkingSpot) {
       throw new NotFoundException(`Parking Spot with ID ${id} not found`);
@@ -138,7 +164,10 @@ export class InventoryService {
     });
   }
 
-  async createProperty(schemaName: string, createPropertyDto: CreatePropertyDto) {
+  async createProperty(
+    schemaName: string,
+    createPropertyDto: CreatePropertyDto,
+  ) {
     return this.prisma.getTenantDB(schemaName).property.create({
       data: {
         type: createPropertyDto.type,
@@ -149,10 +178,16 @@ export class InventoryService {
     });
   }
 
-  async updateProperty(schemaName: string, id: string, updatePropertyDto: UpdatePropertyDto) {
-    const existingProperty = await this.prisma.getTenantDB(schemaName).property.findUnique({
-      where: { id },
-    });
+  async updateProperty(
+    schemaName: string,
+    id: string,
+    updatePropertyDto: UpdatePropertyDto,
+  ) {
+    const existingProperty = await this.prisma
+      .getTenantDB(schemaName)
+      .property.findUnique({
+        where: { id },
+      });
 
     if (!existingProperty) {
       throw new NotFoundException(`Property with ID ${id} not found`);
@@ -211,7 +246,10 @@ export class InventoryService {
     });
   }
 
-  async createResident(schemaName: string, createResidentDto: CreateResidentDto) {
+  async createResident(
+    schemaName: string,
+    createResidentDto: CreateResidentDto,
+  ) {
     return this.prisma.getTenantDB(schemaName).resident.create({
       data: {
         name: createResidentDto.name,
@@ -223,10 +261,16 @@ export class InventoryService {
     });
   }
 
-  async updateResident(schemaName: string, id: string, updateResidentDto: UpdateResidentDto) {
-    const existingResident = await this.prisma.getTenantDB(schemaName).resident.findUnique({
-      where: { id },
-    });
+  async updateResident(
+    schemaName: string,
+    id: string,
+    updateResidentDto: UpdateResidentDto,
+  ) {
+    const existingResident = await this.prisma
+      .getTenantDB(schemaName)
+      .resident.findUnique({
+        where: { id },
+      });
 
     if (!existingResident) {
       throw new NotFoundException(`Resident with ID ${id} not found`);
@@ -239,9 +283,11 @@ export class InventoryService {
   }
 
   async deleteResident(schemaName: string, id: string) {
-    const existingResident = await this.prisma.getTenantDB(schemaName).resident.findUnique({
-      where: { id },
-    });
+    const existingResident = await this.prisma
+      .getTenantDB(schemaName)
+      .resident.findUnique({
+        where: { id },
+      });
 
     if (!existingResident) {
       throw new NotFoundException(`Resident with ID ${id} not found`);
@@ -264,13 +310,27 @@ export class InventoryService {
     // This method would typically aggregate data from various inventory models.
     // For now, returning a placeholder.
     return {
-      commonAreasCount: await this.prisma.getTenantDB(schemaName).amenity.count({ where: { residentialComplexId } }),
-      parkingSpotsCount: await this.prisma.getTenantDB(schemaName).parking.count({ where: { residentialComplexId } }),
-      propertiesCount: await this.prisma.getTenantDB(schemaName).property.count({ where: { residentialComplexId } }),
-      petsCount: await this.prisma.getTenantDB(schemaName).pet.count({ where: { residentialComplexId } }),
-      vehiclesCount: await this.prisma.getTenantDB(schemaName).vehicle.count({ where: { residentialComplexId } }),
-      residentsCount: await this.prisma.getTenantDB(schemaName).resident.count({ where: { property: { residentialComplexId } } }),
-      serviceProvidersCount: await this.prisma.getTenantDB(schemaName).serviceProvider.count({ where: { residentialComplexId } }),
+      commonAreasCount: await this.prisma
+        .getTenantDB(schemaName)
+        .amenity.count({ where: { residentialComplexId } }),
+      parkingSpotsCount: await this.prisma
+        .getTenantDB(schemaName)
+        .parking.count({ where: { residentialComplexId } }),
+      propertiesCount: await this.prisma
+        .getTenantDB(schemaName)
+        .property.count({ where: { residentialComplexId } }),
+      petsCount: await this.prisma
+        .getTenantDB(schemaName)
+        .pet.count({ where: { residentialComplexId } }),
+      vehiclesCount: await this.prisma
+        .getTenantDB(schemaName)
+        .vehicle.count({ where: { residentialComplexId } }),
+      residentsCount: await this.prisma
+        .getTenantDB(schemaName)
+        .resident.count({ where: { property: { residentialComplexId } } }),
+      serviceProvidersCount: await this.prisma
+        .getTenantDB(schemaName)
+        .serviceProvider.count({ where: { residentialComplexId } }),
     };
   }
 }

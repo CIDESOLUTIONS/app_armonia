@@ -40,7 +40,7 @@ export function Header({
   const [theme, setTheme] = useState("Claro");
   const [currency, setCurrency] = useState("Pesos");
   const router = useRouter();
-  
+
   const { user, changeUserRole } = useAuthStore();
   const { selectedComplexId, selectedComplexName, setSelectedComplex } =
     useComplexStore();

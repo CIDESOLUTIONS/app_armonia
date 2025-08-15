@@ -1,9 +1,14 @@
 import { test, expect, Page } from "@playwright/test";
 
 // Helper function for reliable login
-async function login(page: Page, email: string, password: string, portal: 'admin' | 'resident') {
+async function login(
+  page: Page,
+  email: string,
+  password: string,
+  portal: "admin" | "resident",
+) {
   // 1. Go to homepage
-  await page.goto('/es');
+  await page.goto("/es");
 
   // 2. Click the main login button in the header
   await page.locator('header >> a:has-text("Login")').click();
@@ -12,9 +17,9 @@ async function login(page: Page, email: string, password: string, portal: 'admin
   await expect(page).toHaveURL(/.*\/portal-selector/);
 
   // 4. Click the card corresponding to the correct portal
-  if (portal === 'admin') {
+  if (portal === "admin") {
     await page.locator('button:has-text("Acceder como Administrador")').click();
-  } else if (portal === 'resident') {
+  } else if (portal === "resident") {
     await page.locator('button:has-text("Acceder como Residente")').click();
   }
 
@@ -25,28 +30,35 @@ async function login(page: Page, email: string, password: string, portal: 'admin
   await page.fill('input[name="email"]', email);
   await page.fill('input[name="password"]', password);
   await page.click('button[type="submit"]');
-  
+
   // 7. Wait for navigation to complete and check for correct portal URLs
-  if (portal === 'admin') {
+  if (portal === "admin") {
     await expect(page).toHaveURL(/.*\/complex-admin/);
-  } else if (portal === 'resident') {
+  } else if (portal === "resident") {
     await expect(page).toHaveURL(/.*\/resident/);
   }
 }
 
 test.describe("Virtual Assembly E2E Tests (CP-601)", () => {
-  const adminEmail = process.env.E2E_ADMIN_EMAIL || `admin.e2e.${Date.now()}@test.com`;
+  const adminEmail =
+    process.env.E2E_ADMIN_EMAIL || `admin.e2e.${Date.now()}@test.com`;
   const adminPassword = process.env.E2E_ADMIN_PASSWORD || "password123";
-  const residentEmail = process.env.E2E_RESIDENT_EMAIL || `resident.e2e.${Date.now()}@test.com`;
+  const residentEmail =
+    process.env.E2E_RESIDENT_EMAIL || `resident.e2e.${Date.now()}@test.com`;
   const residentPassword = process.env.E2E_RESIDENT_PASSWORD || "password123";
 
-  test("should manage the full lifecycle of a virtual assembly", async ({ page }) => {
+  test("should manage the full lifecycle of a virtual assembly", async ({
+    page,
+  }) => {
     // 1. Admin creates the assembly
-    await login(page, adminEmail, adminPassword, 'admin');
+    await login(page, adminEmail, adminPassword, "admin");
     await page.goto("/es/complex-admin/assembly");
     await page.click('button:has-text("Crear Asamblea")');
     await page.fill('input[name="title"]', "Asamblea General Ordinaria E2E");
-    await page.fill('textarea[name="description"]', "Asamblea de prueba para E2E.");
+    await page.fill(
+      'textarea[name="description"]',
+      "Asamblea de prueba para E2E.",
+    );
     await page.fill('input[name="date"]', "2025-12-31T19:00");
     await page.click('button:has-text("Crear")');
     await expect(page.locator("text=Asamblea creada con éxito")).toBeVisible();
@@ -64,14 +76,14 @@ test.describe("Virtual Assembly E2E Tests (CP-601)", () => {
     await expect(page.locator("text=Votación creada")).toBeVisible();
 
     // 4. Resident logs in and votes
-    await login(page, residentEmail, residentPassword, 'resident');
+    await login(page, residentEmail, residentPassword, "resident");
     await page.goto("/es/resident/assembly");
     await page.click('button:has-text("Votar")');
     await page.click('button:has-text("A favor")');
     await expect(page.locator("text=Voto registrado")).toBeVisible();
 
     // 5. Admin closes the votation and checks results
-    await login(page, adminEmail, adminPassword, 'admin');
+    await login(page, adminEmail, adminPassword, "admin");
     await page.goto("/es/complex-admin/assembly");
     await page.click('button:has-text("Cerrar Votación")');
     await expect(page.locator("text=Votación cerrada")).toBeVisible();

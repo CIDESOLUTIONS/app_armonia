@@ -39,7 +39,10 @@ export class SurveyController {
 
   @Get()
   getSurveys(@GetUser() user: any) {
-    return this.surveyService.getSurveys(user.schemaName, user.residentialComplexId);
+    return this.surveyService.getSurveys(
+      user.schemaName,
+      user.residentialComplexId,
+    );
   }
 
   @Get(':id')

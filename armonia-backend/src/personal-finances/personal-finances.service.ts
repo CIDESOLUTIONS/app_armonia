@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreatePersonalTransactionDto,
@@ -11,7 +15,9 @@ import {
 export class PersonalFinancesService {
   constructor(private prisma: PrismaService) {}
 
-  private mapToPersonalTransactionDto(transaction: any): PersonalTransactionDto {
+  private mapToPersonalTransactionDto(
+    transaction: any,
+  ): PersonalTransactionDto {
     return {
       id: transaction.id,
       userId: transaction.userId,

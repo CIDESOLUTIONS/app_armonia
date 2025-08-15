@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Plans } from "@/components/landing/Plans"; // Assuming Plans component is already there

@@ -66,7 +66,9 @@ export class PlansService {
     });
 
     if (!complex) {
-      throw new NotFoundException(`Residential Complex with ID ${residentialComplexId} not found.`);
+      throw new NotFoundException(
+        `Residential Complex with ID ${residentialComplexId} not found.`,
+      );
     }
 
     // Return the complex with its plan details, or map to a simplified DTO
@@ -81,7 +83,9 @@ export class PlansService {
     const updatedComplex = await prisma.residentialComplex.update({
       where: { id: updateSubscriptionDto.residentialComplexId }, // Use residentialComplexId from DTO
       data: {
-        ...(updateSubscriptionDto.planId && { plan: { connect: { id: updateSubscriptionDto.planId } } }),
+        ...(updateSubscriptionDto.planId && {
+          plan: { connect: { id: updateSubscriptionDto.planId } },
+        }),
       },
     });
     return updatedComplex; // You might want to map this to a more appropriate DTO

@@ -11,7 +11,9 @@ import {
 export class MicroCreditService {
   constructor(private prisma: PrismaService) {}
 
-  private mapToMicroCreditApplicationDto(application: any): MicroCreditApplicationDto {
+  private mapToMicroCreditApplicationDto(
+    application: any,
+  ): MicroCreditApplicationDto {
     return {
       id: application.id,
       userId: application.userId,

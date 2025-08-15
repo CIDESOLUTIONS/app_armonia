@@ -9,7 +9,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
   // maxFailures: 1, // Commented out to ensure all tests run
-  globalSetup: require.resolve('./playwright.global-setup.simple'), // Simplified setup
+  globalSetup: require.resolve("./playwright.global-setup.simple"), // Simplified setup
   use: {
     baseURL: "http://localhost:3000",
     trace: "on-first-retry",

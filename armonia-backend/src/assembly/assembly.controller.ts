@@ -141,7 +141,10 @@ export class AssemblyController {
   async endVote(
     @GetUser() user: any,
     @Param('voteId') voteId: string,
-  ): Promise<{ vote: AssemblyVoteDto; results: CalculateVoteResultsResultDto }> {
+  ): Promise<{
+    vote: AssemblyVoteDto;
+    results: CalculateVoteResultsResultDto;
+  }> {
     return this.assemblyService.endVote(user.schemaName, voteId);
   }
 }

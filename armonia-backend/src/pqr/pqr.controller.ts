@@ -38,10 +38,7 @@ export class PqrController {
   @UseGuards(
     RolesGuard([UserRole.RESIDENT, UserRole.ADMIN, UserRole.COMPLEX_ADMIN]),
   )
-  async getPqrs(
-    @GetUser() user: any,
-    @Query() filters: GetPQRParamsDto,
-  ) {
+  async getPqrs(@GetUser() user: any, @Query() filters: GetPQRParamsDto) {
     return this.pqrService.getPqrs(
       user.schemaName,
       user.userId,
@@ -54,10 +51,7 @@ export class PqrController {
   @UseGuards(
     RolesGuard([UserRole.RESIDENT, UserRole.ADMIN, UserRole.COMPLEX_ADMIN]),
   )
-  async getPqrById(
-    @GetUser() user: any,
-    @Param('id') id: string,
-  ) {
+  async getPqrById(@GetUser() user: any, @Param('id') id: string) {
     return this.pqrService.getPqrById(
       user.schemaName,
       user.userId,

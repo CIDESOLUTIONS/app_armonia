@@ -7,21 +7,24 @@ const blogPosts = [
     title: "5 consejos para una gestión de asambleas más eficiente",
     excerpt:
       "Descubra cómo la tecnología puede optimizar sus asambleas, desde la convocatoria hasta la generación de actas.",
-    imageUrl: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=2832&auto=format&fit=crop",
+    imageUrl:
+      "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=2832&auto=format&fit=crop",
     link: "/blog/gestion-asambleas",
   },
   {
     title: "La importancia de la comunicación en un conjunto residencial",
     excerpt:
       "Explore estrategias y herramientas para fortalecer la comunicación entre administradores, residentes y personal.",
-    imageUrl: "https://images.unsplash.com/photo-1516542076529-1ea3854896f2?q=80&w=2671&auto=format&fit=crop",
+    imageUrl:
+      "https://images.unsplash.com/photo-1516542076529-1ea3854896f2?q=80&w=2671&auto=format&fit=crop",
     link: "/blog/comunicacion-efectiva",
   },
   {
     title: "Cómo optimizar las finanzas de su conjunto con Armonía",
     excerpt:
       "Aprenda a utilizar las herramientas financieras de Armonía para un manejo transparente y eficiente de los recursos.",
-    imageUrl: "https://images.pexels.com/photos/265087/pexels-photo-265087.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    imageUrl:
+      "https://images.pexels.com/photos/265087/pexels-photo-265087.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
     link: "/blog/finanzas-transparentes",
   },
 ];

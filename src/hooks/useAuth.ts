@@ -12,13 +12,16 @@ export function useAuth() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password, complexId, schemaName }),
         },
-        body: JSON.stringify({ email, password, complexId, schemaName }),
-      });
+      );
 
       const result = await response.json();
 
@@ -56,13 +59,16 @@ export function useAuth() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register-complex`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/register-complex`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
         },
-        body: JSON.stringify(data),
-      });
+      );
 
       const result = await response.json();
 

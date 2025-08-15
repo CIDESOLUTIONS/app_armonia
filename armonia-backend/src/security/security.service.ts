@@ -16,7 +16,9 @@ export class SecurityService {
         type: data.type,
         description: data.description,
         location: data.location,
-        reportedBy: data.reportedByUserId ? { connect: { id: data.reportedByUserId } } : undefined,
+        reportedBy: data.reportedByUserId
+          ? { connect: { id: data.reportedByUserId } }
+          : undefined,
         residentialComplex: { connect: { id: data.residentialComplexId } },
       },
     });

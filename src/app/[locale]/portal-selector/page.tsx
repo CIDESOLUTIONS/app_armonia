@@ -11,9 +11,36 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building, UserPlus, Shield, ArrowLeft, User, Briefcase } from "lucide-react";
+import {
+  Building,
+  UserPlus,
+  Shield,
+  ArrowLeft,
+  User,
+  Briefcase,
+} from "lucide-react";
 import { ROUTES } from "@/constants/routes";
 import { Header } from "@/components/layout/header";
+
+// Helper para las clases de Tailwind
+const colorClasses = {
+  indigo: {
+    header: "bg-indigo-600 text-indigo-100",
+    button: "bg-indigo-600 hover:bg-indigo-700",
+  },
+  green: {
+    header: "bg-green-600 text-green-100",
+    button: "bg-green-600 hover:bg-green-700",
+  },
+  red: {
+    header: "bg-red-600 text-red-100",
+    button: "bg-red-600 hover:bg-red-700",
+  },
+  blue: {
+    header: "bg-blue-600 text-blue-100",
+    button: "bg-blue-600 hover:bg-blue-700",
+  },
+};
 
 export default function PortalSelector() {
   const router = useRouter();
@@ -21,41 +48,23 @@ export default function PortalSelector() {
   const [theme, setTheme] = useState("Claro");
   const [currency, setCurrency] = useState("Pesos");
 
-  // Textos según el idioma
   const texts = {
     es: {
       title: "Seleccionar Portal",
       subtitle: "Elija el tipo de acceso que necesita",
       adminPortal: "Portal Administración",
       adminDesc: "Gestión completa del conjunto residencial",
-      adminFeatures: [
-        "Gestión de propiedades y residentes",
-        "Administración financiera",
-        "Gestión de asambleas",
-        "Configuración del sistema",
-        "Control de seguridad y accesos",
-      ],
       adminButton: "Acceder como Administrador",
       residentPortal: "Portal Residentes",
       residentDesc: "Acceso para propietarios y residentes",
-      residentFeatures: [
-        "Consulta de estado de cuenta",
-        "Reserva de servicios comunes",
-        "Participación en asambleas",
-        "Gestión de PQR",
-        "Acceso a documentos del conjunto",
-      ],
       residentButton: "Acceder como Residente",
       receptionPortal: "Portal Recepción",
       receptionDesc: "Acceso para personal de recepción y vigilancia",
-      receptionFeatures: [
-        "Registro de visitantes",
-        "Control de correspondencia",
-        "Registro de incidentes",
-        "Monitoreo de vigilancia",
-        "Gestión de paquetería",
-      ],
       receptionButton: "Acceder como Recepción",
+      portfolioPortal: "Portal Portafolio",
+      portfolioDesc:
+        "Gestión centralizada para administradores de múltiples conjuntos",
+      portfolioButton: "Acceder como Gestor de Portafolio",
       registerQuestion: "¿Necesita registrar un nuevo conjunto?",
       registerButton: "Registrar Conjunto",
       backButton: "Volver a Inicio",
@@ -65,34 +74,16 @@ export default function PortalSelector() {
       subtitle: "Choose the type of access you need",
       adminPortal: "Administration Portal",
       adminDesc: "Complete management of the residential complex",
-      adminFeatures: [
-        "Property and resident management",
-        "Financial administration",
-        "Assembly management",
-        "System configuration",
-        "Security and access control",
-      ],
       adminButton: "Access as Administrator",
       residentPortal: "Resident Portal",
       residentDesc: "Access for owners and residents",
-      residentFeatures: [
-        "View account status",
-        "Book common services",
-        "Participate in assemblies",
-        "Manage requests and complaints",
-        "Access to complex documents",
-      ],
       residentButton: "Access as Resident",
       receptionPortal: "Reception Portal",
       receptionDesc: "Access for reception and security staff",
-      receptionFeatures: [
-        "Visitor registration",
-        "Mail control",
-        "Incident logging",
-        "Security monitoring",
-        "Package management",
-      ],
       receptionButton: "Access as Reception",
+      portfolioPortal: "Portfolio Portal",
+      portfolioDesc: "Centralized management for multi-complex administrators",
+      portfolioButton: "Access as Portfolio Manager",
       registerQuestion: "Need to register a new complex?",
       registerButton: "Register Complex",
       backButton: "Back to Home",
@@ -101,17 +92,53 @@ export default function PortalSelector() {
 
   const t = language === "Español" ? texts.es : texts.en;
 
-  // Efecto para aplicar el tema en la interfaz
   useEffect(() => {
     if (typeof document !== "undefined") {
       document.body.classList.toggle("dark-mode", theme === "Oscuro");
     }
   }, [theme]);
 
-  const navigateToLogin = (portalType: "admin" | "resident" | "reception" | "portfolio") => {
-    // Redirigir a la página de login con el parámetro del tipo de portal
-    router.push(`/login?portal=${portalType}`);
+  const navigateToLogin = (
+    portalType: "admin" | "resident" | "reception" | "portfolio",
+  ) => {
+    router.push(`/es/login?portal=${portalType}`);
   };
+
+  const portalCards = [
+    {
+      id: "admin",
+      title: t.adminPortal,
+      description: t.adminDesc,
+      buttonText: t.adminButton,
+      icon: <Building className="w-6 h-6 mr-2" />,
+      color: "indigo" as keyof typeof colorClasses,
+    },
+    {
+      id: "resident",
+      title: t.residentPortal,
+      description: t.residentDesc,
+      buttonText: t.residentButton,
+      icon: <User className="w-6 h-6 mr-2" />,
+      color: "green" as keyof typeof colorClasses,
+    },
+    {
+      id: "reception",
+      title: t.receptionPortal,
+      description: t.receptionDesc,
+      buttonText: t.receptionButton,
+      icon: <Shield className="w-6 h-6 mr-2" />,
+      color: "red" as keyof typeof colorClasses,
+    },
+    {
+      id: "portfolio",
+      title: t.portfolioPortal,
+      description: t.portfolioDesc,
+      buttonText: t.portfolioButton,
+      icon: <Briefcase className="w-6 h-6 mr-2" />,
+      color: "blue" as keyof typeof colorClasses,
+      fullWidth: true,
+    },
+  ];
 
   return (
     <div
@@ -153,58 +180,33 @@ export default function PortalSelector() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Card 1: Administración */}
-          <Card className="... omitted for brevity ...">
-            {/* ... omitted for brevity ... */}
-          </Card>
-
-          {/* Card 2: Residentes */}
-          <Card className="... omitted for brevity ...">
-            {/* ... omitted for brevity ... */}
-          </Card>
-
-          {/* Card 3: Recepción */}
-          <Card className="... omitted for brevity ...">
-            {/* ... omitted for brevity ... */}
-          </Card>
-
-          {/* Card 4: Portfolio */}
-          <Card
-            className={`overflow-hidden transition-all hover:shadow-xl ${theme === "Oscuro" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} transform hover:-translate-y-1 duration-300 md:col-span-2`}
-          >
-            <CardHeader className="bg-blue-600 text-white pb-6">
-              <CardTitle className="flex items-center text-xl">
-                <Briefcase className="w-6 h-6 mr-2" />
-                {t.portfolioPortal || 'Portal Portafolio'}
-              </CardTitle>
-              <CardDescription className="text-blue-100">
-                {t.portfolioDesc || 'Gestión centralizada para administradores de múltiples conjuntos'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <ul
-                className={`space-y-2 ${theme === "Oscuro" ? "text-gray-300" : "text-gray-600"}`}
+          {portalCards.map((card) => (
+            <Card
+              key={card.id}
+              className={`overflow-hidden transition-all hover:shadow-xl ${theme === "Oscuro" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} transform hover:-translate-y-1 duration-300 ${card.fullWidth ? "md:col-span-2" : ""}`}
+            >
+              <CardHeader
+                className={`${colorClasses[card.color].header} text-white pb-6`}
               >
-                {(t.portfolioFeatures || []).map((feature, index) => (
-                  <li
-                    key={`portfolio-feature-${index}`}
-                    className="flex items-start mb-2"
-                  >
-                    <span className="w-2 h-2 bg-blue-500 rounded-full mr-2 mt-1.5"></span>
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button
-                className="w-full bg-blue-600 hover:bg-blue-700"
-                onClick={() => navigateToLogin("portfolio")}
-              >
-                {t.portfolioButton || 'Acceder como Gestor de Portafolio'}
-              </Button>
-            </CardFooter>
-          </Card>
+                <CardTitle className="flex items-center text-xl">
+                  {card.icon}
+                  {card.title}
+                </CardTitle>
+                <CardDescription className={colorClasses[card.color].header}>
+                  {card.description}
+                </CardDescription>
+              </CardHeader>
+              <CardFooter>
+                <Button
+                  className={`w-full ${colorClasses[card.color].button}`}
+                  onClick={() => navigateToLogin(card.id as any)}
+                  data-testid={`portal-${card.id}-button`}
+                >
+                  {card.buttonText}
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
         </div>
 
         <div className="mt-10 text-center">
@@ -227,20 +229,6 @@ export default function PortalSelector() {
           </div>
         </div>
       </div>
-
-      <footer
-        className={`py-6 ${theme === "Oscuro" ? "bg-gray-800 text-gray-400" : "bg-gray-900 text-gray-400"}`}
-      >
-        <div className="container mx-auto px-4 text-center">
-          <p>
-            © 2025 Armonía.{" "}
-            {language === "Español"
-              ? "Todos los derechos reservados"
-              : "All rights reserved"}
-            .
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }

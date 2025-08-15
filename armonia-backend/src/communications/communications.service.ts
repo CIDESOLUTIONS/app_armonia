@@ -631,7 +631,13 @@ export class CommunicationsService {
       throw new Error('El usuario no pertenece a esta conversación');
     }
     const message: any = await prisma.message.create({
-      data: { conversation: { connect: { id: conversationId } }, sender: { connect: { id: senderId } }, recipient: { connect: { id: recipientId } }, content: data.content, status: 'sent' },
+      data: {
+        conversation: { connect: { id: conversationId } },
+        sender: { connect: { id: senderId } },
+        recipient: { connect: { id: recipientId } },
+        content: data.content,
+        status: 'sent',
+      },
       include: { sender: { select: { id: true, name: true } } },
     });
     if (data.attachments && data.attachments.length > 0) {
@@ -999,7 +1005,12 @@ export class CommunicationsService {
     }
     if (event.attendees.length > 0) {
       return await prisma.eventAttendee.update({
-        where: { eventId_userId: { eventId: event.attendees[0].eventId, userId: event.attendees[0].userId } },
+        where: {
+          eventId_userId: {
+            eventId: event.attendees[0].eventId,
+            userId: event.attendees[0].userId,
+          },
+        },
         data: { status },
       });
     } else {
