@@ -1,4 +1,4 @@
-import '@test/jest-setup';
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { DocumentsService } from './documents.service';
 import { PrismaService } from '../prisma/prisma.service';

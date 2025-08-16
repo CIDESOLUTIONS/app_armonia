@@ -1,4 +1,4 @@
-import '@test/jest-setup';
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { FinancesService } from './finances.service';
 import { CommunicationsService } from '../communications/communications.service';
