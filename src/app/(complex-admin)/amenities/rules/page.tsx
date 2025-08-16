@@ -154,7 +154,7 @@ export default function ReservationRulesPage() {
     e.preventDefault();
     try {
       if (currentRule) {
-        await updateReservationRule(currentRule.id, formData);
+        await updateReservationRule(currentRule.id, { id: currentRule.id, ...formData });
         toast({
           title: "Éxito",
           description: "Regla de reserva actualizada correctamente.",
@@ -437,12 +437,14 @@ export default function ReservationRulesPage() {
                 id="allowCancellation"
                 name="allowCancellation"
                 checked={formData.allowCancellation}
-                onCheckedChange={(checked) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    allowCancellation: checked,
-                  }))
-                }
+                onCheckedChange={(checked) => {
+                  if (typeof checked === 'boolean') {
+                    setFormData((prev) => ({
+                      ...prev,
+                      allowCancellation: checked,
+                    }));
+                  }
+                }}
               />
               <Label htmlFor="allowCancellation">Permitir Cancelación</Label>
             </div>
@@ -466,9 +468,11 @@ export default function ReservationRulesPage() {
                 id="isActive"
                 name="isActive"
                 checked={formData.isActive}
-                onCheckedChange={(checked) =>
-                  setFormData((prev) => ({ ...prev, isActive: checked }))
-                }
+                onCheckedChange={(checked) => {
+                  if (typeof checked === 'boolean') {
+                    setFormData((prev) => ({ ...prev, isActive: checked }));
+                  }
+                }}
               />
               <Label htmlFor="isActive">Activa</Label>
             </div>

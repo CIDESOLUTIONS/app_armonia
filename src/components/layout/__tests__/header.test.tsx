@@ -2,12 +2,16 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { Header } from "../header";
 import { useAuthStore } from "@/store/authStore";
 import { usePathname, useRouter } from "next/navigation";
-import { useLocale, useTranslations } from "next-intl";
 
-// Mock de next-intl
-jest.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => key,
-  useLocale: () => "es",
+// Mock de react-i18next
+jest.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+    i18n: {
+      language: "es",
+      changeLanguage: jest.fn(),
+    },
+  }),
 }));
 
 // Mock de next/navigation

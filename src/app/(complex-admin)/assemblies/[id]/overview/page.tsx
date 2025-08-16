@@ -25,6 +25,7 @@ import {
   Assembly,
   CreateVoteDto,
   VoteResult,
+  VoteStatus,
 } from "@/services/assemblyService";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -79,12 +80,10 @@ export default function AssemblyDetailPage() {
     try {
       const fetchedAssembly = await getAssemblyById(
         assemblyId,
-        user?.complexId || "",
       );
       setAssembly(fetchedAssembly);
       const fetchedQuorum = await getAssemblyQuorumStatus(
         assemblyId,
-        user?.complexId || "",
       );
       setQuorumStatus(fetchedQuorum);
       // Fetch votes for this assembly
@@ -118,7 +117,7 @@ export default function AssemblyDetailPage() {
   ) => {
     if (!assemblyId || !user?.complexId) return;
     try {
-      await registerAttendance(assemblyId, userId, true, user.complexId); // Assuming unitId 1 for now
+      await registerAttendance(assemblyId, userId); // Assuming unitId 1 for now
       toast({
         title: "Éxito",
         description: `Asistencia registrada para la unidad ${userId}.`,
@@ -142,10 +141,19 @@ export default function AssemblyDetailPage() {
     if (!assemblyId || !user?.complexId) return;
     try {
       const createdVote = await createVote(
-        { ...newVoteForm, assemblyId },
-        user.complexId,
+        assemblyId,
+        newVoteForm,
       );
-      setVotes((prev) => [...prev, createdVote]);
+      setVotes((prev) => [
+        ...prev,
+        {
+          id: createdVote.id,
+          question: createdVote.title, // Map title to question
+                              options: createdVote.options.map(opt => ({ id: Number(opt.id), value: opt.text })),
+          isWeighted: createdVote.weightedVoting, // Map weightedVoting to isWeighted
+          isActive: createdVote.status === VoteStatus.ACTIVE, // Map status to isActive
+        },
+      ]);
       toast({
         title: "Éxito",
         description: "Votación creada correctamente.",
@@ -174,7 +182,7 @@ export default function AssemblyDetailPage() {
   const handleGetVoteResults = async (voteId: number) => {
     if (!user?.complexId) return;
     try {
-      const results = await getVoteResults(voteId, user.complexId);
+      const results = await getVoteResults(voteId);
       setVoteResults((prev) => ({ ...prev, [voteId]: results }));
       toast({
         title: "Éxito",
@@ -201,7 +209,7 @@ export default function AssemblyDetailPage() {
   ) => {
     if (!user?.id || !user?.complexId) return;
     try {
-      await submitVote(voteId, user.id, option, 1, weight, user.complexId); // Assuming unitId 1 for now
+      await submitVote(voteId, user.id, option); // Assuming unitId 1 for now
       toast({
         title: "Éxito",
         description: "Voto registrado correctamente.",
@@ -224,7 +232,7 @@ export default function AssemblyDetailPage() {
   const handleGenerateMinutes = async () => {
     if (!assemblyId || !user?.complexId) return;
     try {
-      const pdfBlob = await generateMeetingMinutes(assemblyId, user.complexId);
+      const pdfBlob = await generateMeetingMinutes(assemblyId);
       const url = window.URL.createObjectURL(pdfBlob);
       const a = document.createElement("a");
       a.href = url;
@@ -351,7 +359,7 @@ export default function AssemblyDetailPage() {
                       variant="outline"
                       className="mr-2 mb-2"
                       onClick={
-                        () => handleSubmitVote(vote.id, option.value, 1) // Assuming weight 1 for now
+                        () => handleSubmitVote(vote.id, option.value) // Assuming weight 1 for now
                       }
                     >
                       {" "}

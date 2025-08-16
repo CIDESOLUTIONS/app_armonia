@@ -1,5 +1,5 @@
 // src/components/ui/badge.tsx
-import { cva } from "class-variance-authority";
+import { cva, VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils"; // Si no tienes esta utilidad, la definiremos también
 
 const badgeVariants = cva(

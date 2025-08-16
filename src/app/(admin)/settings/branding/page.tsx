@@ -11,7 +11,7 @@ import {
   getResidentialComplexById,
   updateResidentialComplex,
 } from "@/services/residentialComplexService";
-import { useForm } from "react-hook-form";
+import { useForm, ControllerRenderProps } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
@@ -55,7 +55,7 @@ export default function BrandingSettingsPage() {
   const [loading, setLoading] = useState(true);
 
   const form = useForm<BrandingFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       logoUrl: "",
       primaryColor: "",
@@ -151,7 +151,7 @@ export default function BrandingSettingsPage() {
             <FormField
               control={form.control}
               name="logoUrl"
-              render={({ field }) => (
+              render={({ field }: { field: ControllerRenderProps<BrandingFormValues, "logoUrl"> }) => (
                 <FormItem>
                   <FormLabel>URL del Logo</FormLabel>
                   <FormControl>
@@ -167,7 +167,7 @@ export default function BrandingSettingsPage() {
             <FormField
               control={form.control}
               name="primaryColor"
-              render={({ field }) => (
+              render={({ field }: { field: ControllerRenderProps<BrandingFormValues, "primaryColor"> }) => (
                 <FormItem>
                   <FormLabel>Color Primario</FormLabel>
                   <FormControl>
@@ -180,7 +180,7 @@ export default function BrandingSettingsPage() {
             <FormField
               control={form.control}
               name="secondaryColor"
-              render={({ field }) => (
+              render={({ field }: { field: ControllerRenderProps<BrandingFormValues, "secondaryColor"> }) => (
                 <FormItem>
                   <FormLabel>Color Secundario</FormLabel>
                   <FormControl>
