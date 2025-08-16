@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { getDashboardStats } from "@/services/dashboardService";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "react-i18next";
 import {
   Loader2,
   Building2,
@@ -25,7 +25,7 @@ interface DashboardStats {
 }
 
 export default function InventoryPage() {
-  const t = useTranslations("admin.inventory");
+  const { t } = useTranslation("admin.inventory");
   const { user, loading: authLoading } = useAuthStore();
   const { toast } = useToast();
   const [stats, setStats] = useState<DashboardStats | null>(null);

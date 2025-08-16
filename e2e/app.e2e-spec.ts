@@ -93,9 +93,7 @@ test.describe("Armonía Application E2E Tests", () => {
     ).toBeVisible();
 
     // Edit property - buscar primer botón de editar
-    await page
-      .click('button:has-text("Editar"), button:has-text("Edit")')
-      .first();
+    await page.locator('button:has-text("Editar"), button:has-text("Edit")').first().click();
     await page.selectOption('select[name="status"]', "OCCUPIED");
     await page.click(
       'button:has-text("Guardar"), button:has-text("Save"), button[type="submit"]',
@@ -105,9 +103,7 @@ test.describe("Armonía Application E2E Tests", () => {
     ).toBeVisible();
 
     // Delete property - buscar primer botón de eliminar
-    await page
-      .click('button:has-text("Eliminar"), button:has-text("Delete")')
-      .first();
+    await page.locator('button:has-text("Eliminar"), button:has-text("Delete")').first().click();
     await page.click(
       'button:has-text("Confirmar"), button:has-text("Confirm")',
     );
@@ -141,9 +137,7 @@ test.describe("Armonía Application E2E Tests", () => {
     ).toBeVisible();
 
     // Edit resident
-    await page
-      .click('button:has-text("Editar"), button:has-text("Edit")')
-      .first();
+    await page.locator('button:has-text("Editar"), button:has-text("Edit")').first().click();
     await page.fill('input[name="phone"]', "0987654321");
     await page.click(
       'button:has-text("Guardar"), button:has-text("Save"), button[type="submit"]',
@@ -153,9 +147,7 @@ test.describe("Armonía Application E2E Tests", () => {
     ).toBeVisible();
 
     // Delete resident
-    await page
-      .click('button:has-text("Eliminar"), button:has-text("Delete")')
-      .first();
+    await page.locator('button:has-text("Eliminar"), button:has-text("Delete")').first().click();
     await page.click(
       'button:has-text("Confirmar"), button:has-text("Confirm")',
     );
@@ -189,9 +181,7 @@ test.describe("Armonía Application E2E Tests", () => {
     ).toBeVisible();
 
     // Edit biometric ID
-    await page
-      .click('button:has-text("Editar"), button:has-text("Edit")')
-      .first();
+    await page.locator('button:has-text("Editar"), button:has-text("Edit")').first().click();
     await page.fill('input[name="biometricId"]', "BIO67890");
     await page.click(
       'button:has-text("Guardar"), button:has-text("Save"), button[type="submit"]',
@@ -227,9 +217,7 @@ test.describe("Armonía Application E2E Tests", () => {
     ).toBeVisible();
 
     // Edit vehicle
-    await page
-      .click('button:has-text("Editar"), button:has-text("Edit")')
-      .first();
+    await page.locator('button:has-text("Editar"), button:has-text("Edit")').first().click();
     await page.fill('input[name="color"]', "Azul");
     await page.click(
       'button:has-text("Guardar"), button:has-text("Save"), button[type="submit"]',
@@ -239,9 +227,7 @@ test.describe("Armonía Application E2E Tests", () => {
     ).toBeVisible();
 
     // Delete vehicle
-    await page
-      .click('button:has-text("Eliminar"), button:has-text("Delete")')
-      .first();
+    await page.locator('button:has-text("Eliminar"), button:has-text("Delete")').first().click();
     await page.click(
       'button:has-text("Confirmar"), button:has-text("Confirm")',
     );
@@ -272,9 +258,7 @@ test.describe("Armonía Application E2E Tests", () => {
     ).toBeVisible();
 
     // Edit pet
-    await page
-      .click('button:has-text("Editar"), button:has-text("Edit")')
-      .first();
+    await page.locator('button:has-text("Editar"), button:has-text("Edit")').first().click();
     await page.fill('input[name="breed"]', "Labrador");
     await page.click(
       'button:has-text("Guardar"), button:has-text("Save"), button[type="submit"]',
@@ -284,9 +268,7 @@ test.describe("Armonía Application E2E Tests", () => {
     ).toBeVisible();
 
     // Delete pet
-    await page
-      .click('button:has-text("Eliminar"), button:has-text("Delete")')
-      .first();
+    await page.locator('button:has-text("Eliminar"), button:has-text("Delete")').first().click();
     await page.click(
       'button:has-text("Confirmar"), button:has-text("Confirm")',
     );
@@ -316,9 +298,7 @@ test.describe("Armonía Application E2E Tests", () => {
     ).toBeVisible();
 
     // Edit amenity
-    await page
-      .click('button:has-text("Editar"), button:has-text("Edit")')
-      .first();
+    await page.locator('button:has-text("Editar"), button:has-text("Edit")').first().click();
     await page.fill('input[name="capacity"]', "60");
     await page.click(
       'button:has-text("Guardar"), button:has-text("Save"), button[type="submit"]',
@@ -328,9 +308,7 @@ test.describe("Armonía Application E2E Tests", () => {
     ).toBeVisible();
 
     // Delete amenity
-    await page
-      .click('button:has-text("Eliminar"), button:has-text("Delete")')
-      .first();
+    await page.locator('button:has-text("Eliminar"), button:has-text("Delete")').first().click();
     await page.click(
       'button:has-text("Confirmar"), button:has-text("Confirm")',
     );
@@ -406,7 +384,7 @@ test.describe("Armonía Application E2E Tests", () => {
     ).toBeVisible();
 
     // View and add comment
-    await page.click('button:has-text("Ver"), button:has-text("View")').first();
+    await page.locator('button:has-text("Ver"), button:has-text("View")').first().click();
     await page.fill(
       'textarea[placeholder*="comentario"], textarea[name="comment"]',
       "Este es un comentario de prueba.",
@@ -515,13 +493,13 @@ test.describe("Armonía Application E2E Tests", () => {
     await page.waitForLoadState("networkidle");
 
     // Approve a pending reservation (assuming one exists from resident tests)
-    await page.click('button:has-text("Aprobar")').first();
+    await page.locator('button:has-text("Aprobar")').first().click();
     await expect(
       page.locator("text=aprobada, text=approved, text=éxito, text=success"),
     ).toBeVisible();
 
     // Reject a pending reservation
-    await page.click('button:has-text("Rechazar")').first();
+    await page.locator('button:has-text("Rechazar")').first().click();
     await expect(
       page.locator("text=rechazada, text=rejected, text=éxito, text=success"),
     ).toBeVisible();
@@ -550,9 +528,7 @@ test.describe("Armonía Application E2E Tests", () => {
     ).toBeVisible();
 
     // Update project status
-    await page
-      .click('button:has-text("Editar"), button:has-text("Edit")')
-      .first();
+    await page.locator('button:has-text("Editar"), button:has-text("Edit")').first().click();
     await page.selectOption('select[name="status"]', "IN_PROGRESS");
     await page.click(
       'button:has-text("Guardar"), button:has-text("Save"), button[type="submit"]',
@@ -587,9 +563,7 @@ test.describe("Armonía Application E2E Tests", () => {
     ).toBeVisible();
 
     // Edit staff member
-    await page
-      .click('button:has-text("Editar"), button:has-text("Edit")')
-      .first();
+    await page.locator('button:has-text("Editar"), button:has-text("Edit")').first().click();
     await page.selectOption('select[name="role"]', "SECURITY");
     await page.click(
       'button:has-text("Guardar"), button:has-text("Save"), button[type="submit"]',

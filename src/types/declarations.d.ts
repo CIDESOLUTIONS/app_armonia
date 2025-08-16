@@ -63,12 +63,7 @@ declare module "@hookform/resolvers/zod" {
   export function zodResolver(schema: unknown): unknown;
 }
 
-declare module "react-hook-form" {
-  export function useForm(
-    config?: Record<string, unknown>,
-  ): Record<string, unknown>;
-  export function Controller(props: Record<string, unknown>): JSX.Element;
-}
+
 
 declare module "@/components/ui/form" {
   export function Form(props: Record<string, unknown>): JSX.Element;

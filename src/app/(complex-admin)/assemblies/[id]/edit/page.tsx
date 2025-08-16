@@ -16,8 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { getAssemblyById, updateAssembly } from "@/services/assemblyService";
-import { useForm } from "react-hook-form";
+import { getAssemblyById, updateAssembly, AssemblyStatus } from "@/services/assemblyService";
+import { useForm, ControllerRenderProps } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   assemblySchema,
@@ -41,8 +41,10 @@ export default function EditAssemblyPage() {
 
   const [pageLoading, setPageLoading] = useState(true); // Renamed to avoid conflict
 
+  const [assembly, setAssembly] = useState<AssemblyFormValues | null>(null);
+
   const form = useForm<AssemblyFormValues>({
-    resolver: zodResolver(assemblySchema),
+    resolver: zodResolver(assemblySchema) as any,
     defaultValues: {
       title: "",
       description: "",
@@ -111,7 +113,10 @@ export default function EditAssemblyPage() {
     if (!assemblyId) return;
 
     try {
-      await updateAssembly(assemblyId, data);
+      await updateAssembly(assemblyId, {
+        ...data,
+        status: data.status as AssemblyStatus,
+      });
       toast({
         title: "Éxito",
         description: "Asamblea actualizada correctamente.",
@@ -164,7 +169,7 @@ export default function EditAssemblyPage() {
             <FormField
               control={control}
               name="title"
-              render={({ field }) => (
+              render={({ field }: { field: ControllerRenderProps<AssemblyFormValues, "title"> }) => (
                 <FormItem>
                   <FormLabel>Título</FormLabel>
                   <FormControl>
@@ -177,7 +182,7 @@ export default function EditAssemblyPage() {
             <FormField
               control={control}
               name="description"
-              render={({ field }) => (
+              render={({ field }: { field: ControllerRenderProps<AssemblyFormValues, "description"> }) => (
                 <FormItem>
                   <FormLabel>Descripción</FormLabel>
                   <FormControl>
@@ -194,7 +199,7 @@ export default function EditAssemblyPage() {
             <FormField
               control={control}
               name="scheduledDate"
-              render={({ field }) => (
+              render={({ field }: { field: ControllerRenderProps<AssemblyFormValues, "scheduledDate"> }) => (
                 <FormItem>
                   <FormLabel>Fecha y Hora Programada</FormLabel>
                   <FormControl>
@@ -207,7 +212,7 @@ export default function EditAssemblyPage() {
             <FormField
               control={control}
               name="location"
-              render={({ field }) => (
+              render={({ field }: { field: ControllerRenderProps<AssemblyFormValues, "location"> }) => (
                 <FormItem>
                   <FormLabel>Ubicación</FormLabel>
                   <FormControl>
@@ -220,7 +225,7 @@ export default function EditAssemblyPage() {
             <FormField
               control={control}
               name="status"
-              render={({ field }) => (
+              render={({ field }: { field: ControllerRenderProps<AssemblyFormValues, "status"> }) => (
                 <FormItem>
                   <FormLabel>Estado</FormLabel>
                   <Select

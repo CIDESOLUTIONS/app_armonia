@@ -61,7 +61,7 @@ const authMiddleware = auth((req) => {
 
 export function middleware(request: NextRequest) {
   // Ejecutar primero el middleware de autenticación
-  const authResponse = authMiddleware(request);
+  const authResponse = (authMiddleware as any)(request);
   if (authResponse) {
     return authResponse; // Si hay redirección de auth, aplicarla
   }
