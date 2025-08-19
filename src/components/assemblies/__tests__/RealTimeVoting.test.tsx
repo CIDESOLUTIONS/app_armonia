@@ -4,23 +4,24 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import RealTimeVoting from "../RealTimeVoting";
 import { act } from "react-dom/test-utils";
 import { toast } from "@/components/ui/use-toast";
+import { vi } from 'vitest';
 
 // Mock de fetch
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 // Mock de toast
-jest.mock("@/components/ui/use-toast", () => ({
-  toast: jest.fn(),
+vi.mock("@/components/ui/use-toast", () => ({
+  toast: vi.fn(),
 }));
 
 describe("RealTimeVoting Component", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("muestra estado de carga inicialmente", () => {
     // Mock de fetch para que no resuelva inmediatamente
-    (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+    (global.fetch as any).mockImplementation(() => new Promise(() => {}));
 
     render(
       <RealTimeVoting
@@ -29,7 +30,7 @@ describe("RealTimeVoting Component", () => {
         topic="Test Topic"
         language="Español"
         userVote={null}
-        onVoteSubmitted={jest.fn()}
+        onVoteSubmitted={vi.fn()}
       />,
     );
 
@@ -38,7 +39,7 @@ describe("RealTimeVoting Component", () => {
 
   it("muestra estadísticas de votación correctamente", async () => {
     // Mock de respuesta exitosa
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         totalVotes: 10,
@@ -58,7 +59,7 @@ describe("RealTimeVoting Component", () => {
         topic="Test Topic"
         language="Español"
         userVote={null}
-        onVoteSubmitted={jest.fn()}
+        onVoteSubmitted={vi.fn()}
       />,
     );
 
@@ -74,7 +75,7 @@ describe("RealTimeVoting Component", () => {
 
   it("permite votar cuando la votación está abierta", async () => {
     // Mock para obtener estadísticas
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         totalVotes: 10,
@@ -88,13 +89,13 @@ describe("RealTimeVoting Component", () => {
     });
 
     // Mock para enviar voto
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true }),
     });
 
     // Mock para actualizar estadísticas después de votar
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         totalVotes: 11,
@@ -107,7 +108,7 @@ describe("RealTimeVoting Component", () => {
       }),
     });
 
-    const onVoteSubmittedMock = jest.fn();
+    const onVoteSubmittedMock = vi.fn();
 
     render(
       <RealTimeVoting
@@ -152,7 +153,7 @@ describe("RealTimeVoting Component", () => {
 
   it("no muestra botones de votación cuando el usuario ya votó", async () => {
     // Mock de respuesta exitosa
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         totalVotes: 10,
@@ -172,7 +173,7 @@ describe("RealTimeVoting Component", () => {
         topic="Test Topic"
         language="Español"
         userVote="YES" // Usuario ya votó
-        onVoteSubmitted={jest.fn()}
+        onVoteSubmitted={vi.fn()}
       />,
     );
 
@@ -188,7 +189,7 @@ describe("RealTimeVoting Component", () => {
 
   it("muestra mensaje de error cuando falla la carga", async () => {
     // Mock de respuesta fallida
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: false,
       json: async () => ({ error: "Error de servidor" }),
     });
@@ -200,7 +201,7 @@ describe("RealTimeVoting Component", () => {
         topic="Test Topic"
         language="Español"
         userVote={null}
-        onVoteSubmitted={jest.fn()}
+        onVoteSubmitted={vi.fn()}
       />,
     );
 

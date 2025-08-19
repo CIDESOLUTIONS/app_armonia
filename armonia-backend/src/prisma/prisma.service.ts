@@ -27,6 +27,18 @@ export class PrismaService implements OnModuleDestroy {
     return client;
   }
 
+  // NOTE: This is a temporary method for testing purposes to bypass process.env issues.
+  public getTenantDBForTest(databaseUrl: string): PrismaClient {
+    const client = new PrismaClient({
+      datasources: {
+        db: {
+          url: databaseUrl,
+        },
+      },
+    });
+    return client;
+  }
+
   async onModuleDestroy() {
     for (const client of this.clients.values()) {
       await client.$disconnect();

@@ -16,7 +16,10 @@
     "start:prod": "node -r tsconfig-paths/register dist/src/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "npx prisma generate --schema=./prisma/schema.prisma && npm run build && jest --clearCache && jest",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:integration": "npx prisma generate --schema=./prisma/schema.prisma && dotenv -e .env -- npx jest --config jest.integration.config.js",
+    "db:push": "dotenv -e .env -- npx prisma db push --schema=./prisma/schema.prisma",
+    "db:push:script": "node db-push-wrapper.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.848.0",
@@ -68,6 +71,7 @@
     "babel-jest": "^30.0.5",
     "cpx": "^1.5.0",
     "cross-env": "^10.0.0",
+    "dotenv-cli": "^7.4.2",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",

@@ -11,7 +11,7 @@
  * @param defaultData Datos por defecto para las respuestas
  * @returns Mock del modelo con todos los métodos como jest.fn()
  */
-export function createPrismaModelMock(defaultData: unknown = {}) {
+export function createPrismaModelMock(defaultData: any = {}) {
   return {
     findUnique: jest.fn().mockResolvedValue(defaultData.findUnique || null),
     findFirst: jest.fn().mockResolvedValue(defaultData.findFirst || null),
@@ -49,7 +49,7 @@ export function createPrismaModelMock(defaultData: unknown = {}) {
  * @param defaultData Datos por defecto para las respuestas de cada modelo
  * @returns Mock completo de PrismaClient
  */
-export function createPrismaClientMock(defaultData: unknown = {}) {
+export function createPrismaClientMock(defaultData: any = {}) {
   // Crear mocks para cada modelo
   const mockModels = {
     pQR: createPrismaModelMock(defaultData.pQR || {}),

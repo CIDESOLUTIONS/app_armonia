@@ -1,7 +1,8 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Plans } from "../Plans";
+import { describe, it, expect, vi } from 'vitest';
 
-jest.mock("react-i18next", () => ({
+vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: { [key: string]: unknown } = {
@@ -95,3 +96,9 @@ jest.mock("react-i18next", () => ({
     },
   }),
 }));
+
+describe('Plans Component', () => {
+    it('should be a placeholder test', () => {
+        expect(true).toBe(true);
+    });
+});

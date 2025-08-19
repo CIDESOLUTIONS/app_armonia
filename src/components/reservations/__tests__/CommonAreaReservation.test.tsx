@@ -1,13 +1,11 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@/__mocks__/test-utils";
 import "@testing-library/jest-dom";
 import CommonAreaReservation from "../CommonAreaReservation";
-import { Toaster } from "@/components/ui/toaster";
-import { ToastProvider } from "@/components/ui/toast";
 
 // Mock next-auth
-jest.mock("next-auth/react", () => ({
-  useSession: jest.fn(() => ({
+vi.mock("next-auth/react", () => ({
+  useSession: vi.fn(() => ({
     data: {
       user: {
         id: 1,
@@ -23,14 +21,14 @@ jest.mock("next-auth/react", () => ({
 }));
 
 // Mock fetch
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe("CommonAreaReservation Component", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Mock successful fetch for common areas
-    (global.fetch as jest.Mock).mockImplementation((url: string) => {
+    (global.fetch as any).mockImplementation((url: string) => {
       if (url.includes("/api/common-areas")) {
         return Promise.resolve({
           ok: true,
@@ -90,22 +88,12 @@ describe("CommonAreaReservation Component", () => {
   });
 
   it("renders the component title", async () => {
-    render(
-      <ToastProvider>
-        <CommonAreaReservation />
-        <Toaster />
-      </ToastProvider>,
-    );
+    render(<CommonAreaReservation />);
     expect(screen.getByText("Reserva de Áreas Comunes")).toBeInTheDocument();
   });
 
   it("loads and displays common areas", async () => {
-    render(
-      <ToastProvider>
-        <CommonAreaReservation />
-        <Toaster />
-      </ToastProvider>,
-    );
+    render(<CommonAreaReservation />);
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
         "/api/common-areas?active=true",

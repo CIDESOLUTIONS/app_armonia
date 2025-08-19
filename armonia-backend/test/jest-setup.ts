@@ -25,6 +25,7 @@ jest.mock('@aws-sdk/client-s3');
 jest.mock('@aws-sdk/lib-storage');
 
 
+/*
 // Database connection setup
 const prisma = new PrismaClient();
 
@@ -42,3 +43,19 @@ afterAll(async () => {
   await prisma.$disconnect();
   console.log('Database connection closed for test suite.');
 });
+*/
+
+// Mock PrismaService for all unit tests
+import { createPrismaClientMock } from '../../src/__mocks__/prisma-mock-helper';
+import { PrismaService } from '../src/prisma/prisma.service';
+
+// Create a reusable mock instance
+const mockPrismaClient = createPrismaClientMock();
+
+// Mock the PrismaService implementation
+jest.mock('../src/prisma/prisma.service.ts', () => ({
+  __esModule: true,
+  PrismaService: jest.fn().mockImplementation(() => ({
+    getTenantDB: jest.fn().mockReturnValue(mockPrismaClient),
+  })),
+}));

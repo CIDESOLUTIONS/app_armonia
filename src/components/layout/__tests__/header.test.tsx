@@ -2,38 +2,39 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { Header } from "../header";
 import { useAuthStore } from "@/store/authStore";
 import { usePathname, useRouter } from "next/navigation";
+import { vi } from 'vitest';
 
 // Mock de react-i18next
-jest.mock("react-i18next", () => ({
+vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string) => key,
     i18n: {
       language: "es",
-      changeLanguage: jest.fn(),
+      changeLanguage: vi.fn(),
     },
   }),
 }));
 
 // Mock de next/navigation
-jest.mock("next/navigation", () => ({
+vi.mock("next/navigation", () => ({
   useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
+    push: vi.fn(),
+    replace: vi.fn(),
   }),
   usePathname: () => "/",
 }));
 
 // Mock de zustand store
-jest.mock("@/store/authStore", () => ({
-  useAuthStore: jest.fn(),
+vi.mock("@/store/authStore", () => ({
+  useAuthStore: vi.fn(),
 }));
 
 describe("Header", () => {
   beforeEach(() => {
     // Resetear mocks antes de cada prueba
-    (useAuthStore as jest.Mock).mockReturnValue({
+    (useAuthStore as any).mockReturnValue({
       user: null,
-      changeUserRole: jest.fn(),
+      changeUserRole: vi.fn(),
     });
   });
 
@@ -62,14 +63,14 @@ describe("Header", () => {
   });
 
   it("shows user icon and logout button when logged in", () => {
-    (useAuthStore as jest.Mock).mockReturnValue({
+    (useAuthStore as any).mockReturnValue({
       user: {
         id: 1,
         email: "test@example.com",
         name: "Test User",
         role: "RESIDENT",
       },
-      changeUserRole: jest.fn(),
+      changeUserRole: vi.fn(),
     });
     render(<Header isLoggedIn={true} />);
     expect(screen.getByLabelText("User menu")).toBeInTheDocument(); // Assuming an accessible label
@@ -104,14 +105,14 @@ describe("Header", () => {
   });
 
   it("displays complex name and admin name when logged in", () => {
-    (useAuthStore as jest.Mock).mockReturnValue({
+    (useAuthStore as any).mockReturnValue({
       user: {
         id: 1,
         email: "test@example.com",
         name: "Test User",
         role: "RESIDENT",
       },
-      changeUserRole: jest.fn(),
+      changeUserRole: vi.fn(),
     });
     render(
       <Header

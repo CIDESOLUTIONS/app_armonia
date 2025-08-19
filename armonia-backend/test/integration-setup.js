@@ -1,0 +1,1 @@
+require('dotenv').config({ path: '/home/meciza/Documentos/app_armonia/armonia-backend/.env' });
