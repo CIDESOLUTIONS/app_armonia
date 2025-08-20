@@ -22,7 +22,7 @@ vi.mock("next/navigation", () => ({
   usePathname: vi.fn(() => "/"),
 }));
 
-// Mock de i18next (para asegurar que la instancia global sea mockeada)
+// Mock de i18next
 vi.mock("i18next", () => {
   const i18nInstance = {
     init: vi.fn(),
@@ -37,14 +37,14 @@ vi.mock("i18next", () => {
   };
 });
 
-// Mock de react-i18next (simplificado)
+// Mock de react-i18next
 vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key) => key, // Simple mock: returns the key as the translation
+  useTranslation: vi.fn(() => ({
+    t: vi.fn((key) => key),
     i18n: {
       changeLanguage: vi.fn(),
-      language: 'es', // Provide a default language
+      language: 'es',
     },
-  }),
-  I18nextProvider: ({ children }) => children, // Mock the provider to just render children
+  })),
+  I18nextProvider: ({ children }) => children,
 }));
