@@ -19,10 +19,7 @@ describe('LandingPage', () => {
     render(<LandingPage />);
     
     // The title is "Armonía"
-    const titleElement = screen.getByRole('heading', {
-      name: /Armonía/i,
-      level: 1,
-    });
+    const titleElement = screen.getByText('Armonía', { selector: 'h1.text-4xl' });
 
     expect(titleElement).toBeInTheDocument();
   });

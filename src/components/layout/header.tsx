@@ -237,6 +237,7 @@ export function Header({
                 <button
                   className="text-white hover:text-indigo-200 focus:outline-none"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  aria-label={t("user_menu")}
                 >
                   <User className="w-6 h-6" />
                 </button>

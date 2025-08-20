@@ -5,6 +5,7 @@ import { vi } from 'vitest';
 import { ToastProvider } from '@/components/ui/use-toast';
 import { I18nextProvider } from 'react-i18next';
 import i18n from 'i18next';
+import { SessionProvider } from 'next-auth/react'; // Import SessionProvider
 
 // Initialize a basic i18n instance for tests
 i18n.init({
@@ -32,7 +33,9 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <I18nextProvider i18n={i18n}>
         <AppRouterContext.Provider value={createMockRouter() as any}>
-            <ToastProvider>{children}</ToastProvider>
+            <ToastProvider>
+                <SessionProvider>{children}</SessionProvider> {/* Add SessionProvider */}
+            </ToastProvider>
         </AppRouterContext.Provider>
     </I18nextProvider>
   );

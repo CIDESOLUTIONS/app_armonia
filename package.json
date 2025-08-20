@@ -131,6 +131,7 @@
     "typescript-eslint": "^8.36.0",
     "unplugin-swc": "^1.5.5",
     "vitest": "^3.2.4",
+    "@testing-library/user-event": "^14.5.2",
     "wait-on": "^8.0.4",
     "whatwg-fetch": "^3.6.20",
     "next-router-mock": "^0.9.13"

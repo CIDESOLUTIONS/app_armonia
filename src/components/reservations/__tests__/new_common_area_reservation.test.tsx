@@ -1,9 +1,51 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@/__mocks__/test-utils";
+import { render, screen, waitFor } from "@/__mocks__/test-utils";
 import "@testing-library/jest-dom";
 import CommonAreaReservation from "../CommonAreaReservation";
+import { vi } from 'vitest';
 
-// Mock next-auth
+// Mock de @/hooks/useReservationsWithPayments a nivel de archivo
+vi.mock("@/hooks/useReservationsWithPayments", () => ({
+  useReservationsWithPayments: () => ({
+    commonAreas: [],
+    selectedArea: undefined,
+    myReservations: [],
+    calendarEvents: [],
+    viewDate: new Date(),
+    isLoading: false,
+    isCreatingReservation: false,
+    reservationForm: {
+      title: "",
+      description: "",
+      startDateTime: "",
+      endDateTime: "",
+      commonAreaId: null,
+      propertyId: null,
+      status: "PENDING",
+      requiresPayment: false,
+      attendees: 1,
+    },
+    isReservationDialogOpen: false,
+    selectedReservation: null,
+    isDetailDialogOpen: false,
+    isPaymentModalOpen: false,
+    setSelectedArea: vi.fn(),
+    setViewDate: vi.fn(),
+    fetchReservations: vi.fn(),
+    setReservationForm: vi.fn(),
+    setIsReservationDialogOpen: vi.fn(),
+    setIsDetailDialogOpen: vi.fn(),
+    setIsPaymentModalOpen: vi.fn(),
+    handleCreateReservation: vi.fn(),
+    handleCancelReservation: vi.fn(),
+    handleEventClick: vi.fn(),
+    handleNewReservation: vi.fn(),
+    handlePaymentComplete: vi.fn(),
+    selectedProperty: { id: 1, name: "Dummy Property" },
+  }),
+}));
+
+// Mock next-auth (needed because CommonAreaReservation uses useSession directly)
 vi.mock("next-auth/react", () => ({
   useSession: vi.fn(() => ({
     data: {
@@ -20,10 +62,10 @@ vi.mock("next-auth/react", () => ({
   ),
 }));
 
-// Mock fetch
+// Mock fetch (needed because CommonAreaReservation makes fetch calls directly)
 global.fetch = vi.fn();
 
-describe("CommonAreaReservation Component", () => {
+describe("CommonAreaReservation Component - New Test", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -80,10 +122,7 @@ describe("CommonAreaReservation Component", () => {
             ]),
         });
       }
-      return Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({}),
-      });
+      return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
     });
   });
 
