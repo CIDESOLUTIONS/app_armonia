@@ -62,6 +62,20 @@ vi.mock("next-auth/react", () => ({
   ),
 }));
 
+// Mock react-big-calendar
+vi.mock("react-big-calendar", () => ({
+  Calendar: vi.fn(() => <div>Mock Calendar</div>),
+  momentLocalizer: vi.fn(() => vi.fn()),
+}));
+
+// Mock moment
+vi.mock("moment", () => ({
+  default: vi.fn(() => ({
+    locale: vi.fn(),
+  })),
+  locale: vi.fn(), // Mock the static locale method
+}));
+
 // Mock fetch (needed because CommonAreaReservation makes fetch calls directly)
 global.fetch = vi.fn();
 

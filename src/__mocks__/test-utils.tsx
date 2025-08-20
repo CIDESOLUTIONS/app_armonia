@@ -1,11 +1,11 @@
 import React, { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
-import { AppRouterContext } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { vi } from 'vitest';
 import { ToastProvider } from '@/components/ui/use-toast';
-import { I18nextProvider } from 'react-i18next';
-import i18n from 'i18next';
-import { SessionProvider } from 'next-auth/react'; // Import SessionProvider
+import { I18nextProvider } from 'react-i18next'; // Re-added I18nextProvider import
+import i18n from 'i18next'; // Re-added i18n import
+import { SessionProvider } from 'next-auth/react';
+import { MemoryRouterProvider } from 'next-router-mock/MemoryRouterProvider'; // Import MemoryRouterProvider
 
 // Initialize a basic i18n instance for tests
 i18n.init({
@@ -18,25 +18,14 @@ i18n.init({
   },
 });
 
-
-// Mock the router
-const createMockRouter = () => ({
-  back: vi.fn(),
-  forward: vi.fn(),
-  push: vi.fn(),
-  replace: vi.fn(),
-  refresh: vi.fn(),
-  prefetch: vi.fn(),
-});
-
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
-    <I18nextProvider i18n={i18n}>
-        <AppRouterContext.Provider value={createMockRouter() as any}>
-            <ToastProvider>
-                <SessionProvider>{children}</SessionProvider> {/* Add SessionProvider */}
-            </ToastProvider>
-        </AppRouterContext.Provider>
+    <I18nextProvider i18n={i18n}> {/* Re-added I18nextProvider */}
+      <MemoryRouterProvider> {/* Use MemoryRouterProvider here */}
+        <ToastProvider>
+          <SessionProvider>{children}</SessionProvider>
+        </ToastProvider>
+      </MemoryRouterProvider>
     </I18nextProvider>
   );
 };
