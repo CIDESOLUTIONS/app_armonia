@@ -3,6 +3,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+targetRoles         String[]
+
 generator client {
   provider        = "prisma-client-js"
   output          = "../../node_modules/.prisma/client"
@@ -296,11 +298,41 @@ model Intercom {
 }
 
 model IoTDevice {
-  id          String   @id @default(cuid())
-  type        String // SMART_METER, CAMERA
-  status      String // ONLINE, OFFLINE
+  id                   String   @id @default(cuid())
+  name                 String
+  type                 String   // SMART_METER, CAMERA, SENSOR, ACCESS_CONTROL, THERMOSTAT, etc.
+  status               String   @default("OFFLINE") // ONLINE, OFFLINE, MAINTENANCE, ERROR, UNKNOWN
+  location             String
+  description          String?
+  serialNumber         String?
+  manufacturer         String?
+  model                String?
+  firmwareVersion      String?
+  metadata             Json?
+  lastSeen             DateTime?
+  installedAt          DateTime @default(now())
+  nextMaintenanceAt    DateTime?
+  propertyId           String?
+  property             Property? @relation(fields: [propertyId], references: [id])
   residentialComplexId String
-  residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  residentialComplex   ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  
+  // Relaciones con IoT
+  iotDevices           IoTDevice[]
+  utilityBills         UtilityBill[]
+  consumptionAnalytics ConsumptionAnalytics[]
+  telemetryData        TelemetryData[]
+  smartMeterReadings   SmartMeterReading[]
+  alerts               IoTAlert[]
+  deviceConfigs        DeviceConfig[]
+  utilityReadings      UtilityReading[]
+  
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  
+  @@index([residentialComplexId, type])
+  @@index([status])
+  @@index([propertyId])
 }
 
 model Listing {
@@ -468,6 +500,7 @@ model Payment {
   paymentMethod String?
   fees        Fee[]
   attempts    PaymentAttempt[]
+  bankReconciliations BankReconciliation[] // Added
 }
 
 model PaymentGatewayConfig {
@@ -595,6 +628,10 @@ model Property {
   status               String? // Added
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
+   // Relaciones con IoT
+  iotDevices           IoTDevice[]
+  smartMeterReadings   SmartMeterReading[]
+  utilityBills         UtilityBill[]
 }
 
 model Question {
@@ -717,6 +754,18 @@ model ResidentialComplex {
   isActive     Boolean @default(true) // Added
   securityEvents SecurityEvent[] // Added
   accessAttempts AccessAttempt[] // Added
+  bankReconciliations BankReconciliation[] // Added
+  
+  // Relaciones con IoT
+  telemetryData TelemetryData[]
+  iotAlerts IoTAlert[]
+  deviceConfigs DeviceConfig[]
+  utilityBills UtilityBill[]
+  smartMeterReadings SmartMeterReading[]
+  utilityReadings UtilityReading[]
+  consumptionAnalytics ConsumptionAnalytics[]
+  utilityRates UtilityRate[]
+  paymentGateways PaymentGatewayConfig[]
 }
 
 model Review {
@@ -769,11 +818,32 @@ model ServiceProvider {
 }
 
 model SmartMeterReading {
-  id          String   @id @default(cuid())
-  deviceId    String
-  // device      SmartMeterDevice @relation(fields: [deviceId], references: [id])
-  reading     Float
-  timestamp   DateTime
+  id                   String   @id @default(cuid())
+  deviceId             String
+  device               IoTDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  propertyId           String?
+  property             Property? @relation(fields: [propertyId], references: [id])
+  reading              Float
+  previousReading      Float?
+  unit                 String   // kWh, m3, liters, gallons, etc.
+  consumption          Float?   // Calculated consumption
+  cost                 Float?   // Calculated cost
+  timestamp            DateTime
+  isAutomatic          Boolean  @default(true)
+  source               String   @default("telemetry") // telemetry, manual, api
+  additionalData       Json?
+  residentialComplexId String
+  residentialComplex   ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  
+  // Relaciones con facturación
+  utilityBills         UtilityBill[]
+  
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  
+  @@index([deviceId, timestamp])
+  @@index([propertyId])
+  @@index([residentialComplexId, timestamp])
 }
 
 model Survey {
@@ -783,6 +853,174 @@ model Survey {
   questions   Question[]
   residentialComplexId String
   residentialComplex ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+}
+
+// ========== IOT TABLES ==========
+
+model TelemetryData {
+  id                   String   @id @default(cuid())
+  deviceId             String
+  device               IoTDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  dataType             String?  // sensor_reading, status_update, heartbeat, etc.
+  payload              Json     // Raw telemetry data
+  timestamp            DateTime
+  metadata             Json?
+  source               String   @default("device") // device, api, manual
+  processed            Boolean  @default(false)
+  residentialComplexId String
+  residentialComplex   ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  
+  createdAt            DateTime @default(now())
+  
+  @@index([deviceId, timestamp])
+  @@index([residentialComplexId, processed])
+  @@index([timestamp])
+}
+
+model IoTAlert {
+  id                   String   @id @default(cuid())
+  deviceId             String
+  device               IoTDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  type                 String   // CONSUMPTION_SPIKE, DEVICE_OFFLINE, THRESHOLD_EXCEEDED, etc.
+  severity             String   // LOW, MEDIUM, HIGH, CRITICAL
+  status               String   @default("ACTIVE") // ACTIVE, ACKNOWLEDGED, RESOLVED, DISMISSED
+  title                String
+  message              String
+  data                 Json?    // Additional alert data
+  acknowledgedBy       String?
+  acknowledgedByUser   User?    @relation("AcknowledgedAlerts", fields: [acknowledgedBy], references: [id])
+  acknowledgedAt       DateTime?
+  resolvedBy           String?
+  resolvedByUser       User?    @relation("ResolvedAlerts", fields: [resolvedBy], references: [id])
+  resolvedAt           DateTime?
+  resolution           String?  // Resolution notes
+  residentialComplexId String
+  residentialComplex   ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  
+  @@index([deviceId, status])
+  @@index([residentialComplexId, severity])
+  @@index([status, createdAt])
+}
+
+model DeviceConfig {
+  id                   String   @id @default(cuid())
+  deviceId             String
+  device               IoTDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  configType           String   // threshold, schedule, alert_settings, etc.
+  configKey            String
+  configValue          Json     // Configuration value (can be string, number, object, etc.)
+  isActive             Boolean  @default(true)
+  description          String?
+  residentialComplexId String
+  residentialComplex   ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  
+  @@unique([deviceId, configKey])
+  @@index([deviceId, configType])
+}
+
+model UtilityBill {
+  id                   String   @id @default(cuid())
+  propertyId           String
+  property             Property @relation(fields: [propertyId], references: [id])
+  period               String   // "2024-01", "2024-Q1", etc.
+  billingPeriodStart   DateTime
+  billingPeriodEnd     DateTime
+  utilityType          String   // electricity, water, gas, etc.
+  totalConsumption     Float
+  unit                 String   // kWh, m3, etc.
+  ratePerUnit          Float
+  fixedCharges         Float?   // Fixed monthly charges
+  taxes                Float?   // Taxes and additional charges
+  totalAmount          Float
+  status               String   @default("PENDING") // PENDING, SENT, PAID, OVERDUE
+  dueDate              DateTime
+  paidAt               DateTime?
+  paymentReference     String?
+  generatedAt          DateTime @default(now())
+  generatedBy          String   // AUTOMATIC, MANUAL
+  notes                String?
+  residentialComplexId String
+  residentialComplex   ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  
+  // Relaciones con lecturas
+  readings             SmartMeterReading[]
+  
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  
+  @@index([propertyId, period])
+  @@index([residentialComplexId, status])
+  @@index([dueDate])
+}
+// ========== MODELOS ADICIONALES IOT ==========
+
+model UtilityReading {
+  id                   String   @id @default(cuid())
+  deviceId             String
+  device               IoTDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  propertyId           String?
+  property             Property? @relation(fields: [propertyId], references: [id])
+  utilityType          String   // electricity, water, gas
+  reading              Float    // Lectura actual
+  previousReading      Float?   // Lectura anterior
+  consumption          Float?   // Consumo calculado
+  unit                 String   // kWh, m3, liters
+  cost                 Float?   // Costo calculado
+  readingDate          DateTime
+  isAutomatic          Boolean  @default(true)
+  metadata             Json?    // Datos adicionales del sensor
+  residentialComplexId String
+  residentialComplex   ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  
+  // Relaciones con análisis
+  analytics            ConsumptionAnalytics[]
+  
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  
+  @@index([deviceId, readingDate])
+  @@index([propertyId, utilityType])
+  @@index([residentialComplexId, readingDate])
+}
+
+model ConsumptionAnalytics {
+  id                   String   @id @default(cuid())
+  propertyId           String
+  property             Property @relation(fields: [propertyId], references: [id])
+  utilityType          String   // electricity, water, gas
+  period               String   // daily, weekly, monthly, yearly
+  periodStart          DateTime
+  periodEnd            DateTime
+  totalConsumption     Float
+  averageConsumption   Float
+  peakConsumption      Float
+  minConsumption       Float
+  consumptionTrend     String   // increasing, decreasing, stable
+  anomalyDetected      Boolean  @default(false)
+  anomalyScore         Float?   // Puntuación de anomalía (0-1)
+  predictedConsumption Float?   // Predicción para el siguiente período
+  costAnalysis         Json?    // Análisis de costos detallado
+  recommendations      Json?    // Recomendaciones de ahorro
+  comparisonData       Json?    // Comparación con períodos anteriores
+  residentialComplexId String
+  residentialComplex   ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  
+  // Relaciones
+  readings             UtilityReading[]
+  
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  
+  @@index([propertyId, utilityType, period])
+  @@index([residentialComplexId, periodStart])
+  @@index([anomalyDetected])
+  @@unique([propertyId, utilityType, period, periodStart])
 }
 
 model UserVote {
@@ -846,6 +1084,24 @@ model User {
   administeredComplexes ResidentialComplex[] @relation("AdministeredComplexes") // Added
   reportedSecurityEvents SecurityEvent[] @relation("ReportedSecurityEvents") // Added
   userAccessAttempts AccessAttempt[] @relation("UserAccessAttempts") // Added
+  processedReconciliations BankReconciliation[] @relation("ProcessedReconciliations") // Added
+
+  // Relaciones con documentos
+  uploadedDocuments Document[] @relation("UploadedDocuments")
+  updatedDocuments Document[] @relation("UpdatedDocuments")
+  approvedDocuments Document[] @relation("ApprovedDocuments")
+  sharedDocuments DocumentShare[] @relation("SharedDocuments")
+  receivedDocuments DocumentShare[] @relation("ReceivedDocuments")
+  documentComments DocumentComment[] @relation("DocumentComments")
+  documentActivities DocumentActivity[] @relation("DocumentActivities")
+  
+  // Relaciones con IoT
+  acknowledgedAlerts IoTAlert[] @relation("AcknowledgedAlerts")
+  resolvedAlerts IoTAlert[] @relation("ResolvedAlerts")
+
+  userAccessAttempts AccessAttempt[] @relation("UserAccessAttempts") // Added
+  paymentMethods PaymentMethod[]
+  paymentNotifications PaymentNotification[]
 }
 
 model UtilityRate {
@@ -910,4 +1166,161 @@ model AssemblyVoteRecord {
   option      String
   coefficient Float? // Added missing field
   createdAt   DateTime @default(now())
+}
+model BankReconciliation {
+  id                   String   @id @default(cuid())
+  transactionId        String   @unique
+  date                 DateTime
+  description          String
+  amount               Float
+  type                 String   // CREDIT, DEBIT
+  reference            String?
+  account              String?
+  bankName             String?
+  accountNumber        String?
+  status               String   // MATCHED, UNMATCHED, PARTIALLY_MATCHED, MANUAL_REVIEW
+  paymentId            String?
+  payment              Payment? @relation(fields: [paymentId], references: [id])
+  confidence           Float?
+  reason               String?
+  suggestions          Json?
+  notes                String?
+  processedById        String?
+  processedBy          User?    @relation("ProcessedReconciliations", fields: [processedById], references: [id])
+  residentialComplexId String
+  residentialComplex   ResidentialComplex @relation(fields: [residentialComplexId], references: [id])
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  processedAt          DateTime?
+}
+// ========================================
+// PAYMENT GATEWAY MODELS
+// ========================================
+
+model Transaction {
+  id                   String               @id @default(cuid())
+  paymentId            String
+  payment              Payment              @relation(fields: [paymentId], references: [id])
+  paymentGatewayId     String
+  paymentGateway       PaymentGatewayConfig? @relation(fields: [paymentGatewayId], references: [id])
+  amount               Float
+  currency             String
+  type                 String // PAYMENT, REFUND, CHARGEBACK
+  status               String // PENDING, PROCESSING, COMPLETED, FAILED, CANCELLED
+  gatewayTransactionId String?
+  gatewayReference     String?
+  gatewayResponse      Json? // Full response from gateway
+  processingFee        Float?
+  netAmount            Float? // Amount after fees
+  description          String?
+  metadata             Json?
+  ipAddress            String?
+  userAgent            String?
+  webhookVerified      Boolean              @default(false)
+  reconciled           Boolean              @default(false)
+  reconciledAt         DateTime?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  completedAt          DateTime?
+
+  @@index([paymentGatewayId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model PaymentMethod {
+  id                   String    @id @default(cuid())
+  userId               String
+  user                 User      @relation(fields: [userId], references: [id])
+  type                 String // CREDIT_CARD, DEBIT_CARD, BANK_ACCOUNT, PAYPAL
+  provider             String // STRIPE, PAYPAL, PSE
+  gatewayMethodId      String? // ID from payment gateway
+  isDefault            Boolean   @default(false)
+  isActive             Boolean   @default(true)
+  // Card details (masked/tokenized)
+  last4                String?
+  brand                String? // visa, mastercard, amex
+  expiryMonth          Int?
+  expiryYear           Int?
+  // Bank details (for PSE/bank transfers)
+  bankName             String?
+  bankCode             String?
+  accountType          String? // SAVINGS, CHECKING
+  // PayPal details
+  paypalEmail          String?
+  // Metadata
+  name                 String? // User-defined name for this method
+  metadata             Json?
+  payments             Payment[]
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([type])
+}
+
+model WebhookEvent {
+  id                String   @id @default(cuid())
+  provider          String // STRIPE, PAYPAL, PSE
+  eventType         String // payment.succeeded, payment.failed, etc.
+  eventId           String // Provider's event ID
+  paymentId         String?
+  payment           Payment? @relation(fields: [paymentId], references: [id])
+  processed         Boolean  @default(false)
+  processedAt       DateTime?
+  retryCount        Int      @default(0)
+  maxRetries        Int      @default(3)
+  rawPayload        Json // Full webhook payload
+  signature         String? // Webhook signature for verification
+  verified          Boolean  @default(false)
+  errorMessage      String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([provider, eventId])
+  @@index([processed])
+  @@index([eventType])
+}
+
+model PaymentRefund {
+  id                String   @id @default(cuid())
+  paymentId         String
+  payment           Payment  @relation(fields: [paymentId], references: [id])
+  amount            Float
+  currency          String
+  reason            String // REQUESTED_BY_CUSTOMER, DUPLICATE, FRAUDULENT
+  status            String // PENDING, PROCESSING, SUCCEEDED, FAILED, CANCELLED
+  gatewayRefundId   String?
+  gatewayResponse   Json?
+  processedBy       String? // User ID who processed the refund
+  notes             String?
+  metadata          Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  processedAt       DateTime?
+
+  @@index([paymentId])
+  @@index([status])
+}
+
+model PaymentNotification {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  paymentId      String?
+  payment        Payment? @relation(fields: [paymentId], references: [id])
+  type           String // PAYMENT_RECEIVED, PAYMENT_FAILED, REFUND_PROCESSED
+  title          String
+  message        String
+  isRead         Boolean  @default(false)
+  readAt         DateTime?
+  sentViaEmail   Boolean  @default(false)
+  sentViaSMS     Boolean  @default(false)
+  sentViaApp     Boolean  @default(true)
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
+  @@index([isRead])
 }
