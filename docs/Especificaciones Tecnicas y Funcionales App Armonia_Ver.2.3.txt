@@ -2,7 +2,7 @@
 Especificaciones Técnicas 
 Sistema de Administración de Conjuntos Residenciales
 Versión: 2.3
-Fecha de Actualización: 11 de Agosto de 2025
+Fecha de Actualización: 21 de Agosto de 2025
 
 1. Introducción
 
@@ -184,6 +184,7 @@ Gestión de áreas comunes y amenidades (salón social, BBQ, canchas) con calend
 * Realización de pagos en línea.
 * Reserva de amenidades y áreas comunes.
 * Pre-registro de visitantes y generación de QR temporal y registro de biometría.
+* Gestión IoT hogar
 * Botón de pánico
 * Recepción de notificaciones (paquetería, anuncios).
 * Gestión de presupuesto familiar por inmueble (plantilla de ayuda para manejo de ingresos y gastos por mes y por año, máximo 2 años de histórico)	
