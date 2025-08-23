@@ -341,7 +341,7 @@ export class DocumentsController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   async removePermanent(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Request() req: any,
   ): Promise<{ message: string }> {
     await this.documentsService.removePermanent(id, req.user.residentialComplexId);

@@ -32,6 +32,7 @@ import { PortfolioModule } from './portfolio/portfolio.module';
 import { MarketplaceModule } from './marketplace/marketplace.module';
 import { AssemblyModule } from './assembly/assembly.module';
 import { PanicModule } from './panic/panic.module';
+import { AppAdminModule } from './app-admin/app-admin.module';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { PanicModule } from './panic/panic.module';
     MarketplaceModule,
     AssemblyModule,
     PanicModule,
+    AppAdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

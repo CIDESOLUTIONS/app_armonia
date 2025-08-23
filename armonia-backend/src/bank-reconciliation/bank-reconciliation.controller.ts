@@ -173,7 +173,7 @@ export class BankReconciliationController {
         throw new BadRequestException('Usuario no autenticado');
       }
 
-      const result = await this.bankReconciliationService.bulkReconciliation(dto, userId);
+      const result = await this.bankReconciliationService.bulkReconciliation(dto, userId, user.schemaName);
       
       this.logger.log(`Procesamiento en lote: ${result.success} éxitos, ${result.failed} fallos`);
       

@@ -96,37 +96,46 @@ export class IotService {
       const limit = filters.limit || 10;
       const offset = (page - 1) * limit;
 
-      let whereClause = `WHERE schema_name = '${schemaName}'`;
-      
+      const whereConditions = [`schema_name = '${schemaName}'`];
+      const queryParams = [];
+
       if (filters.type) {
-        whereClause += ` AND type = '${filters.type}'`;
+        whereConditions.push(`type = ${queryParams.length + 1}`);
+        queryParams.push(filters.type);
       }
       if (filters.status) {
-        whereClause += ` AND status = '${filters.status}'`;
+        whereConditions.push(`status = ${queryParams.length + 1}`);
+        queryParams.push(filters.status);
       }
       if (filters.location) {
-        whereClause += ` AND location ILIKE '%${filters.location}%'`;
+        whereConditions.push(`location ILIKE ${queryParams.length + 1}`);
+        queryParams.push(`%${filters.location}%`);
       }
       if (filters.propertyId) {
-        whereClause += ` AND property_id = '${filters.propertyId}'`;
+        whereConditions.push(`property_id = ${queryParams.length + 1}`);
+        queryParams.push(filters.propertyId);
       }
       if (filters.search) {
-        whereClause += ` AND (name ILIKE '%${filters.search}%' OR description ILIKE '%${filters.search}%' OR serial_number ILIKE '%${filters.search}%')`;
+        whereConditions.push(`(name ILIKE ${queryParams.length + 1} OR description ILIKE ${queryParams.length + 1} OR serial_number ILIKE ${queryParams.length + 1})`);
+        queryParams.push(`%${filters.search}%`);
       }
 
-      const devices = await this.prisma.$queryRaw`
+      const whereClause = `WHERE ${whereConditions.join(' AND ')}`;
+
+      const devices = await this.prisma.$queryRawUnsafe(`
         SELECT * FROM iot_devices ${whereClause}
         ORDER BY created_at DESC
         LIMIT ${limit} OFFSET ${offset}
-      ` as any[];
+      `, ...queryParams) as any[];
 
-      const total = await this.prisma.$queryRaw`
+      const totalResult = await this.prisma.$queryRawUnsafe(`
         SELECT COUNT(*) as count FROM iot_devices ${whereClause}
-      ` as any[];
+      `, ...queryParams) as any[];
+      const total = Number(totalResult[0]?.count || 0);
 
       return {
         devices: devices.map(device => this.mapDeviceToDto(device)),
-        total: Number(total[0]?.count || 0),
+        total,
       };
     } catch (error) {
       throw new BadRequestException('Error al obtener dispositivos: ' + error.message);
