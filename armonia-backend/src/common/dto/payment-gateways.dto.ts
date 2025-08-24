@@ -10,10 +10,20 @@ import {
   IsObject,
   Min,
   Max,
+  IsDecimal,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import {
+  Prisma,
+  PaymentStatus,
+  PaymentMethodType,
+  TransactionType,
+  RefundReason,
+} from '@prisma/client';
 
+// This enum can remain local as it's specific to the gateway logic
+// and not part of the core Prisma schema model for transactions.
 export enum PaymentGatewayType {
   STRIPE = 'STRIPE',
   PAYPAL = 'PAYPAL',
@@ -23,53 +33,12 @@ export enum PaymentGatewayType {
   MERCADO_PAGO = 'MERCADO_PAGO',
 }
 
-export enum PaymentStatus {
-  PENDING = 'PENDING',
-  PROCESSING = 'PROCESSING',
-  COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED',
-  CANCELLED = 'CANCELLED',
-  REFUNDED = 'REFUNDED',
-}
-
-export enum PaymentMethodType {
-  CREDIT_CARD = 'CREDIT_CARD',
-  DEBIT_CARD = 'DEBIT_CARD',
-  BANK_ACCOUNT = 'BANK_ACCOUNT',
-  PAYPAL = 'PAYPAL',
-  PSE = 'PSE',
-}
-
-export enum TransactionType {
-  PAYMENT = 'PAYMENT',
-  REFUND = 'REFUND',
-  CHARGEBACK = 'CHARGEBACK',
-}
-
-export enum RefundReason {
-  REQUESTED_BY_CUSTOMER = 'REQUESTED_BY_CUSTOMER',
-  DUPLICATE = 'DUPLICATE',
-  FRAUDULENT = 'FRAUDULENT',
-  ERROR = 'ERROR',
-}
-
-export enum NotificationType {
-  PAYMENT_RECEIVED = 'PAYMENT_RECEIVED',
-  PAYMENT_FAILED = 'PAYMENT_FAILED',
-  REFUND_PROCESSED = 'REFUND_PROCESSED',
-  PAYMENT_CANCELLED = 'PAYMENT_CANCELLED',
-}
 export class PaymentGatewayConfigDto {
-  @ApiProperty({
-    description: 'Unique identifier of the payment gateway configuration',
-  })
+  @ApiProperty({ description: 'Unique identifier of the payment gateway configuration' })
   @IsString()
   id: string;
 
-  @ApiProperty({
-    enum: PaymentGatewayType,
-    description: 'Type of the payment gateway',
-  })
+  @ApiProperty({ enum: PaymentGatewayType, description: 'Type of the payment gateway' })
   @IsEnum(PaymentGatewayType)
   type: PaymentGatewayType;
 
@@ -77,53 +46,34 @@ export class PaymentGatewayConfigDto {
   @IsString()
   name: string;
 
-  @ApiProperty({
-    description: 'API Key for the payment gateway (masked for security)',
-  })
+  @ApiProperty({ description: 'API Key for the payment gateway (masked for security)' })
   @IsString()
   apiKey: string;
 
-  @ApiProperty({
-    description: 'Secret Key for the payment gateway (masked for security)',
-  })
+  @ApiProperty({ description: 'Secret Key for the payment gateway (masked for security)' })
   @IsString()
   secretKey: string;
 
-  @ApiProperty({
-    description: 'Webhook secret for verification',
-    required: false,
-  })
+  @ApiProperty({ description: 'Webhook secret for verification', required: false })
   @IsOptional()
   @IsString()
   webhookSecret?: string;
 
-  @ApiProperty({
-    description: 'Merchant ID for PSE and other providers',
-    required: false,
-  })
+  @ApiProperty({ description: 'Merchant ID for PSE and other providers', required: false })
   @IsOptional()
   @IsString()
   merchantId?: string;
 
-  @ApiProperty({
-    description: 'Environment (test or production)',
-    default: 'test',
-  })
+  @ApiProperty({ description: 'Environment (test or production)', default: 'test' })
   @IsString()
   environment: string;
 
-  @ApiProperty({
-    type: [String],
-    description: 'List of supported currencies (e.g., USD, COP)',
-  })
+  @ApiProperty({ type: [String], description: 'List of supported currencies (e.g., USD, COP)' })
   @IsArray()
   @IsString({ each: true })
   supportedCurrencies: string[];
 
-  @ApiProperty({
-    type: [String],
-    description: 'List of supported payment methods',
-  })
+  @ApiProperty({ type: [String], description: 'List of supported payment methods' })
   @IsArray()
   @IsString({ each: true })
   supportedMethods: string[];
@@ -141,57 +91,35 @@ export class PaymentGatewayConfigDto {
   @IsString()
   webhookUrl?: string;
 
-  @ApiProperty({
-    description: 'Maximum transaction amount',
-    required: false,
-  })
+  @ApiProperty({ description: 'Maximum transaction amount', required: false })
   @IsOptional()
-  @IsNumber()
-  maxAmount?: number;
+  @IsDecimal()
+  maxAmount?: Prisma.Decimal;
 
-  @ApiProperty({
-    description: 'Minimum transaction amount',
-    required: false,
-  })
+  @ApiProperty({ description: 'Minimum transaction amount', required: false })
   @IsOptional()
-  @IsNumber()
-  minAmount?: number;
+  @IsDecimal()
+  minAmount?: Prisma.Decimal;
 
-  @ApiProperty({
-    description: 'Commission rate percentage',
-    required: false,
-  })
+  @ApiProperty({ description: 'Commission rate percentage', required: false })
   @IsOptional()
-  @IsNumber()
-  commissionRate?: number;
+  @IsDecimal()
+  commissionRate?: Prisma.Decimal;
 
-  @ApiProperty({
-    description: 'Fixed commission amount',
-    required: false,
-  })
+  @ApiProperty({ description: 'Fixed commission amount', required: false })
   @IsOptional()
-  @IsNumber()
-  fixedCommission?: number;
+  @IsDecimal()
+  fixedCommission?: Prisma.Decimal;
 
-  @ApiProperty({
-    description: 'Date of creation',
-    type: String,
-    format: 'date-time',
-  })
+  @ApiProperty({ description: 'Date of creation', type: String, format: 'date-time' })
   createdAt: Date;
 
-  @ApiProperty({
-    description: 'Date of last update',
-    type: String,
-    format: 'date-time',
-  })
+  @ApiProperty({ description: 'Date of last update', type: String, format: 'date-time' })
   updatedAt: Date;
 }
+
 export class CreatePaymentGatewayDto {
-  @ApiProperty({
-    enum: PaymentGatewayType,
-    description: 'Type of the payment gateway',
-  })
+  @ApiProperty({ enum: PaymentGatewayType, description: 'Type of the payment gateway' })
   @IsEnum(PaymentGatewayType)
   type: PaymentGatewayType;
 
@@ -207,119 +135,67 @@ export class CreatePaymentGatewayDto {
   @IsString()
   secretKey: string;
 
-  @ApiProperty({
-    description: 'Webhook secret for verification',
-    required: false,
-  })
+  @ApiProperty({ description: 'Webhook secret for verification', required: false })
   @IsOptional()
   @IsString()
   webhookSecret?: string;
 
-  @ApiProperty({
-    description: 'Merchant ID for PSE and other providers',
-    required: false,
-  })
+  @ApiProperty({ description: 'Merchant ID for PSE and other providers', required: false })
   @IsOptional()
   @IsString()
   merchantId?: string;
 
-  @ApiProperty({
-    description: 'Environment (test or production)',
-    default: 'test',
-  })
+  @ApiProperty({ description: 'Environment (test or production)', default: 'test' })
   @IsOptional()
   @IsString()
   environment?: string;
 
-  @ApiProperty({
-    description: 'Indicates if the payment gateway is active',
-    required: false,
-    default: true,
-  })
+  @ApiProperty({ description: 'Indicates if the payment gateway is active', required: false, default: true })
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
 
-  @ApiProperty({
-    description: 'Indicates if the gateway is in test mode',
-    required: false,
-    default: true,
-  })
+  @ApiProperty({ description: 'Indicates if the gateway is in test mode', required: false, default: true })
   @IsOptional()
   @IsBoolean()
   testMode?: boolean;
 
-  @ApiProperty({
-    description: 'Webhook URL for this gateway',
-    required: false,
-  })
+  @ApiProperty({ description: 'Webhook URL for this gateway', required: false })
   @IsOptional()
   @IsString()
   webhookUrl?: string;
 
-  @ApiProperty({
-    type: [String],
-    description: 'List of supported currencies (e.g., USD, COP)',
-    required: false,
-    default: [],
-  })
+  @ApiProperty({ type: [String], description: 'List of supported currencies (e.g., USD, COP)', required: false, default: [] })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   supportedCurrencies?: string[];
 
-  @ApiProperty({
-    type: [String],
-    description: 'List of supported payment methods',
-    required: false,
-    default: [],
-  })
+  @ApiProperty({ type: [String], description: 'List of supported payment methods', required: false, default: [] })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   supportedMethods?: string[];
 
-  @ApiProperty({
-    description: 'Maximum transaction amount',
-    required: false,
-  })
+  @ApiProperty({ description: 'Maximum transaction amount', required: false })
   @IsOptional()
-  @IsNumber()
-  @Min(0)
-  maxAmount?: number;
+  @IsDecimal()
+  maxAmount?: Prisma.Decimal;
 
-  @ApiProperty({
-    description: 'Minimum transaction amount',
-    required: false,
-  })
+  @ApiProperty({ description: 'Minimum transaction amount', required: false })
   @IsOptional()
-  @IsNumber()
-  @Min(0)
-  minAmount?: number;
+  @IsDecimal()
+  minAmount?: Prisma.Decimal;
 
-  @ApiProperty({
-    description: 'Commission rate percentage',
-    required: false,
-  })
+  @ApiProperty({ description: 'Commission rate percentage', required: false })
   @IsOptional()
-  @IsNumber()
-  @Min(0)
-  @Max(100)
-  commissionRate?: number;
+  @IsDecimal()
+  commissionRate?: Prisma.Decimal;
 
-  @ApiProperty({
-    description: 'Fixed commission amount',
-    required: false,
-  })
+  @ApiProperty({ description: 'Fixed commission amount', required: false })
   @IsOptional()
-  @IsNumber()
-  @Min(0)
-  fixedCommission?: number;
-}
-@IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  supportedCurrencies?: string[];
+  @IsDecimal()
+  fixedCommission?: Prisma.Decimal;
 }
 
 // ========================================
@@ -336,18 +212,14 @@ export class CreateTransactionDto {
   paymentGatewayId: string;
 
   @ApiProperty({ description: 'Transaction amount' })
-  @IsNumber()
-  @Min(0)
-  amount: number;
+  @IsDecimal()
+  amount: Prisma.Decimal;
 
   @ApiProperty({ description: 'Currency code', default: 'COP' })
   @IsString()
   currency: string;
 
-  @ApiProperty({
-    enum: TransactionType,
-    description: 'Type of transaction',
-  })
+  @ApiProperty({ enum: TransactionType, description: 'Type of transaction' })
   @IsEnum(TransactionType)
   type: TransactionType;
 
@@ -383,15 +255,18 @@ export class TransactionDto {
   paymentGatewayId: string;
 
   @ApiProperty({ description: 'Transaction amount' })
-  amount: number;
+  @IsDecimal()
+  amount: Prisma.Decimal;
 
   @ApiProperty({ description: 'Currency code' })
   currency: string;
 
   @ApiProperty({ enum: TransactionType, description: 'Type of transaction' })
+  @IsEnum(TransactionType)
   type: TransactionType;
 
   @ApiProperty({ enum: PaymentStatus, description: 'Transaction status' })
+  @IsEnum(PaymentStatus)
   status: PaymentStatus;
 
   @ApiProperty({ description: 'Gateway transaction ID', required: false })
@@ -401,10 +276,12 @@ export class TransactionDto {
   gatewayReference?: string;
 
   @ApiProperty({ description: 'Processing fee', required: false })
-  processingFee?: number;
+  @IsDecimal()
+  processingFee?: Prisma.Decimal;
 
   @ApiProperty({ description: 'Net amount after fees', required: false })
-  netAmount?: number;
+  @IsDecimal()
+  netAmount?: Prisma.Decimal;
 
   @ApiProperty({ description: 'Transaction description', required: false })
   description?: string;
@@ -434,10 +311,7 @@ export class CreatePaymentMethodDto {
   @IsString()
   userId: string;
 
-  @ApiProperty({
-    enum: PaymentMethodType,
-    description: 'Payment method type',
-  })
+  @ApiProperty({ enum: PaymentMethodType, description: 'Payment method type' })
   @IsEnum(PaymentMethodType)
   type: PaymentMethodType;
 
@@ -518,6 +392,7 @@ export class PaymentMethodDto {
   userId: string;
 
   @ApiProperty({ enum: PaymentMethodType, description: 'Payment method type' })
+  @IsEnum(PaymentMethodType)
   type: PaymentMethodType;
 
   @ApiProperty({ description: 'Payment provider' })
@@ -567,9 +442,8 @@ export class CreatePaymentDto {
   userId: string;
 
   @ApiProperty({ description: 'Payment amount' })
-  @IsNumber()
-  @Min(0.01)
-  amount: number;
+  @IsDecimal()
+  amount: Prisma.Decimal;
 
   @ApiProperty({ description: 'Currency code', default: 'COP' })
   @IsOptional()
@@ -633,6 +507,7 @@ export class PaymentResponseDto {
   id: string;
 
   @ApiProperty({ enum: PaymentStatus, description: 'Payment status' })
+  @IsEnum(PaymentStatus)
   status: PaymentStatus;
 
   @ApiProperty({ description: 'Gateway reference', required: false })
@@ -691,9 +566,8 @@ export class CreateRefundDto {
   paymentId: string;
 
   @ApiProperty({ description: 'Refund amount' })
-  @IsNumber()
-  @Min(0.01)
-  amount: number;
+  @IsDecimal()
+  amount: Prisma.Decimal;
 
   @ApiProperty({ description: 'Currency code', default: 'COP' })
   @IsOptional()
@@ -723,15 +597,18 @@ export class RefundDto {
   paymentId: string;
 
   @ApiProperty({ description: 'Refund amount' })
-  amount: number;
+  @IsDecimal()
+  amount: Prisma.Decimal;
 
   @ApiProperty({ description: 'Currency code' })
   currency: string;
 
   @ApiProperty({ enum: RefundReason, description: 'Refund reason' })
+  @IsEnum(RefundReason)
   reason: RefundReason;
 
   @ApiProperty({ enum: PaymentStatus, description: 'Refund status' })
+  @IsEnum(PaymentStatus)
   status: PaymentStatus;
 
   @ApiProperty({ description: 'Gateway refund ID', required: false })
@@ -782,15 +659,13 @@ export class PaymentFilterDto {
 
   @ApiProperty({ description: 'Minimum amount', required: false })
   @IsOptional()
-  @IsNumber()
-  @Min(0)
-  amountFrom?: number;
+  @IsDecimal()
+  amountFrom?: Prisma.Decimal;
 
   @ApiProperty({ description: 'Maximum amount', required: false })
   @IsOptional()
-  @IsNumber()
-  @Min(0)
-  amountTo?: number;
+  @IsDecimal()
+  amountTo?: Prisma.Decimal;
 
   @ApiProperty({ description: 'Page number', required: false, default: 1 })
   @IsOptional()

@@ -1,6 +1,5 @@
 import {
   IsString,
-  IsNumber,
   IsOptional,
   IsDateString,
   IsEnum,
@@ -8,20 +7,12 @@ import {
   ValidateNested,
   IsBoolean,
   IsDecimal,
+  IsNumber,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { Prisma, ReconciliationStatus, BankTransactionType } from '@prisma/client';
 
-export enum BankTransactionType {
-  CREDIT = 'CREDIT',
-  DEBIT = 'DEBIT',
-}
-
-export enum ReconciliationStatus {
-  MATCHED = 'MATCHED',
-  UNMATCHED = 'UNMATCHED',
-  PARTIALLY_MATCHED = 'PARTIALLY_MATCHED',
-  MANUAL_REVIEW = 'MANUAL_REVIEW',
-}
+export { ReconciliationStatus, BankTransactionType };
 
 export class BankTransactionDto {
   @IsString()
@@ -33,8 +24,8 @@ export class BankTransactionDto {
   @IsString()
   description: string;
 
-  @IsNumber({ maxDecimalPlaces: 2 })
-  amount: number;
+  @IsDecimal()
+  amount: Prisma.Decimal;
 
   @IsEnum(BankTransactionType)
   type: BankTransactionType;
@@ -98,8 +89,8 @@ export class ReconciliationResultDto {
   status: ReconciliationStatus;
 
   @IsOptional()
-  @IsNumber()
-  confidence?: number;
+  @IsDecimal()
+  confidence?: Prisma.Decimal;
 
   @IsOptional()
   @IsString()
@@ -126,14 +117,14 @@ export class ReconciliationSummaryDto {
   @IsNumber()
   unmatchedTransactions: number;
 
-  @IsNumber({ maxDecimalPlaces: 2 })
-  totalAmount: number;
+  @IsDecimal()
+  totalAmount: Prisma.Decimal;
 
-  @IsNumber({ maxDecimalPlaces: 2 })
-  matchedAmount: number;
+  @IsDecimal()
+  matchedAmount: Prisma.Decimal;
 
-  @IsNumber({ maxDecimalPlaces: 2 })
-  unmatchedAmount: number;
+  @IsDecimal()
+  unmatchedAmount: Prisma.Decimal;
 
   @IsDateString()
   processedAt: string;
@@ -159,9 +150,9 @@ export class ManualReconciliationDto {
 }
 
 export class ReconciliationConfigDto {
-  @IsNumber()
+  @IsDecimal()
   @IsOptional()
-  amountTolerance?: number;
+  amountTolerance?: Prisma.Decimal;
 
   @IsNumber()
   @IsOptional()
