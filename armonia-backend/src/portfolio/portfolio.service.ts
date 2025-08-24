@@ -1,189 +1,106 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import {
-  PortfolioMetricDto,
-  ComplexMetricDto,
-} from '../common/dto/portfolio.dto';
-import { format } from 'date-fns';
 
 @Injectable()
 export class PortfolioService {
+  private readonly logger = new Logger(PortfolioService.name);
+
   constructor(private prisma: PrismaService) {}
 
-  async getPortfolioMetrics(userId: string): Promise<PortfolioMetricDto> {
-    // Para un APP_ADMIN, obtener todos los schemas de los complejos residenciales
-    const prisma = this.prisma.getTenantDB('public');
-    const complexes = await prisma.residentialComplex.findMany({
-      select: { id: true, name: true },
+  async getConsolidatedMetrics(userId: string): Promise<any> {
+    this.logger.log(`Fetching consolidated metrics for user ${userId}`);
+
+    const userWithComplexes = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        administeredComplexes: true,
+      },
     });
 
-    let totalProperties = 0;
-    let totalResidents = 0;
-    let totalPendingFees = 0;
-    let totalIncome = 0;
-    let totalOpenPqrs = 0;
-    let totalBudgetsApproved = 0;
-    let totalExpenses = 0;
-
-    for (const complex of complexes) {
-      const tenantPrisma = this.prisma.getTenantDB(complex.id);
-      // Obtener métricas de cada tenant
-      const propertiesCount = await tenantPrisma.property.count();
-      totalProperties += propertiesCount;
-
-      const residentsCount = await tenantPrisma.user.count({
-        where: { role: 'RESIDENT' },
-      });
-      totalResidents += residentsCount;
-
-      const pendingFees = await tenantPrisma.fee.aggregate({
-        _sum: { amount: true },
-        where: { paid: false },
-      });
-      totalPendingFees += pendingFees._sum.amount || 0;
-
-      const income = await tenantPrisma.payment.aggregate({
-        _sum: { amount: true },
-        where: { status: 'COMPLETED' },
-      });
-      totalIncome += income._sum.amount || 0;
-
-      const openPqrs = await tenantPrisma.pQR.count({
-        where: { status: { notIn: ['RESOLVED', 'CLOSED'] } },
-      });
-      totalOpenPqrs += openPqrs;
-
-      const budgetsApproved = await tenantPrisma.budget.aggregate({
-        _sum: { totalAmount: true },
-        where: { status: 'APPROVED' },
-      });
-      totalBudgetsApproved += budgetsApproved._sum.totalAmount || 0;
-
-      const expenses = await tenantPrisma.expense.aggregate({
-        _sum: { amount: true },
-      });
-      totalExpenses += expenses._sum.amount || 0;
+    if (!userWithComplexes) {
+      throw new NotFoundException(`User with ID ${userId} not found.`);
     }
 
-    return {
-      totalProperties,
-      totalResidents,
-      totalPendingFees,
-      totalIncome,
-      totalOpenPqrs,
-      totalBudgetsApproved,
-      totalExpenses,
+    const consolidatedMetrics = {
+      totalProperties: 0,
+      totalResidents: 0,
+      totalIncome: 0,
+      totalExpenses: 0,
+      totalPendingFees: 0,
+      totalOpenPqrs: 0,
+      totalBudgetsApproved: 0,
     };
+
+    for (const complex of userWithComplexes.administeredComplexes) {
+      try {
+        const tenantPrisma = this.prisma.getTenantDB(complex.id);
+
+        const [properties, residents, pendingFees, openPqrs] = await Promise.all([
+          tenantPrisma.property.count(),
+          tenantPrisma.resident.count(),
+          tenantPrisma.fee.aggregate({ _sum: { amount: true }, where: { paid: false } }),
+          tenantPrisma.pqr.count({ where: { status: 'OPEN' } }),
+        ]);
+
+        consolidatedMetrics.totalProperties += properties;
+        consolidatedMetrics.totalResidents += residents;
+        consolidatedMetrics.totalPendingFees += pendingFees._sum.amount || 0;
+        consolidatedMetrics.totalOpenPqrs += openPqrs;
+
+      } catch (error) {
+        this.logger.error(`Could not process metrics for complex ${complex.id}: ${error.message}`);
+      }
+    }
+
+    return consolidatedMetrics;
   }
 
-  async getComplexMetrics(userId: string): Promise<ComplexMetricDto[]> {
-    const prisma = this.prisma.getTenantDB('public');
-    const complexes = await prisma.residentialComplex.findMany({
-      select: { id: true, name: true },
-    });
+  async getMetricsByComplex(userId: string): Promise<any[]> {
+    this.logger.log(`Fetching metrics per complex for user ${userId}`);
 
-    const complexMetrics: ComplexMetricDto[] = [];
-
-    for (const complex of complexes) {
-      const tenantPrisma = this.prisma.getTenantDB(complex.id);
-
-      const residents = await tenantPrisma.user.count({
-        where: { role: 'RESIDENT' },
-      });
-
-      const pendingFees = await tenantPrisma.fee.aggregate({
-        _sum: { amount: true },
-        where: { paid: false },
-      });
-
-      const income = await tenantPrisma.payment.aggregate({
-        _sum: { amount: true },
-        where: {
-          status: 'COMPLETED',
+    const userWithComplexes = await this.prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          administeredComplexes: true,
         },
       });
+  
+      if (!userWithComplexes) {
+        throw new NotFoundException(`User with ID ${userId} not found.`);
+      }
 
-      const openPqrs = await tenantPrisma.pQR.count({
-        where: { status: { notIn: ['RESOLVED', 'CLOSED'] } },
-      });
+    const metricsPerComplex = [];
 
-      const budgetApproved = await tenantPrisma.budget.aggregate({
-        _sum: { totalAmount: true },
-        where: { status: 'APPROVED' },
-      });
+    for (const complex of userWithComplexes.administeredComplexes) {
+        try {
+            const tenantPrisma = this.prisma.getTenantDB(complex.id);
+    
+            const [properties, residents, pendingFees, openPqrs] = await Promise.all([
+              tenantPrisma.property.count(),
+              tenantPrisma.resident.count(),
+              tenantPrisma.fee.aggregate({ _sum: { amount: true }, where: { paid: false } }),
+              tenantPrisma.pqr.count({ where: { status: 'OPEN' } }),
+            ]);
+    
+            metricsPerComplex.push({
+              complexId: complex.id,
+              complexName: complex.name,
+              totalProperties: properties,
+              totalResidents: residents,
+              totalPendingFees: pendingFees._sum.amount || 0,
+              totalOpenPqrs: openPqrs,
+            });
 
-      const expenses = await tenantPrisma.expense.aggregate({
-        _sum: { amount: true },
-      });
-
-      complexMetrics.push({
-        id: complex.id,
-        name: complex.name,
-        residents: residents,
-        pendingFees: pendingFees._sum.amount || 0,
-        income: income._sum.amount || 0,
-        openPqrs: openPqrs,
-        budgetApproved: budgetApproved._sum.totalAmount || 0,
-        expenses: expenses._sum.amount || 0,
-      });
+        } catch (error) {
+            this.logger.error(`Could not process metrics for complex ${complex.id}: ${error.message}`);
+            metricsPerComplex.push({
+                complexId: complex.id,
+                complexName: complex.name,
+                error: 'Could not fetch metrics for this complex.',
+            });
+        }
     }
 
-    return complexMetrics;
-  }
-
-  async generateConsolidatedFinancialReport(
-    startDate: string,
-    endDate: string,
-  ): Promise<any> {
-    const prisma = this.prisma.getTenantDB('public');
-    const complexes = await prisma.residentialComplex.findMany({
-      select: { id: true, name: true },
-    });
-
-    const reportData: any = [];
-    let totalIncomeAllComplexes = 0;
-    let totalExpensesAllComplexes = 0;
-
-    for (const complex of complexes) {
-      const tenantPrisma = this.prisma.getTenantDB(complex.id);
-
-      const income = await tenantPrisma.payment.aggregate({
-        _sum: { amount: true },
-        where: {
-          date: { gte: new Date(startDate), lte: new Date(endDate) },
-          status: 'COMPLETED',
-        },
-      });
-
-      const expenses = await tenantPrisma.expense.aggregate({
-        _sum: { amount: true },
-        where: {
-          expenseDate: { gte: new Date(startDate), lte: new Date(endDate) },
-        },
-      });
-
-      const complexIncome = income._sum.amount || 0;
-      const complexExpenses = expenses._sum.amount || 0;
-
-      reportData.push({
-        complexName: complex.name,
-        income: complexIncome,
-        expenses: complexExpenses,
-        netBalance: complexIncome - complexExpenses,
-      });
-
-      totalIncomeAllComplexes += complexIncome;
-      totalExpensesAllComplexes += complexExpenses;
-    }
-
-    return {
-      startDate,
-      endDate,
-      totalIncomeAllComplexes,
-      totalExpensesAllComplexes: totalExpensesAllComplexes,
-      netBalanceAllComplexes:
-        totalIncomeAllComplexes - totalExpensesAllComplexes,
-      complexReports: reportData,
-    };
+    return metricsPerComplex;
   }
 }

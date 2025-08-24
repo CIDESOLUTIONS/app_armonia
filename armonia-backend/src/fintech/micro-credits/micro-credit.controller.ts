@@ -6,8 +6,12 @@ import {
   Body,
   Param,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { RolesGuard } from '../../auth/roles.guard';
+import { Roles } from '../../auth/roles.decorator';
+import { UserRole } from '../../common/enums/user-role.enum';
 import { GetUser } from '../../common/decorators/user.decorator';
 import { MicroCreditService } from './micro-credit.service';
 import {
@@ -20,38 +24,51 @@ import {
 export class MicroCreditController {
   constructor(private readonly microCreditService: MicroCreditService) {}
 
-  @Post()
-  async createApplication(
+  @Post('apply')
+  @Roles(UserRole.RESIDENT)
+  async applyForCredit(
     @GetUser() user: any,
     @Body() createDto: CreateMicroCreditApplicationDto,
   ) {
     return this.microCreditService.createApplication(
       user.schemaName,
-      user.userId,
+      user.id,
       createDto,
     );
   }
 
-  @Get()
-  async getApplications(@GetUser() user: any) {
-    return this.microCreditService.getApplications(
+  @Get('my-applications')
+  @Roles(UserRole.RESIDENT)
+  async getMyApplications(@GetUser() user: any) {
+    return this.microCreditService.getApplicationsForUser(
       user.schemaName,
-      user.userId,
+      user.id,
     );
   }
 
-  @Put(':id')
-  async updateApplication(
+  @Get('all')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.COMPLEX_ADMIN)
+  async getAllApplications(
+    @GetUser() user: any,
+    @Query('status') status?: string,
+  ) {
+    return this.microCreditService.getAllApplications(user.schemaName, status);
+  }
+
+  @Put(':id/status')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.COMPLEX_ADMIN)
+  async updateApplicationStatus(
     @GetUser() user: any,
     @Param('id') id: string,
     @Body() updateDto: UpdateMicroCreditApplicationDto,
   ) {
-    // Solo administradores pueden actualizar el estado
-    // Se debería añadir un RolesGuard aquí
-    return this.microCreditService.updateApplication(
+    return this.microCreditService.updateApplicationStatus(
       user.schemaName,
       id,
-      updateDto,
+      updateDto.status,
+      user.id, // admin who approved/rejected
     );
   }
 }

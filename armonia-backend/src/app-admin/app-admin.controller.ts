@@ -11,7 +11,7 @@ import { Roles } from '../auth/roles.decorator';
 export class AppAdminController {
   constructor(private readonly appAdminService: AppAdminService) {}
 
-  @Get('operative-metrics')
+  @Get('metrics')
   async getOperativeMetrics(@GetUser() user: any) {
     return this.appAdminService.getOperativeMetrics();
   }

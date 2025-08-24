@@ -132,6 +132,15 @@ export class PaymentGatewayConfigDto {
   @IsBoolean()
   isActive: boolean;
 
+  @ApiProperty({ description: 'Indicates if the gateway is in test mode', default: true })
+  @IsBoolean()
+  testMode: boolean;
+
+  @ApiProperty({ description: 'Webhook URL for this gateway', required: false })
+  @IsOptional()
+  @IsString()
+  webhookUrl?: string;
+
   @ApiProperty({
     description: 'Maximum transaction amount',
     required: false,
@@ -230,6 +239,23 @@ export class CreatePaymentGatewayDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @ApiProperty({
+    description: 'Indicates if the gateway is in test mode',
+    required: false,
+    default: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  testMode?: boolean;
+
+  @ApiProperty({
+    description: 'Webhook URL for this gateway',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  webhookUrl?: string;
 
   @ApiProperty({
     type: [String],

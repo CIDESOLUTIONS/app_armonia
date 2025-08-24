@@ -5,164 +5,181 @@ import {
   IsEnum,
   IsOptional,
   IsNumber,
-} from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
+  Min,
+  Max,
+} from 'class-validator';
+
+// Note: ApiProperty is a backend decorator, removed for frontend compatibility
 
 export enum PaymentGatewayType {
-  STRIPE = "STRIPE",
-  PAYU = "PAYU",
-  WOMPI = "WOMPI",
-  MERCADO_PAGO = "MERCADO_PAGO",
-  PAYPAL = "PAYPAL",
+  STRIPE = 'STRIPE',
+  PAYPAL = 'PAYPAL',
+  PSE = 'PSE',
+  PAYU = 'PAYU',
+  WOMPI = 'WOMPI',
+  MERCADO_PAGO = 'MERCADO_PAGO',
 }
 
 export class PaymentGatewayConfigDto {
-  @ApiProperty({
-    description: "Unique identifier of the payment gateway configuration",
-  })
-  @IsNumber()
-  id: number;
-
-  @ApiProperty({
-    enum: PaymentGatewayType,
-    description: "Type of the payment gateway",
-  })
-  @IsEnum(PaymentGatewayType)
+  id: string;
   type: PaymentGatewayType;
-
-  @ApiProperty({ description: "Name of the payment gateway configuration" })
-  @IsString()
   name: string;
-
-  @ApiProperty({
-    description: "API Key for the payment gateway (masked for security)",
-  })
-  @IsString()
   apiKey: string;
-
-  @ApiProperty({
-    description: "Secret Key for the payment gateway (masked for security)",
-  })
-  @IsString()
   secretKey: string;
-
-  @ApiProperty({ description: "Indicates if the payment gateway is active" })
-  @IsBoolean()
-  isActive: boolean;
-
-  @ApiProperty({
-    type: [String],
-    description: "List of supported currencies (e.g., USD, COP)",
-  })
-  @IsArray()
-  @IsString({ each: true })
+  webhookSecret?: string;
+  merchantId?: string;
+  environment: string;
   supportedCurrencies: string[];
-
-  @ApiProperty({
-    description: "Date of creation",
-    type: String,
-    format: "date-time",
-  })
+  supportedMethods: string[];
+  isActive: boolean;
+  testMode: boolean;
+  webhookUrl?: string;
+  maxAmount?: number;
+  minAmount?: number;
+  commissionRate?: number;
+  fixedCommission?: number;
   createdAt: Date;
-
-  @ApiProperty({
-    description: "Date of last update",
-    type: String,
-    format: "date-time",
-  })
   updatedAt: Date;
 }
 
 export class CreatePaymentGatewayDto {
-  @ApiProperty({
-    enum: PaymentGatewayType,
-    description: "Type of the payment gateway",
-  })
   @IsEnum(PaymentGatewayType)
   type: PaymentGatewayType;
 
-  @ApiProperty({ description: "Name of the payment gateway configuration" })
   @IsString()
   name: string;
 
-  @ApiProperty({ description: "API Key for the payment gateway" })
   @IsString()
   apiKey: string;
 
-  @ApiProperty({ description: "Secret Key for the payment gateway" })
   @IsString()
   secretKey: string;
 
-  @ApiProperty({
-    description: "Indicates if the payment gateway is active",
-    required: false,
-    default: true,
-  })
+  @IsOptional()
+  @IsString()
+  webhookSecret?: string;
+
+  @IsOptional()
+  @IsString()
+  merchantId?: string;
+
+  @IsOptional()
+  @IsString()
+  environment?: string;
+
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
 
-  @ApiProperty({
-    type: [String],
-    description: "List of supported currencies (e.g., USD, COP)",
-    required: false,
-    default: [],
-  })
+  @IsOptional()
+  @IsBoolean()
+  testMode?: boolean;
+
+  @IsOptional()
+  @IsString()
+  webhookUrl?: string;
+
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   supportedCurrencies?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  supportedMethods?: string[];
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  maxAmount?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  minAmount?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  commissionRate?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  fixedCommission?: number;
 }
 
 export class UpdatePaymentGatewayDto {
-  @ApiProperty({
-    enum: PaymentGatewayType,
-    description: "Type of the payment gateway",
-    required: false,
-  })
   @IsOptional()
   @IsEnum(PaymentGatewayType)
   type?: PaymentGatewayType;
 
-  @ApiProperty({
-    description: "Name of the payment gateway configuration",
-    required: false,
-  })
   @IsOptional()
   @IsString()
   name?: string;
 
-  @ApiProperty({
-    description: "API Key for the payment gateway",
-    required: false,
-  })
   @IsOptional()
   @IsString()
   apiKey?: string;
 
-  @ApiProperty({
-    description: "Secret Key for the payment gateway",
-    required: false,
-  })
   @IsOptional()
   @IsString()
   secretKey?: string;
 
-  @ApiProperty({
-    description: "Indicates if the payment gateway is active",
-    required: false,
-  })
+  @IsOptional()
+  @IsString()
+  webhookSecret?: string;
+
+  @IsOptional()
+  @IsString()
+  merchantId?: string;
+
+  @IsOptional()
+  @IsString()
+  environment?: string;
+
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
 
-  @ApiProperty({
-    type: [String],
-    description: "List of supported currencies (e.g., USD, COP)",
-    required: false,
-  })
+  @IsOptional()
+  @IsBoolean()
+  testMode?: boolean;
+
+  @IsOptional()
+  @IsString()
+  webhookUrl?: string;
+
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   supportedCurrencies?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  supportedMethods?: string[];
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  maxAmount?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  minAmount?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  commissionRate?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  fixedCommission?: number;
 }

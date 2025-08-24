@@ -1,37 +1,28 @@
-import { Controller, Get, UseGuards, Query } from '@nestjs/common';
-import { PortfolioService } from './portfolio.service';
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { UserRole } from '../common/enums/user-role.enum';
 import { GetUser } from '../common/decorators/user.decorator';
-import { Roles } from '../auth/roles.decorator';
+import { PortfolioService } from './portfolio.service';
 
-@UseGuards(JwtAuthGuard, RolesGuard([UserRole.ADMIN]))
+@ApiTags('Portfolio')
 @Controller('portfolio')
+@UseGuards(JwtAuthGuard)
 export class PortfolioController {
   constructor(private readonly portfolioService: PortfolioService) {}
 
   @Get('metrics')
-  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get consolidated portfolio metrics' })
+  @ApiResponse({ status: 200, description: 'Consolidated metrics for the portfolio manager.' })
   async getPortfolioMetrics(@GetUser() user: any) {
-    return this.portfolioService.getPortfolioMetrics(user.userId);
+    // This will be implemented in the service
+    return this.portfolioService.getConsolidatedMetrics(user.id);
   }
 
-  @Get('complexes')
-  @Roles(UserRole.ADMIN)
+  @Get('complex-metrics')
+  @ApiOperation({ summary: 'Get metrics for each complex in the portfolio' })
+  @ApiResponse({ status: 200, description: 'A list of metrics for each complex.' })
   async getComplexMetrics(@GetUser() user: any) {
-    return this.portfolioService.getComplexMetrics(user.userId);
-  }
-
-  @Get('reports/financial-summary')
-  @Roles(UserRole.ADMIN)
-  async getConsolidatedFinancialReport(
-    @Query('startDate') startDate: string,
-    @Query('endDate') endDate: string,
-  ) {
-    return this.portfolioService.generateConsolidatedFinancialReport(
-      startDate,
-      endDate,
-    );
+    // This will be implemented in the service
+    return this.portfolioService.getMetricsByComplex(user.id);
   }
 }
