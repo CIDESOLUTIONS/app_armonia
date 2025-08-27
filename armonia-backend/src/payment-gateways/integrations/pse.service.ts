@@ -6,7 +6,7 @@ import {
   PaymentResponseDto,
   CreateRefundDto,
   PaymentStatus,
-} from '../../common/dto/payment-gateways.dto';
+} from '@armonia-backend/common/dto/payment-gateways.dto';
 
 // Bancos PSE simulados para desarrollo
 const PSE_BANKS = [

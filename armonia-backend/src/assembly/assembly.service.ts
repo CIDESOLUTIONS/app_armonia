@@ -23,8 +23,6 @@ export class AssemblyService {
   constructor(
     private prisma: PrismaService,
     private activityLogger: ActivityLogger,
-    // private wsService: WebSocketService,
-    // private signatureService: DigitalSignatureService,
   ) {}
 
   async createAssembly(
@@ -55,15 +53,9 @@ export class AssemblyService {
         },
       });
 
-      // await notifyAssemblyConvocation(
-      //   assembly.id,
-      //   assembly.title,
-      //   assembly.date,
-      //   assembly.location,
-      // );
-
       return {
         ...assembly,
+        quorum: assembly.quorum.toNumber(),
         type: assembly.type as AssemblyType,
         status: assembly.status as AssemblyStatus,
       };
@@ -84,6 +76,7 @@ export class AssemblyService {
     });
     return assemblies.map((assembly) => ({
       ...assembly,
+      quorum: assembly.quorum.toNumber(),
       type: assembly.type as AssemblyType,
       status: assembly.status as AssemblyStatus,
     }));
@@ -97,6 +90,7 @@ export class AssemblyService {
     }
     return {
       ...assembly,
+      quorum: assembly.quorum.toNumber(),
       type: assembly.type as AssemblyType,
       status: assembly.status as AssemblyStatus,
     };
@@ -114,6 +108,7 @@ export class AssemblyService {
     });
     return {
       ...updatedAssembly,
+      quorum: updatedAssembly.quorum.toNumber(),
       type: updatedAssembly.type as AssemblyType,
       status: updatedAssembly.status as AssemblyStatus,
     };
@@ -162,7 +157,7 @@ export class AssemblyService {
       const property = await prisma.property.findUnique({
         where: { id: unitId },
         include: {
-          residents: {
+          resident: {
             include: {
               user: true,
             },
@@ -175,10 +170,7 @@ export class AssemblyService {
         throw new NotFoundException('Propiedad no encontrada');
       }
 
-      const isOwner = property.residents.some(
-        (resident) =>
-          resident.userId === userId && resident.propertyId === unitId,
-      );
+      const isOwner = property.resident?.userId === userId;
 
       if (!isOwner) {
         ServerLogger.warn(
@@ -281,11 +273,7 @@ export class AssemblyService {
           attendance: true,
           residentialComplex: {
             include: {
-              properties: {
-                include: {
-                  residents: true,
-                },
-              },
+              properties: true,
             },
           },
         },
@@ -301,7 +289,6 @@ export class AssemblyService {
       const totalUnits = assembly.residentialComplex.properties.length;
       const presentUnits = assembly.attendance.length;
 
-      // Assuming all units have a coefficient of 1 for simplicity, or fetch from a more detailed property model if available
       const totalCoefficients = totalUnits;
       const presentCoefficients = presentUnits;
 
@@ -310,7 +297,7 @@ export class AssemblyService {
           ? (presentCoefficients / totalCoefficients) * 100
           : 0;
 
-      const requiredQuorum = 50; // Assuming a default required quorum of 50%
+      const requiredQuorum = 50; 
       const quorumReached = quorumPercentage >= requiredQuorum;
 
       const result: CalculateQuorumResultDto = {
@@ -389,11 +376,8 @@ export class AssemblyService {
       const vote = await prisma.assemblyVote.create({
         data: {
           assemblyId,
-          question: voteData.title, // Mapping title to question as per schema
+          question: voteData.title,
           options: voteData.options || ['A favor', 'En contra', 'Abstención'],
-          // startTime: voteData.startTime || new Date(), // startTime is not in schema
-          // endTime: voteData.endTime || null, // endTime is not in schema
-          // weightedVoting: voteData.weightedVoting !== undefined ? voteData.weightedVoting : true, // weightedVoting is not in schema
         },
       });
 
@@ -443,15 +427,6 @@ export class AssemblyService {
         throw new NotFoundException('Votación no encontrada');
       }
 
-      // if (vote.status !== 'ACTIVE') { // status is not in schema
-      //   ServerLogger.warn(
-      //     `Intento de votar en votación no activa: ${voteId} (estado: ${vote.status})`,
-      //   );
-      //   throw new Error(
-      //     `La votación no está activa (estado actual: ${vote.status})`,
-      //   );
-      // }
-
       if (!vote.options.includes(option)) {
         ServerLogger.warn(`Opción de voto inválida: ${option}`);
         throw new Error('Opción de voto inválida');
@@ -497,18 +472,13 @@ export class AssemblyService {
           `Voto actualizado para unidad ${unitId} en votación ${voteId}`,
         );
 
-        return updatedVote;
+        return {
+            ...updatedVote,
+            coefficient: updatedVote.coefficient.toNumber(),
+        };
       }
 
       const coefficient = 1;
-
-      // if (vote.weightedVoting) { // weightedVoting is not in schema
-      //   const unit = await prisma.unit.findUnique({
-      //     where: { id: unitId },
-      //   });
-
-      //   coefficient = unit ? unit.coefficient || 1 : 1;
-      // }
 
       const voteRecord = await prisma.assemblyVoteRecord.create({
         data: {
@@ -526,7 +496,10 @@ export class AssemblyService {
 
       await this.calculateVoteResults(schemaName, voteId);
 
-      return voteRecord;
+      return {
+        ...voteRecord,
+        coefficient: voteRecord.coefficient.toNumber(),
+      };
     } catch (error: unknown) {
       if (error instanceof Error) {
         ServerLogger.error(`Error al registrar voto: ${error.message}`);
@@ -564,7 +537,7 @@ export class AssemblyService {
 
       const results: CalculateVoteResultsResultDto = {
         voteId,
-        title: vote.question, // Mapping question to title as per schema
+        title: vote.question,
         totalVotes: voteRecords.length,
         totalWeight: 0,
         options: {},
@@ -579,20 +552,13 @@ export class AssemblyService {
         };
       });
 
-      Object.keys(results.options).forEach((option: string) => {
-        results.options[option] = {
-          count: 0,
-          weight: 0,
-          percentage: 0,
-        };
-      });
-
-      voteRecords.forEach((record: AssemblyVoteRecordDto) => {
+      voteRecords.forEach((record) => {
         const option = record.option;
         if (results.options[option]) {
           results.options[option].count++;
-          results.options[option].weight += record.coefficient || 1;
-          results.totalWeight += record.coefficient || 1;
+          const coefficient = record.coefficient.toNumber() || 1;
+          results.options[option].weight += coefficient;
+          results.totalWeight += coefficient;
         }
       });
 
@@ -641,33 +607,14 @@ export class AssemblyService {
         throw new NotFoundException('Votación no encontrada');
       }
 
-      // if (vote.status !== 'ACTIVE') { // status is not in schema
-      //   ServerLogger.warn(
-      //     `Intento de finalizar votación no activa: ${voteId} (estado: ${vote.status})`,
-      //   );
-      //   throw new Error(
-      //     `La votación no está activa (estado actual: ${vote.status})`,
-      //   );
-      // }
-
       const updatedVote = await prisma.assemblyVote.update({
         where: { id: voteId },
-        data: {
-          // status: 'COMPLETED', // status is not in schema
-          // endTime: new Date(), // endTime is not in schema
-        },
+        data: {},
       });
 
       ServerLogger.info(`Finalizada votación ${voteId}`);
 
       const results = await this.calculateVoteResults(schemaName, voteId);
-
-      // await prisma.assemblyVote.update({
-      //   where: { id: voteId },
-      //   data: {
-      //     results: results, // results is not in schema
-      //   },
-      // });
 
       return {
         vote: {
@@ -717,7 +664,6 @@ export class AssemblyService {
               votes: true,
             },
           },
-          // topics: true, // topics is not in schema
         },
       });
 
@@ -732,20 +678,14 @@ export class AssemblyService {
         assemblyId,
         title: `Acta de Asamblea: ${assembly.title}`,
         date: assembly.date,
-        // location: assembly.location, // location is not in schema
-        property: assembly.residentialComplex.properties[0].id, // Assuming one property for simplicity
+        property: assembly.residentialComplex.properties[0].id,
         quorum: quorum,
         attendees: assembly.attendance.map((a) => ({
           name: `${a.user.name}`,
           unit: a.unitId,
-          coefficient: 1, // Assuming coefficient of 1 for simplicity
+          coefficient: 1,
           checkInTime: a.checkInTime,
         })),
-        // topics: assembly.topics.map((t: Topic) => ({
-        //   title: t.title,
-        //   description: t.description,
-        //   decisions: t.decisions || 'Sin decisiones registradas',
-        // })),
         votes: assembly.votes.map((v) => {
           const results: { [key: string]: { count: number; weight: number } } =
             {};
@@ -759,20 +699,16 @@ export class AssemblyService {
           v.votes.forEach((record) => {
             if (results[record.option]) {
               results[record.option].count++;
-              results[record.option].weight += record.coefficient || 1;
+              results[record.option].weight += record.coefficient.toNumber() || 1;
             }
           });
 
           return {
             title: v.question,
-            // description: v.description, // description is not in schema
             options: v.options,
             results,
-            // startTime: v.startTime, // startTime is not in schema
-            // endTime: v.endTime || new Date(), // endTime is not in schema
           };
         }),
-        // conclusions: assembly.conclusions || 'Sin conclusiones registradas', // conclusions is not in schema
         generatedAt: new Date().toISOString(),
       };
 
@@ -787,7 +723,6 @@ export class AssemblyService {
         `Acta generada para asamblea ${assemblyId}: ${minutes.id}`,
       );
 
-      // PDFKit related code commented out due to import issues
       return Buffer.from('PDF generation temporarily disabled');
     } catch (error: unknown) {
       if (error instanceof Error) {

@@ -15,8 +15,8 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { RolesGuard } from '@armonia-backend/common/guards/roles.guard';
+import { Roles } from '@armonia-backend/common/decorators/roles.decorator';
 import {
   DevicesService,
   ReadingsService,

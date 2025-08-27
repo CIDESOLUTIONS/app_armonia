@@ -16,11 +16,25 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   Prisma,
-  PaymentStatus,
   PaymentMethodType,
-  TransactionType,
   RefundReason,
 } from '@prisma/client';
+
+export export enum PaymentStatus {
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
+  REFUNDED = 'REFUNDED',
+  PROCESSING = 'PROCESSING',
+}
+
+export export enum TransactionType {
+  PAYMENT = 'PAYMENT',
+  REFUND = 'REFUND',
+  CHARGEBACK = 'CHARGEBACK',
+  ADJUSTMENT = 'ADJUSTMENT',
+}
 
 // This enum can remain local as it's specific to the gateway logic
 // and not part of the core Prisma schema model for transactions.
@@ -623,8 +637,8 @@ export class RefundDto {
   @ApiProperty({ description: 'Creation date' })
   createdAt: Date;
 
-  @ApiProperty({ description: 'Processing date', required: false })
-  processedAt?: Date;
+  @ApiProperty({ description: 'Last update date' })
+  updatedAt: Date;
 }
 
 // ========================================

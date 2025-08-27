@@ -9,9 +9,8 @@ import {
   UploadedFile,
   UseInterceptors,
   UseGuards,
-  Request,
   BadRequestException,
-  Logger
+  Logger,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiBearerAuth } from '@nestjs/swagger';
@@ -22,22 +21,24 @@ import {
   ReconciliationSummaryDto,
   ManualReconciliationDto,
   ReconciliationFilterDto,
-  ReconciliationConfigDto
-} from '../../common/dto/bank-reconciliation.dto';
+  ReconciliationConfigDto,
+  ReconciliationStatus,
+} from '@armonia-backend/common/dto/bank-reconciliation.dto';
 import {
   ProcessReconciliationDto,
   ReconciliationStatsDto,
-  BulkReconciliationDto
+  BulkReconciliationDto,
 } from './dto/reconciliation-process.dto';
-import { TenantInterceptor } from '../../common/interceptors/tenant.interceptor';
-import { GetUser } from '../../common/decorators/user.decorator';
-import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
-import { RolesGuard } from '../../auth/roles.guard';
-import { Roles } from '../../auth/roles.decorator';
-import { UserRole } from '../../common/enums/user-role.enum';
+import { TenantInterceptor } from '@armonia-backend/common/interceptors/tenant.interceptor';
+import { GetUser } from '@armonia-backend/common/decorators/user.decorator';
+import { JwtAuthGuard } from '@armonia-backend/auth/jwt-auth.guard';
+import { RolesGuard } from '@armonia-backend/auth/roles.guard';
+import { Roles } from '@armonia-backend/auth/roles.decorator';
+import { Prisma, UserRole } from '@prisma/client';
+
 @ApiTags('Conciliación Bancaria')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard([UserRole.COMPLEX_ADMIN, UserRole.ADMIN]))
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('bank-reconciliation')
 @UseInterceptors(TenantInterceptor)
 export class BankReconciliationController {
@@ -50,19 +51,17 @@ export class BankReconciliationController {
   @ApiConsumes('multipart/form-data')
   @ApiResponse({ status: 201, description: 'Extracto procesado exitosamente' })
   @UseInterceptors(FileInterceptor('file'))
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   async uploadBankStatement(
     @UploadedFile() file: Express.Multer.File,
     @Body() uploadDto: BankStatementUploadDto,
-    @GetUser
+    @GetUser() user: any,
   ) {
     try {
       if (!file) {
         throw new BadRequestException('Archivo requerido');
       }
-      if (!user.schemaName) {
-        throw new BadRequestException('Esquema de base de datos no encontrado');
-      }
-      const residentialComplexId = req.user?.residentialComplexId;
+      const residentialComplexId = user?.residentialComplexId;
       if (!residentialComplexId) {
         throw new BadRequestException('ID de conjunto residencial requerido');
       }
@@ -70,18 +69,18 @@ export class BankReconciliationController {
       const transactions = await this.bankReconciliationService.uploadBankStatement(
         file,
         uploadDto,
-        residentialComplexId
+        residentialComplexId,
       );
 
       this.logger.log(`Extracto procesado: ${transactions.length} transacciones`);
-      
+
       return {
         success: true,
         message: 'Extracto bancario procesado exitosamente',
         data: {
           transactionsCount: transactions.length,
-          transactions
-        }
+          transactions,
+        },
       };
     } catch (error) {
       this.logger.error(`Error subiendo extracto: ${error.message}`);
@@ -92,33 +91,34 @@ export class BankReconciliationController {
   @Post('reconcile')
   @ApiOperation({ summary: 'Ejecutar conciliación automática' })
   @ApiResponse({ status: 201, description: 'Conciliación completada', type: [ReconciliationResultDto] })
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   async reconcileTransactions(
     @Body() dto: ProcessReconciliationDto,
-    @Request() req: any
+    @GetUser() user: any,
   ): Promise<{ success: boolean; message: string; data: ReconciliationResultDto[] }> {
     try {
-      const residentialComplexId = req.user?.residentialComplexId || dto.residentialComplexId;
-      if (!residentialComplexId) {
-        throw new BadRequestException('ID de conjunto residencial requerido');
+      const residentialComplexId = user?.residentialComplexId;
+      if (!residentialComplexId || !user.schemaName) {
+        throw new BadRequestException('ID de conjunto o esquema de BD no encontrado en el token');
       }
 
       dto.residentialComplexId = residentialComplexId;
-      
-      const results = await this.bankReconciliationService.reconcileTransactions(dto, User.schemaName);
-      
+
+      const results = await this.bankReconciliationService.reconcileTransactions(dto, user.schemaName);
+
       const summary = {
         total: results.length,
-        matched: results.filter(r => r.status === 'MATCHED').length,
-        unmatched: results.filter(r => r.status === 'UNMATCHED').length,
-        needsReview: results.filter(r => r.status === 'MANUAL_REVIEW').length
+        matched: results.filter((r) => r.status === ReconciliationStatus.MATCHED).length,
+        unmatched: results.filter((r) => r.status === ReconciliationStatus.UNMATCHED).length,
+        needsReview: results.filter((r) => r.status === ReconciliationStatus.MANUAL_REVIEW).length,
       };
 
       this.logger.log(`Conciliación completada: ${summary.matched}/${summary.total} coincidencias`);
-      
+
       return {
         success: true,
         message: 'Conciliación completada exitosamente',
-        data: results
+        data: results,
       };
     } catch (error) {
       this.logger.error(`Error en conciliación: ${error.message}`);
@@ -129,29 +129,24 @@ export class BankReconciliationController {
   @Post('manual-reconciliation')
   @ApiOperation({ summary: 'Conciliación manual de transacciones' })
   @ApiResponse({ status: 201, description: 'Conciliación manual completada' })
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   async manualReconciliation(
     @Body() dto: ManualReconciliationDto,
-    @GetUser() user: any
+    @GetUser() user: any,
   ): Promise<{ success: boolean; message: string; data: ReconciliationResultDto }> {
     try {
-      if (!user.schemaName) {
-        throw new BadRequestException('Esquema de base de datos no encontrado');
+      if (!user.schemaName || !user.id) {
+        throw new BadRequestException('Falta información del usuario en el token');
       }
 
-      const userId = req.user?.id;
-      if (!userId) {
-        throw new BadRequestException('Usuario no autenticado');
-      }
+      const result = await this.bankReconciliationService.manualReconciliation(dto, user.id, user.schemaName);
 
-      const result = await this.bankReconciliationService.manualReconciliation(dto, userId,  user.schemaName);
-      
-      this.logger.log(`Conciliación manual completada por usuario ${userId}`);
-      
+      this.logger.log(`Conciliación manual completada por usuario ${user.id}`);
+
       return {
         success: true,
         message: 'Conciliación manual completada exitosamente',
-        data: result
+        data: result,
       };
     } catch (error) {
       this.logger.error(`Error en conciliación manual: ${error.message}`);
@@ -162,25 +157,24 @@ export class BankReconciliationController {
   @Post('bulk-reconciliation')
   @ApiOperation({ summary: 'Procesamiento en lote de conciliaciones' })
   @ApiResponse({ status: 201, description: 'Procesamiento en lote completado' })
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   async bulkReconciliation(
     @Body() dto: BulkReconciliationDto,
-    @GetUser() user: any
+    @GetUser() user: any,
   ): Promise<{ success: boolean; message: string; data: { success: number; failed: number } }> {
     try {
-      const userId = user.id;
-      if (!userId) {
-        throw new BadRequestException('Usuario no autenticado');
+      if (!user.id || !user.schemaName) {
+        throw new BadRequestException('Falta información del usuario en el token');
       }
 
-      const result = await this.bankReconciliationService.bulkReconciliation(dto, userId, user.schemaName);
-      
+      const result = await this.bankReconciliationService.bulkReconciliation(dto, user.id, user.schemaName);
+
       this.logger.log(`Procesamiento en lote: ${result.success} éxitos, ${result.failed} fallos`);
-      
+
       return {
         success: true,
         message: `Procesamiento completado: ${result.success} éxitos, ${result.failed} fallos`,
-        data: result
+        data: result,
       };
     } catch (error) {
       this.logger.error(`Error en procesamiento en lote: ${error.message}`);
@@ -191,21 +185,25 @@ export class BankReconciliationController {
   @Get('results')
   @ApiOperation({ summary: 'Obtener resultados de conciliación con filtros' })
   @ApiResponse({ status: 200, description: 'Resultados obtenidos exitosamente' })
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   async getReconciliationResults(
-    @Query() filter: ReconciliationFilterDto
+    @Query() filter: ReconciliationFilterDto,
+    @GetUser() user: any,
   ): Promise<{ success: boolean; data: ReconciliationResultDto[]; pagination: any }> {
     try {
-      const results = await this.bankReconciliationService.getReconciliationResults(filter);
-      
+      if (!user.schemaName) {
+        throw new BadRequestException('Esquema de base de datos no encontrado');
+      }
+      const results = await this.bankReconciliationService.getReconciliationResults(filter, user.schemaName);
+
       return {
         success: true,
         data: results,
         pagination: {
           page: filter.page || 1,
           limit: filter.limit || 10,
-          total: results.length
-        }
+          total: results.length, // Note: This is just the count of the current page, not total items.
+        },
       };
     } catch (error) {
       this.logger.error(`Error obteniendo resultados: ${error.message}`);
@@ -216,27 +214,28 @@ export class BankReconciliationController {
   @Get('stats')
   @ApiOperation({ summary: 'Obtener estadísticas de conciliación' })
   @ApiResponse({ status: 200, description: 'Estadísticas obtenidas exitosamente', type: ReconciliationStatsDto })
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   async getReconciliationStats(
+    @GetUser() user: any,
     @Query('periodStart') periodStart?: string,
     @Query('periodEnd') periodEnd?: string,
-    @GetUser() user?: any
   ): Promise<{ success: boolean; data: ReconciliationStatsDto }> {
     try {
-      const residentialComplexId = user.residentialComplexId;
-      if (!residentialComplexId) {
-        throw new BadRequestException('ID de conjunto residencial requerido');
+      const { residentialComplexId, schemaName } = user;
+      if (!residentialComplexId || !schemaName) {
+        throw new BadRequestException('Información del conjunto no encontrada en el token');
       }
 
       const stats = await this.bankReconciliationService.getReconciliationStats(
         residentialComplexId,
+        schemaName,
         periodStart,
-        periodEnd
+        periodEnd,
       );
-      
+
       return {
         success: true,
-        data: stats
+        data: stats,
       };
     } catch (error) {
       this.logger.error(`Error obteniendo estadísticas: ${error.message}`);
@@ -247,99 +246,72 @@ export class BankReconciliationController {
   @Get('config')
   @ApiOperation({ summary: 'Obtener configuración de conciliación' })
   @ApiResponse({ status: 200, description: 'Configuración obtenida exitosamente' })
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   async getReconciliationConfig(): Promise<{ success: boolean; data: ReconciliationConfigDto }> {
-    try {
-      // Retornar configuración por defecto
-      const config: ReconciliationConfigDto = {
-        amountTolerance: 0.01,
-        dateTolerance: 3,
-        autoMatch: true,
-        matchingRules: [
-          'exact_amount_date',
-          'amount_tolerance',
-          'reference_match',
-          'partial_match'
-        ]
-      };
-      
-      return {
-        success: true,
-        data: config
-      };
-    } catch (error) {
-      this.logger.error(`Error obteniendo configuración: ${error.message}`);
-      throw error;
-    }
+    // In a real implementation, you would fetch this from a database
+    const config: ReconciliationConfigDto = {
+      amountTolerance: new Prisma.Decimal(0.01),
+      dateTolerance: 3,
+      autoMatch: true,
+      matchingRules: ['exact_amount_date', 'amount_tolerance', 'reference_match', 'partial_match'],
+    };
+
+    return {
+      success: true,
+      data: config,
+    };
   }
 
   @Put('config')
   @ApiOperation({ summary: 'Actualizar configuración de conciliación' })
   @ApiResponse({ status: 200, description: 'Configuración actualizada exitosamente' })
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   async updateReconciliationConfig(
     @Body() config: ReconciliationConfigDto,
-    @GetUser() user: any
+    @GetUser() user: any,
   ): Promise<{ success: boolean; message: string; data: ReconciliationConfigDto }> {
-    try {
-      const userId = user.id;
-      if (!userId) {
-        throw new BadRequestException('Usuario no autenticado');
-      }
-
-      // En una implementación real, guardarías la configuración en base de datos
-      this.logger.log(`Configuración actualizada por usuario ${userId}`);
-      
-      return {
-        success: true,
-        message: 'Configuración actualizada exitosamente',
-        data: config
-      };
-    } catch (error) {
-      this.logger.error(`Error actualizando configuración: ${error.message}`);
-      throw error;
-    }
+    // In a real implementation, you would save this to a database
+    this.logger.log(`Configuración actualizada por usuario ${user.id}`);
+    return {
+      success: true,
+      message: 'Configuración actualizada exitosamente',
+      data: config,
+    };
   }
 
   @Get('summary/:reconciliationId')
   @ApiOperation({ summary: 'Obtener resumen de una conciliación específica' })
   @ApiResponse({ status: 200, description: 'Resumen obtenido exitosamente', type: ReconciliationSummaryDto })
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   async getReconciliationSummary(
-    @Param('reconciliationId') reconciliationId: string
+    @Param('reconciliationId') reconciliationId: string,
   ): Promise<{ success: boolean; data: ReconciliationSummaryDto }> {
-    try {
-      // En una implementación real, buscarías el resumen en base de datos
-      const summary: ReconciliationSummaryDto = {
-        id: reconciliationId,
-        totalTransactions: 0,
-        matchedTransactions: 0,
-        unmatchedTransactions: 0,
-        totalAmount: 0,
-        matchedAmount: 0,
-        unmatchedAmount: 0,
-        processedAt: new Date().toISOString()
-      };
-      
-      return {
-        success: true,
-        data: summary
-      };
-    } catch (error) {
-      this.logger.error(`Error obteniendo resumen: ${error.message}`);
-      throw error;
-    }
+    // This is a mock. In a real implementation, you would fetch this from the database.
+    const summary: ReconciliationSummaryDto = {
+      id: reconciliationId,
+      totalTransactions: 0,
+      matchedTransactions: 0,
+      unmatchedTransactions: 0,
+      totalAmount: new Prisma.Decimal(0),
+      matchedAmount: new Prisma.Decimal(0),
+      unmatchedAmount: new Prisma.Decimal(0),
+      processedAt: new Date().toISOString(),
+    };
+
+    return {
+      success: true,
+      data: summary,
+    };
   }
 
   @Get('health')
   @ApiOperation({ summary: 'Verificar estado del servicio de conciliación' })
   @ApiResponse({ status: 200, description: 'Estado del servicio' })
-  @Roles(UserRole.COMPLEX_ADMIN, UserRole.ADMIN)
   async getHealth(): Promise<{ success: boolean; message: string; timestamp: string }> {
     return {
       success: true,
       message: 'Servicio de conciliación bancaria operativo',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 }

@@ -7,7 +7,7 @@ import {
   CreateRefundDto,
   PaymentStatus,
   PaymentGatewayType,
-} from '../../common/dto/payment-gateways.dto';
+} from '@armonia-backend/common/dto/payment-gateways.dto';
 
 @Injectable()
 export class StripeService {

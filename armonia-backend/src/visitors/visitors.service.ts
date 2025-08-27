@@ -12,7 +12,7 @@ import {
   VisitorStatus,
   VisitorDocumentType,
   PreRegistrationStatus,
-} from '../common/dto/visitors.dto';
+} from '@armonia-backend/common/dto/visitors.dto';
 
 @Injectable()
 export class VisitorsService {

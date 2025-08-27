@@ -11,13 +11,13 @@ import {
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { RolesGuard } from '../../auth/roles.guard';
 import { Roles } from '../../auth/roles.decorator';
-import { UserRole } from '../../common/enums/user-role.enum';
-import { GetUser } from '../../common/decorators/user.decorator';
+import { UserRole } from '@prisma/client';
+import { GetUser } from '@armonia-backend/common/decorators/user.decorator';
 import { MicroCreditService } from './micro-credit.service';
 import {
   CreateMicroCreditApplicationDto,
   UpdateMicroCreditApplicationDto,
-} from '../../common/dto/fintech.dto';
+} from '@armonia-backend/common/dto/fintech.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('fintech/micro-credits')

@@ -5,7 +5,7 @@ import {
   UpdateMicroCreditApplicationDto,
   MicroCreditApplicationDto,
   MicroCreditStatus,
-} from '../../common/dto/fintech.dto';
+} from '@armonia-backend/common/dto/fintech.dto';
 
 @Injectable()
 export class MicroCreditService {

@@ -1,63 +1,64 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '@armonia-backend/prisma/prisma.service';
+import Decimal from 'decimal.js';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class AppAdminService {
   constructor(private prisma: PrismaService) {}
 
   async getOperativeMetrics(): Promise<any> {
+    const publicPrisma = this.prisma.getTenantDB('public');
+
     const [totalComplexes, totalUsers, plans, subscriptions] = await Promise.all([
-      this.prisma.residentialComplex.count({ where: { isActive: true } }),
-      this.prisma.user.count(),
-      this.prisma.plan.findMany(),
-      this.prisma.subscription.findMany({
-        where: { status: 'ACTIVE' },
+      publicPrisma.residentialComplex.count({ where: { isActive: true } }),
+      publicPrisma.user.count(),
+      publicPrisma.plan.findMany(),
+      publicPrisma.subscription.findMany({
+        where: { status: Prisma.SubscriptionStatus.ACTIVE },
         include: { plan: true },
       }),
     ]);
 
-    // Calcular MRR y ARR
-    let mrr = 0;
+    let mrr = new Decimal(0);
     for (const sub of subscriptions) {
-      let monthlyPrice = sub.plan.price;
-      if (sub.plan.billingCycle === 'YEARLY') {
-        monthlyPrice = sub.plan.price / 12;
-      } else if (sub.plan.billingCycle === 'QUARTERLY') {
-        monthlyPrice = sub.plan.price / 3;
+      let monthlyPrice = new Decimal(sub.plan.price);
+      if (sub.plan.billingCycle === Prisma.BillingCycle.YEARLY) {
+        monthlyPrice = monthlyPrice.div(12);
+      } else if (sub.plan.billingCycle === Prisma.BillingCycle.QUARTERLY) {
+        monthlyPrice = monthlyPrice.div(3);
       }
-      mrr += monthlyPrice;
+      mrr = mrr.plus(monthlyPrice);
     }
-    const arr = mrr * 12;
+    const arr = mrr.times(12);
 
-    // Calcular desglose por plan
-    const complexesByPlanRaw = await this.prisma.residentialComplex.groupBy({
+    const complexesByPlanRaw = await publicPrisma.residentialComplex.groupBy({
       by: ['planId'],
-      _count: {
-        id: true,
-      },
+      _count: { id: true },
       where: { isActive: true },
     });
 
-    const complexesByPlan = complexesByPlanRaw.map(group => {
-        const plan = plans.find(p => p.id === group.planId);
-        return {
-            name: plan ? plan.name : 'Desconocido',
-            count: group._count.id
-        }
+    const complexesByPlan = complexesByPlanRaw.map((group) => {
+      const plan = plans.find((p) => p.id === group.planId);
+      return {
+        name: plan ? plan.name : 'Desconocido',
+        count: group._count.id,
+      };
     });
 
     return {
       totalComplexes,
       totalUsers,
-      mrr: Math.round(mrr),
-      arr: Math.round(arr),
-      mrrChange: 0, // Placeholder for change calculation
+      mrr: mrr.toDP(2).toNumber(),
+      arr: arr.toDP(2).toNumber(),
+      mrrChange: 0, // Placeholder
       complexesByPlan,
     };
   }
 
   async getComplexMetrics(): Promise<any[]> {
-    const complexes = await this.prisma.residentialComplex.findMany({
+    const publicPrisma = this.prisma.getTenantDB('public');
+    const complexes = await publicPrisma.residentialComplex.findMany({
       where: { isActive: true },
       select: { id: true, name: true },
     });
@@ -66,26 +67,26 @@ export class AppAdminService {
       try {
         const tenantPrisma = this.prisma.getTenantDB(complex.id);
         const [residents, pendingFees, income, openPqrs] = await Promise.all([
-          tenantPrisma.user.count({ where: { role: 'RESIDENT' } }),
+          tenantPrisma.user.count({ where: { role: Prisma.UserRole.RESIDENT } }),
           tenantPrisma.fee.aggregate({ _sum: { amount: true }, where: { paid: false } }),
-          tenantPrisma.payment.aggregate({ _sum: { amount: true }, where: { status: 'COMPLETED' } }),
-          tenantPrisma.pQR.count({ where: { status: { notIn: ['RESOLVED', 'CLOSED'] } } })
+          tenantPrisma.payment.aggregate({ _sum: { amount: true }, where: { status: Prisma.PaymentStatus.COMPLETED } }),
+          tenantPrisma.pQR.count({ where: { status: { notIn: [Prisma.PQRStatus.RESOLVED, Prisma.PQRStatus.CLOSED] } } }),
         ]);
-  
+
         return {
           id: complex.id,
           name: complex.name,
           residents,
-          pendingFees: pendingFees._sum.amount || 0,
-          income: income._sum.amount || 0,
+          pendingFees: (pendingFees._sum.amount || new Decimal(0)).toNumber(),
+          income: (income._sum.amount || new Decimal(0)).toNumber(),
           openPqrs,
         };
       } catch (error) {
         return {
           id: complex.id,
           name: complex.name,
-          error: `Could not fetch metrics: ${error.message}`
-        }
+          error: `Could not fetch metrics: ${error.message}`,
+        };
       }
     });
 
@@ -93,45 +94,46 @@ export class AppAdminService {
   }
 
   async getFinancialSummary(startDate: string, endDate: string): Promise<any> {
-    const complexes = await this.prisma.residentialComplex.findMany({
+    const publicPrisma = this.prisma.getTenantDB('public');
+    const complexes = await publicPrisma.residentialComplex.findMany({
       where: { isActive: true },
       select: { id: true, name: true },
     });
 
-    let totalIncomeAllComplexes = 0;
-    let totalExpensesAllComplexes = 0;
+    let totalIncomeAllComplexes = new Decimal(0);
+    let totalExpensesAllComplexes = new Decimal(0);
 
     const reportDataPromises = complexes.map(async (complex) => {
       try {
         const tenantPrisma = this.prisma.getTenantDB(complex.id);
         const [income, expenses] = await Promise.all([
-           tenantPrisma.payment.aggregate({
+          tenantPrisma.payment.aggregate({
             _sum: { amount: true },
-            where: { date: { gte: new Date(startDate), lte: new Date(endDate) }, status: 'COMPLETED' },
+            where: { date: { gte: new Date(startDate), lte: new Date(endDate) }, status: Prisma.PaymentStatus.COMPLETED },
           }),
           tenantPrisma.expense.aggregate({
             _sum: { amount: true },
             where: { expenseDate: { gte: new Date(startDate), lte: new Date(endDate) } },
-          })
+          }),
         ]);
-  
-        const complexIncome = income._sum.amount || 0;
-        const complexExpenses = expenses._sum.amount || 0;
-        
-        totalIncomeAllComplexes += complexIncome;
-        totalExpensesAllComplexes += complexExpenses;
-  
+
+        const complexIncome = new Decimal(income._sum.amount || 0);
+        const complexExpenses = new Decimal(expenses._sum.amount || 0);
+
+        totalIncomeAllComplexes = totalIncomeAllComplexes.plus(complexIncome);
+        totalExpensesAllComplexes = totalExpensesAllComplexes.plus(complexExpenses);
+
         return {
           complexName: complex.name,
-          income: complexIncome,
-          expenses: complexExpenses,
-          netBalance: complexIncome - complexExpenses,
+          income: complexIncome.toNumber(),
+          expenses: complexExpenses.toNumber(),
+          netBalance: complexIncome.minus(complexExpenses).toNumber(),
         };
       } catch (error) {
         return {
           complexName: complex.name,
-          error: `Could not fetch financial summary: ${error.message}`
-        }
+          error: `Could not fetch financial summary: ${error.message}`,
+        };
       }
     });
 
@@ -140,9 +142,9 @@ export class AppAdminService {
     return {
       startDate,
       endDate,
-      totalIncomeAllComplexes,
-      totalExpensesAllComplexes,
-      netBalanceAllComplexes: totalIncomeAllComplexes - totalExpensesAllComplexes,
+      totalIncomeAllComplexes: totalIncomeAllComplexes.toNumber(),
+      totalExpensesAllComplexes: totalExpensesAllComplexes.toNumber(),
+      netBalanceAllComplexes: totalIncomeAllComplexes.minus(totalExpensesAllComplexes).toNumber(),
       complexReports,
     };
   }

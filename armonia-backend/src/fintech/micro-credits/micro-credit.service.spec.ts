@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MicroCreditService } from './micro-credit.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
-import { MicroCreditStatus } from '../../common/dto/fintech.dto';
+import { MicroCreditStatus } from '@armonia-backend/common/dto/fintech.dto';
 
 const mockPrismaService = {
   getTenantDB: jest.fn().mockReturnValue({

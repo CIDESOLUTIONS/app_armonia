@@ -11,15 +11,15 @@ import {
 } from '@nestjs/common';
 import { VisitorsService } from './visitors.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { GetUser } from '../common/decorators/user.decorator';
+import { GetUser } from '@armonia-backend/common/decorators/user.decorator';
 import {
   CreateVisitorDto,
   UpdateVisitorDto,
   VisitorFilterParamsDto,
-} from '../common/dto/visitors.dto';
+} from '@armonia-backend/common/dto/visitors.dto';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
-import { UserRole } from '../common/enums/user-role.enum';
+import { UserRole } from '@prisma/client';
 
 @UseGuards(JwtAuthGuard)
 @Controller('visitors')

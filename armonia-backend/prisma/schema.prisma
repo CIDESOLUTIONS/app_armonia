@@ -284,6 +284,25 @@ enum LogLevel {
   FATAL
 }
 
+enum DocumentType {
+  REGULATION
+  MINUTES
+  MANUAL
+  CONTRACT
+  INVOICE
+  REPORT
+  CERTIFICATE
+  BUDGET
+  OTHER
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
 // ========== PLAN & LICENSING MODELS ==========
 
 model Plan {
@@ -565,7 +584,7 @@ model Document {
   fileSize             Int
   mimeType             String
   checksum             String?
-  type                 String
+  type                 DocumentType
   category             String?
   subcategory          String?
   tags                 String[]
@@ -583,7 +602,7 @@ model Document {
   approvedById         String?
   approvedBy           User?              @relation("ApprovedDocuments", fields: [approvedById], references: [id])
   expirationDate       DateTime?
-  priority             String?
+  priority             Priority?
   language             String?
   downloadCount        Int
   viewCount            Int

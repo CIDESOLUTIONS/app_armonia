@@ -18,7 +18,7 @@ import { FinancesModule } from './finances/finances.module';
 import { ProjectsModule } from './projects/projects.module';
 import { SecurityModule } from './security/security.module';
 import { PlansModule } from './plans/plans.module';
-import { BankReconciliationModule } from './bank-reconciliation/bank-reconciliation.module';
+// import { BankReconciliationModule } from './bank-reconciliation/bank-reconciliation.module';
 import { DocumentsModule } from './documents/documents.module';
 import { PaymentGatewaysModule } from './payment-gateways/payment-gateways.module'; // Uncommented
 import { ResidentialComplexModule } from './residential-complex/residential-complex.module';
@@ -54,7 +54,7 @@ import { MonitoringModule } from './monitoring/monitoring.module';
     ProjectsModule,
     SecurityModule,
     PlansModule,
-    BankReconciliationModule,
+    // BankReconciliationModule,
     DocumentsModule,
     PaymentGatewaysModule,
     ResidentialComplexModule,
