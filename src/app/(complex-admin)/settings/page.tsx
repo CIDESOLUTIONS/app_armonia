@@ -11,7 +11,7 @@ import {
   Banknote,
   FileText,
   Puzzle,
-  Key,
+  CreditCard,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -108,6 +108,19 @@ export default function SettingsPage() {
                 </h3>
                 <p className="text-gray-600 text-sm">
                   Configura cuentas bancarias y medios de pago.
+                </p>
+              </Link>
+
+              <Link
+                href="/admin/settings/payment-gateways"
+                className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer flex flex-col items-center text-center"
+              >
+                <CreditCard className="h-12 w-12 text-indigo-600 mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Pasarelas de Pago
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  Configura Stripe, PayPal, PSE y otros.
                 </p>
               </Link>
 

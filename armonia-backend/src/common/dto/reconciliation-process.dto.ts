@@ -1,6 +1,6 @@
 import { IsString, IsOptional, IsArray, ValidateNested, IsNumber, IsBoolean } from 'class-validator';
 import { Type } from 'class-transformer';
-import { BankTransactionDto, ReconciliationConfigDto } from '../../../common/dto/bank-reconciliation.dto';
+import { BankTransactionDto, ReconciliationConfigDto } from './bank-reconciliation.dto';
 
 export class ProcessReconciliationDto {
   @IsArray()

@@ -12,7 +12,7 @@ import {
   Max,
   IsDecimal,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   Prisma,
@@ -20,7 +20,7 @@ import {
   RefundReason,
 } from '@prisma/client';
 
-export export enum PaymentStatus {
+export enum PaymentStatus {
   PENDING = 'PENDING',
   COMPLETED = 'COMPLETED',
   FAILED = 'FAILED',
@@ -29,7 +29,7 @@ export export enum PaymentStatus {
   PROCESSING = 'PROCESSING',
 }
 
-export export enum TransactionType {
+export enum TransactionType {
   PAYMENT = 'PAYMENT',
   REFUND = 'REFUND',
   CHARGEBACK = 'CHARGEBACK',
@@ -211,6 +211,10 @@ export class CreatePaymentGatewayDto {
   @IsDecimal()
   fixedCommission?: Prisma.Decimal;
 }
+
+export class UpdatePaymentGatewayDto extends PartialType(
+  CreatePaymentGatewayDto,
+) {}
 
 // ========================================
 // TRANSACTION DTOs

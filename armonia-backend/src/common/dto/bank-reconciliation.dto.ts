@@ -10,9 +10,19 @@ import {
   IsNumber,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { Prisma, ReconciliationStatus, BankTransactionType } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
-export { ReconciliationStatus, BankTransactionType };
+export enum ReconciliationStatus {
+  MATCHED = 'MATCHED',
+  UNMATCHED = 'UNMATCHED',
+  MANUAL_REVIEW = 'MANUAL_REVIEW',
+  PARTIALLY_MATCHED = 'PARTIALLY_MATCHED',
+}
+
+export enum BankTransactionType {
+  CREDIT = 'CREDIT',
+  DEBIT = 'DEBIT',
+}
 
 export class BankTransactionDto {
   @IsString()

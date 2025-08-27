@@ -101,7 +101,7 @@ export class DocumentsController {
   @Get('stats')
   @ApiOperation({ summary: 'Obtener estadísticas de documentos' })
   async getStats(@GetUser() user: any): Promise<any> {
-    return this.documentsService.getDocumentStats(user.schemaName);
+    // return this.documentsService.getDocumentStats(user.schemaName);
   }
 
   @Get(':id')
@@ -160,7 +160,7 @@ export class DocumentsController {
   @Delete(':id/permanent')
   @ApiOperation({ summary: 'Eliminar permanentemente un documento (solo administradores)' })
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @Roles(UserRole.ADMIN)
   async removePermanent(@Param('id') id: string, @GetUser() user: any): Promise<{ message: string }> {
     await this.documentsService.removePermanent(id, user.schemaName);
     return { message: 'Documento eliminado permanentemente' };

@@ -157,11 +157,7 @@ export class AssemblyService {
       const property = await prisma.property.findUnique({
         where: { id: unitId },
         include: {
-          resident: {
-            include: {
-              user: true,
-            },
-          },
+          resident: true,
         },
       });
 

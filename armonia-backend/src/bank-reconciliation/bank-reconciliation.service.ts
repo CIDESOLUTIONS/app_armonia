@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, Logger, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
-import { Decimal } from 'decimal.js';
+import Decimal from 'decimal.js';
 import {
   BankTransactionDto,
   ReconciliationResultDto,
@@ -11,12 +11,12 @@ import {
   ReconciliationStatus,
   BankTransactionType,
   BankStatementUploadDto,
-} from '@armonia-backend/common/dto/bank-reconciliation.dto';
+} from '../common/dto/bank-reconciliation.dto';
 import {
   ProcessReconciliationDto,
   ReconciliationStatsDto,
   BulkReconciliationDto,
-} from './dto/reconciliation-process.dto';
+} from '../common/dto/reconciliation-process.dto';
 import * as Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 

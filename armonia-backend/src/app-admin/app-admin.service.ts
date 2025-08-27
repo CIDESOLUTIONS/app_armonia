@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '@armonia-backend/prisma/prisma.service';
 import Decimal from 'decimal.js';
-import { Prisma } from '@prisma/client';
+import { SubscriptionStatus, BillingCycle, UserRole, PaymentStatus, PQRStatus } from '@prisma/client';
 
 @Injectable()
 export class AppAdminService {
@@ -15,17 +15,17 @@ export class AppAdminService {
       publicPrisma.user.count(),
       publicPrisma.plan.findMany(),
       publicPrisma.subscription.findMany({
-        where: { status: Prisma.SubscriptionStatus.ACTIVE },
+        where: { status: SubscriptionStatus.ACTIVE },
         include: { plan: true },
       }),
     ]);
 
     let mrr = new Decimal(0);
     for (const sub of subscriptions) {
-      let monthlyPrice = new Decimal(sub.plan.price);
-      if (sub.plan.billingCycle === Prisma.BillingCycle.YEARLY) {
+      let monthlyPrice = new Decimal(sub.plan.price.toString());
+      if (sub.plan.billingCycle === BillingCycle.YEARLY) {
         monthlyPrice = monthlyPrice.div(12);
-      } else if (sub.plan.billingCycle === Prisma.BillingCycle.QUARTERLY) {
+      } else if (sub.plan.billingCycle === BillingCycle.QUARTERLY) {
         monthlyPrice = monthlyPrice.div(3);
       }
       mrr = mrr.plus(monthlyPrice);
@@ -67,18 +67,18 @@ export class AppAdminService {
       try {
         const tenantPrisma = this.prisma.getTenantDB(complex.id);
         const [residents, pendingFees, income, openPqrs] = await Promise.all([
-          tenantPrisma.user.count({ where: { role: Prisma.UserRole.RESIDENT } }),
+          tenantPrisma.user.count({ where: { role: UserRole.RESIDENT } }),
           tenantPrisma.fee.aggregate({ _sum: { amount: true }, where: { paid: false } }),
-          tenantPrisma.payment.aggregate({ _sum: { amount: true }, where: { status: Prisma.PaymentStatus.COMPLETED } }),
-          tenantPrisma.pQR.count({ where: { status: { notIn: [Prisma.PQRStatus.RESOLVED, Prisma.PQRStatus.CLOSED] } } }),
+          tenantPrisma.payment.aggregate({ _sum: { amount: true }, where: { status: PaymentStatus.COMPLETED } }),
+          tenantPrisma.pQR.count({ where: { status: { notIn: [PQRStatus.RESOLVED, PQRStatus.CLOSED] } } }),
         ]);
 
         return {
           id: complex.id,
           name: complex.name,
           residents,
-          pendingFees: (pendingFees._sum.amount || new Decimal(0)).toNumber(),
-          income: (income._sum.amount || new Decimal(0)).toNumber(),
+          pendingFees: (new Decimal(pendingFees._sum.amount || 0)).toNumber(),
+          income: (new Decimal(income._sum.amount || 0)).toNumber(),
           openPqrs,
         };
       } catch (error) {
@@ -109,7 +109,7 @@ export class AppAdminService {
         const [income, expenses] = await Promise.all([
           tenantPrisma.payment.aggregate({
             _sum: { amount: true },
-            where: { date: { gte: new Date(startDate), lte: new Date(endDate) }, status: Prisma.PaymentStatus.COMPLETED },
+            where: { date: { gte: new Date(startDate), lte: new Date(endDate) }, status: PaymentStatus.COMPLETED },
           }),
           tenantPrisma.expense.aggregate({
             _sum: { amount: true },

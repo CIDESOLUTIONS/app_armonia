@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { BankReconciliationController } from './bank-reconciliation.controller';
 import { BankReconciliationService } from './bank-reconciliation.service';
-import { PrismaModule } from '../../prisma/prisma.module';
+import { PrismaModule } from '../prisma/prisma.module';
 
 /**
  * Módulo de Conciliación Bancaria

@@ -15,9 +15,9 @@ export class FeatureGuard implements CanActivate {
     private plansService: PlansService,
   ) {}
 
-  canActivate(
+    async canActivate(
     context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  ): Promise<boolean> {
     const requiredFeatures = this.reflector.get<string[]>(
       'features',
       context.getHandler(),
@@ -34,15 +34,19 @@ export class FeatureGuard implements CanActivate {
       throw new ForbiddenException('Authentication required for this feature.');
     }
 
-    // Check if the user's plan supports all required features
-    const hasAccess = requiredFeatures.every((feature) =>
-      this.plansService.checkFeatureAccess(user.residentialComplexId, feature),
-    );
+    const subscriptions = await this.plansService.findSubscriptionsByComplex(user.residentialComplexId);
+    const activeSubscription = subscriptions.find(s => s.status === 'ACTIVE' || s.status === 'TRIAL');
 
-    if (!hasAccess) {
-      throw new ForbiddenException(
-        'Your current plan does not support this feature.',
-      );
+    if (!activeSubscription) {
+      throw new ForbiddenException('No active subscription found for this complex.');
+    }
+
+    // Check if the user's plan supports all required features
+    for (const feature of requiredFeatures) {
+      const accessCheck = await this.plansService.checkFeatureAccess({ subscriptionId: activeSubscription.id, feature });
+      if (!accessCheck.hasAccess) {
+        throw new ForbiddenException(`Your current plan does not support this feature: ${feature}. Reason: ${accessCheck.reason}`);
+      }
     }
 
     return true;

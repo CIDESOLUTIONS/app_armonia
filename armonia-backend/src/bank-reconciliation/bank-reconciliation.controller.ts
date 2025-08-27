@@ -24,11 +24,7 @@ import {
   ReconciliationConfigDto,
   ReconciliationStatus,
 } from '@armonia-backend/common/dto/bank-reconciliation.dto';
-import {
-  ProcessReconciliationDto,
-  ReconciliationStatsDto,
-  BulkReconciliationDto,
-} from './dto/reconciliation-process.dto';
+import { ProcessReconciliationDto, ReconciliationStatsDto, BulkReconciliationDto } from '../common/dto/reconciliation-process.dto';
 import { TenantInterceptor } from '@armonia-backend/common/interceptors/tenant.interceptor';
 import { GetUser } from '@armonia-backend/common/decorators/user.decorator';
 import { JwtAuthGuard } from '@armonia-backend/auth/jwt-auth.guard';

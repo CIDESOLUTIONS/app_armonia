@@ -4,7 +4,7 @@ import {
   BadRequestException,
   Logger,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import {
   UtilityReadingDto,
   CreateUtilityReadingDto,
@@ -15,7 +15,7 @@ import {
   UtilityType,
   AnalyticsPeriod,
   ConsumptionTrend,
-} from '../common/dto/iot.dto';
+} from '../dto/iot.dto';
 import { addDays, addWeeks, addMonths, addYears, startOfDay, endOfDay } from 'date-fns';
 
 @Injectable()
