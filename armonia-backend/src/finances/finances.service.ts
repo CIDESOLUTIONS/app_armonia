@@ -22,16 +22,16 @@ export class FinancesService {
       data: {
         title: data.title,
         description: data.description,
-        amount: data.amount,
+        amount: new Decimal(data.amount),
         dueDate: data.dueDate,
-        type: data.type as FeeType,
+              type: FeeType.ADMINISTRATION,
         property: { connect: { id: data.propertyId } },
         isRecurring: data.isRecurring,
         frequency: data.frequency,
         paid: false,
       },
     });
-    return { ...fee, amount: fee.amount.toNumber(), status: fee.paid ? PaymentStatus.PAID : PaymentStatus.PENDING };
+    return { ...fee, amount: fee.amount.toNumber(), status: fee.paid ? PaymentStatus.COMPLETED : PaymentStatus.PENDING };
   }
 
   async getFees(
@@ -43,7 +43,7 @@ export class FinancesService {
       const where: Prisma.FeeWhereInput = {};
       if (filters.type) where.type = filters.type as FeeType;
       if (filters.propertyId) where.propertyId = filters.propertyId;
-      if (filters.status) where.paid = filters.status === PaymentStatus.PAID;
+      if (filters.status) where.paid = filters.status === PaymentStatus.COMPLETED;
 
       const page = filters.page || 1;
       const limit = filters.limit || 10;
@@ -63,7 +63,7 @@ export class FinancesService {
         fees: fees.map((fee) => ({
           ...fee,
           amount: fee.amount.toNumber(),
-          status: fee.paid ? PaymentStatus.PAID : PaymentStatus.PENDING,
+          status: fee.paid ? PaymentStatus.COMPLETED : PaymentStatus.PENDING,
         })),
         total,
       };
@@ -78,7 +78,7 @@ export class FinancesService {
     if (!fee) {
       throw new NotFoundException(`Cuota con ID ${id} no encontrada.`);
     }
-    return { ...fee, amount: fee.amount.toNumber(), status: fee.paid ? PaymentStatus.PAID : PaymentStatus.PENDING };
+    return { ...fee, amount: fee.amount.toNumber(), status: fee.paid ? PaymentStatus.COMPLETED : PaymentStatus.PENDING };
   }
 
   async updateFee(
@@ -95,7 +95,7 @@ export class FinancesService {
             type: data.type as FeeType | undefined,
         }
     });
-    return { ...updatedFee, amount: updatedFee.amount.toNumber(), status: updatedFee.paid ? PaymentStatus.PAID : PaymentStatus.PENDING };
+    return { ...updatedFee, amount: updatedFee.amount.toNumber(), status: updatedFee.paid ? PaymentStatus.COMPLETED : PaymentStatus.PENDING };
   }
 
   async deleteFee(schemaName: string, id: string): Promise<void> {
@@ -114,7 +114,7 @@ export class FinancesService {
       })}`,
       amount: 100000, 
       dueDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 5),
-      type: FeeType.ORDINARY,
+      type: FeeType.ADMINISTRATION,
       propertyId: property.id,
       isRecurring: true,
       frequency: 'MONTHLY',

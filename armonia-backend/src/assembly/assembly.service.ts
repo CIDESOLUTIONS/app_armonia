@@ -166,7 +166,7 @@ export class AssemblyService {
         throw new NotFoundException('Propiedad no encontrada');
       }
 
-      const isOwner = property.resident?.userId === userId;
+      const isOwner = property.resident?.id === userId;
 
       if (!isOwner) {
         ServerLogger.warn(

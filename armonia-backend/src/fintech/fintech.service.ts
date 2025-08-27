@@ -127,7 +127,7 @@ export class FintechService {
     if (status) where.status = status;
     if (type) where.type = type;
     
-    const applications = await prisma.creditApplication.findMany({
+    const applications = await prisma.microCreditApplication.findMany({
       where,
       include: {
         user: {

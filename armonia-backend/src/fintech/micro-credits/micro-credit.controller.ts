@@ -48,7 +48,7 @@ export class MicroCreditController {
 
   @Get('all')
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.COMPLEX_ADMIN)
+  @Roles(UserRole.ADMIN)
   async getAllApplications(
     @GetUser() user: any,
     @Query('status') status?: string,

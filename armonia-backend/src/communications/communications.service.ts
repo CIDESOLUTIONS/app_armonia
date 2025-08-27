@@ -109,18 +109,18 @@ export class CommunicationsService {
         throw new Error(`Usuario con ID ${userId} no encontrado`);
       }
 
-      if (notification.type === NotificationType.SMS && user.phoneNumber) {
-        await this.sendSms(user.phoneNumber, notification.message);
-      }
+      // if (notification.type === NotificationType.SMS && user.phoneNumber) {
+      //   await this.sendSms(user.phoneNumber, notification.message);
+      // }
 
-      if (notification.type === NotificationType.PUSH && user.deviceToken) {
-        await this.sendPushNotification(
-          user.deviceToken,
-          notification.title,
-          notification.message,
-          notification.data,
-        );
-      }
+      // if (notification.type === NotificationType.PUSH && user.deviceToken) {
+      //   await this.sendPushNotification(
+      //     user.deviceToken,
+      //     notification.title,
+      //     notification.message,
+      //     notification.data,
+      //   );
+      // }
 
       const dbNotification = await prisma.notification.create({
         data: {
@@ -287,28 +287,28 @@ export class CommunicationsService {
         targetUserIds = allUsers.map((user) => user.id);
         break;
       }
-      case 'RESIDENT': {
-        if (!recipientId)
-          throw new Error('Recipient ID is required for RESIDENT type.');
-        const resident = await prisma.resident.findUnique({
-          where: { id: recipientId },
-          select: { userId: true },
-        });
-        if (resident && resident.userId) targetUserIds.push(resident.userId);
-        break;
-      }
-      case 'PROPERTY': {
-        if (!recipientId)
-          throw new Error('Recipient ID is required for PROPERTY type.');
-        const propertyResidents = await prisma.resident.findMany({
-          where: { propertyId: recipientId },
-          select: { userId: true },
-        });
-        targetUserIds = propertyResidents
-          .map((resident) => resident.userId)
-          .filter(Boolean) as string[];
-        break;
-      }
+      // case 'RESIDENT': {
+      //   if (!recipientId)
+      //     throw new Error('Recipient ID is required for RESIDENT type.');
+      //   const resident = await prisma.resident.findUnique({
+      //     where: { id: recipientId },
+      //     select: { userId: true },
+      //   });
+      //   if (resident && resident.userId) targetUserIds.push(resident.userId);
+      //   break;
+      // }
+      // case 'PROPERTY': {
+      //   if (!recipientId)
+      //     throw new Error('Recipient ID is required for PROPERTY type.');
+      //   const propertyResidents = await prisma.resident.findMany({
+      //     where: { propertyId: recipientId },
+      //     select: { userId: true },
+      //   });
+      //   targetUserIds = propertyResidents
+      //     .map((resident) => resident.userId)
+      //     .filter(Boolean) as string[];
+      //   break;
+      // }
       case 'USER':
         if (!recipientId)
           throw new Error('Recipient ID is required for USER type.');
@@ -362,7 +362,7 @@ export class CommunicationsService {
       queryOptions.take = Number(limit);
     }
     let announcements;
-    if (userRole === 'ADMIN' || userRole === 'COMPLEX_ADMIN') {
+    if (userRole === 'ADMIN') {
       announcements = await prisma.announcement.findMany(queryOptions);
     } else {
       queryOptions.where.OR = [
@@ -935,7 +935,7 @@ export class CommunicationsService {
       queryOptions.where.endDateTime = { lte: endDate };
     }
     let events;
-    if (userRole === 'ADMIN' || userRole === 'COMPLEX_ADMIN') {
+    if (userRole === 'ADMIN') {
       events = await prisma.communityEvent.findMany(queryOptions);
     } else {
       queryOptions.where.OR = [

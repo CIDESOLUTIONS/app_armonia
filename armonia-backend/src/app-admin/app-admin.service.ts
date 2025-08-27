@@ -77,8 +77,8 @@ export class AppAdminService {
           id: complex.id,
           name: complex.name,
           residents,
-          pendingFees: (new Decimal(pendingFees._sum.amount || 0)).toNumber(),
-          income: (new Decimal(income._sum.amount || 0)).toNumber(),
+          pendingFees: new Decimal(pendingFees._sum.amount || 0).toNumber(),
+          income: new Decimal(income._sum.amount || 0).toNumber(),
           openPqrs,
         };
       } catch (error) {

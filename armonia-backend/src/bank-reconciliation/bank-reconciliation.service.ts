@@ -104,7 +104,7 @@ export class BankReconciliationService {
       bankTransaction,
       status: ReconciliationStatus.UNMATCHED,
       processedAt: new Date().toISOString(),
-      confidence: new Prisma.Decimal(0),
+      confidence: new Decimal(0),
       suggestions: [],
     };
 
@@ -112,7 +112,7 @@ export class BankReconciliationService {
     if (exactMatches.length === 1) {
       result.systemPayment = exactMatches[0];
       result.status = ReconciliationStatus.MATCHED;
-      result.confidence = new Prisma.Decimal(1.0);
+      result.confidence = new Decimal(1.0);
       result.reason = 'Coincidencia exacta por monto y fecha';
       return result;
     }
@@ -121,7 +121,7 @@ export class BankReconciliationService {
     if (amountMatches.length === 1) {
       result.systemPayment = amountMatches[0];
       result.status = ReconciliationStatus.MATCHED;
-      result.confidence = new Prisma.Decimal(0.9);
+      result.confidence = new Decimal(0.9);
       result.reason = 'Coincidencia por monto con tolerancia';
       return result;
     }
@@ -130,7 +130,7 @@ export class BankReconciliationService {
     if (referenceMatches.length === 1) {
       result.systemPayment = referenceMatches[0];
       result.status = ReconciliationStatus.MATCHED;
-      result.confidence = new Prisma.Decimal(0.8);
+      result.confidence = new Decimal(0.8);
       result.reason = 'Coincidencia por referencia';
       return result;
     }
@@ -139,7 +139,7 @@ export class BankReconciliationService {
       result.status = ReconciliationStatus.MANUAL_REVIEW;
       result.suggestions = [...exactMatches, ...amountMatches].slice(0, 5);
       result.reason = 'Múltiples coincidencias encontradas';
-      result.confidence = new Prisma.Decimal(0.5);
+      result.confidence = new Decimal(0.5);
       return result;
     }
 
@@ -148,7 +148,7 @@ export class BankReconciliationService {
       result.status = ReconciliationStatus.PARTIALLY_MATCHED;
       result.suggestions = partialMatches.slice(0, 3);
       result.reason = 'Coincidencias parciales encontradas';
-      result.confidence = new Prisma.Decimal(0.3);
+      result.confidence = new Decimal(0.3);
       return result;
     }
 
@@ -168,7 +168,7 @@ export class BankReconciliationService {
       const paymentDate = new Date(payment.date);
       const daysDiff = Math.abs((transactionDate.getTime() - paymentDate.getTime()) / (1000 * 60 * 60 * 24));
       const amountDiff = new Decimal(payment.amount).minus(bankTransaction.amount).abs();
-      return amountDiff.lessThan(0.01) && daysDiff <= dateTolerance;
+      return amountDiff.lessThan(new Decimal(0.01)) && daysDiff <= dateTolerance;
     });
   }
 
@@ -429,9 +429,9 @@ export class BankReconciliationService {
     const matchedAmountResult = await prisma.bankReconciliation.aggregate({ where: { ...whereClause, status: ReconciliationStatus.MATCHED }, _sum: { amount: true } });
     const unmatchedAmountResult = await prisma.bankReconciliation.aggregate({ where: { ...whereClause, status: ReconciliationStatus.UNMATCHED }, _sum: { amount: true } });
 
-    const totalAmount = totalAmountResult._sum.amount || new Prisma.Decimal(0);
-    const matchedAmount = matchedAmountResult._sum.amount || new Prisma.Decimal(0);
-    const unmatchedAmount = unmatchedAmountResult._sum.amount || new Prisma.Decimal(0);
+    const totalAmount = totalAmountResult._sum.amount || new Decimal(0);
+    const matchedAmount = matchedAmountResult._sum.amount || new Decimal(0);
+    const unmatchedAmount = unmatchedAmountResult._sum.amount || new Decimal(0);
 
     const matchingAccuracy = totalTransactions > 0 ? (matchedTransactions / totalTransactions) * 100 : 0;
 
@@ -667,7 +667,7 @@ export class BankReconciliationService {
         transactionId,
         date: new Date().toISOString(),
         description: 'Transacción bancaria no encontrada',
-        amount: new Prisma.Decimal(0),
+        amount: new Decimal(0),
         type: BankTransactionType.CREDIT,
       };
     } catch (error) {
@@ -676,7 +676,7 @@ export class BankReconciliationService {
         transactionId,
         date: new Date().toISOString(),
         description: 'Error obteniendo transacción bancaria',
-        amount: new Prisma.Decimal(0),
+        amount: new Decimal(0),
         type: BankTransactionType.CREDIT,
       };
     }

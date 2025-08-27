@@ -26,7 +26,7 @@ import { DocumentResponseDto } from '@armonia-backend/documents/dto/document-res
 import { JwtAuthGuard } from '@armonia-backend/auth/jwt-auth.guard';
 import { RolesGuard } from '@armonia-backend/auth/roles.guard';
 import { Roles } from '@armonia-backend/auth/roles.decorator';
-import { UserRole } from '@prisma/client';
+import { UserRole, AccessLevel } from '@prisma/client';
 import { GetUser } from '@armonia-backend/common/decorators/user.decorator';
 
 @ApiTags('documents')
@@ -135,7 +135,7 @@ export class DocumentsController {
     @Body() shareData: { userIds: string[]; permissions: string[] },
     @GetUser() user: any,
   ): Promise<{ message: string; sharedWith: number }> {
-    return this.documentsService.shareDocument(id, shareData.userIds, shareData.permissions, user.schemaName);
+    return this.documentsService.shareDocument(id, shareData.userIds, shareData.permissions as AccessLevel[], user.id, user.schemaName);
   }
 
   @Patch(':id')

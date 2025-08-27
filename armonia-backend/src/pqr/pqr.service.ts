@@ -9,7 +9,7 @@ import {
   UpdatePQRDto,
   GetPQRParamsDto,
 } from '../common/dto/pqr.dto';
-import { UserRole } from '../common/enums/user-role.enum';
+import { PQRType, PQRStatus, UserRole } from '@prisma/client';
 
 @Injectable()
 export class PqrService {
@@ -21,8 +21,8 @@ export class PqrService {
       data: {
         title: data.title,
         description: data.description,
-        type: data.type,
-        status: data.status,
+        type: data.type as PQRType,
+        status: data.status as PQRStatus,
         reportedBy: { connect: { id: userId } }, // Connect to User model
         residentialComplex: { connect: { id: data.residentialComplexId } }, // Connect to ResidentialComplex
       },
@@ -40,8 +40,8 @@ export class PqrService {
     if (userRole === UserRole.RESIDENT) {
       where.reportedById = userId;
     }
-    if (filters.status) where.status = filters.status;
-    if (filters.type) where.type = filters.type;
+    if (filters.status) where.status = filters.status as PQRStatus;
+    if (filters.type) where.type = filters.type as PQRType;
 
     return prisma.pQR.findMany({
       where,
@@ -81,8 +81,8 @@ export class PqrService {
       data: {
         title: data.title,
         description: data.description,
-        type: data.type,
-        status: data.status,
+        type: data.type as PQRType,
+        status: data.status as PQRStatus,
         ...(data.reportedById && {
           reportedBy: { connect: { id: data.reportedById } },
         }),
