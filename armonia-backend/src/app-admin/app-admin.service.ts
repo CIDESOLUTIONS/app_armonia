@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '@armonia-backend/prisma/prisma.service';
 import Decimal from 'decimal.js';
-import { SubscriptionStatus, BillingCycle, UserRole, PaymentStatus, PQRStatus } from '@prisma/client';
 
 @Injectable()
 export class AppAdminService {
@@ -15,7 +14,7 @@ export class AppAdminService {
       publicPrisma.user.count(),
       publicPrisma.plan.findMany(),
       publicPrisma.subscription.findMany({
-        where: { status: SubscriptionStatus.ACTIVE },
+        where: { status: 'ACTIVE' },
         include: { plan: true },
       }),
     ]);
@@ -23,9 +22,9 @@ export class AppAdminService {
     let mrr = new Decimal(0);
     for (const sub of subscriptions) {
       let monthlyPrice = new Decimal(sub.plan.price.toString());
-      if (sub.plan.billingCycle === BillingCycle.YEARLY) {
+      if (sub.plan.billingCycle === 'YEARLY') {
         monthlyPrice = monthlyPrice.div(12);
-      } else if (sub.plan.billingCycle === BillingCycle.QUARTERLY) {
+      } else if (sub.plan.billingCycle === 'QUARTERLY') {
         monthlyPrice = monthlyPrice.div(3);
       }
       mrr = mrr.plus(monthlyPrice);
@@ -67,10 +66,10 @@ export class AppAdminService {
       try {
         const tenantPrisma = this.prisma.getTenantDB(complex.id);
         const [residents, pendingFees, income, openPqrs] = await Promise.all([
-          tenantPrisma.user.count({ where: { role: UserRole.RESIDENT } }),
+          tenantPrisma.user.count({ where: { role: 'RESIDENT' } }),
           tenantPrisma.fee.aggregate({ _sum: { amount: true }, where: { paid: false } }),
-          tenantPrisma.payment.aggregate({ _sum: { amount: true }, where: { status: PaymentStatus.COMPLETED } }),
-          tenantPrisma.pQR.count({ where: { status: { notIn: [PQRStatus.RESOLVED, PQRStatus.CLOSED] } } }),
+          tenantPrisma.payment.aggregate({ _sum: { amount: true }, where: { status: 'COMPLETED' } }),
+          tenantPrisma.pQR.count({ where: { status: { notIn: ['RESOLVED', 'CLOSED'] } } }),
         ]);
 
         return {
@@ -109,7 +108,7 @@ export class AppAdminService {
         const [income, expenses] = await Promise.all([
           tenantPrisma.payment.aggregate({
             _sum: { amount: true },
-            where: { date: { gte: new Date(startDate), lte: new Date(endDate) }, status: PaymentStatus.COMPLETED },
+            where: { date: { gte: new Date(startDate), lte: new Date(endDate) }, status: 'COMPLETED' },
           }),
           tenantPrisma.expense.aggregate({
             _sum: { amount: true },

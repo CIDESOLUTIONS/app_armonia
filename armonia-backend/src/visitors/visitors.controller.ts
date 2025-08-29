@@ -21,13 +21,13 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '@prisma/client';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('visitors')
 export class VisitorsController {
   constructor(private readonly visitorsService: VisitorsService) {}
 
   @Post()
-  @UseGuards(RolesGuard([UserRole.SECURITY, UserRole.RECEPTION]))
+  @Roles(UserRole.GUARD, UserRole.STAFF)
   createVisitor(
     @GetUser() user: any,
     @Body() createVisitorDto: CreateVisitorDto,
@@ -39,29 +39,31 @@ export class VisitorsController {
   }
 
   @Get()
+  @Roles(UserRole.ADMIN, UserRole.GUARD, UserRole.STAFF)
   getVisitors(@GetUser() user: any, @Query() filters: VisitorFilterParamsDto) {
     return this.visitorsService.getVisitors(user.schemaName, filters);
   }
 
   @Get('pre-registered')
-  @UseGuards(RolesGuard([UserRole.SECURITY, UserRole.RECEPTION]))
+  @Roles(UserRole.GUARD, UserRole.STAFF)
   getPreRegisteredVisitors(@GetUser() user: any) {
     return this.visitorsService.getPreRegisteredVisitors(user.schemaName);
   }
 
   @Post('scan-qr')
-  @UseGuards(RolesGuard([UserRole.SECURITY, UserRole.RECEPTION]))
+  @Roles(UserRole.GUARD, UserRole.STAFF)
   scanQrCode(@GetUser() user: any, @Body('qrCode') qrCode: string) {
     return this.visitorsService.scanQrCode(user.schemaName, qrCode);
   }
 
   @Get(':id')
+  @Roles(UserRole.ADMIN, UserRole.GUARD, UserRole.STAFF)
   getVisitorById(@GetUser() user: any, @Param('id') id: string) {
     return this.visitorsService.getVisitorById(user.schemaName, id);
   }
 
   @Put(':id')
-  @UseGuards(RolesGuard([UserRole.SECURITY, UserRole.RECEPTION]))
+  @Roles(UserRole.GUARD, UserRole.STAFF)
   updateVisitor(
     @GetUser() user: any,
     @Param('id') id: string,
@@ -75,7 +77,7 @@ export class VisitorsController {
   }
 
   @Delete(':id')
-  @UseGuards(RolesGuard([UserRole.SECURITY, UserRole.RECEPTION]))
+  @Roles(UserRole.GUARD, UserRole.STAFF)
   deleteVisitor(@GetUser() user: any, @Param('id') id: string) {
     return this.visitorsService.deleteVisitor(user.schemaName, id);
   }

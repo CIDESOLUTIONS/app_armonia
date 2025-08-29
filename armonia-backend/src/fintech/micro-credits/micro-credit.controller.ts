@@ -19,7 +19,7 @@ import {
   UpdateMicroCreditApplicationDto,
 } from '@armonia-backend/common/dto/fintech.dto';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('fintech/micro-credits')
 export class MicroCreditController {
   constructor(private readonly microCreditService: MicroCreditService) {}
@@ -47,7 +47,6 @@ export class MicroCreditController {
   }
 
   @Get('all')
-  @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
   async getAllApplications(
     @GetUser() user: any,
@@ -57,8 +56,7 @@ export class MicroCreditController {
   }
 
   @Put(':id/status')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.COMPLEX_ADMIN)
+  @Roles(UserRole.ADMIN)
   async updateApplicationStatus(
     @GetUser() user: any,
     @Param('id') id: string,
